@@ -20,8 +20,8 @@ pub enum Expr {
     Function(Vec<Expr>, Box<Expr>),
     BinOp(BinOp, Box<Expr>, Box<Expr>),
     IfElse(Box<Expr>, Vec<Expr>, Vec<Expr>),
-    Call(String, Vec<Expr>),
-    GlobalDataAddr(String),
+    Call(Vec<String>, Vec<Expr>),
+    Tuple(Vec<Expr>),
 }
 
 impl Expr {
@@ -41,12 +41,20 @@ impl Expr {
         Expr::Function(args.into(), expr.into())
     }
 
+    fn bin_op<E>(op: BinOp, first: E, second: E) -> Expr where E: Into<Box<Expr>> {
+        Expr::BinOp(op, first.into(), second.into())
+    }
+
     fn if_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr where E: Into<Box<Expr>>, V1: Into<Vec<Expr>>, V2: Into<Vec<Expr>> {
         Expr::IfElse(expr.into(), then_expr.into(), else_expr.into())
     }
 
-    fn bin_op<E>(op: BinOp, first: E, second: E) -> Expr where E: Into<Box<Expr>> {
-        Expr::BinOp(op, first.into(), second.into())
+    fn call<E>(address: Vec<&str>, expr: E) -> Expr where E: Into<Vec<Expr>> {
+        let address = address.into_iter::<>()
+            .map(|s| String::from(s))
+            .collect::<Vec<_>>();
+
+        Expr::Call(address, expr.into())
     }
 }
 
@@ -79,11 +87,18 @@ pub enum Type {
         head: (String, Box<Type>),
         tail: Vec<(String, Box<Type>)>,
     },
-    Tuple(Box<Type>, Vec<Box<Type>>),
+    Tuple(Vec<Box<Type>>),
     Unit,
 }
 
 impl Type {
+    fn tuple<T>(types: Vec<T>) -> Type where T: Into<Box<Type>> {
+        let types = types.into_iter()
+            .map(|t| t.into())
+            .collect::<Vec<_>>();
+        Type::Tuple(types)
+    }
+
     fn identifier<S>(s: S) -> Type where S: Into<String> {
         Type::Identifier(s.into())
     }
@@ -115,7 +130,7 @@ pub struct Module {
 
 peg::parser!(pub grammar parser() for str {
     pub rule module() -> Module
-        = __ "module" _ name:identifier() _ __ "where"
+        = __ "module" _ name:identifier() __ "where"
           declarations:((_ dec:declaration() _ {dec}) ** "\n") __
           { Module { name: name, declarations: declarations } }
 
@@ -123,8 +138,12 @@ peg::parser!(pub grammar parser() for str {
         = type_annotation()
         / value_definition()
 
+    rule type_definition() -> Type
+       = _ "(" args:((_ t:type_definition() _ { Box::new(t) }) ++ ",") ")" _ { Type::Tuple(args) }
+       / _ t:identifier() _ { Type::Identifier(t) }
+
     rule type_annotation() -> Declaration
-        = __ name:identifier() _ ":" types:((_ t:identifier() _ { Type::Identifier(t) }) ** "->") _
+        = __ name:identifier() _ ":" types:(type_definition() ** "->") _
         { Declaration::TypeAnnotation {name: name, types: types } }
 
     rule value_definition() -> Declaration
@@ -142,7 +161,7 @@ peg::parser!(pub grammar parser() for str {
         / binary_op()
 
     rule function() -> Expr
-        = __ "|" args:((_ v:binary_op() _ { v }) ** ",") "|" _
+        = __ "|" args:((_ a:binary_op() _ { a }) ** ",") "|" _
         "=>" _ definition:expression() _
         { Expr::function(args, definition) }
 
@@ -169,7 +188,8 @@ peg::parser!(pub grammar parser() for str {
         a:@ _ "*" _ b:(@) { Expr::BinOp(BinOp::Mul, Box::new(a), Box::new(b)) }
         a:@ _ "/" _ b:(@) { Expr::BinOp(BinOp::Div, Box::new(a), Box::new(b)) }
         --
-        i:identifier() _ "(" args:((_ e:expression() _ {e}) ** ",") ")" { Expr::Call(i, args) }
+        "(" args:((_ e:expression() _ {e}) ++ ",") ")" { Expr::Tuple(args) }
+        address:((i:identifier() ++ ".")) "(" args:((_ e:expression() _ {e}) ** ",") ")" { Expr::Call(address, args) }
         i:identifier() { Expr::Identifier(i) }
         l:literal() { l }
     }
@@ -180,7 +200,6 @@ peg::parser!(pub grammar parser() for str {
 
     rule literal() -> Expr
         = n:$(['0'..='9']+) { Expr::Literal(n.to_owned()) }
-        / "&" i:identifier() { Expr::GlobalDataAddr(i) }
 
     rule __() =  quiet!{[' ' | '\t' | '\n']*}
 
@@ -260,7 +279,7 @@ mod tests {
     }
 
     #[test]
-    fn test_function_declaration_with_type() {
+    fn test_single_arg_function_declaration_with_type() {
         let source: &str = r#"
             module Test
             where
@@ -284,13 +303,70 @@ mod tests {
                         name: String::from("increment_positive"),
                         definition: Expr::function(
                             Expr::literal("0"),
-                            Expr::literal("0")),
+                            Expr::literal("0"),
+                        ),
                     },
                     Declaration::Value {
                         name: String::from("increment_positive"),
                         definition: Expr::function(
                             Expr::identifier("x"),
-                            Expr::bin_op(BinOp::Add, Expr::identifier("x"), Expr::literal("1"))),
+                            Expr::bin_op(
+                                BinOp::Add,
+                                Expr::identifier("x"),
+                                Expr::literal("1"),
+                            ),
+                        ),
+                    }
+                ],
+            },
+            parse::parser::module(source).unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_multi_arg_function_declaration_with_type() {
+        let source: &str = r#"
+            module Test
+            where
+
+            increment_by_length : (Int, String) -> Int
+            increment_by_length = |(0, 1)| => 0
+            increment_by_length = |(x, y)| => x + String.length(y)
+"#;
+        assert_eq!(
+            parse::Module {
+                name: String::from("Test"),
+                declarations: vec![
+                    Declaration::TypeAnnotation {
+                        name: String::from("increment_by_length"),
+                        types: vec![
+                            Type::tuple(vec![
+                                Type::identifier("Int"),
+                                Type::identifier("String"),
+                            ]),
+                            Type::identifier("Int"),
+                        ],
+                    },
+                    Declaration::Value {
+                        name: String::from("increment_by_length"),
+                        definition: Expr::function(
+                            Expr::Tuple(vec![Expr::literal("0"), Expr::literal("1")]),
+                            Expr::literal("0"),
+                        ),
+                    },
+                    Declaration::Value {
+                        name: String::from("increment_by_length"),
+                        definition: Expr::function(
+                            Expr::Tuple(vec![Expr::identifier("x"), Expr::identifier("y")]),
+                            Expr::bin_op(
+                                BinOp::Add,
+                                Expr::identifier("x"),
+                                Expr::call(
+                                    vec!["String", "length"],
+                                    Expr::identifier("y"),
+                                ),
+                            ),
+                        ),
                     }
                 ],
             },
