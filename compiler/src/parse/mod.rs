@@ -25,11 +25,11 @@ pub enum Expr {
 }
 
 impl Expr {
-    fn literal<S>(s: S) -> Expr where S: Into<String> {
+    pub fn literal<S>(s: S) -> Expr where S: Into<String> {
         Expr::Literal(s.into())
     }
 
-    fn identifier<S>(s: S) -> Expr where S: Into<String> {
+    pub fn identifier<S>(s: S) -> Expr where S: Into<String> {
         Expr::Identifier(s.into())
     }
 
@@ -41,7 +41,7 @@ impl Expr {
         Expr::Function(args.into(), expr.into())
     }
 
-    fn bin_op<E>(op: BinOp, first: E, second: E) -> Expr where E: Into<Box<Expr>> {
+    pub fn bin_op<E>(op: BinOp, first: E, second: E) -> Expr where E: Into<Box<Expr>> {
         Expr::BinOp(op, first.into(), second.into())
     }
 
@@ -49,7 +49,7 @@ impl Expr {
         Expr::IfElse(expr.into(), then_expr.into(), else_expr.into())
     }
 
-    fn call<E>(address: Vec<&str>, expr: E) -> Expr where E: Into<Vec<Expr>> {
+    pub fn call<E>(address: Vec<&str>, expr: E) -> Expr where E: Into<Vec<Expr>> {
         let address = address.into_iter::<>()
             .map(|s| String::from(s))
             .collect::<Vec<_>>();
@@ -92,7 +92,7 @@ pub enum Type {
 }
 
 impl Type {
-    fn tuple<T>(types: Vec<T>) -> Type where T: Into<Box<Type>> {
+    pub fn tuple<T>(types: Vec<T>) -> Type where T: Into<Box<Type>> {
         let types = types.into_iter()
             .map(|t| t.into())
             .collect::<Vec<_>>();
@@ -106,7 +106,7 @@ impl Type {
         }
     }
 
-    fn identifier<S>(s: S) -> Type where S: Into<String> {
+    pub fn identifier<S>(s: S) -> Type where S: Into<String> {
         Type::Identifier(s.into())
     }
 }
