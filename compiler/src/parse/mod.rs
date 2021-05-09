@@ -138,7 +138,7 @@ pub struct Module {
 peg::parser!(pub grammar parser() for str {
     pub rule module() -> Module
         = __ "module" _ name:identifier() __ "where"
-          declarations:((_ dec:declaration() _ {dec}) ** "\n") __
+          declarations:((__ dec:declaration() _ {dec}) ** "\n") __
           { Module { name: name, declarations: declarations } }
 
     rule declaration() -> Declaration
@@ -155,11 +155,11 @@ peg::parser!(pub grammar parser() for str {
     }
 
     rule type_annotation() -> Declaration
-        = __ name:identifier() _ ":" _ t:type_definition() _
+        = name:identifier() _ ":" _ t:type_definition() _
         { Declaration::TypeAnnotation {name: name, t: t } }
 
     rule value_definition() -> Declaration
-        = __ name:identifier() _ "=" _ e:expression() _ { Declaration::Value {name: name, definition: e } }
+        = name:identifier() _ "=" _ e:expression() _ { Declaration::Value {name: name, definition: e } }
 
     rule statements() -> Vec<Expr>
         = s:(statement()*) { s }
@@ -173,14 +173,14 @@ peg::parser!(pub grammar parser() for str {
         / binary_op()
 
     rule function() -> Expr
-        = __ "|" args:((_ a:binary_op() _ { a }) ** ",") "|" _
+        = "|" args:((_ a:binary_op() _ { a }) ** ",") "|" _
         "=>" __ definition:expression() _
         { Expr::function(args, definition) }
 
     rule if_else() -> Expr
-        = "if" _ e:expression()
-        __ "then" _ then_body:expression()
-        __ "else" _ else_body:expression()
+        = "if" _ e:expression() __
+          "then" __ then_body:expression() __
+          "else" __ else_body:expression() _
         { Expr::if_else(e, then_body, else_body) }
 
     rule assignment() -> Expr
@@ -200,7 +200,7 @@ peg::parser!(pub grammar parser() for str {
         a:@ _ "*" _ b:(@) { Expr::BinOp(BinOp::Mul, Box::new(a), Box::new(b)) }
         a:@ _ "/" _ b:(@) { Expr::BinOp(BinOp::Div, Box::new(a), Box::new(b)) }
         --
-        "(" args:((_ e:expression() _ {e}) ++ ",") ")" { Expr::Tuple(args) }
+        "(" args:((_ e:expression() _ {e}) **<2,> ",") ")" { Expr::Tuple(args) }
         "(" _ e:expression() _ ")" { e }
         address:(identifier() ++ ".") "(" args:((_ e:expression() _ {e}) ** ",") ")" { Expr::Call(address, args) }
         i:identifier() { Expr::Identifier(i) }
@@ -540,6 +540,53 @@ Module names were not equal.
                                     Expr::literal("1"),
                                 ),
                                 Expr::identifier("num"),
+                            ),
+                        ),
+                    },
+                ],
+            },
+            parse::parser::module(source).unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_nested_if_then_else() {
+        let source: &str = r#"
+            module Test
+            where
+
+            increment_or_decrement = |num| =>
+              if Number.is_positive?(num)
+              then num + 1
+              else
+                if Number.is_negative?(num)
+                then num - 1
+                else num
+"#;
+        assert_module(
+            parse::Module {
+                name: String::from("Test"),
+                declarations: vec![
+                    Declaration::Value {
+                        name: String::from("increment_or_decrement"),
+                        definition: Expr::function(
+                            Expr::identifier("num"),
+                            Expr::if_else(
+                                Expr::call(vec!["Number", "is_positive?"], Expr::identifier("num")),
+                                Expr::bin_op(
+                                    BinOp::Add,
+                                    Expr::identifier("num"),
+                                    Expr::literal("1"),
+                                ),
+                                Expr::if_else(
+                                    Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
+                                    Expr::bin_op(
+                                        BinOp::Sub,
+                                        Expr::identifier("num"),
+                                        Expr::literal("1"),
+                                    ),
+                                    Expr::identifier("num"),
+                                ),
                             ),
                         ),
                     },
