@@ -19,7 +19,7 @@ pub enum Expr {
     Assign(String, Box<Expr>),
     Function(Vec<Expr>, Box<Expr>),
     BinOp(BinOp, Box<Expr>, Box<Expr>),
-    IfElse(Box<Expr>, Vec<Expr>, Vec<Expr>),
+    IfElse(Box<Expr>, Box<Expr>, Box<Expr>),
     Call(Vec<String>, Vec<Expr>),
     Tuple(Vec<Expr>),
 }
@@ -45,7 +45,7 @@ impl Expr {
         Expr::BinOp(op, first.into(), second.into())
     }
 
-    fn if_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr where E: Into<Box<Expr>>, V1: Into<Vec<Expr>>, V2: Into<Vec<Expr>> {
+    fn if_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr where E: Into<Box<Expr>>, V1: Into<Box<Expr>>, V2: Into<Box<Expr>> {
         Expr::IfElse(expr.into(), then_expr.into(), else_expr.into())
     }
 
@@ -174,13 +174,13 @@ peg::parser!(pub grammar parser() for str {
 
     rule function() -> Expr
         = __ "|" args:((_ a:binary_op() _ { a }) ** ",") "|" _
-        "=>" _ definition:expression() _
+        "=>" __ definition:expression() _
         { Expr::function(args, definition) }
 
     rule if_else() -> Expr
-        = "if" _ e:expression() _ "{" _ "\n"
-        then_body:statements() _ "}" _ "else" _ "{" _ "\n"
-        else_body:statements() _ "}"
+        = "if" _ e:expression()
+        __ "then" _ then_body:expression()
+        __ "else" _ else_body:expression()
         { Expr::if_else(e, then_body, else_body) }
 
     rule assignment() -> Expr
@@ -208,7 +208,7 @@ peg::parser!(pub grammar parser() for str {
     }
 
     rule identifier() -> String
-        = quiet!{ n:$(['a'..='z' | 'A'..='Z']['a'..='z' | 'A'..='Z' | '0'..='9' | '_']*) { n.to_owned() } }
+        = quiet!{ n:$(['_']?['a'..='z' | 'A'..='Z']['a'..='z' | 'A'..='Z' | '0'..='9' | '_']*['?']?) { n.to_owned() } }
         / expected!("identifier")
 
     rule literal() -> Expr
@@ -426,6 +426,61 @@ mod tests {
                             ),
                         ),
                     }
+                ],
+            },
+            parse::parser::module(source).unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_simple_if_then_else() {
+        let source: &str = r#"
+            module Test
+            where
+
+            increment_positive = |num| =>
+              if Number.is_positive?(num)
+              then num + 1
+              else num
+            decrement_negative = |num| =>
+              if Number.is_negative?(num)
+              then num - 1
+              else num
+"#;
+        assert_eq!(
+            parse::Module {
+                name: String::from("Test"),
+                declarations: vec![
+                    Declaration::Value {
+                        name: String::from("increment_positive"),
+                        definition: Expr::function(
+                            Expr::identifier("num"),
+                            Expr::if_else(
+                                Expr::call(vec!["Number", "is_positive?"], Expr::identifier("num")),
+                                Expr::bin_op(
+                                    BinOp::Add,
+                                    Expr::identifier("num"),
+                                    Expr::literal("1"),
+                                ),
+                                Expr::identifier("num")
+                            ),
+                        ),
+                    },
+                    Declaration::Value {
+                        name: String::from("decrement_negative"),
+                        definition: Expr::function(
+                            Expr::identifier("num"),
+                            Expr::if_else(
+                                Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
+                                Expr::bin_op(
+                                    BinOp::Sub,
+                                    Expr::identifier("num"),
+                                    Expr::literal("1"),
+                                ),
+                                Expr::identifier("num")
+                            ),
+                        ),
+                    },
                 ],
             },
             parse::parser::module(source).unwrap(),
