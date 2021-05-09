@@ -99,6 +99,13 @@ impl Type {
         Type::Tuple(types)
     }
 
+    fn lambda<T1, T2>(arg_type: T1, return_type: T2) -> Type where T1: Into<Box<Type>>, T2: Into<Box<Type>> {
+        Type::Lambda {
+            arg_type: arg_type.into(),
+            return_type: return_type.into(),
+        }
+    }
+
     fn identifier<S>(s: S) -> Type where S: Into<String> {
         Type::Identifier(s.into())
     }
@@ -114,7 +121,7 @@ impl From<Type> for Vec<Type> {
 pub enum Declaration {
     TypeAnnotation {
         name: String,
-        types: Vec<Type>,
+        t: Type,
     },
     Value {
         name: String,
@@ -138,13 +145,18 @@ peg::parser!(pub grammar parser() for str {
         = type_annotation()
         / value_definition()
 
-    rule type_definition() -> Type
-       = _ "(" args:((_ t:type_definition() _ { Box::new(t) }) ++ ",") ")" _ { Type::Tuple(args) }
-       / _ t:identifier() _ { Type::Identifier(t) }
+    rule type_definition() -> Type = precedence!{
+        arg_type:@ _ "->" _ return_type:(@) { Type::lambda(arg_type, return_type) }
+        --
+        "(" args:((_ t:type_definition() _ { Box::new(t) }) **<2,> ",") ")" _ { Type::Tuple(args) }
+        --
+        "(" _ t:type_definition() _ ")" _ { t }
+        t:identifier() _ { Type::Identifier(t) }
+    }
 
     rule type_annotation() -> Declaration
-        = __ name:identifier() _ ":" types:(type_definition() ** "->") _
-        { Declaration::TypeAnnotation {name: name, types: types } }
+        = __ name:identifier() _ ":" _ t:type_definition() _
+        { Declaration::TypeAnnotation {name: name, t: t } }
 
     rule value_definition() -> Declaration
         = __ name:identifier() _ "=" _ e:expression() _ { Declaration::Value {name: name, definition: e } }
@@ -189,7 +201,8 @@ peg::parser!(pub grammar parser() for str {
         a:@ _ "/" _ b:(@) { Expr::BinOp(BinOp::Div, Box::new(a), Box::new(b)) }
         --
         "(" args:((_ e:expression() _ {e}) ++ ",") ")" { Expr::Tuple(args) }
-        address:((i:identifier() ++ ".")) "(" args:((_ e:expression() _ {e}) ** ",") ")" { Expr::Call(address, args) }
+        "(" _ e:expression() _ ")" { e }
+        address:(identifier() ++ ".") "(" args:((_ e:expression() _ {e}) ** ",") ")" { Expr::Call(address, args) }
         i:identifier() { Expr::Identifier(i) }
         l:literal() { l }
     }
@@ -266,7 +279,7 @@ mod tests {
                 declarations: vec![
                     Declaration::TypeAnnotation {
                         name: String::from("thing"),
-                        types: vec![Type::identifier("Int")],
+                        t: Type::identifier("Int"),
                     },
                     Declaration::Value {
                         name: String::from("thing"),
@@ -294,10 +307,10 @@ mod tests {
                 declarations: vec![
                     Declaration::TypeAnnotation {
                         name: String::from("increment_positive"),
-                        types: vec![
+                        t: Type::lambda(
                             Type::identifier("Int"),
                             Type::identifier("Int"),
-                        ],
+                        ),
                     },
                     Declaration::Value {
                         name: String::from("increment_positive"),
@@ -339,13 +352,13 @@ mod tests {
                 declarations: vec![
                     Declaration::TypeAnnotation {
                         name: String::from("increment_by_length"),
-                        types: vec![
+                        t: Type::lambda(
                             Type::tuple(vec![
                                 Type::identifier("Int"),
                                 Type::identifier("String"),
                             ]),
                             Type::identifier("Int"),
-                        ],
+                        ),
                     },
                     Declaration::Value {
                         name: String::from("increment_by_length"),
@@ -374,60 +387,48 @@ mod tests {
         );
     }
 
-//     #[test]
-//     fn test_123() {
-//         let source: &str = r#"
-//             module Main
-//             where
-//
-//
-//
-//             fn foo(a: Int, b: Int) -> Int {
-//                 c = if a {
-//                     if b {
-//                         30
-//                     } else {
-//                         40
-//                     }
-//                 } else {
-//                     50
-//                 }
-//                 c = c + 2
-//             }
-// "#;
-//         assert_eq!(
-//             parse::Module {
-//                 name: String::from("Main"),
-//                 declarations: vec![
-//                     Declaration::Function {
-//                         name: String::from("foo"),
-//                         args: vec![
-//                             (String::from("a"), Type::identifier("Int")),
-//                             (String::from("b"), Type::identifier("Int")),
-//                         ],
-//                         return_type: Type::identifier("Int"),
-//                         expressions: vec![
-//                             Expr::assign(
-//                                 "c",
-//                                 Expr::if_else(
-//                                     Expr::identifier("a"),
-//                                     Expr::if_else(
-//                                         Expr::identifier("b"),
-//                                         Expr::literal("30"),
-//                                         Expr::literal("40"),
-//                                     ),
-//                                     Expr::literal("50"),
-//                                 ),
-//                             ),
-//                             Expr::assign(
-//                                 "c",
-//                                 Expr::bin_op(BinOp::Add, Expr::identifier("c"), Expr::literal("2")),
-//                             ),
-//                         ],
-//                     }
-//                 ],
-//             },
-//             parse::parser::module(source).unwrap(),
-//         );
-//     }
+    #[test]
+    fn test_curried_function_declaration_with_type() {
+        let source: &str = r#"
+            module Test
+            where
+
+            increment_by_length : (Int -> Int) -> Int -> Int
+            increment_by_length = |f| => |value| => f(value)
+"#;
+        assert_eq!(
+            parse::Module {
+                name: String::from("Test"),
+                declarations: vec![
+                    Declaration::TypeAnnotation {
+                        name: String::from("increment_by_length"),
+                        t: Type::lambda(
+                            Type::lambda(
+                                Type::identifier("Int"),
+                                Type::identifier("Int"),
+                            ),
+                            Type::lambda(
+                                Type::identifier("Int"),
+                                Type::identifier("Int"),
+                            ),
+                        ),
+                    },
+                    Declaration::Value {
+                        name: String::from("increment_by_length"),
+                        definition: Expr::function(
+                            Expr::identifier("f"),
+                            Expr::function(
+                                Expr::identifier("value"),
+                                Expr::call(
+                                    vec!["f"],
+                                    Expr::identifier("value"),
+                                ),
+                            ),
+                        ),
+                    }
+                ],
+            },
+            parse::parser::module(source).unwrap(),
+        );
+    }
 }
