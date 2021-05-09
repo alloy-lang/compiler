@@ -224,6 +224,68 @@ mod tests {
     use crate::parse;
     use crate::parse::{BinOp, Declaration, Expr, Type};
 
+    macro_rules! assert_eq {
+        ($expected:expr, $actual:expr) => ({
+            match (&$expected, &$actual) {
+                (expected_val, actual_val) => {
+                    if !(*expected_val == *actual_val) {
+                        // The reborrows below are intentional. Without them, the stack slot for the
+                        // borrow is initialized even before the values are compared, leading to a
+                        // noticeable slow down.
+                        panic!(r#"assertion failed: `(expected == actual)`
+  expected: `{:?}`,
+ actual: `{:?}`"#, &*expected_val, &*actual_val)
+                    }
+                }
+            }
+        });
+        ($expected:expr, $actual:expr, $($arg:tt)+) => ({
+            match (&$expected, &$actual) {
+                (expected_val, actual_val) => {
+                    if !(*expected_val == *actual_val) {
+                        panic!($($arg)+)
+                    }
+                }
+            }
+        });
+    }
+
+    fn assert_declarations(module_name: String, expecteds: Vec<Declaration>, actuals: Vec<Declaration>) {
+        let pairs = expecteds.iter()
+            .zip(actuals.iter())
+            .enumerate()
+            .collect::<Vec<_>>();
+
+        for (index, (expected, actual)) in pairs {
+            assert_eq!(expected, actual, r#"
+
+Declaration in module '{}' at index {} were not equal.
+ expected: {:?}
+   actual: {:?}
+"#,
+                module_name,
+                index,
+                expected,
+                actual,
+            );
+        }
+
+        assert_eq!(expecteds, actuals);
+    }
+
+    fn assert_module(expected: parse::Module, actual: parse::Module) {
+        assert_eq!(expected.name, actual.name, r#"
+
+Module names were not equal.
+ expected: {}
+   actual: {}
+"#,
+                   expected.name,
+                   actual.name,
+        );
+        assert_declarations(expected.name, expected.declarations, actual.declarations);
+    }
+
     #[test]
     fn test_empty_module() {
         let source: &str = r#"
@@ -233,7 +295,7 @@ mod tests {
 
 
 "#;
-        assert_eq!(
+        assert_module(
             parse::Module {
                 name: String::from("Test"),
                 declarations: vec![],
@@ -250,7 +312,7 @@ mod tests {
 
             thing = 0
 "#;
-        assert_eq!(
+        assert_module(
             parse::Module {
                 name: String::from("Test"),
                 declarations: vec![
@@ -273,7 +335,7 @@ mod tests {
             thing : Int
             thing = 0
 "#;
-        assert_eq!(
+        assert_module(
             parse::Module {
                 name: String::from("Test"),
                 declarations: vec![
@@ -301,7 +363,7 @@ mod tests {
             increment_positive = |0| => 0
             increment_positive = |x| => x + 1
 "#;
-        assert_eq!(
+        assert_module(
             parse::Module {
                 name: String::from("Test"),
                 declarations: vec![
@@ -346,7 +408,7 @@ mod tests {
             increment_by_length = |(0, 1)| => 0
             increment_by_length = |(x, y)| => x + String.length(y)
 "#;
-        assert_eq!(
+        assert_module(
             parse::Module {
                 name: String::from("Test"),
                 declarations: vec![
@@ -396,7 +458,7 @@ mod tests {
             increment_by_length : (Int -> Int) -> Int -> Int
             increment_by_length = |f| => |value| => f(value)
 "#;
-        assert_eq!(
+        assert_module(
             parse::Module {
                 name: String::from("Test"),
                 declarations: vec![
@@ -447,7 +509,7 @@ mod tests {
               then num - 1
               else num
 "#;
-        assert_eq!(
+        assert_module(
             parse::Module {
                 name: String::from("Test"),
                 declarations: vec![
@@ -462,7 +524,7 @@ mod tests {
                                     Expr::identifier("num"),
                                     Expr::literal("1"),
                                 ),
-                                Expr::identifier("num")
+                                Expr::identifier("num"),
                             ),
                         ),
                     },
@@ -477,7 +539,7 @@ mod tests {
                                     Expr::identifier("num"),
                                     Expr::literal("1"),
                                 ),
-                                Expr::identifier("num")
+                                Expr::identifier("num"),
                             ),
                         ),
                     },
