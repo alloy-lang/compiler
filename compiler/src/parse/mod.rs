@@ -1,4 +1,4 @@
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub enum BinOp {
     Eq,
     Ne,
@@ -12,7 +12,7 @@ pub enum BinOp {
     Div,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub enum Expr {
     Literal(String),
     Identifier(String),
@@ -64,38 +64,35 @@ impl From<Expr> for Vec<Expr> {
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub enum Type {
     Identifier(String),
+    Atom(String),
+    Variable(String),
     Lambda {
         arg_type: Box<Type>,
         return_type: Box<Type>,
-    },
-    Variable {
-        var_name: String,
-        var_type: Box<Type>,
     },
     Record {
         properties: Vec<(String, Box<Type>)>,
     },
     Alias {
         type_name: String,
-        target: String,
+        target: Box<Type>,
     },
     Union {
-        type_name: String,
-        head: (String, Box<Type>),
-        tail: Vec<(String, Box<Type>)>,
+        types: Vec<Type>,
     },
-    Tuple(Vec<Box<Type>>),
+    Named {
+        type_name: String,
+        target: Box<Type>,
+    },
+    Tuple(Vec<Type>),
     Unit,
 }
 
 impl Type {
-    pub fn tuple<T>(types: Vec<T>) -> Type where T: Into<Box<Type>> {
-        let types = types.into_iter()
-            .map(|t| t.into())
-            .collect::<Vec<_>>();
+    pub fn tuple(types: Vec<Type>) -> Type {
         Type::Tuple(types)
     }
 
@@ -109,6 +106,14 @@ impl Type {
     pub fn identifier<S>(s: S) -> Type where S: Into<String> {
         Type::Identifier(s.into())
     }
+
+    pub fn atom<S>(s: S) -> Type where S: Into<String> {
+        Type::Atom(s.into())
+    }
+
+    pub fn variable<S>(s: S) -> Type where S: Into<String> {
+        Type::Variable(s.into())
+    }
 }
 
 impl From<Type> for Vec<Type> {
@@ -117,7 +122,7 @@ impl From<Type> for Vec<Type> {
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub enum Declaration {
     TypeAnnotation {
         name: String,
@@ -127,9 +132,14 @@ pub enum Declaration {
         name: String,
         definition: Expr,
     },
+    TypeAliasDefinition {
+        name: String,
+        type_variables: Vec<String>,
+        t: Type,
+    },
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Module {
     name: String,
     declarations: Vec<Declaration>,
@@ -144,13 +154,19 @@ peg::parser!(pub grammar parser() for str {
     rule declaration() -> Declaration
         = type_annotation()
         / value_definition()
+        / type_alias_definition()
+
+    rule possible_union_type() -> Type
+        = ("|")? _ types:((_ t:type_definition() __ { t }) ++ "|") { Type::Union { types: types } }
+        / t:type_definition() { t }
 
     rule type_definition() -> Type = precedence!{
         arg_type:@ _ "->" _ return_type:(@) { Type::lambda(arg_type, return_type) }
         --
-        "(" args:((_ t:type_definition() _ { Box::new(t) }) **<2,> ",") ")" _ { Type::Tuple(args) }
+        "(" args:((_ t:type_definition() _ { t }) **<2,> ",") ")" _ { Type::Tuple(args) }
         --
         "(" _ t:type_definition() _ ")" _ { t }
+        ":" t:identifier() _ { Type::Atom(t) }
         t:identifier() _ { Type::Identifier(t) }
     }
 
@@ -161,11 +177,12 @@ peg::parser!(pub grammar parser() for str {
     rule value_definition() -> Declaration
         = name:identifier() _ "=" _ e:expression() _ { Declaration::Value {name: name, definition: e } }
 
-    rule statements() -> Vec<Expr>
-        = s:(statement()*) { s }
-
-    rule statement() -> Expr
-        = _ e:expression() _ "\n" { e }
+    rule type_alias_definition() -> Declaration
+        = quiet!{ "data" _ name:identifier() _
+        "<" _ type_variables:((_ t:identifier() _ { t }) ** ",") _ ">" _ "=" __
+        t:possible_union_type()
+        { Declaration::TypeAliasDefinition { name: name, type_variables: type_variables, t: t } } }
+        / expected!("type alias")
 
     rule expression() -> Expr
         = if_else()
@@ -263,10 +280,10 @@ Declaration in module '{}' at index {} were not equal.
  expected: {:?}
    actual: {:?}
 "#,
-                module_name,
-                index,
-                expected,
-                actual,
+                       module_name,
+                       index,
+                       expected,
+                       actual,
             );
         }
 
@@ -594,5 +611,74 @@ Module names were not equal.
             },
             parse::parser::module(source).unwrap(),
         );
+    }
+
+    #[test]
+    fn test_multi_property_union_type() {
+        let expected = parse::Module {
+            name: String::from("Test"),
+            declarations: vec![
+                Declaration::TypeAliasDefinition {
+                    name: String::from("Either"),
+                    type_variables: vec![String::from("L"), String::from("R")],
+                    t: Type::Union {
+                        types: vec![
+                            Type::Tuple(vec![
+                                Type::atom("Right"),
+                                Type::identifier("R"),
+                            ]),
+                            Type::Tuple(vec![
+                                Type::atom("Left"),
+                                Type::identifier("L"),
+                            ]),
+                        ]
+                    },
+                },
+            ],
+        };
+
+        {
+            let source: &str = r#"
+            module Test
+            where
+
+            data Either<L, R> =
+              | (:Right, R)
+              | (:Left, L)
+"#;
+
+            assert_module(
+                expected.clone(),
+                parse::parser::module(source).unwrap(),
+            );
+        }
+        {
+            let source: &str = r#"
+            module Test
+            where
+
+            data Either<L, R> =
+              (:Right, R)
+              | (:Left, L)
+"#;
+
+            assert_module(
+                expected.clone(),
+                parse::parser::module(source).unwrap(),
+            );
+        }
+        {
+            let source: &str = r#"
+            module Test
+            where
+
+            data Either<L, R> = (:Right, R) | (:Left, L)
+"#;
+
+            assert_module(
+                expected,
+                parse::parser::module(source).unwrap(),
+            );
+        }
     }
 }
