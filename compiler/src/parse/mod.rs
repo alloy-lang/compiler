@@ -219,7 +219,7 @@ peg::parser!(pub grammar parser() for str {
         --
         "(" args:((_ e:expression() _ {e}) **<2,> ",") ")" { Expr::Tuple(args) }
         "(" _ e:expression() _ ")" { e }
-        address:(identifier() ++ ".") "(" args:((_ e:expression() _ {e}) ** ",") ")" { Expr::Call(address, args) }
+        address:(identifier() ++ "::") "(" args:((_ e:expression() _ {e}) ** ",") ")" { Expr::Call(address, args) }
         i:identifier() { Expr::Identifier(i) }
         l:literal() { l }
     }
@@ -423,7 +423,7 @@ Module names were not equal.
 
             increment_by_length : (Int, String) -> Int
             increment_by_length = |(0, 1)| => 0
-            increment_by_length = |(x, y)| => x + String.length(y)
+            increment_by_length = |(x, y)| => x + String::length(y)
 "#;
         assert_module(
             parse::Module {
@@ -518,11 +518,11 @@ Module names were not equal.
             where
 
             increment_positive = |num| =>
-              if Number.is_positive?(num)
+              if Number::is_positive?(num)
               then num + 1
               else num
             decrement_negative = |num| =>
-              if Number.is_negative?(num)
+              if Number::is_negative?(num)
               then num - 1
               else num
 "#;
@@ -573,10 +573,10 @@ Module names were not equal.
             where
 
             increment_or_decrement = |num| =>
-              if Number.is_positive?(num)
+              if Number::is_positive?(num)
               then num + 1
               else
-                if Number.is_negative?(num)
+                if Number::is_negative?(num)
                 then num - 1
                 else num
 "#;
