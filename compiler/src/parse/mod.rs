@@ -1,5 +1,5 @@
 #[derive(Debug, Eq, PartialEq, Clone)]
-pub enum BinOp {
+pub(crate)enum BinOp {
     Eq,
     Ne,
     Lt,
@@ -13,7 +13,7 @@ pub enum BinOp {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone)]
-pub enum Expr {
+pub(crate)enum Expr {
     Literal(String),
     Identifier(String),
     Assign(String, Box<Expr>),
@@ -25,11 +25,11 @@ pub enum Expr {
 }
 
 impl Expr {
-    pub fn literal<S>(s: S) -> Expr where S: Into<String> {
+    pub(crate)fn literal<S>(s: S) -> Expr where S: Into<String> {
         Expr::Literal(s.into())
     }
 
-    pub fn identifier<S>(s: S) -> Expr where S: Into<String> {
+    pub(crate)fn identifier<S>(s: S) -> Expr where S: Into<String> {
         Expr::Identifier(s.into())
     }
 
@@ -41,7 +41,7 @@ impl Expr {
         Expr::Function(args.into(), expr.into())
     }
 
-    pub fn bin_op<E>(op: BinOp, first: E, second: E) -> Expr where E: Into<Box<Expr>> {
+    pub(crate)fn bin_op<E>(op: BinOp, first: E, second: E) -> Expr where E: Into<Box<Expr>> {
         Expr::BinOp(op, first.into(), second.into())
     }
 
@@ -49,7 +49,7 @@ impl Expr {
         Expr::IfElse(expr.into(), then_expr.into(), else_expr.into())
     }
 
-    pub fn call<E>(address: Vec<&str>, expr: E) -> Expr where E: Into<Vec<Expr>> {
+    pub(crate)fn call<E>(address: Vec<&str>, expr: E) -> Expr where E: Into<Vec<Expr>> {
         let address = address.into_iter::<>()
             .map(|s| String::from(s))
             .collect::<Vec<_>>();
@@ -65,7 +65,7 @@ impl From<Expr> for Vec<Expr> {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone)]
-pub enum Type {
+pub(crate)enum Type {
     Identifier(String),
     Atom(String),
     Variable(String),
@@ -92,7 +92,7 @@ pub enum Type {
 }
 
 impl Type {
-    pub fn tuple(types: Vec<Type>) -> Type {
+    pub(crate)fn tuple(types: Vec<Type>) -> Type {
         Type::Tuple(types)
     }
 
@@ -103,15 +103,15 @@ impl Type {
         }
     }
 
-    pub fn identifier<S>(s: S) -> Type where S: Into<String> {
+    pub(crate)fn identifier<S>(s: S) -> Type where S: Into<String> {
         Type::Identifier(s.into())
     }
 
-    pub fn atom<S>(s: S) -> Type where S: Into<String> {
+    pub(crate)fn atom<S>(s: S) -> Type where S: Into<String> {
         Type::Atom(s.into())
     }
 
-    pub fn variable<S>(s: S) -> Type where S: Into<String> {
+    pub(crate)fn variable<S>(s: S) -> Type where S: Into<String> {
         Type::Variable(s.into())
     }
 }
@@ -123,7 +123,7 @@ impl From<Type> for Vec<Type> {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone)]
-pub enum Declaration {
+pub(crate)enum Declaration {
     TypeAnnotation {
         name: String,
         t: Type,
@@ -140,13 +140,13 @@ pub enum Declaration {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone)]
-pub struct Module {
+pub(crate)struct Module {
     name: String,
     declarations: Vec<Declaration>,
 }
 
-peg::parser!(pub grammar parser() for str {
-    pub rule module() -> Module
+peg::parser!(pub(crate)grammar parser() for str {
+    pub(crate)rule module() -> Module
         = __ "module" _ name:identifier() __ "where"
           declarations:((__ dec:declaration() _ {dec}) ** "\n") __
           { Module { name: name, declarations: declarations } }
