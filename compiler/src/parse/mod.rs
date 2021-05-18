@@ -1,4 +1,4 @@
-#[derive(Debug, Eq, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub(crate)enum BinOp {
     Eq,
     Ne,
@@ -12,9 +12,11 @@ pub(crate)enum BinOp {
     Div,
 }
 
-#[derive(Debug, Eq, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub(crate)enum Expr {
-    Literal(String),
+    StringLiteral(String),
+    FloatLiteral(String),
+    IntLiteral(String),
     Identifier(String),
     Assign(String, Box<Expr>),
     Function(Vec<Expr>, Box<Expr>),
@@ -25,8 +27,16 @@ pub(crate)enum Expr {
 }
 
 impl Expr {
-    pub(crate)fn literal<S>(s: S) -> Expr where S: Into<String> {
-        Expr::Literal(s.into())
+    pub(crate)fn string_literal<S>(s: S) -> Expr where S: Into<String> {
+        Expr::StringLiteral(s.into())
+    }
+
+    pub(crate)fn int_literal<S>(s: S) -> Expr where S: Into<String> {
+        Expr::IntLiteral(s.into())
+    }
+
+    pub(crate)fn float_literal<S>(s: S) -> Expr where S: Into<String> {
+        Expr::FloatLiteral(s.into())
     }
 
     pub(crate)fn identifier<S>(s: S) -> Expr where S: Into<String> {
@@ -64,7 +74,7 @@ impl From<Expr> for Vec<Expr> {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub(crate)enum Type {
     Identifier(String),
     Atom(String),
@@ -122,7 +132,7 @@ impl From<Type> for Vec<Type> {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub(crate)enum Declaration {
     TypeAnnotation {
         name: String,
@@ -139,10 +149,10 @@ pub(crate)enum Declaration {
     },
 }
 
-#[derive(Debug, Eq, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub(crate)struct Module {
-    name: String,
-    declarations: Vec<Declaration>,
+    pub(crate) name: String,
+    pub(crate) declarations: Vec<Declaration>,
 }
 
 peg::parser!(pub(crate)grammar parser() for str {
@@ -229,7 +239,9 @@ peg::parser!(pub(crate)grammar parser() for str {
         / expected!("identifier")
 
     rule literal() -> Expr
-        = n:$(['0'..='9']+) { Expr::Literal(n.to_owned()) }
+        = n:$("\"" ['a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '-' | '/'] "\"") { Expr::string_literal(n) }
+        / n:$(['0'..='9']+ "." ['0'..='9']+) { Expr::float_literal(n) }
+        / n:$(['0'..='9']+) { Expr::int_literal(n) }
 
     rule __() =  quiet!{[' ' | '\t' | '\n']*}
 
@@ -335,7 +347,7 @@ Module names were not equal.
                 declarations: vec![
                     Declaration::Value {
                         name: String::from("thing"),
-                        definition: Expr::literal("0"),
+                        definition: Expr::int_literal("0"),
                     }
                 ],
             },
@@ -362,7 +374,7 @@ Module names were not equal.
                     },
                     Declaration::Value {
                         name: String::from("thing"),
-                        definition: Expr::literal("0"),
+                        definition: Expr::int_literal("0"),
                     }
                 ],
             },
@@ -394,8 +406,8 @@ Module names were not equal.
                     Declaration::Value {
                         name: String::from("increment_positive"),
                         definition: Expr::function(
-                            Expr::literal("0"),
-                            Expr::literal("0"),
+                            Expr::int_literal("0"),
+                            Expr::int_literal("0"),
                         ),
                     },
                     Declaration::Value {
@@ -405,7 +417,7 @@ Module names were not equal.
                             Expr::bin_op(
                                 BinOp::Add,
                                 Expr::identifier("x"),
-                                Expr::literal("1"),
+                                Expr::int_literal("1"),
                             ),
                         ),
                     }
@@ -442,8 +454,8 @@ Module names were not equal.
                     Declaration::Value {
                         name: String::from("increment_by_length"),
                         definition: Expr::function(
-                            Expr::Tuple(vec![Expr::literal("0"), Expr::literal("1")]),
-                            Expr::literal("0"),
+                            Expr::Tuple(vec![Expr::int_literal("0"), Expr::int_literal("1")]),
+                            Expr::int_literal("0"),
                         ),
                     },
                     Declaration::Value {
@@ -539,7 +551,7 @@ Module names were not equal.
                                 Expr::bin_op(
                                     BinOp::Add,
                                     Expr::identifier("num"),
-                                    Expr::literal("1"),
+                                    Expr::int_literal("1"),
                                 ),
                                 Expr::identifier("num"),
                             ),
@@ -554,7 +566,7 @@ Module names were not equal.
                                 Expr::bin_op(
                                     BinOp::Sub,
                                     Expr::identifier("num"),
-                                    Expr::literal("1"),
+                                    Expr::int_literal("1"),
                                 ),
                                 Expr::identifier("num"),
                             ),
@@ -593,14 +605,14 @@ Module names were not equal.
                                 Expr::bin_op(
                                     BinOp::Add,
                                     Expr::identifier("num"),
-                                    Expr::literal("1"),
+                                    Expr::int_literal("1"),
                                 ),
                                 Expr::if_else(
                                     Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
                                     Expr::bin_op(
                                         BinOp::Sub,
                                         Expr::identifier("num"),
-                                        Expr::literal("1"),
+                                        Expr::int_literal("1"),
                                     ),
                                     Expr::identifier("num"),
                                 ),
