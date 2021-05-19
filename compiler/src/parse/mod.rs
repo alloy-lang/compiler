@@ -1,4 +1,4 @@
-#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum BinOp {
     Eq,
     Ne,
@@ -12,7 +12,7 @@ pub(crate) enum BinOp {
     Div,
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum Expr {
     StringLiteral(String),
     FloatLiteral(String),
@@ -106,7 +106,7 @@ impl From<Expr> for Vec<Expr> {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum Type {
     Identifier(String),
     Atom(String),
@@ -177,7 +177,7 @@ impl From<Type> for Vec<Type> {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum Declaration {
     TypeAnnotation {
         name: String,
@@ -194,7 +194,7 @@ pub(crate) enum Declaration {
     },
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) struct Module {
     pub(crate) name: String,
     pub(crate) declarations: Vec<Declaration>,

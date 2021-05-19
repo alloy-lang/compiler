@@ -1,10 +1,10 @@
-use std::collections::HashSet;
+use std::collections::BTreeSet;
 
 use itertools::Itertools;
 
 use crate::parse;
 
-// #[derive(Debug, Eq, PartialEq, Clone, Hash)]
+// #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 // pub(crate) enum BinOp {
 //     Eq,
 //     Ne,
@@ -18,7 +18,7 @@ use crate::parse;
 //     Div,
 // }
 //
-// #[derive(Debug, Eq, PartialEq, Clone, Hash)]
+// #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 // pub(crate) enum Expr {
 //     Literal(String),
 //     Identifier(String),
@@ -70,7 +70,7 @@ use crate::parse;
 //     }
 // }
 //
-// #[derive(Debug, Eq, PartialEq, Clone, Hash)]
+// #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 // pub(crate) enum Type {
 //     Identifier(String),
 //     Atom(String),
@@ -128,7 +128,7 @@ use crate::parse;
 //     }
 // }
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum Declaration {
     Type {
         name: String,
@@ -141,13 +141,13 @@ pub(crate) enum Declaration {
     },
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) struct Module {
     name: String,
     declarations: Vec<Declaration>,
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 struct TypeAnnotation {
     name: String,
     t: parse::Type,
@@ -155,8 +155,8 @@ struct TypeAnnotation {
 
 impl TypeAnnotation {
     pub(crate) fn new<S>(name: S, t: parse::Type) -> TypeAnnotation
-    where
-        S: Into<String>,
+        where
+            S: Into<String>,
     {
         TypeAnnotation {
             name: name.into(),
@@ -165,7 +165,7 @@ impl TypeAnnotation {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum CanonicalizeError {
     ConflictingTypeAnnotations {
         name: String,
@@ -215,9 +215,9 @@ pub(crate) fn canonicalize(parsed: parse::Module) -> Result<Module, Vec<Canonica
 
 fn to_canonical_declaration(
     name: String,
-    declarations: impl IntoIterator<Item = parse::Declaration>,
+    declarations: impl IntoIterator<Item=parse::Declaration>,
 ) -> Result<Vec<Declaration>, CanonicalizeError> {
-    let (type_hints, declarations): (HashSet<parse::Declaration>, HashSet<parse::Declaration>) =
+    let (type_hints, declarations): (BTreeSet<parse::Declaration>, BTreeSet<parse::Declaration>) =
         declarations
             .into_iter()
             .partition(|dec| matches!(dec, parse::Declaration::TypeAnnotation { .. }));
@@ -423,8 +423,8 @@ Module names were not equal.
             vec![canonical::CanonicalizeError::ConflictingTypeAnnotations {
                 name: "thing".into(),
                 types: vec![
-                    parse::Type::identifier("String"),
                     parse::Type::identifier("Int"),
+                    parse::Type::identifier("String"),
                 ],
             }],
             actual,
