@@ -247,23 +247,27 @@ mod tests {
         });
     }
 
-    fn assert_declarations(module_name: String, expecteds: Vec<Declaration>, actuals: Vec<Declaration>) {
-        let pairs = expecteds.iter()
+    fn assert_declarations(
+        module_name: String,
+        expecteds: Vec<Declaration>,
+        actuals: Vec<Declaration>,
+    ) {
+        let pairs = expecteds
+            .iter()
             .zip(actuals.iter())
             .enumerate()
             .collect::<Vec<_>>();
 
         for (index, (expected, actual)) in pairs {
-            assert_eq!(expected, actual, r#"
+            assert_eq!(
+                expected, actual,
+                r#"
 
 Declaration in module '{}' at index {} were not equal.
  expected: {:?}
    actual: {:?}
 "#,
-                       module_name,
-                       index,
-                       expected,
-                       actual,
+                module_name, index, expected, actual,
             );
         }
 
@@ -271,14 +275,15 @@ Declaration in module '{}' at index {} were not equal.
     }
 
     fn assert_module(expected: canonical::Module, actual: canonical::Module) {
-        assert_eq!(expected.name, actual.name, r#"
+        assert_eq!(
+            expected.name, actual.name,
+            r#"
 
 Module names were not equal.
  expected: {}
    actual: {}
 "#,
-                   expected.name,
-                   actual.name,
+            expected.name, actual.name,
         );
         assert_declarations(expected.name, expected.declarations, actual.declarations);
     }

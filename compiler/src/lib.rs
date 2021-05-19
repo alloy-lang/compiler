@@ -1,8 +1,8 @@
-use std::collections::HashMap;
 use crate::CompileError::BadDocs;
+use std::collections::HashMap;
 
-mod parse;
 mod canonical;
+mod parse;
 
 pub struct Artifacts {
     module: HashMap<String, String>,

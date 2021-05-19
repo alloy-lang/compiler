@@ -1,5 +1,5 @@
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
-pub(crate)enum BinOp {
+pub(crate) enum BinOp {
     Eq,
     Ne,
     Lt,
@@ -13,7 +13,7 @@ pub(crate)enum BinOp {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
-pub(crate)enum Expr {
+pub(crate) enum Expr {
     StringLiteral(String),
     FloatLiteral(String),
     IntLiteral(String),
@@ -27,40 +27,72 @@ pub(crate)enum Expr {
 }
 
 impl Expr {
-    pub(crate)fn string_literal<S>(s: S) -> Expr where S: Into<String> {
+    pub(crate) fn string_literal<S>(s: S) -> Expr
+    where
+        S: Into<String>,
+    {
         Expr::StringLiteral(s.into())
     }
 
-    pub(crate)fn int_literal<S>(s: S) -> Expr where S: Into<String> {
+    pub(crate) fn int_literal<S>(s: S) -> Expr
+    where
+        S: Into<String>,
+    {
         Expr::IntLiteral(s.into())
     }
 
-    pub(crate)fn float_literal<S>(s: S) -> Expr where S: Into<String> {
+    pub(crate) fn float_literal<S>(s: S) -> Expr
+    where
+        S: Into<String>,
+    {
         Expr::FloatLiteral(s.into())
     }
 
-    pub(crate)fn identifier<S>(s: S) -> Expr where S: Into<String> {
+    pub(crate) fn identifier<S>(s: S) -> Expr
+    where
+        S: Into<String>,
+    {
         Expr::Identifier(s.into())
     }
 
-    fn assign<S, E>(name: S, expr: E) -> Expr where S: Into<String>, E: Into<Box<Expr>> {
+    fn assign<S, E>(name: S, expr: E) -> Expr
+    where
+        S: Into<String>,
+        E: Into<Box<Expr>>,
+    {
         Expr::Assign(name.into(), expr.into())
     }
 
-    fn function<A, E>(args: A, expr: E) -> Expr where A: Into<Vec<Expr>>, E: Into<Box<Expr>> {
+    fn function<A, E>(args: A, expr: E) -> Expr
+    where
+        A: Into<Vec<Expr>>,
+        E: Into<Box<Expr>>,
+    {
         Expr::Function(args.into(), expr.into())
     }
 
-    pub(crate)fn bin_op<E>(op: BinOp, first: E, second: E) -> Expr where E: Into<Box<Expr>> {
+    pub(crate) fn bin_op<E>(op: BinOp, first: E, second: E) -> Expr
+    where
+        E: Into<Box<Expr>>,
+    {
         Expr::BinOp(op, first.into(), second.into())
     }
 
-    fn if_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr where E: Into<Box<Expr>>, V1: Into<Box<Expr>>, V2: Into<Box<Expr>> {
+    fn if_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr
+    where
+        E: Into<Box<Expr>>,
+        V1: Into<Box<Expr>>,
+        V2: Into<Box<Expr>>,
+    {
         Expr::IfElse(expr.into(), then_expr.into(), else_expr.into())
     }
 
-    pub(crate)fn call<E>(address: Vec<&str>, expr: E) -> Expr where E: Into<Vec<Expr>> {
-        let address = address.into_iter::<>()
+    pub(crate) fn call<E>(address: Vec<&str>, expr: E) -> Expr
+    where
+        E: Into<Vec<Expr>>,
+    {
+        let address = address
+            .into_iter()
             .map(|s| String::from(s))
             .collect::<Vec<_>>();
 
@@ -75,7 +107,7 @@ impl From<Expr> for Vec<Expr> {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
-pub(crate)enum Type {
+pub(crate) enum Type {
     Identifier(String),
     Atom(String),
     Variable(String),
@@ -102,26 +134,39 @@ pub(crate)enum Type {
 }
 
 impl Type {
-    pub(crate)fn tuple(types: Vec<Type>) -> Type {
+    pub(crate) fn tuple(types: Vec<Type>) -> Type {
         Type::Tuple(types)
     }
 
-    fn lambda<T1, T2>(arg_type: T1, return_type: T2) -> Type where T1: Into<Box<Type>>, T2: Into<Box<Type>> {
+    fn lambda<T1, T2>(arg_type: T1, return_type: T2) -> Type
+    where
+        T1: Into<Box<Type>>,
+        T2: Into<Box<Type>>,
+    {
         Type::Lambda {
             arg_type: arg_type.into(),
             return_type: return_type.into(),
         }
     }
 
-    pub(crate)fn identifier<S>(s: S) -> Type where S: Into<String> {
+    pub(crate) fn identifier<S>(s: S) -> Type
+    where
+        S: Into<String>,
+    {
         Type::Identifier(s.into())
     }
 
-    pub(crate)fn atom<S>(s: S) -> Type where S: Into<String> {
+    pub(crate) fn atom<S>(s: S) -> Type
+    where
+        S: Into<String>,
+    {
         Type::Atom(s.into())
     }
 
-    pub(crate)fn variable<S>(s: S) -> Type where S: Into<String> {
+    pub(crate) fn variable<S>(s: S) -> Type
+    where
+        S: Into<String>,
+    {
         Type::Variable(s.into())
     }
 }
@@ -133,7 +178,7 @@ impl From<Type> for Vec<Type> {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
-pub(crate)enum Declaration {
+pub(crate) enum Declaration {
     TypeAnnotation {
         name: String,
         t: Type,
@@ -150,7 +195,7 @@ pub(crate)enum Declaration {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
-pub(crate)struct Module {
+pub(crate) struct Module {
     pub(crate) name: String,
     pub(crate) declarations: Vec<Declaration>,
 }
@@ -279,23 +324,27 @@ mod tests {
         });
     }
 
-    fn assert_declarations(module_name: String, expecteds: Vec<Declaration>, actuals: Vec<Declaration>) {
-        let pairs = expecteds.iter()
+    fn assert_declarations(
+        module_name: String,
+        expecteds: Vec<Declaration>,
+        actuals: Vec<Declaration>,
+    ) {
+        let pairs = expecteds
+            .iter()
             .zip(actuals.iter())
             .enumerate()
             .collect::<Vec<_>>();
 
         for (index, (expected, actual)) in pairs {
-            assert_eq!(expected, actual, r#"
+            assert_eq!(
+                expected, actual,
+                r#"
 
 Declaration in module '{}' at index {} were not equal.
  expected: {:?}
    actual: {:?}
 "#,
-                       module_name,
-                       index,
-                       expected,
-                       actual,
+                module_name, index, expected, actual,
             );
         }
 
@@ -303,14 +352,15 @@ Declaration in module '{}' at index {} were not equal.
     }
 
     fn assert_module(expected: parse::Module, actual: parse::Module) {
-        assert_eq!(expected.name, actual.name, r#"
+        assert_eq!(
+            expected.name, actual.name,
+            r#"
 
 Module names were not equal.
  expected: {}
    actual: {}
 "#,
-                   expected.name,
-                   actual.name,
+            expected.name, actual.name,
         );
         assert_declarations(expected.name, expected.declarations, actual.declarations);
     }
@@ -344,12 +394,10 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                declarations: vec![
-                    Declaration::Value {
-                        name: String::from("thing"),
-                        definition: Expr::int_literal("0"),
-                    }
-                ],
+                declarations: vec![Declaration::Value {
+                    name: String::from("thing"),
+                    definition: Expr::int_literal("0"),
+                }],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -375,7 +423,7 @@ Module names were not equal.
                     Declaration::Value {
                         name: String::from("thing"),
                         definition: Expr::int_literal("0"),
-                    }
+                    },
                 ],
             },
             parse::parser::module(source).unwrap(),
@@ -398,29 +446,19 @@ Module names were not equal.
                 declarations: vec![
                     Declaration::TypeAnnotation {
                         name: String::from("increment_positive"),
-                        t: Type::lambda(
-                            Type::identifier("Int"),
-                            Type::identifier("Int"),
-                        ),
+                        t: Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                     },
                     Declaration::Value {
                         name: String::from("increment_positive"),
-                        definition: Expr::function(
-                            Expr::int_literal("0"),
-                            Expr::int_literal("0"),
-                        ),
+                        definition: Expr::function(Expr::int_literal("0"), Expr::int_literal("0")),
                     },
                     Declaration::Value {
                         name: String::from("increment_positive"),
                         definition: Expr::function(
                             Expr::identifier("x"),
-                            Expr::bin_op(
-                                BinOp::Add,
-                                Expr::identifier("x"),
-                                Expr::int_literal("1"),
-                            ),
+                            Expr::bin_op(BinOp::Add, Expr::identifier("x"), Expr::int_literal("1")),
                         ),
-                    }
+                    },
                 ],
             },
             parse::parser::module(source).unwrap(),
@@ -444,10 +482,7 @@ Module names were not equal.
                     Declaration::TypeAnnotation {
                         name: String::from("increment_by_length"),
                         t: Type::lambda(
-                            Type::tuple(vec![
-                                Type::identifier("Int"),
-                                Type::identifier("String"),
-                            ]),
+                            Type::tuple(vec![Type::identifier("Int"), Type::identifier("String")]),
                             Type::identifier("Int"),
                         ),
                     },
@@ -465,13 +500,10 @@ Module names were not equal.
                             Expr::bin_op(
                                 BinOp::Add,
                                 Expr::identifier("x"),
-                                Expr::call(
-                                    vec!["String", "length"],
-                                    Expr::identifier("y"),
-                                ),
+                                Expr::call(vec!["String", "length"], Expr::identifier("y")),
                             ),
                         ),
-                    }
+                    },
                 ],
             },
             parse::parser::module(source).unwrap(),
@@ -494,14 +526,8 @@ Module names were not equal.
                     Declaration::TypeAnnotation {
                         name: String::from("increment_by_length"),
                         t: Type::lambda(
-                            Type::lambda(
-                                Type::identifier("Int"),
-                                Type::identifier("Int"),
-                            ),
-                            Type::lambda(
-                                Type::identifier("Int"),
-                                Type::identifier("Int"),
-                            ),
+                            Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
+                            Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                         ),
                     },
                     Declaration::Value {
@@ -510,13 +536,10 @@ Module names were not equal.
                             Expr::identifier("f"),
                             Expr::function(
                                 Expr::identifier("value"),
-                                Expr::call(
-                                    vec!["f"],
-                                    Expr::identifier("value"),
-                                ),
+                                Expr::call(vec!["f"], Expr::identifier("value")),
                             ),
                         ),
-                    }
+                    },
                 ],
             },
             parse::parser::module(source).unwrap(),
@@ -595,31 +618,29 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                declarations: vec![
-                    Declaration::Value {
-                        name: String::from("increment_or_decrement"),
-                        definition: Expr::function(
-                            Expr::identifier("num"),
+                declarations: vec![Declaration::Value {
+                    name: String::from("increment_or_decrement"),
+                    definition: Expr::function(
+                        Expr::identifier("num"),
+                        Expr::if_else(
+                            Expr::call(vec!["Number", "is_positive?"], Expr::identifier("num")),
+                            Expr::bin_op(
+                                BinOp::Add,
+                                Expr::identifier("num"),
+                                Expr::int_literal("1"),
+                            ),
                             Expr::if_else(
-                                Expr::call(vec!["Number", "is_positive?"], Expr::identifier("num")),
+                                Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
                                 Expr::bin_op(
-                                    BinOp::Add,
+                                    BinOp::Sub,
                                     Expr::identifier("num"),
                                     Expr::int_literal("1"),
                                 ),
-                                Expr::if_else(
-                                    Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
-                                    Expr::bin_op(
-                                        BinOp::Sub,
-                                        Expr::identifier("num"),
-                                        Expr::int_literal("1"),
-                                    ),
-                                    Expr::identifier("num"),
-                                ),
+                                Expr::identifier("num"),
                             ),
                         ),
-                    },
-                ],
+                    ),
+                }],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -629,24 +650,16 @@ Module names were not equal.
     fn test_multi_property_union_type() {
         let expected = parse::Module {
             name: String::from("Test"),
-            declarations: vec![
-                Declaration::TypeAliasDefinition {
-                    name: String::from("Either"),
-                    type_variables: vec![String::from("L"), String::from("R")],
-                    t: Type::Union {
-                        types: vec![
-                            Type::Tuple(vec![
-                                Type::atom("Right"),
-                                Type::identifier("R"),
-                            ]),
-                            Type::Tuple(vec![
-                                Type::atom("Left"),
-                                Type::identifier("L"),
-                            ]),
-                        ]
-                    },
+            declarations: vec![Declaration::TypeAliasDefinition {
+                name: String::from("Either"),
+                type_variables: vec![String::from("L"), String::from("R")],
+                t: Type::Union {
+                    types: vec![
+                        Type::Tuple(vec![Type::atom("Right"), Type::identifier("R")]),
+                        Type::Tuple(vec![Type::atom("Left"), Type::identifier("L")]),
+                    ],
                 },
-            ],
+            }],
         };
 
         {
@@ -659,10 +672,7 @@ Module names were not equal.
               | (:Left, L)
 "#;
 
-            assert_module(
-                expected.clone(),
-                parse::parser::module(source).unwrap(),
-            );
+            assert_module(expected.clone(), parse::parser::module(source).unwrap());
         }
         {
             let source: &str = r#"
@@ -674,10 +684,7 @@ Module names were not equal.
               | (:Left, L)
 "#;
 
-            assert_module(
-                expected.clone(),
-                parse::parser::module(source).unwrap(),
-            );
+            assert_module(expected.clone(), parse::parser::module(source).unwrap());
         }
         {
             let source: &str = r#"
@@ -687,10 +694,7 @@ Module names were not equal.
             data Either<L, R> = (:Right, R) | (:Left, L)
 "#;
 
-            assert_module(
-                expected,
-                parse::parser::module(source).unwrap(),
-            );
+            assert_module(expected, parse::parser::module(source).unwrap());
         }
     }
 }
