@@ -148,76 +148,124 @@ pub(crate) struct Module {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
+struct TypeAnnotation {
+    name: String,
+    t: parse::Type,
+}
+
+impl TypeAnnotation {
+    pub(crate) fn new<S>(name: S, t: parse::Type) -> TypeAnnotation
+    where
+        S: Into<String>,
+    {
+        TypeAnnotation {
+            name: name.into(),
+            t,
+        }
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub(crate) enum CanonicalizeError {
-    ConflictingTypeAnnotations,
+    ConflictingTypeAnnotations {
+        name: String,
+        types: Vec<parse::Type>,
+    },
 }
 
 pub(crate) fn canonicalize(parsed: parse::Module) -> Result<Module, Vec<CanonicalizeError>> {
-    let (declarations, errors): (Vec<Result<_, _>>, Vec<Result<_, CanonicalizeError>>) = parsed.declarations.into_iter()
+    let (declarations, errors): (Vec<Result<_, _>>, Vec<Result<_, CanonicalizeError>>) = parsed
+        .declarations
+        .into_iter()
         .group_by(|dec| match dec {
             parse::Declaration::TypeAnnotation { name, t: _ } => name.clone(),
-            parse::Declaration::Value { name, definition: _ } => name.clone(),
-            parse::Declaration::TypeAliasDefinition { name, type_variables: _, t: _ } => name.clone(),
+            parse::Declaration::Value {
+                name,
+                definition: _,
+            } => name.clone(),
+            parse::Declaration::TypeAliasDefinition {
+                name,
+                type_variables: _,
+                t: _,
+            } => name.clone(),
         })
         .into_iter()
-        .map(|(_, declarations)| {
-            let (type_hints, declarations): (HashSet<parse::Declaration>, HashSet<parse::Declaration>) = declarations.into_iter()
-                .partition(|dec| matches!(dec, parse::Declaration::TypeAnnotation { .. }));
-
-            let type_hint = match type_hints.len() {
-                0 => None,
-                1 => match type_hints.into_iter().next() {
-                    Some(parse::Declaration::TypeAnnotation { name, t }) => Some(t),
-                    _ => None,
-                },
-                _ => return Err(CanonicalizeError::ConflictingTypeAnnotations),
-            };
-
-            println!("declarations: {:?}", declarations);
-
-            let declarations = declarations.into_iter()
-                .map(|declaration| match declaration {
-                    parse::Declaration::TypeAnnotation { name, t } => todo!("should never get here"),
-                    parse::Declaration::Value { name, definition } => Declaration::Value {
-                        name,
-                        t: type_hint.clone(),
-                        definition,
-                    },
-                    parse::Declaration::TypeAliasDefinition { .. } => todo!(),
-                    // parse::Declaration::TypeAliasDefinition { name, type_variables, t } => Declaration::Type {
-                    //     name,
-                    //     t: parse::Type::Unit,
-                    // },
-                })
-                .collect::<Vec<_>>();
-
-            Ok(declarations)
-        })
+        .map(|(name, declarations)| to_canonical_declaration(name, declarations))
         .partition(Result::is_ok);
 
-    let errors = errors.into_iter()
-        .map(Result::unwrap_err)
-        .collect::<Vec<_>>();
-
     if !errors.is_empty() {
+        let errors = errors
+            .into_iter()
+            .map(Result::unwrap_err)
+            .collect::<Vec<_>>();
         return Err(errors);
     }
 
-    let declarations = declarations.into_iter()
+    let declarations = declarations
+        .into_iter()
         .map(Result::unwrap)
         .flat_map(|f| f)
         .collect::<Vec<_>>();
 
     Ok(Module {
         name: parsed.name,
-        declarations: declarations,
+        declarations,
     })
+}
+
+fn to_canonical_declaration(
+    name: String,
+    declarations: impl IntoIterator<Item = parse::Declaration>,
+) -> Result<Vec<Declaration>, CanonicalizeError> {
+    let (type_hints, declarations): (HashSet<parse::Declaration>, HashSet<parse::Declaration>) =
+        declarations
+            .into_iter()
+            .partition(|dec| matches!(dec, parse::Declaration::TypeAnnotation { .. }));
+
+    let type_hint = match type_hints.len() {
+        0 => None,
+        1 => match type_hints.into_iter().next() {
+            Some(parse::Declaration::TypeAnnotation { name: _, t }) => Some(t),
+            _ => None,
+        },
+        _ => {
+            return Err(CanonicalizeError::ConflictingTypeAnnotations {
+                name,
+                types: type_hints
+                    .into_iter()
+                    .filter_map(|dec| match dec {
+                        parse::Declaration::TypeAnnotation { name, t } => Some(t),
+                        _ => None,
+                    })
+                    .collect(),
+            });
+        }
+    };
+
+    let declarations = declarations
+        .into_iter()
+        .map(|declaration| match declaration {
+            parse::Declaration::TypeAnnotation { name, t } => todo!("should never get here"),
+            parse::Declaration::Value { name, definition } => Declaration::Value {
+                name,
+                t: type_hint.clone(),
+                definition,
+            },
+            parse::Declaration::TypeAliasDefinition { .. } => todo!(),
+            // parse::Declaration::TypeAliasDefinition { name, type_variables, t } => Declaration::Type {
+            //     name,
+            //     t: parse::Type::Unit,
+            // },
+        })
+        .collect::<Vec<_>>();
+
+    Ok(declarations)
 }
 
 #[cfg(test)]
 mod tests {
     use crate::canonical;
-    use crate::canonical::{/*BinOp, */canonicalize, Declaration};
+    use crate::canonical::{canonicalize, Declaration, TypeAnnotation};
     use crate::parse;
     use crate::parse::{Expr, Type};
 
@@ -323,13 +371,11 @@ Module names were not equal.
         assert_module(
             canonical::Module {
                 name: String::from("Test"),
-                declarations: vec![
-                    Declaration::Value {
-                        name: String::from("thing"),
-                        t: Some(Type::Identifier("Int".into())),
-                        definition: Expr::int_literal("0"),
-                    }
-                ],
+                declarations: vec![Declaration::Value {
+                    name: String::from("thing"),
+                    t: None,
+                    definition: Expr::int_literal("0"),
+                }],
             },
             actual,
         );
@@ -350,13 +396,11 @@ Module names were not equal.
         assert_module(
             canonical::Module {
                 name: String::from("Test"),
-                declarations: vec![
-                    Declaration::Value {
-                        name: String::from("thing"),
-                        t: Some(Type::Identifier("Int".into())),
-                        definition: Expr::int_literal("0"),
-                    }
-                ],
+                declarations: vec![Declaration::Value {
+                    name: String::from("thing"),
+                    t: Some(Type::Identifier("Int".into())),
+                    definition: Expr::int_literal("0"),
+                }],
             },
             actual,
         );
@@ -376,9 +420,13 @@ Module names were not equal.
         let actual = canonicalize(parsed_module).unwrap_err();
 
         assert_eq!(
-            vec![
-                canonical::CanonicalizeError::ConflictingTypeAnnotations,
-            ],
+            vec![canonical::CanonicalizeError::ConflictingTypeAnnotations {
+                name: "thing".into(),
+                types: vec![
+                    parse::Type::identifier("String"),
+                    parse::Type::identifier("Int"),
+                ],
+            }],
             actual,
         );
     }
@@ -720,4 +768,3 @@ Module names were not equal.
 //         }
 //     }
 }
-
