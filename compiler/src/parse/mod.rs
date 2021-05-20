@@ -1,3 +1,5 @@
+use std::iter::FromIterator;
+
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum BinOp {
     Eq,
@@ -24,6 +26,7 @@ pub(crate) enum Expr {
     IfElse(Box<Expr>, Box<Expr>, Box<Expr>),
     Call(Vec<String>, Vec<Expr>),
     Tuple(Vec<Expr>),
+    Match(Vec<Expr>),
 }
 
 impl Expr {
@@ -63,7 +66,7 @@ impl Expr {
         Expr::Assign(name.into(), expr.into())
     }
 
-    fn function<A, E>(args: A, expr: E) -> Expr
+    pub(crate) fn function<A, E>(args: A, expr: E) -> Expr
     where
         A: Into<Vec<Expr>>,
         E: Into<Box<Expr>>,
@@ -103,6 +106,20 @@ impl From<Expr> for Vec<Expr> {
     }
 }
 
+impl FromIterator<Expr> for Expr {
+    fn from_iter<T: IntoIterator<Item = Expr>>(iter: T) -> Self {
+        let mut iter = iter.into_iter();
+        let (_, upper_bound) = iter.size_hint();
+
+        match upper_bound {
+            Some(0) => todo!(),
+            // Some(0) => Expr::Unit,
+            Some(1) => iter.next().unwrap(),
+            _ => Expr::Match(iter.collect()),
+        }
+    }
+}
+
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum Type {
     Identifier(String),
@@ -135,7 +152,7 @@ impl Type {
         Type::Tuple(types)
     }
 
-    fn lambda<T1, T2>(arg_type: T1, return_type: T2) -> Type
+    pub(crate) fn lambda<T1, T2>(arg_type: T1, return_type: T2) -> Type
     where
         T1: Into<Box<Type>>,
         T2: Into<Box<Type>>,

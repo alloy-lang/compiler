@@ -20,58 +20,6 @@ use crate::parse::Expr;
 // }
 //
 // #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-// pub(crate) enum Expr {
-//     Literal(String),
-//     Identifier(String),
-//     Assign(String, Box<Expr>),
-//     Function(Vec<Expr>, Box<Expr>),
-//     BinOp(BinOp, Box<Expr>, Box<Expr>),
-//     IfElse(Box<Expr>, Box<Expr>, Box<Expr>),
-//     Call(Vec<String>, Vec<Expr>),
-//     Tuple(Vec<Expr>),
-// }
-//
-// impl Expr {
-//     pub(crate) fn literal<S>(s: S) -> Expr where S: Into<String> {
-//         Expr::Literal(s.into())
-//     }
-//
-//     pub(crate) fn identifier<S>(s: S) -> Expr where S: Into<String> {
-//         Expr::Identifier(s.into())
-//     }
-//
-//     fn assign<S, E>(name: S, expr: E) -> Expr where S: Into<String>, E: Into<Box<Expr>> {
-//         Expr::Assign(name.into(), expr.into())
-//     }
-//
-//     fn function<A, E>(args: A, expr: E) -> Expr where A: Into<Vec<Expr>>, E: Into<Box<Expr>> {
-//         Expr::Function(args.into(), expr.into())
-//     }
-//
-//     pub(crate) fn bin_op<E>(op: BinOp, first: E, second: E) -> Expr where E: Into<Box<Expr>> {
-//         Expr::BinOp(op, first.into(), second.into())
-//     }
-//
-//     fn if_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr where E: Into<Box<Expr>>, V1: Into<Box<Expr>>, V2: Into<Box<Expr>> {
-//         Expr::IfElse(expr.into(), then_expr.into(), else_expr.into())
-//     }
-//
-//     pub(crate) fn call<E>(address: Vec<&str>, expr: E) -> Expr where E: Into<Vec<Expr>> {
-//         let address = address.into_iter::<>()
-//             .map(|s| String::from(s))
-//             .collect::<Vec<_>>();
-//
-//         Expr::Call(address, expr.into())
-//     }
-// }
-//
-// impl From<Expr> for Vec<Expr> {
-//     fn from(e: Expr) -> Self {
-//         vec![e]
-//     }
-// }
-//
-// #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 // pub(crate) enum Type {
 //     Identifier(String),
 //     Atom(String),
@@ -142,28 +90,34 @@ pub(crate) enum Declaration {
     },
 }
 
+impl Declaration {
+    fn new_value<S>(name: S, t: parse::Type, definition: Expr) -> Declaration
+    where
+        S: Into<String>,
+    {
+        Declaration::Value {
+            name: name.into(),
+            t: Some(t),
+            definition,
+        }
+    }
+
+    fn new_value_no_type<S>(name: S, definition: Expr) -> Declaration
+    where
+        S: Into<String>,
+    {
+        Declaration::Value {
+            name: name.into(),
+            t: None,
+            definition,
+        }
+    }
+}
+
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) struct Module {
     name: String,
     declarations: Vec<Declaration>,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-struct TypeAnnotation {
-    name: String,
-    t: parse::Type,
-}
-
-impl TypeAnnotation {
-    pub(crate) fn new<S>(name: S, t: parse::Type) -> TypeAnnotation
-        where
-            S: Into<String>,
-    {
-        TypeAnnotation {
-            name: name.into(),
-            t,
-        }
-    }
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
@@ -194,7 +148,6 @@ pub(crate) fn canonicalize(parsed: parse::Module) -> Result<Module, Vec<Canonica
     let declarations = declarations
         .into_iter()
         .map(Result::unwrap)
-        .flat_map(|f| f)
         .collect::<Vec<_>>();
 
     Ok(Module {
@@ -220,8 +173,8 @@ fn extract_name(dec: &parse::Declaration) -> String {
 
 fn to_canonical_declaration(
     name: String,
-    declarations: impl IntoIterator<Item=parse::Declaration>,
-) -> Result<Vec<Declaration>, CanonicalizeError> {
+    declarations: impl IntoIterator<Item = parse::Declaration>,
+) -> Result<Declaration, CanonicalizeError> {
     let (type_hints, declarations): (BTreeSet<parse::Declaration>, BTreeSet<parse::Declaration>) =
         declarations
             .into_iter()
@@ -247,32 +200,31 @@ fn to_canonical_declaration(
         }
     };
 
-    let declarations = declarations
+    let definition = declarations
         .into_iter()
         .map(|declaration| match declaration {
-            parse::Declaration::TypeAnnotation { name, t } => todo!("should never get here"),
-            parse::Declaration::Value { name, definition } => Declaration::Value {
-                name,
-                t: type_hint.clone(),
-                definition,
-            },
+            parse::Declaration::TypeAnnotation { .. } => todo!("should never get here"),
             parse::Declaration::TypeAliasDefinition { .. } => todo!(),
-            // parse::Declaration::TypeAliasDefinition { name, type_variables, t } => Declaration::Type {
-            //     name,
-            //     t: parse::Type::Unit,
-            // },
+            parse::Declaration::Value {
+                name: _,
+                definition,
+            } => definition,
         })
-        .collect::<Vec<_>>();
+        .collect::<Expr>();
 
-    Ok(declarations)
+    Ok(Declaration::Value {
+        name,
+        t: type_hint,
+        definition,
+    })
 }
 
 #[cfg(test)]
 mod tests {
     use crate::canonical;
-    use crate::canonical::{canonicalize, Declaration, TypeAnnotation};
+    use crate::canonical::{canonicalize, Declaration};
     use crate::parse;
-    use crate::parse::{Expr, Type};
+    use crate::parse::{BinOp, Expr, Type};
 
     macro_rules! assert_eq {
         ($expected:expr, $actual:expr $(,)?) => ({
@@ -436,55 +388,42 @@ Module names were not equal.
         );
     }
 
-//     #[test]
-//     fn test_single_arg_function_declaration_with_type() {
-//         let source: &str = r#"
-//             module Test
-//             where
-//
-//             increment_positive : Int -> Int
-//             increment_positive = |0| => 0
-//             increment_positive = |x| => x + 1
-// "#;
-//         let parsed_module = parse::parser::module(source).unwrap();
-//         let actual = canonicalize(parsed_module).unwrap();
-//
-//         assert_module(
-//             canonical::Module {
-//                 name: String::from("Test"),
-//                 declarations: vec![
-//                     Declaration::Value {
-//                         name: String::from("increment_positive"),
-//                         t: Type::lambda(
-//                             Type::identifier("Int"),
-//                             Type::identifier("Int"),
-//                         ),
-//                         definition: Expr::function(
-//                             Expr::literal("0"),
-//                             Expr::literal("0"),
-//                         ),
-//                     },
-//                     Declaration::Value {
-//                         name: String::from("increment_positive"),
-//                         t: Type::lambda(
-//                             Type::identifier("Int"),
-//                             Type::identifier("Int"),
-//                         ),
-//                         definition: Expr::function(
-//                             Expr::identifier("x"),
-//                             Expr::bin_op(
-//                                 BinOp::Add,
-//                                 Expr::identifier("x"),
-//                                 Expr::literal("1"),
-//                             ),
-//                         ),
-//                     }
-//                 ],
-//             },
-//             actual,
-//         );
-//     }
-//
+    #[test]
+    fn test_single_arg_function_declaration_with_type() {
+        let source: &str = r#"
+            module Test
+            where
+
+            increment_positive : Int -> Int
+            increment_positive = |0| => 0
+            increment_positive = |x| => x + 1
+"#;
+        let parsed_module = parse::parser::module(source).unwrap();
+        let actual = canonicalize(parsed_module).unwrap();
+
+        assert_module(
+            canonical::Module {
+                name: String::from("Test"),
+                declarations: vec![Declaration::new_value(
+                    String::from("increment_positive"),
+                    Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
+                    Expr::Match(vec![
+                        Expr::function(Expr::int_literal("0"), Expr::int_literal("0")),
+                        Expr::function(
+                            Expr::identifier("x"),
+                            Expr::bin_op(
+                                parse::BinOp::Add,
+                                Expr::identifier("x"),
+                                Expr::int_literal("1"),
+                            ),
+                        ),
+                    ]),
+                )],
+            },
+            actual,
+        );
+    }
+
 //     #[test]
 //     fn test_multi_arg_function_declaration_with_type() {
 //         let source: &str = r#"
@@ -524,7 +463,7 @@ Module names were not equal.
 //                         definition: Expr::function(
 //                             Expr::Tuple(vec![Expr::identifier("x"), Expr::identifier("y")]),
 //                             Expr::bin_op(
-//                                 BinOp::Add,
+//                                 parse::BinOp::Add,
 //                                 Expr::identifier("x"),
 //                                 Expr::call(
 //                                     vec!["String", "length"],
@@ -616,7 +555,7 @@ Module names were not equal.
 //                             Expr::if_else(
 //                                 Expr::call(vec!["Number", "is_positive?"], Expr::identifier("num")),
 //                                 Expr::bin_op(
-//                                     BinOp::Add,
+//                                     parse::BinOp::Add,
 //                                     Expr::identifier("num"),
 //                                     Expr::literal("1"),
 //                                 ),
@@ -631,7 +570,7 @@ Module names were not equal.
 //                             Expr::if_else(
 //                                 Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
 //                                 Expr::bin_op(
-//                                     BinOp::Sub,
+//                                     parse::BinOp::Sub,
 //                                     Expr::identifier("num"),
 //                                     Expr::literal("1"),
 //                                 ),
@@ -673,14 +612,14 @@ Module names were not equal.
 //                             Expr::if_else(
 //                                 Expr::call(vec!["Number", "is_positive?"], Expr::identifier("num")),
 //                                 Expr::bin_op(
-//                                     BinOp::Add,
+//                                     parse::BinOp::Add,
 //                                     Expr::identifier("num"),
 //                                     Expr::literal("1"),
 //                                 ),
 //                                 Expr::if_else(
 //                                     Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
 //                                     Expr::bin_op(
-//                                         BinOp::Sub,
+//                                         parse::BinOp::Sub,
 //                                         Expr::identifier("num"),
 //                                         Expr::literal("1"),
 //                                     ),
