@@ -3,6 +3,7 @@ use std::collections::BTreeSet;
 use itertools::Itertools;
 
 use crate::parse;
+use crate::parse::Expr;
 
 // #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 // pub(crate) enum BinOp {
@@ -130,14 +131,14 @@ use crate::parse;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum Declaration {
-    Type {
-        name: String,
-        t: parse::Type,
-    },
+    // Type {
+    //     name: String,
+    //     t: parse::Type,
+    // },
     Value {
         name: String,
         t: Option<parse::Type>,
-        definition: parse::Expr,
+        definition: Expr,
     },
 }
 
@@ -177,18 +178,7 @@ pub(crate) fn canonicalize(parsed: parse::Module) -> Result<Module, Vec<Canonica
     let (declarations, errors): (Vec<Result<_, _>>, Vec<Result<_, CanonicalizeError>>) = parsed
         .declarations
         .into_iter()
-        .group_by(|dec| match dec {
-            parse::Declaration::TypeAnnotation { name, t: _ } => name.clone(),
-            parse::Declaration::Value {
-                name,
-                definition: _,
-            } => name.clone(),
-            parse::Declaration::TypeAliasDefinition {
-                name,
-                type_variables: _,
-                t: _,
-            } => name.clone(),
-        })
+        .group_by(extract_name)
         .into_iter()
         .map(|(name, declarations)| to_canonical_declaration(name, declarations))
         .partition(Result::is_ok);
@@ -213,6 +203,21 @@ pub(crate) fn canonicalize(parsed: parse::Module) -> Result<Module, Vec<Canonica
     })
 }
 
+fn extract_name(dec: &parse::Declaration) -> String {
+    match dec {
+        parse::Declaration::TypeAnnotation { name, t: _ } => name.clone(),
+        parse::Declaration::Value {
+            name,
+            definition: _,
+        } => name.clone(),
+        parse::Declaration::TypeAliasDefinition {
+            name,
+            type_variables: _,
+            t: _,
+        } => name.clone(),
+    }
+}
+
 fn to_canonical_declaration(
     name: String,
     declarations: impl IntoIterator<Item=parse::Declaration>,
@@ -234,7 +239,7 @@ fn to_canonical_declaration(
                 types: type_hints
                     .into_iter()
                     .filter_map(|dec| match dec {
-                        parse::Declaration::TypeAnnotation { name, t } => Some(t),
+                        parse::Declaration::TypeAnnotation { name: _, t } => Some(t),
                         _ => None,
                     })
                     .collect(),

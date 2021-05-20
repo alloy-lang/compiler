@@ -91,10 +91,7 @@ impl Expr {
     where
         E: Into<Vec<Expr>>,
     {
-        let address = address
-            .into_iter()
-            .map(|s| String::from(s))
-            .collect::<Vec<_>>();
+        let address = address.into_iter().map(String::from).collect::<Vec<_>>();
 
         Expr::Call(address, expr.into())
     }
@@ -115,22 +112,22 @@ pub(crate) enum Type {
         arg_type: Box<Type>,
         return_type: Box<Type>,
     },
-    Record {
-        properties: Vec<(String, Box<Type>)>,
-    },
-    Alias {
-        type_name: String,
-        target: Box<Type>,
-    },
+    // Record {
+    //     properties: Vec<(String, Box<Type>)>,
+    // },
+    // Alias {
+    //     type_name: String,
+    //     target: Box<Type>,
+    // },
     Union {
         types: Vec<Type>,
     },
-    Named {
-        type_name: String,
-        target: Box<Type>,
-    },
+    // Named {
+    //     type_name: String,
+    //     target: Box<Type>,
+    // },
     Tuple(Vec<Type>),
-    Unit,
+    // Unit,
 }
 
 impl Type {
@@ -200,11 +197,12 @@ pub(crate) struct Module {
     pub(crate) declarations: Vec<Declaration>,
 }
 
+#[allow(clippy::all)]
 peg::parser!(pub(crate)grammar parser() for str {
     pub(crate)rule module() -> Module
         = __ "module" _ name:identifier() __ "where"
           declarations:((__ dec:declaration() _ {dec}) ** "\n") __
-          { Module { name: name, declarations: declarations } }
+          { Module { name, declarations } }
 
     rule declaration() -> Declaration
         = type_annotation()
@@ -212,7 +210,7 @@ peg::parser!(pub(crate)grammar parser() for str {
         / type_alias_definition()
 
     rule possible_union_type() -> Type
-        = ("|")? _ types:((_ t:type_definition() __ { t }) ++ "|") { Type::Union { types: types } }
+        = ("|")? _ types:((_ t:type_definition() __ { t }) ++ "|") { Type::Union { types } }
         / t:type_definition() { t }
 
     rule type_definition() -> Type = precedence!{
@@ -227,16 +225,16 @@ peg::parser!(pub(crate)grammar parser() for str {
 
     rule type_annotation() -> Declaration
         = name:identifier() _ ":" _ t:type_definition() _
-        { Declaration::TypeAnnotation {name: name, t: t } }
+        { Declaration::TypeAnnotation {name, t } }
 
     rule value_definition() -> Declaration
-        = name:identifier() _ "=" _ e:expression() _ { Declaration::Value {name: name, definition: e } }
+        = name:identifier() _ "=" _ e:expression() _ { Declaration::Value {name, definition: e } }
 
     rule type_alias_definition() -> Declaration
         = quiet!{ "data" _ name:identifier() _
         "<" _ type_variables:((_ t:identifier() _ { t }) ** ",") _ ">" _ "=" __
         t:possible_union_type()
-        { Declaration::TypeAliasDefinition { name: name, type_variables: type_variables, t: t } } }
+        { Declaration::TypeAliasDefinition { name, type_variables, t } } }
         / expected!("type alias")
 
     rule expression() -> Expr
