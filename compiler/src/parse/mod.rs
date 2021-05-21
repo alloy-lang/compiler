@@ -299,7 +299,7 @@ peg::parser!(pub(crate)grammar parser() for str {
         / expected!("identifier")
 
     rule literal() -> Expr
-        = n:$("\"" ['a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '-' | '/'] "\"") { Expr::string_literal(n) }
+        = "\"" n:$(['a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '-' | '/']* ) "\"" { Expr::string_literal(n) }
         / n:$(['0'..='9']+ "." ['0'..='9']+) { Expr::float_literal(n) }
         / n:$(['0'..='9']+) { Expr::int_literal(n) }
 
@@ -487,7 +487,7 @@ Module names were not equal.
             where
 
             increment_by_length : (Int, String) -> Int
-            increment_by_length = |(0, 1)| => 0
+            increment_by_length = |(0, "")| => 0
             increment_by_length = |(x, y)| => x + String::length(y)
 "#;
         assert_module(
@@ -504,7 +504,7 @@ Module names were not equal.
                     Declaration::Value {
                         name: String::from("increment_by_length"),
                         definition: Expr::function(
-                            Expr::Tuple(vec![Expr::int_literal("0"), Expr::int_literal("1")]),
+                            Expr::Tuple(vec![Expr::int_literal("0"), Expr::string_literal("")]),
                             Expr::int_literal("0"),
                         ),
                     },
