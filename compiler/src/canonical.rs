@@ -158,16 +158,14 @@ pub(crate) fn canonicalize(parsed: parse::Module) -> Result<Module, Vec<Canonica
 
 fn extract_name(dec: &parse::Declaration) -> String {
     match dec {
-        parse::Declaration::TypeAnnotation { name, t: _ } => name.clone(),
-        parse::Declaration::Value {
-            name,
-            definition: _,
-        } => name.clone(),
-        parse::Declaration::TypeAliasDefinition {
-            name,
-            type_variables: _,
-            t: _,
-        } => name.clone(),
+        parse::Declaration::TypeAnnotation { name, .. } => name.clone(),
+        parse::Declaration::Value { name, .. } => name.clone(),
+        parse::Declaration::TypeAliasDefinition { .. } => todo!(),
+        // parse::Declaration::TypeAliasDefinition {
+        //     name,
+        //     type_variables: _,
+        //     t: _,
+        // } => name.clone(),
     }
 }
 
@@ -183,8 +181,9 @@ fn to_canonical_declaration(
     let type_hint = match type_hints.len() {
         0 => None,
         1 => match type_hints.into_iter().next() {
-            Some(parse::Declaration::TypeAnnotation { name: _, t }) => Some(t),
-            _ => None,
+            Some(parse::Declaration::TypeAnnotation { t, .. }) => Some(t),
+            // _ => None,
+            _ => todo!(),
         },
         _ => {
             return Err(CanonicalizeError::ConflictingTypeAnnotations {
@@ -192,7 +191,7 @@ fn to_canonical_declaration(
                 types: type_hints
                     .into_iter()
                     .filter_map(|dec| match dec {
-                        parse::Declaration::TypeAnnotation { name: _, t } => Some(t),
+                        parse::Declaration::TypeAnnotation { t, .. } => Some(t),
                         _ => None,
                     })
                     .collect(),
@@ -205,10 +204,7 @@ fn to_canonical_declaration(
         .map(|declaration| match declaration {
             parse::Declaration::TypeAnnotation { .. } => todo!("should never get here"),
             parse::Declaration::TypeAliasDefinition { .. } => todo!(),
-            parse::Declaration::Value {
-                name: _,
-                definition,
-            } => definition,
+            parse::Declaration::Value { definition, .. } => definition,
         })
         .collect::<Expr>();
 

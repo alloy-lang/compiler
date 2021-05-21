@@ -124,7 +124,7 @@ impl FromIterator<Expr> for Expr {
 pub(crate) enum Type {
     Identifier(String),
     Atom(String),
-    Variable(String),
+    // Variable(String),
     Lambda {
         arg_type: Box<Type>,
         return_type: Box<Type>,
@@ -177,12 +177,12 @@ impl Type {
         Type::Atom(s.into())
     }
 
-    pub(crate) fn variable<S>(s: S) -> Type
-    where
-        S: Into<String>,
-    {
-        Type::Variable(s.into())
-    }
+    // pub(crate) fn variable<S>(s: S) -> Type
+    // where
+    //     S: Into<String>,
+    // {
+    //     Type::Variable(s.into())
+    // }
 }
 
 impl From<Type> for Vec<Type> {
