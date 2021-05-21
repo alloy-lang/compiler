@@ -420,216 +420,188 @@ Module names were not equal.
         );
     }
 
-//     #[test]
-//     fn test_multi_arg_function_declaration_with_type() {
-//         let source: &str = r#"
-//             module Test
-//             where
-//
-//             increment_by_length : (Int, String) -> Int
-//             increment_by_length = |(0, 1)| => 0
-//             increment_by_length = |(x, y)| => x + String::length(y)
-// "#;
-//         let parsed_module = parse::parser::module(source).unwrap();
-//         let actual = canonicalize(parsed_module).unwrap();
-//
-//         assert_module(
-//             canonical::Module {
-//                 name: String::from("Test"),
-//                 declarations: vec![
-//                     Declaration::TypeAnnotation {
-//                         name: String::from("increment_by_length"),
-//                         t: Type::lambda(
-//                             Type::tuple(vec![
-//                                 Type::identifier("Int"),
-//                                 Type::identifier("String"),
-//                             ]),
-//                             Type::identifier("Int"),
-//                         ),
-//                     },
-//                     Declaration::Value {
-//                         name: String::from("increment_by_length"),
-//                         definition: Expr::function(
-//                             Expr::Tuple(vec![Expr::literal("0"), Expr::literal("1")]),
-//                             Expr::literal("0"),
-//                         ),
-//                     },
-//                     Declaration::Value {
-//                         name: String::from("increment_by_length"),
-//                         definition: Expr::function(
-//                             Expr::Tuple(vec![Expr::identifier("x"), Expr::identifier("y")]),
-//                             Expr::bin_op(
-//                                 parse::BinOp::Add,
-//                                 Expr::identifier("x"),
-//                                 Expr::call(
-//                                     vec!["String", "length"],
-//                                     Expr::identifier("y"),
-//                                 ),
-//                             ),
-//                         ),
-//                     }
-//                 ],
-//             },
-//             actual,
-//         );
-//     }
-//
-//     #[test]
-//     fn test_curried_function_declaration_with_type() {
-//         let source: &str = r#"
-//             module Test
-//             where
-//
-//             increment_by_length : (Int -> Int) -> Int -> Int
-//             increment_by_length = |f| => |value| => f(value)
-// "#;
-//         let parsed_module = parse::parser::module(source).unwrap();
-//         let actual = canonicalize(parsed_module).unwrap();
-//
-//         assert_module(
-//             canonical::Module {
-//                 name: String::from("Test"),
-//                 declarations: vec![
-//                     Declaration::TypeAnnotation {
-//                         name: String::from("increment_by_length"),
-//                         t: Type::lambda(
-//                             Type::lambda(
-//                                 Type::identifier("Int"),
-//                                 Type::identifier("Int"),
-//                             ),
-//                             Type::lambda(
-//                                 Type::identifier("Int"),
-//                                 Type::identifier("Int"),
-//                             ),
-//                         ),
-//                     },
-//                     Declaration::Value {
-//                         name: String::from("increment_by_length"),
-//                         definition: Expr::function(
-//                             Expr::identifier("f"),
-//                             Expr::function(
-//                                 Expr::identifier("value"),
-//                                 Expr::call(
-//                                     vec!["f"],
-//                                     Expr::identifier("value"),
-//                                 ),
-//                             ),
-//                         ),
-//                     }
-//                 ],
-//             },
-//             actual,
-//         );
-//     }
-//
-//     #[test]
-//     fn test_simple_if_then_else() {
-//         let source: &str = r#"
-//             module Test
-//             where
-//
-//             increment_positive = |num| =>
-//               if Number::is_positive?(num)
-//               then num + 1
-//               else num
-//             decrement_negative = |num| =>
-//               if Number::is_negative?(num)
-//               then num - 1
-//               else num
-// "#;
-//         let parsed_module = parse::parser::module(source).unwrap();
-//         let actual = canonicalize(parsed_module).unwrap();
-//
-//         assert_module(
-//             canonical::Module {
-//                 name: String::from("Test"),
-//                 declarations: vec![
-//                     Declaration::Value {
-//                         name: String::from("increment_positive"),
-//                         definition: Expr::function(
-//                             Expr::identifier("num"),
-//                             Expr::if_else(
-//                                 Expr::call(vec!["Number", "is_positive?"], Expr::identifier("num")),
-//                                 Expr::bin_op(
-//                                     parse::BinOp::Add,
-//                                     Expr::identifier("num"),
-//                                     Expr::literal("1"),
-//                                 ),
-//                                 Expr::identifier("num"),
-//                             ),
-//                         ),
-//                     },
-//                     Declaration::Value {
-//                         name: String::from("decrement_negative"),
-//                         definition: Expr::function(
-//                             Expr::identifier("num"),
-//                             Expr::if_else(
-//                                 Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
-//                                 Expr::bin_op(
-//                                     parse::BinOp::Sub,
-//                                     Expr::identifier("num"),
-//                                     Expr::literal("1"),
-//                                 ),
-//                                 Expr::identifier("num"),
-//                             ),
-//                         ),
-//                     },
-//                 ],
-//             },
-//             actual,
-//         );
-//     }
-//
-//     #[test]
-//     fn test_nested_if_then_else() {
-//         let source: &str = r#"
-//             module Test
-//             where
-//
-//             increment_or_decrement = |num| =>
-//               if Number::is_positive?(num)
-//               then num + 1
-//               else
-//                 if Number::is_negative?(num)
-//                 then num - 1
-//                 else num
-// "#;
-//         let parsed_module = parse::parser::module(source).unwrap();
-//         let actual = canonicalize(parsed_module).unwrap();
-//
-//         assert_module(
-//             canonical::Module {
-//                 name: String::from("Test"),
-//                 declarations: vec![
-//                     Declaration::Value {
-//                         name: String::from("increment_or_decrement"),
-//                         definition: Expr::function(
-//                             Expr::identifier("num"),
-//                             Expr::if_else(
-//                                 Expr::call(vec!["Number", "is_positive?"], Expr::identifier("num")),
-//                                 Expr::bin_op(
-//                                     parse::BinOp::Add,
-//                                     Expr::identifier("num"),
-//                                     Expr::literal("1"),
-//                                 ),
-//                                 Expr::if_else(
-//                                     Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
-//                                     Expr::bin_op(
-//                                         parse::BinOp::Sub,
-//                                         Expr::identifier("num"),
-//                                         Expr::literal("1"),
-//                                     ),
-//                                     Expr::identifier("num"),
-//                                 ),
-//                             ),
-//                         ),
-//                     },
-//                 ],
-//             },
-//             actual,
-//         );
-//     }
-//
+    #[test]
+    fn test_multi_arg_function_declaration_with_type() {
+        let source: &str = r#"
+            module Test
+            where
+
+            increment_by_length : (Int, String) -> Int
+            increment_by_length = |(0, "")| => 0
+            increment_by_length = |(x, y)| => x + String::length(y)
+"#;
+        let parsed_module = parse::parser::module(source).unwrap();
+        let actual = canonicalize(parsed_module).unwrap();
+
+        assert_module(
+            canonical::Module {
+                name: String::from("Test"),
+                declarations: vec![Declaration::new_value(
+                    String::from("increment_by_length"),
+                    Type::lambda(
+                        Type::tuple(vec![Type::identifier("Int"), Type::identifier("String")]),
+                        Type::identifier("Int"),
+                    ),
+                    Expr::Match(vec![
+                        Expr::function(
+                            Expr::Tuple(vec![Expr::int_literal("0"), Expr::string_literal("")]),
+                            Expr::int_literal("0"),
+                        ),
+                        Expr::function(
+                            Expr::Tuple(vec![Expr::identifier("x"), Expr::identifier("y")]),
+                            Expr::bin_op(
+                                parse::BinOp::Add,
+                                Expr::identifier("x"),
+                                Expr::call(vec!["String", "length"], Expr::identifier("y")),
+                            ),
+                        ),
+                    ]),
+                )],
+            },
+            actual,
+        );
+    }
+
+    #[test]
+    fn test_curried_function_declaration_with_type() {
+        let source: &str = r#"
+            module Test
+            where
+
+            increment_by_length : (Int -> Int) -> Int -> Int
+            increment_by_length = |f| => |value| => f(value)
+"#;
+        let parsed_module = parse::parser::module(source).unwrap();
+        let actual = canonicalize(parsed_module).unwrap();
+
+        assert_module(
+            canonical::Module {
+                name: String::from("Test"),
+                declarations: vec![Declaration::new_value(
+                    String::from("increment_by_length"),
+                    Type::lambda(
+                        Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
+                        Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
+                    ),
+                    Expr::function(
+                        Expr::identifier("f"),
+                        Expr::function(
+                            Expr::identifier("value"),
+                            Expr::call(vec!["f"], Expr::identifier("value")),
+                        ),
+                    ),
+                )],
+            },
+            actual,
+        );
+    }
+
+    #[test]
+    fn test_simple_if_then_else() {
+        let source: &str = r#"
+            module Test
+            where
+
+            increment_positive = |num| =>
+              if Number::is_positive?(num)
+              then num + 1
+              else num
+            decrement_negative = |num| =>
+              if Number::is_negative?(num)
+              then num - 1
+              else num
+"#;
+        let parsed_module = parse::parser::module(source).unwrap();
+        let actual = canonicalize(parsed_module).unwrap();
+
+        assert_module(
+            canonical::Module {
+                name: String::from("Test"),
+                declarations: vec![
+                    Declaration::new_value_no_type(
+                        String::from("increment_positive"),
+                        Expr::function(
+                            Expr::identifier("num"),
+                            Expr::if_else(
+                                Expr::call(vec!["Number", "is_positive?"], Expr::identifier("num")),
+                                Expr::bin_op(
+                                    parse::BinOp::Add,
+                                    Expr::identifier("num"),
+                                    Expr::int_literal("1"),
+                                ),
+                                Expr::identifier("num"),
+                            ),
+                        ),
+                    ),
+                    Declaration::new_value_no_type(
+                        String::from("decrement_negative"),
+                        Expr::function(
+                            Expr::identifier("num"),
+                            Expr::if_else(
+                                Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
+                                Expr::bin_op(
+                                    parse::BinOp::Sub,
+                                    Expr::identifier("num"),
+                                    Expr::int_literal("1"),
+                                ),
+                                Expr::identifier("num"),
+                            ),
+                        ),
+                    ),
+                ],
+            },
+            actual,
+        );
+    }
+
+    #[test]
+    fn test_nested_if_then_else() {
+        let source: &str = r#"
+        module Test
+        where
+
+        increment_or_decrement = |num| =>
+          if Number::is_positive?(num)
+          then num + 1
+          else
+            if Number::is_negative?(num)
+            then num - 1
+            else num
+"#;
+        let parsed_module = parse::parser::module(source).unwrap();
+        let actual = canonicalize(parsed_module).unwrap();
+
+        assert_module(
+            canonical::Module {
+                name: String::from("Test"),
+                declarations: vec![Declaration::new_value_no_type(
+                    String::from("increment_or_decrement"),
+                    Expr::function(
+                        Expr::identifier("num"),
+                        Expr::if_else(
+                            Expr::call(vec!["Number", "is_positive?"], Expr::identifier("num")),
+                            Expr::bin_op(
+                                parse::BinOp::Add,
+                                Expr::identifier("num"),
+                                Expr::int_literal("1"),
+                            ),
+                            Expr::if_else(
+                                Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
+                                Expr::bin_op(
+                                    parse::BinOp::Sub,
+                                    Expr::identifier("num"),
+                                    Expr::int_literal("1"),
+                                ),
+                                Expr::identifier("num"),
+                            ),
+                        ),
+                    ),
+                )],
+            },
+            actual,
+        );
+    }
+
 //     #[test]
 //     fn test_multi_property_union_type() {
 //         let expected = canonical::Module {

@@ -81,7 +81,7 @@ impl Expr {
         Expr::BinOp(op, first.into(), second.into())
     }
 
-    fn if_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr
+    pub(crate) fn if_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr
     where
         E: Into<Box<Expr>>,
         V1: Into<Box<Expr>>,
