@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 
-use itertools::Itertools;
+use itertools::{Either, Itertools};
 
 use crate::parse;
 use crate::parse::Expr;
@@ -78,11 +78,32 @@ use crate::parse::Expr;
 // }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+struct TypeAnnotation {
+    name: String,
+    type_variables: Vec<String>,
+    t: parse::Type,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+struct Value {
+    name: String,
+    definition: Expr,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+struct TypeAliasDefinition {
+    name: String,
+    type_variables: Vec<String>,
+    t: parse::Type,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum Declaration {
-    // Type {
-    //     name: String,
-    //     t: parse::Type,
-    // },
+    Type {
+        name: String,
+        type_variables: Vec<String>,
+        t: parse::Type,
+    },
     Value {
         name: String,
         t: Option<parse::Type>,
@@ -126,6 +147,10 @@ pub(crate) enum CanonicalizeError {
         name: String,
         types: Vec<parse::Type>,
     },
+    MissingValueDefinition {
+        name: String,
+        type_hint: Option<parse::Type>,
+    },
 }
 
 pub(crate) fn canonicalize(parsed: parse::Module) -> Result<Module, Vec<CanonicalizeError>> {
@@ -160,12 +185,7 @@ fn extract_name(dec: &parse::Declaration) -> String {
     match dec {
         parse::Declaration::TypeAnnotation { name, .. } => name.clone(),
         parse::Declaration::Value { name, .. } => name.clone(),
-        parse::Declaration::TypeAliasDefinition { .. } => todo!(),
-        // parse::Declaration::TypeAliasDefinition {
-        //     name,
-        //     type_variables: _,
-        //     t: _,
-        // } => name.clone(),
+        parse::Declaration::TypeAliasDefinition { name, .. } => name.clone(),
     }
 }
 
@@ -173,15 +193,49 @@ fn to_canonical_declaration(
     name: String,
     declarations: impl IntoIterator<Item = parse::Declaration>,
 ) -> Result<Declaration, CanonicalizeError> {
-    let (type_hints, declarations): (BTreeSet<parse::Declaration>, BTreeSet<parse::Declaration>) =
-        declarations
-            .into_iter()
-            .partition(|dec| matches!(dec, parse::Declaration::TypeAnnotation { .. }));
+    let (type_hints, values, type_alias_definitions): (
+        BTreeSet<TypeAnnotation>,
+        BTreeSet<Value>,
+        BTreeSet<TypeAliasDefinition>,
+    ) = {
+        let (type_hints, declarations): (BTreeSet<TypeAnnotation>, BTreeSet<parse::Declaration>) =
+            declarations.into_iter().partition_map(|dec| match dec {
+                parse::Declaration::TypeAnnotation {
+                    name,
+                    type_variables,
+                    t,
+                } => Either::Left(TypeAnnotation {
+                    name,
+                    type_variables,
+                    t,
+                }),
+                parse::Declaration::Value { .. } => Either::Right(dec),
+                parse::Declaration::TypeAliasDefinition { .. } => Either::Right(dec),
+            });
+        let (values, type_alias_definitions): (BTreeSet<Value>, BTreeSet<TypeAliasDefinition>) =
+            declarations.into_iter().partition_map(|dec| match dec {
+                parse::Declaration::TypeAnnotation { .. } => todo!("should never get here"),
+                parse::Declaration::Value { name, definition } => {
+                    Either::Left(Value { name, definition })
+                }
+                parse::Declaration::TypeAliasDefinition {
+                    name,
+                    type_variables,
+                    t,
+                } => Either::Right(TypeAliasDefinition {
+                    name,
+                    type_variables,
+                    t,
+                }),
+            });
+
+        (type_hints, values, type_alias_definitions)
+    };
 
     let type_hint = match type_hints.len() {
         0 => None,
         1 => match type_hints.into_iter().next() {
-            Some(parse::Declaration::TypeAnnotation { t, .. }) => Some(t),
+            Some(TypeAnnotation { t, .. }) => Some(t),
             // _ => None,
             _ => todo!(),
         },
@@ -191,21 +245,20 @@ fn to_canonical_declaration(
                 types: type_hints
                     .into_iter()
                     .filter_map(|dec| match dec {
-                        parse::Declaration::TypeAnnotation { t, .. } => Some(t),
-                        _ => None,
+                        TypeAnnotation { t, .. } => Some(t),
                     })
                     .collect(),
             });
         }
     };
 
-    let definition = declarations
+    if values.is_empty() {
+        return Err(CanonicalizeError::MissingValueDefinition { name, type_hint });
+    }
+
+    let definition = values
         .into_iter()
-        .map(|declaration| match declaration {
-            parse::Declaration::TypeAnnotation { .. } => todo!("should never get here"),
-            parse::Declaration::TypeAliasDefinition { .. } => todo!(),
-            parse::Declaration::Value { definition, .. } => definition,
-        })
+        .map(|value| value.definition)
         .collect::<Expr>();
 
     Ok(Declaration::Value {
@@ -379,6 +432,26 @@ Module names were not equal.
                     parse::Type::identifier("Int"),
                     parse::Type::identifier("String"),
                 ],
+            }],
+            actual,
+        );
+    }
+
+    #[test]
+    fn test_type_annotation_with_no_definition_returns_error() {
+        let source: &str = r#"
+            module Test
+            where
+
+            thing : String
+"#;
+        let parsed_module = parse::parser::module(source).unwrap();
+        let actual = canonicalize(parsed_module).unwrap_err();
+
+        assert_eq!(
+            vec![canonical::CanonicalizeError::MissingValueDefinition {
+                name: "thing".into(),
+                type_hint: parse::Type::identifier("String").into(),
             }],
             actual,
         );
@@ -602,81 +675,64 @@ Module names were not equal.
         );
     }
 
-//     #[test]
-//     fn test_multi_property_union_type() {
-//         let expected = canonical::Module {
-//             name: String::from("Test"),
-//             declarations: vec![
-//                 Declaration::TypeAliasDefinition {
-//                     name: String::from("Either"),
-//                     type_variables: vec![String::from("L"), String::from("R")],
-//                     t: Type::Union {
-//                         types: vec![
-//                             Type::Tuple(vec![
-//                                 Type::atom("Right"),
-//                                 Type::identifier("R"),
-//                             ]),
-//                             Type::Tuple(vec![
-//                                 Type::atom("Left"),
-//                                 Type::identifier("L"),
-//                             ]),
-//                         ]
-//                     },
-//                 },
-//             ],
-//         };
-//
-//         {
-//             let source: &str = r#"
-//             module Test
-//             where
-//
-//             data Either<L, R> =
-//               | (:Right, R)
-//               | (:Left, L)
-// "#;
-//
-//             let parsed_module = parse::parser::module(source).unwrap();
-//             let actual = canonicalize(parsed_module).unwrap();
-//
-//             assert_module(
-//                 expected.clone(),
-//                 actual,
-//             );
-//         }
-//         {
-//             let source: &str = r#"
-//             module Test
-//             where
-//
-//             data Either<L, R> =
-//               (:Right, R)
-//               | (:Left, L)
-// "#;
-//
-//             let parsed_module = parse::parser::module(source).unwrap();
-//             let actual = canonicalize(parsed_module).unwrap();
-//
-//             assert_module(
-//                 expected.clone(),
-//                 actual,
-//             );
-//         }
-//         {
-//             let source: &str = r#"
-//             module Test
-//             where
-//
-//             data Either<L, R> = (:Right, R) | (:Left, L)
-// "#;
-//
-//             let parsed_module = parse::parser::module(source).unwrap();
-//             let actual = canonicalize(parsed_module).unwrap();
-//
-//             assert_module(
-//                 expected,
-//                 actual,
-//             );
-//         }
-//     }
+    //     #[test]
+    //     fn test_multi_property_union_type() {
+    //         let expected = canonical::Module {
+    //             name: String::from("Test"),
+    //             declarations: vec![Declaration::Type {
+    //                 name: String::from("Either"),
+    //                 type_variables: vec![String::from("L"), String::from("R")],
+    //                 t: Type::Union {
+    //                     types: vec![
+    //                         Type::Tuple(vec![Type::atom("Right"), Type::identifier("R")]),
+    //                         Type::Tuple(vec![Type::atom("Left"), Type::identifier("L")]),
+    //                     ],
+    //                 },
+    //             }],
+    //         };
+    //
+    //         {
+    //             let source: &str = r#"
+    //             module Test
+    //             where
+    //
+    //             data Either<L, R> =
+    //               | (:Right, R)
+    //               | (:Left, L)
+    // "#;
+    //
+    //             let parsed_module = parse::parser::module(source).unwrap();
+    //             let actual = canonicalize(parsed_module).unwrap();
+    //
+    //             assert_module(expected.clone(), actual);
+    //         }
+    //         {
+    //             let source: &str = r#"
+    //             module Test
+    //             where
+    //
+    //             data Either<L, R> =
+    //               (:Right, R)
+    //               | (:Left, L)
+    // "#;
+    //
+    //             let parsed_module = parse::parser::module(source).unwrap();
+    //             let actual = canonicalize(parsed_module).unwrap();
+    //
+    //             assert_module(expected.clone(), actual);
+    //         }
+    //         {
+    //             let source: &str = r#"
+    //             module Test
+    //             where
+    //
+    //             data Either<L, R> = (:Right, R) | (:Left, L)
+    // "#;
+    //
+    //             let parsed_module = parse::parser::module(source).unwrap();
+    //             let actual = canonicalize(parsed_module).unwrap();
+    //
+    //             assert_module(expected, actual);
+    //         }
+    //     }
 }

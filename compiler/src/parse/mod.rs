@@ -195,6 +195,7 @@ impl From<Type> for Vec<Type> {
 pub(crate) enum Declaration {
     TypeAnnotation {
         name: String,
+        type_variables: Vec<String>,
         t: Type,
     },
     Value {
@@ -242,7 +243,7 @@ peg::parser!(pub(crate)grammar parser() for str {
 
     rule type_annotation() -> Declaration
         = name:identifier() _ ":" _ t:type_definition() _
-        { Declaration::TypeAnnotation {name, t } }
+        { Declaration::TypeAnnotation {name, type_variables: Vec::new(), t } }
 
     rule value_definition() -> Declaration
         = name:identifier() _ "=" _ e:expression() _ { Declaration::Value {name, definition: e } }
@@ -433,6 +434,7 @@ Module names were not equal.
                 declarations: vec![
                     Declaration::TypeAnnotation {
                         name: String::from("thing"),
+                        type_variables: vec![],
                         t: Type::identifier("Int"),
                     },
                     Declaration::Value {
@@ -461,6 +463,7 @@ Module names were not equal.
                 declarations: vec![
                     Declaration::TypeAnnotation {
                         name: String::from("increment_positive"),
+                        type_variables: vec![],
                         t: Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                     },
                     Declaration::Value {
@@ -496,6 +499,7 @@ Module names were not equal.
                 declarations: vec![
                     Declaration::TypeAnnotation {
                         name: String::from("increment_by_length"),
+                        type_variables: vec![],
                         t: Type::lambda(
                             Type::tuple(vec![Type::identifier("Int"), Type::identifier("String")]),
                             Type::identifier("Int"),
@@ -540,6 +544,7 @@ Module names were not equal.
                 declarations: vec![
                     Declaration::TypeAnnotation {
                         name: String::from("increment_by_length"),
+                        type_variables: vec![],
                         t: Type::lambda(
                             Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                             Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
