@@ -78,20 +78,20 @@ use crate::parse::Expr;
 // }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-struct TypeAnnotation {
+pub(crate) struct TypeAnnotation {
     name: String,
     type_variables: Vec<String>,
     t: parse::Type,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-struct Value {
+pub(crate) struct Value {
     name: String,
     definition: Expr,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-struct TypeAliasDefinition {
+pub(crate) struct TypeAliasDefinition {
     name: String,
     type_variables: Vec<String>,
     t: parse::Type,
@@ -145,7 +145,11 @@ pub(crate) struct Module {
 pub(crate) enum CanonicalizeError {
     ConflictingTypeAnnotations {
         name: String,
-        types: Vec<parse::Type>,
+        types: Vec<TypeAnnotation>,
+    },
+    ConflictingTypeAliasDefinitions {
+        name: String,
+        type_aliases: Vec<TypeAliasDefinition>,
     },
     MissingValueDefinition {
         name: String,
@@ -193,12 +197,12 @@ fn to_canonical_declaration(
     name: String,
     declarations: impl IntoIterator<Item = parse::Declaration>,
 ) -> Result<Declaration, CanonicalizeError> {
-    let (type_hints, values, type_alias_definitions): (
-        BTreeSet<TypeAnnotation>,
-        BTreeSet<Value>,
-        BTreeSet<TypeAliasDefinition>,
+    let (type_annotations, values, type_aliases): (
+        Vec<TypeAnnotation>,
+        Vec<Value>,
+        Vec<TypeAliasDefinition>,
     ) = {
-        let (type_hints, declarations): (BTreeSet<TypeAnnotation>, BTreeSet<parse::Declaration>) =
+        let (type_annotations, declarations): (Vec<TypeAnnotation>, Vec<parse::Declaration>) =
             declarations.into_iter().partition_map(|dec| match dec {
                 parse::Declaration::TypeAnnotation {
                     name,
@@ -212,7 +216,7 @@ fn to_canonical_declaration(
                 parse::Declaration::Value { .. } => Either::Right(dec),
                 parse::Declaration::TypeAliasDefinition { .. } => Either::Right(dec),
             });
-        let (values, type_alias_definitions): (BTreeSet<Value>, BTreeSet<TypeAliasDefinition>) =
+        let (values, type_alias_definitions): (Vec<Value>, Vec<TypeAliasDefinition>) =
             declarations.into_iter().partition_map(|dec| match dec {
                 parse::Declaration::TypeAnnotation { .. } => todo!("should never get here"),
                 parse::Declaration::Value { name, definition } => {
@@ -229,28 +233,36 @@ fn to_canonical_declaration(
                 }),
             });
 
-        (type_hints, values, type_alias_definitions)
+        (type_annotations, values, type_alias_definitions)
     };
 
-    let type_hint = match type_hints.len() {
-        0 => None,
-        1 => match type_hints.into_iter().next() {
-            Some(TypeAnnotation { t, .. }) => Some(t),
-            // _ => None,
-            _ => todo!(),
-        },
-        _ => {
-            return Err(CanonicalizeError::ConflictingTypeAnnotations {
-                name,
-                types: type_hints
-                    .into_iter()
-                    .filter_map(|dec| match dec {
-                        TypeAnnotation { t, .. } => Some(t),
-                    })
-                    .collect(),
-            });
-        }
-    };
+    if type_aliases.len() > 1 {
+        return Err(CanonicalizeError::ConflictingTypeAliasDefinitions { name, type_aliases });
+    }
+
+    if let Some(TypeAliasDefinition {
+        name,
+        type_variables,
+        t,
+    }) = type_aliases.first().map(Clone::clone)
+    {
+        return Ok(Declaration::Type {
+            name,
+            type_variables,
+            t,
+        });
+    }
+
+    if type_annotations.len() > 1 {
+        return Err(CanonicalizeError::ConflictingTypeAnnotations {
+            name,
+            types: type_annotations,
+        });
+    }
+
+    let type_hint = type_annotations
+        .first()
+        .map(|TypeAnnotation { t, .. }| t.clone());
 
     if values.is_empty() {
         return Err(CanonicalizeError::MissingValueDefinition { name, type_hint });
@@ -274,6 +286,8 @@ mod tests {
     use crate::canonical::{canonicalize, Declaration};
     use crate::parse;
     use crate::parse::{BinOp, Expr, Type};
+
+    use super::TypeAnnotation;
 
     macro_rules! assert_eq {
         ($expected:expr, $actual:expr $(,)?) => ({
@@ -429,8 +443,16 @@ Module names were not equal.
             vec![canonical::CanonicalizeError::ConflictingTypeAnnotations {
                 name: "thing".into(),
                 types: vec![
-                    parse::Type::identifier("Int"),
-                    parse::Type::identifier("String"),
+                    TypeAnnotation {
+                        name: "thing".into(),
+                        type_variables: vec![],
+                        t: parse::Type::identifier("String"),
+                    },
+                    TypeAnnotation {
+                        name: "thing".into(),
+                        type_variables: vec![],
+                        t: parse::Type::identifier("Int"),
+                    },
                 ],
             }],
             actual,
@@ -675,64 +697,64 @@ Module names were not equal.
         );
     }
 
-    //     #[test]
-    //     fn test_multi_property_union_type() {
-    //         let expected = canonical::Module {
-    //             name: String::from("Test"),
-    //             declarations: vec![Declaration::Type {
-    //                 name: String::from("Either"),
-    //                 type_variables: vec![String::from("L"), String::from("R")],
-    //                 t: Type::Union {
-    //                     types: vec![
-    //                         Type::Tuple(vec![Type::atom("Right"), Type::identifier("R")]),
-    //                         Type::Tuple(vec![Type::atom("Left"), Type::identifier("L")]),
-    //                     ],
-    //                 },
-    //             }],
-    //         };
-    //
-    //         {
-    //             let source: &str = r#"
-    //             module Test
-    //             where
-    //
-    //             data Either<L, R> =
-    //               | (:Right, R)
-    //               | (:Left, L)
-    // "#;
-    //
-    //             let parsed_module = parse::parser::module(source).unwrap();
-    //             let actual = canonicalize(parsed_module).unwrap();
-    //
-    //             assert_module(expected.clone(), actual);
-    //         }
-    //         {
-    //             let source: &str = r#"
-    //             module Test
-    //             where
-    //
-    //             data Either<L, R> =
-    //               (:Right, R)
-    //               | (:Left, L)
-    // "#;
-    //
-    //             let parsed_module = parse::parser::module(source).unwrap();
-    //             let actual = canonicalize(parsed_module).unwrap();
-    //
-    //             assert_module(expected.clone(), actual);
-    //         }
-    //         {
-    //             let source: &str = r#"
-    //             module Test
-    //             where
-    //
-    //             data Either<L, R> = (:Right, R) | (:Left, L)
-    // "#;
-    //
-    //             let parsed_module = parse::parser::module(source).unwrap();
-    //             let actual = canonicalize(parsed_module).unwrap();
-    //
-    //             assert_module(expected, actual);
-    //         }
-    //     }
+    #[test]
+    fn test_multi_property_union_type() {
+        let expected = canonical::Module {
+            name: String::from("Test"),
+            declarations: vec![Declaration::Type {
+                name: String::from("Either"),
+                type_variables: vec![String::from("L"), String::from("R")],
+                t: Type::Union {
+                    types: vec![
+                        Type::Tuple(vec![Type::atom("Right"), Type::identifier("R")]),
+                        Type::Tuple(vec![Type::atom("Left"), Type::identifier("L")]),
+                    ],
+                },
+            }],
+        };
+
+        {
+            let source: &str = r#"
+                module Test
+                where
+
+                data Either<L, R> =
+                  | (:Right, R)
+                  | (:Left, L)
+    "#;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_module(expected.clone(), actual);
+        }
+        {
+            let source: &str = r#"
+                module Test
+                where
+
+                data Either<L, R> =
+                  (:Right, R)
+                  | (:Left, L)
+    "#;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_module(expected.clone(), actual);
+        }
+        {
+            let source: &str = r#"
+                module Test
+                where
+
+                data Either<L, R> = (:Right, R) | (:Left, L)
+    "#;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_module(expected, actual);
+        }
+    }
 }
