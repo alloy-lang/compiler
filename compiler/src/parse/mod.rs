@@ -90,11 +90,15 @@ impl Expr {
         Expr::IfElse(expr.into(), then_expr.into(), else_expr.into())
     }
 
-    pub(crate) fn call<E>(address: Vec<&str>, expr: E) -> Expr
+    pub(crate) fn call<S, E>(address: Vec<S>, expr: E) -> Expr
     where
+        S: Into<String>,
         E: Into<Vec<Expr>>,
     {
-        let address = address.into_iter().map(String::from).collect::<Vec<_>>();
+        let address = address
+            .into_iter()
+            .map(|s| s.into())
+            .collect::<Vec<String>>();
 
         Expr::Call(address, expr.into())
     }
@@ -192,6 +196,26 @@ impl From<Type> for Vec<Type> {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+pub(crate) struct TypeAnnotation {
+    pub(crate) name: String,
+    pub(crate) type_variables: Vec<String>,
+    pub(crate) t: Type,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+pub(crate) struct Value {
+    pub(crate) name: String,
+    pub(crate) definition: Expr,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+pub(crate) struct TypeAliasDefinition {
+    pub(crate) name: String,
+    pub(crate) type_variables: Vec<String>,
+    pub(crate) t: Type,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum Declaration {
     TypeAnnotation {
         name: String,
@@ -209,6 +233,80 @@ pub(crate) enum Declaration {
     },
 }
 
+impl Declaration {
+    fn new_type_annotation<S>(name: S, type_variables: Vec<String>, t: Type) -> Declaration
+    where
+        S: Into<String>,
+    {
+        Declaration::TypeAnnotation {
+            name: name.into(),
+            type_variables,
+            t,
+        }
+    }
+
+    fn new_value<S>(name: S, definition: Expr) -> Declaration
+    where
+        S: Into<String>,
+    {
+        Declaration::Value {
+            name: name.into(),
+            definition,
+        }
+    }
+
+    fn new_type_alias<S>(name: S, type_variables: Vec<String>, t: Type) -> Declaration
+    where
+        S: Into<String>,
+    {
+        Declaration::TypeAliasDefinition {
+            name: name.into(),
+            type_variables,
+            t,
+        }
+    }
+
+    pub(crate) fn categorize(
+        declarations: impl IntoIterator<Item = Declaration>,
+    ) -> (Vec<TypeAnnotation>, Vec<Value>, Vec<TypeAliasDefinition>) {
+        let mut type_annotations: Vec<TypeAnnotation> = Vec::new();
+        let mut values: Vec<Value> = Vec::new();
+        let mut type_aliases: Vec<TypeAliasDefinition> = Vec::new();
+
+        for declaration in declarations {
+            match declaration {
+                Declaration::TypeAnnotation {
+                    name,
+                    type_variables,
+                    t,
+                } => {
+                    type_annotations.push(TypeAnnotation {
+                        name,
+                        type_variables,
+                        t,
+                    });
+                }
+                Declaration::Value { name, definition } => {
+                    values.push(Value { name, definition });
+                }
+                Declaration::TypeAliasDefinition {
+                    name,
+                    type_variables,
+                    t,
+                } => {
+                    type_aliases.push(TypeAliasDefinition {
+                        name,
+                        type_variables,
+                        t,
+                    });
+                }
+            }
+        }
+
+        (type_annotations, values, type_aliases)
+    }
+}
+
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) struct Module {
     pub(crate) name: String,
@@ -219,7 +317,7 @@ pub(crate) struct Module {
 peg::parser!(pub(crate)grammar parser() for str {
     pub(crate)rule module() -> Module
         = __ "module" _ name:identifier() __ "where"
-          declarations:((__ dec:declaration() _ {dec}) ** "\n") __
+          declarations:((__ dec:declaration() _ { dec }) ** "\n") __
           { Module { name, declarations } }
 
     rule declaration() -> Declaration
@@ -234,25 +332,25 @@ peg::parser!(pub(crate)grammar parser() for str {
     rule type_definition() -> Type = precedence!{
         arg_type:@ _ "->" _ return_type:(@) { Type::lambda(arg_type, return_type) }
         --
-        "(" args:((_ t:type_definition() _ { t }) **<2,> ",") ")" _ { Type::Tuple(args) }
+        "(" args:((_ t:type_definition() _ { t }) **<2,> ",") ")" _ { Type::tuple(args) }
         --
         "(" _ t:type_definition() _ ")" _ { t }
-        ":" t:identifier() _ { Type::Atom(t) }
-        t:identifier() _ { Type::Identifier(t) }
+        ":" t:identifier() _ { Type::atom(t) }
+        t:identifier() _ { Type::identifier(t) }
     }
 
     rule type_annotation() -> Declaration
         = name:identifier() _ ":" _ t:type_definition() _
-        { Declaration::TypeAnnotation {name, type_variables: Vec::new(), t } }
+        { Declaration::new_type_annotation(name, Vec::new(), t) }
 
     rule value_definition() -> Declaration
-        = name:identifier() _ "=" _ e:expression() _ { Declaration::Value {name, definition: e } }
+        = name:identifier() _ "=" _ e:expression() _ { Declaration::new_value(name, e) }
 
     rule type_alias_definition() -> Declaration
         = quiet!{ "data" _ name:identifier() _
         "<" _ type_variables:((_ t:identifier() _ { t }) ** ",") _ ">" _ "=" __
         t:possible_union_type()
-        { Declaration::TypeAliasDefinition { name, type_variables, t } } }
+        { Declaration::new_type_alias(name, type_variables, t) } }
         / expected!("type alias")
 
     rule expression() -> Expr
@@ -275,23 +373,23 @@ peg::parser!(pub(crate)grammar parser() for str {
         = i:identifier() _ "=" _ e:expression() { Expr::assign(i, e) }
 
     rule binary_op() -> Expr = precedence!{
-        a:@ _ "==" _ b:(@) { Expr::BinOp(BinOp::Eq, Box::new(a), Box::new(b)) }
-        a:@ _ "!=" _ b:(@) { Expr::BinOp(BinOp::Ne, Box::new(a), Box::new(b)) }
-        a:@ _ "<"  _ b:(@) { Expr::BinOp(BinOp::Lt, Box::new(a), Box::new(b)) }
-        a:@ _ "<=" _ b:(@) { Expr::BinOp(BinOp::Le, Box::new(a), Box::new(b)) }
-        a:@ _ ">"  _ b:(@) { Expr::BinOp(BinOp::Gt, Box::new(a), Box::new(b)) }
-        a:@ _ ">=" _ b:(@) { Expr::BinOp(BinOp::Ge, Box::new(a), Box::new(b)) }
+        a:@ _ "==" _ b:(@) { Expr::bin_op(BinOp::Eq, a, b) }
+        a:@ _ "!=" _ b:(@) { Expr::bin_op(BinOp::Ne, a, b) }
+        a:@ _ "<"  _ b:(@) { Expr::bin_op(BinOp::Lt, a, b) }
+        a:@ _ "<=" _ b:(@) { Expr::bin_op(BinOp::Le, a, b) }
+        a:@ _ ">"  _ b:(@) { Expr::bin_op(BinOp::Gt, a, b) }
+        a:@ _ ">=" _ b:(@) { Expr::bin_op(BinOp::Ge, a, b) }
         --
-        a:@ _ "+" _ b:(@) { Expr::BinOp(BinOp::Add, Box::new(a), Box::new(b)) }
-        a:@ _ "-" _ b:(@) { Expr::BinOp(BinOp::Sub, Box::new(a), Box::new(b)) }
+        a:@ _ "+" _ b:(@) { Expr::bin_op(BinOp::Add, a, b) }
+        a:@ _ "-" _ b:(@) { Expr::bin_op(BinOp::Sub, a, b) }
         --
-        a:@ _ "*" _ b:(@) { Expr::BinOp(BinOp::Mul, Box::new(a), Box::new(b)) }
-        a:@ _ "/" _ b:(@) { Expr::BinOp(BinOp::Div, Box::new(a), Box::new(b)) }
+        a:@ _ "*" _ b:(@) { Expr::bin_op(BinOp::Mul, a, b) }
+        a:@ _ "/" _ b:(@) { Expr::bin_op(BinOp::Div, a, b) }
         --
-        "(" args:((_ e:expression() _ {e}) **<2,> ",") ")" { Expr::Tuple(args) }
+        "(" args:((_ e:expression() _ { e }) **<2,> ",") ")" { Expr::Tuple(args) }
         "(" _ e:expression() _ ")" { e }
-        address:(identifier() ++ "::") "(" args:((_ e:expression() _ {e}) ** ",") ")" { Expr::Call(address, args) }
-        i:identifier() { Expr::Identifier(i) }
+        address:(identifier() ++ "::") "(" args:((_ e:expression() _ { e }) ** ",") ")" { Expr::call(address, args) }
+        i:identifier() { Expr::identifier(i) }
         l:literal() { l }
     }
 

@@ -1,6 +1,7 @@
 // use std::collections::HashMap;
 
 mod canonical;
+#[allow(clippy::redundant_closure_call)]
 mod parse;
 
 // pub struct Artifacts {

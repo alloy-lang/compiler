@@ -1,6 +1,4 @@
-use std::collections::BTreeSet;
-
-use itertools::{Either, Itertools};
+use itertools::Itertools;
 
 use crate::parse;
 use crate::parse::Expr;
@@ -78,26 +76,6 @@ use crate::parse::Expr;
 // }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub(crate) struct TypeAnnotation {
-    name: String,
-    type_variables: Vec<String>,
-    t: parse::Type,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub(crate) struct Value {
-    name: String,
-    definition: Expr,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub(crate) struct TypeAliasDefinition {
-    name: String,
-    type_variables: Vec<String>,
-    t: parse::Type,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum Declaration {
     Type {
         name: String,
@@ -145,11 +123,11 @@ pub(crate) struct Module {
 pub(crate) enum CanonicalizeError {
     ConflictingTypeAnnotations {
         name: String,
-        types: Vec<TypeAnnotation>,
+        types: Vec<parse::TypeAnnotation>,
     },
     ConflictingTypeAliasDefinitions {
         name: String,
-        type_aliases: Vec<TypeAliasDefinition>,
+        type_aliases: Vec<parse::TypeAliasDefinition>,
     },
     MissingValueDefinition {
         name: String,
@@ -197,50 +175,13 @@ fn to_canonical_declaration(
     name: String,
     declarations: impl IntoIterator<Item = parse::Declaration>,
 ) -> Result<Declaration, CanonicalizeError> {
-    let (type_annotations, values, type_aliases): (
-        Vec<TypeAnnotation>,
-        Vec<Value>,
-        Vec<TypeAliasDefinition>,
-    ) = {
-        let (type_annotations, declarations): (Vec<TypeAnnotation>, Vec<parse::Declaration>) =
-            declarations.into_iter().partition_map(|dec| match dec {
-                parse::Declaration::TypeAnnotation {
-                    name,
-                    type_variables,
-                    t,
-                } => Either::Left(TypeAnnotation {
-                    name,
-                    type_variables,
-                    t,
-                }),
-                parse::Declaration::Value { .. } => Either::Right(dec),
-                parse::Declaration::TypeAliasDefinition { .. } => Either::Right(dec),
-            });
-        let (values, type_alias_definitions): (Vec<Value>, Vec<TypeAliasDefinition>) =
-            declarations.into_iter().partition_map(|dec| match dec {
-                parse::Declaration::TypeAnnotation { .. } => todo!("should never get here"),
-                parse::Declaration::Value { name, definition } => {
-                    Either::Left(Value { name, definition })
-                }
-                parse::Declaration::TypeAliasDefinition {
-                    name,
-                    type_variables,
-                    t,
-                } => Either::Right(TypeAliasDefinition {
-                    name,
-                    type_variables,
-                    t,
-                }),
-            });
-
-        (type_annotations, values, type_alias_definitions)
-    };
+    let (type_annotations, values, type_aliases) = parse::Declaration::categorize(declarations);
 
     if type_aliases.len() > 1 {
         return Err(CanonicalizeError::ConflictingTypeAliasDefinitions { name, type_aliases });
     }
 
-    if let Some(TypeAliasDefinition {
+    if let Some(parse::TypeAliasDefinition {
         name,
         type_variables,
         t,
@@ -262,7 +203,7 @@ fn to_canonical_declaration(
 
     let type_hint = type_annotations
         .first()
-        .map(|TypeAnnotation { t, .. }| t.clone());
+        .map(|parse::TypeAnnotation { t, .. }| t.clone());
 
     if values.is_empty() {
         return Err(CanonicalizeError::MissingValueDefinition { name, type_hint });
@@ -285,9 +226,7 @@ mod tests {
     use crate::canonical;
     use crate::canonical::{canonicalize, Declaration};
     use crate::parse;
-    use crate::parse::{BinOp, Expr, Type};
-
-    use super::TypeAnnotation;
+    use crate::parse::{BinOp, Expr, Type, TypeAnnotation};
 
     macro_rules! assert_eq {
         ($expected:expr, $actual:expr $(,)?) => ({
@@ -443,12 +382,12 @@ Module names were not equal.
             vec![canonical::CanonicalizeError::ConflictingTypeAnnotations {
                 name: "thing".into(),
                 types: vec![
-                    TypeAnnotation {
+                    parse::TypeAnnotation {
                         name: "thing".into(),
                         type_variables: vec![],
                         t: parse::Type::identifier("String"),
                     },
-                    TypeAnnotation {
+                    parse::TypeAnnotation {
                         name: "thing".into(),
                         type_variables: vec![],
                         t: parse::Type::identifier("Int"),
