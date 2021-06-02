@@ -216,7 +216,7 @@ pub(crate) struct TypeAliasDefinition {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub(crate) enum Declaration {
+enum Declaration {
     TypeAnnotation {
         name: String,
         type_variables: Vec<String>,
@@ -310,15 +310,33 @@ impl Declaration {
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) struct Module {
     pub(crate) name: String,
-    pub(crate) declarations: Vec<Declaration>,
+    pub(crate) type_annotations: Vec<TypeAnnotation>,
+    pub(crate) values: Vec<Value>,
+    pub(crate) type_aliases: Vec<TypeAliasDefinition>,
 }
 
-#[allow(clippy::all)]
-peg::parser!(pub(crate)grammar parser() for str {
+impl Module {
+    fn from_declarations<S>(name: S, declarations: Vec<Declaration>) -> Module
+    where
+        S: Into<String>,
+    {
+        let (type_annotations, values, type_aliases) = Declaration::categorize(declarations);
+
+        Module {
+            name: name.into(),
+            type_annotations,
+            values,
+            type_aliases,
+        }
+    }
+}
+
+peg::parser! {
+pub(crate)grammar parser() for str {
     pub(crate)rule module() -> Module
         = __ "module" _ name:identifier() __ "where"
           declarations:((__ dec:declaration() _ { dec }) ** "\n") __
-          { Module { name, declarations } }
+          { Module::from_declarations(name, declarations) }
 
     rule declaration() -> Declaration
         = type_annotation()
@@ -405,12 +423,13 @@ peg::parser!(pub(crate)grammar parser() for str {
     rule __() =  quiet!{[' ' | '\t' | '\n']*}
 
     rule _() =  quiet!{[' ' | '\t']*}
-});
+}
+}
 
 #[cfg(test)]
 mod tests {
     use crate::parse;
-    use crate::parse::{BinOp, Declaration, Expr, Type};
+    use crate::parse::{BinOp, Expr, Type};
 
     macro_rules! assert_eq {
         ($expected:expr, $actual:expr) => ({
@@ -422,7 +441,7 @@ mod tests {
                         // noticeable slow down.
                         panic!(r#"assertion failed: `(expected == actual)`
   expected: `{:?}`,
- actual: `{:?}`"#, &*expected_val, &*actual_val)
+    actual: `{:?}`"#, &*expected_val, &*actual_val)
                     }
                 }
             }
@@ -438,10 +457,10 @@ mod tests {
         });
     }
 
-    fn assert_declarations(
-        module_name: String,
-        expecteds: Vec<Declaration>,
-        actuals: Vec<Declaration>,
+    fn assert_type_annotations(
+        module_name: &String,
+        expecteds: Vec<parse::TypeAnnotation>,
+        actuals: Vec<parse::TypeAnnotation>,
     ) {
         let pairs = expecteds
             .iter()
@@ -454,7 +473,61 @@ mod tests {
                 expected, actual,
                 r#"
 
-Declaration in module '{}' at index {} were not equal.
+TypeAnnotation in module '{}' at index {} were not equal.
+ expected: {:?}
+   actual: {:?}
+"#,
+                module_name, index, expected, actual,
+            );
+        }
+
+        assert_eq!(expecteds, actuals);
+    }
+
+    fn assert_values(
+        module_name: &String,
+        expecteds: Vec<parse::Value>,
+        actuals: Vec<parse::Value>,
+    ) {
+        let pairs = expecteds
+            .iter()
+            .zip(actuals.iter())
+            .enumerate()
+            .collect::<Vec<_>>();
+
+        for (index, (expected, actual)) in pairs {
+            assert_eq!(
+                expected, actual,
+                r#"
+
+Value in module '{}' at index {} were not equal.
+ expected: {:?}
+   actual: {:?}
+"#,
+                module_name, index, expected, actual,
+            );
+        }
+
+        assert_eq!(expecteds, actuals);
+    }
+
+    fn assert_type_aliases(
+        module_name: &String,
+        expecteds: Vec<parse::TypeAliasDefinition>,
+        actuals: Vec<parse::TypeAliasDefinition>,
+    ) {
+        let pairs = expecteds
+            .iter()
+            .zip(actuals.iter())
+            .enumerate()
+            .collect::<Vec<_>>();
+
+        for (index, (expected, actual)) in pairs {
+            assert_eq!(
+                expected, actual,
+                r#"
+
+TypeAlias in module '{}' at index {} were not equal.
  expected: {:?}
    actual: {:?}
 "#,
@@ -476,7 +549,14 @@ Module names were not equal.
 "#,
             expected.name, actual.name,
         );
-        assert_declarations(expected.name, expected.declarations, actual.declarations);
+
+        assert_type_annotations(
+            &expected.name,
+            expected.type_annotations,
+            actual.type_annotations,
+        );
+        assert_values(&expected.name, expected.values, actual.values);
+        assert_type_aliases(&expected.name, expected.type_aliases, actual.type_aliases);
     }
 
     #[test]
@@ -491,7 +571,9 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                declarations: vec![],
+                type_annotations: vec![],
+                type_aliases: vec![],
+                values: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -508,10 +590,12 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                declarations: vec![Declaration::Value {
+                type_annotations: vec![],
+                values: vec![parse::Value {
                     name: String::from("thing"),
                     definition: Expr::int_literal("0"),
                 }],
+                type_aliases: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -529,17 +613,16 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                declarations: vec![
-                    Declaration::TypeAnnotation {
-                        name: String::from("thing"),
-                        type_variables: vec![],
-                        t: Type::identifier("Int"),
-                    },
-                    Declaration::Value {
-                        name: String::from("thing"),
-                        definition: Expr::int_literal("0"),
-                    },
-                ],
+                type_annotations: vec![parse::TypeAnnotation {
+                    name: String::from("thing"),
+                    type_variables: vec![],
+                    t: Type::identifier("Int"),
+                }],
+                values: vec![parse::Value {
+                    name: String::from("thing"),
+                    definition: Expr::int_literal("0"),
+                }],
+                type_aliases: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -558,17 +641,17 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                declarations: vec![
-                    Declaration::TypeAnnotation {
-                        name: String::from("increment_positive"),
-                        type_variables: vec![],
-                        t: Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
-                    },
-                    Declaration::Value {
+                type_annotations: vec![parse::TypeAnnotation {
+                    name: String::from("increment_positive"),
+                    type_variables: vec![],
+                    t: Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
+                }],
+                values: vec![
+                    parse::Value {
                         name: String::from("increment_positive"),
                         definition: Expr::function(Expr::int_literal("0"), Expr::int_literal("0")),
                     },
-                    Declaration::Value {
+                    parse::Value {
                         name: String::from("increment_positive"),
                         definition: Expr::function(
                             Expr::identifier("x"),
@@ -576,6 +659,7 @@ Module names were not equal.
                         ),
                     },
                 ],
+                type_aliases: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -594,23 +678,23 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                declarations: vec![
-                    Declaration::TypeAnnotation {
-                        name: String::from("increment_by_length"),
-                        type_variables: vec![],
-                        t: Type::lambda(
-                            Type::tuple(vec![Type::identifier("Int"), Type::identifier("String")]),
-                            Type::identifier("Int"),
-                        ),
-                    },
-                    Declaration::Value {
+                type_annotations: vec![parse::TypeAnnotation {
+                    name: String::from("increment_by_length"),
+                    type_variables: vec![],
+                    t: Type::lambda(
+                        Type::tuple(vec![Type::identifier("Int"), Type::identifier("String")]),
+                        Type::identifier("Int"),
+                    ),
+                }],
+                values: vec![
+                    parse::Value {
                         name: String::from("increment_by_length"),
                         definition: Expr::function(
                             Expr::Tuple(vec![Expr::int_literal("0"), Expr::string_literal("")]),
                             Expr::int_literal("0"),
                         ),
                     },
-                    Declaration::Value {
+                    parse::Value {
                         name: String::from("increment_by_length"),
                         definition: Expr::function(
                             Expr::Tuple(vec![Expr::identifier("x"), Expr::identifier("y")]),
@@ -622,6 +706,7 @@ Module names were not equal.
                         ),
                     },
                 ],
+                type_aliases: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -639,26 +724,25 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                declarations: vec![
-                    Declaration::TypeAnnotation {
-                        name: String::from("increment_by_length"),
-                        type_variables: vec![],
-                        t: Type::lambda(
-                            Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
-                            Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
+                type_annotations: vec![parse::TypeAnnotation {
+                    name: String::from("increment_by_length"),
+                    type_variables: vec![],
+                    t: Type::lambda(
+                        Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
+                        Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
+                    ),
+                }],
+                values: vec![parse::Value {
+                    name: String::from("increment_by_length"),
+                    definition: Expr::function(
+                        Expr::identifier("f"),
+                        Expr::function(
+                            Expr::identifier("value"),
+                            Expr::call(vec!["f"], Expr::identifier("value")),
                         ),
-                    },
-                    Declaration::Value {
-                        name: String::from("increment_by_length"),
-                        definition: Expr::function(
-                            Expr::identifier("f"),
-                            Expr::function(
-                                Expr::identifier("value"),
-                                Expr::call(vec!["f"], Expr::identifier("value")),
-                            ),
-                        ),
-                    },
-                ],
+                    ),
+                }],
+                type_aliases: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -682,8 +766,9 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                declarations: vec![
-                    Declaration::Value {
+                type_annotations: vec![],
+                values: vec![
+                    parse::Value {
                         name: String::from("increment_positive"),
                         definition: Expr::function(
                             Expr::identifier("num"),
@@ -698,7 +783,7 @@ Module names were not equal.
                             ),
                         ),
                     },
-                    Declaration::Value {
+                    parse::Value {
                         name: String::from("decrement_negative"),
                         definition: Expr::function(
                             Expr::identifier("num"),
@@ -714,6 +799,7 @@ Module names were not equal.
                         ),
                     },
                 ],
+                type_aliases: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -736,7 +822,9 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                declarations: vec![Declaration::Value {
+                type_annotations: vec![],
+                type_aliases: vec![],
+                values: vec![parse::Value {
                     name: String::from("increment_or_decrement"),
                     definition: Expr::function(
                         Expr::identifier("num"),
@@ -768,7 +856,9 @@ Module names were not equal.
     fn test_multi_property_union_type() {
         let expected = parse::Module {
             name: String::from("Test"),
-            declarations: vec![Declaration::TypeAliasDefinition {
+            type_annotations: vec![],
+            values: vec![],
+            type_aliases: vec![parse::TypeAliasDefinition {
                 name: String::from("Either"),
                 type_variables: vec![String::from("L"), String::from("R")],
                 t: Type::Union {

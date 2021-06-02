@@ -1,4 +1,4 @@
-use itertools::Itertools;
+use itertools::{Either, Itertools};
 
 use crate::parse;
 use crate::parse::Expr;
@@ -76,36 +76,36 @@ use crate::parse::Expr;
 // }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub(crate) enum Declaration {
-    Type {
-        name: String,
-        type_variables: Vec<String>,
-        t: parse::Type,
-    },
-    Value {
-        name: String,
-        t: Option<parse::Type>,
-        definition: Expr,
-    },
+struct TypeAlias {
+    name: String,
+    type_variables: Vec<String>,
+    t: parse::Type,
 }
 
-impl Declaration {
-    fn new_value<S>(name: S, t: parse::Type, definition: Expr) -> Declaration
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+struct Value {
+    name: String,
+    t: Option<parse::Type>,
+    definition: Expr,
+}
+
+impl Value {
+    fn new_value<S>(name: S, t: parse::Type, definition: Expr) -> Value
     where
         S: Into<String>,
     {
-        Declaration::Value {
+        Value {
             name: name.into(),
             t: Some(t),
             definition,
         }
     }
 
-    fn new_value_no_type<S>(name: S, definition: Expr) -> Declaration
+    fn new_value_no_type<S>(name: S, definition: Expr) -> Value
     where
         S: Into<String>,
     {
-        Declaration::Value {
+        Value {
             name: name.into(),
             t: None,
             definition,
@@ -116,11 +116,15 @@ impl Declaration {
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) struct Module {
     name: String,
-    declarations: Vec<Declaration>,
+    values: Vec<Value>,
+    type_aliases: Vec<TypeAlias>,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum CanonicalizeError {
+    MissingTypeAnnotation {
+        name: String,
+    },
     ConflictingTypeAnnotations {
         name: String,
         types: Vec<parse::TypeAnnotation>,
@@ -136,63 +140,59 @@ pub(crate) enum CanonicalizeError {
 }
 
 pub(crate) fn canonicalize(parsed: parse::Module) -> Result<Module, Vec<CanonicalizeError>> {
-    let (declarations, errors): (Vec<Result<_, _>>, Vec<Result<_, CanonicalizeError>>) = parsed
-        .declarations
+    let parse::Module {
+        name,
+        type_annotations,
+        values,
+        type_aliases,
+    } = parsed;
+
+    let (values, value_errors): (Vec<Value>, Vec<CanonicalizeError>) = values
         .into_iter()
-        .group_by(extract_name)
+        .group_by(|v| v.name.clone())
         .into_iter()
-        .map(|(name, declarations)| to_canonical_declaration(name, declarations))
-        .partition(Result::is_ok);
+        .map(|(name, values)| to_canonical_value(name, values, type_annotations.clone()))
+        .partition_map(|res| match res {
+            Ok(value) => Either::Left(value),
+            Err(error) => Either::Right(error),
+        });
+
+    let (type_aliases, type_alias_errors): (Vec<TypeAlias>, Vec<CanonicalizeError>) = type_aliases
+        .into_iter()
+        .group_by(|ta| ta.name.clone())
+        .into_iter()
+        .map(|(name, declarations)| to_canonical_type_alias(name, declarations))
+        .partition_map(|res| match res {
+            Ok(value) => Either::Left(value),
+            Err(error) => Either::Right(error),
+        });
+
+    let errors: Vec<CanonicalizeError> = vec![value_errors, type_alias_errors]
+        .into_iter()
+        .flatten()
+        .collect::<Vec<CanonicalizeError>>();
 
     if !errors.is_empty() {
-        let errors = errors
-            .into_iter()
-            .map(Result::unwrap_err)
-            .collect::<Vec<_>>();
         return Err(errors);
     }
 
-    let declarations = declarations
-        .into_iter()
-        .map(Result::unwrap)
-        .collect::<Vec<_>>();
-
     Ok(Module {
-        name: parsed.name,
-        declarations,
+        name,
+        values,
+        type_aliases,
     })
 }
 
-fn extract_name(dec: &parse::Declaration) -> String {
-    match dec {
-        parse::Declaration::TypeAnnotation { name, .. } => name.clone(),
-        parse::Declaration::Value { name, .. } => name.clone(),
-        parse::Declaration::TypeAliasDefinition { name, .. } => name.clone(),
-    }
-}
-
-fn to_canonical_declaration(
+fn to_canonical_value(
     name: String,
-    declarations: impl IntoIterator<Item = parse::Declaration>,
-) -> Result<Declaration, CanonicalizeError> {
-    let (type_annotations, values, type_aliases) = parse::Declaration::categorize(declarations);
-
-    if type_aliases.len() > 1 {
-        return Err(CanonicalizeError::ConflictingTypeAliasDefinitions { name, type_aliases });
-    }
-
-    if let Some(parse::TypeAliasDefinition {
-        name,
-        type_variables,
-        t,
-    }) = type_aliases.first().map(Clone::clone)
-    {
-        return Ok(Declaration::Type {
-            name,
-            type_variables,
-            t,
-        });
-    }
+    values: impl IntoIterator<Item = parse::Value>,
+    type_annotations: impl IntoIterator<Item = parse::TypeAnnotation>,
+) -> Result<Value, CanonicalizeError> {
+    let values = values.into_iter().collect::<Vec<_>>();
+    let type_annotations = type_annotations
+        .into_iter()
+        .filter(|ta| ta.name == name)
+        .collect::<Vec<_>>();
 
     if type_annotations.len() > 1 {
         return Err(CanonicalizeError::ConflictingTypeAnnotations {
@@ -214,17 +214,43 @@ fn to_canonical_declaration(
         .map(|value| value.definition)
         .collect::<Expr>();
 
-    Ok(Declaration::Value {
+    Ok(Value {
         name,
         t: type_hint,
         definition,
     })
 }
 
+fn to_canonical_type_alias(
+    name: String,
+    type_aliases: impl IntoIterator<Item = parse::TypeAliasDefinition>,
+) -> Result<TypeAlias, CanonicalizeError> {
+    let type_aliases = type_aliases.into_iter().collect::<Vec<_>>();
+
+    if type_aliases.len() > 1 {
+        return Err(CanonicalizeError::ConflictingTypeAliasDefinitions { name, type_aliases });
+    }
+
+    if let Some(parse::TypeAliasDefinition {
+        name,
+        type_variables,
+        t,
+    }) = type_aliases.first().map(Clone::clone)
+    {
+        return Ok(TypeAlias {
+            name,
+            type_variables,
+            t,
+        });
+    }
+
+    Err(CanonicalizeError::MissingTypeAnnotation { name })
+}
+
 #[cfg(test)]
 mod tests {
     use crate::canonical;
-    use crate::canonical::{canonicalize, Declaration};
+    use crate::canonical::canonicalize;
     use crate::parse;
     use crate::parse::{BinOp, Expr, Type, TypeAnnotation};
 
@@ -238,7 +264,7 @@ mod tests {
                         // noticeable slow down.
                         panic!(r#"assertion failed: `(expected == actual)`
   expected: `{:?}`,
- actual: `{:?}`"#, &*expected_val, &*actual_val)
+    actual: `{:?}`"#, &*expected_val, &*actual_val)
                     }
                 }
             }
@@ -254,47 +280,6 @@ mod tests {
         });
     }
 
-    fn assert_declarations(
-        module_name: String,
-        expecteds: Vec<Declaration>,
-        actuals: Vec<Declaration>,
-    ) {
-        let pairs = expecteds
-            .iter()
-            .zip(actuals.iter())
-            .enumerate()
-            .collect::<Vec<_>>();
-
-        for (index, (expected, actual)) in pairs {
-            assert_eq!(
-                expected, actual,
-                r#"
-
-Declaration in module '{}' at index {} were not equal.
- expected: {:?}
-   actual: {:?}
-"#,
-                module_name, index, expected, actual,
-            );
-        }
-
-        assert_eq!(expecteds, actuals);
-    }
-
-    fn assert_module(expected: canonical::Module, actual: canonical::Module) {
-        assert_eq!(
-            expected.name, actual.name,
-            r#"
-
-Module names were not equal.
- expected: {}
-   actual: {}
-"#,
-            expected.name, actual.name,
-        );
-        assert_declarations(expected.name, expected.declarations, actual.declarations);
-    }
-
     #[test]
     fn test_empty_module() {
         let source: &str = r#"
@@ -307,10 +292,11 @@ Module names were not equal.
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
-        assert_module(
+        assert_eq!(
             canonical::Module {
                 name: String::from("Test"),
-                declarations: vec![],
+                values: vec![],
+                type_aliases: vec![],
             },
             actual,
         );
@@ -327,14 +313,15 @@ Module names were not equal.
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
-        assert_module(
+        assert_eq!(
             canonical::Module {
                 name: String::from("Test"),
-                declarations: vec![Declaration::Value {
+                values: vec![canonical::Value {
                     name: String::from("thing"),
                     t: None,
                     definition: Expr::int_literal("0"),
                 }],
+                type_aliases: vec![],
             },
             actual,
         );
@@ -352,14 +339,15 @@ Module names were not equal.
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
-        assert_module(
+        assert_eq!(
             canonical::Module {
                 name: String::from("Test"),
-                declarations: vec![Declaration::Value {
+                values: vec![canonical::Value {
                     name: String::from("thing"),
                     t: Some(Type::Identifier("Int".into())),
                     definition: Expr::int_literal("0"),
                 }],
+                type_aliases: vec![],
             },
             actual,
         );
@@ -398,25 +386,25 @@ Module names were not equal.
         );
     }
 
-    #[test]
-    fn test_type_annotation_with_no_definition_returns_error() {
-        let source: &str = r#"
-            module Test
-            where
-
-            thing : String
-"#;
-        let parsed_module = parse::parser::module(source).unwrap();
-        let actual = canonicalize(parsed_module).unwrap_err();
-
-        assert_eq!(
-            vec![canonical::CanonicalizeError::MissingValueDefinition {
-                name: "thing".into(),
-                type_hint: parse::Type::identifier("String").into(),
-            }],
-            actual,
-        );
-    }
+    //     #[test]
+    //     fn test_type_annotation_with_no_definition_returns_error() {
+    //         let source: &str = r#"
+    //             module Test
+    //             where
+    //
+    //             thing : String
+    // "#;
+    //         let parsed_module = parse::parser::module(source).unwrap();
+    //         let actual = canonicalize(parsed_module).unwrap_err();
+    //
+    //         assert_eq!(
+    //             vec![canonical::CanonicalizeError::MissingValueDefinition {
+    //                 name: "thing".into(),
+    //                 type_hint: parse::Type::identifier("String").into(),
+    //             }],
+    //             actual,
+    //         );
+    //     }
 
     #[test]
     fn test_single_arg_function_declaration_with_type() {
@@ -431,10 +419,10 @@ Module names were not equal.
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
-        assert_module(
+        assert_eq!(
             canonical::Module {
                 name: String::from("Test"),
-                declarations: vec![Declaration::new_value(
+                values: vec![canonical::Value::new_value(
                     String::from("increment_positive"),
                     Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                     Expr::Match(vec![
@@ -449,6 +437,7 @@ Module names were not equal.
                         ),
                     ]),
                 )],
+                type_aliases: vec![],
             },
             actual,
         );
@@ -467,10 +456,10 @@ Module names were not equal.
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
-        assert_module(
+        assert_eq!(
             canonical::Module {
                 name: String::from("Test"),
-                declarations: vec![Declaration::new_value(
+                values: vec![canonical::Value::new_value(
                     String::from("increment_by_length"),
                     Type::lambda(
                         Type::tuple(vec![Type::identifier("Int"), Type::identifier("String")]),
@@ -491,6 +480,7 @@ Module names were not equal.
                         ),
                     ]),
                 )],
+                type_aliases: vec![],
             },
             actual,
         );
@@ -508,10 +498,10 @@ Module names were not equal.
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
-        assert_module(
+        assert_eq!(
             canonical::Module {
                 name: String::from("Test"),
-                declarations: vec![Declaration::new_value(
+                values: vec![canonical::Value::new_value(
                     String::from("increment_by_length"),
                     Type::lambda(
                         Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
@@ -525,6 +515,7 @@ Module names were not equal.
                         ),
                     ),
                 )],
+                type_aliases: vec![],
             },
             actual,
         );
@@ -548,11 +539,11 @@ Module names were not equal.
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
-        assert_module(
+        assert_eq!(
             canonical::Module {
                 name: String::from("Test"),
-                declarations: vec![
-                    Declaration::new_value_no_type(
+                values: vec![
+                    canonical::Value::new_value_no_type(
                         String::from("increment_positive"),
                         Expr::function(
                             Expr::identifier("num"),
@@ -567,7 +558,7 @@ Module names were not equal.
                             ),
                         ),
                     ),
-                    Declaration::new_value_no_type(
+                    canonical::Value::new_value_no_type(
                         String::from("decrement_negative"),
                         Expr::function(
                             Expr::identifier("num"),
@@ -583,6 +574,7 @@ Module names were not equal.
                         ),
                     ),
                 ],
+                type_aliases: vec![],
             },
             actual,
         );
@@ -605,10 +597,10 @@ Module names were not equal.
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
-        assert_module(
+        assert_eq!(
             canonical::Module {
                 name: String::from("Test"),
-                declarations: vec![Declaration::new_value_no_type(
+                values: vec![canonical::Value::new_value_no_type(
                     String::from("increment_or_decrement"),
                     Expr::function(
                         Expr::identifier("num"),
@@ -631,6 +623,7 @@ Module names were not equal.
                         ),
                     ),
                 )],
+                type_aliases: vec![],
             },
             actual,
         );
@@ -640,7 +633,8 @@ Module names were not equal.
     fn test_multi_property_union_type() {
         let expected = canonical::Module {
             name: String::from("Test"),
-            declarations: vec![Declaration::Type {
+            values: vec![],
+            type_aliases: vec![canonical::TypeAlias {
                 name: String::from("Either"),
                 type_variables: vec![String::from("L"), String::from("R")],
                 t: Type::Union {
@@ -665,7 +659,7 @@ Module names were not equal.
             let parsed_module = parse::parser::module(source).unwrap();
             let actual = canonicalize(parsed_module).unwrap();
 
-            assert_module(expected.clone(), actual);
+            assert_eq!(expected.clone(), actual);
         }
         {
             let source: &str = r#"
@@ -680,7 +674,7 @@ Module names were not equal.
             let parsed_module = parse::parser::module(source).unwrap();
             let actual = canonicalize(parsed_module).unwrap();
 
-            assert_module(expected.clone(), actual);
+            assert_eq!(expected.clone(), actual);
         }
         {
             let source: &str = r#"
@@ -693,7 +687,7 @@ Module names were not equal.
             let parsed_module = parse::parser::module(source).unwrap();
             let actual = canonicalize(parsed_module).unwrap();
 
-            assert_module(expected, actual);
+            assert_eq!(expected, actual);
         }
     }
 }
