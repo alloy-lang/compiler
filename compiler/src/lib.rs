@@ -4,6 +4,9 @@ mod canonical;
 #[allow(clippy::redundant_closure_call)]
 mod parse;
 
+#[cfg(test)]
+mod test_source;
+
 // pub struct Artifacts {
 //     module: HashMap<String, String>,
 // }

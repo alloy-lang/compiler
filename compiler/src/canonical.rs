@@ -253,6 +253,7 @@ mod tests {
     use crate::canonical::canonicalize;
     use crate::parse;
     use crate::parse::{BinOp, Expr, Type, TypeAnnotation};
+    use crate::test_source;
 
     macro_rules! assert_eq {
         ($expected:expr, $actual:expr $(,)?) => ({
@@ -282,13 +283,7 @@ mod tests {
 
     #[test]
     fn test_empty_module() {
-        let source: &str = r#"
-            module Test
-            where
-
-
-
-"#;
+        let source: &str = test_source::EMPTY_MODULE;
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
@@ -304,12 +299,7 @@ mod tests {
 
     #[test]
     fn test_value_declaration_no_type() {
-        let source: &str = r#"
-            module Test
-            where
-
-            thing = 0
-"#;
+        let source: &str = test_source::VALUE_DECLARATION_NO_TYPE;
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
@@ -329,13 +319,7 @@ mod tests {
 
     #[test]
     fn test_value_declaration_with_type() {
-        let source: &str = r#"
-            module Test
-            where
-
-            thing : Int
-            thing = 0
-"#;
+        let source: &str = test_source::VALUE_DECLARATION_WITH_TYPE;
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
@@ -355,14 +339,7 @@ mod tests {
 
     #[test]
     fn test_value_declaration_with_conflicting_type_annotations() {
-        let source: &str = r#"
-            module Test
-            where
-
-            thing : String
-            thing : Int
-            thing = 0
-"#;
+        let source: &str = test_source::VALUE_DECLARATION_WITH_CONFLICTING_TYPE_ANNOTATIONS;
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap_err();
 
@@ -386,36 +363,24 @@ mod tests {
         );
     }
 
-    //     #[test]
-    //     fn test_type_annotation_with_no_definition_returns_error() {
-    //         let source: &str = r#"
-    //             module Test
-    //             where
+    // #[test]
+    // fn test_type_annotation_with_no_definition_returns_error() {
+    //     let source: &str = test_source::TYPE_ANNOTATION_WITH_NO_DEFINITION;
+    //     let parsed_module = parse::parser::module(source).unwrap();
+    //     let actual = canonicalize(parsed_module).unwrap_err();
     //
-    //             thing : String
-    // "#;
-    //         let parsed_module = parse::parser::module(source).unwrap();
-    //         let actual = canonicalize(parsed_module).unwrap_err();
-    //
-    //         assert_eq!(
-    //             vec![canonical::CanonicalizeError::MissingValueDefinition {
-    //                 name: "thing".into(),
-    //                 type_hint: parse::Type::identifier("String").into(),
-    //             }],
-    //             actual,
-    //         );
-    //     }
+    //     assert_eq!(
+    //         vec![canonical::CanonicalizeError::MissingValueDefinition {
+    //             name: "thing".into(),
+    //             type_hint: parse::Type::identifier("String").into(),
+    //         }],
+    //         actual,
+    //     );
+    // }
 
     #[test]
     fn test_single_arg_function_declaration_with_type() {
-        let source: &str = r#"
-            module Test
-            where
-
-            increment_positive : Int -> Int
-            increment_positive = |0| => 0
-            increment_positive = |x| => x + 1
-"#;
+        let source: &str = test_source::SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE;
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
@@ -445,14 +410,7 @@ mod tests {
 
     #[test]
     fn test_multi_arg_function_declaration_with_type() {
-        let source: &str = r#"
-            module Test
-            where
-
-            increment_by_length : (Int, String) -> Int
-            increment_by_length = |(0, "")| => 0
-            increment_by_length = |(x, y)| => x + String::length(y)
-"#;
+        let source: &str = test_source::MULTI_ARG_FUNCTION_DECLARATION_WITH_TYPE;
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
@@ -488,13 +446,7 @@ mod tests {
 
     #[test]
     fn test_curried_function_declaration_with_type() {
-        let source: &str = r#"
-            module Test
-            where
-
-            increment_by_length : (Int -> Int) -> Int -> Int
-            increment_by_length = |f| => |value| => f(value)
-"#;
+        let source: &str = test_source::CURRIED_FUNCTION_DECLARATION_WITH_TYPE;
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
@@ -523,19 +475,7 @@ mod tests {
 
     #[test]
     fn test_simple_if_then_else() {
-        let source: &str = r#"
-            module Test
-            where
-
-            increment_positive = |num| =>
-              if Number::is_positive?(num)
-              then num + 1
-              else num
-            decrement_negative = |num| =>
-              if Number::is_negative?(num)
-              then num - 1
-              else num
-"#;
+        let source: &str = test_source::SIMPLE_IF_THEN_ELSE;
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
@@ -582,18 +522,7 @@ mod tests {
 
     #[test]
     fn test_nested_if_then_else() {
-        let source: &str = r#"
-        module Test
-        where
-
-        increment_or_decrement = |num| =>
-          if Number::is_positive?(num)
-          then num + 1
-          else
-            if Number::is_negative?(num)
-            then num - 1
-            else num
-"#;
+        let source: &str = test_source::NESTED_IF_THEN_ELSE;
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap();
 
@@ -647,14 +576,7 @@ mod tests {
         };
 
         {
-            let source: &str = r#"
-                module Test
-                where
-
-                data Either<L, R> =
-                  | (:Right, R)
-                  | (:Left, L)
-    "#;
+            let source: &str = test_source::MULTI_PROPERTY_UNION_TYPE_1;
 
             let parsed_module = parse::parser::module(source).unwrap();
             let actual = canonicalize(parsed_module).unwrap();
@@ -662,14 +584,7 @@ mod tests {
             assert_eq!(expected.clone(), actual);
         }
         {
-            let source: &str = r#"
-                module Test
-                where
-
-                data Either<L, R> =
-                  (:Right, R)
-                  | (:Left, L)
-    "#;
+            let source: &str = test_source::MULTI_PROPERTY_UNION_TYPE_2;
 
             let parsed_module = parse::parser::module(source).unwrap();
             let actual = canonicalize(parsed_module).unwrap();
@@ -677,12 +592,7 @@ mod tests {
             assert_eq!(expected.clone(), actual);
         }
         {
-            let source: &str = r#"
-                module Test
-                where
-
-                data Either<L, R> = (:Right, R) | (:Left, L)
-    "#;
+            let source: &str = test_source::MULTI_PROPERTY_UNION_TYPE_3;
 
             let parsed_module = parse::parser::module(source).unwrap();
             let actual = canonicalize(parsed_module).unwrap();

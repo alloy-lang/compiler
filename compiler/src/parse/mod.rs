@@ -430,6 +430,7 @@ pub(crate)grammar parser() for str {
 mod tests {
     use crate::parse;
     use crate::parse::{BinOp, Expr, Type};
+    use crate::test_source;
 
     macro_rules! assert_eq {
         ($expected:expr, $actual:expr) => ({
@@ -561,13 +562,7 @@ Module names were not equal.
 
     #[test]
     fn test_empty_module() {
-        let source: &str = r#"
-            module Test
-            where
-
-
-
-"#;
+        let source: &str = test_source::EMPTY_MODULE;
         assert_module(
             parse::Module {
                 name: String::from("Test"),
@@ -581,12 +576,7 @@ Module names were not equal.
 
     #[test]
     fn test_value_declaration_no_type() {
-        let source: &str = r#"
-            module Test
-            where
-
-            thing = 0
-"#;
+        let source: &str = test_source::VALUE_DECLARATION_NO_TYPE;
         assert_module(
             parse::Module {
                 name: String::from("Test"),
@@ -603,13 +593,7 @@ Module names were not equal.
 
     #[test]
     fn test_value_declaration_with_type() {
-        let source: &str = r#"
-            module Test
-            where
-
-            thing : Int
-            thing = 0
-"#;
+        let source: &str = test_source::VALUE_DECLARATION_WITH_TYPE;
         assert_module(
             parse::Module {
                 name: String::from("Test"),
@@ -630,14 +614,7 @@ Module names were not equal.
 
     #[test]
     fn test_single_arg_function_declaration_with_type() {
-        let source: &str = r#"
-            module Test
-            where
-
-            increment_positive : Int -> Int
-            increment_positive = |0| => 0
-            increment_positive = |x| => x + 1
-"#;
+        let source: &str = test_source::SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE;
         assert_module(
             parse::Module {
                 name: String::from("Test"),
@@ -667,14 +644,7 @@ Module names were not equal.
 
     #[test]
     fn test_multi_arg_function_declaration_with_type() {
-        let source: &str = r#"
-            module Test
-            where
-
-            increment_by_length : (Int, String) -> Int
-            increment_by_length = |(0, "")| => 0
-            increment_by_length = |(x, y)| => x + String::length(y)
-"#;
+        let source: &str = test_source::MULTI_ARG_FUNCTION_DECLARATION_WITH_TYPE;
         assert_module(
             parse::Module {
                 name: String::from("Test"),
@@ -714,13 +684,7 @@ Module names were not equal.
 
     #[test]
     fn test_curried_function_declaration_with_type() {
-        let source: &str = r#"
-            module Test
-            where
-
-            increment_by_length : (Int -> Int) -> Int -> Int
-            increment_by_length = |f| => |value| => f(value)
-"#;
+        let source: &str = test_source::CURRIED_FUNCTION_DECLARATION_WITH_TYPE;
         assert_module(
             parse::Module {
                 name: String::from("Test"),
@@ -750,19 +714,7 @@ Module names were not equal.
 
     #[test]
     fn test_simple_if_then_else() {
-        let source: &str = r#"
-            module Test
-            where
-
-            increment_positive = |num| =>
-              if Number::is_positive?(num)
-              then num + 1
-              else num
-            decrement_negative = |num| =>
-              if Number::is_negative?(num)
-              then num - 1
-              else num
-"#;
+        let source: &str = test_source::SIMPLE_IF_THEN_ELSE;
         assert_module(
             parse::Module {
                 name: String::from("Test"),
@@ -807,18 +759,7 @@ Module names were not equal.
 
     #[test]
     fn test_nested_if_then_else() {
-        let source: &str = r#"
-            module Test
-            where
-
-            increment_or_decrement = |num| =>
-              if Number::is_positive?(num)
-              then num + 1
-              else
-                if Number::is_negative?(num)
-                then num - 1
-                else num
-"#;
+        let source: &str = test_source::NESTED_IF_THEN_ELSE;
         assert_module(
             parse::Module {
                 name: String::from("Test"),
@@ -871,36 +812,17 @@ Module names were not equal.
         };
 
         {
-            let source: &str = r#"
-            module Test
-            where
-
-            data Either<L, R> =
-              | (:Right, R)
-              | (:Left, L)
-"#;
+            let source: &str = test_source::MULTI_PROPERTY_UNION_TYPE_1;
 
             assert_module(expected.clone(), parse::parser::module(source).unwrap());
         }
         {
-            let source: &str = r#"
-            module Test
-            where
-
-            data Either<L, R> =
-              (:Right, R)
-              | (:Left, L)
-"#;
+            let source: &str = test_source::MULTI_PROPERTY_UNION_TYPE_2;
 
             assert_module(expected.clone(), parse::parser::module(source).unwrap());
         }
         {
-            let source: &str = r#"
-            module Test
-            where
-
-            data Either<L, R> = (:Right, R) | (:Left, L)
-"#;
+            let source: &str = test_source::MULTI_PROPERTY_UNION_TYPE_3;
 
             assert_module(expected, parse::parser::module(source).unwrap());
         }
