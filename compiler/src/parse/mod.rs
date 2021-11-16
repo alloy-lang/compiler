@@ -575,8 +575,8 @@ Module names were not equal.
     }
 
     #[test]
-    fn test_value_declaration_no_type() {
-        let source: &str = test_source::VALUE_DECLARATION_NO_TYPE;
+    fn test_int_value_declaration_no_type() {
+        let source: &str = test_source::INT_VALUE_DECLARATION_WITH_NO_TYPE;
         assert_module(
             parse::Module {
                 name: String::from("Test"),
@@ -592,8 +592,8 @@ Module names were not equal.
     }
 
     #[test]
-    fn test_value_declaration_with_type() {
-        let source: &str = test_source::VALUE_DECLARATION_WITH_TYPE;
+    fn test_int_value_declaration_with_type() {
+        let source: &str = test_source::INT_VALUE_DECLARATION_WITH_TYPE;
         assert_module(
             parse::Module {
                 name: String::from("Test"),
@@ -605,6 +605,44 @@ Module names were not equal.
                 values: vec![parse::Value {
                     name: String::from("thing"),
                     definition: Expr::int_literal("0"),
+                }],
+                type_aliases: vec![],
+            },
+            parse::parser::module(source).unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_float_value_declaration_no_type() {
+        let source: &str = test_source::FLOAT_VALUE_DECLARATION_WITH_NO_TYPE;
+        assert_module(
+            parse::Module {
+                name: String::from("Test"),
+                type_annotations: vec![],
+                values: vec![parse::Value {
+                    name: String::from("thing"),
+                    definition: Expr::float_literal("0.1"),
+                }],
+                type_aliases: vec![],
+            },
+            parse::parser::module(source).unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_float_value_declaration_with_type() {
+        let source: &str = test_source::FLOAT_VALUE_DECLARATION_WITH_TYPE;
+        assert_module(
+            parse::Module {
+                name: String::from("Test"),
+                type_annotations: vec![parse::TypeAnnotation {
+                    name: String::from("thing"),
+                    type_variables: vec![],
+                    t: Type::identifier("Float"),
+                }],
+                values: vec![parse::Value {
+                    name: String::from("thing"),
+                    definition: Expr::float_literal("0.1"),
                 }],
                 type_aliases: vec![],
             },

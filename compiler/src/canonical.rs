@@ -264,8 +264,8 @@ mod tests {
                         // borrow is initialized even before the values are compared, leading to a
                         // noticeable slow down.
                         panic!(r#"assertion failed: `(expected == actual)`
-  expected: `{:?}`,
-    actual: `{:?}`"#, &*expected_val, &*actual_val)
+  expected: `{:#?}`,
+    actual: `{:#?}`"#, &*expected_val, &*actual_val)
                     }
                 }
             }
@@ -298,48 +298,68 @@ mod tests {
     }
 
     #[test]
-    fn test_value_declaration_no_type() {
-        let source: &str = test_source::VALUE_DECLARATION_NO_TYPE;
-        let parsed_module = parse::parser::module(source).unwrap();
-        let actual = canonicalize(parsed_module).unwrap();
+    fn test_int_value_declaration_with_or_without_type() {
+        let expected = canonical::Module {
+            name: String::from("Test"),
+            values: vec![canonical::Value::new_value(
+                "thing",
+                parse::Type::identifier("Int"),
+                Expr::int_literal("0"),
+            )],
+            type_aliases: vec![],
+        };
 
-        assert_eq!(
-            canonical::Module {
-                name: String::from("Test"),
-                values: vec![canonical::Value {
-                    name: String::from("thing"),
-                    t: None,
-                    definition: Expr::int_literal("0"),
-                }],
-                type_aliases: vec![],
-            },
-            actual,
-        );
+        {
+            let source: &str = test_source::INT_VALUE_DECLARATION_WITH_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected, actual);
+        }
+        {
+            let source: &str = test_source::INT_VALUE_DECLARATION_WITH_NO_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected, actual);
+        }
     }
 
     #[test]
-    fn test_value_declaration_with_type() {
-        let source: &str = test_source::VALUE_DECLARATION_WITH_TYPE;
-        let parsed_module = parse::parser::module(source).unwrap();
-        let actual = canonicalize(parsed_module).unwrap();
+    fn test_float_value_declaration_with_or_without_type() {
+        let expected = canonical::Module {
+            name: String::from("Test"),
+            values: vec![canonical::Value::new_value(
+                "thing",
+                parse::Type::identifier("Float"),
+                Expr::float_literal("0.1"),
+            )],
+            type_aliases: vec![],
+        };
 
-        assert_eq!(
-            canonical::Module {
-                name: String::from("Test"),
-                values: vec![canonical::Value {
-                    name: String::from("thing"),
-                    t: Some(Type::Identifier("Int".into())),
-                    definition: Expr::int_literal("0"),
-                }],
-                type_aliases: vec![],
-            },
-            actual,
-        );
+        {
+            let source: &str = test_source::FLOAT_VALUE_DECLARATION_WITH_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected, actual);
+        }
+        {
+            let source: &str = test_source::FLOAT_VALUE_DECLARATION_WITH_NO_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected, actual);
+        }
     }
 
     #[test]
     fn test_value_declaration_with_conflicting_type_annotations() {
-        let source: &str = test_source::VALUE_DECLARATION_WITH_CONFLICTING_TYPE_ANNOTATIONS;
+        let source: &str = test_source::INT_VALUE_DECLARATION_WITH_CONFLICTING_TYPE_ANNOTATIONS;
         let parsed_module = parse::parser::module(source).unwrap();
         let actual = canonicalize(parsed_module).unwrap_err();
 
@@ -379,69 +399,90 @@ mod tests {
     // }
 
     #[test]
-    fn test_single_arg_function_declaration_with_type() {
-        let source: &str = test_source::SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE;
-        let parsed_module = parse::parser::module(source).unwrap();
-        let actual = canonicalize(parsed_module).unwrap();
-
-        assert_eq!(
-            canonical::Module {
-                name: String::from("Test"),
-                values: vec![canonical::Value::new_value(
-                    String::from("increment_positive"),
-                    Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
-                    Expr::Match(vec![
-                        Expr::function(Expr::int_literal("0"), Expr::int_literal("0")),
-                        Expr::function(
+    fn test_single_arg_function_declaration_with_or_without_type() {
+        let expected = canonical::Module {
+            name: String::from("Test"),
+            values: vec![canonical::Value::new_value(
+                String::from("increment_positive"),
+                Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
+                Expr::Match(vec![
+                    Expr::function(Expr::int_literal("0"), Expr::int_literal("0")),
+                    Expr::function(
+                        Expr::identifier("x"),
+                        Expr::bin_op(
+                            parse::BinOp::Add,
                             Expr::identifier("x"),
-                            Expr::bin_op(
-                                parse::BinOp::Add,
-                                Expr::identifier("x"),
-                                Expr::int_literal("1"),
-                            ),
+                            Expr::int_literal("1"),
                         ),
-                    ]),
-                )],
-                type_aliases: vec![],
-            },
-            actual,
-        );
+                    ),
+                ]),
+            )],
+            type_aliases: vec![],
+        };
+
+        {
+            let source: &str = test_source::SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected, actual);
+        }
+
+        {
+            let source: &str = test_source::SINGLE_ARG_FUNCTION_DECLARATION_WITH_NO_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected, actual);
+        }
     }
 
     #[test]
     fn test_multi_arg_function_declaration_with_type() {
-        let source: &str = test_source::MULTI_ARG_FUNCTION_DECLARATION_WITH_TYPE;
-        let parsed_module = parse::parser::module(source).unwrap();
-        let actual = canonicalize(parsed_module).unwrap();
-
-        assert_eq!(
-            canonical::Module {
-                name: String::from("Test"),
-                values: vec![canonical::Value::new_value(
-                    String::from("increment_by_length"),
-                    Type::lambda(
-                        Type::tuple(vec![Type::identifier("Int"), Type::identifier("String")]),
-                        Type::identifier("Int"),
+        let expected = canonical::Module {
+            name: String::from("Test"),
+            values: vec![canonical::Value::new_value(
+                String::from("increment_by_length"),
+                Type::lambda(
+                    Type::tuple(vec![Type::identifier("Int"), Type::identifier("String")]),
+                    Type::identifier("Int"),
+                ),
+                Expr::Match(vec![
+                    Expr::function(
+                        Expr::Tuple(vec![Expr::int_literal("0"), Expr::string_literal("")]),
+                        Expr::int_literal("0"),
                     ),
-                    Expr::Match(vec![
-                        Expr::function(
-                            Expr::Tuple(vec![Expr::int_literal("0"), Expr::string_literal("")]),
-                            Expr::int_literal("0"),
+                    Expr::function(
+                        Expr::Tuple(vec![Expr::identifier("x"), Expr::identifier("y")]),
+                        Expr::bin_op(
+                            parse::BinOp::Add,
+                            Expr::identifier("x"),
+                            Expr::call(vec!["String", "length"], Expr::identifier("y")),
                         ),
-                        Expr::function(
-                            Expr::Tuple(vec![Expr::identifier("x"), Expr::identifier("y")]),
-                            Expr::bin_op(
-                                parse::BinOp::Add,
-                                Expr::identifier("x"),
-                                Expr::call(vec!["String", "length"], Expr::identifier("y")),
-                            ),
-                        ),
-                    ]),
-                )],
-                type_aliases: vec![],
-            },
-            actual,
-        );
+                    ),
+                ]),
+            )],
+            type_aliases: vec![],
+        };
+
+        {
+            let source: &str = test_source::MULTI_ARG_FUNCTION_DECLARATION_WITH_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected, actual);
+        }
+        {
+            let source: &str = test_source::MULTI_ARG_FUNCTION_DECLARATION_WITH_NO_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected, actual);
+        }
     }
 
     #[test]
@@ -472,6 +513,36 @@ mod tests {
             actual,
         );
     }
+
+    // TODO 001: type inference with type variables
+    // #[test]
+    // fn test_curried_function_declaration_with_no_type() {
+    //     let source: &str = test_source::CURRIED_FUNCTION_DECLARATION_WITH_NO_TYPE;
+    //     let parsed_module = parse::parser::module(source).unwrap();
+    //     let actual = canonicalize(parsed_module).unwrap();
+    //
+    //     assert_eq!(
+    //         canonical::Module {
+    //             name: String::from("Test"),
+    //             values: vec![canonical::Value::new_value(
+    //                 String::from("increment_by_length"),
+    //                 Type::lambda(
+    //                     Type::lambda(Type::variable("T1"), Type::variable("T2")),
+    //                     Type::lambda(Type::variable("T1"), Type::variable("T2")),
+    //                 ),
+    //                 Expr::function(
+    //                     Expr::identifier("f"),
+    //                     Expr::function(
+    //                         Expr::identifier("value"),
+    //                         Expr::call(vec!["f"], Expr::identifier("value")),
+    //                     ),
+    //                 ),
+    //             )],
+    //             type_aliases: vec![],
+    //         },
+    //         actual,
+    //     );
+    // }
 
     #[test]
     fn test_simple_if_then_else() {

@@ -6,14 +6,14 @@ pub(crate) const EMPTY_MODULE: &str = r#"
 
 "#;
 
-pub(crate) const VALUE_DECLARATION_NO_TYPE: &str = r#"
+pub(crate) const INT_VALUE_DECLARATION_WITH_NO_TYPE: &str = r#"
             module Test
             where
 
             thing = 0
 "#;
 
-pub(crate) const VALUE_DECLARATION_WITH_TYPE: &str = r#"
+pub(crate) const INT_VALUE_DECLARATION_WITH_TYPE: &str = r#"
             module Test
             where
 
@@ -21,7 +21,22 @@ pub(crate) const VALUE_DECLARATION_WITH_TYPE: &str = r#"
             thing = 0
 "#;
 
-pub(crate) const VALUE_DECLARATION_WITH_CONFLICTING_TYPE_ANNOTATIONS: &str = r#"
+pub(crate) const FLOAT_VALUE_DECLARATION_WITH_NO_TYPE: &str = r#"
+            module Test
+            where
+
+            thing = 0.1
+"#;
+
+pub(crate) const FLOAT_VALUE_DECLARATION_WITH_TYPE: &str = r#"
+            module Test
+            where
+
+            thing : Float
+            thing = 0.1
+"#;
+
+pub(crate) const INT_VALUE_DECLARATION_WITH_CONFLICTING_TYPE_ANNOTATIONS: &str = r#"
             module Test
             where
 
@@ -47,12 +62,29 @@ pub(crate) const SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
             increment_positive = |0| => 0
             increment_positive = |x| => x + 1
 "#;
+pub(crate) const SINGLE_ARG_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
+
+
+            module Test
+            where
+
+            increment_positive = |0| => 0
+            increment_positive = |x| => x + 1
+"#;
 
 pub(crate) const MULTI_ARG_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
             module Test
             where
 
             increment_by_length : (Int, String) -> Int
+            increment_by_length = |(0, "")| => 0
+            increment_by_length = |(x, y)| => x + String::length(y)
+"#;
+
+pub(crate) const MULTI_ARG_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
+            module Test
+            where
+
             increment_by_length = |(0, "")| => 0
             increment_by_length = |(x, y)| => x + String::length(y)
 "#;
@@ -64,6 +96,14 @@ pub(crate) const CURRIED_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
             increment_by_length : (Int -> Int) -> Int -> Int
             increment_by_length = |f| => |value| => f(value)
 "#;
+
+// TODO 001: type inference with type variables
+// pub(crate) const CURRIED_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
+//             module Test
+//             where
+//
+//             increment_by_length = |f| => |value| => f(value)
+// "#;
 
 pub(crate) const SIMPLE_IF_THEN_ELSE: &str = r#"
             module Test
