@@ -86,7 +86,7 @@ struct TypeAlias {
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 struct Value {
     name: String,
-    t: Option<parse::Type>,
+    t: parse::Type,
     definition: Expr,
 }
 
@@ -97,7 +97,7 @@ impl Value {
     {
         Value {
             name: name.into(),
-            t: Some(t),
+            t,
             definition,
         }
     }
@@ -208,7 +208,7 @@ fn to_canonical_value(
 
     Ok(Value {
         name,
-        t: Some(type_def),
+        t: type_def,
         definition,
     })
 }
