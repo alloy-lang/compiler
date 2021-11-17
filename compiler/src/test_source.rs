@@ -93,17 +93,16 @@ pub(crate) const CURRIED_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
             module Test
             where
 
-            increment_by_length : (Int -> Int) -> Int -> Int
-            increment_by_length = |f| => |value| => f(value)
+            apply : (Int -> Int) -> Int -> Int
+            apply = |f| => |value| => f(value)
 "#;
 
-// TODO 001: type inference with type variables
-// pub(crate) const CURRIED_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
-//             module Test
-//             where
-//
-//             increment_by_length = |f| => |value| => f(value)
-// "#;
+pub(crate) const CURRIED_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
+            module Test
+            where
+
+            apply = |f| => |value| => f(value)
+"#;
 
 pub(crate) const SIMPLE_IF_THEN_ELSE: &str = r#"
             module Test

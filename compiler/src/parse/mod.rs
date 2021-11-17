@@ -20,7 +20,8 @@ pub(crate) enum Expr {
     FloatLiteral(String),
     IntLiteral(String),
     Identifier(String),
-    Assign(String, Box<Expr>),
+    // TODO 001: function arguments are not an "expresion"
+    // they can be a literal value, a variable identifier, or a tuple
     Function(Vec<Expr>, Box<Expr>),
     BinOp(BinOp, Box<Expr>, Box<Expr>),
     IfElse(Box<Expr>, Box<Expr>, Box<Expr>),
@@ -56,14 +57,6 @@ impl Expr {
         S: Into<String>,
     {
         Expr::Identifier(s.into())
-    }
-
-    fn assign<S, E>(name: S, expr: E) -> Expr
-    where
-        S: Into<String>,
-        E: Into<Box<Expr>>,
-    {
-        Expr::Assign(name.into(), expr.into())
     }
 
     pub(crate) fn function<A, E>(args: A, expr: E) -> Expr
@@ -386,9 +379,6 @@ pub(crate)grammar parser() for str {
           "then" __ then_body:expression() __
           "else" __ else_body:expression() _
         { Expr::if_else(e, then_body, else_body) }
-
-    rule assignment() -> Expr
-        = i:identifier() _ "=" _ e:expression() { Expr::assign(i, e) }
 
     rule binary_op() -> Expr = precedence!{
         a:@ _ "==" _ b:(@) { Expr::bin_op(BinOp::Eq, a, b) }
@@ -727,7 +717,7 @@ Module names were not equal.
             parse::Module {
                 name: String::from("Test"),
                 type_annotations: vec![parse::TypeAnnotation {
-                    name: String::from("increment_by_length"),
+                    name: String::from("apply"),
                     type_variables: vec![],
                     t: Type::lambda(
                         Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
@@ -735,7 +725,7 @@ Module names were not equal.
                     ),
                 }],
                 values: vec![parse::Value {
-                    name: String::from("increment_by_length"),
+                    name: String::from("apply"),
                     definition: Expr::function(
                         Expr::identifier("f"),
                         Expr::function(
