@@ -5,12 +5,12 @@ use crate::parse;
 use crate::parse::{BinOp, Expr, Type};
 
 #[derive(Debug, Eq, PartialEq, Clone)]
-struct TypeMap {
+pub(crate) struct TypeMap {
     map: LinkedHashMap<Expr, parse::Type>,
 }
 
 impl TypeMap {
-    fn new() -> Self {
+    pub(crate) fn new() -> Self {
         TypeMap {
             map: LinkedHashMap::new(),
         }
@@ -28,6 +28,10 @@ impl TypeMap {
         self.map.entry(expr.clone()).or_insert(t);
     }
 
+    pub(crate) fn insert_value_type(&mut self, name: &str, t: parse::Type) {
+        self.map.entry(Expr::identifier(name)).or_insert(t);
+    }
+
     fn insert_type_variable(&mut self, expr: &Expr) {
         let type_id = format!("T{}", self.map.len());
 
@@ -37,11 +41,11 @@ impl TypeMap {
     }
 }
 
-pub(crate) fn infer_type(what_are_you: &Expr) -> parse::Type {
+pub(crate) fn infer_type(what_are_you: &Expr, context_type_map: &TypeMap) -> parse::Type {
     let type_map = {
-        let mut type_map = TypeMap::new();
+        let mut type_map = context_type_map.clone();
         assign_type_names(what_are_you, &mut type_map);
-        println!("type_map: {:?}\n\n", type_map);
+        // println!("type_map: {:?}\n\n", type_map);
 
         type_map
     };
@@ -49,7 +53,7 @@ pub(crate) fn infer_type(what_are_you: &Expr) -> parse::Type {
     let type_equations = {
         let mut type_equations = Vec::new();
         generate_type_equations(what_are_you, &type_map, &mut type_equations);
-        println!("type_equations: {:?}\n\n", type_equations);
+        // println!("type_equations: {:?}\n\n", type_equations);
 
         type_equations
     };
@@ -67,7 +71,7 @@ pub(crate) fn infer_type(what_are_you: &Expr) -> parse::Type {
                 }
             }
         }
-        println!("substitutions: {:?}\n\n", substitutions);
+        // println!("substitutions: {:?}\n\n", substitutions);
 
         apply_unifier(&type_map.must_get(what_are_you), &substitutions)
     };
