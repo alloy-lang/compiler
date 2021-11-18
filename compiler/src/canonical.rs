@@ -227,24 +227,20 @@ fn to_canonical_type_alias(
 ) -> Result<TypeAlias, CanonicalizeError> {
     let type_aliases = type_aliases.into_iter().collect::<Vec<_>>();
 
-    if type_aliases.len() > 1 {
-        return Err(CanonicalizeError::ConflictingTypeAliasDefinitions { name, type_aliases });
-    }
-
-    if let Some(parse::TypeAliasDefinition {
-        name,
-        type_variables,
-        t,
-    }) = type_aliases.first().map(Clone::clone)
-    {
-        return Ok(TypeAlias {
+    match &type_aliases[..] {
+        [parse::TypeAliasDefinition {
             name,
             type_variables,
             t,
-        });
+        }] => Ok(TypeAlias {
+            name: name.clone(),
+            type_variables: type_variables.clone(),
+            t: t.clone(),
+        }),
+        [] => panic!("Empty TypeAlias list for name: {}", name),
+        // _ => Err(CanonicalizeError::ConflictingTypeAliasDefinitions { name, type_aliases }),
+        _ => todo!("conflicting TypeAlias definitions"),
     }
-
-    Err(CanonicalizeError::MissingTypeAnnotation { name })
 }
 
 #[cfg(test)]
