@@ -91,7 +91,7 @@ struct Value {
 }
 
 impl Value {
-    fn new_value<S>(name: S, t: parse::Type, definition: Expr) -> Value
+    fn new<S>(name: S, t: parse::Type, definition: Expr) -> Value
     where
         S: Into<String>,
     {
@@ -140,7 +140,7 @@ pub(crate) fn canonicalize(parsed: parse::Module) -> Result<Module, Vec<Canonica
         .group_by(|v| v.name.clone())
         .into_iter()
         .map(|(name, values)| {
-            to_canonical_value(name, values, type_annotations.clone(), &mut type_map).map(|v| {
+            to_canonical_value(name, values, type_annotations.clone(), &type_map).map(|v| {
                 type_map.insert_value_type(&v.name, v.t.clone());
                 v
             })
@@ -210,11 +210,7 @@ fn to_canonical_value(
 
     let type_def = type_hint.unwrap_or_else(|| infer_type(&definition, type_map));
 
-    Ok(Value {
-        name,
-        t: type_def,
-        definition,
-    })
+    Ok(Value::new(name, type_def, definition))
 }
 
 fn to_canonical_type_alias(
@@ -292,7 +288,7 @@ mod tests {
     fn test_int_value_declaration_with_or_without_type() {
         let expected = canonical::Module {
             name: String::from("Test"),
-            values: vec![canonical::Value::new_value(
+            values: vec![canonical::Value::new(
                 "thing",
                 parse::Type::identifier("Int"),
                 Expr::int_literal("0"),
@@ -322,7 +318,7 @@ mod tests {
     fn test_float_value_declaration_with_or_without_type() {
         let expected = canonical::Module {
             name: String::from("Test"),
-            values: vec![canonical::Value::new_value(
+            values: vec![canonical::Value::new(
                 "thing",
                 parse::Type::identifier("Float"),
                 Expr::float_literal("0.1"),
@@ -393,7 +389,7 @@ mod tests {
     fn test_single_arg_function_declaration_with_or_without_type() {
         let expected = canonical::Module {
             name: String::from("Test"),
-            values: vec![canonical::Value::new_value(
+            values: vec![canonical::Value::new(
                 String::from("increment_positive"),
                 Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                 Expr::Match(vec![
@@ -462,7 +458,7 @@ mod tests {
     fn test_multi_arg_function_declaration_with_type() {
         let expected = canonical::Module {
             name: String::from("Test"),
-            values: vec![canonical::Value::new_value(
+            values: vec![canonical::Value::new(
                 String::from("increment_by_length"),
                 Type::lambda(
                     Type::tuple(vec![Type::identifier("Int"), Type::identifier("String")]),
@@ -508,7 +504,7 @@ mod tests {
     fn test_curried_function_declaration_with_type() {
         let expected = canonical::Module {
             name: String::from("Test"),
-            values: vec![canonical::Value::new_value(
+            values: vec![canonical::Value::new(
                 String::from("apply"),
                 Type::lambda(
                     Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
@@ -539,7 +535,7 @@ mod tests {
     fn test_curried_function_declaration_with_no_type() {
         let expected = canonical::Module {
             name: String::from("Test"),
-            values: vec![canonical::Value::new_value(
+            values: vec![canonical::Value::new(
                 String::from("apply"),
                 Type::lambda(
                     Type::lambda(Type::variable("T3"), Type::variable("T4")),
@@ -576,7 +572,7 @@ mod tests {
             canonical::Module {
                 name: String::from("Test"),
                 values: vec![
-                    canonical::Value::new_value(
+                    canonical::Value::new(
                         String::from("increment_positive"),
                         Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                         Expr::function(
@@ -592,7 +588,7 @@ mod tests {
                             ),
                         ),
                     ),
-                    canonical::Value::new_value(
+                    canonical::Value::new(
                         String::from("decrement_negative"),
                         Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                         Expr::function(
@@ -624,7 +620,7 @@ mod tests {
         assert_eq!(
             canonical::Module {
                 name: String::from("Test"),
-                values: vec![canonical::Value::new_value(
+                values: vec![canonical::Value::new(
                     String::from("increment_or_decrement"),
                     Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                     Expr::function(
@@ -659,7 +655,7 @@ mod tests {
         let expected = canonical::Module {
             name: String::from("Test"),
             values: vec![
-                canonical::Value::new_value(
+                canonical::Value::new(
                     String::from("max"),
                     Type::lambda(
                         Type::tuple(vec![Type::identifier("Int"), Type::identifier("Int")]),
@@ -678,7 +674,7 @@ mod tests {
                         ),
                     ),
                 ),
-                canonical::Value::new_value(
+                canonical::Value::new(
                     String::from("sum_two_largest"),
                     Type::lambda(
                         Type::tuple(vec![
