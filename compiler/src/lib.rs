@@ -3,6 +3,7 @@
 mod canonical;
 #[allow(clippy::redundant_closure_call)]
 mod parse;
+mod type_inference;
 
 #[cfg(test)]
 mod test_source;

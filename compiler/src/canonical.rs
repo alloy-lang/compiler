@@ -2,6 +2,7 @@ use itertools::{Either, Itertools};
 
 use crate::parse;
 use crate::parse::Expr;
+use crate::type_inference::{infer_type, TypeMap};
 
 // #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 // pub(crate) enum BinOp {
@@ -85,7 +86,7 @@ struct TypeAlias {
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 struct Value {
     name: String,
-    t: Option<parse::Type>,
+    t: parse::Type,
     definition: Expr,
 }
 
@@ -96,18 +97,7 @@ impl Value {
     {
         Value {
             name: name.into(),
-            t: Some(t),
-            definition,
-        }
-    }
-
-    fn new_value_no_type<S>(name: S, definition: Expr) -> Value
-    where
-        S: Into<String>,
-    {
-        Value {
-            name: name.into(),
-            t: None,
+            t,
             definition,
         }
     }
@@ -147,11 +137,17 @@ pub(crate) fn canonicalize(parsed: parse::Module) -> Result<Module, Vec<Canonica
         type_aliases,
     } = parsed;
 
+    let mut type_map = TypeMap::new();
     let (values, value_errors): (Vec<Value>, Vec<CanonicalizeError>) = values
         .into_iter()
         .group_by(|v| v.name.clone())
         .into_iter()
-        .map(|(name, values)| to_canonical_value(name, values, type_annotations.clone()))
+        .map(|(name, values)| {
+            to_canonical_value(name, values, type_annotations.clone(), &mut type_map).map(|v| {
+                type_map.insert_value_type(&v.name, v.t.clone());
+                v
+            })
+        })
         .partition_map(|res| match res {
             Ok(value) => Either::Left(value),
             Err(error) => Either::Right(error),
@@ -187,6 +183,7 @@ fn to_canonical_value(
     name: String,
     values: impl IntoIterator<Item = parse::Value>,
     type_annotations: impl IntoIterator<Item = parse::TypeAnnotation>,
+    type_map: &TypeMap,
 ) -> Result<Value, CanonicalizeError> {
     let values = values.into_iter().collect::<Vec<_>>();
     let type_annotations = type_annotations
@@ -214,9 +211,11 @@ fn to_canonical_value(
         .map(|value| value.definition)
         .collect::<Expr>();
 
+    let type_def = type_hint.unwrap_or_else(|| infer_type(&definition, type_map));
+
     Ok(Value {
         name,
-        t: type_hint,
+        t: type_def,
         definition,
     })
 }
@@ -248,7 +247,7 @@ mod tests {
     use crate::canonical;
     use crate::canonical::canonicalize;
     use crate::parse;
-    use crate::parse::{BinOp, Expr, Type, TypeAnnotation};
+    use crate::parse::{Expr, Type};
     use crate::test_source;
 
     macro_rules! assert_eq {
@@ -260,8 +259,8 @@ mod tests {
                         // borrow is initialized even before the values are compared, leading to a
                         // noticeable slow down.
                         panic!(r#"assertion failed: `(expected == actual)`
-  expected: `{:#?}`,
-    actual: `{:#?}`"#, &*expected_val, &*actual_val)
+  expected: `{:?}`,
+    actual: `{:?}`"#, &*expected_val, &*actual_val)
                     }
                 }
             }
@@ -483,62 +482,65 @@ mod tests {
 
     #[test]
     fn test_curried_function_declaration_with_type() {
-        let source: &str = test_source::CURRIED_FUNCTION_DECLARATION_WITH_TYPE;
-        let parsed_module = parse::parser::module(source).unwrap();
-        let actual = canonicalize(parsed_module).unwrap();
-
-        assert_eq!(
-            canonical::Module {
-                name: String::from("Test"),
-                values: vec![canonical::Value::new_value(
-                    String::from("increment_by_length"),
-                    Type::lambda(
-                        Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
-                        Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
-                    ),
+        let expected = canonical::Module {
+            name: String::from("Test"),
+            values: vec![canonical::Value::new_value(
+                String::from("apply"),
+                Type::lambda(
+                    Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
+                    Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
+                ),
+                Expr::function(
+                    Expr::identifier("f"),
                     Expr::function(
-                        Expr::identifier("f"),
-                        Expr::function(
-                            Expr::identifier("value"),
-                            Expr::call(vec!["f"], Expr::identifier("value")),
-                        ),
+                        Expr::identifier("value"),
+                        Expr::call(vec!["f"], Expr::identifier("value")),
                     ),
-                )],
-                type_aliases: vec![],
-            },
-            actual,
-        );
+                ),
+            )],
+            type_aliases: vec![],
+        };
+
+        {
+            let source: &str = test_source::CURRIED_FUNCTION_DECLARATION_WITH_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected, actual);
+        }
     }
 
-    // TODO 001: type inference with type variables
-    // #[test]
-    // fn test_curried_function_declaration_with_no_type() {
-    //     let source: &str = test_source::CURRIED_FUNCTION_DECLARATION_WITH_NO_TYPE;
-    //     let parsed_module = parse::parser::module(source).unwrap();
-    //     let actual = canonicalize(parsed_module).unwrap();
-    //
-    //     assert_eq!(
-    //         canonical::Module {
-    //             name: String::from("Test"),
-    //             values: vec![canonical::Value::new_value(
-    //                 String::from("increment_by_length"),
-    //                 Type::lambda(
-    //                     Type::lambda(Type::variable("T1"), Type::variable("T2")),
-    //                     Type::lambda(Type::variable("T1"), Type::variable("T2")),
-    //                 ),
-    //                 Expr::function(
-    //                     Expr::identifier("f"),
-    //                     Expr::function(
-    //                         Expr::identifier("value"),
-    //                         Expr::call(vec!["f"], Expr::identifier("value")),
-    //                     ),
-    //                 ),
-    //             )],
-    //             type_aliases: vec![],
-    //         },
-    //         actual,
-    //     );
-    // }
+    #[test]
+    fn test_curried_function_declaration_with_no_type() {
+        let expected = canonical::Module {
+            name: String::from("Test"),
+            values: vec![canonical::Value::new_value(
+                String::from("apply"),
+                Type::lambda(
+                    Type::lambda(Type::variable("T3"), Type::variable("T4")),
+                    Type::lambda(Type::variable("T3"), Type::variable("T4")),
+                ),
+                Expr::function(
+                    Expr::identifier("f"),
+                    Expr::function(
+                        Expr::identifier("value"),
+                        Expr::call(vec!["f"], Expr::identifier("value")),
+                    ),
+                ),
+            )],
+            type_aliases: vec![],
+        };
+
+        {
+            let source: &str = test_source::CURRIED_FUNCTION_DECLARATION_WITH_NO_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected, actual);
+        }
+    }
 
     #[test]
     fn test_simple_if_then_else() {
@@ -550,8 +552,9 @@ mod tests {
             canonical::Module {
                 name: String::from("Test"),
                 values: vec![
-                    canonical::Value::new_value_no_type(
+                    canonical::Value::new_value(
                         String::from("increment_positive"),
+                        Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                         Expr::function(
                             Expr::identifier("num"),
                             Expr::if_else(
@@ -565,8 +568,9 @@ mod tests {
                             ),
                         ),
                     ),
-                    canonical::Value::new_value_no_type(
+                    canonical::Value::new_value(
                         String::from("decrement_negative"),
+                        Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                         Expr::function(
                             Expr::identifier("num"),
                             Expr::if_else(
@@ -596,8 +600,9 @@ mod tests {
         assert_eq!(
             canonical::Module {
                 name: String::from("Test"),
-                values: vec![canonical::Value::new_value_no_type(
+                values: vec![canonical::Value::new_value(
                     String::from("increment_or_decrement"),
+                    Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                     Expr::function(
                         Expr::identifier("num"),
                         Expr::if_else(
@@ -623,6 +628,113 @@ mod tests {
             },
             actual,
         );
+    }
+
+    #[test]
+    fn test_call_function_in_module_with_type() {
+        let expected = canonical::Module {
+            name: String::from("Test"),
+            values: vec![
+                canonical::Value::new_value(
+                    String::from("max"),
+                    Type::lambda(
+                        Type::tuple(vec![Type::identifier("Int"), Type::identifier("Int")]),
+                        Type::identifier("Int"),
+                    ),
+                    Expr::function(
+                        Expr::Tuple(vec![Expr::identifier("first"), Expr::identifier("second")]),
+                        Expr::if_else(
+                            Expr::bin_op(
+                                parse::BinOp::Gt,
+                                Expr::identifier("first"),
+                                Expr::identifier("second"),
+                            ),
+                            Expr::identifier("first"),
+                            Expr::identifier("second"),
+                        ),
+                    ),
+                ),
+                canonical::Value::new_value(
+                    String::from("sum_two_largest"),
+                    Type::lambda(
+                        Type::tuple(vec![
+                            Type::identifier("Int"),
+                            Type::identifier("Int"),
+                            Type::identifier("Int"),
+                        ]),
+                        Type::identifier("Int"),
+                    ),
+                    Expr::function(
+                        Expr::Tuple(vec![
+                            Expr::identifier("num1"),
+                            Expr::identifier("num2"),
+                            Expr::identifier("num3"),
+                        ]),
+                        Expr::if_else(
+                            Expr::bin_op(
+                                parse::BinOp::Eq,
+                                Expr::identifier("num1"),
+                                Expr::call(
+                                    vec!["max"],
+                                    Expr::Tuple(vec![
+                                        Expr::identifier("num1"),
+                                        Expr::identifier("num2"),
+                                    ]),
+                                ),
+                            ),
+                            Expr::bin_op(
+                                parse::BinOp::Add,
+                                Expr::identifier("num1"),
+                                Expr::call(
+                                    vec!["max"],
+                                    Expr::Tuple(vec![
+                                        Expr::identifier("num2"),
+                                        Expr::identifier("num3"),
+                                    ]),
+                                ),
+                            ),
+                            Expr::bin_op(
+                                parse::BinOp::Add,
+                                Expr::identifier("num2"),
+                                Expr::call(
+                                    vec!["max"],
+                                    Expr::Tuple(vec![
+                                        Expr::identifier("num1"),
+                                        Expr::identifier("num3"),
+                                    ]),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ],
+            type_aliases: vec![],
+        };
+
+        {
+            let source: &str = test_source::CALL_FUNCTION_IN_MODULE_WITH_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected.clone(), actual);
+        }
+        {
+            let source: &str = test_source::CALL_FUNCTION_IN_MODULE_WITH_ONE_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected.clone(), actual);
+        }
+        {
+            let source: &str = test_source::CALL_FUNCTION_IN_MODULE_WITH_NO_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected.clone(), actual);
+        }
     }
 
     #[test]

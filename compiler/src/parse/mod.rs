@@ -121,7 +121,8 @@ impl FromIterator<Expr> for Expr {
 pub(crate) enum Type {
     Identifier(String),
     Atom(String),
-    // Variable(String),
+    // TODO: move type variables out of "parse::Type" if it's not needed for reading source code
+    Variable(String),
     Lambda {
         arg_type: Box<Type>,
         return_type: Box<Type>,
@@ -145,6 +146,10 @@ pub(crate) enum Type {
 }
 
 impl Type {
+    pub(crate) fn union(types: Vec<Type>) -> Type {
+        Type::Union { types }
+    }
+
     pub(crate) fn tuple(types: Vec<Type>) -> Type {
         Type::Tuple(types)
     }
@@ -174,12 +179,12 @@ impl Type {
         Type::Atom(s.into())
     }
 
-    // pub(crate) fn variable<S>(s: S) -> Type
-    // where
-    //     S: Into<String>,
-    // {
-    //     Type::Variable(s.into())
-    // }
+    pub(crate) fn variable<S>(s: S) -> Type
+    where
+        S: Into<String>,
+    {
+        Type::Variable(s.into())
+    }
 }
 
 impl From<Type> for Vec<Type> {
