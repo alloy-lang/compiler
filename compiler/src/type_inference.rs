@@ -71,7 +71,7 @@ pub(crate) fn infer_type(what_are_you: &Expr, context_type_map: &TypeMap) -> par
         substitutions
     };
 
-    apply_unifier(&type_map.must_get(what_are_you), &substitutions)
+    apply_unifier(type_map.must_get(what_are_you), &substitutions)
 }
 
 fn assign_type_names<'a>(what_are_you: &'a Expr, type_map: &'a mut TypeMap) {
@@ -351,7 +351,7 @@ fn apply_unifier<'a>(
         ),
         Type::Union { types } => {
             let types = types
-                .into_iter()
+                .iter()
                 .map(|t| apply_unifier(t, substitutions))
                 .unique()
                 .collect::<Vec<_>>();
@@ -364,7 +364,7 @@ fn apply_unifier<'a>(
         }
         Type::Tuple(types) => parse::Type::tuple(
             types
-                .into_iter()
+                .iter()
                 .map(|t| apply_unifier(t, substitutions))
                 .collect(),
         ),
