@@ -112,9 +112,6 @@ pub(crate) struct Module {
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum CanonicalizeError {
-    MissingTypeAnnotation {
-        name: String,
-    },
     ConflictingTypeAnnotations {
         name: String,
         types: Vec<parse::TypeAnnotation>,
@@ -237,8 +234,7 @@ fn to_canonical_type_alias(
             t: t.clone(),
         }),
         [] => panic!("Empty TypeAlias list for name: {}", name),
-        // _ => Err(CanonicalizeError::ConflictingTypeAliasDefinitions { name, type_aliases }),
-        _ => todo!("conflicting TypeAlias definitions"),
+        _ => Err(CanonicalizeError::ConflictingTypeAliasDefinitions { name, type_aliases }),
     }
 }
 
@@ -429,6 +425,34 @@ mod tests {
 
             let parsed_module = parse::parser::module(source).unwrap();
             let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected, actual);
+        }
+    }
+
+    #[test]
+    fn test_value_with_conflicting_type_annotations() {
+        let expected = vec![canonical::CanonicalizeError::ConflictingTypeAnnotations {
+            name: "thing".into(),
+            types: vec![
+                parse::TypeAnnotation {
+                    name: "thing".to_string(),
+                    type_variables: vec![],
+                    t: parse::Type::identifier("String"),
+                },
+                parse::TypeAnnotation {
+                    name: "thing".to_string(),
+                    type_variables: vec![],
+                    t: parse::Type::identifier("Int"),
+                },
+            ],
+        }];
+
+        {
+            let source: &str = test_source::VALUE_WITH_CONFLICTING_TYPE_ANNOTATIONS;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap_err();
 
             assert_eq!(expected, actual);
         }
@@ -775,6 +799,42 @@ mod tests {
 
             let parsed_module = parse::parser::module(source).unwrap();
             let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected, actual);
+        }
+    }
+
+    #[test]
+    fn test_conflicting_type_alias_definitions() {
+        let expected = vec![
+            canonical::CanonicalizeError::ConflictingTypeAliasDefinitions {
+                name: String::from("Bool"),
+                type_aliases: vec![
+                    parse::TypeAliasDefinition {
+                        name: "Bool".to_string(),
+                        type_variables: vec![],
+                        t: parse::Type::union(vec![
+                            parse::Type::atom("False"),
+                            parse::Type::atom("True"),
+                        ]),
+                    },
+                    parse::TypeAliasDefinition {
+                        name: "Bool".to_string(),
+                        type_variables: vec![],
+                        t: parse::Type::union(vec![
+                            parse::Type::atom("True"),
+                            parse::Type::atom("False"),
+                        ]),
+                    },
+                ],
+            },
+        ];
+
+        {
+            let source: &str = test_source::CONFLICTING_TYPE_ALIAS_DEFINITIONS;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap_err();
 
             assert_eq!(expected, actual);
         }

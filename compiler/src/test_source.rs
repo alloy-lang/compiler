@@ -45,11 +45,20 @@ pub(crate) const INT_VALUE_DECLARATION_WITH_CONFLICTING_TYPE_ANNOTATIONS: &str =
             thing = 0
 "#;
 
-pub(crate) const TYPE_ANNOTATION_WITH_NO_DEFINITION: &str = r#"
+// pub(crate) const TYPE_ANNOTATION_WITH_NO_DEFINITION: &str = r#"
+//                 module Test
+//                 where
+//
+//                 thing : String
+// "#;
+
+pub(crate) const VALUE_WITH_CONFLICTING_TYPE_ANNOTATIONS: &str = r#"
                 module Test
                 where
 
                 thing : String
+                thing : Int
+                thing = 0.0
 "#;
 
 pub(crate) const SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
@@ -200,4 +209,13 @@ pub(crate) const MULTI_PROPERTY_UNION_TYPE_3: &str = r#"
             where
 
             data Either<L, R> = (:Right, R) | (:Left, L)
+"#;
+
+pub(crate) const CONFLICTING_TYPE_ALIAS_DEFINITIONS: &str = r#"
+            module Test
+            where
+
+            data Bool<> = :False | :True
+
+            data Bool<> = :True | :False
 "#;
