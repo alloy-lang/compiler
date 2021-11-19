@@ -58,25 +58,20 @@ pub(crate) fn infer_type(what_are_you: &Expr, context_type_map: &TypeMap) -> par
         type_equations
     };
 
-    let inferred_type = {
+    let substitutions = {
         let mut substitutions = LinkedHashMap::new();
 
-        for (left, right, _original_expr) in type_equations {
-            match unify(left, right, &mut substitutions) {
-                None => {
-                    break;
-                }
-                Some(new_subs) => {
-                    substitutions = new_subs.clone();
-                }
-            }
-        }
+        type_equations
+            .into_iter()
+            .find(|(left, right, _original_expr)| {
+                unify(left.clone(), right.clone(), &mut substitutions).is_none()
+            });
         // println!("substitutions: {:?}\n\n", substitutions);
 
-        apply_unifier(&type_map.must_get(what_are_you), &substitutions)
+        substitutions
     };
 
-    inferred_type
+    apply_unifier(&type_map.must_get(what_are_you), &substitutions)
 }
 
 fn assign_type_names<'a>(what_are_you: &'a Expr, type_map: &'a mut TypeMap) {
@@ -281,9 +276,9 @@ fn unify(
     left: parse::Type,
     right: parse::Type,
     substitutions: &mut LinkedHashMap<String, parse::Type>,
-) -> Option<&LinkedHashMap<String, parse::Type>> {
+) -> Option<()> {
     if left == right {
-        return Some(substitutions);
+        return Some(());
     }
 
     match (&left, &right) {
@@ -293,7 +288,7 @@ fn unify(
             }
             substitutions.insert(left_type_id.clone(), right);
 
-            Some(substitutions)
+            Some(())
         }
         (_, parse::Type::Variable(right_type_id)) => {
             if let Some(inner_type) = substitutions.get(right_type_id) {
@@ -301,7 +296,7 @@ fn unify(
             }
             substitutions.insert(right_type_id.clone(), left);
 
-            Some(substitutions)
+            Some(())
         }
         (parse::Type::Tuple(ts1), parse::Type::Tuple(ts2)) => {
             if ts1.len() != ts2.len() {
@@ -311,7 +306,7 @@ fn unify(
                 unify(t1.clone(), t2.clone(), substitutions);
             });
 
-            Some(substitutions)
+            Some(())
         }
         (
             parse::Type::Lambda {
@@ -326,7 +321,7 @@ fn unify(
             unify(*return1.clone(), *return2.clone(), substitutions);
             unify(*arg1.clone(), *arg2.clone(), substitutions);
 
-            Some(substitutions)
+            Some(())
         }
         (_, _) => None,
     }
@@ -361,9 +356,9 @@ fn apply_unifier<'a>(
                 .unique()
                 .collect::<Vec<_>>();
 
-            match types.len() {
-                0 => todo!("empty union type"),
-                1 => types[0].clone(),
+            match &types[..] {
+                [] => panic!("empty union type"),
+                [t] => t.clone(),
                 _ => parse::Type::union(types),
             }
         }
