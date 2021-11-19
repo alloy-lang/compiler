@@ -331,7 +331,21 @@ impl Module {
 
 peg::parser! {
 pub(crate)grammar parser() for str {
-    pub(crate)rule module() -> Module
+    rule traced<T>(e: rule<T>) -> T =
+        &(input:$([_]*) {
+            #[cfg(feature = "trace")]
+            println!("[PEG_INPUT_START]\n{}\n[PEG_TRACE_START]", input);
+        })
+        e:e()? {?
+            #[cfg(feature = "trace")]
+            println!("[PEG_TRACE_STOP]");
+            e.ok_or("")
+        }
+
+    // pub(crate)rule module() -> Module = traced(<real_module()>)
+    pub(crate)rule module() -> Module = real_module()
+
+    rule real_module() -> Module
         = __ "module" _ name:identifier() __ "where"
           declarations:((__ dec:declaration() _ { dec }) ** "\n") __
           { Module::from_declarations(name, declarations) }
@@ -342,7 +356,7 @@ pub(crate)grammar parser() for str {
         / type_alias_definition()
 
     rule possible_union_type() -> Type
-        = ("|")? _ types:((_ t:type_definition() __ { t }) ++ "|") { Type::Union { types } }
+        = ("|")? _ types:((_ t:type_definition() _n_() { t }) ++ "|") { Type::Union { types } }
         / t:type_definition() { t }
 
     rule type_definition() -> Type = precedence!{
@@ -407,7 +421,7 @@ pub(crate)grammar parser() for str {
     }
 
     rule identifier() -> String
-        = quiet!{ n:$(['_']?['a'..='z' | 'A'..='Z']['a'..='z' | 'A'..='Z' | '0'..='9' | '_']*['?']?) { n.to_owned() } }
+        = quiet!{ n:$(['_']?['a'..='z' | 'A'..='Z']['a'..='z' | 'A'..='Z' | '0'..='9' | '_']*['?' | '\'']?) { n.to_owned() } }
         / expected!("identifier")
 
     rule literal() -> Expr
@@ -415,6 +429,7 @@ pub(crate)grammar parser() for str {
         / n:$(['0'..='9']+ "." ['0'..='9']+) { Expr::float_literal(n) }
         / n:$(['0'..='9']+) { Expr::int_literal(n) }
 
+    rule _n_() =  _ ['\n']? _
     rule __() =  quiet!{[' ' | '\t' | '\n']*}
 
     rule _() =  quiet!{[' ' | '\t']*}
