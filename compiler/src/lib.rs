@@ -1,4 +1,5 @@
-// use std::collections::HashMap;
+use crate::canonical::canonicalize;
+use crate::parse::parser;
 
 mod canonical;
 #[allow(clippy::redundant_closure_call)]
@@ -8,10 +9,6 @@ mod type_inference;
 #[cfg(test)]
 mod test_source;
 
-// pub struct Artifacts {
-//     module: HashMap<String, String>,
-// }
-//
 // pub enum CompileError {
 //     BadSyntax(),
 //     BadImports(),
@@ -29,6 +26,8 @@ mod test_source;
 //     })
 // }
 //
-// fn canonicalize() -> Result<canonical::Module, CompileError> {
-//     Err(BadDocs())
-// }
+pub fn compile(source: &str) -> canonical::Module {
+    let parsed_module = parser::module(source).unwrap();
+
+    canonicalize(parsed_module).unwrap()
+}

@@ -104,7 +104,7 @@ impl Value {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub(crate) struct Module {
+pub struct Module {
     name: String,
     values: Vec<Value>,
     type_aliases: Vec<TypeAlias>,
