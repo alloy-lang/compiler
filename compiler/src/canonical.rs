@@ -656,25 +656,6 @@ mod tests {
             name: String::from("Test"),
             values: vec![
                 canonical::Value::new(
-                    String::from("max"),
-                    Type::lambda(
-                        Type::tuple(vec![Type::identifier("Int"), Type::identifier("Int")]),
-                        Type::identifier("Int"),
-                    ),
-                    Expr::function(
-                        Expr::Tuple(vec![Expr::identifier("first"), Expr::identifier("second")]),
-                        Expr::if_else(
-                            Expr::bin_op(
-                                parse::BinOp::Gt,
-                                Expr::identifier("first"),
-                                Expr::identifier("second"),
-                            ),
-                            Expr::identifier("first"),
-                            Expr::identifier("second"),
-                        ),
-                    ),
-                ),
-                canonical::Value::new(
                     String::from("sum_two_largest"),
                     Type::lambda(
                         Type::tuple(vec![
@@ -724,6 +705,25 @@ mod tests {
                                     ]),
                                 ),
                             ),
+                        ),
+                    ),
+                ),
+                canonical::Value::new(
+                    String::from("max"),
+                    Type::lambda(
+                        Type::tuple(vec![Type::identifier("Int"), Type::identifier("Int")]),
+                        Type::identifier("Int"),
+                    ),
+                    Expr::function(
+                        Expr::Tuple(vec![Expr::identifier("first"), Expr::identifier("second")]),
+                        Expr::if_else(
+                            Expr::bin_op(
+                                parse::BinOp::Gt,
+                                Expr::identifier("first"),
+                                Expr::identifier("second"),
+                            ),
+                            Expr::identifier("first"),
+                            Expr::identifier("second"),
                         ),
                     ),
                 ),

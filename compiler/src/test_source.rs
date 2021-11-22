@@ -144,48 +144,48 @@ pub(crate) const CALL_FUNCTION_IN_MODULE_WITH_TYPE: &str = r#"
             module Test
             where
 
-            max : (Int, Int) -> Int
-            max = |(first, second)| =>
-              if first > second
-              then first
-              else second
-
             sum_two_largest : (Int, Int, Int) -> Int
             sum_two_largest = |(num1, num2, num3)| =>
               if num1 == max((num1, num2))
               then num1 + max((num2, num3))
               else num2 + max((num1, num3))
+
+            max : (Int, Int) -> Int
+            max = |(first, second)| =>
+              if first > second
+              then first
+              else second
 "#;
 
 pub(crate) const CALL_FUNCTION_IN_MODULE_WITH_ONE_TYPE: &str = r#"
             module Test
             where
 
+            sum_two_largest = |(num1, num2, num3)| =>
+              if num1 == max((num1, num2))
+              then num1 + max((num2, num3))
+              else num2 + max((num1, num3))
+
             max : (Int, Int) -> Int
             max = |(first, second)| =>
               if first > second
               then first
               else second
-
-            sum_two_largest = |(num1, num2, num3)| =>
-              if num1 == max((num1, num2))
-              then num1 + max((num2, num3))
-              else num2 + max((num1, num3))
 "#;
 
 pub(crate) const CALL_FUNCTION_IN_MODULE_WITH_NO_TYPE: &str = r#"
             module Test
             where
 
-            max = |(first, second)| =>
-              if first > second
-              then first
-              else second
-
             sum_two_largest = |(num1, num2, num3)| =>
               if num1 == max((num1, num2))
               then num1 + max((num2, num3))
               else num2 + max((num1, num3))
+
+            max = |(first, second)| =>
+              if first > second
+              then first
+              else second
 "#;
 
 pub(crate) const MULTI_PROPERTY_UNION_TYPE_1: &str = r#"
