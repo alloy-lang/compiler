@@ -2,7 +2,7 @@ use itertools::Itertools;
 use linked_hash_map::LinkedHashMap;
 
 use crate::parse;
-use crate::parse::{BinOp, Expr, Type};
+use crate::parse::{Expr, LiteralData, Pattern, Type};
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub(crate) struct TypeMap {
@@ -17,7 +17,8 @@ impl TypeMap {
     }
 
     fn must_get(&self, expr: &Expr) -> &parse::Type {
-        &self.map[expr]
+        self.get(expr)
+            .unwrap_or_else(|| panic!("No type found for expressions '{:?}'", expr))
     }
 
     fn get(&self, expr: &Expr) -> Option<&parse::Type> {
@@ -45,7 +46,7 @@ pub(crate) fn infer_type(what_are_you: &Expr, context_type_map: &TypeMap) -> par
     let type_map = {
         let mut type_map = context_type_map.clone();
         assign_type_names(what_are_you, &mut type_map);
-        // println!("type_map: {:?}\n\n", type_map);
+        println!("type_map: {:?}\n\n", type_map);
 
         type_map
     };
@@ -53,7 +54,7 @@ pub(crate) fn infer_type(what_are_you: &Expr, context_type_map: &TypeMap) -> par
     let type_equations = {
         let mut type_equations = Vec::new();
         generate_type_equations(what_are_you, &type_map, &mut type_equations);
-        // println!("type_equations: {:?}\n\n", type_equations);
+        println!("type_equations: {:?}\n\n", type_equations);
 
         type_equations
     };
@@ -66,7 +67,7 @@ pub(crate) fn infer_type(what_are_you: &Expr, context_type_map: &TypeMap) -> par
             .find(|(left, right, _original_expr)| {
                 unify(left.clone(), right.clone(), &mut substitutions).is_none()
             });
-        // println!("substitutions: {:?}\n\n", substitutions);
+        println!("substitutions: {:?}\n\n", substitutions);
 
         substitutions
     };
@@ -76,28 +77,36 @@ pub(crate) fn infer_type(what_are_you: &Expr, context_type_map: &TypeMap) -> par
 
 fn assign_type_names<'a>(what_are_you: &'a Expr, type_map: &'a mut TypeMap) {
     match what_are_you {
-        Expr::StringLiteral(_) => {
-            type_map.insert_type(what_are_you, parse::Type::identifier("String"));
-        }
-        Expr::FloatLiteral(_) => {
-            type_map.insert_type(what_are_you, parse::Type::identifier("Float"));
-        }
-        Expr::IntLiteral(_) => {
-            type_map.insert_type(what_are_you, parse::Type::identifier("Int"));
-        }
+        Expr::Literal(data) => match data {
+            LiteralData::Integral(_) => {
+                type_map.insert_type(what_are_you, parse::Type::identifier("Int"));
+            }
+            LiteralData::Fractional(_) => {
+                type_map.insert_type(what_are_you, parse::Type::identifier("Float"));
+            }
+            LiteralData::String(_) => {
+                type_map.insert_type(what_are_you, parse::Type::identifier("String"));
+            }
+            LiteralData::Char(_) => {
+                type_map.insert_type(what_are_you, parse::Type::identifier("Char"));
+            }
+        },
         Expr::Identifier(_) => {
             type_map.insert_type_variable(what_are_you);
         }
-        Expr::Function(args, expr) => {
+        Expr::Lambda(arg, expr) => {
             type_map.insert_type_variable(what_are_you);
 
-            args.iter().for_each(|arg| {
-                assign_type_names(arg, type_map);
-            });
+            match arg {
+                Pattern::Literal(data) => assign_type_names(&Expr::Literal(data.clone()), type_map),
+                Pattern::Identifier(id) => assign_type_names(&Expr::identifier(id), type_map),
+                Pattern::Constructor(_, _) => todo!("Pattern::Constructor(_, _)"),
+                Pattern::WildCard => todo!("Pattern::WildCard"),
+            }
 
             assign_type_names(expr, type_map);
         }
-        Expr::BinOp(_op, left, right) => {
+        Expr::OpApply(left, _op, right) => {
             type_map.insert_type_variable(what_are_you);
 
             assign_type_names(left, type_map);
@@ -110,26 +119,36 @@ fn assign_type_names<'a>(what_are_you: &'a Expr, type_map: &'a mut TypeMap) {
             assign_type_names(if_expr, type_map);
             assign_type_names(else_expr, type_map);
         }
-        Expr::Call(_address, args) => {
+        Expr::Apply(func, arg) => {
             type_map.insert_type_variable(what_are_you);
 
-            args.iter().for_each(|arg| {
-                assign_type_names(arg, type_map);
-            });
+            assign_type_names(func, type_map);
+            assign_type_names(arg, type_map);
         }
-        Expr::Tuple(exprs) => {
+        Expr::Case(test_expr, branches) => {
             type_map.insert_type_variable(what_are_you);
+            // type_map.insert_type(what_are_you, parse::Type::union(vec![]));
 
-            exprs.iter().for_each(|expr| {
-                assign_type_names(expr, type_map);
-            });
+            assign_type_names(test_expr, type_map);
+
+            branches
+                .iter()
+                .for_each(|alt| {
+                    match &alt.pattern {
+                        Pattern::Literal(data) => assign_type_names(&Expr::Literal(data.clone()), type_map),
+                        Pattern::Identifier(_) => {}
+                        Pattern::Constructor(_, _) => {}
+                        Pattern::WildCard => {}
+                    }
+
+                    let parse::Match::Simple(match_result_expr) = &alt.matches;
+                    assign_type_names(match_result_expr, type_map)
+                });
         }
-        Expr::Match(exprs) => {
+        Expr::Paren(expr) => {
             type_map.insert_type_variable(what_are_you);
 
-            exprs.iter().for_each(|expr| {
-                assign_type_names(expr, type_map);
-            });
+            assign_type_names(expr, type_map);
         }
     };
 }
@@ -137,72 +156,84 @@ fn assign_type_names<'a>(what_are_you: &'a Expr, type_map: &'a mut TypeMap) {
 fn generate_type_equations<'a>(
     what_are_you: &'a Expr,
     type_map: &TypeMap,
-    type_equations: &mut Vec<(parse::Type, parse::Type, &'a Expr)>,
+    type_equations: &mut Vec<(parse::Type, parse::Type, Expr)>,
 ) {
     match what_are_you {
-        Expr::StringLiteral(_) => type_equations.push((
-            type_map.must_get(what_are_you).clone(),
-            parse::Type::identifier("String"),
-            what_are_you,
-        )),
-        Expr::FloatLiteral(_) => type_equations.push((
-            type_map.must_get(what_are_you).clone(),
-            parse::Type::identifier("Float"),
-            what_are_you,
-        )),
-        Expr::IntLiteral(_) => type_equations.push((
-            type_map.must_get(what_are_you).clone(),
-            parse::Type::identifier("Int"),
-            what_are_you,
-        )),
+        Expr::Literal(data) => match data {
+            LiteralData::Integral(_) => type_equations.push((
+                type_map.must_get(what_are_you).clone(),
+                parse::Type::identifier("Int"),
+                what_are_you.clone(),
+            )),
+            LiteralData::Fractional(_) => type_equations.push((
+                type_map.must_get(what_are_you).clone(),
+                parse::Type::identifier("Float"),
+                what_are_you.clone(),
+            )),
+            LiteralData::String(_) => type_equations.push((
+                type_map.must_get(what_are_you).clone(),
+                parse::Type::identifier("String"),
+                what_are_you.clone(),
+            )),
+            LiteralData::Char(_) => type_equations.push((
+                type_map.must_get(what_are_you).clone(),
+                parse::Type::identifier("Char"),
+                what_are_you.clone(),
+            )),
+        },
         Expr::Identifier(_) => {
             // intentionally empty
         }
-        Expr::Function(args, expr) => {
+        Expr::Lambda(arg, expr) => {
             generate_type_equations(expr, type_map, type_equations);
-            // TODO 002: remove assumption about argument length
-            generate_type_equations(&args[0], type_map, type_equations);
 
-            type_equations.push((
-                type_map.must_get(what_are_you).clone(),
-                parse::Type::lambda(
-                    // TODO 002: remove assumption about argument length
-                    type_map.must_get(&args[0]).clone(),
-                    type_map.must_get(expr).clone(),
-                ),
-                what_are_you,
-            ))
+            if let Some(arg_expr) = match arg {
+                Pattern::Literal(data) => Some(Expr::Literal(data.clone())),
+                Pattern::Identifier(id) => Some(Expr::identifier(id)),
+                Pattern::Constructor(_, _) => todo!("Pattern::Constructor(_, _)"),
+                Pattern::WildCard => todo!("Pattern::WildCard"),
+            } {
+                generate_type_equations(&arg_expr, type_map, type_equations);
+                type_equations.push((
+                    type_map.must_get(what_are_you).clone(),
+                    parse::Type::lambda(
+                        type_map.must_get(&arg_expr).clone(),
+                        type_map.must_get(expr).clone(),
+                    ),
+                    what_are_you.clone(),
+                ))
+            }
         }
-        Expr::BinOp(op, left, right) => {
+        Expr::OpApply(left, op, right) => {
             generate_type_equations(left, type_map, type_equations);
             generate_type_equations(right, type_map, type_equations);
 
-            type_equations.push((
-                type_map.must_get(left).clone(),
-                parse::Type::identifier("Int"),
-                left,
-            ));
-            type_equations.push((
-                type_map.must_get(right).clone(),
-                parse::Type::identifier("Int"),
-                right,
-            ));
-
-            match op {
-                BinOp::Eq | BinOp::Ne | BinOp::Lt | BinOp::Le | BinOp::Gt | BinOp::Ge => {
+            match op.as_str() {
+                "==" | "!=" | "<" | "<=" | ">" | ">=" => {
                     type_equations.push((
                         type_map.must_get(what_are_you).clone(),
                         parse::Type::identifier("Bool"),
-                        what_are_you,
+                        what_are_you.clone(),
                     ));
                 }
-                BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div => {
+                "+" | "-" | "*" | "/" => {
+                    type_equations.push((
+                        type_map.must_get(left).clone(),
+                        parse::Type::identifier("Int"),
+                        *left.clone(),
+                    ));
+                    type_equations.push((
+                        type_map.must_get(right).clone(),
+                        parse::Type::identifier("Int"),
+                        *right.clone(),
+                    ));
                     type_equations.push((
                         type_map.must_get(what_are_you).clone(),
                         parse::Type::identifier("Int"),
-                        what_are_you,
+                        what_are_you.clone(),
                     ));
                 }
+                _ => {}
             }
         }
         Expr::IfElse(condition, if_expr, else_expr) => {
@@ -213,62 +244,69 @@ fn generate_type_equations<'a>(
             type_equations.push((
                 type_map.must_get(condition).clone(),
                 parse::Type::identifier("Bool"),
-                condition,
+                *condition.clone(),
             ));
             type_equations.push((
                 type_map.must_get(what_are_you).clone(),
                 type_map.must_get(if_expr).clone(),
-                what_are_you,
+                what_are_you.clone(),
             ));
             type_equations.push((
                 type_map.must_get(what_are_you).clone(),
                 type_map.must_get(else_expr).clone(),
-                what_are_you,
+                what_are_you.clone(),
             ));
         }
-        Expr::Call(address, args) => {
-            args.iter()
-                .for_each(|arg| generate_type_equations(arg, type_map, type_equations));
+        Expr::Apply(func, arg) => {
+            generate_type_equations(arg, type_map, type_equations);
 
-            if let Some(function_type) = type_map.get(&Expr::identifier(address.join("::"))) {
+            if let Some(function_type) = type_map.get(func) {
                 type_equations.push((
                     function_type.clone(),
                     parse::Type::lambda(
-                        // TODO 002: remove assumption about argument length
-                        type_map.must_get(&args[0]).clone(),
+                        type_map.must_get(arg).clone(),
                         type_map.must_get(what_are_you).clone(),
                     ),
-                    what_are_you,
+                    what_are_you.clone(),
                 ));
             }
         }
-        Expr::Tuple(exprs) => {
-            exprs
-                .iter()
-                .for_each(|expr| generate_type_equations(expr, type_map, type_equations));
-
-            type_equations.push((
-                type_map.must_get(what_are_you).clone(),
-                parse::Type::tuple(
-                    exprs
-                        .iter()
-                        .map(|expr| type_map.must_get(expr).clone())
-                        .collect(),
-                ),
-                what_are_you,
-            ))
-        }
-        Expr::Match(exprs) => {
-            exprs.iter().for_each(|expr| {
-                generate_type_equations(expr, type_map, type_equations);
+        Expr::Case(test_expr, branches) => {
+            branches.iter().for_each(|alt| {
+                let parse::Match::Simple(match_result_expr) = &alt.matches;
+                generate_type_equations(match_result_expr, type_map, type_equations);
 
                 type_equations.push((
                     type_map.must_get(what_are_you).clone(),
-                    type_map.must_get(expr).clone(),
-                    what_are_you,
-                ))
+                    type_map.must_get(match_result_expr).clone(),
+                    what_are_you.clone(),
+                ));
+
+                if let Some(match_pattern_expr) = match &alt.pattern {
+                    Pattern::Literal(data) => Some(Expr::Literal(data.clone())),
+                    Pattern::Identifier(id) => Some(Expr::identifier(id)),
+                    Pattern::Constructor(name, args) => Some(Expr::application(
+                        vec![name],
+                        args.into_iter().map(|p| match p {
+                            Pattern::Literal(data) => Expr::Literal(data.clone()),
+                            Pattern::Identifier(_) => todo!("Pattern::Identifier(_)"),
+                            Pattern::Constructor(_, _) => todo!("Pattern::Constructor(_, _)"),
+                            Pattern::WildCard => todo!("Pattern::WildCard"),
+                        })
+                            .collect::<Vec<_>>(),
+                    )),
+                    Pattern::WildCard => todo!("Pattern::WildCard"),
+                } {
+                    generate_type_equations(&match_pattern_expr, type_map, type_equations);
+                    type_equations.push((
+                        type_map.must_get(&match_pattern_expr).clone(),
+                        type_map.must_get(test_expr).clone(),
+                        what_are_you.clone(),
+                    ))
+                }
             });
         }
+        Expr::Paren(_) => todo!("Expr::Paren(_)"),
     }
 }
 

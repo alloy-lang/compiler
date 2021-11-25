@@ -9,7 +9,7 @@ mod type_inference;
 #[cfg(test)]
 mod test_source;
 
-// pub enum CompileError {
+// pub(crate) enum CompileError {
 //     BadSyntax(),
 //     BadImports(),
 //     BadNames(),

@@ -1,33 +1,110 @@
-use std::iter::FromIterator;
+use itertools::Itertools;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub(crate) enum BinOp {
-    Eq,
-    Ne,
-    Lt,
-    Le,
-    Gt,
-    Ge,
-    Add,
-    Sub,
-    Mul,
-    Div,
+pub(crate) enum Pattern {
+    Literal(LiteralData),
+    Identifier(String),
+    Constructor(String, Vec<Pattern>),
+    WildCard,
+}
+
+impl Pattern {
+    pub(crate) fn string_literal<S>(s: S) -> Pattern
+    where
+        S: Into<String>,
+    {
+        Pattern::Literal(LiteralData::String(s.into()))
+    }
+
+    pub(crate) fn int_literal<S>(int: S) -> Pattern
+    where
+        S: Into<String>,
+    {
+        Pattern::Literal(LiteralData::Integral(int.into()))
+    }
+
+    pub(crate) fn float_literal<S>(float: S) -> Pattern
+    where
+        S: Into<String>,
+    {
+        Pattern::Literal(LiteralData::Fractional(float.into()))
+    }
+
+    pub(crate) fn char_literal(c: char) -> Pattern {
+        Pattern::Literal(LiteralData::Char(c))
+    }
+
+    pub(crate) fn identifier<S>(s: S) -> Pattern
+    where
+        S: Into<String>,
+    {
+        Pattern::Identifier(s.into())
+    }
+
+    pub(crate) fn tuple<A>(args: A) -> Pattern
+    where
+        A: Into<Vec<Pattern>>,
+    {
+        let args = args.into();
+        let n = args.len();
+        let name = tuple_name(n);
+
+        Pattern::Constructor(name, args)
+    }
+}
+
+impl From<Pattern> for Vec<Pattern> {
+    fn from(p: Pattern) -> Self {
+        vec![p]
+    }
+}
+
+// #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+// pub(crate) struct Guard {
+//     pub predicate: Expr,
+//     pub expression: Expr,
+// }
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+pub(crate) enum Match {
+    // Guards(Vec<Guard>),
+    Simple(Expr),
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+pub(crate) struct Alternative {
+    pub pattern: Pattern,
+    pub matches: Match,
+    // pub where_bindings: Option<Vec<Binding>>,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+pub(crate) struct Binding {
+    pub name: String,
+    pub arguments: Vec<Pattern>,
+    pub matches: Match,
+    pub where_bindings: Option<Vec<Binding>>,
+    pub t: Type,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+pub(crate) enum LiteralData {
+    Integral(String),
+    Fractional(String),
+    String(String),
+    Char(char),
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum Expr {
-    StringLiteral(String),
-    FloatLiteral(String),
-    IntLiteral(String),
     Identifier(String),
-    // TODO 001: function arguments are not an "expresion"
-    // they can be a literal value, a variable identifier, or a tuple
-    Function(Vec<Expr>, Box<Expr>),
-    BinOp(BinOp, Box<Expr>, Box<Expr>),
+    Apply(Box<Expr>, Box<Expr>),
+    OpApply(Box<Expr>, String, Box<Expr>),
+    Literal(LiteralData),
+    Lambda(Pattern, Box<Expr>),
+    Case(Box<Expr>, Vec<Alternative>),
     IfElse(Box<Expr>, Box<Expr>, Box<Expr>),
-    Call(Vec<String>, Vec<Expr>),
-    Tuple(Vec<Expr>),
-    Match(Vec<Expr>),
+    Paren(Box<Expr>),
 }
 
 impl Expr {
@@ -35,21 +112,25 @@ impl Expr {
     where
         S: Into<String>,
     {
-        Expr::StringLiteral(s.into())
+        Expr::Literal(LiteralData::String(s.into()))
     }
 
-    pub(crate) fn int_literal<S>(s: S) -> Expr
+    pub(crate) fn int_literal<S>(int: S) -> Expr
     where
         S: Into<String>,
     {
-        Expr::IntLiteral(s.into())
+        Expr::Literal(LiteralData::Integral(int.into()))
     }
 
-    pub(crate) fn float_literal<S>(s: S) -> Expr
+    pub(crate) fn float_literal<S>(float: S) -> Expr
     where
         S: Into<String>,
     {
-        Expr::FloatLiteral(s.into())
+        Expr::Literal(LiteralData::Fractional(float.into()))
+    }
+
+    pub(crate) fn char_literal(c: char) -> Expr {
+        Expr::Literal(LiteralData::Char(c))
     }
 
     pub(crate) fn identifier<S>(s: S) -> Expr
@@ -59,19 +140,22 @@ impl Expr {
         Expr::Identifier(s.into())
     }
 
-    pub(crate) fn function<A, E>(args: A, expr: E) -> Expr
+    pub(crate) fn lambda<A>(args: A, body: Expr) -> Expr
     where
-        A: Into<Vec<Expr>>,
-        E: Into<Box<Expr>>,
+        A: Into<Vec<Pattern>>,
     {
-        Expr::Function(args.into(), expr.into())
+        args.into()
+            .into_iter()
+            .rev()
+            .fold(body, |body, arg| Expr::Lambda(arg, Box::new(body)))
     }
 
-    pub(crate) fn bin_op<E>(op: BinOp, first: E, second: E) -> Expr
+    pub(crate) fn bin_op<S, E>(op: S, first: E, second: E) -> Expr
     where
+        S: Into<String>,
         E: Into<Box<Expr>>,
     {
-        Expr::BinOp(op, first.into(), second.into())
+        Expr::OpApply(first.into(), op.into(), second.into())
     }
 
     pub(crate) fn if_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr
@@ -83,37 +167,47 @@ impl Expr {
         Expr::IfElse(expr.into(), then_expr.into(), else_expr.into())
     }
 
-    pub(crate) fn call<S, E>(address: Vec<S>, expr: E) -> Expr
+    pub(crate) fn application<S, E>(address: Vec<S>, args: E) -> Expr
     where
         S: Into<String>,
         E: Into<Vec<Expr>>,
     {
-        let address = address
-            .into_iter()
-            .map(|s| s.into())
-            .collect::<Vec<String>>();
+        let address = address.into_iter().map(|s| s.into()).join("::");
+        let func = Expr::Identifier(address);
 
-        Expr::Call(address, expr.into())
+        args.into()
+            .into_iter()
+            .fold(func, |func, arg| Expr::Apply(Box::new(func), arg.into()))
     }
+
+    pub(crate) fn tuple<E>(args: E) -> Expr
+    where
+        E: Into<Vec<Expr>>,
+    {
+        let args = args.into();
+        let n = args.len();
+        let name = tuple_name(n);
+
+        Self::application(vec![name], args)
+    }
+
+    pub(crate) fn paren<E>(expr: E) -> Expr
+    where
+        E: Into<Box<Expr>>,
+    {
+        Expr::Paren(expr.into())
+    }
+}
+
+fn tuple_name(n: usize) -> String {
+    let commas = if n == 0 { 0 } else { n - 1 };
+
+    format!("({})", ",".repeat(commas))
 }
 
 impl From<Expr> for Vec<Expr> {
     fn from(e: Expr) -> Self {
         vec![e]
-    }
-}
-
-impl FromIterator<Expr> for Expr {
-    fn from_iter<T: IntoIterator<Item = Expr>>(iter: T) -> Self {
-        let mut iter = iter.into_iter();
-        let (_, upper_bound) = iter.size_hint();
-
-        match upper_bound {
-            Some(0) => todo!(),
-            // Some(0) => Expr::Unit,
-            Some(1) => iter.next().unwrap(),
-            _ => Expr::Match(iter.collect()),
-        }
     }
 }
 
@@ -389,9 +483,9 @@ pub(crate)grammar parser() for str {
         / binary_op()
 
     rule function() -> Expr
-        = "|" args:((_ a:binary_op() _ { a }) ** ",") "|" _
+        = "|" args:((_ a:pattern() _ { a }) ** ",") "|" _
         "=>" __ definition:expression() _
-        { Expr::function(args, definition) }
+        { Expr::lambda(args, definition) }
 
     rule if_else() -> Expr
         = "if" _ e:expression() __
@@ -399,23 +493,32 @@ pub(crate)grammar parser() for str {
           "else" __ else_body:expression() _
         { Expr::if_else(e, then_body, else_body) }
 
+    rule pattern() -> Pattern
+        = "\"" n:$(['a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '-' | '/']* ) "\"" { Pattern::string_literal(n) }
+        / "'" n:$(['a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '-' | '/']) "'" { Pattern::char_literal(n.parse().unwrap()) }
+        / n:$(['-']?['0'..='9']+ "." ['0'..='9']+) { Pattern::float_literal(n) }
+        / n:$(['-']?['0'..='9']+) { Pattern::int_literal(n) }
+        / i:identifier() { Pattern::identifier(i) }
+        / "(" args:((_ p:pattern() _ { p }) **<2,> ",") ")" { Pattern::tuple(args) }
+        / "(" _ p:pattern() _ ")" { p }
+
     rule binary_op() -> Expr = precedence!{
-        a:@ _ "==" _ b:(@) { Expr::bin_op(BinOp::Eq, a, b) }
-        a:@ _ "!=" _ b:(@) { Expr::bin_op(BinOp::Ne, a, b) }
-        a:@ _ "<"  _ b:(@) { Expr::bin_op(BinOp::Lt, a, b) }
-        a:@ _ "<=" _ b:(@) { Expr::bin_op(BinOp::Le, a, b) }
-        a:@ _ ">"  _ b:(@) { Expr::bin_op(BinOp::Gt, a, b) }
-        a:@ _ ">=" _ b:(@) { Expr::bin_op(BinOp::Ge, a, b) }
+        a:@ _ "==" _ b:(@) { Expr::bin_op("==", a, b) }
+        a:@ _ "!=" _ b:(@) { Expr::bin_op("!=", a, b) }
+        a:@ _ "<"  _ b:(@) { Expr::bin_op("<", a, b) }
+        a:@ _ "<=" _ b:(@) { Expr::bin_op("<=", a, b) }
+        a:@ _ ">"  _ b:(@) { Expr::bin_op(">", a, b) }
+        a:@ _ ">=" _ b:(@) { Expr::bin_op(">=", a, b) }
         --
-        a:@ _ "+" _ b:(@) { Expr::bin_op(BinOp::Add, a, b) }
-        a:@ _ "-" _ b:(@) { Expr::bin_op(BinOp::Sub, a, b) }
+        a:@ _ "+" _ b:(@) { Expr::bin_op("+", a, b) }
+        a:@ _ "-" _ b:(@) { Expr::bin_op("-", a, b) }
         --
-        a:@ _ "*" _ b:(@) { Expr::bin_op(BinOp::Mul, a, b) }
-        a:@ _ "/" _ b:(@) { Expr::bin_op(BinOp::Div, a, b) }
+        a:@ _ "*" _ b:(@) { Expr::bin_op("*", a, b) }
+        a:@ _ "/" _ b:(@) { Expr::bin_op("/", a, b) }
         --
-        "(" args:((_ e:expression() _ { e }) **<2,> ",") ")" { Expr::Tuple(args) }
-        "(" _ e:expression() _ ")" { e }
-        address:(identifier() ++ "::") "(" args:((_ e:expression() _ { e }) ** ",") ")" { Expr::call(address, args) }
+        "(" args:((_ e:expression() _ { e }) **<2,> ",") ")" { Expr::tuple(args) }
+        "(" _ e:expression() _ ")" { Expr::paren(e) }
+        address:(identifier() ++ "::") "(" args:((_ e:expression() _ { e }) ** ",") ")" { Expr::application(address, args) }
         i:identifier() { Expr::identifier(i) }
         l:literal() { l }
     }
@@ -426,8 +529,9 @@ pub(crate)grammar parser() for str {
 
     rule literal() -> Expr
         = "\"" n:$(['a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '-' | '/']* ) "\"" { Expr::string_literal(n) }
-        / n:$(['0'..='9']+ "." ['0'..='9']+) { Expr::float_literal(n) }
-        / n:$(['0'..='9']+) { Expr::int_literal(n) }
+        / "'" n:$(['a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '-' | '/']) "'" { Expr::char_literal(n.parse().unwrap()) }
+        / n:$(['-']?['0'..='9']+ "." ['0'..='9']+) { Expr::float_literal(n) }
+        / n:$(['-']?['0'..='9']+) { Expr::int_literal(n) }
 
     rule _n_() =  _ ['\n']? _
     rule __() =  quiet!{[' ' | '\t' | '\n']*}
@@ -439,7 +543,7 @@ pub(crate)grammar parser() for str {
 #[cfg(test)]
 mod tests {
     use crate::parse;
-    use crate::parse::{BinOp, Expr, Type};
+    use crate::parse::{Expr, Pattern, Type};
     use crate::test_source;
 
     macro_rules! assert_eq {
@@ -674,13 +778,13 @@ Module names were not equal.
                 values: vec![
                     parse::Value {
                         name: String::from("increment_positive"),
-                        definition: Expr::function(Expr::int_literal("0"), Expr::int_literal("0")),
+                        definition: Expr::lambda(Pattern::int_literal("0"), Expr::int_literal("0")),
                     },
                     parse::Value {
                         name: String::from("increment_positive"),
-                        definition: Expr::function(
-                            Expr::identifier("x"),
-                            Expr::bin_op(BinOp::Add, Expr::identifier("x"), Expr::int_literal("1")),
+                        definition: Expr::lambda(
+                            Pattern::identifier("x"),
+                            Expr::bin_op("+", Expr::identifier("x"), Expr::int_literal("1")),
                         ),
                     },
                 ],
@@ -707,19 +811,25 @@ Module names were not equal.
                 values: vec![
                     parse::Value {
                         name: String::from("increment_by_length"),
-                        definition: Expr::function(
-                            Expr::Tuple(vec![Expr::int_literal("0"), Expr::string_literal("")]),
+                        definition: Expr::lambda(
+                            Pattern::Constructor(
+                                String::from("(,)"),
+                                vec![Pattern::int_literal("0"), Pattern::string_literal("")],
+                            ),
                             Expr::int_literal("0"),
                         ),
                     },
                     parse::Value {
                         name: String::from("increment_by_length"),
-                        definition: Expr::function(
-                            Expr::Tuple(vec![Expr::identifier("x"), Expr::identifier("y")]),
+                        definition: Expr::lambda(
+                            Pattern::Constructor(
+                                String::from("(,)"),
+                                vec![Pattern::identifier("x"), Pattern::identifier("y")],
+                            ),
                             Expr::bin_op(
-                                BinOp::Add,
+                                "+",
                                 Expr::identifier("x"),
-                                Expr::call(vec!["String", "length"], Expr::identifier("y")),
+                                Expr::application(vec!["String", "length"], Expr::identifier("y")),
                             ),
                         ),
                     },
@@ -746,11 +856,11 @@ Module names were not equal.
                 }],
                 values: vec![parse::Value {
                     name: String::from("apply"),
-                    definition: Expr::function(
-                        Expr::identifier("f"),
-                        Expr::function(
-                            Expr::identifier("value"),
-                            Expr::call(vec!["f"], Expr::identifier("value")),
+                    definition: Expr::lambda(
+                        Pattern::identifier("f"),
+                        Expr::lambda(
+                            Pattern::identifier("value"),
+                            Expr::application(vec!["f"], Expr::identifier("value")),
                         ),
                     ),
                 }],
@@ -770,30 +880,28 @@ Module names were not equal.
                 values: vec![
                     parse::Value {
                         name: String::from("increment_positive"),
-                        definition: Expr::function(
-                            Expr::identifier("num"),
+                        definition: Expr::lambda(
+                            Pattern::identifier("num"),
                             Expr::if_else(
-                                Expr::call(vec!["Number", "is_positive?"], Expr::identifier("num")),
-                                Expr::bin_op(
-                                    BinOp::Add,
+                                Expr::application(
+                                    vec!["Number", "is_positive?"],
                                     Expr::identifier("num"),
-                                    Expr::int_literal("1"),
                                 ),
+                                Expr::bin_op("+", Expr::identifier("num"), Expr::int_literal("1")),
                                 Expr::identifier("num"),
                             ),
                         ),
                     },
                     parse::Value {
                         name: String::from("decrement_negative"),
-                        definition: Expr::function(
-                            Expr::identifier("num"),
+                        definition: Expr::lambda(
+                            Pattern::identifier("num"),
                             Expr::if_else(
-                                Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
-                                Expr::bin_op(
-                                    BinOp::Sub,
+                                Expr::application(
+                                    vec!["Number", "is_negative?"],
                                     Expr::identifier("num"),
-                                    Expr::int_literal("1"),
                                 ),
+                                Expr::bin_op("-", Expr::identifier("num"), Expr::int_literal("1")),
                                 Expr::identifier("num"),
                             ),
                         ),
@@ -815,22 +923,20 @@ Module names were not equal.
                 type_aliases: vec![],
                 values: vec![parse::Value {
                     name: String::from("increment_or_decrement"),
-                    definition: Expr::function(
-                        Expr::identifier("num"),
+                    definition: Expr::lambda(
+                        Pattern::identifier("num"),
                         Expr::if_else(
-                            Expr::call(vec!["Number", "is_positive?"], Expr::identifier("num")),
-                            Expr::bin_op(
-                                BinOp::Add,
+                            Expr::application(
+                                vec!["Number", "is_positive?"],
                                 Expr::identifier("num"),
-                                Expr::int_literal("1"),
                             ),
+                            Expr::bin_op("+", Expr::identifier("num"), Expr::int_literal("1")),
                             Expr::if_else(
-                                Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
-                                Expr::bin_op(
-                                    BinOp::Sub,
+                                Expr::application(
+                                    vec!["Number", "is_negative?"],
                                     Expr::identifier("num"),
-                                    Expr::int_literal("1"),
                                 ),
+                                Expr::bin_op("-", Expr::identifier("num"), Expr::int_literal("1")),
                                 Expr::identifier("num"),
                             ),
                         ),
