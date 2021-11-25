@@ -1,7 +1,6 @@
 use itertools::{Either, Itertools};
 
 use crate::parse;
-use crate::parse::Expr;
 use crate::type_inference::{infer_type, TypeMap};
 
 // #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
@@ -87,11 +86,11 @@ struct TypeAlias {
 struct Value {
     name: String,
     t: parse::Type,
-    definition: Expr,
+    definition: parse::Expr,
 }
 
 impl Value {
-    fn new<S>(name: S, t: parse::Type, definition: Expr) -> Value
+    fn new<S>(name: S, t: parse::Type, definition: parse::Expr) -> Value
     where
         S: Into<String>,
     {
@@ -199,14 +198,38 @@ fn to_canonical_value(
         .first()
         .map(|parse::TypeAnnotation { t, .. }| t.clone());
 
-    if values.is_empty() {
-        return Err(CanonicalizeError::MissingValueDefinition { name, type_hint });
-    }
-
-    let definition = values
-        .into_iter()
-        .map(|value| value.definition)
-        .collect::<Expr>();
+    let definition = match &values[..] {
+        [] => return Err(CanonicalizeError::MissingValueDefinition { name, type_hint }),
+        [value] => value.definition.clone(),
+        _ => parse::Expr::lambda(
+            parse::Pattern::identifier("a"),
+            parse::Expr::Case(
+                parse::Expr::identifier("a").into(),
+                values
+                    .into_iter()
+                    .map(|value| {
+                        match value.definition {
+                            parse::Expr::Paren(_) => todo!("parse::Expr::Paren(expr)"),
+                            // parse::Expr::Paren(expr) => parse::Alternative {
+                            //     pattern: parse::Pattern::WildCard,
+                            //     matches: parse::Match::Simple(*expr),
+                            // },
+                            parse::Expr::Identifier(_) => todo!("parse::Expr::Identifier(_)"),
+                            parse::Expr::Apply(_, _) => todo!("parse::Expr::Apply(_, _)"),
+                            parse::Expr::OpApply(_, _, _) => todo!("parse::Expr::OpApply(_, _, _)"),
+                            parse::Expr::Literal(_) => todo!("parse::Expr::Literal(_)"),
+                            parse::Expr::Lambda(pattern, expr) => parse::Alternative {
+                                pattern,
+                                matches: parse::Match::Simple(*expr),
+                            },
+                            parse::Expr::Case(_, _) => todo!("parse::Expr::Case(_, _)"),
+                            parse::Expr::IfElse(_, _, _) => todo!("parse::Expr::IfElse(_, _, _)"),
+                        }
+                    })
+                    .collect(),
+            ),
+        ),
+    };
 
     let type_def = type_hint.unwrap_or_else(|| infer_type(&definition, type_map));
 
@@ -239,7 +262,7 @@ mod tests {
     use crate::canonical;
     use crate::canonical::canonicalize;
     use crate::parse;
-    use crate::parse::{Expr, Type};
+    use crate::parse::{Alternative, Expr, Match, Pattern, Type};
     use crate::test_source;
 
     macro_rules! assert_eq {
@@ -392,17 +415,26 @@ mod tests {
             values: vec![canonical::Value::new(
                 String::from("increment_positive"),
                 Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
-                Expr::Match(vec![
-                    Expr::function(Expr::int_literal("0"), Expr::int_literal("0")),
-                    Expr::function(
-                        Expr::identifier("x"),
-                        Expr::bin_op(
-                            parse::BinOp::Add,
-                            Expr::identifier("x"),
-                            Expr::int_literal("1"),
-                        ),
+                Expr::lambda(
+                    Pattern::identifier("a"),
+                    Expr::Case(
+                        Expr::identifier("a").into(),
+                        vec![
+                            Alternative {
+                                pattern: Pattern::int_literal("0"),
+                                matches: Match::Simple(Expr::int_literal("0")),
+                            },
+                            Alternative {
+                                pattern: Pattern::identifier("x"),
+                                matches: Match::Simple(Expr::bin_op(
+                                    "+",
+                                    Expr::identifier("x"),
+                                    Expr::int_literal("1"),
+                                )),
+                            },
+                        ],
                     ),
-                ]),
+                ),
             )],
             type_aliases: vec![],
         };
@@ -415,7 +447,6 @@ mod tests {
 
             assert_eq!(expected, actual);
         }
-
         {
             let source: &str = test_source::SINGLE_ARG_FUNCTION_DECLARATION_WITH_NO_TYPE;
 
@@ -455,7 +486,7 @@ mod tests {
     }
 
     #[test]
-    fn test_multi_arg_function_declaration_with_type() {
+    fn test_multi_arg_function_declaration() {
         let expected = canonical::Module {
             name: String::from("Test"),
             values: vec![canonical::Value::new(
@@ -464,20 +495,35 @@ mod tests {
                     Type::tuple(vec![Type::identifier("Int"), Type::identifier("String")]),
                     Type::identifier("Int"),
                 ),
-                Expr::Match(vec![
-                    Expr::function(
-                        Expr::Tuple(vec![Expr::int_literal("0"), Expr::string_literal("")]),
-                        Expr::int_literal("0"),
+                Expr::lambda(
+                    Pattern::identifier("a"),
+                    Expr::Case(
+                        Expr::identifier("a").into(),
+                        vec![
+                            Alternative {
+                                pattern: Pattern::Constructor(
+                                    String::from("(,)"),
+                                    vec![Pattern::int_literal("0"), Pattern::string_literal("")],
+                                ),
+                                matches: Match::Simple(Expr::int_literal("0")),
+                            },
+                            Alternative {
+                                pattern: Pattern::Constructor(
+                                    String::from("(,)"),
+                                    vec![Pattern::identifier("x"), Pattern::identifier("y")],
+                                ),
+                                matches: Match::Simple(Expr::bin_op(
+                                    "+",
+                                    Expr::identifier("x"),
+                                    Expr::application(
+                                        vec!["String", "length"],
+                                        Expr::identifier("y"),
+                                    ),
+                                )),
+                            },
+                        ],
                     ),
-                    Expr::function(
-                        Expr::Tuple(vec![Expr::identifier("x"), Expr::identifier("y")]),
-                        Expr::bin_op(
-                            parse::BinOp::Add,
-                            Expr::identifier("x"),
-                            Expr::call(vec!["String", "length"], Expr::identifier("y")),
-                        ),
-                    ),
-                ]),
+                ),
             )],
             type_aliases: vec![],
         };
@@ -501,7 +547,7 @@ mod tests {
     }
 
     #[test]
-    fn test_curried_function_declaration_with_type() {
+    fn test_curried_function_declaration() {
         let expected = canonical::Module {
             name: String::from("Test"),
             values: vec![canonical::Value::new(
@@ -510,11 +556,11 @@ mod tests {
                     Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                     Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                 ),
-                Expr::function(
-                    Expr::identifier("f"),
-                    Expr::function(
-                        Expr::identifier("value"),
-                        Expr::call(vec!["f"], Expr::identifier("value")),
+                Expr::lambda(
+                    Pattern::identifier("f"),
+                    Expr::lambda(
+                        Pattern::identifier("value"),
+                        Expr::application(vec!["f"], Expr::identifier("value")),
                     ),
                 ),
             )],
@@ -541,11 +587,11 @@ mod tests {
                     Type::lambda(Type::variable("T3"), Type::variable("T4")),
                     Type::lambda(Type::variable("T3"), Type::variable("T4")),
                 ),
-                Expr::function(
-                    Expr::identifier("f"),
-                    Expr::function(
-                        Expr::identifier("value"),
-                        Expr::call(vec!["f"], Expr::identifier("value")),
+                Expr::lambda(
+                    Pattern::identifier("f"),
+                    Expr::lambda(
+                        Pattern::identifier("value"),
+                        Expr::application(vec!["f"], Expr::identifier("value")),
                     ),
                 ),
             )],
@@ -575,15 +621,14 @@ mod tests {
                     canonical::Value::new(
                         String::from("increment_positive"),
                         Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
-                        Expr::function(
-                            Expr::identifier("num"),
+                        Expr::lambda(
+                            Pattern::identifier("num"),
                             Expr::if_else(
-                                Expr::call(vec!["Number", "is_positive?"], Expr::identifier("num")),
-                                Expr::bin_op(
-                                    parse::BinOp::Add,
+                                Expr::application(
+                                    vec!["Number", "is_positive?"],
                                     Expr::identifier("num"),
-                                    Expr::int_literal("1"),
                                 ),
+                                Expr::bin_op("+", Expr::identifier("num"), Expr::int_literal("1")),
                                 Expr::identifier("num"),
                             ),
                         ),
@@ -591,15 +636,14 @@ mod tests {
                     canonical::Value::new(
                         String::from("decrement_negative"),
                         Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
-                        Expr::function(
-                            Expr::identifier("num"),
+                        Expr::lambda(
+                            Pattern::identifier("num"),
                             Expr::if_else(
-                                Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
-                                Expr::bin_op(
-                                    parse::BinOp::Sub,
+                                Expr::application(
+                                    vec!["Number", "is_negative?"],
                                     Expr::identifier("num"),
-                                    Expr::int_literal("1"),
                                 ),
+                                Expr::bin_op("-", Expr::identifier("num"), Expr::int_literal("1")),
                                 Expr::identifier("num"),
                             ),
                         ),
@@ -623,22 +667,20 @@ mod tests {
                 values: vec![canonical::Value::new(
                     String::from("increment_or_decrement"),
                     Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
-                    Expr::function(
-                        Expr::identifier("num"),
+                    Expr::lambda(
+                        Pattern::identifier("num"),
                         Expr::if_else(
-                            Expr::call(vec!["Number", "is_positive?"], Expr::identifier("num")),
-                            Expr::bin_op(
-                                parse::BinOp::Add,
+                            Expr::application(
+                                vec!["Number", "is_positive?"],
                                 Expr::identifier("num"),
-                                Expr::int_literal("1"),
                             ),
+                            Expr::bin_op("+", Expr::identifier("num"), Expr::int_literal("1")),
                             Expr::if_else(
-                                Expr::call(vec!["Number", "is_negative?"], Expr::identifier("num")),
-                                Expr::bin_op(
-                                    parse::BinOp::Sub,
+                                Expr::application(
+                                    vec!["Number", "is_negative?"],
                                     Expr::identifier("num"),
-                                    Expr::int_literal("1"),
                                 ),
+                                Expr::bin_op("-", Expr::identifier("num"), Expr::int_literal("1")),
                                 Expr::identifier("num"),
                             ),
                         ),
@@ -651,7 +693,7 @@ mod tests {
     }
 
     #[test]
-    fn test_call_function_in_module_with_type() {
+    fn test_call_function_in_module() {
         let expected = canonical::Module {
             name: String::from("Test"),
             values: vec![
@@ -661,11 +703,14 @@ mod tests {
                         Type::tuple(vec![Type::identifier("Int"), Type::identifier("Int")]),
                         Type::identifier("Int"),
                     ),
-                    Expr::function(
-                        Expr::Tuple(vec![Expr::identifier("first"), Expr::identifier("second")]),
+                    Expr::lambda(
+                        Pattern::Constructor(
+                            String::from("(,)"),
+                            vec![Pattern::identifier("first"), Pattern::identifier("second")],
+                        ),
                         Expr::if_else(
                             Expr::bin_op(
-                                parse::BinOp::Gt,
+                                ">",
                                 Expr::identifier("first"),
                                 Expr::identifier("second"),
                             ),
@@ -684,41 +729,44 @@ mod tests {
                         ]),
                         Type::identifier("Int"),
                     ),
-                    Expr::function(
-                        Expr::Tuple(vec![
-                            Expr::identifier("num1"),
-                            Expr::identifier("num2"),
-                            Expr::identifier("num3"),
-                        ]),
+                    Expr::lambda(
+                        Pattern::Constructor(
+                            String::from("(,,)"),
+                            vec![
+                                Pattern::identifier("num1"),
+                                Pattern::identifier("num2"),
+                                Pattern::identifier("num3"),
+                            ],
+                        ),
                         Expr::if_else(
                             Expr::bin_op(
-                                parse::BinOp::Eq,
+                                "==",
                                 Expr::identifier("num1"),
-                                Expr::call(
+                                Expr::application(
                                     vec!["max"],
-                                    Expr::Tuple(vec![
+                                    Expr::tuple(vec![
                                         Expr::identifier("num1"),
                                         Expr::identifier("num2"),
                                     ]),
                                 ),
                             ),
                             Expr::bin_op(
-                                parse::BinOp::Add,
+                                "+",
                                 Expr::identifier("num1"),
-                                Expr::call(
+                                Expr::application(
                                     vec!["max"],
-                                    Expr::Tuple(vec![
+                                    Expr::tuple(vec![
                                         Expr::identifier("num2"),
                                         Expr::identifier("num3"),
                                     ]),
                                 ),
                             ),
                             Expr::bin_op(
-                                parse::BinOp::Add,
+                                "+",
                                 Expr::identifier("num2"),
-                                Expr::call(
+                                Expr::application(
                                     vec!["max"],
-                                    Expr::Tuple(vec![
+                                    Expr::tuple(vec![
                                         Expr::identifier("num1"),
                                         Expr::identifier("num3"),
                                     ]),
