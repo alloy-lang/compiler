@@ -3,7 +3,7 @@ use linked_hash_map::LinkedHashMap;
 
 use crate::parse;
 use crate::parse::{Expr, LiteralData, Pattern};
-use crate::types::Type;
+use crate::types::{Type, TypeVariable};
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub(crate) struct TypeEnvironment {
@@ -403,7 +403,7 @@ fn unify(left: Type, right: Type, substitutions: &mut LinkedHashMap<String, Type
     }
 
     match (&left, &right) {
-        (Type::Variable(left_type_id), _) => {
+        (Type::Variable(TypeVariable { id: left_type_id }), _) => {
             if let Some(inner_type) = substitutions.get(left_type_id) {
                 return unify(inner_type.clone(), right, substitutions);
             }
@@ -411,7 +411,7 @@ fn unify(left: Type, right: Type, substitutions: &mut LinkedHashMap<String, Type
 
             Some(())
         }
-        (_, Type::Variable(right_type_id)) => {
+        (_, Type::Variable(TypeVariable { id: right_type_id })) => {
             if let Some(inner_type) = substitutions.get(right_type_id) {
                 return unify(inner_type.clone(), left, substitutions);
             }
@@ -456,7 +456,7 @@ fn apply_unifier<'a>(t: &'a Type, substitutions: &'a LinkedHashMap<String, Type>
     match t {
         Type::Identifier(_) => t.clone(),
         Type::Atom(_) => todo!("Type::Atom(_)"),
-        Type::Variable(type_id) => substitutions
+        Type::Variable(TypeVariable { id: type_id }) => substitutions
             .get(type_id)
             .map(|inner_t| apply_unifier(inner_t, substitutions))
             .unwrap_or_else(|| t.clone()),

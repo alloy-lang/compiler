@@ -1,42 +1,35 @@
-// // #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-// // pub enum Kind {
-// //     Function(Box<Kind>, Box<Kind>),
-// //     Star,
-// // }
-//
-// // impl Kind {
-// //     pub fn new(v: isize) -> Kind {
-// //         match v {
-// //             0 => Kind::Star,
-// //             _ => Kind::Function( Box::new(Kind::Star), Box::new(Kind::Star)),
-// //         }
-// //     }
-// // }
-//
 // #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-// pub struct TypeConstructor {
-//     pub name: String,
-//     // pub kind: Kind,
+// pub enum Kind {
+//     Function(Box<Kind>, Box<Kind>),
+//     Star,
 // }
-//
-// #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-// pub struct TypeVariable {
-//     pub id: String,
-//     // pub kind: Kind,
+
+// impl Kind {
+//     pub fn new(v: isize) -> Kind {
+//         match v {
+//             0 => Kind::Star,
+//             _ => Kind::Function( Box::new(Kind::Star), Box::new(Kind::Star)),
+//         }
+//     }
 // }
-//
-// #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-// pub enum Type {
-//     Variable(TypeVariable),
-//     Constructor(TypeConstructor),
-//     Application(Box<Type>, Box<Type>),
-// }
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+pub struct TypeConstructor {
+    pub name: String,
+    // pub kind: Kind,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+pub struct TypeVariable {
+    pub id: String,
+    // pub kind: Kind,
+}
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum Type {
     Identifier(String),
     Atom(String),
-    Variable(String),
+    Variable(TypeVariable),
     Lambda {
         arg_type: Box<Type>,
         return_type: Box<Type>,
@@ -97,6 +90,6 @@ impl Type {
     where
         S: Into<String>,
     {
-        Type::Variable(s.into())
+        Type::Variable(TypeVariable { id: s.into() })
     }
 }
