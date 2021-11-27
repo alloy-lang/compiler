@@ -190,7 +190,7 @@ impl Expr {
         S: Into<String>,
         E: Into<Vec<Expr>>,
     {
-        let address = address.into_iter().map(|s| s.into()).join("::");
+        let address = address.into_iter().map(Into::into).join("::");
         let func = Expr::Identifier(address);
 
         args.into()
