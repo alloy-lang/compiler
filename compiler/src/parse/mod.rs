@@ -1,9 +1,12 @@
 use itertools::Itertools;
 
+use crate::types::Type;
+
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum Pattern {
     Literal(LiteralData),
     Identifier(String),
+    Tuple(Vec<Pattern>),
     Constructor(String, Vec<Pattern>),
     WildCard,
 }
@@ -46,10 +49,12 @@ impl Pattern {
         A: Into<Vec<Pattern>>,
     {
         let args = args.into();
-        let n = args.len();
-        let name = tuple_name(n);
+        // let n = args.len();
+        // let name = tuple_name(n);
+        //
+        // Pattern::Constructor(name, args)
 
-        Pattern::Constructor(name, args)
+        Pattern::Tuple(args)
     }
 }
 
@@ -208,76 +213,6 @@ fn tuple_name(n: usize) -> String {
 impl From<Expr> for Vec<Expr> {
     fn from(e: Expr) -> Self {
         vec![e]
-    }
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub(crate) enum Type {
-    Identifier(String),
-    Atom(String),
-    // TODO: move type variables out of "parse::Type" if it's not needed for reading source code
-    Variable(String),
-    Lambda {
-        arg_type: Box<Type>,
-        return_type: Box<Type>,
-    },
-    // Record {
-    //     properties: Vec<(String, Box<Type>)>,
-    // },
-    // Alias {
-    //     type_name: String,
-    //     target: Box<Type>,
-    // },
-    Union {
-        types: Vec<Type>,
-    },
-    // Named {
-    //     type_name: String,
-    //     target: Box<Type>,
-    // },
-    Tuple(Vec<Type>),
-    // Unit,
-}
-
-impl Type {
-    pub(crate) fn union(types: Vec<Type>) -> Type {
-        Type::Union { types }
-    }
-
-    pub(crate) fn tuple(types: Vec<Type>) -> Type {
-        Type::Tuple(types)
-    }
-
-    pub(crate) fn lambda<T1, T2>(arg_type: T1, return_type: T2) -> Type
-    where
-        T1: Into<Box<Type>>,
-        T2: Into<Box<Type>>,
-    {
-        Type::Lambda {
-            arg_type: arg_type.into(),
-            return_type: return_type.into(),
-        }
-    }
-
-    pub(crate) fn identifier<S>(s: S) -> Type
-    where
-        S: Into<String>,
-    {
-        Type::Identifier(s.into())
-    }
-
-    pub(crate) fn atom<S>(s: S) -> Type
-    where
-        S: Into<String>,
-    {
-        Type::Atom(s.into())
-    }
-
-    pub(crate) fn variable<S>(s: S) -> Type
-    where
-        S: Into<String>,
-    {
-        Type::Variable(s.into())
     }
 }
 
@@ -543,8 +478,9 @@ pub(crate)grammar parser() for str {
 #[cfg(test)]
 mod tests {
     use crate::parse;
-    use crate::parse::{Expr, Pattern, Type};
+    use crate::parse::{Expr, Pattern, TypeAliasDefinition, TypeAnnotation};
     use crate::test_source;
+    use crate::types::Type;
 
     macro_rules! assert_eq {
         ($expected:expr, $actual:expr) => ({
@@ -574,8 +510,8 @@ mod tests {
 
     fn assert_type_annotations(
         module_name: &String,
-        expecteds: Vec<parse::TypeAnnotation>,
-        actuals: Vec<parse::TypeAnnotation>,
+        expecteds: Vec<TypeAnnotation>,
+        actuals: Vec<TypeAnnotation>,
     ) {
         let pairs = expecteds
             .iter()
@@ -628,8 +564,8 @@ Value in module '{}' at index {} were not equal.
 
     fn assert_type_aliases(
         module_name: &String,
-        expecteds: Vec<parse::TypeAliasDefinition>,
-        actuals: Vec<parse::TypeAliasDefinition>,
+        expecteds: Vec<TypeAliasDefinition>,
+        actuals: Vec<TypeAliasDefinition>,
     ) {
         let pairs = expecteds
             .iter()
@@ -711,7 +647,7 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                type_annotations: vec![parse::TypeAnnotation {
+                type_annotations: vec![TypeAnnotation {
                     name: String::from("thing"),
                     type_variables: vec![],
                     t: Type::identifier("Int"),
@@ -749,7 +685,7 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                type_annotations: vec![parse::TypeAnnotation {
+                type_annotations: vec![TypeAnnotation {
                     name: String::from("thing"),
                     type_variables: vec![],
                     t: Type::identifier("Float"),
@@ -770,7 +706,7 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                type_annotations: vec![parse::TypeAnnotation {
+                type_annotations: vec![TypeAnnotation {
                     name: String::from("increment_positive"),
                     type_variables: vec![],
                     t: Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
@@ -800,7 +736,7 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                type_annotations: vec![parse::TypeAnnotation {
+                type_annotations: vec![TypeAnnotation {
                     name: String::from("increment_by_length"),
                     type_variables: vec![],
                     t: Type::lambda(
@@ -812,20 +748,20 @@ Module names were not equal.
                     parse::Value {
                         name: String::from("increment_by_length"),
                         definition: Expr::lambda(
-                            Pattern::Constructor(
-                                String::from("(,)"),
-                                vec![Pattern::int_literal("0"), Pattern::string_literal("")],
-                            ),
+                            Pattern::tuple(vec![
+                                Pattern::int_literal("0"),
+                                Pattern::string_literal(""),
+                            ]),
                             Expr::int_literal("0"),
                         ),
                     },
                     parse::Value {
                         name: String::from("increment_by_length"),
                         definition: Expr::lambda(
-                            Pattern::Constructor(
-                                String::from("(,)"),
-                                vec![Pattern::identifier("x"), Pattern::identifier("y")],
-                            ),
+                            Pattern::tuple(vec![
+                                Pattern::identifier("x"),
+                                Pattern::identifier("y"),
+                            ]),
                             Expr::bin_op(
                                 "+",
                                 Expr::identifier("x"),
@@ -846,7 +782,7 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                type_annotations: vec![parse::TypeAnnotation {
+                type_annotations: vec![TypeAnnotation {
                     name: String::from("apply"),
                     type_variables: vec![],
                     t: Type::lambda(
@@ -953,13 +889,13 @@ Module names were not equal.
             name: String::from("Test"),
             type_annotations: vec![],
             values: vec![],
-            type_aliases: vec![parse::TypeAliasDefinition {
+            type_aliases: vec![TypeAliasDefinition {
                 name: String::from("Either"),
                 type_variables: vec![String::from("L"), String::from("R")],
                 t: Type::Union {
                     types: vec![
-                        Type::Tuple(vec![Type::atom("Right"), Type::identifier("R")]),
-                        Type::Tuple(vec![Type::atom("Left"), Type::identifier("L")]),
+                        Type::tuple(vec![Type::atom("Right"), Type::identifier("R")]),
+                        Type::tuple(vec![Type::atom("Left"), Type::identifier("L")]),
                     ],
                 },
             }],
