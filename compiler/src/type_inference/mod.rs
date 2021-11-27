@@ -154,10 +154,6 @@ fn assign_expr_type_names<'a>(what_are_you: &'a Expr, type_map: &'a mut TypeEnvi
             branches.iter().for_each(|alt| {
                 assign_pattern_type_names(&alt.pattern, type_map);
 
-                if let Some(match_pattern_expr) = pattern_to_expr(&alt.pattern) {
-                    assign_expr_type_names(&match_pattern_expr, type_map)
-                }
-
                 let parse::Match::Simple(match_result_expr) = &alt.matches;
                 assign_expr_type_names(match_result_expr, type_map)
             });
@@ -192,10 +188,6 @@ fn assign_pattern_type_names<'a>(
             );
 
             type_map.insert_pattern_type(what_are_you, t.clone());
-
-            if let Some(expr) = pattern_to_expr(what_are_you) {
-                type_map.insert_expr_type(&expr, t);
-            }
         }
         Pattern::Constructor(_, _) => todo!("Pattern::Constructor(name, args)"),
         // Pattern::Constructor(name, args) => {
@@ -376,24 +368,6 @@ fn generate_type_equations<'a>(
             });
         }
         Expr::Paren(_) => todo!("Expr::Paren(_)"),
-    }
-}
-
-fn pattern_to_expr(pattern: &Pattern) -> Option<Expr> {
-    match pattern {
-        Pattern::Literal(data) => Some(Expr::Literal(data.clone())),
-        Pattern::Identifier(id) => Some(Expr::identifier(id)),
-        Pattern::Tuple(args) => Some(Expr::tuple(
-            args.iter().filter_map(pattern_to_expr).collect::<Vec<_>>(),
-        )),
-        Pattern::Constructor(_, _) => todo!("Pattern::Constructor(name, args)"),
-        // Pattern::Constructor(name, args) => Some(Expr::application(
-        //     vec![name],
-        //     args.into_iter()
-        //         .filter_map(pattern_to_expr)
-        //         .collect::<Vec<_>>(),
-        // )),
-        Pattern::WildCard => todo!("Pattern::WildCard"),
     }
 }
 

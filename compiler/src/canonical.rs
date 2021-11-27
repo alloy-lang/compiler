@@ -137,24 +137,18 @@ fn to_canonical_value(
                 parse::Expr::identifier("a"),
                 values
                     .into_iter()
-                    .map(|value| {
-                        match value.definition {
-                            parse::Expr::Paren(_) => todo!("parse::Expr::Paren(expr)"),
-                            // parse::Expr::Paren(expr) => parse::Alternative {
-                            //     pattern: parse::Pattern::WildCard,
-                            //     matches: parse::Match::Simple(*expr),
-                            // },
-                            parse::Expr::Identifier(_) => todo!("parse::Expr::Identifier(_)"),
-                            parse::Expr::Apply(_, _) => todo!("parse::Expr::Apply(_, _)"),
-                            parse::Expr::OpApply(_, _, _) => todo!("parse::Expr::OpApply(_, _, _)"),
-                            parse::Expr::Literal(_) => todo!("parse::Expr::Literal(_)"),
-                            parse::Expr::Lambda(pattern, expr) => parse::Alternative {
-                                pattern,
-                                matches: parse::Match::Simple(*expr),
-                            },
-                            parse::Expr::Case(_, _) => todo!("parse::Expr::Case(_, _)"),
-                            parse::Expr::IfElse(_, _, _) => todo!("parse::Expr::IfElse(_, _, _)"),
-                        }
+                    .map(|value| match value.definition {
+                        parse::Expr::Identifier(_) => todo!("parse::Expr::Identifier(_)"),
+                        parse::Expr::Apply(_, _) => todo!("parse::Expr::Apply(_, _)"),
+                        parse::Expr::OpApply(_, _, _) => todo!("parse::Expr::OpApply(_, _, _)"),
+                        parse::Expr::Literal(_) => todo!("parse::Expr::Literal(_)"),
+                        parse::Expr::Lambda(pattern, expr) => parse::Alternative {
+                            pattern,
+                            matches: parse::Match::Simple(*expr),
+                        },
+                        parse::Expr::Case(_, _) => todo!("parse::Expr::Case(_, _)"),
+                        parse::Expr::IfElse(_, _, _) => todo!("parse::Expr::IfElse(_, _, _)"),
+                        parse::Expr::Paren(_) => todo!("parse::Expr::Paren(expr)"),
                     })
                     .collect(),
             ),
@@ -707,22 +701,22 @@ mod tests {
             type_aliases: vec![],
         };
 
-        // {
-        //     let source: &str = test_source::CALL_FUNCTION_IN_MODULE_WITH_TYPE;
-        //
-        //     let parsed_module = parse::parser::module(source).unwrap();
-        //     let actual = canonicalize(parsed_module).unwrap();
-        //
-        //     assert_eq!(expected.clone(), actual);
-        // }
-        // {
-        //     let source: &str = test_source::CALL_FUNCTION_IN_MODULE_WITH_ONE_TYPE;
-        //
-        //     let parsed_module = parse::parser::module(source).unwrap();
-        //     let actual = canonicalize(parsed_module).unwrap();
-        //
-        //     assert_eq!(expected.clone(), actual);
-        // }
+        {
+            let source: &str = test_source::CALL_FUNCTION_IN_MODULE_WITH_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected.clone(), actual);
+        }
+        {
+            let source: &str = test_source::CALL_FUNCTION_IN_MODULE_WITH_ONE_TYPE;
+
+            let parsed_module = parse::parser::module(source).unwrap();
+            let actual = canonicalize(parsed_module).unwrap();
+
+            assert_eq!(expected.clone(), actual);
+        }
         {
             let source: &str = test_source::CALL_FUNCTION_IN_MODULE_WITH_NO_TYPE;
 
