@@ -155,7 +155,7 @@ fn assign_expr_type_names<'a>(what_are_you: &'a Expr, type_map: &'a mut TypeEnvi
                 assign_pattern_type_names(&alt.pattern, type_map);
 
                 let parse::Match::Simple(match_result_expr) = &alt.matches;
-                assign_expr_type_names(match_result_expr, type_map)
+                assign_expr_type_names(match_result_expr, type_map);
             });
         }
         Expr::Paren(expr) => {
@@ -187,7 +187,7 @@ fn assign_pattern_type_names<'a>(
                     .collect(),
             );
 
-            type_map.insert_pattern_type(what_are_you, t.clone());
+            type_map.insert_pattern_type(what_are_you, t);
         }
         Pattern::Constructor(_, _) => todo!("Pattern::Constructor(name, args)"),
         // Pattern::Constructor(name, args) => {
@@ -199,11 +199,7 @@ fn assign_pattern_type_names<'a>(
         //         .map(|arg| type_map.must_get_pattern_type(arg).clone())
         //         .fold(Type::identifier(name), |lhs, rhs| Type::lambda(lhs, rhs));
         //
-        //     type_map.insert_pattern_type(what_are_you, t.clone());
-        //
-        //     if let Some(expr) = pattern_to_expr(what_are_you) {
-        //         type_map.insert_expr_type(&expr, t);
-        //     }
+        //     type_map.insert_pattern_type(what_are_you, t);
         // }
         Pattern::WildCard => todo!("Pattern::WildCard"),
     }
@@ -432,8 +428,7 @@ fn apply_unifier<'a>(t: &'a Type, substitutions: &'a LinkedHashMap<String, Type>
         Type::Atom(_) => todo!("Type::Atom(_)"),
         Type::Variable(TypeVariable { id: type_id }) => substitutions
             .get(type_id)
-            .map(|inner_t| apply_unifier(inner_t, substitutions))
-            .unwrap_or_else(|| t.clone()),
+            .map_or_else(|| t.clone(), |inner_t| apply_unifier(inner_t, substitutions)),
         Type::Lambda {
             arg_type,
             return_type,
