@@ -133,8 +133,8 @@ fn to_canonical_value(
         [value] => value.definition.clone(),
         _ => parse::Expr::lambda(
             parse::Pattern::identifier("a"),
-            parse::Expr::Case(
-                parse::Expr::identifier("a").into(),
+            parse::Expr::case(
+                parse::Expr::identifier("a"),
                 values
                     .into_iter()
                     .map(|value| {
@@ -348,8 +348,8 @@ mod tests {
                 Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                 Expr::lambda(
                     Pattern::identifier("a"),
-                    Expr::Case(
-                        Expr::identifier("a").into(),
+                    Expr::case(
+                        Expr::identifier("a"),
                         vec![
                             Alternative {
                                 pattern: Pattern::int_literal("0"),
@@ -428,8 +428,8 @@ mod tests {
                 ),
                 Expr::lambda(
                     Pattern::identifier("a"),
-                    Expr::Case(
-                        Expr::identifier("a").into(),
+                    Expr::case(
+                        Expr::identifier("a"),
                         vec![
                             Alternative {
                                 pattern: Pattern::tuple(vec![
@@ -741,12 +741,10 @@ mod tests {
             type_aliases: vec![canonical::TypeAlias {
                 name: String::from("Either"),
                 type_variables: vec![String::from("L"), String::from("R")],
-                t: Type::Union {
-                    types: vec![
-                        Type::tuple(vec![Type::atom("Right"), Type::identifier("R")]),
-                        Type::tuple(vec![Type::atom("Left"), Type::identifier("L")]),
-                    ],
-                },
+                t: Type::union(vec![
+                    Type::tuple(vec![Type::atom("Right"), Type::identifier("R")]),
+                    Type::tuple(vec![Type::atom("Left"), Type::identifier("L")]),
+                ]),
             }],
         };
 

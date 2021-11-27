@@ -13,6 +13,9 @@
 //     }
 // }
 
+use non_empty_vec::NonEmpty;
+use std::convert::TryFrom;
+
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub struct TypeConstructor {
     pub name: String,
@@ -42,23 +45,25 @@ pub(crate) enum Type {
     //     target: Box<Type>,
     // },
     Union {
-        types: Vec<Type>,
+        types: NonEmpty<Type>,
     },
     // Named {
     //     type_name: String,
     //     target: Box<Type>,
     // },
-    Tuple(Vec<Type>),
+    Tuple(NonEmpty<Type>),
     // Unit,
 }
 
 impl Type {
     pub(crate) fn union(types: Vec<Type>) -> Type {
-        Type::Union { types }
+        Type::Union {
+            types: NonEmpty::try_from(types).unwrap(),
+        }
     }
 
     pub(crate) fn tuple(types: Vec<Type>) -> Type {
-        Type::Tuple(types)
+        Type::Tuple(NonEmpty::try_from(types).unwrap())
     }
 
     pub(crate) fn lambda<T1, T2>(arg_type: T1, return_type: T2) -> Type

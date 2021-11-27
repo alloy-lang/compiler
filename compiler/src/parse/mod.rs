@@ -1,13 +1,15 @@
-use itertools::Itertools;
-
 use crate::types::Type;
+use core::convert::TryFrom;
+
+use itertools::Itertools;
+use non_empty_vec::NonEmpty;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) enum Pattern {
     Literal(LiteralData),
     Identifier(String),
-    Tuple(Vec<Pattern>),
-    Constructor(String, Vec<Pattern>),
+    Tuple(NonEmpty<Pattern>),
+    Constructor(String, NonEmpty<Pattern>),
     WildCard,
 }
 
@@ -54,7 +56,7 @@ impl Pattern {
         //
         // Pattern::Constructor(name, args)
 
-        Pattern::Tuple(args)
+        Pattern::Tuple(NonEmpty::try_from(args).unwrap())
     }
 }
 
@@ -107,7 +109,7 @@ pub(crate) enum Expr {
     OpApply(Box<Expr>, String, Box<Expr>),
     Literal(LiteralData),
     Lambda(Pattern, Box<Expr>),
-    Case(Box<Expr>, Vec<Alternative>),
+    Case(Box<Expr>, NonEmpty<Alternative>),
     IfElse(Box<Expr>, Box<Expr>, Box<Expr>),
     Paren(Box<Expr>),
 }
@@ -161,6 +163,17 @@ impl Expr {
         E: Into<Box<Expr>>,
     {
         Expr::OpApply(first.into(), op.into(), second.into())
+    }
+
+    pub(crate) fn case<E>(expr: E, alts: Vec<Alternative>) -> Expr
+    where
+        E: Into<Box<Expr>>,
+    {
+        if alts.is_empty() {
+            return *expr.into();
+        }
+
+        Expr::Case(expr.into(), NonEmpty::try_from(alts).unwrap())
     }
 
     pub(crate) fn if_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr
@@ -385,7 +398,7 @@ pub(crate)grammar parser() for str {
         / type_alias_definition()
 
     rule possible_union_type() -> Type
-        = ("|")? _ types:((_ t:type_definition() _n_() { t }) ++ "|") { Type::Union { types } }
+        = ("|")? _ types:((_ t:type_definition() _n_() { t }) ++ "|") { Type::union(types) }
         / t:type_definition() { t }
 
     rule type_definition() -> Type = precedence!{
@@ -892,12 +905,10 @@ Module names were not equal.
             type_aliases: vec![TypeAliasDefinition {
                 name: String::from("Either"),
                 type_variables: vec![String::from("L"), String::from("R")],
-                t: Type::Union {
-                    types: vec![
-                        Type::tuple(vec![Type::atom("Right"), Type::identifier("R")]),
-                        Type::tuple(vec![Type::atom("Left"), Type::identifier("L")]),
-                    ],
-                },
+                t: Type::union(vec![
+                    Type::tuple(vec![Type::atom("Right"), Type::identifier("R")]),
+                    Type::tuple(vec![Type::atom("Left"), Type::identifier("L")]),
+                ]),
             }],
         };
 
