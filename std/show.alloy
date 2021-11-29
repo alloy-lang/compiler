@@ -1,0 +1,5 @@
+module Show
+where
+
+trait Show<T> where
+  show : T -> String

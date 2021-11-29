@@ -1,0 +1,47 @@
+module Bool
+  import std::eq::Eq
+  import std::ord::Ord
+  import std::show::Show
+where
+
+typedef Bool =
+  | False
+  | True
+
+/// Boolean 'not'
+not : Bool -> Bool
+not = |x| =>
+  if x
+  then False
+  else True
+
+/// Boolean 'exclusive or'
+xor : Bool -> Bool -> Bool
+xor = |x, y| =>
+  if x
+  then not(y)
+  else y
+
+
+behavior Eq<Bool> where
+  (==) = |left, right| =>
+    if left
+    then right
+    else not(right)
+
+
+behavior Ord<Bool> where
+  compare = |left, right| =>
+    if left
+    then
+      if right
+      then EQ
+      else GT
+    else LT
+
+
+behavior Show<Bool> where
+  show = |x| =>
+    if x
+    then "True"
+    else "False"

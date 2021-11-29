@@ -1,0 +1,43 @@
+module Either
+  import std::eq::Eq
+  import std::ord::Ord
+  import std::show::Show
+where
+
+/// `Either` represents either right (`Right`) or left (`Left`)
+typedef Either<L, R> =
+    | Left(L)
+    | Right(R)
+
+
+behavior Eq<Either<L, R>> where
+  typevar L has Eq<L>
+  typevar R has Eq<R>
+
+  (==) = |left, right| =>
+    match (left, right) when
+      | (Left(l_val), Left(r_val)) -> Eq::eq(l_val, r_val)
+      | (Right(l_val), Right(r_val)) -> Eq::eq(l_val, r_val)
+      | _ -> False
+
+
+behavior Ord<Either<L, R>> where
+  typevar L has Ord<L>
+  typevar R has Ord<R>
+
+  compare = |left, right| =>
+    match (left, right) when
+      | (Right(l_val), Right(r_val)) -> Ord::compare(l_val, r_val)
+      | (Left(l_val), Left(r_val)) -> Ord::compare(l_val, r_val)
+      | (Right(_), Left(_)) -> LT
+      | (Left(_), Right(_)) -> GT
+
+
+behavior Show<Either<L, R>> where
+  typevar L has Show<L>
+  typevar R has Show<R>
+
+  show = |e| =>
+    match e when
+      | Left(x) -> "Left(" <> Show::show(x) <> ")"
+      | Right(x) -> "Right(" <> Show::show(x) <> ")"

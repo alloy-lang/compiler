@@ -1,0 +1,40 @@
+module Option
+  import std::eq::Eq
+  import std::ord::Ord
+  import std::show::Show
+where
+
+/// `Option` represents a value which may not exist.
+typedef Option<T> =
+    | None
+    | Some(T)
+
+
+behavior Eq<Option<T>> where
+  typevar T has Eq<T>
+
+  (==) = |left, right| =>
+    match (left, right) when
+      | (Some(l_val), Some(r_val)) -> Eq::eq(l_val, r_val)
+      | (None, None) -> True
+      | _ -> False
+
+
+behavior Ord<Option<T>> where
+  typevar T has Ord<T>
+
+  compare = |left, right| =>
+    match (left, right) when
+      | (Some(l_val), Some(r_val)) -> Ord::compare(l_val, r_val)
+      | (None, Some(_)) -> LT
+      | (Some(_), None) -> GT
+      | (None, None) -> EQ
+
+
+behavior Show<Option<T>> where
+  typevar T has Show<T>
+
+  show = |op| =>
+    match op when
+      | Some(x) -> "Some(" <> Show::show(x) <> ")"
+      | None -> "None"

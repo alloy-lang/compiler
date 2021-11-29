@@ -1,0 +1,65 @@
+module Ord
+  import std::bool::Bool
+  import std::eq::Eq
+where
+
+typedef Ordering =
+  | LT
+  | EQ
+  | GT
+
+/// `Ord<T>` defines an ordering on `T`
+/// Any `T` that behaves as `Ord` must also behave as `Eq`
+trait Ord<T> where
+  typevar T has Eq<T>
+
+  compare : T -> T -> Ordering
+
+
+/// Returns whether `left` is less than or equal to `right`.
+(<=) : T -> T -> Bool where
+  typevar T has Ord<T>
+(<=) = |left, right| => match Ord::compare(left, right) when
+  | LT -> True
+  | EQ -> True
+  | GT -> False
+
+/// Returns whether `left` is less than `right`.
+(<) : T -> T -> Bool where
+  typevar T has Ord<T>
+(<) = |left, right| => match Ord::compare(left, right) when
+  | LT -> True
+  | EQ -> False
+  | GT -> False
+
+/// Returns whether `left` is greater than `right`.
+(>) : T -> T -> Bool where
+  typevar T has Ord<T>
+(>) = |left, right| => match Ord::compare(left, right) when
+  | LT -> False
+  | EQ -> False
+  | GT -> True
+
+/// Returns whether `left` is greater than or equal to `right`.
+(>=) : T -> T -> Bool where
+  typevar T has Ord<T>
+(>=) = |left, right| => match Ord::compare(left, right) when
+  | LT -> False
+  | EQ -> True
+  | GT -> True
+
+/// Returns `left` if `left` is less than or equal to `right`, otherwise `right`.
+min<T> : T -> T -> T where
+  typevar T has Ord<T>
+min = |left, right| =>
+  if left <= right
+  then left
+  else right
+
+/// Returns `left` if `left` is greater than or equal to `right`, otherwise `right`.
+max<T> : T -> T -> T where
+  typevar T has Ord<T>
+max = |left, right| =>
+  if left >= right
+  then left
+  else right

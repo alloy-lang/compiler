@@ -1,0 +1,6 @@
+module Eq
+  import std::bool::Bool
+where
+
+trait Eq<T> where
+  (==) : T -> T -> Bool
