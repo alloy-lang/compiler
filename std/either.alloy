@@ -1,8 +1,9 @@
 module Either
-  import std::eq::Eq
-  import std::ord::Ord
-  import std::show::Show
 where
+
+import std::eq::Eq
+import std::ord::Ord
+import std::show::Show
 
 /// `Either` represents either right (`Right`) or left (`Left`)
 typedef Either<L, R> =
@@ -14,7 +15,7 @@ behavior Eq<Either<L, R>> where
   typevar L has Eq<L>
   typevar R has Eq<R>
 
-  (==) = |left, right| =>
+  eq = |left, right| =>
     match (left, right) when
       | (Left(l_val), Left(r_val)) -> Eq::eq(l_val, r_val)
       | (Right(l_val), Right(r_val)) -> Eq::eq(l_val, r_val)

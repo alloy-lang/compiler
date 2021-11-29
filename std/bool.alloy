@@ -1,8 +1,9 @@
 module Bool
-  import std::eq::Eq
-  import std::ord::Ord
-  import std::show::Show
 where
+
+import std::eq::Eq
+import std::ord::Ord
+import std::show::Show
 
 typedef Bool =
   | False

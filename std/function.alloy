@@ -2,43 +2,43 @@ module Function
 where
 
 /// The identity function, where `id x == x`
-id : T -> T where
+id : t -> t where
   typevar T
 id = |x| => x
 
 /// `const(x)` creates a function that always returns `x`
-const : T1 -> T2 -> T1 where
-  typevar T1
-  typevar T2
+const : t1 -> t2 -> t1 where
+  typevar t1
+  typevar t2
 const = |x, _| => x
 
 /// flip `f` creates a new function that takes its two arguments in reverse order
-flip : (T1 -> T2 -> T3) -> (T2 -> T1 -> T3) where
-  typevar T1
-  typevar T2
-  typevar T3
+flip : (t1 -> t2 -> t3) -> (t2 -> t1 -> t3) where
+  typevar t1
+  typevar t2
+  typevar t3
 flip = |f, x, y| => f(y, x)
 
 /// Backward function application, where `f <| x == f x`
 #[infix(right, 0)]
-(<|) : (T1 -> T2) -> T1 -> T2 where
-  typevar T1
-  typevar T2
+(<|) : (t1 -> t2) -> t1 -> t2 where
+  typevar t1
+  typevar t2
 (<|) = |f, x| => f(x)
 
 /// Forward function application, where `x |> f == f x`
 #[infix(left, 0)]
-(|>) : T1 -> (T1 -> T2) -> T2 where
-  typevar T1
-  typevar T2
+(|>) : t1 -> (t1 -> t2) -> t2 where
+  typevar t1
+  typevar t2
 (|>) = |x, f| => f(x)
 
 /// Right-to-left function composition
 #[infix(right, 9)]
-(<<) : (T2 -> T3) -> (T1 -> T2) -> (T1 -> T3)
+(<<) : (t2 -> t3) -> (t1 -> t2) -> (t1 -> t3)
 (<<) = |f, g, x| => f(g(x))
 
 /// Left-to-right function composition
 #[infix(left, 9)]
-(>>) : (T1 -> T2) -> (T2 -> T3) -> (T1 -> T3)
+(>>) : (t1 -> t2) -> (t2 -> t3) -> (t1 -> t3)
 (>>) = flip (<<)

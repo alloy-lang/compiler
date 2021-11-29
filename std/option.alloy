@@ -1,27 +1,28 @@
 module Option
-  import std::eq::Eq
-  import std::ord::Ord
-  import std::show::Show
 where
 
+import std::eq::Eq
+import std::ord::Ord
+import std::show::Show
+
 /// `Option` represents a value which may not exist.
-typedef Option<T> =
+typedef Option<t> =
     | None
     | Some(T)
 
 
-behavior Eq<Option<T>> where
-  typevar T has Eq<T>
+behavior Eq<Option<t>> where
+  typevar t has Eq<t>
 
-  (==) = |left, right| =>
+  eq = |left, right| =>
     match (left, right) when
       | (Some(l_val), Some(r_val)) -> Eq::eq(l_val, r_val)
       | (None, None) -> True
       | _ -> False
 
 
-behavior Ord<Option<T>> where
-  typevar T has Ord<T>
+behavior Ord<Option<t>> where
+  typevar t has Ord<t>
 
   compare = |left, right| =>
     match (left, right) when
@@ -31,8 +32,8 @@ behavior Ord<Option<T>> where
       | (None, None) -> EQ
 
 
-behavior Show<Option<T>> where
-  typevar T has Show<T>
+behavior Show<Option<t>> where
+  typevar t has Show<t>
 
   show = |op| =>
     match op when

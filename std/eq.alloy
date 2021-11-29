@@ -1,6 +1,14 @@
 module Eq
-  import std::bool::Bool
 where
 
-trait Eq<T> where
-  (==) : T -> T -> Bool
+import std::bool::Bool
+
+trait Eq<t> where
+  typevar t
+
+  eq : t -> t -> Bool
+
+  #[infix(left, 4)]
+  (==) = eq
+  #[infix(left, 4)]
+  (!=) = not eq
