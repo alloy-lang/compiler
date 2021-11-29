@@ -2,7 +2,8 @@ module Bool
 where
 
 import std::eq::Eq
-import std::ord::Ord
+import std::order::Ord
+import std::order::Ordering
 import std::show::Show
 
 typedef Bool =
@@ -36,9 +37,9 @@ behavior Ord<Bool> where
     if left
     then
       if right
-      then EQ
-      else GT
-    else LT
+      then Ordering::EQ
+      else Ordering::GT
+    else Ordering::LT
 
 
 behavior Show<Bool> where
