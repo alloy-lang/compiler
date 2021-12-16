@@ -61,6 +61,7 @@ pub(crate) fn canonicalize(parsed: parse::Module) -> Result<Module, Vec<Canonica
         type_annotations,
         values,
         type_aliases,
+        traits,
     } = parsed;
 
     let mut type_map = TypeEnvironment::new();
@@ -173,7 +174,7 @@ fn to_canonical_type_alias(
             t,
         }] => Ok(TypeAlias {
             name: name.clone(),
-            type_variables: type_variables.clone(),
+            type_variables: type_variables.iter().map(|var| var.id.clone()).collect(),
             t: t.clone(),
         }),
         [] => panic!("Empty TypeAlias list for name: {}", name),

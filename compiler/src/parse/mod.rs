@@ -257,10 +257,18 @@ pub(crate) struct TypeAliasDefinition {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+pub(crate) struct TraitDefinition {
+    pub(crate) name: String,
+    pub(crate) type_variables: Vec<TypeVariable>,
+    pub(crate) type_annotations: Vec<TypeAnnotationDefinition>,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 enum Declaration {
     TypeAnnotation(TypeAnnotationDefinition),
     Value(ValueDefinition),
     TypeAlias(TypeAliasDefinition),
+    Trait(TraitDefinition),
 }
 
 impl Declaration {
@@ -297,25 +305,47 @@ impl Declaration {
             name: name.into(),
             type_variables,
             t,
-        }
+        })
+    }
+
+    fn new_trait<S>(
+        name: S,
+        type_variables: Vec<TypeVariable>,
+        type_annotations: Vec<TypeAnnotationDefinition>,
+    ) -> Declaration
+    where
+        S: Into<String>,
+    {
+        Declaration::Trait(TraitDefinition {
+            name: name.into(),
+            type_variables,
+            type_annotations,
+        })
     }
 
     pub(crate) fn categorize(
         declarations: impl IntoIterator<Item = Declaration>,
-    ) -> (Vec<TypeAnnotation>, Vec<Value>, Vec<TypeAliasDefinition>) {
-        let mut type_annotations: Vec<TypeAnnotation> = Vec::new();
-        let mut values: Vec<Value> = Vec::new();
+    ) -> (
+        Vec<TypeAnnotationDefinition>,
+        Vec<ValueDefinition>,
+        Vec<TypeAliasDefinition>,
+        Vec<TraitDefinition>,
+    ) {
+        let mut type_annotations: Vec<TypeAnnotationDefinition> = Vec::new();
+        let mut values: Vec<ValueDefinition> = Vec::new();
         let mut type_aliases: Vec<TypeAliasDefinition> = Vec::new();
+        let mut traits: Vec<TraitDefinition> = Vec::new();
 
         for declaration in declarations {
             match declaration {
                 Declaration::TypeAnnotation(ta) => type_annotations.push(ta),
                 Declaration::Value(v) => values.push(v),
                 Declaration::TypeAlias(tad) => type_aliases.push(tad),
+                Declaration::Trait(td) => traits.push(td),
             }
         }
 
-        (type_annotations, values, type_aliases)
+        (type_annotations, values, type_aliases, traits)
     }
 }
 
@@ -325,6 +355,7 @@ pub(crate) struct Module {
     pub(crate) type_annotations: Vec<TypeAnnotationDefinition>,
     pub(crate) values: Vec<ValueDefinition>,
     pub(crate) type_aliases: Vec<TypeAliasDefinition>,
+    pub(crate) traits: Vec<TraitDefinition>,
 }
 
 impl Module {
@@ -332,13 +363,15 @@ impl Module {
     where
         S: Into<String>,
     {
-        let (type_annotations, values, type_aliases) = Declaration::categorize(declarations);
+        let (type_annotations, values, type_aliases, traits) =
+            Declaration::categorize(declarations);
 
         Module {
             name: name.into(),
             type_annotations,
             values,
             type_aliases,
+            traits,
         }
     }
 }
@@ -365,7 +398,8 @@ pub(crate)grammar parser() for str {
           { Module::from_declarations(name, declarations) }
 
     rule declaration() -> Declaration
-        = t:type_annotation() { Declaration::TypeAnnotation(t) }
+        = t:trait_definition() { Declaration::Trait(t) }
+        / t:type_annotation() { Declaration::TypeAnnotation(t) }
         / t:value_definition() { Declaration::Value(t) }
         / t:type_alias_definition() { Declaration::TypeAlias(t) }
 
@@ -400,8 +434,12 @@ pub(crate)grammar parser() for str {
         _ name:identifier() _ "=" _ e:expression() _ { ValueDefinition { name, definition: e } } }
         / expected!("value definition")
 
-    rule value_definition() -> Declaration
-        = name:identifier() _ "=" _ e:expression() _ { Declaration::new_value(name, e) }
+    rule trait_definition() -> TraitDefinition
+        = comments()
+        "trait" _ name:identifier() type_variables:type_variables() _ "where" _ "\n"
+        _ tvar_bounds:((b:type_variable_bound() { b })*)
+        _ type_annotations:((tanno:type_annotation() { tanno })*)
+        { TraitDefinition { name, type_variables, type_annotations } }
 
     // rule type_variable_bound() -> TypeVariableBounds
     // rule type_variable_bound() -> TypeVariable
@@ -473,7 +511,11 @@ pub(crate)grammar parser() for str {
     }
 
     rule identifier() -> String
-        = quiet!{ n:$(['_']?['a'..='z' | 'A'..='Z']['a'..='z' | 'A'..='Z' | '0'..='9' | '_']*['?' | '\'']?) { n.to_owned() } }
+        = quiet!{
+            n:$("_") { n.to_owned() }
+            / n:$(['_']?['a'..='z' | 'A'..='Z']['a'..='z' | 'A'..='Z' | '0'..='9' | '_']*['?' | '\'']?) { n.to_owned() }
+            / n:$(['(']['|' | '<' | '>']+[')']) { n.to_owned() }
+        }
         / expected!("identifier")
 
     rule literal() -> Expr
@@ -616,6 +658,33 @@ TypeAlias in module '{}' at index {} were not equal.
         assert_eq!(expecteds, actuals);
     }
 
+    fn assert_traits(
+        module_name: &String,
+        expecteds: Vec<TraitDefinition>,
+        actuals: Vec<TraitDefinition>,
+    ) {
+        let pairs = expecteds
+            .iter()
+            .zip(actuals.iter())
+            .enumerate()
+            .collect::<Vec<_>>();
+
+        for (index, (expected, actual)) in pairs {
+            assert_eq!(
+                expected, actual,
+                r#"
+
+Trait in module '{}' at index {} were not equal.
+ expected: {:?}
+   actual: {:?}
+"#,
+                module_name, index, expected, actual,
+            );
+        }
+
+        assert_eq!(expecteds, actuals);
+    }
+
     fn assert_module(expected: parse::Module, actual: parse::Module) {
         assert_eq!(
             expected.name, actual.name,
@@ -635,6 +704,7 @@ Module names were not equal.
         );
         assert_values(&expected.name, expected.values, actual.values);
         assert_type_aliases(&expected.name, expected.type_aliases, actual.type_aliases);
+        assert_traits(&expected.name, expected.traits, actual.traits);
     }
 
     #[test]
@@ -645,6 +715,7 @@ Module names were not equal.
                 name: String::from("Test"),
                 type_annotations: vec![],
                 type_aliases: vec![],
+                traits: vec![],
                 values: vec![],
             },
             parse::parser::module(source).unwrap(),
@@ -663,6 +734,7 @@ Module names were not equal.
                     definition: Expr::int_literal("0"),
                 }],
                 type_aliases: vec![],
+                traits: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -684,6 +756,7 @@ Module names were not equal.
                     definition: Expr::int_literal("0"),
                 }],
                 type_aliases: vec![],
+                traits: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -701,6 +774,7 @@ Module names were not equal.
                     definition: Expr::float_literal("0.1"),
                 }],
                 type_aliases: vec![],
+                traits: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -722,6 +796,7 @@ Module names were not equal.
                     definition: Expr::float_literal("0.1"),
                 }],
                 type_aliases: vec![],
+                traits: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -752,6 +827,7 @@ Module names were not equal.
                     },
                 ],
                 type_aliases: vec![],
+                traits: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -798,6 +874,7 @@ Module names were not equal.
                     },
                 ],
                 type_aliases: vec![],
+                traits: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -828,6 +905,7 @@ Module names were not equal.
                     ),
                 }],
                 type_aliases: vec![],
+                traits: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -871,6 +949,7 @@ Module names were not equal.
                     },
                 ],
                 type_aliases: vec![],
+                traits: vec![],
             },
             parse::parser::module(source).unwrap(),
         );
@@ -884,6 +963,7 @@ Module names were not equal.
                 name: String::from("Test"),
                 type_annotations: vec![],
                 type_aliases: vec![],
+                traits: vec![],
                 values: vec![parse::ValueDefinition {
                     name: String::from("increment_or_decrement"),
                     definition: Expr::lambda(
@@ -918,12 +998,13 @@ Module names were not equal.
             values: vec![],
             type_aliases: vec![TypeAliasDefinition {
                 name: String::from("Either"),
-                type_variables: vec![String::from("L"), String::from("R")],
+                type_variables: vec![TypeVariable::new_type("L"), TypeVariable::new_type("R")],
                 t: Type::union(vec![
                     Type::tuple(vec![Type::atom("Right"), Type::identifier("R")]),
                     Type::tuple(vec![Type::atom("Left"), Type::identifier("L")]),
                 ]),
             }],
+            traits: vec![],
         };
 
         {
@@ -940,6 +1021,68 @@ Module names were not equal.
             let source: &str = test_source::MULTI_PROPERTY_UNION_TYPE_3;
 
             assert_module(expected, parse::parser::module(source).unwrap());
+        }
+    }
+
+    #[test]
+    fn test_trait_with_no_typevar() {
+        let expected = parse::Module {
+            name: String::from("Test"),
+            type_annotations: vec![],
+            values: vec![],
+            type_aliases: vec![],
+            traits: vec![TraitDefinition {
+                name: "Simple".to_string(),
+                type_variables: vec![],
+                type_annotations: vec![TypeAnnotationDefinition {
+                    name: "simple".to_string(),
+                    type_variables: vec![],
+                    t: Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
+                }]
+            }],
+        };
+
+        {
+            let source: &str = r#"
+            module Test
+            where
+
+            trait Simple where
+              simple: Int -> Int
+"#;
+
+            assert_module(expected.clone(), parse::parser::module(source).unwrap());
+        }
+    }
+
+    #[test]
+    fn test_trait_with_multiple_typevars() {
+        let expected = parse::Module {
+            name: String::from("Test"),
+            type_annotations: vec![],
+            values: vec![],
+            type_aliases: vec![],
+            traits: vec![TraitDefinition {
+                name: "MultiVar".to_string(),
+                type_variables: vec![
+                    TypeVariable::new_type("a"),
+                    TypeVariable::new_type("b"),
+                ],
+                type_annotations: vec![]
+            }],
+        };
+
+        {
+            let source: &str = r#"
+            module Test
+            where
+
+            trait MultiVar<a, b> where
+              typevar a
+              typevar b
+"#;
+
+            assert_module(expected.clone(), parse::parser::module(source).unwrap());
         }
     }
 
