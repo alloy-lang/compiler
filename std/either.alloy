@@ -4,41 +4,44 @@ where
 import std::eq::Eq
 import std::ord::Ord
 import std::show::Show
+import std::functor::Functor
+import std::applicative::Applicative
+import std::monad::Monad
 
 /// `Either` represents either right (`Right`) or left (`Left`)
-typedef Either<L, R> =
-    | Left(L)
-    | Right(R)
+typedef Either<l, r> =
+    | Left(l)
+    | Right(r)
 
 
-behavior Eq<Either<L, R>> where
-  typevar L has Eq<L>
-  typevar R has Eq<R>
+behavior Eq<Either<l, r>> where
+  typevar l has Eq<l>
+  typevar r has Eq<r>
 
   eq = |left, right| =>
     match (left, right) when
-      | (Left(l_val), Left(r_val)) -> Eq::eq(l_val, r_val)
+      | (Left(l_val), Left(r_val))   -> Eq::eq(l_val, r_val)
       | (Right(l_val), Right(r_val)) -> Eq::eq(l_val, r_val)
       | _ -> False
 
 
-behavior Ord<Either<L, R>> where
-  typevar L has Ord<L>
-  typevar R has Ord<R>
+behavior Ord<Either<l, r>> where
+  typevar l has Ord<l>
+  typevar r has Ord<r>
 
   compare = |left, right| =>
     match (left, right) when
       | (Right(l_val), Right(r_val)) -> Ord::compare(l_val, r_val)
-      | (Left(l_val), Left(r_val)) -> Ord::compare(l_val, r_val)
-      | (Right(_), Left(_)) -> LT
-      | (Left(_), Right(_)) -> GT
+      | (Left(l_val), Left(r_val))   -> Ord::compare(l_val, r_val)
+      | (Right(_), Left(_))          -> LT
+      | (Left(_), Right(_))          -> GT
 
 
-behavior Show<Either<L, R>> where
-  typevar L has Show<L>
-  typevar R has Show<R>
+behavior Show<Either<l, r>> where
+  typevar l has Show<l>
+  typevar r has Show<r>
 
   show = |e| =>
     match e when
-      | Left(x) -> "Left(" <> Show::show(x) <> ")"
+      | Left(x)  -> "Left(" <> Show::show(x) <> ")"
       | Right(x) -> "Right(" <> Show::show(x) <> ")"

@@ -8,12 +8,13 @@ import std::show::Show
 /// `Option` represents a value which may not exist.
 typedef Option<t> =
     | None
-    | Some(T)
+    | Some(t)
 
 
 behavior Eq<Option<t>> where
   typevar t has Eq<t>
 
+  eq : t -> t -> Bool
   eq = |left, right| =>
     match (left, right) when
       | (Some(l_val), Some(r_val)) -> Eq::eq(l_val, r_val)
@@ -24,6 +25,7 @@ behavior Eq<Option<t>> where
 behavior Ord<Option<t>> where
   typevar t has Ord<t>
 
+  compare : t -> t -> Ordering
   compare = |left, right| =>
     match (left, right) when
       | (Some(l_val), Some(r_val)) -> Ord::compare(l_val, r_val)
@@ -35,6 +37,7 @@ behavior Ord<Option<t>> where
 behavior Show<Option<t>> where
   typevar t has Show<t>
 
+  show : Option<t> -> String
   show = |op| =>
     match op when
       | Some(x) -> "Some(" <> Show::show(x) <> ")"

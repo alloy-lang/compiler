@@ -3,7 +3,7 @@ where
 
 /// The identity function, where `id x == x`
 id : t -> t where
-  typevar T
+  typevar t
 id = |x| => x
 
 /// `const(x)` creates a function that always returns `x`
@@ -20,25 +20,25 @@ flip : (t1 -> t2 -> t3) -> (t2 -> t1 -> t3) where
 flip = |f, x, y| => f(y, x)
 
 /// Backward function application, where `f <| x == f x`
-#[infix(right, 0)]
+// #[infix(right, 0)]
 (<|) : (t1 -> t2) -> t1 -> t2 where
   typevar t1
   typevar t2
 (<|) = |f, x| => f(x)
 
 /// Forward function application, where `x |> f == f x`
-#[infix(left, 0)]
+// #[infix(left, 0)]
 (|>) : t1 -> (t1 -> t2) -> t2 where
   typevar t1
   typevar t2
 (|>) = |x, f| => f(x)
 
 /// Right-to-left function composition
-#[infix(right, 9)]
+// #[infix(right, 9)]
 (<<) : (t2 -> t3) -> (t1 -> t2) -> (t1 -> t3)
 (<<) = |f, g, x| => f(g(x))
 
 /// Left-to-right function composition
-#[infix(left, 9)]
+// #[infix(left, 9)]
 (>>) : (t1 -> t2) -> (t2 -> t3) -> (t1 -> t3)
-(>>) = flip (<<)
+(>>) = flip((<<))
