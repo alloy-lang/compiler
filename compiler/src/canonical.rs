@@ -1,7 +1,7 @@
 use itertools::{Either, Itertools};
 
 use crate::parse;
-use crate::parse::{TypeAliasDefinition, TypeAnnotation};
+use crate::parse::{TypeAliasDefinition, TypeAnnotationDefinition};
 use crate::type_inference::{infer_type, TypeEnvironment};
 use crate::types::Type;
 
@@ -43,7 +43,7 @@ pub struct Module {
 pub(crate) enum CanonicalizeError {
     ConflictingTypeAnnotations {
         name: String,
-        types: Vec<TypeAnnotation>,
+        types: Vec<TypeAnnotationDefinition>,
     },
     ConflictingTypeAliasDefinitions {
         name: String,
@@ -107,8 +107,8 @@ pub(crate) fn canonicalize(parsed: parse::Module) -> Result<Module, Vec<Canonica
 
 fn to_canonical_value(
     name: String,
-    values: impl IntoIterator<Item = parse::Value>,
-    type_annotations: impl IntoIterator<Item = TypeAnnotation>,
+    values: impl IntoIterator<Item = parse::ValueDefinition>,
+    type_annotations: impl IntoIterator<Item = TypeAnnotationDefinition>,
     type_map: &TypeEnvironment,
 ) -> Result<Value, CanonicalizeError> {
     let values = values.into_iter().collect::<Vec<_>>();
@@ -126,7 +126,7 @@ fn to_canonical_value(
 
     let type_hint = type_annotations
         .first()
-        .map(|TypeAnnotation { t, .. }| t.clone());
+        .map(|TypeAnnotationDefinition { t, .. }| t.clone());
 
     let definition = match &values[..] {
         [] => return Err(CanonicalizeError::MissingValueDefinition { name, type_hint }),
@@ -186,7 +186,9 @@ mod tests {
     use crate::canonical;
     use crate::canonical::canonicalize;
     use crate::parse;
-    use crate::parse::{Alternative, Expr, Match, Pattern, TypeAliasDefinition, TypeAnnotation};
+    use crate::parse::{
+        Alternative, Expr, Match, Pattern, TypeAliasDefinition, TypeAnnotationDefinition,
+    };
     use crate::test_source;
     use crate::types::Type;
 
@@ -302,12 +304,12 @@ mod tests {
             vec![canonical::CanonicalizeError::ConflictingTypeAnnotations {
                 name: "thing".into(),
                 types: vec![
-                    TypeAnnotation {
+                    TypeAnnotationDefinition {
                         name: "thing".into(),
                         type_variables: vec![],
                         t: Type::identifier("String"),
                     },
-                    TypeAnnotation {
+                    TypeAnnotationDefinition {
                         name: "thing".into(),
                         type_variables: vec![],
                         t: Type::identifier("Int"),
@@ -387,12 +389,12 @@ mod tests {
         let expected = vec![canonical::CanonicalizeError::ConflictingTypeAnnotations {
             name: "thing".into(),
             types: vec![
-                TypeAnnotation {
+                TypeAnnotationDefinition {
                     name: "thing".to_string(),
                     type_variables: vec![],
                     t: Type::identifier("String"),
                 },
-                TypeAnnotation {
+                TypeAnnotationDefinition {
                     name: "thing".to_string(),
                     type_variables: vec![],
                     t: Type::identifier("Int"),

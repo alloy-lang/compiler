@@ -236,14 +236,14 @@ impl From<Type> for Vec<Type> {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub(crate) struct TypeAnnotation {
+pub(crate) struct TypeAnnotationDefinition {
     pub(crate) name: String,
     pub(crate) type_variables: Vec<String>,
     pub(crate) t: Type,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub(crate) struct Value {
+pub(crate) struct ValueDefinition {
     pub(crate) name: String,
     pub(crate) definition: Expr,
 }
@@ -257,49 +257,42 @@ pub(crate) struct TypeAliasDefinition {
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 enum Declaration {
-    TypeAnnotation {
-        name: String,
-        type_variables: Vec<String>,
-        t: Type,
-    },
-    Value {
-        name: String,
-        definition: Expr,
-    },
-    TypeAliasDefinition {
-        name: String,
-        type_variables: Vec<String>,
-        t: Type,
-    },
+    TypeAnnotation(TypeAnnotationDefinition),
+    Value(ValueDefinition),
+    TypeAlias(TypeAliasDefinition),
 }
 
 impl Declaration {
-    fn new_type_annotation<S>(name: S, type_variables: Vec<String>, t: Type) -> Declaration
+    fn new_type_annotation<S>(
+        name: S,
+        type_variables: Vec<types::TypeVariable>,
+        t: Type,
+    ) -> Declaration
     where
         S: Into<String>,
     {
-        Declaration::TypeAnnotation {
+        Declaration::TypeAnnotation(TypeAnnotationDefinition {
             name: name.into(),
             type_variables,
             t,
-        }
+        })
     }
 
     fn new_value<S>(name: S, definition: Expr) -> Declaration
     where
         S: Into<String>,
     {
-        Declaration::Value {
+        Declaration::Value(ValueDefinition {
             name: name.into(),
             definition,
-        }
+        })
     }
 
-    fn new_type_alias<S>(name: S, type_variables: Vec<String>, t: Type) -> Declaration
+    fn new_type_alias<S>(name: S, type_variables: Vec<types::TypeVariable>, t: Type) -> Declaration
     where
         S: Into<String>,
     {
-        Declaration::TypeAliasDefinition {
+        Declaration::TypeAlias(TypeAliasDefinition {
             name: name.into(),
             type_variables,
             t,
@@ -315,31 +308,9 @@ impl Declaration {
 
         for declaration in declarations {
             match declaration {
-                Declaration::TypeAnnotation {
-                    name,
-                    type_variables,
-                    t,
-                } => {
-                    type_annotations.push(TypeAnnotation {
-                        name,
-                        type_variables,
-                        t,
-                    });
-                }
-                Declaration::Value { name, definition } => {
-                    values.push(Value { name, definition });
-                }
-                Declaration::TypeAliasDefinition {
-                    name,
-                    type_variables,
-                    t,
-                } => {
-                    type_aliases.push(TypeAliasDefinition {
-                        name,
-                        type_variables,
-                        t,
-                    });
-                }
+                Declaration::TypeAnnotation(ta) => type_annotations.push(ta),
+                Declaration::Value(v) => values.push(v),
+                Declaration::TypeAlias(tad) => type_aliases.push(tad),
             }
         }
 
@@ -350,8 +321,8 @@ impl Declaration {
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) struct Module {
     pub(crate) name: String,
-    pub(crate) type_annotations: Vec<TypeAnnotation>,
-    pub(crate) values: Vec<Value>,
+    pub(crate) type_annotations: Vec<TypeAnnotationDefinition>,
+    pub(crate) values: Vec<ValueDefinition>,
     pub(crate) type_aliases: Vec<TypeAliasDefinition>,
 }
 
@@ -393,9 +364,9 @@ pub(crate)grammar parser() for str {
           { Module::from_declarations(name, declarations) }
 
     rule declaration() -> Declaration
-        = type_annotation()
-        / value_definition()
-        / type_alias_definition()
+        = t:type_annotation() { Declaration::TypeAnnotation(t) }
+        / t:value_definition() { Declaration::Value(t) }
+        / t:type_alias_definition() { Declaration::TypeAlias(t) }
 
     rule possible_union_type() -> Type
         = ("|")? _ types:((_ t:type_definition() _n_() { t }) ++ "|") { Type::union(types) }
@@ -413,19 +384,46 @@ pub(crate)grammar parser() for str {
         t:identifier() _ { Type::identifier(t) }
     }
 
-    rule type_annotation() -> Declaration
-        = name:identifier() _ ":" _ t:type_definition() _
-        { Declaration::new_type_annotation(name, Vec::new(), t) }
+    rule type_annotation() -> TypeAnnotationDefinition
+        = quiet!{ comments() _ name:identifier() type_variables:type_variables() _ ":" _ t:type_definition() _
+            tvar_bounds:(
+                "where" _ "\n" _ tvar_bounds:((b:type_variable_bound() { b })*) { tvar_bounds }
+                / _ { Vec::new() }
+            )
+            { TypeAnnotationDefinition { name, type_variables, t } }
+        }
+        / expected!("type annotation")
+
+    rule value_definition() -> ValueDefinition
+        = quiet!{ comments()
+        _ name:identifier() _ "=" _ e:expression() _ { ValueDefinition { name, definition: e } } }
+        / expected!("value definition")
 
     rule value_definition() -> Declaration
         = name:identifier() _ "=" _ e:expression() _ { Declaration::new_value(name, e) }
 
-    rule type_alias_definition() -> Declaration
-        = quiet!{ "data" _ name:identifier() _
-        "<" _ type_variables:((_ t:identifier() _ { t }) ** ",") _ ">" _ "=" __
+    // rule type_variable_bound() -> TypeVariableBounds
+    // rule type_variable_bound() -> TypeVariable
+    rule type_variable_bound() -> String
+        = quiet!{ comments()
+        _ "typevar" _ tvar_id:identifier() _ { tvar_id } }
+        / expected!("type variable bound")
+
+    rule type_alias_definition() -> TypeAliasDefinition
+        = quiet!{ "data" _ name:identifier() type_variables:type_variables() "=" __
         t:possible_union_type()
-        { Declaration::new_type_alias(name, type_variables, t) } }
+        { TypeAliasDefinition { name, type_variables, t } } }
         / expected!("type alias")
+
+    rule type_variables() -> Vec<TypeVariable>
+        = _ "<" tvars:((t:type_variable() { t }) ** ",") ">" _ { tvars }
+        / _ { Vec::new() }
+
+    rule type_variable() -> TypeVariable = precedence!{
+        _ t:identifier() tvars:type_variables() { TypeVariable::new_type_function(t, tvars.len()) }
+        --
+        _ t:identifier() _ { TypeVariable::new_type(t) }
+    }
 
     rule expression() -> Expr
         = if_else()
@@ -483,6 +481,14 @@ pub(crate)grammar parser() for str {
         / n:$(['-']?['0'..='9']+ "." ['0'..='9']+) { Expr::float_literal(n) }
         / n:$(['-']?['0'..='9']+) { Expr::int_literal(n) }
 
+    #[cache]
+    rule comments() -> Vec<String>
+        = __ comments:((c:comment() { c }) *) { comments }
+
+    rule comment() -> String
+        = _ "//"  s:$([^'\n']*) "\n"+ { s.to_owned() }
+        / _ "///" s:$([^'\n']*) "\n"+ { s.to_owned() }
+
     rule _n_() =  _ ['\n']? _
     rule __() =  quiet!{[' ' | '\t' | '\n']*}
 
@@ -492,8 +498,10 @@ pub(crate)grammar parser() for str {
 
 #[cfg(test)]
 mod tests {
-    use crate::parse;
-    use crate::parse::{Expr, Pattern, TypeAliasDefinition, TypeAnnotation};
+    use crate::parse::{
+        Expr, Pattern, TraitDefinition, TypeAliasDefinition, TypeAnnotationDefinition,
+        ValueDefinition,
+    };
     use crate::test_source;
     use crate::types::Type;
 
@@ -525,8 +533,8 @@ mod tests {
 
     fn assert_type_annotations(
         module_name: &String,
-        expecteds: Vec<TypeAnnotation>,
-        actuals: Vec<TypeAnnotation>,
+        expecteds: Vec<TypeAnnotationDefinition>,
+        actuals: Vec<TypeAnnotationDefinition>,
     ) {
         let pairs = expecteds
             .iter()
@@ -552,8 +560,8 @@ TypeAnnotation in module '{}' at index {} were not equal.
 
     fn assert_values(
         module_name: &String,
-        expecteds: Vec<parse::Value>,
-        actuals: Vec<parse::Value>,
+        expecteds: Vec<parse::ValueDefinition>,
+        actuals: Vec<parse::ValueDefinition>,
     ) {
         let pairs = expecteds
             .iter()
@@ -646,7 +654,7 @@ Module names were not equal.
             parse::Module {
                 name: String::from("Test"),
                 type_annotations: vec![],
-                values: vec![parse::Value {
+                values: vec![parse::ValueDefinition {
                     name: String::from("thing"),
                     definition: Expr::int_literal("0"),
                 }],
@@ -662,12 +670,12 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                type_annotations: vec![TypeAnnotation {
+                type_annotations: vec![TypeAnnotationDefinition {
                     name: String::from("thing"),
                     type_variables: vec![],
                     t: Type::identifier("Int"),
                 }],
-                values: vec![parse::Value {
+                values: vec![parse::ValueDefinition {
                     name: String::from("thing"),
                     definition: Expr::int_literal("0"),
                 }],
@@ -684,7 +692,7 @@ Module names were not equal.
             parse::Module {
                 name: String::from("Test"),
                 type_annotations: vec![],
-                values: vec![parse::Value {
+                values: vec![parse::ValueDefinition {
                     name: String::from("thing"),
                     definition: Expr::float_literal("0.1"),
                 }],
@@ -700,12 +708,12 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                type_annotations: vec![TypeAnnotation {
+                type_annotations: vec![TypeAnnotationDefinition {
                     name: String::from("thing"),
                     type_variables: vec![],
                     t: Type::identifier("Float"),
                 }],
-                values: vec![parse::Value {
+                values: vec![parse::ValueDefinition {
                     name: String::from("thing"),
                     definition: Expr::float_literal("0.1"),
                 }],
@@ -721,17 +729,17 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                type_annotations: vec![TypeAnnotation {
+                type_annotations: vec![TypeAnnotationDefinition {
                     name: String::from("increment_positive"),
                     type_variables: vec![],
                     t: Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                 }],
                 values: vec![
-                    parse::Value {
+                    parse::ValueDefinition {
                         name: String::from("increment_positive"),
                         definition: Expr::lambda(Pattern::int_literal("0"), Expr::int_literal("0")),
                     },
-                    parse::Value {
+                    parse::ValueDefinition {
                         name: String::from("increment_positive"),
                         definition: Expr::lambda(
                             Pattern::identifier("x"),
@@ -751,7 +759,7 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                type_annotations: vec![TypeAnnotation {
+                type_annotations: vec![TypeAnnotationDefinition {
                     name: String::from("increment_by_length"),
                     type_variables: vec![],
                     t: Type::lambda(
@@ -760,7 +768,7 @@ Module names were not equal.
                     ),
                 }],
                 values: vec![
-                    parse::Value {
+                    parse::ValueDefinition {
                         name: String::from("increment_by_length"),
                         definition: Expr::lambda(
                             Pattern::tuple(vec![
@@ -770,7 +778,7 @@ Module names were not equal.
                             Expr::int_literal("0"),
                         ),
                     },
-                    parse::Value {
+                    parse::ValueDefinition {
                         name: String::from("increment_by_length"),
                         definition: Expr::lambda(
                             Pattern::tuple(vec![
@@ -797,7 +805,7 @@ Module names were not equal.
         assert_module(
             parse::Module {
                 name: String::from("Test"),
-                type_annotations: vec![TypeAnnotation {
+                type_annotations: vec![TypeAnnotationDefinition {
                     name: String::from("apply"),
                     type_variables: vec![],
                     t: Type::lambda(
@@ -805,7 +813,7 @@ Module names were not equal.
                         Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
                     ),
                 }],
-                values: vec![parse::Value {
+                values: vec![parse::ValueDefinition {
                     name: String::from("apply"),
                     definition: Expr::lambda(
                         Pattern::identifier("f"),
@@ -829,7 +837,7 @@ Module names were not equal.
                 name: String::from("Test"),
                 type_annotations: vec![],
                 values: vec![
-                    parse::Value {
+                    parse::ValueDefinition {
                         name: String::from("increment_positive"),
                         definition: Expr::lambda(
                             Pattern::identifier("num"),
@@ -843,7 +851,7 @@ Module names were not equal.
                             ),
                         ),
                     },
-                    parse::Value {
+                    parse::ValueDefinition {
                         name: String::from("decrement_negative"),
                         definition: Expr::lambda(
                             Pattern::identifier("num"),
@@ -872,7 +880,7 @@ Module names were not equal.
                 name: String::from("Test"),
                 type_annotations: vec![],
                 type_aliases: vec![],
-                values: vec![parse::Value {
+                values: vec![parse::ValueDefinition {
                     name: String::from("increment_or_decrement"),
                     definition: Expr::lambda(
                         Pattern::identifier("num"),
