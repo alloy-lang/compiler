@@ -45,3 +45,38 @@ behavior Show<Either<l, r>> where
     match e when
       | Left(x)  -> "Left(" <> Show::show(x) <> ")"
       | Right(x) -> "Right(" <> Show::show(x) <> ")"
+
+behavior Functor<Either<_, _>> where
+
+  map : (r1 -> r2) -> Either<_, r1> -> Either<_, r2> where
+    typevar r1
+    typevar r2
+  map = |convert, x| => match x when
+    | Right(x_val) -> Right(convert(x_val))
+    | Left(x_val)  -> Left(x_val)
+
+
+behavior Applicative<Either<_, _>> where
+
+  apply : Either<_, (r1 -> r2)> -> Either<_, r1> -> Either<_, r2> where
+    typevar r1
+    typevar r2
+  apply = |f, x| => match (f, x) when
+    | (Right(f_val), Right(x_val)) -> Right(f_val(x_val))
+    | (Right(_),     Left(x_val))  -> Left(x_val)
+    | (Left(f_val),  _)            -> Left(f_val)
+
+
+  wrap : r1 -> Either<_, r1> where
+    typevar r1
+  wrap = |x| => Right(x)
+
+
+behavior Monad<Either<_, _>> where
+
+  flat_map : (r1 -> Either<_, r2>) -> Either<_, r1> -> Either<_, r2> where
+    typevar r1
+    typevar r2
+  flat_map = |convert, x| => match x when
+    | Right(x_val) -> convert(x_val)
+    | Left(x_val)  -> Left(x_val)

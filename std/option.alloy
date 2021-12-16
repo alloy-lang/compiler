@@ -42,3 +42,38 @@ behavior Show<Option<t>> where
     match op when
       | Some(x) -> "Some(" <> Show::show(x) <> ")"
       | None -> "None"
+
+
+behavior Functor<Option<_>> where
+
+  map : (t1 -> t2) -> Option<t1> -> Option<t2> where
+    typevar t1
+    typevar t2
+  map = |convert, x| => match x when
+    | Some(x_val) -> Some(convert(x_val))
+    | None        -> None
+
+
+behavior Applicative<Option<_>> where
+
+  apply : Option<(t1 -> t2)> -> Option<t1> -> Option<t2> where
+    typevar t1
+    typevar t2
+  apply = |f, x| => match (f, x) when
+    | (Some(f_val), Some(x_val)) -> Some(f_val(x_val))
+    | _                          -> None
+
+
+  wrap : t1 -> Option<t1> where
+    typevar t1
+  wrap = |x| => Some(x)
+
+
+behavior Monad<Option<_>> where
+
+  flat_map : (t1 -> Option<t2>) -> Option<t1> -> Option<t2> where
+    typevar t1
+    typevar t2
+  flat_map = |convert, x| => match x when
+    | Some(x_val) -> convert(x_val)
+    | None        -> None
