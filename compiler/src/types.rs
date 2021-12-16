@@ -1,15 +1,32 @@
 // #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-// pub enum Kind {
+// pub(crate) enum Kind {
 //     Function(Box<Kind>, Box<Kind>),
-//     Star,
+//     Concrete,
+//     Constraint,
 // }
-
+//
 // impl Kind {
-//     pub fn new(v: isize) -> Kind {
+//     pub(crate) fn new(v: usize) -> Kind {
 //         match v {
-//             0 => Kind::Star,
-//             _ => Kind::Function( Box::new(Kind::Star), Box::new(Kind::Star)),
+//             0 => Kind::Concrete,
+//             _ => Kind::rec_new(v - 1, Kind::Concrete),
 //         }
+//     }
+//
+//     fn rec_new(v: usize, kind: Kind) -> Kind {
+//         let kind = Kind::function(Kind::Concrete, kind);
+//
+//         match v {
+//             0 => kind,
+//             _ => Kind::rec_new(v - 1, kind),
+//         }
+//     }
+//
+//     pub(crate) fn function<K>(l: K, r: K) -> Kind
+//     where
+//         K: Into<Box<Kind>>,
+//     {
+//         Kind::Function(l.into(), r.into())
 //     }
 // }
 
@@ -17,15 +34,36 @@ use non_empty_vec::NonEmpty;
 use std::convert::TryFrom;
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub struct TypeConstructor {
-    pub name: String,
-    // pub kind: Kind,
+pub(crate) struct TypeConstructor {
+    pub(crate) name: String,
+    // pub(crate) kind: Kind,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub struct TypeVariable {
-    pub id: String,
-    // pub kind: Kind,
+pub(crate) struct TypeVariable {
+    pub(crate) id: String,
+    // pub(crate) kind: Kind,
+}
+
+impl TypeVariable {
+    pub(crate) fn new_type<S>(id: S) -> Self
+    where
+        S: Into<String>,
+    {
+        TypeVariable {
+            id: id.into(),
+            // kind: Kind::Concrete,
+        }
+    }
+    pub(crate) fn new_type_function<S>(id: S, args: usize) -> Self
+    where
+        S: Into<String>,
+    {
+        TypeVariable {
+            id: id.into(),
+            // kind: Kind::new(args),
+        }
+    }
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
@@ -95,11 +133,11 @@ impl Type {
         Type::Atom(s.into())
     }
 
-    pub(crate) fn variable<S>(s: S) -> Type
+    pub(crate) fn variable<S>(id: S) -> Type
     where
         S: Into<String>,
     {
-        Type::Variable(TypeVariable { id: s.into() })
+        Type::Variable(TypeVariable::new_type(id))
     }
 
     pub(crate) fn bound<T>(t: T, binds: Vec<Type>) -> Type
@@ -118,14 +156,17 @@ impl Type {
 //     fn test_new_kind_0() {
 //         let kind = Kind::new(0);
 //
-//         assert_eq!(kind, Kind::Type,);
+//         assert_eq!(kind, Kind::Concrete);
 //     }
 //
 //     #[test]
 //     fn test_new_kind_1() {
 //         let kind = Kind::new(1);
 //
-//         assert_eq!(kind, Kind::function(Kind::Type, Kind::Type),);
+//         assert_eq!(
+//             kind,
+//             Kind::function(Kind::Concrete, Kind::Concrete),
+//         );
 //     }
 //
 //     #[test]
@@ -134,7 +175,7 @@ impl Type {
 //
 //         assert_eq!(
 //             kind,
-//             Kind::function(Kind::Type, Kind::function(Kind::Type, Kind::Type)),
+//             Kind::function(Kind::Concrete, Kind::function(Kind::Concrete, Kind::Concrete)),
 //         );
 //     }
 //
@@ -145,8 +186,8 @@ impl Type {
 //         assert_eq!(
 //             kind,
 //             Kind::function(
-//                 Kind::Type,
-//                 Kind::function(Kind::Type, Kind::function(Kind::Type, Kind::Type))
+//                 Kind::Concrete,
+//                 Kind::function(Kind::Concrete, Kind::function(Kind::Concrete, Kind::Concrete)),
 //             ),
 //         );
 //     }
