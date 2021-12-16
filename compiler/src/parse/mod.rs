@@ -406,6 +406,8 @@ pub(crate)grammar parser() for str {
         --
         "(" args:((_ t:type_definition() _ { t }) **<2,> ",") ")" _ { Type::tuple(args) }
         --
+        t:identifier() _ "<" binds:((t:type_definition() { t }) ** ",") ">" _ { Type::bound(Type::identifier(t), binds) }
+        --
         "(" _ t:type_definition() _ ")" _ { t }
         ":" t:identifier() _ { Type::atom(t) }
         t:identifier() _ { Type::identifier(t) }
@@ -926,6 +928,35 @@ Module names were not equal.
             let source: &str = test_source::MULTI_PROPERTY_UNION_TYPE_3;
 
             assert_module(expected, parse::parser::module(source).unwrap());
+        }
+    }
+
+    #[test]
+    fn test_bound_types() {
+        let expected = parse::Module {
+            name: String::from("Test"),
+            type_annotations: vec![TypeAnnotationDefinition {
+                name: "convert".to_string(),
+                type_variables: vec![],
+                t: Type::lambda(
+                    Type::bound(Type::identifier("List"), vec![Type::identifier("String")]),
+                    Type::bound(Type::identifier("List"), vec![Type::identifier("Int")]),
+                ),
+            }],
+            values: vec![],
+            type_aliases: vec![],
+            traits: vec![],
+        };
+
+        {
+            let source: &str = r#"
+            module Test
+            where
+
+            convert : List<String> -> List<Int>
+"#;
+
+            assert_module(expected.clone(), parse::parser::module(source).unwrap());
         }
     }
 }

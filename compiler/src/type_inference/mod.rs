@@ -429,6 +429,7 @@ fn apply_unifier<'a>(t: &'a Type, substitutions: &'a LinkedHashMap<String, Type>
         Type::Variable(TypeVariable { id: type_id }) => substitutions
             .get(type_id)
             .map_or_else(|| t.clone(), |inner_t| apply_unifier(inner_t, substitutions)),
+        Type::Bound { .. } => todo!("Type::Bound(t, binds)"),
         Type::Lambda {
             arg_type,
             return_type,

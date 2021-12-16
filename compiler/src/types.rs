@@ -33,6 +33,10 @@ pub(crate) enum Type {
     Identifier(String),
     Atom(String),
     Variable(TypeVariable),
+    Bound {
+        t: Box<Type>,
+        binds: Vec<Type>,
+    },
     Lambda {
         arg_type: Box<Type>,
         return_type: Box<Type>,
@@ -97,4 +101,53 @@ impl Type {
     {
         Type::Variable(TypeVariable { id: s.into() })
     }
+
+    pub(crate) fn bound<T>(t: T, binds: Vec<Type>) -> Type
+    where
+        T: Into<Box<Type>>,
+    {
+        Type::Bound { t: t.into(), binds }
+    }
 }
+
+// #[cfg(test)]
+// mod tests {
+//     use super::Kind;
+//
+//     #[test]
+//     fn test_new_kind_0() {
+//         let kind = Kind::new(0);
+//
+//         assert_eq!(kind, Kind::Type,);
+//     }
+//
+//     #[test]
+//     fn test_new_kind_1() {
+//         let kind = Kind::new(1);
+//
+//         assert_eq!(kind, Kind::function(Kind::Type, Kind::Type),);
+//     }
+//
+//     #[test]
+//     fn test_new_kind_2() {
+//         let kind = Kind::new(2);
+//
+//         assert_eq!(
+//             kind,
+//             Kind::function(Kind::Type, Kind::function(Kind::Type, Kind::Type)),
+//         );
+//     }
+//
+//     #[test]
+//     fn test_new_kind_3() {
+//         let kind = Kind::new(3);
+//
+//         assert_eq!(
+//             kind,
+//             Kind::function(
+//                 Kind::Type,
+//                 Kind::function(Kind::Type, Kind::function(Kind::Type, Kind::Type))
+//             ),
+//         );
+//     }
+// }
