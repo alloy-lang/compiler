@@ -1,6 +1,7 @@
 use crate::types::Type;
-use core::convert::TryFrom;
+use crate::types::TypeVariable;
 
+use core::convert::TryFrom;
 use itertools::Itertools;
 use non_empty_vec::NonEmpty;
 
@@ -238,7 +239,7 @@ impl From<Type> for Vec<Type> {
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) struct TypeAnnotationDefinition {
     pub(crate) name: String,
-    pub(crate) type_variables: Vec<String>,
+    pub(crate) type_variables: Vec<TypeVariable>,
     pub(crate) t: Type,
 }
 
@@ -251,7 +252,7 @@ pub(crate) struct ValueDefinition {
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub(crate) struct TypeAliasDefinition {
     pub(crate) name: String,
-    pub(crate) type_variables: Vec<String>,
+    pub(crate) type_variables: Vec<TypeVariable>,
     pub(crate) t: Type,
 }
 
@@ -265,7 +266,7 @@ enum Declaration {
 impl Declaration {
     fn new_type_annotation<S>(
         name: S,
-        type_variables: Vec<types::TypeVariable>,
+        type_variables: Vec<TypeVariable>,
         t: Type,
     ) -> Declaration
     where
@@ -288,7 +289,7 @@ impl Declaration {
         })
     }
 
-    fn new_type_alias<S>(name: S, type_variables: Vec<types::TypeVariable>, t: Type) -> Declaration
+    fn new_type_alias<S>(name: S, type_variables: Vec<TypeVariable>, t: Type) -> Declaration
     where
         S: Into<String>,
     {
@@ -504,6 +505,9 @@ mod tests {
     };
     use crate::test_source;
     use crate::types::Type;
+    use crate::types::TypeVariable;
+    use crate::{parse, types};
+    use std::fs;
 
     macro_rules! assert_eq {
         ($expected:expr, $actual:expr) => ({
