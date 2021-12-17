@@ -35,10 +35,16 @@ flip = |f, x, y| => f(y, x)
 
 /// Right-to-left function composition
 // #[infix(right, 9)]
-(<<) : (t2 -> t3) -> (t1 -> t2) -> (t1 -> t3)
+(<<) : (t2 -> t3) -> (t1 -> t2) -> (t1 -> t3) where
+  typevar t1
+  typevar t2
+  typevar t3
 (<<) = |f, g, x| => f(g(x))
 
 /// Left-to-right function composition
 // #[infix(left, 9)]
-(>>) : (t1 -> t2) -> (t2 -> t3) -> (t1 -> t3)
+(>>) : (t1 -> t2) -> (t2 -> t3) -> (t1 -> t3) where
+  typevar t1
+  typevar t2
+  typevar t3
 (>>) = flip((<<))
