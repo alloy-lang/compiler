@@ -420,9 +420,9 @@ pub(crate)grammar parser() for str {
     }
 
     rule type_annotation() -> TypeAnnotationDefinition
-        = quiet!{ comments() _ name:identifier() type_variables:type_variables() _ ":" _ t:type_definition() _
-            tvar_bounds:(
-                "where" _ "\n" _ tvar_bounds:((b:type_variable_bound() { b })*) { tvar_bounds }
+        = quiet!{ comments() _ name:identifier() type_vars:type_variables() _ ":" _ t:type_definition() _
+            type_variables:(
+                "where" _ "\n" tvar_bounds:type_variable_bounds() { tvar_bounds }
                 / _ { Vec::new() }
             )
             { TypeAnnotationDefinition { name, type_variables, t } }
@@ -436,16 +436,18 @@ pub(crate)grammar parser() for str {
 
     rule trait_definition() -> TraitDefinition
         = comments()
-        "trait" _ name:identifier() type_variables:type_variables() _ "where" _ "\n"
-        _ tvar_bounds:((b:type_variable_bound() { b })*)
-        _ type_annotations:((tanno:type_annotation() { tanno })*)
+        "trait" _ name:identifier() type_vars:type_variables() _ "where" _ "\n"
+        type_variables:type_variable_bounds()
+        type_annotations:((tanno:type_annotation() { tanno })*)
         { TraitDefinition { name, type_variables, type_annotations } }
 
-    // rule type_variable_bound() -> TypeVariableBounds
-    // rule type_variable_bound() -> TypeVariable
-    rule type_variable_bound() -> String
+    // rule type_variable_bounds() -> Vec<TypeVariableBound>
+    rule type_variable_bounds() -> Vec<TypeVariable>
+        = _ tvar_bounds:((b:type_variable_bound() { b })*) _ { tvar_bounds }
+
+    rule type_variable_bound() -> TypeVariable
         = quiet!{ comments()
-        _ "typevar" _ tvar_id:identifier() _ { tvar_id } }
+        _ "typevar" _ tvar_id:identifier() _ { TypeVariable::new_type(tvar_id) } }
         / expected!("type variable bound")
 
     rule type_alias_definition() -> TypeAliasDefinition
@@ -1038,7 +1040,7 @@ Module names were not equal.
                     name: "simple".to_string(),
                     type_variables: vec![],
                     t: Type::lambda(Type::identifier("Int"), Type::identifier("Int")),
-                }]
+                }],
             }],
         };
 
@@ -1064,11 +1066,8 @@ Module names were not equal.
             type_aliases: vec![],
             traits: vec![TraitDefinition {
                 name: "MultiVar".to_string(),
-                type_variables: vec![
-                    TypeVariable::new_type("a"),
-                    TypeVariable::new_type("b"),
-                ],
-                type_annotations: vec![]
+                type_variables: vec![TypeVariable::new_type("a"), TypeVariable::new_type("b")],
+                type_annotations: vec![],
             }],
         };
 
