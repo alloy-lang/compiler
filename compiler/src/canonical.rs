@@ -190,7 +190,6 @@ mod tests {
     use crate::parse::{
         Alternative, Expr, Match, Pattern, TypeAliasDefinition, TypeAnnotationDefinition,
     };
-    use crate::test_source;
     use crate::types::Type;
 
     macro_rules! assert_eq {

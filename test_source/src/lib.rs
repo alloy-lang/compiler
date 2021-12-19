@@ -1,4 +1,4 @@
-pub(crate) const EMPTY_MODULE: &str = r#"
+pub const EMPTY_MODULE: &str = r#"
             module Test
             where
 
@@ -6,14 +6,14 @@ pub(crate) const EMPTY_MODULE: &str = r#"
 
 "#;
 
-pub(crate) const INT_VALUE_DECLARATION_WITH_NO_TYPE: &str = r#"
+pub const INT_VALUE_DECLARATION_WITH_NO_TYPE: &str = r#"
             module Test
             where
 
             thing = 0
 "#;
 
-pub(crate) const INT_VALUE_DECLARATION_WITH_TYPE: &str = r#"
+pub const INT_VALUE_DECLARATION_WITH_TYPE: &str = r#"
             module Test
             where
 
@@ -21,14 +21,14 @@ pub(crate) const INT_VALUE_DECLARATION_WITH_TYPE: &str = r#"
             thing = 0
 "#;
 
-pub(crate) const FLOAT_VALUE_DECLARATION_WITH_NO_TYPE: &str = r#"
+pub const FLOAT_VALUE_DECLARATION_WITH_NO_TYPE: &str = r#"
             module Test
             where
 
             thing = 0.1
 "#;
 
-pub(crate) const FLOAT_VALUE_DECLARATION_WITH_TYPE: &str = r#"
+pub const FLOAT_VALUE_DECLARATION_WITH_TYPE: &str = r#"
             module Test
             where
 
@@ -36,7 +36,7 @@ pub(crate) const FLOAT_VALUE_DECLARATION_WITH_TYPE: &str = r#"
             thing = 0.1
 "#;
 
-pub(crate) const INT_VALUE_DECLARATION_WITH_CONFLICTING_TYPE_ANNOTATIONS: &str = r#"
+pub const INT_VALUE_DECLARATION_WITH_CONFLICTING_TYPE_ANNOTATIONS: &str = r#"
             module Test
             where
 
@@ -45,14 +45,14 @@ pub(crate) const INT_VALUE_DECLARATION_WITH_CONFLICTING_TYPE_ANNOTATIONS: &str =
             thing = 0
 "#;
 
-// pub(crate) const TYPE_ANNOTATION_WITH_NO_DEFINITION: &str = r#"
+// pub const TYPE_ANNOTATION_WITH_NO_DEFINITION: &str = r#"
 //                 module Test
 //                 where
 //
 //                 thing : String
 // "#;
 
-pub(crate) const VALUE_WITH_CONFLICTING_TYPE_ANNOTATIONS: &str = r#"
+pub const VALUE_WITH_CONFLICTING_TYPE_ANNOTATIONS: &str = r#"
                 module Test
                 where
 
@@ -61,7 +61,7 @@ pub(crate) const VALUE_WITH_CONFLICTING_TYPE_ANNOTATIONS: &str = r#"
                 thing = 0.0
 "#;
 
-pub(crate) const SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
+pub const SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
 
 
             module Test
@@ -71,7 +71,7 @@ pub(crate) const SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
             increment_positive = |0| => 0
             increment_positive = |x| => x + 1
 "#;
-pub(crate) const SINGLE_ARG_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
+pub const SINGLE_ARG_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
 
 
             module Test
@@ -81,7 +81,7 @@ pub(crate) const SINGLE_ARG_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
             increment_positive = |x| => x + 1
 "#;
 
-pub(crate) const MULTI_ARG_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
+pub const MULTI_ARG_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
             module Test
             where
 
@@ -90,7 +90,7 @@ pub(crate) const MULTI_ARG_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
             increment_by_length = |(x, y)| => x + String::length(y)
 "#;
 
-pub(crate) const MULTI_ARG_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
+pub const MULTI_ARG_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
             module Test
             where
 
@@ -98,7 +98,7 @@ pub(crate) const MULTI_ARG_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
             increment_by_length = |(x, y)| => x + String::length(y)
 "#;
 
-pub(crate) const CURRIED_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
+pub const CURRIED_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
             module Test
             where
 
@@ -106,14 +106,14 @@ pub(crate) const CURRIED_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
             apply = |f| => |value| => f(value)
 "#;
 
-pub(crate) const CURRIED_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
+pub const CURRIED_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
             module Test
             where
 
             apply = |f| => |value| => f(value)
 "#;
 
-pub(crate) const SIMPLE_IF_THEN_ELSE: &str = r#"
+pub const SIMPLE_IF_THEN_ELSE: &str = r#"
             module Test
             where
 
@@ -127,7 +127,7 @@ pub(crate) const SIMPLE_IF_THEN_ELSE: &str = r#"
               else num
 "#;
 
-pub(crate) const NESTED_IF_THEN_ELSE: &str = r#"
+pub const NESTED_IF_THEN_ELSE: &str = r#"
             module Test
             where
 
@@ -140,7 +140,7 @@ pub(crate) const NESTED_IF_THEN_ELSE: &str = r#"
                 else num
 "#;
 
-pub(crate) const CALL_FUNCTION_IN_MODULE_WITH_TYPE: &str = r#"
+pub const CALL_FUNCTION_IN_MODULE_WITH_TYPE: &str = r#"
             module Test
             where
 
@@ -157,7 +157,7 @@ pub(crate) const CALL_FUNCTION_IN_MODULE_WITH_TYPE: &str = r#"
               else num2 + max((num1, num3))
 "#;
 
-pub(crate) const CALL_FUNCTION_IN_MODULE_WITH_ONE_TYPE: &str = r#"
+pub const CALL_FUNCTION_IN_MODULE_WITH_ONE_TYPE: &str = r#"
             module Test
             where
 
@@ -173,7 +173,7 @@ pub(crate) const CALL_FUNCTION_IN_MODULE_WITH_ONE_TYPE: &str = r#"
               else num2 + max((num1, num3))
 "#;
 
-pub(crate) const CALL_FUNCTION_IN_MODULE_WITH_NO_TYPE: &str = r#"
+pub const CALL_FUNCTION_IN_MODULE_WITH_NO_TYPE: &str = r#"
             module Test
             where
 
@@ -188,7 +188,7 @@ pub(crate) const CALL_FUNCTION_IN_MODULE_WITH_NO_TYPE: &str = r#"
               else num2 + max((num1, num3))
 "#;
 
-pub(crate) const MULTI_PROPERTY_UNION_TYPE_1: &str = r#"
+pub const MULTI_PROPERTY_UNION_TYPE_1: &str = r#"
             module Test
             where
 
@@ -196,7 +196,7 @@ pub(crate) const MULTI_PROPERTY_UNION_TYPE_1: &str = r#"
               | (:Right, R)
               | (:Left, L)
 "#;
-pub(crate) const MULTI_PROPERTY_UNION_TYPE_2: &str = r#"
+pub const MULTI_PROPERTY_UNION_TYPE_2: &str = r#"
             module Test
             where
 
@@ -204,14 +204,14 @@ pub(crate) const MULTI_PROPERTY_UNION_TYPE_2: &str = r#"
               (:Right, R)
               | (:Left, L)
 "#;
-pub(crate) const MULTI_PROPERTY_UNION_TYPE_3: &str = r#"
+pub const MULTI_PROPERTY_UNION_TYPE_3: &str = r#"
             module Test
             where
 
             data Either<L, R> = (:Right, R) | (:Left, L)
 "#;
 
-pub(crate) const CONFLICTING_TYPE_ALIAS_DEFINITIONS: &str = r#"
+pub const CONFLICTING_TYPE_ALIAS_DEFINITIONS: &str = r#"
             module Test
             where
 

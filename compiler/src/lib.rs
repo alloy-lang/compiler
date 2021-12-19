@@ -6,8 +6,6 @@ mod canonical;
 mod parse;
 mod type_inference;
 
-#[cfg(test)]
-mod test_source;
 mod types;
 
 // pub(crate) enum CompileError {
