@@ -1,6 +1,6 @@
 // #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 // pub(crate) enum Kind {
-//     Function(Box<Kind>, Box<Kind>),
+//     Arrow(Box<Kind>, Box<Kind>),
 //     Concrete,
 //     Constraint,
 // }
@@ -14,7 +14,7 @@
 //     }
 //
 //     fn rec_new(v: usize, kind: Kind) -> Kind {
-//         let kind = Kind::function(Kind::Concrete, kind);
+//         let kind = Kind::arrow(Kind::Concrete, kind);
 //
 //         match v {
 //             0 => kind,
@@ -22,11 +22,11 @@
 //         }
 //     }
 //
-//     pub(crate) fn function<K>(l: K, r: K) -> Kind
+//     pub(crate) fn arrow<K>(l: K, r: K) -> Kind
 //     where
 //         K: Into<Box<Kind>>,
 //     {
-//         Kind::Function(l.into(), r.into())
+//         Kind::Arrow(l.into(), r.into())
 //     }
 // }
 
@@ -55,7 +55,8 @@ impl TypeVariable {
             // kind: Kind::Concrete,
         }
     }
-    pub(crate) fn new_type_function<S>(id: S, args: usize) -> Self
+
+    pub(crate) fn new_type_function<S>(id: S, _args: usize) -> Self
     where
         S: Into<String>,
     {
