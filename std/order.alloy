@@ -10,64 +10,64 @@ typedef Ordering =
   | EQ
   | GT
 
-/// `Ord<t>` defines an ordering on `t`
+/// `Ord` defines an ordering on `self`
 /// Any `t` that behaves as `Ord` must also behave as `Eq`
-trait Ord<t> where
-  typevar t has Eq<t>
+trait Ord where
+  typevar self = Eq
 
-  compare : t -> t -> Ordering
+  compare : self -> self -> Ordering
 
 
 comparing : (t2 -> t1) -> t2 -> t2 -> Ordering where
-  typevar t1 has Ord<t1>
+  typevar t1 = Ord
   typevar t2
-comparing = |convert, x, y| => Ord::compare <| (convert(x), convert(y))
+comparing = |convert, x, y| -> Ord::compare <| (convert(x), convert(y))
 
 
 /// Returns whether `left` is less than or equal to `right`.
 (<=) : t -> t -> Bool where
-  typevar t has Ord<t>
-(<=) = |left, right| => match Ord::compare(left, right) when
+  typevar t = Ord
+(<=) = |left, right| -> match Ord::compare(left, right) when
   | LT -> True
   | EQ -> True
   | GT -> False
 
 /// Returns whether `left` is less than `right`.
 (<) : t -> t -> Bool where
-  typevar t has Ord<t>
-(<) = |left, right| => match Ord::compare(left, right) when
+  typevar t = Ord
+(<) = |left, right| -> match Ord::compare(left, right) when
   | LT -> True
   | EQ -> False
   | GT -> False
 
 /// Returns whether `left` is greater than `right`.
 (>) : t -> t -> Bool where
-  typevar t has Ord<t>
-(>) = |left, right| => match Ord::compare(left, right) when
+  typevar t = Ord
+(>) = |left, right| -> match Ord::compare(left, right) when
   | LT -> False
   | EQ -> False
   | GT -> True
 
 /// Returns whether `left` is greater than or equal to `right`.
 (>=) : t -> t -> Bool where
-  typevar t has Ord<t>
-(>=) = |left, right| => match Ord::compare(left, right) when
+  typevar t = Ord
+(>=) = |left, right| -> match Ord::compare(left, right) when
   | LT -> False
   | EQ -> True
   | GT -> True
 
 /// Returns `left` if `left` is less than or equal to `right`, otherwise `right`.
-min<t> : t -> t -> t where
-  typevar t has Ord<t>
-min = |left, right| =>
+min : t -> t -> t where
+  typevar t = Ord
+min = |left, right| ->
   if left <= right
   then left
   else right
 
 /// Returns `left` if `left` is greater than or equal to `right`, otherwise `right`.
-max<t> : t -> t -> t where
-  typevar t has Ord<t>
-max = |left, right| =>
+max : t -> t -> t where
+  typevar t = Ord
+max = |left, right| ->
   if left >= right
   then left
   else right

@@ -3,7 +3,7 @@ where
 
 import std::eq::Eq
 import std::ord::Ord
-import std::show::Show
+import std::debug::Debug
 import std::functor::Functor
 import std::applicative::Applicative
 import std::monad::Monad
@@ -14,22 +14,22 @@ typedef Either<l, r> =
     | Right(r)
 
 
-behavior Eq<Either<l, r>> where
-  typevar l has Eq<l>
-  typevar r has Eq<r>
+behavior Eq for Either<l, r> where
+  typevar l = Eq
+  typevar r = Eq
 
-  eq = |left, right| =>
+  eq = |left, right| ->
     match (left, right) when
       | (Left(l_val), Left(r_val))   -> Eq::eq(l_val, r_val)
       | (Right(l_val), Right(r_val)) -> Eq::eq(l_val, r_val)
       | _ -> False
 
 
-behavior Ord<Either<l, r>> where
-  typevar l has Ord<l>
-  typevar r has Ord<r>
+behavior Ord for Either<l, r> where
+  typevar l = Ord
+  typevar r = Ord
 
-  compare = |left, right| =>
+  compare = |left, right| ->
     match (left, right) when
       | (Right(l_val), Right(r_val)) -> Ord::compare(l_val, r_val)
       | (Left(l_val), Left(r_val))   -> Ord::compare(l_val, r_val)
@@ -37,46 +37,50 @@ behavior Ord<Either<l, r>> where
       | (Left(_), Right(_))          -> GT
 
 
-behavior Show<Either<l, r>> where
-  typevar l has Show<l>
-  typevar r has Show<r>
+behavior Debug for Either<l, r> where
+  typevar l = Debug
+  typevar r = Debug
 
-  show = |e| =>
+  debug = |e| ->
     match e when
-      | Left(x)  -> "Left(" <> Show::show(x) <> ")"
-      | Right(x) -> "Right(" <> Show::show(x) <> ")"
+      | Left(x)  -> "Left(#{x})"
+      | Right(x) -> "Right(#{x})"
 
-behavior Functor<Either<_, _>> where
 
-  map : (r1 -> r2) -> Either<_, r1> -> Either<_, r2> where
+behavior Functor for Either<l, _> where
+  typevar l
+
+  map : (r1 -> r2) -> Either<l, r1> -> Either<l, r2> where
     typevar r1
     typevar r2
-  map = |convert, x| => match x when
+  map = |convert, x| -> match x when
     | Right(x_val) -> Right(convert(x_val))
     | Left(x_val)  -> Left(x_val)
 
 
-behavior Applicative<Either<_, _>> where
+behavior Applicative for Either<l, _> where
+  typevar l
 
-  apply : Either<_, (r1 -> r2)> -> Either<_, r1> -> Either<_, r2> where
+  apply : Either<l, (r1 -> r2)> -> Either<l, r1> -> Either<l, r2> where
     typevar r1
     typevar r2
-  apply = |f, x| => match (f, x) when
+  apply = |f, x| -> match (f, x) when
     | (Right(f_val), Right(x_val)) -> Right(f_val(x_val))
     | (Right(_),     Left(x_val))  -> Left(x_val)
     | (Left(f_val),  _)            -> Left(f_val)
 
 
-  wrap : r1 -> Either<_, r1> where
+  wrap : r1 -> Either<l, r1> where
     typevar r1
-  wrap = |x| => Right(x)
+  wrap = |x| -> Right(x)
 
 
-behavior Monad<Either<_, _>> where
+behavior Monad for Either<l, _> where
+  typevar l
 
-  flat_map : (r1 -> Either<_, r2>) -> Either<_, r1> -> Either<_, r2> where
+  flat_map : (r1 -> Either<l, r2>) -> Either<l, r1> -> Either<l, r2> where
     typevar r1
     typevar r2
-  flat_map = |convert, x| => match x when
+  flat_map = |convert, x| -> match x when
     | Right(x_val) -> convert(x_val)
     | Left(x_val)  -> Left(x_val)

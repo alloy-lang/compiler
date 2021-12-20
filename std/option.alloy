@@ -3,7 +3,7 @@ where
 
 import std::eq::Eq
 import std::ord::Ord
-import std::show::Show
+import std::debug::Debug
 
 /// `Option` represents a value which may not exist.
 typedef Option<t> =
@@ -11,22 +11,22 @@ typedef Option<t> =
     | Some(t)
 
 
-behavior Eq<Option<t>> where
-  typevar t has Eq<t>
+behavior Eq for Option<t> where
+  typevar t = Eq
 
-  eq : t -> t -> Bool
-  eq = |left, right| =>
+  eq : Option<t> -> Option<t> -> Bool
+  eq = |left, right| ->
     match (left, right) when
       | (Some(l_val), Some(r_val)) -> Eq::eq(l_val, r_val)
       | (None, None) -> True
       | _ -> False
 
 
-behavior Ord<Option<t>> where
-  typevar t has Ord<t>
+behavior Ord for Option<t> where
+  typevar t = Ord
 
-  compare : t -> t -> Ordering
-  compare = |left, right| =>
+  compare : Option<t> -> Option<t> -> Ordering
+  compare = |left, right| ->
     match (left, right) when
       | (Some(l_val), Some(r_val)) -> Ord::compare(l_val, r_val)
       | (None, Some(_)) -> LT
@@ -34,46 +34,46 @@ behavior Ord<Option<t>> where
       | (None, None) -> EQ
 
 
-behavior Show<Option<t>> where
-  typevar t has Show<t>
+behavior Debug for Option<t> where
+  typevar t = Debug
 
-  show : Option<t> -> String
-  show = |op| =>
+  debug : Option<t> -> String
+  debug = |op| ->
     match op when
-      | Some(x) -> "Some(" <> Show::show(x) <> ")"
+      | Some(x) -> "Some(#{x})"
       | None -> "None"
 
 
-behavior Functor<Option<_>> where
+behavior Functor for Option<_> where
 
   map : (t1 -> t2) -> Option<t1> -> Option<t2> where
     typevar t1
     typevar t2
-  map = |convert, x| => match x when
+  map = |convert, x| -> match x when
     | Some(x_val) -> Some(convert(x_val))
     | None        -> None
 
 
-behavior Applicative<Option<_>> where
+behavior Applicative for Option<_> where
 
   apply : Option<(t1 -> t2)> -> Option<t1> -> Option<t2> where
     typevar t1
     typevar t2
-  apply = |f, x| => match (f, x) when
+  apply = |f, x| -> match (f, x) when
     | (Some(f_val), Some(x_val)) -> Some(f_val(x_val))
     | _                          -> None
 
 
   wrap : t1 -> Option<t1> where
     typevar t1
-  wrap = |x| => Some(x)
+  wrap = |x| -> Some(x)
 
 
-behavior Monad<Option<_>> where
+behavior Monad for Option<_> where
 
   flat_map : (t1 -> Option<t2>) -> Option<t1> -> Option<t2> where
     typevar t1
     typevar t2
-  flat_map = |convert, x| => match x when
+  flat_map = |convert, x| -> match x when
     | Some(x_val) -> convert(x_val)
     | None        -> None

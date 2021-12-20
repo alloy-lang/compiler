@@ -1,28 +1,23 @@
 module Functor
 where
 
-/// `Functor<f<_>>` represents an action on a parameterized type which does not
-/// change the structure with the mapped type.
+/// `Functor` represents an action on a containerized type which does not change the structure with the mapped type.
 ///
 /// The following laws should hold:
 ///
 /// * `Functor::map(id) == id`
 /// * `Functor::map(f << g) == Functor::map(f) << Functor::map(g)`
-trait Functor<f<_>> where
-  // `f<_>` indicates that `f` is a type that holds another type
-  // but we don't care about the type of the internal type
-  // Example: `Option<_>`
-  typevar f
+trait Functor where
+  typevar self = Type<_>
 
-  /// Apply the supplied function to the contents of `f<a>`, converting it to
-  /// an `f<b>`
+  /// Apply the supplied function to the contents of `Self<t1>`, converting it to `Self<t2>`
   ///
   /// # Examples
   ///
-  /// * `option.functor.map show_Int.show (Some 1) == Some "1"`
-  /// * `result.functor.map show_Int.show (Some 1) == Ok "1"`
-  /// * `list.functor.map show_Int.show (list.of [1, 2]) == list.of ["1", "2"]`
+  /// * `option.functor.map debug_Int.debug (Some 1) == Some "1"`
+  /// * `result.functor.map debug_Int.debug (Some 1) == Ok "1"`
+  /// * `list.functor.map debug_Int.debug (list.of [1, 2]) == list.of ["1", "2"]`
   ///
-  map : (t1 -> t2) -> f<t1> -> f<t2> where
+  map : (t1 -> t2) -> self<t1> -> self<t2> where
     typevar t1
     typevar t2

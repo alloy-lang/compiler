@@ -4,10 +4,10 @@ where
 import std::bool::Bool
 import std::bool::not
 
-trait Eq<t> where
-  typevar t
+trait Eq where
+  typevar self
 
-  eq : t -> t -> Bool
+  eq : self -> self -> Bool
 
   #[infix(left, 4)]
   (==) = eq

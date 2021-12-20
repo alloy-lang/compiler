@@ -4,46 +4,47 @@ where
 import std::eq::Eq
 import std::order::Ord
 import std::order::Ordering
-import std::show::Show
+import std::debug::Debug
 
 typedef Bool =
   | False
   | True
 
+
 /// Boolean 'not'
 not : Bool -> Bool
-not = |x| =>
+not = |x| ->
   if x
   then False
   else True
 
+
 /// Boolean 'exclusive or'
 xor : Bool -> Bool -> Bool
-xor = |x, y| =>
+xor = |x, y| ->
   if x
   then not(y)
   else y
 
 
-behavior Eq<Bool> where
-  (==) = |left, right| =>
+behavior Eq for Bool where
+  (==) = |left, right| ->
     if left
     then right
     else not(right)
 
 
-behavior Ord<Bool> where
-  compare = |left, right| =>
-    if left
-    then
-      if right
-      then Ordering::EQ
-      else Ordering::GT
-    else Ordering::LT
+behavior Ord for Bool where
+  compare = |left, right| ->
+    match (left, right) when
+    | (True, True)   -> Ordering::EQ
+    | (False, False) -> Ordering::EQ
+    | (True, False)  -> Ordering::GT
+    | (False, True)  -> Ordering::LT
 
 
-behavior Show<Bool> where
-  show = |x| =>
+behavior Debug for Bool where
+  debug = |x| ->
     if x
     then "True"
     else "False"
