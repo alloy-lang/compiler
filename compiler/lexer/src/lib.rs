@@ -8,13 +8,34 @@ enum Token<'a> {
     #[error]
     Error,
 
+    // #[regex(r"\n[ \t\n\f]+")]
+    // Indent(&'a str),
+
+    // Comments
+    #[regex(r"--[^\n]*\n")]
+    Comment(&'a str),
+    #[regex(r"--![^\n]*\n")]
+    DocComment(&'a str),
+
+    // Attributes
+    #[token("#[")]
+    AttributeOpen,
+
     // Keywords
+    #[token("import")]
+    Import,
     #[token("module")]
     Module,
     #[token("where")]
     Where,
+    #[token("when")]
+    When,
+    #[token("match")]
+    Match,
     #[token("trait")]
     Trait,
+    #[token("behavior")]
+    Behavior,
     #[token("typedef")]
     Typedef,
     #[token("typevar")]
@@ -29,6 +50,8 @@ enum Token<'a> {
     // Non-alphanumeric
     #[token("->")]
     Arrow,
+    #[token("::")]
+    Connector,
     // #[token(";")]
     // Semi,
     #[token(",")]
@@ -61,20 +84,22 @@ enum Token<'a> {
     // Dollar,
     #[token("=")]
     Eq,
-    #[token("!")]
-    Bang,
+    // #[token("!")]
+    // Bang,
     #[token("<")]
     Lt,
     #[token(">")]
     Gt,
     #[token("-")]
     Minus,
-    #[token("&")]
+    #[token("&&")]
     And,
-    #[token("|")]
+    #[token("||")]
     Or,
     #[token("+")]
     Plus,
+    #[token("|")]
+    Pipe,
     // #[token("*")]
     // Star,
     // #[token("/")]
@@ -85,6 +110,9 @@ enum Token<'a> {
     // Percent,
     #[regex("_?[a-zA-Z]+")]
     Identifier(&'a str),
+    #[regex(r"\([|<>=]+\)")]
+    #[regex(r"[|<>=]+")]
+    OperatorIdentifier(&'a str),
     #[token("_")]
     NilIdentifier,
 
@@ -98,9 +126,10 @@ enum Token<'a> {
 
 #[cfg(test)]
 mod tests {
-
+    use std::collections::HashMap;
     use super::*;
     use maplit::hashmap;
+    use std::fs;
 
     fn assert_lex<'a>(source: &'a str, expected: Token) {
         let mut lex = Token::lexer(source);
@@ -158,9 +187,13 @@ mod tests {
     #[test]
     fn test_keywords() {
         let source = hashmap! {
+            "import" => Token::Import,
             "module" => Token::Module,
             "where" => Token::Where,
+            "when" => Token::When,
+            "match" => Token::Match,
             "trait" => Token::Trait,
+            "behavior" => Token::Behavior,
             "typedef" => Token::Typedef,
             "typevar" => Token::Typevar,
             "if" => Token::If,
@@ -178,10 +211,44 @@ mod tests {
         let source = hashmap! {
             "_" => Token::NilIdentifier,
             "asdf" => Token::Identifier("asdf"),
+            "_asdf" => Token::Identifier("_asdf"),
+            "(>>=)" => Token::OperatorIdentifier("(>>=)"),
+            ">>=" => Token::OperatorIdentifier(">>="),
+            "(<=<)" => Token::OperatorIdentifier("(<=<)"),
+            "<=<" => Token::OperatorIdentifier("<=<"),
+            "(|>)" => Token::OperatorIdentifier("(|>)"),
+            "|>" => Token::OperatorIdentifier("|>"),
         };
 
         for (source, expected) in source {
             assert_lex(source, expected)
+        }
+    }
+
+    #[test]
+    fn test_attributes() {
+        let source: HashMap<&str, Vec<Token>> = hashmap! {
+            "#[]" => vec![
+                Token::AttributeOpen,
+                Token::CloseBracket,
+            ],
+            "#[test]" => vec![
+                Token::AttributeOpen,
+                Token::Identifier("test"),
+                Token::CloseBracket,
+            ],
+            "#[cfg(test)]" => vec![
+                Token::AttributeOpen,
+                Token::Identifier("cfg"),
+                Token::OpenParen,
+                Token::Identifier("test"),
+                Token::CloseParen,
+                Token::CloseBracket,
+            ],
+        };
+
+        for (source, expected) in source {
+            assert_lexes(source, &expected)
         }
     }
 
