@@ -1,21 +1,56 @@
 extern crate maplit;
 
 use logos::Logos;
+use std::ops::Range;
 
-#[derive(Logos, Debug, PartialEq)]
-enum Token<'a> {
+pub struct TokenStream<'source> {
+    lexer: logos::Lexer<'source, TokenKind<'source>>,
+}
+
+impl<'source> TokenStream<'source> {
+    pub fn from_source(source: &'source str) -> TokenStream<'source> {
+        TokenStream {
+            lexer: TokenKind::lexer(source),
+        }
+    }
+}
+
+impl<'source> Iterator for TokenStream<'source> {
+    type Item = Token<'source>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.lexer
+            .next()
+            .map(|token| Token::new(token, self.lexer.span()))
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct Token<'source> {
+    pub kind: TokenKind<'source>,
+    pub span: Range<usize>,
+}
+
+impl<'source> Token<'source> {
+    fn new(kind: TokenKind<'source>, span: Range<usize>) -> Self {
+        Token { kind, span }
+    }
+}
+
+#[derive(Logos, Debug, PartialEq, Clone)]
+pub enum TokenKind<'source> {
     #[regex(r"[ \t\n\f]+", logos::skip)]
     #[error]
     Error,
 
     // #[regex(r"\n[ \t\n\f]+")]
-    // Indent(&'a str),
+    // Indent(&'source str),
 
     // Comments
     #[regex(r"--[^\n]*\n")]
-    Comment(&'a str),
+    Comment(&'source str),
     #[regex(r"--![^\n]*\n")]
-    DocComment(&'a str),
+    DocComment(&'source str),
 
     // Attributes
     #[token("#[")]
@@ -109,10 +144,10 @@ enum Token<'a> {
     // #[token("%")]
     // Percent,
     #[regex("_?[a-zA-Z]+")]
-    Identifier(&'a str),
+    Identifier(&'source str),
     #[regex(r"\([|<>=]+\)")]
     #[regex(r"[|<>=]+")]
-    OperatorIdentifier(&'a str),
+    OperatorIdentifier(&'source str),
     #[token("_")]
     NilIdentifier,
 
@@ -126,13 +161,13 @@ enum Token<'a> {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
     use super::*;
     use maplit::hashmap;
+    use pretty_assertions::{assert_eq, assert_ne};
     use std::fs;
 
-    fn assert_lex<'a>(source: &'a str, expected: Token) {
-        let mut lex = Token::lexer(source);
+    fn assert_lex<'a>(source: &'a str, expected: TokenKind) {
+        let mut lex = TokenKind::lexer(source);
 
         if let Some(token) = lex.next() {
             assert_eq!(
@@ -152,24 +187,21 @@ mod tests {
         assert_eq!(lex.next(), None);
     }
 
-    fn assert_lexes<'a>(source: &'a str, expected: &[Token]) {
-        let mut lex = Token::lexer(source);
-
-        let mut actual = Vec::new();
-        while let Some(token) = lex.next() {
-            actual.push(token);
-        }
+    fn assert_lexes<'a>(source: &'a str, expected: &[TokenKind]) {
+        let actual = TokenStream::from_source(source)
+            .map(|t| t.kind)
+            .collect::<Vec<_>>();
 
         assert_eq!(expected, actual);
     }
 
     fn assert_no_errors(source: &str) {
-        let mut lex = Token::lexer(source);
+        let mut lex = TokenKind::lexer(source);
 
         while let Some(token) = lex.next() {
             assert_ne!(
                 token,
-                super::Token::Error,
+                super::TokenKind::Error,
                 r#"
                 slice: {:?}
                 span: '{:?}'
@@ -187,18 +219,18 @@ mod tests {
     #[test]
     fn test_keywords() {
         let source = hashmap! {
-            "import" => Token::Import,
-            "module" => Token::Module,
-            "where" => Token::Where,
-            "when" => Token::When,
-            "match" => Token::Match,
-            "trait" => Token::Trait,
-            "behavior" => Token::Behavior,
-            "typedef" => Token::Typedef,
-            "typevar" => Token::Typevar,
-            "if" => Token::If,
-            "then" => Token::Then,
-            "else" => Token::Else,
+            "import" => TokenKind::Import,
+            "module" => TokenKind::Module,
+            "where" => TokenKind::Where,
+            "when" => TokenKind::When,
+            "match" => TokenKind::Match,
+            "trait" => TokenKind::Trait,
+            "behavior" => TokenKind::Behavior,
+            "typedef" => TokenKind::Typedef,
+            "typevar" => TokenKind::Typevar,
+            "if" => TokenKind::If,
+            "then" => TokenKind::Then,
+            "else" => TokenKind::Else,
         };
 
         for (source, expected) in source {
@@ -209,15 +241,15 @@ mod tests {
     #[test]
     fn test_identifiers() {
         let source = hashmap! {
-            "_" => Token::NilIdentifier,
-            "asdf" => Token::Identifier("asdf"),
-            "_asdf" => Token::Identifier("_asdf"),
-            "(>>=)" => Token::OperatorIdentifier("(>>=)"),
-            ">>=" => Token::OperatorIdentifier(">>="),
-            "(<=<)" => Token::OperatorIdentifier("(<=<)"),
-            "<=<" => Token::OperatorIdentifier("<=<"),
-            "(|>)" => Token::OperatorIdentifier("(|>)"),
-            "|>" => Token::OperatorIdentifier("|>"),
+            "_" => TokenKind::NilIdentifier,
+            "asdf" => TokenKind::Identifier("asdf"),
+            "_asdf" => TokenKind::Identifier("_asdf"),
+            "(>>=)" => TokenKind::OperatorIdentifier("(>>=)"),
+            ">>=" => TokenKind::OperatorIdentifier(">>="),
+            "(<=<)" => TokenKind::OperatorIdentifier("(<=<)"),
+            "<=<" => TokenKind::OperatorIdentifier("<=<"),
+            "(|>)" => TokenKind::OperatorIdentifier("(|>)"),
+            "|>" => TokenKind::OperatorIdentifier("|>"),
         };
 
         for (source, expected) in source {
@@ -227,23 +259,23 @@ mod tests {
 
     #[test]
     fn test_attributes() {
-        let source: HashMap<&str, Vec<Token>> = hashmap! {
+        let source = hashmap! {
             "#[]" => vec![
-                Token::AttributeOpen,
-                Token::CloseBracket,
+                TokenKind::AttributeOpen,
+                TokenKind::CloseBracket,
             ],
             "#[test]" => vec![
-                Token::AttributeOpen,
-                Token::Identifier("test"),
-                Token::CloseBracket,
+                TokenKind::AttributeOpen,
+                TokenKind::Identifier("test"),
+                TokenKind::CloseBracket,
             ],
             "#[cfg(test)]" => vec![
-                Token::AttributeOpen,
-                Token::Identifier("cfg"),
-                Token::OpenParen,
-                Token::Identifier("test"),
-                Token::CloseParen,
-                Token::CloseBracket,
+                TokenKind::AttributeOpen,
+                TokenKind::Identifier("cfg"),
+                TokenKind::OpenParen,
+                TokenKind::Identifier("test"),
+                TokenKind::CloseParen,
+                TokenKind::CloseBracket,
             ],
         };
 
@@ -369,21 +401,21 @@ mod tests {
         assert_lexes(
             source,
             &[
-                Token::Module,
-                Token::Identifier("Test"),
-                Token::Where,
-                Token::Trait,
-                Token::Identifier("MultiVar"),
-                Token::Lt,
-                Token::Identifier("a"),
-                Token::Comma,
-                Token::Identifier("b"),
-                Token::Gt,
-                Token::Where,
-                Token::Typevar,
-                Token::Identifier("a"),
-                Token::Typevar,
-                Token::Identifier("b"),
+                TokenKind::Module,
+                TokenKind::Identifier("Test"),
+                TokenKind::Where,
+                TokenKind::Trait,
+                TokenKind::Identifier("MultiVar"),
+                TokenKind::Lt,
+                TokenKind::Identifier("a"),
+                TokenKind::Comma,
+                TokenKind::Identifier("b"),
+                TokenKind::Gt,
+                TokenKind::Where,
+                TokenKind::Typevar,
+                TokenKind::Identifier("a"),
+                TokenKind::Typevar,
+                TokenKind::Identifier("b"),
             ],
         );
     }
@@ -401,20 +433,20 @@ mod tests {
         assert_lexes(
             source,
             &[
-                Token::Module,
-                Token::Identifier("Test"),
-                Token::Where,
-                Token::Identifier("convert"),
-                Token::Colon,
-                Token::Identifier("List"),
-                Token::Lt,
-                Token::Identifier("String"),
-                Token::Gt,
-                Token::Arrow,
-                Token::Identifier("List"),
-                Token::Lt,
-                Token::Identifier("Int"),
-                Token::Gt,
+                TokenKind::Module,
+                TokenKind::Identifier("Test"),
+                TokenKind::Where,
+                TokenKind::Identifier("convert"),
+                TokenKind::Colon,
+                TokenKind::Identifier("List"),
+                TokenKind::Lt,
+                TokenKind::Identifier("String"),
+                TokenKind::Gt,
+                TokenKind::Arrow,
+                TokenKind::Identifier("List"),
+                TokenKind::Lt,
+                TokenKind::Identifier("Int"),
+                TokenKind::Gt,
             ],
         );
     }
