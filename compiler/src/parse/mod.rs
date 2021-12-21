@@ -543,12 +543,13 @@ pub(crate)grammar parser() for str {
 
 #[cfg(test)]
 mod tests {
+    use crate::parse;
     use crate::parse::{
         Expr, Pattern, TraitDefinition, TypeAliasDefinition, TypeAnnotationDefinition,
     };
     use crate::types::Type;
     use crate::types::TypeVariable;
-    use crate::parse;
+    use pretty_assertions::assert_eq;
     use std::fs;
 
     macro_rules! assert_eq {

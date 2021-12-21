@@ -18,6 +18,7 @@ linked-hash-map = "0.5.4"
 
 [dev-dependencies]
 wasmtime = "0.28.0"
+pretty_assertions = "1.0.0"
 test_source = { path = "../test_source" }
 
 [features]

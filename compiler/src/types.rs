@@ -152,6 +152,7 @@ impl Type {
 // #[cfg(test)]
 // mod tests {
 //     use super::Kind;
+//     use pretty_assertions::assert_eq;
 //
 //     #[test]
 //     fn test_new_kind_0() {

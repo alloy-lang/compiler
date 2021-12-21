@@ -61,7 +61,7 @@ pub(crate) fn canonicalize(parsed: parse::Module) -> Result<Module, Vec<Canonica
         type_annotations,
         values,
         type_aliases,
-        traits,
+        traits: _,
     } = parsed;
 
     let mut type_map = TypeEnvironment::new();
@@ -191,6 +191,7 @@ mod tests {
         Alternative, Expr, Match, Pattern, TypeAliasDefinition, TypeAnnotationDefinition,
     };
     use crate::types::Type;
+    use pretty_assertions::assert_eq;
 
     macro_rules! assert_eq {
         ($expected:expr, $actual:expr $(,)?) => ({
