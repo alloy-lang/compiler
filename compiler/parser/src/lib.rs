@@ -18,7 +18,9 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
     while let Some(token) = stream.next() {
         match token.kind {
             TokenKind::Module => {
-                return parse_module(token.span, &mut stream).and_then(validate_module);
+                return parse_module(token.span, &mut stream)
+                    .and_then(validate_module)
+                    .and_then(|module| validate_eof(module, &mut stream));
             }
             TokenKind::EOL => {}
             _ => todo!("Unhandled token kind"),
@@ -49,6 +51,24 @@ fn validate_module<'a>(module: Spanned<Module>) -> Result<Spanned<Module>, Parse
             span: id_span.clone(),
         }),
     };
+}
+
+fn validate_eof<'a>(
+    module: Spanned<Module>,
+    stream: &mut Peekable<TokenStream<'a>>,
+) -> Result<Spanned<Module>, ParseError<'a>> {
+    let remaining = stream
+        .filter(|t| match t.kind {
+            TokenKind::EOL | TokenKind::Comment(_) | TokenKind::DocComment(_) => false,
+            _ => true,
+        })
+        .collect::<Vec<_>>();
+
+    if remaining.is_empty() {
+        Ok(module)
+    } else {
+        Err(ParseError::ExpectedEOF { actual: remaining })
+    }
 }
 
 fn parse_module<'a>(
@@ -150,10 +170,13 @@ pub enum ParseError<'a> {
         message: String,
         span: Span,
     },
+    ExpectedEOF {
+        actual: Vec<Token<'a>>,
+    },
 }
 
 impl<'a> ParseError<'a> {
-    pub fn to_diagnostic<FileId>(self, file_id: FileId) -> Diagnostic<FileId> {
+    pub fn to_diagnostic<FileId: Clone>(self, file_id: FileId) -> Diagnostic<FileId> {
         match self {
             ParseError::ExpectedModuleDefinition { span, actual: _ } => Diagnostic::error()
                 .with_message(
@@ -183,6 +206,18 @@ impl<'a> ParseError<'a> {
                 )
                 .with_code("E0003")
                 .with_labels(vec![Label::primary(file_id, span).with_message(message)]),
+            ParseError::ExpectedEOF { actual } => Diagnostic::error()
+                .with_message("Expected the file to end")
+                .with_code("E0004")
+                .with_labels(
+                    actual
+                        .into_iter()
+                        .map(|t| {
+                            Label::primary(file_id.clone(), t.span)
+                                .with_message(format!("Unexpected Token {:?}", t.kind))
+                        })
+                        .collect(),
+                ),
         }
     }
 }
@@ -256,6 +291,37 @@ mod tests {
         };
 
         assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_unexpected_remainder() {
+        let expected = ParseError::ExpectedEOF {
+            actual: vec![Token {
+                kind: TokenKind::Identifier("Extra"),
+                span: 18..23,
+            }],
+        };
+
+        {
+            let source: &str = "module Test where Extra";
+            let actual = parse(source).expect_err("Expected ParseError");
+
+            assert_eq!(expected, actual);
+        }
+        {
+            // with comment
+            let source: &str = "module Test where Extra -- stuff";
+            let actual = parse(source).expect_err("Expected ParseError");
+
+            assert_eq!(expected, actual);
+        }
+        {
+            // with doc comment
+            let source: &str = "module Test where Extra --! extra stuff";
+            let actual = parse(source).expect_err("Expected ParseError");
+
+            assert_eq!(expected, actual);
+        }
     }
 
     #[test]

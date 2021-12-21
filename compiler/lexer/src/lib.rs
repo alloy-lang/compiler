@@ -53,9 +53,9 @@ pub enum TokenKind<'source> {
     // Indent(&'source str),
 
     // Comments
-    #[regex(r"--[^\n]*\n")]
+    #[regex(r"--[^\n]*\n?")]
     Comment(&'source str),
-    #[regex(r"--![^\n]*\n")]
+    #[regex(r"--![^\n]*\n?")]
     DocComment(&'source str),
 
     // Attributes
