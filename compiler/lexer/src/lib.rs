@@ -8,6 +8,7 @@ pub struct TokenStream<'source> {
 }
 
 impl<'source> TokenStream<'source> {
+    #[must_use]
     pub fn from_source(source: &'source str) -> TokenStream<'source> {
         TokenStream {
             lexer: TokenKind::lexer(source),
@@ -39,9 +40,13 @@ impl<'source> Token<'source> {
 
 #[derive(Logos, Debug, PartialEq, Clone)]
 pub enum TokenKind<'source> {
-    #[regex(r"[ \t\n\f]+", logos::skip)]
     #[error]
     Error,
+
+    #[regex(r"[ \t\f]+", logos::skip)]
+    Whitespace,
+    #[regex(r"[\n]+")]
+    EOL,
 
     // #[regex(r"\n[ \t\n\f]+")]
     // Indent(&'source str),
@@ -401,9 +406,12 @@ mod tests {
         assert_lexes(
             source,
             &[
+                TokenKind::EOL,
                 TokenKind::Module,
                 TokenKind::Identifier("Test"),
+                TokenKind::EOL,
                 TokenKind::Where,
+                TokenKind::EOL,
                 TokenKind::Trait,
                 TokenKind::Identifier("MultiVar"),
                 TokenKind::Lt,
@@ -412,10 +420,13 @@ mod tests {
                 TokenKind::Identifier("b"),
                 TokenKind::Gt,
                 TokenKind::Where,
+                TokenKind::EOL,
                 TokenKind::Typevar,
                 TokenKind::Identifier("a"),
+                TokenKind::EOL,
                 TokenKind::Typevar,
                 TokenKind::Identifier("b"),
+                TokenKind::EOL,
             ],
         );
     }
@@ -433,9 +444,12 @@ mod tests {
         assert_lexes(
             source,
             &[
+                TokenKind::EOL,
                 TokenKind::Module,
                 TokenKind::Identifier("Test"),
+                TokenKind::EOL,
                 TokenKind::Where,
+                TokenKind::EOL,
                 TokenKind::Identifier("convert"),
                 TokenKind::Colon,
                 TokenKind::Identifier("List"),
@@ -447,6 +461,7 @@ mod tests {
                 TokenKind::Lt,
                 TokenKind::Identifier("Int"),
                 TokenKind::Gt,
+                TokenKind::EOL,
             ],
         );
     }
