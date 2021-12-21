@@ -6,6 +6,22 @@ pub const EMPTY_MODULE: &str = r#"
 
 "#;
 
+pub const EMPTY_MODULE_LOWERCASE: &str = r#"
+            module test
+            where
+
+
+
+"#;
+
+pub const EMPTY_MODULE_UNDERSCORE: &str = r#"
+            module _Test
+            where
+
+
+
+"#;
+
 pub const INT_VALUE_DECLARATION_WITH_NO_TYPE: &str = r#"
             module Test
             where
