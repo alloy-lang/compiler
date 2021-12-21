@@ -10,7 +10,7 @@ use alloy_lexer::{Token, TokenKind, TokenStream};
 // parse functions
 //
 
-pub fn parse<'a>(source: &str) -> Result<Module, ParseError> {
+pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
     let mut stream = TokenStream::from_source(source).peekable();
 
     let _doc_comments = extract_doc_comments(&mut stream);
@@ -18,7 +18,7 @@ pub fn parse<'a>(source: &str) -> Result<Module, ParseError> {
     while let Some(token) = stream.next() {
         match token.kind {
             TokenKind::Module => {
-                return parse_module(token.span, &mut stream);
+                return parse_module(token.span, &mut stream).and_then(validate_module);
             }
             TokenKind::EOL => {}
             _ => todo!("Unhandled token kind"),
@@ -31,61 +31,64 @@ pub fn parse<'a>(source: &str) -> Result<Module, ParseError> {
     })
 }
 
+fn validate_module<'a>(module: Spanned<Module>) -> Result<Spanned<Module>, ParseError<'a>> {
+    let id = &module.value.name.value;
+    let id_span = &module.value.name.span;
+
+    return match id.chars().next() {
+        Some(first) if first.is_ascii_uppercase() => Ok(module),
+        Some(_) => Err(ParseError::UnexpectedModuleName {
+            message: format!(
+                "Module name must start with a capital letter. Found: `{}`",
+                id
+            ),
+            span: id_span.clone(),
+        }),
+        None => Err(ParseError::UnexpectedModuleName {
+            message: "Module name must not be empty".to_string(),
+            span: id_span.clone(),
+        }),
+    };
+}
+
 fn parse_module<'a>(
     module_token_span: Span,
     stream: &mut Peekable<TokenStream<'a>>,
-) -> Result<Module, ParseError<'a>> {
+) -> Result<Spanned<Module>, ParseError<'a>> {
     let _doc_comments = extract_doc_comments(stream);
 
-    if let Some(module_id_token) = stream.next() {
-        if let TokenKind::Identifier(id) = module_id_token.kind {
-            let _doc_comments = extract_doc_comments(stream);
+    match stream.next() {
+        Some(module_id_token) => match module_id_token.kind {
+            TokenKind::Identifier(id) => {
+                let _doc_comments = extract_doc_comments(stream);
 
-            if let Some(where_token) = stream.next() {
-                if let TokenKind::Where = where_token.kind {
-                    if let Some(first) = id.chars().next() {
-                        if first.is_ascii_uppercase() {
-                            Ok(Module {
-                                name: id.to_string(),
-                            })
-                        } else {
-                            Err(ParseError::UnexpectedModuleName {
-                                message: format!(
-                                    "Module name must start with a capital letter. Found: `{}`",
-                                    id
-                                ),
-                                span: module_id_token.span,
-                            })
-                        }
-                    } else {
-                        Err(ParseError::UnexpectedModuleName {
-                            message: "Module name must not be empty".to_string(),
-                            span: module_id_token.span,
-                        })
-                    }
-                } else {
-                    Err(ParseError::ExpectedWhereStatement {
-                        span: where_token.span,
-                        actual: Some(where_token.kind),
-                    })
+                match stream.next() {
+                    Some(where_token) if TokenKind::Where == where_token.kind => Ok(Spanned::from(
+                        module_token_span,
+                        where_token.span,
+                        Module {
+                            name: Spanned::from_span(module_id_token.span, id.to_string()),
+                        },
+                    )),
+                    Some(not_where_token) => Err(ParseError::ExpectedWhereStatement {
+                        span: not_where_token.span,
+                        actual: Some(not_where_token.kind),
+                    }),
+                    None => Err(ParseError::ExpectedWhereStatement {
+                        span: module_token_span.start..module_id_token.span.end,
+                        actual: None,
+                    }),
                 }
-            } else {
-                Err(ParseError::ExpectedWhereStatement {
-                    span: module_token_span.start..module_id_token.span.end,
-                    actual: None,
-                })
             }
-        } else {
-            Err(ParseError::ExpectedModuleName {
+            _ => Err(ParseError::ExpectedModuleName {
                 span: module_token_span.start..module_id_token.span.end,
                 actual: Some(module_id_token.kind),
-            })
-        }
-    } else {
-        Err(ParseError::ExpectedModuleName {
+            }),
+        },
+        None => Err(ParseError::ExpectedModuleName {
             span: module_token_span,
             actual: None,
-        })
+        }),
     }
 }
 
@@ -103,9 +106,28 @@ fn extract_doc_comments<'a>(stream: &'a mut Peekable<TokenStream>) -> Vec<Token<
 // parsed AST types
 //
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Spanned<T> {
+    pub span: Span,
+    pub value: T,
+}
+
+impl<T> Spanned<T> {
+    fn from_span(span: Span, value: T) -> Self {
+        Spanned { span, value }
+    }
+
+    fn from(start: Span, end: Span, value: T) -> Self {
+        Spanned {
+            span: start.start..end.end,
+            value,
+        }
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Module {
-    name: String,
+    name: Spanned<String>,
 }
 
 type Span = Range<usize>;
@@ -148,7 +170,9 @@ impl<'a> ParseError<'a> {
                     Label::primary(file_id, span).with_message("expected a module name")
                 ]),
             ParseError::ExpectedWhereStatement { span, actual: _ } => Diagnostic::error()
-                .with_message("Modules must have a `where` statement. Ex: `module HelloWorld where`.")
+                .with_message(
+                    "Modules must have a `where` statement. Ex: `module HelloWorld where`.",
+                )
                 .with_code("E0003")
                 .with_labels(vec![
                     Label::primary(file_id, span).with_message("expected a where statement")
@@ -239,8 +263,14 @@ mod tests {
         let source: &str = test_source::EMPTY_MODULE;
         let actual = parse(source).expect("Successful parse");
 
-        let expected = Module {
-            name: "Test".to_string(),
+        let expected = Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+            },
         };
 
         assert_eq!(expected, actual);
