@@ -3,6 +3,7 @@ extern crate maplit;
 use logos::Logos;
 use std::ops::Range;
 
+#[derive(Clone)]
 pub struct TokenStream<'source> {
     lexer: logos::Lexer<'source, TokenKind<'source>>,
 }
