@@ -2,5 +2,6 @@
 members = [
     "compiler",
     "compiler/lexer",
+    "compiler/parser",
     "test_source",
 ]
