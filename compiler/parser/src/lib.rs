@@ -1,17 +1,22 @@
 use itertools::Itertools;
-use std::iter::Peekable;
+use peekmore::PeekMore;
+use peekmore::PeekMoreIterator;
 use std::ops::Range;
 
 use codespan_reporting::diagnostic::{Diagnostic, Label};
 
+use alloy_ast as ast;
+use alloy_ast::Expr;
 use alloy_lexer::{Token, TokenKind, TokenStream};
 
 //
 // parse functions
 //
 
+type PTokenStream<'a> = PeekMoreIterator<TokenStream<'a>>;
+
 pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
-    let mut stream = TokenStream::from_source(source).peekable();
+    let mut stream = TokenStream::from_source(source).peekmore();
 
     let _doc_comments = extract_doc_comments(&mut stream);
 
@@ -22,7 +27,6 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
                     .and_then(validate_module)
                     .and_then(|module| validate_eof(module, &mut stream));
             }
-            TokenKind::EOL => {}
             _ => todo!("Unhandled token kind"),
         }
     }
@@ -55,7 +59,7 @@ fn validate_module<'a>(module: Spanned<Module>) -> Result<Spanned<Module>, Parse
 
 fn validate_eof<'a>(
     module: Spanned<Module>,
-    stream: &mut Peekable<TokenStream<'a>>,
+    stream: &mut PTokenStream<'a>,
 ) -> Result<Spanned<Module>, ParseError<'a>> {
     let remaining = stream
         .filter(|t| match t.kind {
@@ -73,38 +77,47 @@ fn validate_eof<'a>(
 
 fn parse_module<'a>(
     module_token_span: Span,
-    stream: &mut Peekable<TokenStream<'a>>,
+    stream: &mut PTokenStream<'a>,
 ) -> Result<Spanned<Module>, ParseError<'a>> {
     let _doc_comments = extract_doc_comments(stream);
 
     match stream.next() {
-        Some(module_id_token) => match module_id_token.kind {
-            TokenKind::Identifier(id) => {
-                let _doc_comments = extract_doc_comments(stream);
+        Some(Token {
+            kind: TokenKind::Identifier(id),
+            span: id_token_span,
+        }) => {
+            let _doc_comments = extract_doc_comments(stream);
 
-                match stream.next() {
-                    Some(where_token) if TokenKind::Where == where_token.kind => Ok(Spanned::from(
+            match stream.next() {
+                Some(Token {
+                    kind: TokenKind::Where,
+                    span: where_token_span,
+                }) => {
+                    let (values) = parse_module_contents(stream)?;
+
+                    Ok(Spanned::from(
                         module_token_span,
-                        where_token.span,
+                        where_token_span,
                         Module {
-                            name: Spanned::from_span(module_id_token.span, id.to_string()),
+                            name: Spanned::from_span(id_token_span, id.to_string()),
+                            values,
                         },
-                    )),
-                    Some(not_where_token) => Err(ParseError::ExpectedWhereStatement {
-                        span: not_where_token.span,
-                        actual: Some(not_where_token.kind),
-                    }),
-                    None => Err(ParseError::ExpectedWhereStatement {
-                        span: module_token_span.start..module_id_token.span.end,
-                        actual: None,
-                    }),
+                    ))
                 }
+                Some(not_where_token) => Err(ParseError::ExpectedWhereStatement {
+                    span: not_where_token.span,
+                    actual: Some(not_where_token.kind),
+                }),
+                None => Err(ParseError::ExpectedWhereStatement {
+                    span: module_token_span.start..id_token_span.end,
+                    actual: None,
+                }),
             }
-            _ => Err(ParseError::ExpectedModuleName {
-                span: module_token_span.start..module_id_token.span.end,
-                actual: Some(module_id_token.kind),
-            }),
-        },
+        }
+        Some(not_id_token) => Err(ParseError::ExpectedModuleName {
+            span: module_token_span.start..not_id_token.span.end,
+            actual: Some(not_id_token.kind),
+        }),
         None => Err(ParseError::ExpectedModuleName {
             span: module_token_span,
             actual: None,
@@ -112,8 +125,82 @@ fn parse_module<'a>(
     }
 }
 
+fn parse_module_contents<'a>(
+    stream: &mut PTokenStream<'a>,
+) -> Result<(Vec<Spanned<Value>>), ParseError<'a>> {
+    let mut values = vec![];
+
+    let _doc_comments = extract_doc_comments(stream);
+
+    match stream.peek().cloned() {
+        Some(Token {
+            kind: TokenKind::Identifier(id),
+            span: id_span,
+        }) => match stream.peek_next() {
+            Some(Token {
+                kind: TokenKind::Eq,
+                span: eq_span,
+            }) => {
+                let expr_span = id_span.start..eq_span.clone().end;
+
+                stream.nth(1);
+
+                match parse_expr(expr_span, stream) {
+                    Ok(expr) => values.push(Spanned {
+                        span: id_span.start..expr.span.end,
+                        value: Value {
+                            name: Spanned {
+                                span: id_span,
+                                value: id.to_string(),
+                            },
+                            expr,
+                        },
+                    }),
+                    Err(err) => {
+                        stream.reset_cursor();
+                        return Err(err);
+                    }
+                }
+            }
+            _ => stream.reset_cursor(),
+        },
+        Some(Token {
+            kind: TokenKind::Trait,
+            span: _,
+        }) => return Err(ParseError::ExpectedEOF { actual: vec![] }),
+        Some(t) => todo!("Unhandled token kind: {:?}", t),
+        None => {
+            // skip if stream is empty
+        }
+    }
+
+    Ok((values))
+}
+
+fn parse_expr<'a>(
+    expr_span: Span,
+    stream: &mut PTokenStream<'a>,
+) -> Result<Spanned<ast::Expr>, ParseError<'a>> {
+    let _doc_comments = extract_doc_comments(stream);
+
+    return match stream.next() {
+        Some(Token {
+            kind: TokenKind::LiteralInt(i),
+            span,
+        }) => Ok(Spanned {
+            span,
+            value: ast::Expr::Literal(ast::LiteralData::Integral(i)),
+        }),
+        Some(t) => todo!("Unexpected token while parsing an expression: {:?}", t),
+        None => Err(ParseError::ExpectedExpr {
+            span: expr_span,
+            actual: None,
+        }),
+    };
+}
+
 #[must_use]
-fn extract_doc_comments<'a>(stream: &'a mut Peekable<TokenStream>) -> Vec<Token<'a>> {
+fn extract_doc_comments<'a>(stream: &'a mut PTokenStream) -> Vec<Token<'a>> {
     stream
         .take_while_ref(|t| match t.kind {
             TokenKind::EOL /*| TokenKind::Comment(_) | TokenKind::DocComment(_)*/ => true,
@@ -126,7 +213,9 @@ fn extract_doc_comments<'a>(stream: &'a mut Peekable<TokenStream>) -> Vec<Token<
 // parsed AST types
 //
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+type Span = Range<usize>;
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct Spanned<T> {
     pub span: Span,
     pub value: T,
@@ -145,12 +234,17 @@ impl<T> Spanned<T> {
     }
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct Module {
     name: Spanned<String>,
+    values: Vec<Spanned<Value>>,
 }
 
-type Span = Range<usize>;
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+pub struct Value {
+    name: Spanned<String>,
+    expr: Spanned<ast::Expr>,
+}
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum ParseError<'a> {
@@ -169,6 +263,14 @@ pub enum ParseError<'a> {
     UnexpectedModuleName {
         message: String,
         span: Span,
+    },
+    OrphanedIdentifier {
+        span: Span,
+        name: String,
+    },
+    ExpectedExpr {
+        span: Span,
+        actual: Option<TokenKind<'a>>,
     },
     ExpectedEOF {
         actual: Vec<Token<'a>>,
@@ -204,11 +306,27 @@ impl<'a> ParseError<'a> {
                 .with_message(
                     "Module names must start with a capital letter. Ex: `module HelloWorld where`.",
                 )
-                .with_code("E0003")
+                .with_code("E0004")
                 .with_labels(vec![Label::primary(file_id, span).with_message(message)]),
+            ParseError::OrphanedIdentifier { span, name } => Diagnostic::error()
+                .with_message("TODO")
+                .with_code("E0005")
+                .with_labels(vec![Label::primary(file_id, span).with_message("")]),
+            ParseError::ExpectedExpr { span, actual } => Diagnostic::error()
+                .with_message("Expected expression")
+                .with_code("E0006")
+                .with_labels(vec![actual
+                    .map(|t| {
+                        Label::primary(file_id.clone(), span.clone())
+                            .with_message(format!("Expected expression, but found: {:?}", t))
+                    })
+                    .unwrap_or_else(|| {
+                        Label::primary(file_id.clone(), span)
+                            .with_message("Expected expression".to_string())
+                    })]),
             ParseError::ExpectedEOF { actual } => Diagnostic::error()
                 .with_message("Expected the file to end")
-                .with_code("E0004")
+                .with_code("E0007")
                 .with_labels(
                     actual
                         .into_iter()
@@ -224,6 +342,7 @@ impl<'a> ParseError<'a> {
 
 #[cfg(test)]
 mod tests {
+    use alloy_ast as ast;
     use pretty_assertions::assert_eq;
 
     use super::*;
@@ -336,6 +455,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                values: vec![],
             },
         };
 
@@ -368,12 +488,72 @@ mod tests {
         assert_eq!(expected, actual);
     }
 
-    // #[test]
-    // fn test_int_value_declaration_no_type() {
-    //     let source: &str = test_source::INT_VALUE_DECLARATION_WITH_NO_TYPE;
+    //     #[test]
+    //     fn test_orphaned_identifier() {
+    //         let source: &str = r#"
+    //             module Test
+    //             where
     //
-    //     assert_no_errors(source)
-    // }
+    //             thing
+    // "#;
+    //         let actual = parse(source).expect_err("Expected ParseError");
+    //
+    //         let expected = ParseError::OrphanedIdentifier {
+    //             span: 56..61,
+    //             name: "thing".to_string(),
+    //         };
+    //
+    //         assert_eq!(expected, actual);
+    //     }
+
+    #[test]
+    fn test_partial_value_declaration_with_eq() {
+        let source: &str = r#"
+            module Test
+            where
+
+            thing =
+"#;
+        let actual = parse(source).expect_err("Expected ParseError");
+
+        let expected = ParseError::ExpectedExpr {
+            span: 56..63,
+            actual: None,
+        };
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_int_value_declaration_no_type() {
+        let source: &str = test_source::INT_VALUE_DECLARATION_WITH_NO_TYPE;
+        let actual = parse(source).expect("Successful parse");
+
+        let expected = Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                values: vec![Spanned {
+                    span: 56..65,
+                    value: Value {
+                        name: Spanned {
+                            span: 56..61,
+                            value: "thing".to_string(),
+                        },
+                        expr: Spanned {
+                            span: 64..65,
+                            value: ast::Expr::Literal(ast::LiteralData::Integral(0)),
+                        },
+                    },
+                }],
+            },
+        };
+
+        assert_eq!(expected, actual);
+    }
     //
     // #[test]
     // fn test_int_value_declaration_with_type() {

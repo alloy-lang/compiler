@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "compiler",
+    "compiler/ast",
     "compiler/lexer",
     "compiler/parser",
     "test_source",
