@@ -1,40 +1,118 @@
+use improved_slice_patterns::match_vec;
 use itertools::Itertools;
-use peekmore::PeekMore;
-use peekmore::PeekMoreIterator;
 use std::ops::Range;
 
 use codespan_reporting::diagnostic::{Diagnostic, Label};
 
 use alloy_ast as ast;
-use alloy_ast::Expr;
 use alloy_lexer::{Token, TokenKind, TokenStream};
 
 //
 // parse functions
 //
 
-type PTokenStream<'a> = PeekMoreIterator<TokenStream<'a>>;
-
 pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
-    let mut stream = TokenStream::from_source(source).peekmore();
+    let /*mut*/ stream = TokenStream::from_source(source);
 
-    let _doc_comments = extract_doc_comments(&mut stream);
+    // let _doc_comments = extract_doc_comments(&mut stream);
 
-    while let Some(token) = stream.next() {
-        match token.kind {
-            TokenKind::Module => {
-                return parse_module(token.span, &mut stream)
-                    .and_then(validate_module)
-                    .and_then(|module| validate_eof(module, &mut stream));
+    let tokens = stream
+        .clone()
+        .filter(|t| match t.kind {
+            TokenKind::EOL | TokenKind::Comment(_) | TokenKind::DocComment(_) => false,
+            _ => true,
+        })
+        .collect::<Vec<_>>();
+
+    return match_vec!(tokens;
+        [
+            Token { kind: TokenKind::Module,         span: module_token_span },
+        ] => {
+            Err(ParseError::ExpectedModuleName {
+                span: module_token_span,
+                actual: None,
+            })
+        },
+
+        [
+            Token { kind: TokenKind::Module,         span: module_token_span },
+            Token { kind: TokenKind::Identifier(id), span: id_token_span },
+        ] => {
+            Err(ParseError::ExpectedWhereStatement {
+                span: module_token_span.start..id_token_span.end,
+                actual: None,
+            })
+        },
+
+        [
+            Token { kind: TokenKind::Module, span: module_token_span },
+            Token { kind,                    span: not_id_token_span }
+        ] => {
+            Err(ParseError::ExpectedModuleName {
+                span: module_token_span.start..not_id_token_span.end,
+                actual: Some(kind),
+            })
+        },
+
+        //
+        // TODO: combine this with the one below
+        //
+        [
+            Token { kind: TokenKind::Module,         span: module_token_span },
+            Token { kind: TokenKind::Identifier(id), span: id_token_span },
+            Token { kind: TokenKind::Where,          span: where_token_span },
+        ] => {
+            Ok(Spanned::from(
+                module_token_span,
+                where_token_span,
+                Module {
+                    name: Spanned::from_span(id_token_span, id.to_string()),
+                    values: vec![],
+                },
+            ))
+        },
+
+        [
+            Token { kind: TokenKind::Module,         span: module_token_span },
+            Token { kind: TokenKind::Identifier(id), span: id_token_span },
+            Token { kind: TokenKind::Where,          span: where_token_span },
+            remainder @ ..
+        ] => {
+            let (values) = parse_module_contents(remainder)?;
+
+            Ok(Spanned::from(
+                module_token_span,
+                where_token_span,
+                Module {
+                    name: Spanned::from_span(id_token_span, id.to_string()),
+                    values,
+                },
+            ))
+        },
+
+        [
+            Token { kind: TokenKind::Module,         span: module_token_span },
+            Token { kind: TokenKind::Identifier(id), span: id_token_span },
+            Token { kind,                            span: not_where_token_span },
+        ] => {
+            Err(ParseError::ExpectedWhereStatement {
+                span: not_where_token_span,
+                actual: Some(kind),
+            })
+        },
+    )
+    .map_err(|remaining| {
+        if remaining.is_empty() {
+            ParseError::ExpectedModuleDefinition {
+                span: 0..source.len(),
+                actual: None,
             }
-            _ => todo!("Unhandled token kind"),
+        } else {
+            ParseError::ExpectedEOF { actual: remaining }
         }
-    }
-
-    Err(ParseError::ExpectedModuleDefinition {
-        span: 0..source.len(),
-        actual: None,
     })
+    .and_then(|s| s)
+    .and_then(validate_module);
 }
 
 fn validate_module<'a>(module: Spanned<Module>) -> Result<Spanned<Module>, ParseError<'a>> {
@@ -57,150 +135,79 @@ fn validate_module<'a>(module: Spanned<Module>) -> Result<Spanned<Module>, Parse
     };
 }
 
-fn validate_eof<'a>(
-    module: Spanned<Module>,
-    stream: &mut PTokenStream<'a>,
-) -> Result<Spanned<Module>, ParseError<'a>> {
-    let remaining = stream
-        .filter(|t| match t.kind {
-            TokenKind::EOL | TokenKind::Comment(_) | TokenKind::DocComment(_) => false,
-            _ => true,
-        })
-        .collect::<Vec<_>>();
-
-    if remaining.is_empty() {
-        Ok(module)
-    } else {
-        Err(ParseError::ExpectedEOF { actual: remaining })
-    }
-}
-
-fn parse_module<'a>(
-    module_token_span: Span,
-    stream: &mut PTokenStream<'a>,
-) -> Result<Spanned<Module>, ParseError<'a>> {
-    let _doc_comments = extract_doc_comments(stream);
-
-    match stream.next() {
-        Some(Token {
-            kind: TokenKind::Identifier(id),
-            span: id_token_span,
-        }) => {
-            let _doc_comments = extract_doc_comments(stream);
-
-            match stream.next() {
-                Some(Token {
-                    kind: TokenKind::Where,
-                    span: where_token_span,
-                }) => {
-                    let (values) = parse_module_contents(stream)?;
-
-                    Ok(Spanned::from(
-                        module_token_span,
-                        where_token_span,
-                        Module {
-                            name: Spanned::from_span(id_token_span, id.to_string()),
-                            values,
-                        },
-                    ))
-                }
-                Some(not_where_token) => Err(ParseError::ExpectedWhereStatement {
-                    span: not_where_token.span,
-                    actual: Some(not_where_token.kind),
-                }),
-                None => Err(ParseError::ExpectedWhereStatement {
-                    span: module_token_span.start..id_token_span.end,
-                    actual: None,
-                }),
-            }
-        }
-        Some(not_id_token) => Err(ParseError::ExpectedModuleName {
-            span: module_token_span.start..not_id_token.span.end,
-            actual: Some(not_id_token.kind),
-        }),
-        None => Err(ParseError::ExpectedModuleName {
-            span: module_token_span,
-            actual: None,
-        }),
-    }
-}
-
 fn parse_module_contents<'a>(
-    stream: &mut PTokenStream<'a>,
+    tokens: impl Iterator<Item = Token<'a>>,
 ) -> Result<(Vec<Spanned<Value>>), ParseError<'a>> {
     let mut values = vec![];
 
-    let _doc_comments = extract_doc_comments(stream);
+    // let _doc_comments = extract_doc_comments(stream);
 
-    match stream.peek().cloned() {
-        Some(Token {
-            kind: TokenKind::Identifier(id),
-            span: id_span,
-        }) => match stream.peek_next() {
-            Some(Token {
-                kind: TokenKind::Eq,
-                span: eq_span,
-            }) => {
-                let expr_span = id_span.start..eq_span.clone().end;
-
-                stream.nth(1);
-
-                match parse_expr(expr_span, stream) {
-                    Ok(expr) => values.push(Spanned {
-                        span: id_span.start..expr.span.end,
-                        value: Value {
-                            name: Spanned {
-                                span: id_span,
-                                value: id.to_string(),
-                            },
-                            expr,
-                        },
-                    }),
-                    Err(err) => {
-                        stream.reset_cursor();
-                        return Err(err);
-                    }
-                }
-            }
-            _ => stream.reset_cursor(),
+    let value = match_vec!(tokens.collect::<Vec<_>>();
+        [
+            Token { kind: TokenKind::Identifier(id), span: id_span },
+        ] => {
+            Err(ParseError::OrphanedIdentifier {
+                span: id_span,
+                name: id.to_string(),
+            })
         },
-        Some(Token {
-            kind: TokenKind::Trait,
-            span: _,
-        }) => return Err(ParseError::ExpectedEOF { actual: vec![] }),
-        Some(t) => todo!("Unhandled token kind: {:?}", t),
-        None => {
-            // skip if stream is empty
+
+        [
+            Token { kind: TokenKind::Identifier(id), span: id_span },
+            Token { kind: TokenKind::Eq,             span: eq_span },
+            remainder @ ..
+        ] => {
+            let expr_span = id_span.start..eq_span.end;
+
+            let expr = parse_expr(&expr_span, remainder)?;
+
+            let value = Spanned {
+                span: expr_span.start..expr.span.end,
+                value: Value {
+                    name: Spanned {
+                        span: id_span,
+                        value: id.to_string(),
+                    },
+                    expr,
+                },
+            };
+
+            Ok(value)
         }
-    }
+    )
+    .map_err(|remaining| ParseError::ExpectedEOF { actual: remaining })
+    .and_then(|s| s)?;
+
+    values.push(value);
 
     Ok((values))
 }
 
 fn parse_expr<'a>(
-    expr_span: Span,
-    stream: &mut PTokenStream<'a>,
+    expr_span: &Span,
+    tokens: impl Iterator<Item = Token<'a>>,
 ) -> Result<Spanned<ast::Expr>, ParseError<'a>> {
-    let _doc_comments = extract_doc_comments(stream);
+    // let _doc_comments = extract_doc_comments(stream);
 
-    return match stream.next() {
-        Some(Token {
-            kind: TokenKind::LiteralInt(i),
-            span,
-        }) => Ok(Spanned {
+    match_vec!(tokens.collect::<Vec<_>>();
+        [
+            Token { kind: TokenKind::LiteralInt(i), span },
+        ] => Ok(Spanned {
             span,
             value: ast::Expr::Literal(ast::LiteralData::Integral(i)),
         }),
-        Some(t) => todo!("Unexpected token while parsing an expression: {:?}", t),
-        None => Err(ParseError::ExpectedExpr {
-            span: expr_span,
+
+        [..] => Err(ParseError::ExpectedExpr {
+            span: expr_span.clone(),
             actual: None,
         }),
-    };
+    )
+    .map_err(|remaining| ParseError::ExpectedEOF { actual: remaining })
+    .and_then(|s| s)
 }
 
 #[must_use]
-fn extract_doc_comments<'a>(stream: &'a mut PTokenStream) -> Vec<Token<'a>> {
+fn extract_doc_comments<'a>(stream: &'a mut TokenStream<'a>) -> Vec<Token<'a>> {
     stream
         .take_while_ref(|t| match t.kind {
             TokenKind::EOL /*| TokenKind::Comment(_) | TokenKind::DocComment(_)*/ => true,
@@ -309,9 +316,9 @@ impl<'a> ParseError<'a> {
                 .with_code("E0004")
                 .with_labels(vec![Label::primary(file_id, span).with_message(message)]),
             ParseError::OrphanedIdentifier { span, name } => Diagnostic::error()
-                .with_message("TODO")
+                .with_message("Top level identifiers are typically followed by `:` or `=`.")
                 .with_code("E0005")
-                .with_labels(vec![Label::primary(file_id, span).with_message("")]),
+                .with_labels(vec![Label::primary(file_id, span).with_message(format!("Unexpected identifier '{:?}'", name))]),
             ParseError::ExpectedExpr { span, actual } => Diagnostic::error()
                 .with_message("Expected expression")
                 .with_code("E0006")
@@ -416,27 +423,27 @@ mod tests {
     fn test_unexpected_remainder() {
         let expected = ParseError::ExpectedEOF {
             actual: vec![Token {
-                kind: TokenKind::Identifier("Extra"),
+                kind: TokenKind::Trait,
                 span: 18..23,
             }],
         };
 
         {
-            let source: &str = "module Test where Extra";
+            let source: &str = "module Test where trait";
             let actual = parse(source).expect_err("Expected ParseError");
 
             assert_eq!(expected, actual);
         }
         {
             // with comment
-            let source: &str = "module Test where Extra -- stuff";
+            let source: &str = "module Test where trait -- stuff";
             let actual = parse(source).expect_err("Expected ParseError");
 
             assert_eq!(expected, actual);
         }
         {
             // with doc comment
-            let source: &str = "module Test where Extra --! extra stuff";
+            let source: &str = "module Test where trait --! extra stuff";
             let actual = parse(source).expect_err("Expected ParseError");
 
             assert_eq!(expected, actual);
@@ -488,23 +495,23 @@ mod tests {
         assert_eq!(expected, actual);
     }
 
-    //     #[test]
-    //     fn test_orphaned_identifier() {
-    //         let source: &str = r#"
-    //             module Test
-    //             where
-    //
-    //             thing
-    // "#;
-    //         let actual = parse(source).expect_err("Expected ParseError");
-    //
-    //         let expected = ParseError::OrphanedIdentifier {
-    //             span: 56..61,
-    //             name: "thing".to_string(),
-    //         };
-    //
-    //         assert_eq!(expected, actual);
-    //     }
+    #[test]
+    fn test_orphaned_identifier() {
+        let source: &str = r#"
+                module Test
+                where
+
+                thing
+    "#;
+        let actual = parse(source).expect_err("Expected ParseError");
+
+        let expected = ParseError::OrphanedIdentifier {
+            span: 68..73,
+            name: "thing".to_string(),
+        };
+
+        assert_eq!(expected, actual);
+    }
 
     #[test]
     fn test_partial_value_declaration_with_eq() {

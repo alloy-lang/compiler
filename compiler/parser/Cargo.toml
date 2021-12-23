@@ -9,6 +9,7 @@ edition = "2018"
 alloy_ast = { path = "../ast" }
 alloy_lexer = { path = "../lexer" }
 codespan-reporting = "0.11"
+improved_slice_patterns = "2.0"
 itertools = "0.10"
 peekmore = "1.0"
 
