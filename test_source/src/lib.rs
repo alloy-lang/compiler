@@ -68,15 +68,6 @@ pub const INT_VALUE_DECLARATION_WITH_CONFLICTING_TYPE_ANNOTATIONS: &str = r#"
 //                 thing : String
 // "#;
 
-pub const VALUE_WITH_CONFLICTING_TYPE_ANNOTATIONS: &str = r#"
-                module Test
-                where
-
-                thing : String
-                thing : Int
-                thing = 0.0
-"#;
-
 pub const SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
 
 

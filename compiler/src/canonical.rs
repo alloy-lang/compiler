@@ -386,34 +386,6 @@ mod tests {
     }
 
     #[test]
-    fn test_value_with_conflicting_type_annotations() {
-        let expected = vec![canonical::CanonicalizeError::ConflictingTypeAnnotations {
-            name: "thing".into(),
-            types: vec![
-                TypeAnnotationDefinition {
-                    name: "thing".to_string(),
-                    type_variables: vec![],
-                    t: Type::identifier("String"),
-                },
-                TypeAnnotationDefinition {
-                    name: "thing".to_string(),
-                    type_variables: vec![],
-                    t: Type::identifier("Int"),
-                },
-            ],
-        }];
-
-        {
-            let source: &str = test_source::VALUE_WITH_CONFLICTING_TYPE_ANNOTATIONS;
-
-            let parsed_module = parse::parser::module(source).unwrap();
-            let actual = canonicalize(parsed_module).unwrap_err();
-
-            assert_eq!(expected, actual);
-        }
-    }
-
-    #[test]
     fn test_multi_arg_function_declaration() {
         let expected = canonical::Module {
             name: String::from("Test"),
