@@ -27,6 +27,12 @@ pub struct Behavior {}
 pub struct Value {}
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+pub enum Type {
+    Identifier(String),
+    Variable(String),
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub enum Expr {
     // Identifier(String),
     // Apply(Box<Expr>, Box<Expr>),
@@ -50,9 +56,15 @@ pub enum Pattern {
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub enum LiteralData {
     Integral(i64),
-    // Fractional(NotNan<f64>),
+    Fractional(NotNan<f64>),
     // String(String),
     // Char(char),
+}
+
+impl LiteralData {
+    pub fn fractional(val: f64) -> Self {
+        LiteralData::Fractional(NotNan::new(val).unwrap())
+    }
 }
 
 #[cfg(test)]

@@ -16,3 +16,4 @@ peekmore = "1.0"
 [dev-dependencies]
 pretty_assertions = "1.0.0"
 test_source = { path = "../../test_source" }
+ordered-float = "2.8"
