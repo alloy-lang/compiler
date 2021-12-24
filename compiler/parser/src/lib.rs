@@ -67,6 +67,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
                 where_token_span,
                 Module {
                     name: Spanned::from_span(id_token_span, id.to_string()),
+                    type_annotations: vec![],
                     values: vec![],
                 },
             ))
@@ -78,13 +79,14 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
             Token { kind: TokenKind::Where,          span: where_token_span },
             remainder @ ..
         ] => {
-            let (values) = parse_module_contents(remainder)?;
+            let (type_annotations, values) = parse_module_contents(remainder)?;
 
             Ok(Spanned::from(
                 module_token_span,
                 where_token_span,
                 Module {
                     name: Spanned::from_span(id_token_span, id.to_string()),
+                    type_annotations,
                     values,
                 },
             ))
@@ -137,65 +139,138 @@ fn validate_module<'a>(module: Spanned<Module>) -> Result<Spanned<Module>, Parse
 
 fn parse_module_contents<'a>(
     tokens: impl Iterator<Item = Token<'a>>,
-) -> Result<(Vec<Spanned<Value>>), ParseError<'a>> {
+) -> Result<(Vec<Spanned<TypeAnnotation>>, Vec<Spanned<Value>>), ParseError<'a>> {
+    let mut type_annotations = vec![];
     let mut values = vec![];
 
     // let _doc_comments = extract_doc_comments(stream);
 
-    let value = match_vec!(tokens.collect::<Vec<_>>();
-        [
-            Token { kind: TokenKind::Identifier(id), span: id_span },
-        ] => {
-            Err(ParseError::OrphanedIdentifier {
-                span: id_span,
-                name: id.to_string(),
-            })
-        },
+    let mut remainder = tokens.collect::<Vec<_>>();
 
-        [
-            Token { kind: TokenKind::Identifier(id), span: id_span },
-            Token { kind: TokenKind::Eq,             span: eq_span },
-            remainder @ ..
-        ] => {
-            let expr_span = id_span.start..eq_span.end;
-
-            let expr = parse_expr(&expr_span, remainder)?;
-
-            let value = Spanned {
-                span: expr_span.start..expr.span.end,
-                value: Value {
-                    name: Spanned {
+    loop {
+        remainder = match_vec!(remainder;
+                [
+                    Token { kind: TokenKind::Identifier(id), span: id_span },
+                ] => {
+                    Err(ParseError::OrphanedIdentifier {
                         span: id_span,
-                        value: id.to_string(),
-                    },
-                    expr,
+                        name: id.to_string(),
+                    })
                 },
-            };
 
-            Ok(value)
+                [
+                    Token { kind: TokenKind::Identifier(id), span: id_span },
+                    Token { kind: TokenKind::Colon,          span: colon_span },
+                    remainder @ ..
+                ] => {
+                    let type_span = id_span.start..colon_span.end;
+
+                    let (t, tokens) = parse_type(&type_span, remainder)?;
+
+                    let type_annotation = Spanned {
+                        span: type_span.start..t.span.end,
+                        value: TypeAnnotation {
+                            name: Spanned {
+                                span: id_span,
+                                value: id.to_string(),
+                            },
+                            t,
+                        },
+                    };
+
+                    type_annotations.push(type_annotation);
+
+                    Ok(tokens)
+                },
+
+                [
+                    Token { kind: TokenKind::Identifier(id), span: id_span },
+                    Token { kind: TokenKind::Eq,             span: eq_span },
+                    remainder @ ..
+                ] => {
+                    let expr_span = id_span.start..eq_span.end;
+
+                    let (expr, tokens) = parse_expr(&expr_span, remainder)?;
+
+                    let value = Spanned {
+                        span: expr_span.start..expr.span.end,
+                        value: Value {
+                            name: Spanned {
+                                span: id_span,
+                                value: id.to_string(),
+                            },
+                            expr,
+                        },
+                    };
+
+                    values.push(value);
+
+                    Ok(tokens)
+                }
+        )
+        .map_err(|remaining| ParseError::ExpectedEOF { actual: remaining })
+        .and_then(|s| s)?;
+
+        if remainder.is_empty() {
+            break;
         }
+    }
+
+    Ok((type_annotations, values))
+}
+
+fn parse_type<'a>(
+    type_span: &Span,
+    tokens: impl Iterator<Item = Token<'a>>,
+) -> Result<(Spanned<ast::Type>, Vec<Token<'a>>), ParseError<'a>> {
+    // let _doc_comments = extract_doc_comments(stream);
+
+    match_vec!(tokens.collect::<Vec<_>>();
+        [
+            Token { kind: TokenKind::Identifier(id), span },
+            remainder @ ..,
+        ] => Ok((Spanned {
+            span,
+            value: ast::Type::Identifier(id.to_string()),
+        }, remainder.collect())),
+
+        [..] => Err(ParseError::ExpectedExpr {
+            span: type_span.clone(),
+            actual: None,
+        }),
     )
     .map_err(|remaining| ParseError::ExpectedEOF { actual: remaining })
-    .and_then(|s| s)?;
-
-    values.push(value);
-
-    Ok((values))
+    .and_then(|s| s)
 }
 
 fn parse_expr<'a>(
     expr_span: &Span,
     tokens: impl Iterator<Item = Token<'a>>,
-) -> Result<Spanned<ast::Expr>, ParseError<'a>> {
+) -> Result<(Spanned<ast::Expr>, Vec<Token<'a>>), ParseError<'a>> {
     // let _doc_comments = extract_doc_comments(stream);
 
     match_vec!(tokens.collect::<Vec<_>>();
         [
             Token { kind: TokenKind::LiteralInt(i), span },
-        ] => Ok(Spanned {
+        ] => Ok((Spanned {
             span,
             value: ast::Expr::Literal(ast::LiteralData::Integral(i)),
-        }),
+        }, Vec::new())),
+
+        [
+            Token { kind: TokenKind::LiteralFloat(f), span },
+        ] => Ok((Spanned {
+            span,
+            value: ast::Expr::Literal(ast::LiteralData::fractional(f)),
+        }, Vec::new())),
+
+        [
+            Token { kind: TokenKind::LiteralInt(i), span },
+            remainder @ ..
+        ] => Ok((Spanned {
+            span,
+            value: ast::Expr::Literal(ast::LiteralData::Integral(i)),
+        }, remainder.collect())),
 
         [..] => Err(ParseError::ExpectedExpr {
             span: expr_span.clone(),
@@ -244,7 +319,14 @@ impl<T> Spanned<T> {
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct Module {
     name: Spanned<String>,
+    type_annotations: Vec<Spanned<TypeAnnotation>>,
     values: Vec<Spanned<Value>>,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+pub struct TypeAnnotation {
+    name: Spanned<String>,
+    t: Spanned<ast::Type>,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
@@ -318,19 +400,21 @@ impl<'a> ParseError<'a> {
             ParseError::OrphanedIdentifier { span, name } => Diagnostic::error()
                 .with_message("Top level identifiers are typically followed by `:` or `=`.")
                 .with_code("E0005")
-                .with_labels(vec![Label::primary(file_id, span).with_message(format!("Unexpected identifier '{:?}'", name))]),
+                .with_labels(vec![Label::primary(file_id, span)
+                    .with_message(format!("Unexpected identifier '{:?}'", name))]),
             ParseError::ExpectedExpr { span, actual } => Diagnostic::error()
                 .with_message("Expected expression")
                 .with_code("E0006")
-                .with_labels(vec![actual
-                    .map(|t| {
+                .with_labels(vec![actual.map_or_else(
+                    || {
+                        Label::primary(file_id.clone(), span.clone())
+                            .with_message("Expected expression".to_string())
+                    },
+                    |t| {
                         Label::primary(file_id.clone(), span.clone())
                             .with_message(format!("Expected expression, but found: {:?}", t))
-                    })
-                    .unwrap_or_else(|| {
-                        Label::primary(file_id.clone(), span)
-                            .with_message("Expected expression".to_string())
-                    })]),
+                    },
+                )]),
             ParseError::ExpectedEOF { actual } => Diagnostic::error()
                 .with_message("Expected the file to end")
                 .with_code("E0007")
@@ -350,6 +434,7 @@ impl<'a> ParseError<'a> {
 #[cfg(test)]
 mod tests {
     use alloy_ast as ast;
+    use ordered_float::NotNan;
     use pretty_assertions::assert_eq;
 
     use super::*;
@@ -357,12 +442,12 @@ mod tests {
     #[test]
     fn test_empty_source() {
         let source: &str = "   \n  ";
-        let actual = parse(source).expect_err("Expected ParseError");
+        let actual = parse(source);
 
-        let expected = ParseError::ExpectedModuleDefinition {
+        let expected = Err(ParseError::ExpectedModuleDefinition {
             span: 0..6,
             actual: None,
-        };
+        });
 
         assert_eq!(expected, actual);
     }
@@ -370,12 +455,12 @@ mod tests {
     #[test]
     fn test_module_missing_identifier() {
         let source: &str = "module";
-        let actual = parse(source).expect_err("Expected ParseError");
+        let actual = parse(source);
 
-        let expected = ParseError::ExpectedModuleName {
+        let expected = Err(ParseError::ExpectedModuleName {
             span: 0..6,
             actual: None,
-        };
+        });
 
         assert_eq!(expected, actual);
     }
@@ -383,12 +468,12 @@ mod tests {
     #[test]
     fn test_module_incorrect_identifier() {
         let source: &str = "module _";
-        let actual = parse(source).expect_err("Expected ParseError");
+        let actual = parse(source);
 
-        let expected = ParseError::ExpectedModuleName {
+        let expected = Err(ParseError::ExpectedModuleName {
             span: 0..8,
             actual: Some(TokenKind::NilIdentifier),
-        };
+        });
 
         assert_eq!(expected, actual);
     }
@@ -396,12 +481,12 @@ mod tests {
     #[test]
     fn test_module_missing_where() {
         let source: &str = "module Test";
-        let actual = parse(source).expect_err("Expected ParseError");
+        let actual = parse(source);
 
-        let expected = ParseError::ExpectedWhereStatement {
+        let expected = Err(ParseError::ExpectedWhereStatement {
             span: 0..11,
             actual: None,
-        };
+        });
 
         assert_eq!(expected, actual);
     }
@@ -409,42 +494,42 @@ mod tests {
     #[test]
     fn test_module_incorrect_where() {
         let source: &str = "module Test when";
-        let actual = parse(source).expect_err("Expected ParseError");
+        let actual = parse(source);
 
-        let expected = ParseError::ExpectedWhereStatement {
+        let expected = Err(ParseError::ExpectedWhereStatement {
             span: 12..16,
             actual: Some(TokenKind::When),
-        };
+        });
 
         assert_eq!(expected, actual);
     }
 
     #[test]
     fn test_unexpected_remainder() {
-        let expected = ParseError::ExpectedEOF {
+        let expected = Err(ParseError::ExpectedEOF {
             actual: vec![Token {
                 kind: TokenKind::Trait,
                 span: 18..23,
             }],
-        };
+        });
 
         {
             let source: &str = "module Test where trait";
-            let actual = parse(source).expect_err("Expected ParseError");
+            let actual = parse(source);
 
             assert_eq!(expected, actual);
         }
         {
             // with comment
             let source: &str = "module Test where trait -- stuff";
-            let actual = parse(source).expect_err("Expected ParseError");
+            let actual = parse(source);
 
             assert_eq!(expected, actual);
         }
         {
             // with doc comment
             let source: &str = "module Test where trait --! extra stuff";
-            let actual = parse(source).expect_err("Expected ParseError");
+            let actual = parse(source);
 
             assert_eq!(expected, actual);
         }
@@ -453,18 +538,19 @@ mod tests {
     #[test]
     fn test_empty_module() {
         let source: &str = test_source::EMPTY_MODULE;
-        let actual = parse(source).expect("Successful parse");
+        let actual = parse(source);
 
-        let expected = Spanned {
+        let expected = Ok(Spanned {
             span: 13..42,
             value: Module {
                 name: Spanned {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                type_annotations: vec![],
                 values: vec![],
             },
-        };
+        });
 
         assert_eq!(expected, actual);
     }
@@ -472,12 +558,12 @@ mod tests {
     #[test]
     fn test_empty_module_lowercase() {
         let source: &str = test_source::EMPTY_MODULE_LOWERCASE;
-        let actual = parse(source).expect_err("Expected ParseError");
+        let actual = parse(source);
 
-        let expected = ParseError::UnexpectedModuleName {
+        let expected = Err(ParseError::UnexpectedModuleName {
             message: "Module name must start with a capital letter. Found: `test`".to_string(),
             span: 20..24,
-        };
+        });
 
         assert_eq!(expected, actual);
     }
@@ -485,12 +571,12 @@ mod tests {
     #[test]
     fn test_empty_module_underscore() {
         let source: &str = test_source::EMPTY_MODULE_UNDERSCORE;
-        let actual = parse(source).expect_err("Expected ParseError");
+        let actual = parse(source);
 
-        let expected = ParseError::UnexpectedModuleName {
+        let expected = Err(ParseError::UnexpectedModuleName {
             message: "Module name must start with a capital letter. Found: `_Test`".to_string(),
             span: 20..25,
-        };
+        });
 
         assert_eq!(expected, actual);
     }
@@ -503,12 +589,12 @@ mod tests {
 
                 thing
     "#;
-        let actual = parse(source).expect_err("Expected ParseError");
+        let actual = parse(source);
 
-        let expected = ParseError::OrphanedIdentifier {
+        let expected = Err(ParseError::OrphanedIdentifier {
             span: 68..73,
             name: "thing".to_string(),
-        };
+        });
 
         assert_eq!(expected, actual);
     }
@@ -521,12 +607,12 @@ mod tests {
 
             thing =
 "#;
-        let actual = parse(source).expect_err("Expected ParseError");
+        let actual = parse(source);
 
-        let expected = ParseError::ExpectedExpr {
+        let expected = Err(ParseError::ExpectedExpr {
             span: 56..63,
             actual: None,
-        };
+        });
 
         assert_eq!(expected, actual);
     }
@@ -534,15 +620,16 @@ mod tests {
     #[test]
     fn test_int_value_declaration_no_type() {
         let source: &str = test_source::INT_VALUE_DECLARATION_WITH_NO_TYPE;
-        let actual = parse(source).expect("Successful parse");
+        let actual = parse(source);
 
-        let expected = Spanned {
+        let expected = Ok(Spanned {
             span: 13..42,
             value: Module {
                 name: Spanned {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                type_annotations: vec![],
                 values: vec![Spanned {
                     span: 56..65,
                     value: Value {
@@ -557,37 +644,195 @@ mod tests {
                     },
                 }],
             },
-        };
+        });
 
         assert_eq!(expected, actual);
     }
-    //
-    // #[test]
-    // fn test_int_value_declaration_with_type() {
-    //     let source: &str = test_source::INT_VALUE_DECLARATION_WITH_TYPE;
-    //
-    //     assert_no_errors(source)
-    // }
-    //
-    // #[test]
-    // fn test_float_value_declaration_no_type() {
-    //     let source: &str = test_source::FLOAT_VALUE_DECLARATION_WITH_NO_TYPE;
-    //
-    //     assert_no_errors(source)
-    // }
-    //
-    // #[test]
-    // fn test_float_value_declaration_with_type() {
-    //     let source: &str = test_source::FLOAT_VALUE_DECLARATION_WITH_TYPE;
-    //
-    //     assert_no_errors(source)
-    // }
-    //
+
+    //noinspection DuplicatedCode
+    #[test]
+    fn test_int_value_declaration_with_type() {
+        let source: &str = test_source::INT_VALUE_DECLARATION_WITH_TYPE;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![Spanned {
+                    span: 56..67,
+                    value: TypeAnnotation {
+                        name: Spanned {
+                            span: 56..61,
+                            value: "thing".to_string(),
+                        },
+                        t: Spanned {
+                            span: 64..67,
+                            value: ast::Type::Identifier("Int".to_string()),
+                        },
+                    },
+                }],
+                values: vec![Spanned {
+                    span: 80..89,
+                    value: Value {
+                        name: Spanned {
+                            span: 80..85,
+                            value: "thing".to_string(),
+                        },
+                        expr: Spanned {
+                            span: 88..89,
+                            value: ast::Expr::Literal(ast::LiteralData::Integral(0)),
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_float_value_declaration_no_type() {
+        let source: &str = test_source::FLOAT_VALUE_DECLARATION_WITH_NO_TYPE;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![],
+                values: vec![Spanned {
+                    span: 56..67,
+                    value: Value {
+                        name: Spanned {
+                            span: 56..61,
+                            value: "thing".to_string(),
+                        },
+                        expr: Spanned {
+                            span: 64..67,
+                            value: ast::Expr::Literal(ast::LiteralData::Fractional(
+                                NotNan::new(0.1).unwrap(),
+                            )),
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_float_value_declaration_with_type() {
+        let source: &str = test_source::FLOAT_VALUE_DECLARATION_WITH_TYPE;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![Spanned {
+                    span: 56..69,
+                    value: TypeAnnotation {
+                        name: Spanned {
+                            span: 56..61,
+                            value: "thing".to_string(),
+                        },
+                        t: Spanned {
+                            span: 64..69,
+                            value: ast::Type::Identifier("Float".to_string()),
+                        },
+                    },
+                }],
+                values: vec![Spanned {
+                    span: 82..93,
+                    value: Value {
+                        name: Spanned {
+                            span: 82..87,
+                            value: "thing".to_string(),
+                        },
+                        expr: Spanned {
+                            span: 90..93,
+                            value: ast::Expr::Literal(ast::LiteralData::Fractional(
+                                NotNan::new(0.1).unwrap(),
+                            )),
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
     // #[test]
     // fn test_single_arg_function_declaration_with_type() {
     //     let source: &str = test_source::SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE;
+    //     let actual = parse(source);
     //
-    //     assert_no_errors(source)
+    //     let expected = Ok(Spanned {
+    //         span: 13..42,
+    //         value: Module {
+    //             name: Spanned {
+    //                 span: 20..24,
+    //                 value: "Test".to_string(),
+    //             },
+    //             type_annotations: vec![
+    //                 Spanned {
+    //                     span: 56..69,
+    //                     value: TypeAnnotation {
+    //                         name: Spanned {
+    //                             span: 56..61,
+    //                             value: "thing".to_string(),
+    //                         },
+    //                         t: Spanned {
+    //                             span: 64..69,
+    //                             value: ast::Type::Identifier("Float".to_string()),
+    //                         },
+    //                     },
+    //                 },
+    //                 Spanned {
+    //                     span: 56..69,
+    //                     value: TypeAnnotation {
+    //                         name: Spanned {
+    //                             span: 56..61,
+    //                             value: "thing".to_string(),
+    //                         },
+    //                         t: Spanned {
+    //                             span: 64..69,
+    //                             value: ast::Type::Identifier("Int".to_string()),
+    //                         },
+    //                     },
+    //                 },
+    //             ],
+    //             values: vec![Spanned {
+    //                 span: 82..93,
+    //                 value: Value {
+    //                     name: Spanned {
+    //                         span: 82..87,
+    //                         value: "thing".to_string(),
+    //                     },
+    //                     expr: Spanned {
+    //                         span: 90..93,
+    //                         value: ast::Expr::Literal(ast::LiteralData::Fractional(
+    //                             NotNan::new(0.1).unwrap(),
+    //                         )),
+    //                     },
+    //                 },
+    //             }],
+    //         },
+    //     });
+    //
+    //     assert_eq!(expected, actual);
     // }
     //
     // #[test]
