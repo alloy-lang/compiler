@@ -18,9 +18,11 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
 
     let tokens = stream
         .clone()
-        .filter(|t| match t.kind {
-            TokenKind::EOL | TokenKind::Comment(_) | TokenKind::DocComment(_) => false,
-            _ => true,
+        .filter(|t| {
+            !matches!(
+                t.kind,
+                TokenKind::EOL | TokenKind::Comment(_) | TokenKind::DocComment(_)
+            )
         })
         .collect::<Vec<_>>();
 
