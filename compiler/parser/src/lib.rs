@@ -139,9 +139,11 @@ fn validate_module<'a>(module: Spanned<Module>) -> Result<Spanned<Module>, Parse
     };
 }
 
+type ModuleContents = (Vec<Spanned<TypeAnnotation>>, Vec<Spanned<Value>>);
+
 fn parse_module_contents<'a>(
     tokens: impl Iterator<Item = Token<'a>>,
-) -> Result<(Vec<Spanned<TypeAnnotation>>, Vec<Spanned<Value>>), ParseError<'a>> {
+) -> Result<ModuleContents, ParseError<'a>> {
     let mut type_annotations = vec![];
     let mut values = vec![];
 
