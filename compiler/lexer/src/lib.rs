@@ -149,7 +149,7 @@ pub enum TokenKind<'source> {
     // Caret,
     // #[token("%")]
     // Percent,
-    #[regex("_?[a-zA-Z]+")]
+    #[regex("_?[a-zA-Z][a-zA-Z_0-9]*")]
     Identifier(&'source str),
     #[regex(r"\([|<>=]+\)")]
     #[regex(r"[|<>=]+")]
@@ -205,9 +205,8 @@ mod tests {
         let mut lex = TokenKind::lexer(source);
 
         while let Some(token) = lex.next() {
-            assert_ne!(
-                token,
-                super::TokenKind::Error,
+            assert!(
+                matches!(token, super::TokenKind::Error)
                 r#"
                 slice: {:?}
                 span: '{:?}'
