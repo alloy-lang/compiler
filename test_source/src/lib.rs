@@ -75,8 +75,8 @@ pub const SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
             where
 
             increment_positive : Int -> Int
-            increment_positive = |0| => 0
-            increment_positive = |x| => x + 1
+            increment_positive = |0| -> 0
+            increment_positive = |x| -> x + 1
 "#;
 pub const SINGLE_ARG_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
 
@@ -84,8 +84,8 @@ pub const SINGLE_ARG_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
             module Test
             where
 
-            increment_positive = |0| => 0
-            increment_positive = |x| => x + 1
+            increment_positive = |0| -> 0
+            increment_positive = |x| -> x + 1
 "#;
 
 pub const MULTI_ARG_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
@@ -93,16 +93,16 @@ pub const MULTI_ARG_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
             where
 
             increment_by_length : (Int, String) -> Int
-            increment_by_length = |(0, "")| => 0
-            increment_by_length = |(x, y)| => x + String::length(y)
+            increment_by_length = |(0, "")| -> 0
+            increment_by_length = |(x, y)| -> x + String::length(y)
 "#;
 
 pub const MULTI_ARG_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
             module Test
             where
 
-            increment_by_length = |(0, "")| => 0
-            increment_by_length = |(x, y)| => x + String::length(y)
+            increment_by_length = |(0, "")| -> 0
+            increment_by_length = |(x, y)| -> x + String::length(y)
 "#;
 
 pub const CURRIED_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
@@ -110,25 +110,25 @@ pub const CURRIED_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
             where
 
             apply : (Int -> Int) -> Int -> Int
-            apply = |f| => |value| => f(value)
+            apply = |f| -> |value| -> f(value)
 "#;
 
 pub const CURRIED_FUNCTION_DECLARATION_WITH_NO_TYPE: &str = r#"
             module Test
             where
 
-            apply = |f| => |value| => f(value)
+            apply = |f| -> |value| -> f(value)
 "#;
 
 pub const SIMPLE_IF_THEN_ELSE: &str = r#"
             module Test
             where
 
-            increment_positive = |num| =>
+            increment_positive = |num| ->
               if Number::is_positive?(num)
               then num + 1
               else num
-            decrement_negative = |num| =>
+            decrement_negative = |num| ->
               if Number::is_negative?(num)
               then num - 1
               else num
@@ -138,7 +138,7 @@ pub const NESTED_IF_THEN_ELSE: &str = r#"
             module Test
             where
 
-            increment_or_decrement = |num| =>
+            increment_or_decrement = |num| ->
               if Number::is_positive?(num)
               then num + 1
               else
@@ -152,13 +152,13 @@ pub const CALL_FUNCTION_IN_MODULE_WITH_TYPE: &str = r#"
             where
 
             max : (Int, Int) -> Int
-            max = |(first, second)| =>
+            max = |(first, second)| ->
               if first > second
               then first
               else second
 
             sum_two_largest : (Int, Int, Int) -> Int
-            sum_two_largest = |(num1, num2, num3)| =>
+            sum_two_largest = |(num1, num2, num3)| ->
               if num1 == max((num1, num2))
               then num1 + max((num2, num3))
               else num2 + max((num1, num3))
@@ -169,12 +169,12 @@ pub const CALL_FUNCTION_IN_MODULE_WITH_ONE_TYPE: &str = r#"
             where
 
             max : (Int, Int) -> Int
-            max = |(first, second)| =>
+            max = |(first, second)| ->
               if first > second
               then first
               else second
 
-            sum_two_largest = |(num1, num2, num3)| =>
+            sum_two_largest = |(num1, num2, num3)| ->
               if num1 == max((num1, num2))
               then num1 + max((num2, num3))
               else num2 + max((num1, num3))
@@ -184,12 +184,12 @@ pub const CALL_FUNCTION_IN_MODULE_WITH_NO_TYPE: &str = r#"
             module Test
             where
 
-            max = |(first, second)| =>
+            max = |(first, second)| ->
               if first > second
               then first
               else second
 
-            sum_two_largest = |(num1, num2, num3)| =>
+            sum_two_largest = |(num1, num2, num3)| ->
               if num1 == max((num1, num2))
               then num1 + max((num2, num3))
               else num2 + max((num1, num3))
@@ -200,29 +200,29 @@ pub const MULTI_PROPERTY_UNION_TYPE_1: &str = r#"
             where
 
             data Either<L, R> =
-              | (:Right, R)
-              | (:Left, L)
+              | Right(r)
+              | Left(l)
 "#;
 pub const MULTI_PROPERTY_UNION_TYPE_2: &str = r#"
             module Test
             where
 
             data Either<L, R> =
-              (:Right, R)
-              | (:Left, L)
+              Right(r)
+              | Left(l)
 "#;
 pub const MULTI_PROPERTY_UNION_TYPE_3: &str = r#"
             module Test
             where
 
-            data Either<L, R> = (:Right, R) | (:Left, L)
+            data Either<l, r> = Right(r) | Left(l)
 "#;
 
 pub const CONFLICTING_TYPE_ALIAS_DEFINITIONS: &str = r#"
             module Test
             where
 
-            data Bool<> = :False | :True
+            data Bool = False | True
 
-            data Bool<> = :True | :False
+            data Bool = True | False
 "#;
