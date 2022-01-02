@@ -149,8 +149,10 @@ pub enum TokenKind<'source> {
     // Caret,
     // #[token("%")]
     // Percent,
-    #[regex("_?[a-zA-Z][a-zA-Z_0-9]*")]
-    Identifier(&'source str),
+    #[regex("[a-z_][a-zA-Z_0-9]*")]
+    LowerIdentifier(&'source str),
+    #[regex("[A-Z][a-zA-Z_0-9]*")]
+    UpperIdentifier(&'source str),
     #[regex(r"\([|<>=]+\)")]
     #[regex(r"[|<>=]+")]
     OperatorIdentifier(&'source str),
@@ -169,8 +171,7 @@ pub enum TokenKind<'source> {
 mod tests {
     use super::*;
     use maplit::hashmap;
-    use pretty_assertions::{assert_eq, assert_ne};
-    use std::fs;
+    use pretty_assertions::assert_eq;
 
     fn assert_lex<'a>(source: &'a str, expected: TokenKind) {
         let mut lex = TokenKind::lexer(source);
@@ -206,7 +207,7 @@ mod tests {
 
         while let Some(token) = lex.next() {
             assert!(
-                matches!(token, super::TokenKind::Error)
+                !matches!(token, super::TokenKind::Error),
                 r#"
                 slice: {:?}
                 span: '{:?}'
@@ -247,8 +248,10 @@ mod tests {
     fn test_identifiers() {
         let source = hashmap! {
             "_" => TokenKind::NilIdentifier,
-            "asdf" => TokenKind::Identifier("asdf"),
-            "_asdf" => TokenKind::Identifier("_asdf"),
+            "asdf" => TokenKind::LowerIdentifier("asdf"),
+            "_asdf" => TokenKind::LowerIdentifier("_asdf"),
+            "Asdf" => TokenKind::UpperIdentifier("Asdf"),
+            "_Asdf" => TokenKind::LowerIdentifier("_Asdf"),
             "(>>=)" => TokenKind::OperatorIdentifier("(>>=)"),
             ">>=" => TokenKind::OperatorIdentifier(">>="),
             "(<=<)" => TokenKind::OperatorIdentifier("(<=<)"),
@@ -271,14 +274,14 @@ mod tests {
             ],
             "#[test]" => vec![
                 TokenKind::AttributeOpen,
-                TokenKind::Identifier("test"),
+                TokenKind::LowerIdentifier("test"),
                 TokenKind::CloseBracket,
             ],
             "#[cfg(test)]" => vec![
                 TokenKind::AttributeOpen,
-                TokenKind::Identifier("cfg"),
+                TokenKind::LowerIdentifier("cfg"),
                 TokenKind::OpenParen,
-                TokenKind::Identifier("test"),
+                TokenKind::LowerIdentifier("test"),
                 TokenKind::CloseParen,
                 TokenKind::CloseBracket,
             ],
@@ -408,24 +411,24 @@ mod tests {
             &[
                 TokenKind::EOL,
                 TokenKind::Module,
-                TokenKind::Identifier("Test"),
+                TokenKind::UpperIdentifier("Test"),
                 TokenKind::EOL,
                 TokenKind::Where,
                 TokenKind::EOL,
                 TokenKind::Trait,
-                TokenKind::Identifier("MultiVar"),
+                TokenKind::UpperIdentifier("MultiVar"),
                 TokenKind::Lt,
-                TokenKind::Identifier("a"),
+                TokenKind::LowerIdentifier("a"),
                 TokenKind::Comma,
-                TokenKind::Identifier("b"),
+                TokenKind::LowerIdentifier("b"),
                 TokenKind::Gt,
                 TokenKind::Where,
                 TokenKind::EOL,
                 TokenKind::Typevar,
-                TokenKind::Identifier("a"),
+                TokenKind::LowerIdentifier("a"),
                 TokenKind::EOL,
                 TokenKind::Typevar,
-                TokenKind::Identifier("b"),
+                TokenKind::LowerIdentifier("b"),
                 TokenKind::EOL,
             ],
         );
@@ -446,20 +449,20 @@ mod tests {
             &[
                 TokenKind::EOL,
                 TokenKind::Module,
-                TokenKind::Identifier("Test"),
+                TokenKind::UpperIdentifier("Test"),
                 TokenKind::EOL,
                 TokenKind::Where,
                 TokenKind::EOL,
-                TokenKind::Identifier("convert"),
+                TokenKind::LowerIdentifier("convert"),
                 TokenKind::Colon,
-                TokenKind::Identifier("List"),
+                TokenKind::UpperIdentifier("List"),
                 TokenKind::Lt,
-                TokenKind::Identifier("String"),
+                TokenKind::UpperIdentifier("String"),
                 TokenKind::Gt,
                 TokenKind::Arrow,
-                TokenKind::Identifier("List"),
+                TokenKind::UpperIdentifier("List"),
                 TokenKind::Lt,
-                TokenKind::Identifier("Int"),
+                TokenKind::UpperIdentifier("Int"),
                 TokenKind::Gt,
                 TokenKind::EOL,
             ],

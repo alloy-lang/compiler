@@ -1,3 +1,4 @@
+use core::convert;
 use improved_slice_patterns::match_vec;
 use itertools::Itertools;
 use std::ops::Range;
@@ -6,6 +7,8 @@ use codespan_reporting::diagnostic::{Diagnostic, Label};
 
 use alloy_ast as ast;
 use alloy_lexer::{Token, TokenKind, TokenStream};
+
+mod pattern;
 
 //
 // parse functions
@@ -28,7 +31,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
 
     return match_vec!(tokens;
         [
-            Token { kind: TokenKind::Module,         span: module_token_span },
+            Token { kind: TokenKind::Module,              span: module_token_span },
         ] => {
             Err(ParseError::ExpectedModuleName {
                 span: module_token_span,
@@ -37,8 +40,8 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
         },
 
         [
-            Token { kind: TokenKind::Module,         span: module_token_span },
-            Token { kind: TokenKind::Identifier(id), span: id_token_span },
+            Token { kind: TokenKind::Module,              span: module_token_span },
+            Token { kind: TokenKind::UpperIdentifier(id), span: id_token_span },
         ] => {
             Err(ParseError::ExpectedWhereStatement {
                 span: module_token_span.start..id_token_span.end,
@@ -47,8 +50,35 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
         },
 
         [
-            Token { kind: TokenKind::Module, span: module_token_span },
-            Token { kind,                    span: not_id_token_span }
+            Token { kind: TokenKind::Module,              span: module_token_span },
+            Token { kind: TokenKind::LowerIdentifier(id), span: id_token_span },
+        ] => {
+            Err(ParseError::UnexpectedModuleName {
+                message: format!(
+                    "Module name must start with a capital letter. Found: `{}`",
+                    id
+                ),
+                span: id_token_span,
+            })
+        },
+
+        [
+            Token { kind: TokenKind::Module,              span: module_token_span },
+            Token { kind: TokenKind::LowerIdentifier(id), span: id_token_span },
+            remainder @ ..
+        ] => {
+            Err(ParseError::UnexpectedModuleName {
+                message: format!(
+                    "Module name must start with a capital letter. Found: `{}`",
+                    id
+                ),
+                span: id_token_span,
+            })
+        },
+
+        [
+            Token { kind: TokenKind::Module,              span: module_token_span },
+            Token { kind,                                 span: not_id_token_span }
         ] => {
             Err(ParseError::ExpectedModuleName {
                 span: module_token_span.start..not_id_token_span.end,
@@ -60,9 +90,9 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
         // TODO: combine this with the one below
         //
         [
-            Token { kind: TokenKind::Module,         span: module_token_span },
-            Token { kind: TokenKind::Identifier(id), span: id_token_span },
-            Token { kind: TokenKind::Where,          span: where_token_span },
+            Token { kind: TokenKind::Module,              span: module_token_span },
+            Token { kind: TokenKind::UpperIdentifier(id), span: id_token_span },
+            Token { kind: TokenKind::Where,               span: where_token_span },
         ] => {
             Ok(Spanned::from(
                 module_token_span,
@@ -76,9 +106,9 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
         },
 
         [
-            Token { kind: TokenKind::Module,         span: module_token_span },
-            Token { kind: TokenKind::Identifier(id), span: id_token_span },
-            Token { kind: TokenKind::Where,          span: where_token_span },
+            Token { kind: TokenKind::Module,              span: module_token_span },
+            Token { kind: TokenKind::UpperIdentifier(id), span: id_token_span },
+            Token { kind: TokenKind::Where,               span: where_token_span },
             remainder @ ..
         ] => {
             let (type_annotations, values) = parse_module_contents(remainder)?;
@@ -95,9 +125,9 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
         },
 
         [
-            Token { kind: TokenKind::Module,         span: module_token_span },
-            Token { kind: TokenKind::Identifier(id), span: id_token_span },
-            Token { kind,                            span: not_where_token_span },
+            Token { kind: TokenKind::Module,              span: module_token_span },
+            Token { kind: TokenKind::UpperIdentifier(id), span: id_token_span },
+            Token { kind,                                 span: not_where_token_span },
         ] => {
             Err(ParseError::ExpectedWhereStatement {
                 span: not_where_token_span,
@@ -118,28 +148,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
             }
         }
     })
-    .and_then(|s| s)
-    .and_then(validate_module);
-}
-
-fn validate_module<'a>(module: Spanned<Module>) -> Result<Spanned<Module>, ParseError<'a>> {
-    let id = &module.value.name.value;
-    let id_span = &module.value.name.span;
-
-    return match id.chars().next() {
-        Some(first) if first.is_ascii_uppercase() => Ok(module),
-        Some(_) => Err(ParseError::UnexpectedModuleName {
-            message: format!(
-                "Module name must start with a capital letter. Found: `{}`",
-                id
-            ),
-            span: id_span.clone(),
-        }),
-        None => Err(ParseError::UnexpectedModuleName {
-            message: "Module name must not be empty".to_string(),
-            span: id_span.clone(),
-        }),
-    };
+    .and_then(convert::identity);
 }
 
 type ModuleContents = (Vec<Spanned<TypeAnnotation>>, Vec<Spanned<Value>>);
@@ -159,7 +168,7 @@ fn parse_module_contents<'a>(
 
         remainder = match_vec!(remainder;
                 [
-                    Token { kind: TokenKind::Identifier(id), span: id_span },
+                    Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
                 ] => {
                     Err(ParseError::OrphanedIdentifier {
                         span: id_span,
@@ -168,7 +177,7 @@ fn parse_module_contents<'a>(
                 },
 
                 [
-                    Token { kind: TokenKind::Identifier(id), span: id_span },
+                    Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
                     Token { kind: TokenKind::Colon,          span: colon_span },
                     remainder @ ..
                 ] => {
@@ -193,7 +202,7 @@ fn parse_module_contents<'a>(
                 },
 
                 [
-                    Token { kind: TokenKind::Identifier(id), span: id_span },
+                    Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
                     Token { kind: TokenKind::Eq,             span: eq_span },
                     remainder @ ..
                 ] => {
@@ -238,7 +247,7 @@ fn parse_type<'a>(
 
     match_vec!(input;
         [
-            Token { kind: TokenKind::Identifier(id), span: id_span },
+            Token { kind: TokenKind::UpperIdentifier(id), span: id_span },
             Token { kind: TokenKind::Arrow,          span: arrow_span },
             remainder @ ..,
         ] => {
@@ -254,7 +263,7 @@ fn parse_type<'a>(
         },
 
         [
-            Token { kind: TokenKind::Identifier(id), span: id_span },
+            Token { kind: TokenKind::UpperIdentifier(id), span: id_span },
             remainder @ ..,
         ] => Ok((Spanned {
             span: id_span,
@@ -313,7 +322,7 @@ fn parse_expr<'a>(
             let mut args = Vec::new();
             while !pattern_remainder.is_empty() {
                 pattern_remainder = {
-                    let (pattern, remainder) = parse_pattern(&pipe_span, pattern_remainder.clone())?;
+                    let (pattern, remainder) = pattern::parse(&pipe_span, pattern_remainder.clone())?;
                     args.push(pattern);
 
                     remainder
@@ -360,7 +369,7 @@ fn parse_expr<'a>(
         }, remainder.collect())),
 
         [
-            Token { kind: TokenKind::Identifier(id), span },
+            Token { kind: TokenKind::LowerIdentifier(id), span },
             remainder @ ..
         ] => Ok((Spanned {
             span,
@@ -399,64 +408,6 @@ fn parse_expr<'a>(
         .and_then(|s| s)
         .or_else(|remainder| Ok((expr1, remainder)))
     )
-}
-
-fn parse_pattern<'a>(
-    pattern_span: &Span,
-    input: Vec<Token<'a>>,
-) -> Result<(Spanned<ast::Pattern>, Vec<Token<'a>>), ParseError<'a>> {
-    log::debug!("*parse_pattern* input: {:?}", &input);
-    // let _doc_comments = extract_doc_comments(stream);
-
-    match_vec!(input;
-        [
-            Token { kind: TokenKind::LiteralInt(i), span },
-        ] => Ok((Spanned {
-            span,
-            value: ast::Pattern::int_literal(i),
-        }, Vec::new())),
-
-        [
-            Token { kind: TokenKind::LiteralFloat(f), span },
-        ] => Ok((Spanned {
-            span,
-            value: ast::Pattern::float_literal(f),
-        }, Vec::new())),
-
-        [
-            Token { kind: TokenKind::LiteralInt(i), span },
-            remainder @ ..
-        ] => Ok((Spanned {
-            span,
-            value: ast::Pattern::int_literal(i),
-        }, remainder.collect())),
-
-        [
-            Token { kind: TokenKind::LiteralFloat(f), span },
-            remainder @ ..
-        ] => Ok((Spanned {
-            span,
-            value: ast::Pattern::float_literal(f),
-        }, remainder.collect())),
-
-        [
-            Token { kind: TokenKind::Identifier(id), span },
-            remainder @ ..
-        ] => Ok((Spanned {
-            span,
-            value: ast::Pattern::identifier(id),
-        }, remainder.collect())),
-
-        [remainder @ ..] => Err(ParseError::ExpectedPattern {
-            span: pattern_span.clone(),
-            actual: remainder.collect(),
-        }),
-    )
-    .map_err(|remaining| ParseError::ExpectedEOF {
-        input: vec![],
-        remaining,
-    })
-    .and_then(|s| s)
 }
 
 #[must_use]
@@ -789,12 +740,12 @@ mod tests {
 
     #[test]
     fn test_empty_module_lowercase() {
-        let source: &str = test_source::EMPTY_MODULE_LOWERCASE;
+        let source: &str = "module test where";
         let actual = parse(source);
 
         let expected = Err(ParseError::UnexpectedModuleName {
             message: "Module name must start with a capital letter. Found: `test`".to_string(),
-            span: 20..24,
+            span: 7..11,
         });
 
         assert_eq!(expected, actual);
@@ -802,12 +753,12 @@ mod tests {
 
     #[test]
     fn test_empty_module_underscore() {
-        let source: &str = test_source::EMPTY_MODULE_UNDERSCORE;
+        let source: &str = "module _Test where";
         let actual = parse(source);
 
         let expected = Err(ParseError::UnexpectedModuleName {
             message: "Module name must start with a capital letter. Found: `_Test`".to_string(),
-            span: 20..25,
+            span: 7..12,
         });
 
         assert_eq!(expected, actual);
