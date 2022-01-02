@@ -49,9 +49,9 @@ impl Type {
     // }
 
     pub fn lambda<T1, T2>(arg_type: T1, return_type: T2) -> Type
-        where
-            T1: Into<Box<Type>>,
-            T2: Into<Box<Type>>,
+    where
+        T1: Into<Box<Type>>,
+        T2: Into<Box<Type>>,
     {
         Type::Lambda {
             arg_type: arg_type.into(),
@@ -60,15 +60,15 @@ impl Type {
     }
 
     pub fn identifier<S>(s: S) -> Type
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         Type::Identifier(s.into())
     }
 
     pub fn variable<S>(id: S) -> Type
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         Type::Variable(id.into())
     }
@@ -96,21 +96,19 @@ pub enum Expr {
 impl Expr {
     #[must_use]
     pub fn string_literal<S>(s: S) -> Expr
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         Expr::Literal(LiteralData::String(s.into()))
     }
 
     #[must_use]
-    pub fn int_literal(int: i64) -> Expr
-    {
+    pub fn int_literal(int: i64) -> Expr {
         Expr::Literal(LiteralData::Integral(int))
     }
 
     #[must_use]
-    pub fn float_literal(float: f64) -> Expr
-    {
+    pub fn float_literal(float: f64) -> Expr {
         Expr::Literal(LiteralData::fractional(float))
     }
 
@@ -121,16 +119,16 @@ impl Expr {
 
     #[must_use]
     pub fn identifier<S>(s: S) -> Expr
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         Expr::Identifier(s.into())
     }
 
     #[must_use]
     pub fn lambda<A>(args: A, body: Expr) -> Expr
-        where
-            A: Into<Vec<Pattern>>,
+    where
+        A: Into<Vec<Pattern>>,
     {
         args.into()
             .into_iter()
@@ -140,10 +138,10 @@ impl Expr {
 
     #[must_use]
     pub fn bin_op<S, E1, E2>(op: S, first: E1, second: E2) -> Expr
-        where
-            S: Into<String>,
-            E1: Into<Box<Expr>>,
-            E2: Into<Box<Expr>>,
+    where
+        S: Into<String>,
+        E1: Into<Box<Expr>>,
+        E2: Into<Box<Expr>>,
     {
         Expr::OpApply(first.into(), op.into(), second.into())
     }
@@ -198,8 +196,8 @@ impl Expr {
 
     #[must_use]
     pub fn paren<E>(expr: E) -> Expr
-        where
-            E: Into<Box<Expr>>,
+    where
+        E: Into<Box<Expr>>,
     {
         Expr::Paren(expr.into())
     }
@@ -217,21 +215,19 @@ pub enum Pattern {
 impl Pattern {
     #[must_use]
     pub fn string_literal<S>(s: S) -> Pattern
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         Pattern::Literal(LiteralData::String(s.into()))
     }
 
     #[must_use]
-    pub fn int_literal(int: i64) -> Pattern
-    {
+    pub fn int_literal(int: i64) -> Pattern {
         Pattern::Literal(LiteralData::Integral(int))
     }
 
     #[must_use]
-    pub fn float_literal(float: f64) -> Pattern
-    {
+    pub fn float_literal(float: f64) -> Pattern {
         Pattern::Literal(LiteralData::fractional(float))
     }
 
@@ -242,16 +238,16 @@ impl Pattern {
 
     #[must_use]
     pub fn identifier<S>(s: S) -> Pattern
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         Pattern::Identifier(s.into())
     }
 
     #[must_use]
     pub fn tuple<A>(args: A) -> Pattern
-        where
-            A: Into<Vec<Pattern>>,
+    where
+        A: Into<Vec<Pattern>>,
     {
         let args = args.into();
         // let n = args.len();
