@@ -12,7 +12,7 @@ import std::functor::Functor
 /// * `apply(wrap(f), wrap(x)) == wrap(f(x))`
 /// * `apply(u, wrap(y)) == apply(wrap(|g| -> g(x)), u)`
 trait Applicative where
-    typevar self = Type<_> + Functor
+    typevar self = #Type<_> + Functor
 
     /// Similar to `Functor::map`
     /// but this time the supplied function `t1 -> t2` is embedded in `self`

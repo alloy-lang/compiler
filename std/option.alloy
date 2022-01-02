@@ -5,7 +5,8 @@ import std::eq::Eq
 import std::ord::Ord
 import std::debug::Debug
 
-/// `Option` represents a value which may not exist.
+/// `Option<t>` represents a value `t` which may not exist.
+/// `Option<t>` requires a "concrete" type as a type argument
 typedef Option<t> =
     | None
     | Some(t)
