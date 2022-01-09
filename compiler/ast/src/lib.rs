@@ -35,6 +35,7 @@ pub enum Type {
         arg_type: Box<Type>,
         return_type: Box<Type>,
     },
+    Tuple(NonEmpty<Type>),
 }
 
 impl Type {
@@ -43,10 +44,10 @@ impl Type {
     //         types: NonEmpty::try_from(types).unwrap(),
     //     }
     // }
-    //
-    // pub fn tuple(types: Vec<Type>) -> Type {
-    //     Type::Tuple(NonEmpty::try_from(types).unwrap())
-    // }
+
+    pub fn tuple(types: Vec<Type>) -> Type {
+        Type::Tuple(NonEmpty::try_from(types).unwrap())
+    }
 
     pub fn lambda<T1, T2>(arg_type: T1, return_type: T2) -> Type
     where
