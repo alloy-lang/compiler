@@ -1,3 +1,5 @@
+use core::convert;
+
 use improved_slice_patterns::match_vec;
 
 use alloy_ast as ast;
@@ -60,5 +62,5 @@ pub fn parse<'a>(
         input: vec![],
         remaining,
     })
-    .and_then(|s| s)
+    .and_then(convert::identity)
 }

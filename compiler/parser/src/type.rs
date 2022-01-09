@@ -1,3 +1,5 @@
+use core::convert;
+
 use improved_slice_patterns::match_vec;
 
 use alloy_ast as ast;
@@ -44,9 +46,6 @@ pub fn parse<'a>(
             actual: remainder.collect(),
         }),
     )
-    .map_err(|remaining| ParseError::ExpectedEOF {
-        input: vec![],
-        remaining,
-    })
-    .and_then(|s| s)
+        .map_err(|remaining| ParseError::ExpectedEOF { input, remaining })
+        .and_then(convert::identity)
 }
