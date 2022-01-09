@@ -90,7 +90,7 @@ pub enum TokenKind<'source> {
 
     // Non-alphanumeric
     #[token("->")]
-    Arrow,
+    RightArrow,
     #[token("::")]
     Connector,
     // #[token(";")]
@@ -160,7 +160,7 @@ pub enum TokenKind<'source> {
     NilIdentifier,
 
     #[regex(r#""([^"\\]|\\t|\\u|\\n|\\")*""#)]
-    LiteralString,
+    LiteralString(&'source str),
     #[regex(r#"-?[0-9]+"#, |lex| lex.slice().parse())]
     LiteralInt(i64),
     #[regex(r#"-?[0-9]+\.[0-9]+"#, |lex| lex.slice().parse())]
@@ -459,7 +459,7 @@ mod tests {
                 TokenKind::Lt,
                 TokenKind::UpperIdentifier("String"),
                 TokenKind::Gt,
-                TokenKind::Arrow,
+                TokenKind::RightArrow,
                 TokenKind::UpperIdentifier("List"),
                 TokenKind::Lt,
                 TokenKind::UpperIdentifier("Int"),

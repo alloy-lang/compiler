@@ -1,3 +1,4 @@
+use core::convert;
 use improved_slice_patterns::match_vec;
 use itertools::Itertools;
 
@@ -29,7 +30,7 @@ pub fn parse<'a>(
             let (expr, remainder) = match_vec!(remainder.collect::<Vec<_>>();
                 [
                     Token { kind: TokenKind::Pipe,  span: end_pipe_span },
-                    Token { kind: TokenKind::Arrow, span: arrow_span },
+                    Token { kind: TokenKind::RightArrow, span: arrow_span },
                     remainder @ ..
                 ] => parse(&pipe_span, remainder),
 
@@ -42,7 +43,7 @@ pub fn parse<'a>(
                 input: vec![],
                 remaining,
             })
-            .and_then(|s| s)?;
+            .and_then(convert::identity)?;
 
             let mut args = Vec::new();
             while !pattern_remainder.is_empty() {
@@ -61,7 +62,6 @@ pub fn parse<'a>(
                     expr.value,
                 ),
             }, remainder))
-
         },
         [
             Token { kind: TokenKind::LiteralInt(i), span },
@@ -110,7 +110,7 @@ pub fn parse<'a>(
             input,
             remaining,
         })
-        .and_then(|s| s)
+        .and_then(convert::identity)
         .and_then(|(expr1, remainder)| match_vec!(remainder;
             [
                 Token { kind: TokenKind::Plus, span: op_span },
@@ -130,7 +130,7 @@ pub fn parse<'a>(
                 (expr1.clone(), remainder.collect())
             ),
         )
-            .and_then(|s| s)
+            .and_then(convert::identity)
             .or_else(|remainder| Ok((expr1, remainder)))
         )
 }
