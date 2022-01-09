@@ -1,9 +1,9 @@
 use core::convert;
-use improved_slice_patterns::match_vec;
-use itertools::Itertools;
+use std::iter;
 use std::ops::Range;
 
 use codespan_reporting::diagnostic::{Diagnostic, Label};
+use improved_slice_patterns::match_vec;
 
 use alloy_ast as ast;
 use alloy_lexer::{Token, TokenKind, TokenStream};
@@ -313,11 +313,23 @@ pub enum ParseError<'a> {
         span: Span,
         actual: Vec<Token<'a>>,
     },
+    ExpectedLambdaReturnType {
+        span: Span,
+        actual: Vec<Token<'a>>,
+    },
     ExpectedPattern {
         span: Span,
         actual: Vec<Token<'a>>,
     },
     ExpectedPipe {
+        span: Span,
+        actual: Vec<Token<'a>>,
+    },
+    ExpectedClosedParen {
+        span: Span,
+        actual: Vec<Token<'a>>,
+    },
+    ExpectedTupleComma {
         span: Span,
         actual: Vec<Token<'a>>,
     },
@@ -390,9 +402,30 @@ impl<'a> ParseError<'a> {
                         })
                         .collect(),
                 ),
+            ParseError::ExpectedLambdaReturnType { span, actual } => {
+                dbg!(&actual);
+
+                let labels = actual
+                    .into_iter()
+                    .map(|t| {
+                        Label::secondary(file_id.clone(), t.span)
+                            .with_message(format!("Expected return type, but found: {:?}", t.kind))
+                    })
+                    .chain(iter::once(
+                        Label::primary(file_id.clone(), span).with_message("Expected return type"),
+                    ))
+                    .collect();
+
+                dbg!(&labels);
+
+                Diagnostic::error()
+                    .with_message("Expected lambda to have a return type. Ex `Int -> String`")
+                    .with_code("E0008")
+                    .with_labels(labels)
+            }
             ParseError::ExpectedPattern { span, actual } => Diagnostic::error()
                 .with_message("Expected pattern")
-                .with_code("E0008")
+                .with_code("E0009")
                 .with_labels(
                     actual
                         .into_iter()
@@ -404,7 +437,7 @@ impl<'a> ParseError<'a> {
                 ),
             ParseError::ExpectedPipe { span, actual } => Diagnostic::error()
                 .with_message("Expected lambda arguments to end with a `|`. Ex: `|arg1, arg2| ->`.")
-                .with_code("E0009")
+                .with_code("E0010")
                 .with_labels(
                     actual
                         .into_iter()
@@ -414,12 +447,41 @@ impl<'a> ParseError<'a> {
                         })
                         .collect(),
                 ),
+            ParseError::ExpectedClosedParen { span, .. } => {
+                let labels = vec![Label::primary(file_id.clone(), span)
+                    .with_message("Expected closed parenthesis")];
+
+                Diagnostic::error()
+                    .with_message("Expected a close parenthesis `)`. Ex: `(Int, String)`.")
+                    .with_code("E0011")
+                    .with_labels(labels)
+            }
+            ParseError::ExpectedTupleComma { span, actual } => {
+                let labels = actual
+                    .into_iter()
+                    .map(|t| {
+                        Label::secondary(file_id.clone(), t.span)
+                            .with_message(format!("Expected a comma, but found: {:?}", t.kind))
+                    })
+                    .chain(iter::once(
+                        Label::primary(file_id.clone(), span)
+                            .with_message("Expected a comma between tuple arguments"),
+                    ))
+                    .collect();
+
+                Diagnostic::error()
+                    .with_message(
+                        "Expected a comma between tuple arguments. Ex: `(Int, String)` instead of `(Int String)`.",
+                    )
+                    .with_code("E0012")
+                    .with_labels(labels)
+            }
             ParseError::ExpectedEOF {
                 input: _,
                 remaining,
             } => Diagnostic::error()
                 .with_message("Expected the file to end")
-                .with_code("E0010")
+                .with_code("E0013")
                 .with_labels(
                     remaining
                         .into_iter()
@@ -779,6 +841,94 @@ mod tests {
     }
 
     #[test]
+    fn test_incomplete_function_type_annotation() {
+        let source: &str = r#"
+            module Test
+            where
+
+            incomplete : Int -> 0
+        "#;
+        let actual = parse(source);
+
+        let expected: Result<Spanned<Module>, ParseError> =
+            Err(ParseError::ExpectedLambdaReturnType {
+                span: 69..75,
+                actual: vec![Token {
+                    span: 76..77,
+                    kind: TokenKind::LiteralInt(0),
+                }],
+            });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_no_close_parens_unit_type_annotation() {
+        let source: &str = r#"
+            module Test
+            where
+
+            no_close_parens : ("#;
+        let actual = parse(source);
+
+        let expected = Err(ParseError::ExpectedClosedParen {
+            span: 74..75,
+            actual: vec![],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_no_close_parens_tuple_type_annotation() {
+        let source: &str = r#"
+            module Test
+            where
+
+            no_close_parens : (Int
+            0
+        "#;
+        let actual = parse(source);
+
+        let expected = Err(ParseError::ExpectedClosedParen {
+            span: 74..78,
+            actual: vec![
+                Token {
+                    kind: TokenKind::UpperIdentifier("Int"),
+                    span: 75..78,
+                },
+                Token {
+                    kind: TokenKind::LiteralInt(0),
+                    span: 91..92,
+                },
+            ],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_no_comma_tuple_type_annotation() {
+        let source: &str = r#"
+            module Test
+            where
+
+            no_close_parens : (Int String)
+        "#;
+        let actual = parse(source);
+
+        let expected = Err(ParseError::ExpectedTupleComma {
+            span: 74..86,
+            actual: vec![Token {
+                kind: TokenKind::UpperIdentifier("String"),
+                span: 79..85,
+            }],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
     fn test_single_arg_function_declaration_with_type() {
         let source: &str = test_source::SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE;
         let actual = parse(source);
@@ -850,12 +1000,95 @@ mod tests {
         assert_eq!(expected, actual);
     }
 
-    // #[test]
-    // fn test_multi_arg_function_declaration_with_type() {
-    //     let source: &str = test_source::MULTI_ARG_FUNCTION_DECLARATION_WITH_TYPE;
-    //
-    //     assert_no_errors(source)
-    // }
+    #[test]
+    fn test_multi_arg_function_declaration_with_type() {
+        let source: &str = r#"
+
+
+            module Test
+            where
+
+            increment_by_length : (Int, String) -> Int
+            increment_by_length = |(0, "")| -> 0
+            increment_by_length = |(x, y)| -> x + 1
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 15..44,
+            value: Module {
+                name: Spanned {
+                    span: 22..26,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![Spanned {
+                    span: 58..100,
+                    value: TypeAnnotation {
+                        name: Spanned {
+                            span: 58..77,
+                            value: "increment_by_length".to_string(),
+                        },
+                        t: Spanned {
+                            span: 80..100,
+                            value: ast::Type::lambda(
+                                ast::Type::tuple(vec![
+                                    ast::Type::identifier("Int"),
+                                    ast::Type::identifier("String"),
+                                ]),
+                                ast::Type::identifier("Int"),
+                            ),
+                        },
+                    },
+                }],
+                values: vec![
+                    Spanned {
+                        span: 113..149,
+                        value: Value {
+                            name: Spanned {
+                                span: 113..132,
+                                value: "increment_by_length".to_string(),
+                            },
+                            expr: Spanned {
+                                span: 135..149,
+                                value: ast::Expr::lambda(
+                                    vec![ast::Pattern::tuple(vec![
+                                        ast::Pattern::int_literal(0),
+                                        ast::Pattern::string_literal(r#""""#),
+                                    ])],
+                                    ast::Expr::int_literal(0),
+                                ),
+                            },
+                        },
+                    },
+                    Spanned {
+                        span: 162..201,
+                        value: Value {
+                            name: Spanned {
+                                span: 162..181,
+                                value: "increment_by_length".to_string(),
+                            },
+                            expr: Spanned {
+                                span: 184..201,
+                                value: ast::Expr::lambda(
+                                    vec![ast::Pattern::tuple(vec![
+                                        ast::Pattern::identifier("x"),
+                                        ast::Pattern::identifier("y"),
+                                    ])],
+                                    ast::Expr::bin_op(
+                                        "+",
+                                        ast::Expr::identifier("x"),
+                                        ast::Expr::int_literal(1),
+                                    ),
+                                ),
+                            },
+                        },
+                    },
+                ],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
     //
     // #[test]
     // fn test_curried_function_declaration_with_type() {
