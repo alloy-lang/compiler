@@ -181,7 +181,7 @@ fn parse_module_contents<'a>(
 
                 [
                     Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
-                    Token { kind: TokenKind::Colon,          span: colon_span },
+                    Token { kind: TokenKind::Colon,               span: colon_span },
                     remainder @ ..
                 ] => {
                     let type_span = id_span.start..colon_span.end;
@@ -206,7 +206,7 @@ fn parse_module_contents<'a>(
 
                 [
                     Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
-                    Token { kind: TokenKind::Eq,             span: eq_span },
+                    Token { kind: TokenKind::Eq,                  span: eq_span },
                     remainder @ ..
                 ] => {
                     let expr_span = id_span.start..eq_span.end;
@@ -233,7 +233,7 @@ fn parse_module_contents<'a>(
             input: vec![],
             remaining,
         })
-        .and_then(|s| s)?;
+        .and_then(convert::identity)?;
     }
 
     Ok((type_annotations, values))
@@ -328,7 +328,10 @@ pub enum ParseError<'a> {
 }
 
 impl<'a> ParseError<'a> {
-    pub fn to_diagnostic<FileId: Clone>(self, file_id: FileId) -> Diagnostic<FileId> {
+    pub fn to_diagnostic<FileId: Clone + std::fmt::Debug>(
+        self,
+        file_id: FileId,
+    ) -> Diagnostic<FileId> {
         match self {
             ParseError::ExpectedModuleDefinition { span, actual: _ } => Diagnostic::error()
                 .with_message(
@@ -432,9 +435,10 @@ impl<'a> ParseError<'a> {
 
 #[cfg(test)]
 mod tests {
-    use alloy_ast as ast;
     use ordered_float::NotNan;
     use pretty_assertions::assert_eq;
+
+    use alloy_ast as ast;
 
     use super::*;
 
@@ -639,7 +643,7 @@ mod tests {
                         },
                         expr: Spanned {
                             span: 64..65,
-                            value: ast::Expr::Literal(ast::LiteralData::Integral(0)),
+                            value: ast::Expr::int_literal(0),
                         },
                     },
                 }],
@@ -671,7 +675,7 @@ mod tests {
                         },
                         t: Spanned {
                             span: 64..67,
-                            value: ast::Type::Identifier("Int".to_string()),
+                            value: ast::Type::identifier("Int"),
                         },
                     },
                 }],
@@ -749,7 +753,7 @@ mod tests {
                         },
                         t: Spanned {
                             span: 64..69,
-                            value: ast::Type::Identifier("Float".to_string()),
+                            value: ast::Type::identifier("Float"),
                         },
                     },
                 }],
@@ -796,8 +800,8 @@ mod tests {
                         t: Spanned {
                             span: 79..89,
                             value: ast::Type::lambda(
-                                ast::Type::Identifier("Int".to_string()),
-                                ast::Type::Identifier("Int".to_string()),
+                                ast::Type::identifier("Int"),
+                                ast::Type::identifier("Int"),
                             ),
                         },
                     },
