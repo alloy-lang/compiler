@@ -29,6 +29,7 @@ pub struct Value {}
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub enum Type {
+    Unit,
     Identifier(String),
     Variable(String),
     Lambda {
@@ -46,7 +47,11 @@ impl Type {
     // }
 
     pub fn tuple(types: Vec<Type>) -> Type {
-        Type::Tuple(NonEmpty::try_from(types).unwrap())
+        match &types[..] {
+            [] => Type::Unit,
+            [arg] => arg.clone(),
+            _ => Type::Tuple(NonEmpty::try_from(types).unwrap()),
+        }
     }
 
     pub fn lambda<T1, T2>(arg_type: T1, return_type: T2) -> Type
@@ -84,6 +89,7 @@ impl Type {
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub enum Expr {
+    Unit,
     Identifier(String),
     // Apply(Box<Expr>, Box<Expr>),
     OpApply(Box<Expr>, String, Box<Expr>),
@@ -92,6 +98,7 @@ pub enum Expr {
     // Case(Box<Expr>, NonEmpty<Alternative>),
     // IfElse(Box<Expr>, Box<Expr>, Box<Expr>),
     Paren(Box<Expr>),
+    Tuple(NonEmpty<Expr>),
 }
 
 impl Expr {
@@ -202,10 +209,25 @@ impl Expr {
     {
         Expr::Paren(expr.into())
     }
+
+    #[must_use]
+    pub fn tuple<A>(args: A) -> Expr
+        where
+            A: Into<Vec<Expr>>,
+    {
+        let args = args.into();
+
+        match &args[..] {
+            [] => Expr::Unit,
+            [arg] => Expr::paren(arg.clone()),
+            _ => Expr::Tuple(NonEmpty::try_from(args).unwrap()),
+        }
+    }
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub enum Pattern {
+    Unit,
     Literal(LiteralData),
     Identifier(String),
     Tuple(NonEmpty<Pattern>),
@@ -251,12 +273,12 @@ impl Pattern {
         A: Into<Vec<Pattern>>,
     {
         let args = args.into();
-        // let n = args.len();
-        // let name = tuple_name(n);
-        //
-        // Pattern::Constructor(name, args)
 
-        Pattern::Tuple(NonEmpty::try_from(args).unwrap())
+        match &args[..] {
+            [] => Pattern::Unit,
+            [arg] => arg.clone(),
+            _ => Pattern::Tuple(NonEmpty::try_from(args).unwrap()),
+        }
     }
 }
 
