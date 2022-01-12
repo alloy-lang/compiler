@@ -10,6 +10,7 @@ use alloy_lexer::{Token, TokenKind, TokenStream};
 
 mod docs;
 mod expr;
+mod parens;
 mod pattern;
 mod r#type;
 
@@ -155,6 +156,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
 }
 
 type ModuleContents = (Vec<Spanned<TypeAnnotation>>, Vec<Spanned<Value>>);
+type ParseResult<'a, T> = Result<(Spanned<T>, Vec<Token<'a>>), ParseError<'a>>;
 
 fn parse_module_contents<'a>(
     input: impl Iterator<Item = Token<'a>>,
@@ -929,6 +931,91 @@ mod tests {
     }
 
     #[test]
+    fn test_parens_expression() {
+        let source = r#"
+            module Test
+            where
+
+            parens = (1 + 2)
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![],
+                values: vec![Spanned {
+                    span: 56..72,
+                    value: Value {
+                        name: Spanned {
+                            span: 56..62,
+                            value: "parens".to_string(),
+                        },
+                        expr: Spanned {
+                            span: 65..72,
+                            value: ast::Expr::paren(ast::Expr::bin_op(
+                                "+",
+                                ast::Expr::int_literal(1),
+                                ast::Expr::int_literal(2),
+                            )),
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_tuple_expression() {
+        let source = r#"
+            module Test
+            where
+
+            tuple = (1 + 2, 3)
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![],
+                values: vec![Spanned {
+                    span: 56..74,
+                    value: Value {
+                        name: Spanned {
+                            span: 56..61,
+                            value: "tuple".to_string(),
+                        },
+                        expr: Spanned {
+                            span: 64..74,
+                            value: ast::Expr::tuple(vec![
+                                ast::Expr::bin_op(
+                                    "+",
+                                    ast::Expr::int_literal(1),
+                                    ast::Expr::int_literal(2),
+                                ),
+                                ast::Expr::int_literal(3),
+                            ]),
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
     fn test_single_arg_function_declaration_with_type() {
         let source = test_source::SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE;
         let actual = parse(source);
@@ -1089,13 +1176,154 @@ mod tests {
 
         assert_eq!(expected, actual);
     }
-    //
-    // #[test]
-    // fn test_curried_function_declaration_with_type() {
-    //     let source: &str = test_source::CURRIED_FUNCTION_DECLARATION_WITH_TYPE;
-    //
-    //     assert_no_errors(source)
-    // }
+
+    #[test]
+    fn test_unit_type_annotation() {
+        let source = r#"
+            module Test
+            where
+
+            unit_type : ()"#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![Spanned {
+                    span: 56..70,
+                    value: TypeAnnotation {
+                        name: Spanned {
+                            span: 56..65,
+                            value: "unit_type".to_string(),
+                        },
+                        t: Spanned {
+                            span: 68..70,
+                            value: ast::Type::Unit,
+                        },
+                    },
+                }],
+                values: vec![],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_unit_expr_annotation() {
+        let source = r#"
+            module Test
+            where
+
+            unit_expr = ()"#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![],
+                values: vec![Spanned {
+                    span: 56..70,
+                    value: Value {
+                        name: Spanned {
+                            span: 56..65,
+                            value: "unit_expr".to_string(),
+                        },
+                        expr: Spanned {
+                            span: 68..70,
+                            value: ast::Expr::Unit,
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_unit_pattern_annotation() {
+        let source = r#"
+            module Test
+            where
+
+            unit_pattern = |()| -> 0"#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![],
+                values: vec![Spanned {
+                    span: 56..80,
+                    value: Value {
+                        name: Spanned {
+                            span: 56..68,
+                            value: "unit_pattern".to_string(),
+                        },
+                        expr: Spanned {
+                            span: 71..80,
+                            value: ast::Expr::lambda(
+                                vec![ast::Pattern::Unit],
+                                ast::Expr::int_literal(0),
+                            ),
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_parens_type_annotation() {
+        let source = r#"
+            module Test
+            where
+
+            single_parens_type : (Int)"#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![Spanned {
+                    span: 56..82,
+                    value: TypeAnnotation {
+                        name: Spanned {
+                            span: 56..74,
+                            value: "single_parens_type".to_string(),
+                        },
+                        t: Spanned {
+                            span: 77..82,
+                            value: ast::Type::identifier("Int"),
+                        },
+                    },
+                }],
+                values: vec![],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
     //
     // #[test]
     // fn test_simple_if_then_else() {

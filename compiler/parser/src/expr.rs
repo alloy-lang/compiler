@@ -5,13 +5,17 @@ use itertools::Itertools;
 use alloy_ast as ast;
 use alloy_lexer::{Token, TokenKind};
 
-use super::pattern;
-use super::{ParseError, Span, Spanned};
+use super::{parens, pattern};
+use super::{ParseError, ParseResult, Span, Spanned};
+
+fn parse_vec<'a>(expr_span: &Span, input: Vec<Token<'a>>) -> ParseResult<'a, ast::Expr> {
+    self::parse(expr_span, input.into_iter())
+}
 
 pub fn parse<'a>(
     expr_span: &Span,
     input: impl Iterator<Item = Token<'a>>,
-) -> Result<(Spanned<ast::Expr>, Vec<Token<'a>>), ParseError<'a>> {
+) -> ParseResult<'a, ast::Expr> {
     let input = input.collect::<Vec<_>>();
     log::debug!("*parse_expr* input: {:?}", &input);
 
@@ -100,6 +104,11 @@ pub fn parse<'a>(
             span,
             value: ast::Expr::identifier(id),
         }, remainder.collect())),
+
+        [
+            Token { kind: TokenKind::OpenParen, span: open_paren_span },
+            remainder @ ..
+        ] => parens::parse(open_paren_span, &mut remainder.clone(), self::parse_vec, ast::Expr::tuple),
 
         [remainder @ ..,] => Err(ParseError::ExpectedExpr {
             span: expr_span.clone(),
