@@ -506,7 +506,7 @@ mod tests {
 
     #[test]
     fn test_empty_source() {
-        let source: &str = "   \n  ";
+        let source = "   \n  ";
         let actual = parse(source);
 
         let expected = Err(ParseError::ExpectedModuleDefinition {
@@ -519,7 +519,7 @@ mod tests {
 
     #[test]
     fn test_module_missing_identifier() {
-        let source: &str = "module";
+        let source = "module";
         let actual = parse(source);
 
         let expected = Err(ParseError::ExpectedModuleName {
@@ -532,7 +532,7 @@ mod tests {
 
     #[test]
     fn test_module_incorrect_identifier() {
-        let source: &str = "module _";
+        let source = "module _";
         let actual = parse(source);
 
         let expected = Err(ParseError::ExpectedModuleName {
@@ -545,7 +545,7 @@ mod tests {
 
     #[test]
     fn test_module_missing_where() {
-        let source: &str = "module Test";
+        let source = "module Test";
         let actual = parse(source);
 
         let expected = Err(ParseError::ExpectedWhereStatement {
@@ -558,7 +558,7 @@ mod tests {
 
     #[test]
     fn test_module_incorrect_where() {
-        let source: &str = "module Test when";
+        let source = "module Test when";
         let actual = parse(source);
 
         let expected = Err(ParseError::ExpectedWhereStatement {
@@ -580,21 +580,21 @@ mod tests {
         });
 
         {
-            let source: &str = "module Test where trait";
+            let source = "module Test where trait";
             let actual = parse(source);
 
             assert_eq!(expected, actual);
         }
         {
             // with comment
-            let source: &str = "module Test where trait -- stuff";
+            let source = "module Test where trait -- stuff";
             let actual = parse(source);
 
             assert_eq!(expected, actual);
         }
         {
             // with doc comment
-            let source: &str = "module Test where trait --! extra stuff";
+            let source = "module Test where trait --! extra stuff";
             let actual = parse(source);
 
             assert_eq!(expected, actual);
@@ -603,7 +603,7 @@ mod tests {
 
     #[test]
     fn test_empty_module() {
-        let source: &str = test_source::EMPTY_MODULE;
+        let source = test_source::EMPTY_MODULE;
         let actual = parse(source);
 
         let expected = Ok(Spanned {
@@ -623,7 +623,7 @@ mod tests {
 
     #[test]
     fn test_empty_module_lowercase() {
-        let source: &str = "module test where";
+        let source = "module test where";
         let actual = parse(source);
 
         let expected = Err(ParseError::UnexpectedModuleName {
@@ -636,7 +636,7 @@ mod tests {
 
     #[test]
     fn test_empty_module_underscore() {
-        let source: &str = "module _Test where";
+        let source = "module _Test where";
         let actual = parse(source);
 
         let expected = Err(ParseError::UnexpectedModuleName {
@@ -649,7 +649,7 @@ mod tests {
 
     #[test]
     fn test_orphaned_identifier() {
-        let source: &str = r#"
+        let source = r#"
                 module Test
                 where
 
@@ -667,7 +667,7 @@ mod tests {
 
     #[test]
     fn test_partial_value_declaration_with_eq() {
-        let source: &str = r#"
+        let source = r#"
             module Test
             where
 
@@ -685,7 +685,7 @@ mod tests {
 
     #[test]
     fn test_int_value_declaration_no_type() {
-        let source: &str = test_source::INT_VALUE_DECLARATION_WITH_NO_TYPE;
+        let source = test_source::INT_VALUE_DECLARATION_WITH_NO_TYPE;
         let actual = parse(source);
 
         let expected = Ok(Spanned {
@@ -718,7 +718,7 @@ mod tests {
     //noinspection DuplicatedCode
     #[test]
     fn test_int_value_declaration_with_type() {
-        let source: &str = test_source::INT_VALUE_DECLARATION_WITH_TYPE;
+        let source = test_source::INT_VALUE_DECLARATION_WITH_TYPE;
         let actual = parse(source);
 
         let expected = Ok(Spanned {
@@ -762,7 +762,7 @@ mod tests {
 
     #[test]
     fn test_float_value_declaration_no_type() {
-        let source: &str = test_source::FLOAT_VALUE_DECLARATION_WITH_NO_TYPE;
+        let source = test_source::FLOAT_VALUE_DECLARATION_WITH_NO_TYPE;
         let actual = parse(source);
 
         let expected = Ok(Spanned {
@@ -796,7 +796,7 @@ mod tests {
 
     #[test]
     fn test_float_value_declaration_with_type() {
-        let source: &str = test_source::FLOAT_VALUE_DECLARATION_WITH_TYPE;
+        let source = test_source::FLOAT_VALUE_DECLARATION_WITH_TYPE;
         let actual = parse(source);
 
         let expected = Ok(Spanned {
@@ -842,7 +842,7 @@ mod tests {
 
     #[test]
     fn test_incomplete_function_type_annotation() {
-        let source: &str = r#"
+        let source = r#"
             module Test
             where
 
@@ -864,7 +864,7 @@ mod tests {
 
     #[test]
     fn test_no_close_parens_unit_type_annotation() {
-        let source: &str = r#"
+        let source = r#"
             module Test
             where
 
@@ -881,7 +881,7 @@ mod tests {
 
     #[test]
     fn test_no_close_parens_tuple_type_annotation() {
-        let source: &str = r#"
+        let source = r#"
             module Test
             where
 
@@ -909,7 +909,7 @@ mod tests {
 
     #[test]
     fn test_no_comma_tuple_type_annotation() {
-        let source: &str = r#"
+        let source = r#"
             module Test
             where
 
@@ -930,7 +930,7 @@ mod tests {
 
     #[test]
     fn test_single_arg_function_declaration_with_type() {
-        let source: &str = test_source::SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE;
+        let source = test_source::SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE;
         let actual = parse(source);
 
         let expected = Ok(Spanned {
@@ -1002,7 +1002,7 @@ mod tests {
 
     #[test]
     fn test_multi_arg_function_declaration_with_type() {
-        let source: &str = r#"
+        let source = r#"
 
 
             module Test
@@ -1099,14 +1099,14 @@ mod tests {
     //
     // #[test]
     // fn test_simple_if_then_else() {
-    //     let source: &str = test_source::SIMPLE_IF_THEN_ELSE;
+    //     let source = test_source::SIMPLE_IF_THEN_ELSE;
     //
     //     assert_no_errors(source)
     // }
     //
     // #[test]
     // fn test_nested_if_then_else() {
-    //     let source: &str = test_source::NESTED_IF_THEN_ELSE;
+    //     let source = test_source::NESTED_IF_THEN_ELSE;
     //
     //     assert_no_errors(source)
     // }
@@ -1114,17 +1114,17 @@ mod tests {
     // #[test]
     // fn test_multi_property_union_type() {
     //     {
-    //         let source: &str = test_source::MULTI_PROPERTY_UNION_TYPE_1;
+    //         let source = test_source::MULTI_PROPERTY_UNION_TYPE_1;
     //
     //         assert_no_errors(source);
     //     }
     //     {
-    //         let source: &str = test_source::MULTI_PROPERTY_UNION_TYPE_2;
+    //         let source = test_source::MULTI_PROPERTY_UNION_TYPE_2;
     //
     //         assert_no_errors(source);
     //     }
     //     {
-    //         let source: &str = test_source::MULTI_PROPERTY_UNION_TYPE_3;
+    //         let source = test_source::MULTI_PROPERTY_UNION_TYPE_3;
     //
     //         assert_no_errors(source);
     //     }
