@@ -17,7 +17,7 @@ where
     F: Fn(&Span, Vec<Token<'a>>) -> ParseResult<'a, T>,
     C: FnOnce(Vec<T>) -> T,
 {
-    let mut pattern_remainder = remainder
+    let mut parens_remainder = remainder
         .take_while_ref(|t| !matches!(t.kind, TokenKind::CloseParen))
         .collect::<Vec<_>>();
 
@@ -29,10 +29,10 @@ where
 
             [remainder @ ..] => {
                 let span = open_paren_span.clone();
-                let span = span.start..pattern_remainder.iter().next().map(|t| t.span.clone()).unwrap_or(span).end;
+                let span = span.start..parens_remainder.iter().next().map(|t| t.span.clone()).unwrap_or(span).end;
                 Err(ParseError::ExpectedClosedParen {
                     span,
-                    actual: pattern_remainder.clone(),
+                    actual: parens_remainder.clone(),
                 })
             }
         )
@@ -42,14 +42,14 @@ where
         })
         .and_then(convert::identity)?;
 
-    // now that we have the open and close parenthesis, we know the total span for the tuple pattern
-    let pattern_span = open_paren_span.start..close_paren_span.end;
+    // now that we have the open and close parenthesis, we know the total span for the tuple parens
+    let parens_span = open_paren_span.start..close_paren_span.end;
 
-    let mut pattern_args = Vec::new();
-    while !pattern_remainder.is_empty() {
-        pattern_remainder = {
-            let (pattern_arg, remainder) = parse_thing(&open_paren_span, pattern_remainder)?;
-            pattern_args.push(pattern_arg);
+    let mut parens_args = Vec::new();
+    while !parens_remainder.is_empty() {
+        parens_remainder = {
+            let (parens_arg, remainder) = parse_thing(&open_paren_span, parens_remainder)?;
+            parens_args.push(parens_arg);
 
             match_vec!(remainder;
                 [
@@ -60,7 +60,7 @@ where
                 [] => Vec::new()
             )
             .map_err(|remaining| ParseError::ExpectedTupleComma {
-                span: pattern_span.clone(),
+                span: parens_span.clone(),
                 actual: remaining,
             })?
         };
@@ -68,9 +68,9 @@ where
 
     Ok((
         Spanned {
-            span: pattern_span,
+            span: parens_span,
             value: construct_thing(
-                pattern_args
+                parens_args
                     .into_iter()
                     .map(|t| t.value)
                     .collect::<Vec<_>>(),

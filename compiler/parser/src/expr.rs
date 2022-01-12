@@ -38,10 +38,14 @@ pub fn parse<'a>(
                     remainder @ ..
                 ] => parse(&pipe_span, remainder),
 
-                [remainder @ ..,] => Err(ParseError::ExpectedPipe {
-                    span: expr_span.clone(),
-                    actual: remainder.collect(),
-                })
+                [remainder @ ..,] => {
+                    let span = expr_span.clone();
+                    let span = span.start..pattern_remainder.iter().next().map(|t| t.span.clone()).unwrap_or(span).end;
+                    Err(ParseError::ExpectedPipe {
+                        span,
+                        actual: pattern_remainder.clone(),
+                    })
+                }
             )
             .map_err(|remaining| ParseError::ExpectedEOF {
                 input: vec![],
@@ -52,7 +56,7 @@ pub fn parse<'a>(
             let mut args = Vec::new();
             while !pattern_remainder.is_empty() {
                 pattern_remainder = {
-                    let (pattern, remainder) = pattern::parse(&pipe_span, pattern_remainder.clone())?;
+                    let (pattern, remainder) = pattern::parse(&pipe_span, pattern_remainder)?;
                     args.push(pattern);
 
                     remainder
