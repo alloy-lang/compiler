@@ -1016,6 +1016,76 @@ mod tests {
     }
 
     #[test]
+    fn test_no_close_pipe_lambda_expr() {
+        let source = r#"
+            module Test
+            where
+
+            no_right_arrow = |arg -> arg
+        "#;
+        let actual = parse(source);
+
+        let expected = Err(ParseError::ExpectedPipe {
+            span: 56..77,
+            actual: vec![
+                Token {
+                    kind: TokenKind::LowerIdentifier("arg"),
+                    span: 74..77,
+                },
+                Token {
+                    kind: TokenKind::RightArrow,
+                    span: 78..80,
+                },
+                Token {
+                    kind: TokenKind::LowerIdentifier("arg"),
+                    span: 81..84,
+                },
+            ],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_no_right_arrow_lambda_expr() {
+        let source = r#"
+            module Test
+            where
+
+            no_right_arrow = |arg| arg
+        "#;
+        let actual = parse(source);
+
+        let expected = Err(ParseError::ExpectedPipe {
+            span: 56..77,
+            actual: vec![Token {
+                kind: TokenKind::LowerIdentifier("arg"),
+                span: 74..77,
+            }],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_no_body_lambda_expr() {
+        let source = r#"
+            module Test
+            where
+
+            no_body = |arg| ->
+        "#;
+        let actual = parse(source);
+
+        let expected = Err(ParseError::ExpectedExpr {
+            span: 66..67,
+            actual: vec![],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
     fn test_single_arg_function_declaration_with_type() {
         let source = test_source::SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE;
         let actual = parse(source);
