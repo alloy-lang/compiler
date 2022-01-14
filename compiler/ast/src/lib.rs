@@ -1,4 +1,5 @@
 use core::convert::TryFrom;
+use itertools::Itertools;
 use non_empty_vec::NonEmpty;
 use ordered_float::NotNan;
 
@@ -91,7 +92,7 @@ impl Type {
 pub enum Expr {
     Unit,
     Identifier(String),
-    // Apply(Box<Expr>, Box<Expr>),
+    Apply(Box<Expr>, Box<Expr>),
     OpApply(Box<Expr>, String, Box<Expr>),
     Literal(LiteralData),
     Lambda(Pattern, Box<Expr>),
@@ -212,8 +213,8 @@ impl Expr {
 
     #[must_use]
     pub fn tuple<A>(args: A) -> Expr
-        where
-            A: Into<Vec<Expr>>,
+    where
+        A: Into<Vec<Expr>>,
     {
         let args = args.into();
 

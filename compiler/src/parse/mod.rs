@@ -272,11 +272,7 @@ enum Declaration {
 }
 
 impl Declaration {
-    fn new_type_annotation<S>(
-        name: S,
-        type_variables: Vec<TypeVariable>,
-        t: Type,
-    ) -> Declaration
+    fn new_type_annotation<S>(name: S, type_variables: Vec<TypeVariable>, t: Type) -> Declaration
     where
         S: Into<String>,
     {
