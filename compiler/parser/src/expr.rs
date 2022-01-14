@@ -57,7 +57,7 @@ pub fn parse<'a>(
             while !pattern_remainder.is_empty() {
                 pattern_remainder = {
                     let (pattern, remainder) = pattern::parse(&pipe_span, pattern_remainder)?;
-                    args.push(pattern);
+                    args.push(pattern.value);
 
                     remainder
                 };
@@ -66,7 +66,7 @@ pub fn parse<'a>(
             Ok((Spanned {
                 span: pipe_span.start..expr.span.end,
                 value: ast::Expr::lambda(
-                    args.into_iter().map(|t| t.value).collect::<Vec<_>>(),
+                    args,
                     expr.value,
                 ),
             }, remainder))

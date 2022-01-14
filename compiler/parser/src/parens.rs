@@ -49,7 +49,7 @@ where
     while !parens_remainder.is_empty() {
         parens_remainder = {
             let (parens_arg, remainder) = parse_thing(&open_paren_span, parens_remainder)?;
-            parens_args.push(parens_arg);
+            parens_args.push(parens_arg.value);
 
             match_vec!(remainder;
                 [
@@ -69,12 +69,7 @@ where
     Ok((
         Spanned {
             span: parens_span,
-            value: construct_thing(
-                parens_args
-                    .into_iter()
-                    .map(|t| t.value)
-                    .collect::<Vec<_>>(),
-            ),
+            value: construct_thing(parens_args),
         },
         remainder.collect(),
     ))
