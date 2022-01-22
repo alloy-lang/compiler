@@ -323,6 +323,10 @@ pub enum ParseError<'a> {
         span: Span,
         actual: Vec<Token<'a>>,
     },
+    ExpectedRightArrow {
+        span: Span,
+        actual: Vec<Token<'a>>,
+    },
     ExpectedPipe {
         span: Span,
         actual: Vec<Token<'a>>,
@@ -332,6 +336,10 @@ pub enum ParseError<'a> {
         actual: Vec<Token<'a>>,
     },
     ExpectedTupleComma {
+        span: Span,
+        actual: Vec<Token<'a>>,
+    },
+    ExpectedLambdaArgsComma {
         span: Span,
         actual: Vec<Token<'a>>,
     },
@@ -405,8 +413,6 @@ impl<'a> ParseError<'a> {
                         .collect(),
                 ),
             ParseError::ExpectedLambdaReturnType { span, actual } => {
-                dbg!(&actual);
-
                 let labels = actual
                     .into_iter()
                     .map(|t| {
@@ -418,10 +424,8 @@ impl<'a> ParseError<'a> {
                     ))
                     .collect();
 
-                dbg!(&labels);
-
                 Diagnostic::error()
-                    .with_message("Expected lambda to have a return type. Ex `Int -> String`")
+                    .with_message("We encountered an error while parsing a type annotation. We expected to find a return type for your lambda, ex: `Int -> String`")
                     .with_code("E0008")
                     .with_labels(labels)
             }
@@ -449,13 +453,29 @@ impl<'a> ParseError<'a> {
                         })
                         .collect(),
                 ),
+            ParseError::ExpectedRightArrow { actual, span } => Diagnostic::error()
+                .with_message(
+                    "Expected lambda arguments to be followed by `->`. Ex: `|arg1, arg2| ->`.",
+                )
+                .with_code("E0011")
+                .with_labels(
+                    actual
+                        .into_iter()
+                        .map(|t| {
+                            Label::primary(file_id.clone(), span.clone()).with_message(format!(
+                                "Expected right arrow, but found: {:?}",
+                                t.kind
+                            ))
+                        })
+                        .collect(),
+                ),
             ParseError::ExpectedClosedParen { span, .. } => {
                 let labels = vec![Label::primary(file_id.clone(), span)
                     .with_message("Expected closed parenthesis")];
 
                 Diagnostic::error()
                     .with_message("Expected a close parenthesis `)`. Ex: `(Int, String)`.")
-                    .with_code("E0011")
+                    .with_code("E0012")
                     .with_labels(labels)
             }
             ParseError::ExpectedTupleComma { span, actual } => {
@@ -475,7 +495,27 @@ impl<'a> ParseError<'a> {
                     .with_message(
                         "Expected a comma between tuple arguments. Ex: `(Int, String)` instead of `(Int String)`.",
                     )
-                    .with_code("E0012")
+                    .with_code("E0013")
+                    .with_labels(labels)
+            }
+            ParseError::ExpectedLambdaArgsComma { span, actual } => {
+                let labels = actual
+                    .into_iter()
+                    .map(|t| {
+                        Label::secondary(file_id.clone(), t.span)
+                            .with_message(format!("Expected a comma, but found: {:?}", t.kind))
+                    })
+                    .chain(iter::once(
+                        Label::primary(file_id.clone(), span)
+                            .with_message("Expected a comma between lambda arguments"),
+                    ))
+                    .collect();
+
+                Diagnostic::error()
+                    .with_message(
+                        "Expected a comma between lambda arguments. Ex: `|arg1, arg2|` instead of `|arg1 arg2|`.",
+                    )
+                    .with_code("E0013")
                     .with_labels(labels)
             }
             ParseError::ExpectedEOF {
@@ -483,7 +523,7 @@ impl<'a> ParseError<'a> {
                 remaining,
             } => Diagnostic::error()
                 .with_message("Expected the file to end")
-                .with_code("E0013")
+                .with_code("E0014")
                 .with_labels(
                     remaining
                         .into_iter()
@@ -1056,8 +1096,8 @@ mod tests {
         "#;
         let actual = parse(source);
 
-        let expected = Err(ParseError::ExpectedPipe {
-            span: 56..77,
+        let expected = Err(ParseError::ExpectedRightArrow {
+            span: 73..78,
             actual: vec![Token {
                 kind: TokenKind::LowerIdentifier("arg"),
                 span: 74..77,
@@ -1080,6 +1120,27 @@ mod tests {
         let expected = Err(ParseError::ExpectedExpr {
             span: 66..67,
             actual: vec![],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_no_comma_lambda_expr() {
+        let source = r#"
+            module Test
+            where
+
+            no_body = |arg1 arg2| -> arg1
+        "#;
+        let actual = parse(source);
+
+        let expected = Err(ParseError::ExpectedLambdaArgsComma {
+            span: 66..77,
+            actual: vec![Token {
+                kind: TokenKind::LowerIdentifier("arg2"),
+                span: 72..76,
+            }],
         });
 
         assert_eq!(expected, actual);
@@ -1241,6 +1302,68 @@ mod tests {
                         },
                     },
                 ],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_curried_function_declaration_with_type() {
+        let source = test_source::CURRIED_FUNCTION_DECLARATION_WITH_TYPE;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![Spanned {
+                    span: 56..96,
+                    value: TypeAnnotation {
+                        name: Spanned {
+                            span: 56..61,
+                            value: "apply".to_string(),
+                        },
+                        t: Spanned {
+                            span: 64..96,
+                            value: ast::Type::lambda(
+                                ast::Type::lambda(
+                                    ast::Type::identifier("String"),
+                                    ast::Type::identifier("Int"),
+                                ),
+                                ast::Type::lambda(
+                                    ast::Type::identifier("String"),
+                                    ast::Type::identifier("Int"),
+                                ),
+                            ),
+                        },
+                    },
+                }],
+                values: vec![Spanned {
+                    span: 109..143,
+                    value: Value {
+                        name: Spanned {
+                            span: 109..114,
+                            value: "apply".to_string(),
+                        },
+                        expr: Spanned {
+                            span: 117..143,
+                            value: ast::Expr::lambda(
+                                vec![ast::Pattern::identifier("f")],
+                                ast::Expr::lambda(
+                                    vec![ast::Pattern::identifier("value")],
+                                    ast::Expr::application(
+                                        vec!["f"],
+                                        vec![ast::Expr::identifier("value")],
+                                    ),
+                                ),
+                            ),
+                        },
+                    },
+                }],
             },
         });
 

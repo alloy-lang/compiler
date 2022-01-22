@@ -177,31 +177,19 @@ impl Expr {
     //     Expr::IfElse(expr.into(), then_expr.into(), else_expr.into())
     // }
 
-    // #[must_use]
-    // pub fn application<S, E>(address: Vec<S>, args: E) -> Expr
-    //     where
-    //         S: Into<String>,
-    //         E: Into<Vec<Expr>>,
-    // {
-    //     let address = address.into_iter().map(Into::into).join("::");
-    //     let func = Expr::Identifier(address);
-    //
-    //     args.into()
-    //         .into_iter()
-    //         .fold(func, |func, arg| Expr::Apply(Box::new(func), arg.into()))
-    // }
+    #[must_use]
+    pub fn application<S, E>(address: Vec<S>, args: E) -> Expr
+    where
+        S: Into<String>,
+        E: Into<Vec<Expr>>,
+    {
+        let address = address.into_iter().map(Into::into).join("::");
+        let func = Expr::Identifier(address);
 
-    // #[must_use]
-    // pub fn tuple<E>(args: E) -> Expr
-    //     where
-    //         E: Into<Vec<Expr>>,
-    // {
-    //     let args = args.into();
-    //     let n = args.len();
-    //     let name = tuple_name(n);
-    //
-    //     Self::application(vec![name], args)
-    // }
+        args.into()
+            .into_iter()
+            .fold(func, |func, arg| Expr::Apply(Box::new(func), arg.into()))
+    }
 
     #[must_use]
     pub fn paren<E>(expr: E) -> Expr

@@ -1,6 +1,7 @@
 use core::convert;
 
 use improved_slice_patterns::match_vec;
+use non_empty_vec::NonEmpty;
 
 use alloy_ast as ast;
 use alloy_lexer::{Token, TokenKind};
@@ -16,10 +17,12 @@ pub fn parse<'a>(
     type_name_span: &Span,
     input: impl Iterator<Item = Token<'a>>,
 ) -> ParseResult<'a, ast::Type> {
-    let (mut type_, remainder) = parse_single_type(type_name_span, input)?;
+    let (first_type, remainder) = parse_single_type(type_name_span, input)?;
 
     let mut remainder = remainder.into_iter().peekable();
 
+    let first_span = first_type.span.clone();
+    let mut types = NonEmpty::new(first_type);
     loop {
         log::debug!("*parse_type* remainder: {:?}", &remainder);
 
@@ -28,7 +31,7 @@ pub fn parse<'a>(
                 kind: TokenKind::RightArrow,
                 span: arrow_span,
             }) => {
-                let new_span = type_.span.start..arrow_span.end;
+                let new_span = first_span.start..arrow_span.end;
 
                 let (next_type, next_remainder) = parse_single_type(&new_span, remainder.skip(1))
                     .map_err(|e| match e {
@@ -38,10 +41,7 @@ pub fn parse<'a>(
                     _ => e,
                 })?;
 
-                type_ = Spanned {
-                    span: new_span.start..next_type.span.end,
-                    value: ast::Type::lambda(type_.value, next_type.value),
-                };
+                types.push(next_type);
                 remainder = next_remainder.into_iter().peekable();
             }
             _ => {
@@ -50,7 +50,25 @@ pub fn parse<'a>(
         }
     }
 
-    Ok((type_, remainder.collect()))
+    let spanned = {
+        let (last_type, types) = types.split_last();
+
+        let span = types
+            .first()
+            .map(|o| o.span.start..last_type.span.end)
+            .unwrap_or(last_type.span.clone());
+
+        let value = types
+            .into_iter()
+            .cloned()
+            .rfold(last_type.value.clone(), |func, arg| {
+                ast::Type::lambda(arg.value, func)
+            });
+
+        Spanned { span, value }
+    };
+
+    Ok((spanned, remainder.collect()))
 }
 
 fn parse_single_type<'a>(
