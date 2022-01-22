@@ -93,7 +93,7 @@ pub const CURRIED_FUNCTION_DECLARATION_WITH_TYPE: &str = r#"
             module Test
             where
 
-            apply : (Int -> Int) -> Int -> Int
+            apply : (String -> Int) -> String -> Int
             apply = |f| -> |value| -> f(value)
 "#;
 

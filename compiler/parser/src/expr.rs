@@ -23,7 +23,7 @@ pub fn parse<'a>(
 
     match_vec!(input.clone();
         [
-            Token { kind: TokenKind::Pipe, span: pipe_span },
+            Token { kind: TokenKind::Pipe, span: start_pipe_span },
             remainder @ ..
         ] => {
             let mut remainder = remainder.clone();
@@ -31,12 +31,27 @@ pub fn parse<'a>(
                 .take_while_ref(|t| !matches!(t.kind, TokenKind::Pipe))
                 .collect::<Vec<_>>();
 
-            let (expr, remainder) = match_vec!(remainder.collect::<Vec<_>>();
+            let (pipe_span, expr, remainder) = match_vec!(remainder.collect::<Vec<_>>();
                 [
                     Token { kind: TokenKind::Pipe,  span: end_pipe_span },
                     Token { kind: TokenKind::RightArrow, span: arrow_span },
                     remainder @ ..
-                ] => parse(&pipe_span, remainder),
+                ] => {
+                    let pipe_span = start_pipe_span.start..end_pipe_span.end;
+                    let (expr, remainder) = parse(&start_pipe_span, remainder)?;
+                    Ok((pipe_span, expr, remainder))
+                },
+
+                [
+                    Token { kind: TokenKind::Pipe,  span: end_pipe_span },
+                    remainder @ ..
+                ] => {
+                    let span = start_pipe_span.start..end_pipe_span.end;
+                    Err(ParseError::ExpectedRightArrow {
+                        span,
+                        actual: pattern_remainder.clone(),
+                    })
+                },
 
                 [remainder @ ..,] => {
                     let span = expr_span.clone();
@@ -56,15 +71,26 @@ pub fn parse<'a>(
             let mut args = Vec::new();
             while !pattern_remainder.is_empty() {
                 pattern_remainder = {
-                    let (pattern, remainder) = pattern::parse(&pipe_span, pattern_remainder)?;
-                    args.push(pattern.value);
+                    let (pattern_arg, remainder) = pattern::parse(&start_pipe_span, pattern_remainder)?;
+                    args.push(pattern_arg.value);
 
-                    remainder
+                    match_vec!(remainder;
+                        [
+                            Token { kind: TokenKind::Comma, span },
+                            remainder @ ..
+                        ] => remainder.collect(),
+
+                        [] => Vec::new()
+                    )
+                    .map_err(|remaining| ParseError::ExpectedLambdaArgsComma {
+                        span: pipe_span.clone(),
+                        actual: remaining,
+                    })?
                 };
             }
 
             Ok((Spanned {
-                span: pipe_span.start..expr.span.end,
+                span: start_pipe_span.start..expr.span.end,
                 value: ast::Expr::lambda(
                     args,
                     expr.value,
@@ -100,6 +126,12 @@ pub fn parse<'a>(
             span,
             value: ast::Expr::float_literal(f),
         }, remainder.collect())),
+
+        [
+            Token { kind: TokenKind::LowerIdentifier(id), span },
+            Token { kind: TokenKind::OpenParen,           span: open_paren_span },
+            remainder @ ..
+        ] => parens::parse(open_paren_span, &mut remainder.clone(), self::parse_vec, |args| ast::Expr::application(vec![id], args)),
 
         [
             Token { kind: TokenKind::LowerIdentifier(id), span },
