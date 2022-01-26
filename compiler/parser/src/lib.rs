@@ -24,47 +24,19 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
     // let _doc_comments = extract_doc_comments(&mut stream);
 
     let tokens = stream
-        .clone()
         .filter(|t| {
             !matches!(
                 t.kind,
                 TokenKind::EOL | TokenKind::Comment(_) | TokenKind::DocComment(_)
             )
         })
+        .chain(iter::once(Token {
+            kind: TokenKind::EOF,
+            span: source.len()..source.len(),
+        }))
         .collect::<Vec<_>>();
 
     return match_vec!(tokens;
-        [
-            Token { kind: TokenKind::Module,              span: module_token_span },
-        ] => {
-            Err(ParseError::ExpectedModuleName {
-                span: module_token_span,
-                actual: None,
-            })
-        },
-
-        [
-            Token { kind: TokenKind::Module,              span: module_token_span },
-            Token { kind: TokenKind::UpperIdentifier(id), span: id_token_span },
-        ] => {
-            Err(ParseError::ExpectedWhereStatement {
-                span: module_token_span.start..id_token_span.end,
-                actual: None,
-            })
-        },
-
-        [
-            Token { kind: TokenKind::Module,              span: module_token_span },
-            Token { kind: TokenKind::LowerIdentifier(id), span: id_token_span },
-        ] => {
-            Err(ParseError::UnexpectedModuleName {
-                message: format!(
-                    "Module name must start with a capital letter. Found: `{}`",
-                    id
-                ),
-                span: id_token_span,
-            })
-        },
 
         [
             Token { kind: TokenKind::Module,              span: module_token_span },
@@ -81,32 +53,17 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
         },
 
         [
-            Token { kind: TokenKind::Module,              span: module_token_span },
-            Token { kind,                                 span: not_id_token_span }
+            Token { kind: TokenKind::Module,                     span: module_token_span },
+            Token { kind: TokenKind::InvalidUpperIdentifier(id), span: id_token_span },
+            remainder @ ..
         ] => {
-            Err(ParseError::ExpectedModuleName {
-                span: module_token_span.start..not_id_token_span.end,
-                actual: Some(kind),
+            Err(ParseError::UnexpectedModuleName {
+                message: format!(
+                    "Module name must start with a capital letter. Found: `{}`",
+                    id
+                ),
+                span: id_token_span,
             })
-        },
-
-        //
-        // TODO: combine this with the one below
-        //
-        [
-            Token { kind: TokenKind::Module,              span: module_token_span },
-            Token { kind: TokenKind::UpperIdentifier(id), span: id_token_span },
-            Token { kind: TokenKind::Where,               span: where_token_span },
-        ] => {
-            Ok(Spanned::from(
-                module_token_span,
-                where_token_span,
-                Module {
-                    name: Spanned::from_span(id_token_span, id.to_string()),
-                    type_annotations: vec![],
-                    values: vec![],
-                },
-            ))
         },
 
         [
@@ -131,28 +88,42 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
         [
             Token { kind: TokenKind::Module,              span: module_token_span },
             Token { kind: TokenKind::UpperIdentifier(id), span: id_token_span },
-            Token { kind,                                 span: not_where_token_span },
+            remainder @ ..
         ] => {
+            let remainder = remainder.into_iter().collect::<Vec<_>>();
+            let span = find_last_span(&remainder, &id_token_span, source.len());
+
             Err(ParseError::ExpectedWhereStatement {
-                span: not_where_token_span,
-                actual: Some(kind),
+                span,
+                actual: remainder,
             })
         },
-    )
-    .map_err(|remaining| {
-        if remaining.is_empty() {
-            ParseError::ExpectedModuleDefinition {
-                span: 0..source.len(),
-                actual: None,
-            }
-        } else {
-            ParseError::ExpectedEOF {
-                input: vec![],
-                remaining,
-            }
+
+        [
+            Token { kind: TokenKind::Module,              span: module_token_span },
+            remainder @ ..
+        ] => {
+            let remainder = remainder.into_iter().collect::<Vec<_>>();
+            let span = find_last_span(&remainder, &module_token_span, source.len());
+
+            Err(ParseError::ExpectedModuleName {
+                span,
+                actual: remainder,
+            })
         }
+    )
+    .map_err(|remaining| ParseError::ExpectedModuleDefinition {
+        span: 0..source.len(),
+        actual: remaining,
     })
     .and_then(convert::identity);
+}
+
+fn find_last_span(remainder: &[Token], previous_span: &Span, source_length: usize) -> Span {
+    remainder.iter()
+        .filter(|t| !matches!(t.kind, TokenKind::EOF))
+        .last()
+        .map_or_else(|| previous_span.end..source_length, |l| l.span.clone())
 }
 
 type ModuleContents = (Vec<Spanned<TypeAnnotation>>, Vec<Spanned<Value>>);
@@ -172,15 +143,6 @@ fn parse_module_contents<'a>(
         log::debug!("*parse_module_contents* remainder: {:?}", remainder);
 
         remainder = match_vec!(remainder;
-                [
-                    Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
-                ] => {
-                    Err(ParseError::OrphanedIdentifier {
-                        span: id_span,
-                        name: id.to_string(),
-                    })
-                },
-
                 [
                     Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
                     Token { kind: TokenKind::Colon,               span: colon_span },
@@ -229,6 +191,22 @@ fn parse_module_contents<'a>(
                     values.push(value);
 
                     Ok(tokens)
+                },
+
+                [
+                    Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
+                    remainder @ ..
+                ] => {
+                    Err(ParseError::OrphanedIdentifier {
+                        span: id_span,
+                        name: id.to_string(),
+                    })
+                },
+
+                [
+                    Token { kind: TokenKind::EOF, span }
+                ] => {
+                    Ok(Vec::new())
                 }
         )
         .map_err(|remaining| ParseError::ExpectedEOF {
@@ -289,15 +267,15 @@ pub struct Value {
 pub enum ParseError<'a> {
     ExpectedModuleDefinition {
         span: Span,
-        actual: Option<TokenKind<'a>>,
+        actual: Vec<Token<'a>>,
     },
     ExpectedModuleName {
         span: Span,
-        actual: Option<TokenKind<'a>>,
+        actual: Vec<Token<'a>>,
     },
     ExpectedWhereStatement {
         span: Span,
-        actual: Option<TokenKind<'a>>,
+        actual: Vec<Token<'a>>,
     },
     UnexpectedModuleName {
         message: String,
@@ -553,7 +531,10 @@ mod tests {
 
         let expected = Err(ParseError::ExpectedModuleDefinition {
             span: 0..6,
-            actual: None,
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 6..6,
+            }],
         });
 
         assert_eq!(expected, actual);
@@ -561,12 +542,15 @@ mod tests {
 
     #[test]
     fn test_module_missing_identifier() {
-        let source = "module";
+        let source = "module ";
         let actual = parse(source);
 
         let expected = Err(ParseError::ExpectedModuleName {
-            span: 0..6,
-            actual: None,
+            span: 6..7,
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 7..7,
+            }],
         });
 
         assert_eq!(expected, actual);
@@ -574,12 +558,21 @@ mod tests {
 
     #[test]
     fn test_module_incorrect_identifier() {
-        let source = "module _";
+        let source = "module _ ";
         let actual = parse(source);
 
         let expected = Err(ParseError::ExpectedModuleName {
-            span: 0..8,
-            actual: Some(TokenKind::NilIdentifier),
+            span: 7..8,
+            actual: vec![
+                Token {
+                    kind: TokenKind::NilIdentifier,
+                    span: 7..8,
+                },
+                Token {
+                    kind: TokenKind::EOF,
+                    span: 9..9,
+                },
+            ],
         });
 
         assert_eq!(expected, actual);
@@ -587,12 +580,15 @@ mod tests {
 
     #[test]
     fn test_module_missing_where() {
-        let source = "module Test";
+        let source = "module Test ";
         let actual = parse(source);
 
         let expected = Err(ParseError::ExpectedWhereStatement {
-            span: 0..11,
-            actual: None,
+            span: 11..12,
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 12..12,
+            }],
         });
 
         assert_eq!(expected, actual);
@@ -605,7 +601,16 @@ mod tests {
 
         let expected = Err(ParseError::ExpectedWhereStatement {
             span: 12..16,
-            actual: Some(TokenKind::When),
+            actual: vec![
+                Token {
+                    kind: TokenKind::When,
+                    span: 12..16,
+                },
+                Token {
+                    kind: TokenKind::EOF,
+                    span: 16..16,
+                },
+            ],
         });
 
         assert_eq!(expected, actual);
@@ -613,17 +618,23 @@ mod tests {
 
     #[test]
     fn test_unexpected_remainder() {
-        let expected = Err(ParseError::ExpectedEOF {
-            input: vec![],
-            remaining: vec![Token {
-                kind: TokenKind::Trait,
-                span: 18..23,
-            }],
-        });
-
         {
             let source = "module Test where trait";
             let actual = parse(source);
+
+            let expected = Err(ParseError::ExpectedEOF {
+                input: vec![],
+                remaining: vec![
+                    Token {
+                        kind: TokenKind::Trait,
+                        span: 18..23,
+                    },
+                    Token {
+                        kind: TokenKind::EOF,
+                        span: 23..23,
+                    },
+                ],
+            });
 
             assert_eq!(expected, actual);
         }
@@ -632,12 +643,40 @@ mod tests {
             let source = "module Test where trait -- stuff";
             let actual = parse(source);
 
+            let expected = Err(ParseError::ExpectedEOF {
+                input: vec![],
+                remaining: vec![
+                    Token {
+                        kind: TokenKind::Trait,
+                        span: 18..23,
+                    },
+                    Token {
+                        kind: TokenKind::EOF,
+                        span: 32..32,
+                    },
+                ],
+            });
+
             assert_eq!(expected, actual);
         }
         {
             // with doc comment
             let source = "module Test where trait --! extra stuff";
             let actual = parse(source);
+
+            let expected = Err(ParseError::ExpectedEOF {
+                input: vec![],
+                remaining: vec![
+                    Token {
+                        kind: TokenKind::Trait,
+                        span: 18..23,
+                    },
+                    Token {
+                        kind: TokenKind::EOF,
+                        span: 39..39,
+                    },
+                ],
+            });
 
             assert_eq!(expected, actual);
         }
@@ -719,7 +758,10 @@ mod tests {
 
         let expected = Err(ParseError::ExpectedExpr {
             span: 56..63,
-            actual: Vec::new(),
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 64..64,
+            }],
         });
 
         assert_eq!(expected, actual);
@@ -895,10 +937,16 @@ mod tests {
         let expected: Result<Spanned<Module>, ParseError> =
             Err(ParseError::ExpectedLambdaReturnType {
                 span: 69..75,
-                actual: vec![Token {
-                    span: 76..77,
-                    kind: TokenKind::LiteralInt(0),
-                }],
+                actual: vec![
+                    Token {
+                        span: 76..77,
+                        kind: TokenKind::LiteralInt(0),
+                    },
+                    Token {
+                        kind: TokenKind::EOF,
+                        span: 86..86,
+                    },
+                ],
             });
 
         assert_eq!(expected, actual);
@@ -915,7 +963,10 @@ mod tests {
 
         let expected = Err(ParseError::ExpectedClosedParen {
             span: 74..75,
-            actual: vec![],
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 75..75,
+            }],
         });
 
         assert_eq!(expected, actual);
@@ -942,6 +993,10 @@ mod tests {
                 Token {
                     kind: TokenKind::LiteralInt(0),
                     span: 91..92,
+                },
+                Token {
+                    kind: TokenKind::EOF,
+                    span: 101..101,
                 },
             ],
         });
@@ -1080,6 +1135,10 @@ mod tests {
                     kind: TokenKind::LowerIdentifier("arg"),
                     span: 81..84,
                 },
+                Token {
+                    kind: TokenKind::EOF,
+                    span: 93..93,
+                },
             ],
         });
 
@@ -1119,7 +1178,10 @@ mod tests {
 
         let expected = Err(ParseError::ExpectedExpr {
             span: 66..67,
-            actual: vec![],
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 83..83,
+            }],
         });
 
         assert_eq!(expected, actual);

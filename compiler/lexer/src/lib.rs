@@ -91,8 +91,6 @@ pub enum TokenKind<'source> {
     // Non-alphanumeric
     #[token("->")]
     RightArrow,
-    #[token("::")]
-    Connector,
     // #[token(";")]
     // Semi,
     #[token(",")]
@@ -117,8 +115,8 @@ pub enum TokenKind<'source> {
     // Pound,
     // #[token("~")]
     // Tilde,
-    #[token("?")]
-    Question,
+    // #[token("?")]
+    // Question,
     #[token(":")]
     Colon,
     // #[token("$")]
@@ -149,9 +147,12 @@ pub enum TokenKind<'source> {
     // Caret,
     // #[token("%")]
     // Percent,
-    #[regex("[a-z_][a-zA-Z_0-9]*")]
+
+    #[regex("_[A-Z][a-zA-Z0-9_]*[?]?")]
+    InvalidUpperIdentifier(&'source str),
+    #[regex("_?[a-z][a-zA-Z0-9_]*[?]?")]
     LowerIdentifier(&'source str),
-    #[regex("[A-Z][a-zA-Z_0-9]*")]
+    #[regex("[A-Z][a-zA-Z0-9_]*")]
     UpperIdentifier(&'source str),
     #[regex(r"\([|<>=]+\)")]
     #[regex(r"[|<>=]+")]
@@ -165,6 +166,8 @@ pub enum TokenKind<'source> {
     LiteralInt(i64),
     #[regex(r#"-?[0-9]+\.[0-9]+"#, |lex| lex.slice().parse())]
     LiteralFloat(f64),
+
+    EOF,
 }
 
 #[cfg(test)]
