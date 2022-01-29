@@ -147,7 +147,6 @@ pub enum TokenKind<'source> {
     // Caret,
     // #[token("%")]
     // Percent,
-
     #[regex("_[A-Z][a-zA-Z0-9_]*[?]?")]
     InvalidUpperIdentifier(&'source str),
     #[regex("_?[a-z][a-zA-Z0-9_]*[?]?")]
@@ -159,6 +158,13 @@ pub enum TokenKind<'source> {
     OperatorIdentifier(&'source str),
     #[token("_")]
     NilIdentifier,
+
+    #[regex("([a-zA-Z][a-zA-Z0-9_]*(:))+[A-Z][a-zA-Z0-9_]*")]
+    InvalidUpperPath(&'source str),
+    #[regex("([a-zA-Z][a-zA-Z0-9_]*::)+[A-Z][a-zA-Z0-9_]*")]
+    UpperPath(&'source str),
+    #[regex("([a-zA-Z][a-zA-Z0-9_]*::)+_?[a-z][a-zA-Z0-9_]*[?]?")]
+    LowerPath(&'source str),
 
     #[regex(r#""([^"\\]|\\t|\\u|\\n|\\")*""#)]
     LiteralString(&'source str),
@@ -176,7 +182,7 @@ mod tests {
     use maplit::hashmap;
     use pretty_assertions::assert_eq;
 
-    fn assert_lex<'a>(source: &'a str, expected: TokenKind) {
+    fn assert_lex(source: &str, expected: TokenKind) {
         let mut lex = TokenKind::lexer(source);
 
         if let Some(token) = lex.next() {
@@ -254,13 +260,29 @@ mod tests {
             "asdf" => TokenKind::LowerIdentifier("asdf"),
             "_asdf" => TokenKind::LowerIdentifier("_asdf"),
             "Asdf" => TokenKind::UpperIdentifier("Asdf"),
-            "_Asdf" => TokenKind::LowerIdentifier("_Asdf"),
+            "_Asdf" => TokenKind::InvalidUpperIdentifier("_Asdf"),
             "(>>=)" => TokenKind::OperatorIdentifier("(>>=)"),
             ">>=" => TokenKind::OperatorIdentifier(">>="),
             "(<=<)" => TokenKind::OperatorIdentifier("(<=<)"),
             "<=<" => TokenKind::OperatorIdentifier("<=<"),
             "(|>)" => TokenKind::OperatorIdentifier("(|>)"),
             "|>" => TokenKind::OperatorIdentifier("|>"),
+        };
+
+        for (source, expected) in source {
+            assert_lex(source, expected)
+        }
+    }
+
+    #[test]
+    fn test_paths() {
+        let source = hashmap! {
+            "Number::is_positive?" => TokenKind::LowerPath("Number::is_positive?"),
+            "std::Number::is_positive?" => TokenKind::LowerPath("std::Number::is_positive?"),
+            "std::Number" => TokenKind::UpperPath("std::Number"),
+            "std:Number" => TokenKind::InvalidUpperPath("std:Number"),
+            // "std.Number" => TokenKind::InvalidUpperPath("std.Number"),
+            // "std/Number" => TokenKind::InvalidUpperPath("std/Number"),
         };
 
         for (source, expected) in source {
