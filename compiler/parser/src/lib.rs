@@ -120,7 +120,8 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
 }
 
 fn find_last_span(remainder: &[Token], previous_span: &Span, source_length: usize) -> Span {
-    remainder.iter()
+    remainder
+        .iter()
         .filter(|t| !matches!(t.kind, TokenKind::EOF))
         .last()
         .map_or_else(|| previous_span.end..source_length, |l| l.span.clone())
