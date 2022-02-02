@@ -2,8 +2,8 @@ use core::convert;
 use improved_slice_patterns::match_vec;
 use itertools::Itertools;
 
+use super::{Token, TokenKind};
 use alloy_ast as ast;
-use alloy_lexer::{Token, TokenKind};
 
 use super::{parens, pattern};
 use super::{ParseError, ParseResult, Span, Spanned};
@@ -128,10 +128,20 @@ pub fn parse<'a>(
         }, remainder.collect())),
 
         [
-            Token { kind: TokenKind::LowerIdentifier(id), span },
-            Token { kind: TokenKind::OpenParen,           span: open_paren_span },
+            Token { kind: TokenKind::LowerIdentifier(id),  span: id_span },
+            Token { kind: TokenKind::Parens(inner_tokens), span: parens_span },
             remainder @ ..
-        ] => parens::parse(open_paren_span, &mut remainder.clone(), self::parse_vec, |args| ast::Expr::application(vec![id], args)),
+        ] => {
+            let args: Vec<ast::Expr> = parens::parse_args(&parens_span, inner_tokens, self::parse_vec)?
+                .into_iter()
+                .map(|arg| arg.value)
+                .collect();
+
+            Ok((Spanned {
+                span: id_span.start..parens_span.end,
+                value: ast::Expr::application(vec![id], args),
+            }, remainder.collect()))
+        },
 
         [
             Token { kind: TokenKind::LowerIdentifier(id), span },
@@ -142,9 +152,19 @@ pub fn parse<'a>(
         }, remainder.collect())),
 
         [
-            Token { kind: TokenKind::OpenParen, span: open_paren_span },
+            Token { kind: TokenKind::Parens(inner_tokens), span: parens_span },
             remainder @ ..
-        ] => parens::parse(open_paren_span, &mut remainder.clone(), self::parse_vec, ast::Expr::tuple),
+        ] => {
+            let args: Vec<ast::Expr> = parens::parse_args(&parens_span, inner_tokens, self::parse_vec)?
+                .into_iter()
+                .map(|arg| arg.value)
+                .collect();
+
+            Ok((Spanned {
+                span: parens_span,
+                value: ast::Expr::tuple(args),
+            }, remainder.collect()))
+        },
 
         [remainder @ ..,] => Err(ParseError::ExpectedExpr {
             span: expr_span.clone(),

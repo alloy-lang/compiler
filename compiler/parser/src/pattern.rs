@@ -2,8 +2,8 @@ use core::convert;
 
 use improved_slice_patterns::match_vec;
 
+use super::{Token, TokenKind};
 use alloy_ast as ast;
-use alloy_lexer::{Token, TokenKind};
 
 use super::parens;
 use super::{ParseError, ParseResult, Span, Spanned};
@@ -60,9 +60,19 @@ pub fn parse<'a>(pattern_span: &Span, input: Vec<Token<'a>>) -> ParseResult<'a, 
         }, remainder.collect())),
 
         [
-            Token { kind: TokenKind::OpenParen, span: open_paren_span },
+            Token { kind: TokenKind::Parens(inner_tokens), span: parens_span },
             remainder @ ..
-        ] => parens::parse(open_paren_span, &mut remainder.clone(), self::parse, ast::Pattern::tuple),
+        ] => {
+            let args: Vec<ast::Pattern> = parens::parse_args(&parens_span, inner_tokens, self::parse)?
+                .into_iter()
+                .map(|arg| arg.value)
+                .collect();
+
+            Ok((Spanned {
+                span: parens_span,
+                value: ast::Pattern::tuple(args),
+            }, remainder.collect()))
+        },
 
         [remainder @ ..] => Err(ParseError::ExpectedPattern {
             span: pattern_span.clone(),

@@ -106,9 +106,9 @@ pub enum TokenKind<'source> {
     #[token("}")]
     CloseBrace,
     #[token("[")]
-    OpenBracket,
+    OpenSqBracket,
     #[token("]")]
-    CloseBracket,
+    CloseSqBracket,
     // #[token("@")]
     // At,
     // #[token("#")]
@@ -295,12 +295,12 @@ mod tests {
         let source = hashmap! {
             "#[]" => vec![
                 TokenKind::AttributeOpen,
-                TokenKind::CloseBracket,
+                TokenKind::CloseSqBracket,
             ],
             "#[test]" => vec![
                 TokenKind::AttributeOpen,
                 TokenKind::LowerIdentifier("test"),
-                TokenKind::CloseBracket,
+                TokenKind::CloseSqBracket,
             ],
             "#[cfg(test)]" => vec![
                 TokenKind::AttributeOpen,
@@ -308,7 +308,7 @@ mod tests {
                 TokenKind::OpenParen,
                 TokenKind::LowerIdentifier("test"),
                 TokenKind::CloseParen,
-                TokenKind::CloseBracket,
+                TokenKind::CloseSqBracket,
             ],
         };
 

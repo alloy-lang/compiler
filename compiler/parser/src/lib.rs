@@ -1,4 +1,3 @@
-use core::convert;
 use std::iter;
 use std::ops::Range;
 
@@ -6,8 +5,11 @@ use codespan_reporting::diagnostic::{Diagnostic, Label};
 use improved_slice_patterns::match_vec;
 
 use alloy_ast as ast;
-use alloy_lexer::{Token, TokenKind, TokenStream};
+use alloy_lexer::TokenKind as LTK;
+use alloy_lexer::TokenStream as LexerTokenStream;
+use convert::TokenConverter;
 
+mod convert;
 mod docs;
 mod expr;
 mod parens;
@@ -19,17 +21,17 @@ mod r#type;
 //
 
 pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
-    let /*mut*/ stream = TokenStream::from_source(source);
-
-    // let _doc_comments = extract_doc_comments(&mut stream);
-
-    let tokens = stream
+    let /*mut*/ stream = LexerTokenStream::from_source(source)
         .filter(|t| {
             !matches!(
                 t.kind,
-                TokenKind::EOL | TokenKind::Comment(_) | TokenKind::DocComment(_)
+                LTK::EOL | LTK::Comment(_) | LTK::DocComment(_)
             )
-        })
+        });
+
+    // let _doc_comments = extract_doc_comments(&mut stream);
+
+    let tokens = TokenConverter::new(stream)
         .chain(iter::once(Token {
             kind: TokenKind::EOF,
             span: source.len()..source.len(),
@@ -116,7 +118,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
         span: 0..source.len(),
         actual: remaining,
     })
-    .and_then(convert::identity);
+    .and_then(core::convert::identity);
 }
 
 fn find_last_span(remainder: &[Token], previous_span: &Span, source_length: usize) -> Span {
@@ -214,10 +216,164 @@ fn parse_module_contents<'a>(
             input: vec![],
             remaining,
         })
-        .and_then(convert::identity)?;
+        .and_then(core::convert::identity)?;
     }
 
     Ok((type_annotations, values))
+}
+
+//
+// unparsed Tokens
+//
+#[derive(Debug, PartialEq, Clone)]
+pub struct Token<'source> {
+    pub kind: TokenKind<'source>,
+    pub span: Range<usize>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum TokenKind<'source> {
+    // #[error]
+    Error,
+
+    // #[regex(r"[ \t\f]+", logos::skip)]
+    Whitespace,
+    // #[regex(r"[\n]+")]
+    EOL,
+
+    // #[regex(r"\n[ \t\n\f]+")]
+    // Indent(&'source str),
+
+    // Comments
+    // #[regex(r"--[^\n]*\n?")]
+    Comment(&'source str),
+    // #[regex(r"--![^\n]*\n?")]
+    DocComment(&'source str),
+
+    // Attributes
+    // #[token("#[")]
+    AttributeOpen,
+
+    // Keywords
+    // #[token("import")]
+    Import,
+    // #[token("module")]
+    Module,
+    // #[token("where")]
+    Where,
+    // #[token("when")]
+    When,
+    // #[token("match")]
+    Match,
+    // #[token("trait")]
+    Trait,
+    // #[token("behavior")]
+    Behavior,
+    // #[token("typedef")]
+    Typedef,
+    // #[token("typevar")]
+    Typevar,
+    // #[token("if")]
+    If,
+    // #[token("then")]
+    Then,
+    // #[token("else")]
+    Else,
+
+    // Non-alphanumeric
+    // #[token("->")]
+    RightArrow,
+    // #[token(";")]
+    // Semi,
+    // #[token(",")]
+    Comma,
+    // #[token(".")]
+    Dot,
+    // #[token("(")]
+    // OpenParen,
+    // #[token(")")]
+    CloseParen,
+    // #[regex("\($1\)")]
+    Parens(Vec<Token<'source>>),
+    // #[token("{")]
+    // OpenBrace,
+    // #[token("}")]
+    CloseBrace,
+    // #[regex("\{$1\}")]
+    Braces(Vec<Token<'source>>),
+    // #[token("[")]
+    // OpenBracket,
+    // #[token("]")]
+    CloseSqBracket,
+    // #[regex("\[$1\]")]
+    SqBrackets(Vec<Token<'source>>),
+    // #[regex("\<$1\>")]
+    AngledBrackets(Vec<Token<'source>>),
+    // #[token("@")]
+    // At,
+    // #[token("#")]
+    // Pound,
+    // #[token("~")]
+    // Tilde,
+    // #[token("?")]
+    // Question,
+    // #[token(":")]
+    Colon,
+    // #[token("$")]
+    // Dollar,
+    // #[token("=")]
+    Eq,
+    // #[token("!")]
+    // Bang,
+    // #[token("<")]
+    Lt,
+    // #[token(">")]
+    Gt,
+    // #[token("-")]
+    Minus,
+    // #[token("&&")]
+    And,
+    // #[token("||")]
+    Or,
+    // #[token("+")]
+    Plus,
+    // #[token("|")]
+    Pipe,
+    // #[token("*")]
+    // Star,
+    // #[token("/")]
+    // Slash,
+    // #[token("^")]
+    // Caret,
+    // #[token("%")]
+    // Percent,
+    // #[regex("_[A-Z][a-zA-Z0-9_]*[?]?")]
+    InvalidUpperIdentifier(&'source str),
+    // #[regex("_?[a-z][a-zA-Z0-9_]*[?]?")]
+    LowerIdentifier(&'source str),
+    // #[regex("[A-Z][a-zA-Z0-9_]*")]
+    UpperIdentifier(&'source str),
+    // #[regex(r"\([|<>=]+\)")]
+    // #[regex(r"[|<>=]+")]
+    OperatorIdentifier(&'source str),
+    // #[token("_")]
+    NilIdentifier,
+
+    // #[regex("([a-zA-Z][a-zA-Z0-9_]*(:))+[A-Z][a-zA-Z0-9_]*")]
+    InvalidUpperPath(&'source str),
+    // #[regex("([a-zA-Z][a-zA-Z0-9_]*::)+[A-Z][a-zA-Z0-9_]*")]
+    UpperPath(&'source str),
+    // #[regex("([a-zA-Z][a-zA-Z0-9_]*::)+_?[a-z][a-zA-Z0-9_]*[?]?")]
+    LowerPath(&'source str),
+
+    // #[regex(r#""([^"\\]|\\t|\\u|\\n|\\")*""#)]
+    LiteralString(&'source str),
+    // #[regex(r#"-?[0-9]+"#, |lex| lex.slice().parse())]
+    LiteralInt(i64),
+    // #[regex(r#"-?[0-9]+\.[0-9]+"#, |lex| lex.slice().parse())]
+    LiteralFloat(f64),
+
+    EOF,
 }
 
 //
@@ -984,7 +1140,7 @@ mod tests {
         "#;
         let actual = parse(source);
 
-        let expected = Err(ParseError::ExpectedClosedParen {
+        let expected = Err(ParseError::ExpectedTupleComma {
             span: 74..78,
             actual: vec![
                 Token {
@@ -1580,12 +1736,75 @@ mod tests {
         assert_eq!(expected, actual);
     }
 
-    //
+    #[test]
+    fn test_many_parens() {
+        let source = r#"
+            module Test
+            where
+
+            many_parens_type : ((((), (Int))))"#;
+        let actual: Result<Spanned<Module>, ParseError> = parse(source);
+
+        let expected: Result<Spanned<Module>, ParseError> = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![Spanned {
+                    span: 56..90,
+                    value: TypeAnnotation {
+                        name: Spanned {
+                            span: 56..72,
+                            value: "many_parens_type".to_string(),
+                        },
+                        t: Spanned {
+                            span: 75..90,
+                            value: ast::Type::tuple(vec![
+                                ast::Type::Unit,
+                                ast::Type::identifier("Int"),
+                            ]),
+                        },
+                    },
+                }],
+                values: vec![],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
     // #[test]
     // fn test_simple_if_then_else() {
     //     let source = test_source::SIMPLE_IF_THEN_ELSE;
+    //     let actual = parse(source);
     //
-    //     assert_no_errors(source)
+    //     let expected = Ok(Spanned {
+    //         span: 13..42,
+    //         value: Module {
+    //             name: Spanned {
+    //                 span: 20..24,
+    //                 value: "Test".to_string(),
+    //             },
+    //             type_annotations: vec![Spanned {
+    //                 span: 56..82,
+    //                 value: TypeAnnotation {
+    //                     name: Spanned {
+    //                         span: 56..74,
+    //                         value: "single_parens_type".to_string(),
+    //                     },
+    //                     t: Spanned {
+    //                         span: 77..82,
+    //                         value: ast::Type::identifier("Int"),
+    //                     },
+    //                 },
+    //             }],
+    //             values: vec![],
+    //         },
+    //     });
+    //
+    //     assert_eq!(expected, actual);
     // }
     //
     // #[test]
