@@ -53,13 +53,13 @@ pub fn parse<'a>(
     let spanned = {
         let (last_type, types) = types.split_last();
 
-        let span = types
-            .first()
-            .map(|o| o.span.start..last_type.span.end)
-            .unwrap_or(last_type.span.clone());
+        let span = types.first().map_or_else(
+            || last_type.span.clone(),
+            |o| o.span.start..last_type.span.end,
+        );
 
         let value = types
-            .into_iter()
+            .iter()
             .cloned()
             .rfold(last_type.value.clone(), |func, arg| {
                 ast::Type::lambda(arg.value, func)
@@ -82,16 +82,13 @@ fn parse_single_type<'a>(
         [
             Token { kind: TokenKind::UpperIdentifier(id), span },
             remainder @ ..
-        ] => Ok((Spanned {
-            span: span,
-            value: ast::Type::Identifier(id.to_string()),
-        }, remainder.collect())),
+        ] => Ok((Spanned { span, value: ast::Type::identifier(id) }, remainder.collect())),
 
         [
             Token { kind: TokenKind::LowerIdentifier(id), span },
             remainder @ ..
         ] => Ok((
-            Spanned { span: span.clone(), value: ast::Type::variable(id) },
+            Spanned { span, value: ast::Type::variable(id) },
             remainder.collect(),
         )),
 
