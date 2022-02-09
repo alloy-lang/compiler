@@ -62,7 +62,7 @@ pub fn parse<'a>(pattern_span: &Span, input: Vec<Token<'a>>) -> ParseResult<'a, 
         [
             Token { kind: TokenKind::OpenParen, span: open_paren_span },
             remainder @ ..
-        ] => parens::parse(open_paren_span, &mut remainder.clone(), self::parse, ast::Pattern::tuple),
+        ] => parens::parse(open_paren_span, remainder, self::parse, ast::Pattern::tuple),
 
         [remainder @ ..] => Err(ParseError::ExpectedPattern {
             span: pattern_span.clone(),

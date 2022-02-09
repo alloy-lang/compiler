@@ -95,7 +95,7 @@ fn parse_single_type<'a>(
         [
             Token { kind: TokenKind::OpenParen, span: open_paren_span },
             remainder @ ..
-        ] => parens::parse(open_paren_span, &mut remainder.clone(), self::parse_vec, ast::Type::tuple),
+        ] => parens::parse(open_paren_span, remainder, self::parse_vec, ast::Type::tuple),
 
         [remainder @ ..,] => Err(ParseError::ExpectedType {
             span: type_span.clone(),
