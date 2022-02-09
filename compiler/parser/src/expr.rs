@@ -55,7 +55,7 @@ pub fn parse<'a>(
 
                 [remainder @ ..,] => {
                     let span = expr_span.clone();
-                    let span = span.start..pattern_remainder.iter().next().map(|t| t.span.clone()).unwrap_or(span).end;
+                    let span = span.start..pattern_remainder.get(0).map_or(span, |t| t.span.clone()).end;
                     Err(ParseError::ExpectedPipe {
                         span,
                         actual: pattern_remainder.clone(),
@@ -131,7 +131,7 @@ pub fn parse<'a>(
             Token { kind: TokenKind::LowerIdentifier(id), span },
             Token { kind: TokenKind::OpenParen,           span: open_paren_span },
             remainder @ ..
-        ] => parens::parse(open_paren_span, &mut remainder.clone(), self::parse_vec, |args| ast::Expr::application(vec![id], args)),
+        ] => parens::parse(open_paren_span, remainder, self::parse_vec, |args| ast::Expr::application(vec![id], args)),
 
         [
             Token { kind: TokenKind::LowerIdentifier(id), span },
@@ -144,7 +144,7 @@ pub fn parse<'a>(
         [
             Token { kind: TokenKind::OpenParen, span: open_paren_span },
             remainder @ ..
-        ] => parens::parse(open_paren_span, &mut remainder.clone(), self::parse_vec, ast::Expr::tuple),
+        ] => parens::parse(open_paren_span, remainder, self::parse_vec, ast::Expr::tuple),
 
         [remainder @ ..,] => Err(ParseError::ExpectedExpr {
             span: expr_span.clone(),

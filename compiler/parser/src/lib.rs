@@ -119,6 +119,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
     .and_then(convert::identity);
 }
 
+#[must_use]
 fn find_last_span(remainder: &[Token], previous_span: &Span, source_length: usize) -> Span {
     remainder
         .iter()
@@ -449,8 +450,8 @@ impl<'a> ParseError<'a> {
                         .collect(),
                 ),
             ParseError::ExpectedClosedParen { span, .. } => {
-                let labels = vec![Label::primary(file_id.clone(), span)
-                    .with_message("Expected closed parenthesis")];
+                let labels =
+                    vec![Label::primary(file_id, span).with_message("Expected closed parenthesis")];
 
                 Diagnostic::error()
                     .with_message("Expected a close parenthesis `)`. Ex: `(Int, String)`.")

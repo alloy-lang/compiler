@@ -1,4 +1,3 @@
-use core::convert::TryFrom;
 use itertools::Itertools;
 use non_empty_vec::NonEmpty;
 use ordered_float::NotNan;
@@ -42,19 +41,29 @@ pub enum Type {
 
 impl Type {
     // pub fn union(types: Vec<Type>) -> Type {
-    //     Type::Union {
-    //         types: NonEmpty::try_from(types).unwrap(),
+    //     match &types[..] {
+    //         [] => Type::Unit,
+    //         [arg] => arg.clone(),
+    //         _ => unsafe {
+    //             Type::Union {
+    //                 types: Type::Tuple(NonEmpty::new_unchecked(types))
+    //             }
+    //         },
     //     }
     // }
 
+    #[must_use]
     pub fn tuple(types: Vec<Type>) -> Type {
         match &types[..] {
             [] => Type::Unit,
             [arg] => arg.clone(),
-            _ => Type::Tuple(NonEmpty::try_from(types).unwrap()),
+            _ => unsafe {
+                Type::Tuple(NonEmpty::new_unchecked(types))
+            },
         }
     }
 
+    #[must_use]
     pub fn lambda<T1, T2>(arg_type: T1, return_type: T2) -> Type
     where
         T1: Into<Box<Type>>,
@@ -66,6 +75,7 @@ impl Type {
         }
     }
 
+    #[must_use]
     pub fn identifier<S>(s: S) -> Type
     where
         S: Into<String>,
@@ -73,6 +83,7 @@ impl Type {
         Type::Identifier(s.into())
     }
 
+    #[must_use]
     pub fn variable<S>(id: S) -> Type
     where
         S: Into<String>,
@@ -164,7 +175,9 @@ impl Expr {
     //         return *expr.into();
     //     }
     //
-    //     Expr::Case(expr.into(), NonEmpty::try_from(alts).unwrap())
+    //     NonEmpty::try_from(alts)
+    //         .map(|alts| Expr::Case(expr.into(), alts))
+    //         .unwrap_or_else(|| *expr.into())
     // }
 
     // #[must_use]
@@ -209,7 +222,9 @@ impl Expr {
         match &args[..] {
             [] => Expr::Unit,
             [arg] => Expr::paren(arg.clone()),
-            _ => Expr::Tuple(NonEmpty::try_from(args).unwrap()),
+            _ => unsafe {
+                Expr::Tuple(NonEmpty::new_unchecked(args))
+            },
         }
     }
 }
@@ -266,7 +281,9 @@ impl Pattern {
         match &args[..] {
             [] => Pattern::Unit,
             [arg] => arg.clone(),
-            _ => Pattern::Tuple(NonEmpty::try_from(args).unwrap()),
+            _ => unsafe {
+                Pattern::Tuple(NonEmpty::new_unchecked(args))
+            },
         }
     }
 }
@@ -282,7 +299,9 @@ pub enum LiteralData {
 impl LiteralData {
     #[must_use]
     pub fn fractional(val: f64) -> Self {
-        LiteralData::Fractional(NotNan::new(val).unwrap())
+        unsafe {
+            LiteralData::Fractional(NotNan::new_unchecked(val))
+        }
     }
 }
 
