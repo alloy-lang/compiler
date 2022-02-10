@@ -980,27 +980,16 @@ mod tests {
             module Test
             where
 
-            no_close_parens : (Int
-            0
+            no_close_parens : (Int, String
         "#;
         let actual = parse(source);
 
         let expected = Err(ParseError::ExpectedClosedParen {
-            span: 74..78,
-            actual: vec![
-                Token {
-                    kind: TokenKind::UpperIdentifier("Int"),
-                    span: 75..78,
-                },
-                Token {
-                    kind: TokenKind::LiteralInt(0),
-                    span: 91..92,
-                },
-                Token {
-                    kind: TokenKind::EOF,
-                    span: 101..101,
-                },
-            ],
+            span: 74..95,
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 95..95,
+            }],
         });
 
         assert_eq!(expected, actual);
@@ -1017,11 +1006,21 @@ mod tests {
         let actual = parse(source);
 
         let expected = Err(ParseError::ExpectedTupleComma {
-            span: 74..86,
-            actual: vec![Token {
-                kind: TokenKind::UpperIdentifier("String"),
-                span: 79..85,
-            }],
+            span: 74..78,
+            actual: vec![
+                Token {
+                    kind: TokenKind::UpperIdentifier("String"),
+                    span: 79..85,
+                },
+                Token {
+                    kind: TokenKind::CloseParen,
+                    span: 85..86,
+                },
+                Token {
+                    kind: TokenKind::EOF,
+                    span: 95..95,
+                },
+            ],
         });
 
         assert_eq!(expected, actual);
@@ -1581,7 +1580,45 @@ mod tests {
         assert_eq!(expected, actual);
     }
 
-    //
+    #[test]
+    fn test_many_parens() {
+        let source = r#"
+            module Test
+            where
+
+            many_parens_type : ((((), (Int))))"#;
+        let actual: Result<Spanned<Module>, ParseError> = parse(source);
+
+        let expected: Result<Spanned<Module>, ParseError> = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![Spanned {
+                    span: 56..90,
+                    value: TypeAnnotation {
+                        name: Spanned {
+                            span: 56..72,
+                            value: "many_parens_type".to_string(),
+                        },
+                        t: Spanned {
+                            span: 75..90,
+                            value: ast::Type::tuple(vec![
+                                ast::Type::Unit,
+                                ast::Type::identifier("Int"),
+                            ]),
+                        },
+                    },
+                }],
+                values: vec![],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
     // #[test]
     // fn test_simple_if_then_else() {
     //     let source = test_source::SIMPLE_IF_THEN_ELSE;
