@@ -1,4 +1,5 @@
 use core::convert;
+
 use improved_slice_patterns::match_vec;
 use itertools::Itertools;
 
@@ -131,13 +132,13 @@ pub fn parse<'a>(
             Token { kind: TokenKind::LowerIdentifier(id), span },
             Token { kind: TokenKind::OpenParen,           span: open_paren_span },
             remainder @ ..
-        ] => parens::parse(open_paren_span, remainder, self::parse_vec, |args| ast::Expr::application(ast::QualifiedLowerName::from(id), args)),
+        ] => parens::parse(open_paren_span, remainder, self::parse_vec, |args| ast::Expr::application(&ast::QualifiedLowerName::from(id), args)),
 
         [
             Token { kind: TokenKind::LowerPath(id), span },
             Token { kind: TokenKind::OpenParen,           span: open_paren_span },
             remainder @ ..
-        ] => parens::parse(open_paren_span, remainder, self::parse_vec, |args| ast::Expr::application(ast::QualifiedLowerName::from(id), args)),
+        ] => parens::parse(open_paren_span, remainder, self::parse_vec, |args| ast::Expr::application(&ast::QualifiedLowerName::from(id), args)),
 
         [
             Token { kind: TokenKind::LowerIdentifier(id), span },
@@ -157,28 +158,40 @@ pub fn parse<'a>(
             remainder @ ..
         ] => {
             let (if_expr, remainder) = self::parse(&if_span, remainder)?;
-            let mut remainder = remainder.into_iter();
+            let mut remainder = remainder.into_iter().peekable();
 
-            match remainder.next() {
+            match remainder.peek().cloned() {
                 Some(t) if t.kind == TokenKind::Then => {
-                    let (then_expr, remainder) = self::parse(&t.span, remainder)?;
-                    let mut remainder = remainder.into_iter();
+                    let (then_expr, remainder) = self::parse(&t.span, remainder.skip(1))?;
+                    let mut remainder = remainder.into_iter().peekable();
 
-                    match remainder.next() {
+                    match remainder.peek().cloned() {
                         Some(t) if t.kind == TokenKind::Else => {
-                            let (else_expr, remainder) = self::parse(&t.span, remainder)?;
+                            let (else_expr, remainder) = self::parse(&t.span, remainder.skip(1))?;
 
                             Ok((Spanned {
                                 span: if_span.start..else_expr.span.end,
                                 value: ast::Expr::if_then_else(if_expr.value, then_expr.value, else_expr.value),
                             }, remainder))
                         }
-                        Some(t) => todo!("then todo: {:?}", t),
-                        None => todo!("then todo: None"),
+                        Some(t) => Err(ParseError::ExpectedElseKeyWord {
+                            span: t.span,
+                            actual: remainder.collect_vec(),
+                        }),
+                        None => Err(ParseError::ExpectedElseKeyWord {
+                            span: then_expr.span,
+                            actual: vec![],
+                        }),
                     }
                 }
-                Some(t) => todo!("then todo: {:?}", t),
-                None => todo!("then todo: None"),
+                Some(t) => Err(ParseError::ExpectedThenKeyWord {
+                    span: t.span,
+                    actual: remainder.collect_vec(),
+                }),
+                None => Err(ParseError::ExpectedThenKeyWord {
+                    span: if_expr.span,
+                    actual: vec![],
+                }),
             }
         },
 
