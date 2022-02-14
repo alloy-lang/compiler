@@ -1419,7 +1419,7 @@ mod tests {
                                 ast::Expr::lambda(
                                     vec![ast::Pattern::identifier("value")],
                                     ast::Expr::application(
-                                        vec!["f"],
+                                        ast::QualifiedLowerName::from("f"),
                                         vec![ast::Expr::identifier("value")],
                                     ),
                                 ),
@@ -1619,12 +1619,80 @@ mod tests {
         assert_eq!(expected, actual);
     }
 
-    // #[test]
-    // fn test_simple_if_then_else() {
-    //     let source = test_source::SIMPLE_IF_THEN_ELSE;
-    //
-    //     assert_no_errors(source)
-    // }
+    #[test]
+    fn test_simple_if_then_else() {
+        let source = test_source::SIMPLE_IF_THEN_ELSE;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![],
+                values: vec![
+                    Spanned {
+                        span: 56..178,
+                        value: Value {
+                            name: Spanned {
+                                span: 56..74,
+                                value: "increment_positive".to_string(),
+                            },
+                            expr: Spanned {
+                                span: 77..178,
+                                value: ast::Expr::lambda(
+                                    vec![ast::Pattern::identifier("num")],
+                                    ast::Expr::if_then_else(
+                                        ast::Expr::application(
+                                            ast::QualifiedLowerName::from("Number::is_positive?"),
+                                            vec![ast::Expr::identifier("num")],
+                                        ),
+                                        ast::Expr::bin_op(
+                                            "+",
+                                            ast::Expr::identifier("num"),
+                                            ast::Expr::int_literal(1),
+                                        ),
+                                        ast::Expr::identifier("num"),
+                                    ),
+                                ),
+                            },
+                        },
+                    },
+                    Spanned {
+                        span: 191..313,
+                        value: Value {
+                            name: Spanned {
+                                span: 191..209,
+                                value: "decrement_negative".to_string(),
+                            },
+                            expr: Spanned {
+                                span: 212..313,
+                                value: ast::Expr::lambda(
+                                    vec![ast::Pattern::identifier("num")],
+                                    ast::Expr::if_then_else(
+                                        ast::Expr::application(
+                                            ast::QualifiedLowerName::from("Number::is_negative?"),
+                                            vec![ast::Expr::identifier("num")],
+                                        ),
+                                        ast::Expr::bin_op(
+                                            "-",
+                                            ast::Expr::identifier("num"),
+                                            ast::Expr::int_literal(1),
+                                        ),
+                                        ast::Expr::identifier("num"),
+                                    ),
+                                ),
+                            },
+                        },
+                    },
+                ],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
     //
     // #[test]
     // fn test_nested_if_then_else() {

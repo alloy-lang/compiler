@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use non_empty_vec::NonEmpty;
 use ordered_float::NotNan;
 
@@ -108,7 +107,7 @@ pub enum Expr {
     Literal(LiteralData),
     Lambda(Pattern, Box<Expr>),
     // Case(Box<Expr>, NonEmpty<Alternative>),
-    // IfElse(Box<Expr>, Box<Expr>, Box<Expr>),
+    IfElse(Box<Expr>, Box<Expr>, Box<Expr>),
     Paren(Box<Expr>),
     Tuple(NonEmpty<Expr>),
 }
@@ -180,23 +179,22 @@ impl Expr {
     //         .unwrap_or_else(|| *expr.into())
     // }
 
-    // #[must_use]
-    // pub fn if_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr
-    //     where
-    //         E: Into<Box<Expr>>,
-    //         V1: Into<Box<Expr>>,
-    //         V2: Into<Box<Expr>>,
-    // {
-    //     Expr::IfElse(expr.into(), then_expr.into(), else_expr.into())
-    // }
+    #[must_use]
+    pub fn if_then_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr
+        where
+            E: Into<Box<Expr>>,
+            V1: Into<Box<Expr>>,
+            V2: Into<Box<Expr>>,
+    {
+        Expr::IfElse(expr.into(), then_expr.into(), else_expr.into())
+    }
 
     #[must_use]
-    pub fn application<S, E>(address: Vec<S>, args: E) -> Expr
+    pub fn application<E>(address: QualifiedLowerName, args: E) -> Expr
     where
-        S: Into<String>,
         E: Into<Vec<Expr>>,
     {
-        let address = address.into_iter().map(Into::into).join("::");
+        let address = address.as_string();
         let func = Expr::Identifier(address);
 
         args.into()
@@ -301,6 +299,94 @@ impl LiteralData {
     pub fn fractional(val: f64) -> Self {
         unsafe {
             LiteralData::Fractional(NotNan::new_unchecked(val))
+        }
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+pub struct QualifiedLowerName {
+    pub modules: Vec<String>,
+    pub access: Vec<String>,
+}
+
+impl QualifiedLowerName {
+    pub fn simple(name: String) -> Self {
+        Self {
+            modules: Vec::new(),
+            access: vec![name],
+        }
+    }
+
+    pub fn from<S>(name: S) -> Self where S: Into<String> {
+        let name = name.into();
+        let segments = name.split("::");
+        let (modules, access) = segments
+            .into_iter()
+            .map(|str| str.to_string())
+            .partition(|name| name.starts_with(|ch| ('A'..='Z').contains(&ch)));
+
+        Self { modules, access }
+    }
+
+    pub fn as_string(&self) -> String {
+        self.modules
+            .iter()
+            .cloned()
+            .chain(self.access.iter().cloned())
+            .collect::<Vec<String>>()
+            .join("::")
+    }
+
+    pub fn without_module(&self) -> Self {
+        Self {
+            modules: vec![],
+            access: self.access.clone(),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+pub struct QualifiedUpperName {
+    pub modules: Vec<String>,
+    pub access: String,
+}
+
+impl QualifiedUpperName {
+    pub fn from(name: &str) -> Option<Self> {
+        let mut segments: Vec<String> = name
+            .split("::")
+            .into_iter()
+            .map(|str| str.to_string())
+            .collect();
+
+        let last = segments.pop();
+
+        last.map(|access| Self {
+            modules: segments,
+            access,
+        })
+    }
+
+    pub fn as_string(&self) -> String {
+        let mut string = self
+            .modules
+            .iter()
+            .cloned()
+            .collect::<Vec<String>>()
+            .join("::");
+
+        if string.is_empty() {
+            self.access.clone()
+        } else {
+            string.push_str(&format!(".{}", self.access));
+            string
+        }
+    }
+
+    pub fn without_module(&self) -> Self {
+        Self {
+            modules: vec![],
+            access: self.access.clone(),
         }
     }
 }
