@@ -190,7 +190,7 @@ impl Expr {
     }
 
     #[must_use]
-    pub fn application<E>(address: QualifiedLowerName, args: E) -> Expr
+    pub fn application<E>(address: &QualifiedLowerName, args: E) -> Expr
     where
         E: Into<Vec<Expr>>,
     {
@@ -310,6 +310,7 @@ pub struct QualifiedLowerName {
 }
 
 impl QualifiedLowerName {
+    #[must_use]
     pub fn simple(name: String) -> Self {
         Self {
             modules: Vec::new(),
@@ -317,17 +318,19 @@ impl QualifiedLowerName {
         }
     }
 
+    #[must_use]
     pub fn from<S>(name: S) -> Self where S: Into<String> {
         let name = name.into();
         let segments = name.split("::");
         let (modules, access) = segments
             .into_iter()
-            .map(|str| str.to_string())
+            .map(ToString::to_string)
             .partition(|name| name.starts_with(|ch| ('A'..='Z').contains(&ch)));
 
         Self { modules, access }
     }
 
+    #[must_use]
     pub fn as_string(&self) -> String {
         self.modules
             .iter()
@@ -337,6 +340,7 @@ impl QualifiedLowerName {
             .join("::")
     }
 
+    #[must_use]
     pub fn without_module(&self) -> Self {
         Self {
             modules: vec![],
@@ -352,11 +356,12 @@ pub struct QualifiedUpperName {
 }
 
 impl QualifiedUpperName {
+    #[must_use]
     pub fn from(name: &str) -> Option<Self> {
         let mut segments: Vec<String> = name
             .split("::")
             .into_iter()
-            .map(|str| str.to_string())
+            .map(ToString::to_string)
             .collect();
 
         let last = segments.pop();
@@ -367,12 +372,11 @@ impl QualifiedUpperName {
         })
     }
 
+    #[must_use]
     pub fn as_string(&self) -> String {
         let mut string = self
             .modules
-            .iter()
-            .cloned()
-            .collect::<Vec<String>>()
+            .clone()
             .join("::");
 
         if string.is_empty() {
@@ -383,6 +387,7 @@ impl QualifiedUpperName {
         }
     }
 
+    #[must_use]
     pub fn without_module(&self) -> Self {
         Self {
             modules: vec![],

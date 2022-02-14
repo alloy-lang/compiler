@@ -18,8 +18,7 @@ where
     let mut parens_args = Vec::new();
     loop {
         match parens_remainder.peek().map(|t| t.kind.clone()) {
-            None => break,
-            Some(TokenKind::CloseParen) | Some(TokenKind::EOF) => break,
+            None | Some(TokenKind::CloseParen | TokenKind::EOF) => break,
             _ => {}
         };
 
