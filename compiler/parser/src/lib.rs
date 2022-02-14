@@ -323,6 +323,14 @@ pub enum ParseError<'a> {
         span: Span,
         actual: Vec<Token<'a>>,
     },
+    ExpectedThenKeyWord {
+        span: Span,
+        actual: Vec<Token<'a>>,
+    },
+    ExpectedElseKeyWord {
+        span: Span,
+        actual: Vec<Token<'a>>,
+    },
     ExpectedEOF {
         input: Vec<Token<'a>>,
         remaining: Vec<Token<'a>>,
@@ -494,6 +502,44 @@ impl<'a> ParseError<'a> {
                 Diagnostic::error()
                     .with_message(
                         "Expected a comma between lambda arguments. Ex: `|arg1, arg2|` instead of `|arg1 arg2|`.",
+                    )
+                    .with_code("E0013")
+                    .with_labels(labels)
+            }
+            ParseError::ExpectedThenKeyWord { span, actual } => {
+                let labels = actual
+                    .first()
+                    .map(|t| {
+                        Label::primary(file_id.clone(), span).with_message(format!(
+                            "Expected 'then' following 'if', but found: {:?}",
+                            t.kind
+                        ))
+                    })
+                    .into_iter()
+                    .collect();
+
+                Diagnostic::error()
+                    .with_message(
+                        "Expected 'then' following 'if'. Ex: `if (num > 1) then 1 else 0` instead of `if (num > 1) 1 else 0`.",
+                    )
+                    .with_code("E0013")
+                    .with_labels(labels)
+            }
+            ParseError::ExpectedElseKeyWord { span, actual } => {
+                let labels = actual
+                    .first()
+                    .map(|t| {
+                        Label::primary(file_id.clone(), span).with_message(format!(
+                            "Expected 'else' following 'if then', but found: {:?}",
+                            t.kind
+                        ))
+                    })
+                    .into_iter()
+                    .collect();
+
+                Diagnostic::error()
+                    .with_message(
+                        "Expected 'else' following 'if then'. Ex: `if (num > 1) then 1 else 0` instead of `if (num > 1) 1 else 0`.",
                     )
                     .with_code("E0013")
                     .with_labels(labels)
@@ -1689,6 +1735,73 @@ mod tests {
                     },
                 ],
             },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_if_with_no_then_else() {
+        let source = r#"
+            module Test
+            where
+
+            missing_then = |num| ->
+              if Number::is_positive?(num) num + 1
+              else num
+"#;
+        let actual = parse(source);
+
+        let expected = Err(ParseError::ExpectedThenKeyWord {
+            span: 123..126,
+            actual: vec![
+                Token {
+                    kind: TokenKind::LowerIdentifier("num"),
+                    span: 123..126,
+                },
+                Token {
+                    kind: TokenKind::Plus,
+                    span: 127..128,
+                },
+                Token {
+                    kind: TokenKind::LiteralInt(1),
+                    span: 129..130,
+                },
+                Token {
+                    kind: TokenKind::Else,
+                    span: 145..149,
+                },
+                Token {
+                    kind: TokenKind::LowerIdentifier("num"),
+                    span: 150..153,
+                },
+                Token {
+                    kind: TokenKind::EOF,
+                    span: 154..154,
+                },
+            ],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_if_then_with_no_else() {
+        let source = r#"
+            module Test
+            where
+
+            missing_then = |num| ->
+              if Number::is_positive?(num) then num + 1
+"#;
+        let actual = parse(source);
+
+        let expected = Err(ParseError::ExpectedElseKeyWord {
+            span: 136..136,
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 136..136,
+            }],
         });
 
         assert_eq!(expected, actual);
