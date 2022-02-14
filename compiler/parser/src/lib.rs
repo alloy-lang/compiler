@@ -1419,7 +1419,7 @@ mod tests {
                                 ast::Expr::lambda(
                                     vec![ast::Pattern::identifier("value")],
                                     ast::Expr::application(
-                                        ast::QualifiedLowerName::from("f"),
+                                        &ast::QualifiedLowerName::from("f"),
                                         vec![ast::Expr::identifier("value")],
                                     ),
                                 ),
@@ -1646,7 +1646,7 @@ mod tests {
                                     vec![ast::Pattern::identifier("num")],
                                     ast::Expr::if_then_else(
                                         ast::Expr::application(
-                                            ast::QualifiedLowerName::from("Number::is_positive?"),
+                                            &ast::QualifiedLowerName::from("Number::is_positive?"),
                                             vec![ast::Expr::identifier("num")],
                                         ),
                                         ast::Expr::bin_op(
@@ -1673,7 +1673,7 @@ mod tests {
                                     vec![ast::Pattern::identifier("num")],
                                     ast::Expr::if_then_else(
                                         ast::Expr::application(
-                                            ast::QualifiedLowerName::from("Number::is_negative?"),
+                                            &ast::QualifiedLowerName::from("Number::is_negative?"),
                                             vec![ast::Expr::identifier("num")],
                                         ),
                                         ast::Expr::bin_op(
