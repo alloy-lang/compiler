@@ -53,7 +53,7 @@ pub fn parse<'a>(
                     })
                 },
 
-                [remainder @ ..,] => {
+                [remainder @ ..] => {
                     let span = expr_span.clone();
                     let span = span.start..pattern_remainder.get(0).map_or(span, |t| t.span.clone()).end;
                     Err(ParseError::ExpectedPipe {
@@ -131,7 +131,13 @@ pub fn parse<'a>(
             Token { kind: TokenKind::LowerIdentifier(id), span },
             Token { kind: TokenKind::OpenParen,           span: open_paren_span },
             remainder @ ..
-        ] => parens::parse(open_paren_span, remainder, self::parse_vec, |args| ast::Expr::application(vec![id], args)),
+        ] => parens::parse(open_paren_span, remainder, self::parse_vec, |args| ast::Expr::application(ast::QualifiedLowerName::from(id), args)),
+
+        [
+            Token { kind: TokenKind::LowerPath(id), span },
+            Token { kind: TokenKind::OpenParen,           span: open_paren_span },
+            remainder @ ..
+        ] => parens::parse(open_paren_span, remainder, self::parse_vec, |args| ast::Expr::application(ast::QualifiedLowerName::from(id), args)),
 
         [
             Token { kind: TokenKind::LowerIdentifier(id), span },
@@ -145,6 +151,36 @@ pub fn parse<'a>(
             Token { kind: TokenKind::OpenParen, span: open_paren_span },
             remainder @ ..
         ] => parens::parse(open_paren_span, remainder, self::parse_vec, ast::Expr::tuple),
+
+        [
+            Token { kind: TokenKind::If, span: if_span },
+            remainder @ ..
+        ] => {
+            let (if_expr, remainder) = self::parse(&if_span, remainder)?;
+            let mut remainder = remainder.into_iter();
+
+            match remainder.next() {
+                Some(t) if t.kind == TokenKind::Then => {
+                    let (then_expr, remainder) = self::parse(&t.span, remainder)?;
+                    let mut remainder = remainder.into_iter();
+
+                    match remainder.next() {
+                        Some(t) if t.kind == TokenKind::Else => {
+                            let (else_expr, remainder) = self::parse(&t.span, remainder)?;
+
+                            Ok((Spanned {
+                                span: if_span.start..else_expr.span.end,
+                                value: ast::Expr::if_then_else(if_expr.value, then_expr.value, else_expr.value),
+                            }, remainder))
+                        }
+                        Some(t) => todo!("then todo: {:?}", t),
+                        None => todo!("then todo: None"),
+                    }
+                }
+                Some(t) => todo!("then todo: {:?}", t),
+                None => todo!("then todo: None"),
+            }
+        },
 
         [remainder @ ..,] => Err(ParseError::ExpectedExpr {
             span: expr_span.clone(),
@@ -168,6 +204,19 @@ pub fn parse<'a>(
                 Ok((Spanned {
                     span: expr_span.start..expr2.span.end,
                     value: ast::Expr::bin_op("+", expr1.value.clone(), expr2.value),
+                }, remainder))
+            },
+            [
+                Token { kind: TokenKind::Minus, span: op_span },
+                remainder @ ..
+            ] => {
+                let expr_span = expr_span.start..op_span.end;
+
+                let (expr2, remainder) = parse(&expr_span, remainder)?;
+
+                Ok((Spanned {
+                    span: expr_span.start..expr2.span.end,
+                    value: ast::Expr::bin_op("-", expr1.value.clone(), expr2.value),
                 }, remainder))
             },
 
