@@ -1806,13 +1806,63 @@ mod tests {
 
         assert_eq!(expected, actual);
     }
-    //
-    // #[test]
-    // fn test_nested_if_then_else() {
-    //     let source = test_source::NESTED_IF_THEN_ELSE;
-    //
-    //     assert_no_errors(source)
-    // }
+
+    #[test]
+    fn test_nested_if_then_else() {
+        let source = test_source::NESTED_IF_THEN_ELSE;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                type_annotations: vec![],
+                values: vec![Spanned {
+                    span: 56..277,
+                    value: Value {
+                        name: Spanned {
+                            span: 56..78,
+                            value: "increment_or_decrement".to_string(),
+                        },
+                        expr: Spanned {
+                            span: 81..277,
+                            value: ast::Expr::lambda(
+                                vec![ast::Pattern::identifier("num")],
+                                ast::Expr::if_then_else(
+                                    ast::Expr::application(
+                                        &ast::QualifiedLowerName::from("Number::is_positive?"),
+                                        vec![ast::Expr::identifier("num")],
+                                    ),
+                                    ast::Expr::bin_op(
+                                        "+",
+                                        ast::Expr::identifier("num"),
+                                        ast::Expr::int_literal(1),
+                                    ),
+                                    ast::Expr::if_then_else(
+                                        ast::Expr::application(
+                                            &ast::QualifiedLowerName::from("Number::is_negative?"),
+                                            vec![ast::Expr::identifier("num")],
+                                        ),
+                                        ast::Expr::bin_op(
+                                            "-",
+                                            ast::Expr::identifier("num"),
+                                            ast::Expr::int_literal(1),
+                                        ),
+                                        ast::Expr::identifier("num"),
+                                    ),
+                                ),
+                            ),
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
     //
     // #[test]
     // fn test_multi_property_union_type() {
