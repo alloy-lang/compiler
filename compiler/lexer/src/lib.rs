@@ -153,8 +153,8 @@ pub enum TokenKind<'source> {
     LowerIdentifier(&'source str),
     #[regex("[A-Z][a-zA-Z0-9_]*")]
     UpperIdentifier(&'source str),
-    #[regex(r"\([|<>=]+\)")]
-    #[regex(r"[|<>=]+")]
+    #[regex(r"\([!|<>=]+\)")]
+    #[regex(r"[!|<>=]+")]
     OperatorIdentifier(&'source str),
     #[token("_")]
     NilIdentifier,
@@ -267,6 +267,10 @@ mod tests {
             "<=<" => TokenKind::OperatorIdentifier("<=<"),
             "(|>)" => TokenKind::OperatorIdentifier("(|>)"),
             "|>" => TokenKind::OperatorIdentifier("|>"),
+            "!" => TokenKind::OperatorIdentifier("!"),
+            "(!)" => TokenKind::OperatorIdentifier("!"),
+            "!=" => TokenKind::OperatorIdentifier("!="),
+            "(!=)" => TokenKind::OperatorIdentifier("!="),
         };
 
         for (source, expected) in source {
