@@ -538,7 +538,7 @@ pub(crate)grammar parser() for str {
 }
 
 #[cfg(test)]
-mod tests {
+mod old_parser_tests {
     use crate::parse;
     use crate::parse::{
         Expr, Pattern, TraitDefinition, TypeAliasDefinition, TypeAnnotationDefinition,

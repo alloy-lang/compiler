@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use non_empty_vec::NonEmpty;
 use ordered_float::NotNan;
 
@@ -190,11 +191,12 @@ impl Expr {
     }
 
     #[must_use]
-    pub fn application<E>(address: &QualifiedLowerName, args: E) -> Expr
+    pub fn application<S, E>(address: NonEmpty<S>, args: E) -> Expr
     where
+        S: Into<String>,
         E: Into<Vec<Expr>>,
     {
-        let address = address.as_string();
+        let address = address.into_iter().map(Into::into).join("::");
         let func = Expr::Identifier(address);
 
         args.into()
@@ -303,100 +305,7 @@ impl LiteralData {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub struct QualifiedLowerName {
-    pub modules: Vec<String>,
-    pub access: Vec<String>,
-}
-
-impl QualifiedLowerName {
-    #[must_use]
-    pub fn simple(name: String) -> Self {
-        Self {
-            modules: Vec::new(),
-            access: vec![name],
-        }
-    }
-
-    #[must_use]
-    pub fn from<S>(name: S) -> Self where S: Into<String> {
-        let name = name.into();
-        let segments = name.split("::");
-        let (modules, access) = segments
-            .into_iter()
-            .map(ToString::to_string)
-            .partition(|name| name.starts_with(|ch| ('A'..='Z').contains(&ch)));
-
-        Self { modules, access }
-    }
-
-    #[must_use]
-    pub fn as_string(&self) -> String {
-        self.modules
-            .iter()
-            .cloned()
-            .chain(self.access.iter().cloned())
-            .collect::<Vec<String>>()
-            .join("::")
-    }
-
-    #[must_use]
-    pub fn without_module(&self) -> Self {
-        Self {
-            modules: vec![],
-            access: self.access.clone(),
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub struct QualifiedUpperName {
-    pub modules: Vec<String>,
-    pub access: String,
-}
-
-impl QualifiedUpperName {
-    #[must_use]
-    pub fn from(name: &str) -> Option<Self> {
-        let mut segments: Vec<String> = name
-            .split("::")
-            .into_iter()
-            .map(ToString::to_string)
-            .collect();
-
-        let last = segments.pop();
-
-        last.map(|access| Self {
-            modules: segments,
-            access,
-        })
-    }
-
-    #[must_use]
-    pub fn as_string(&self) -> String {
-        let mut string = self
-            .modules
-            .clone()
-            .join("::");
-
-        if string.is_empty() {
-            self.access.clone()
-        } else {
-            string.push_str(&format!(".{}", self.access));
-            string
-        }
-    }
-
-    #[must_use]
-    pub fn without_module(&self) -> Self {
-        Self {
-            modules: vec![],
-            access: self.access.clone(),
-        }
-    }
-}
-
 #[cfg(test)]
-mod tests {
+mod ast_tests {
     use pretty_assertions::{assert_eq, assert_ne};
 }

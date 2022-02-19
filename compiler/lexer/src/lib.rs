@@ -1,6 +1,8 @@
 extern crate maplit;
 
-use logos::Logos;
+use logos::{Lexer, Logos};
+use non_empty_vec::{EmptyError, NonEmpty};
+use std::convert::TryFrom;
 use std::ops::Range;
 
 #[derive(Clone)]
@@ -40,6 +42,12 @@ impl<'source> Token<'source> {
 }
 
 #[derive(Logos, Debug, PartialEq, Clone)]
+#[logos(
+    subpattern op_id = r"[!|<>=]+",
+    subpattern upper_id = r"[A-Z]([a-zA-Z0-9_]*)",
+    subpattern lower_id = r"_?[a-z]([a-zA-Z0-9_]*)",
+    subpattern either_id = r"[a-zA-Z]([a-zA-Z0-9_]*)",
+)]
 pub enum TokenKind<'source> {
     #[error]
     Error,
@@ -147,24 +155,28 @@ pub enum TokenKind<'source> {
     // Caret,
     // #[token("%")]
     // Percent,
-    #[regex("_[A-Z][a-zA-Z0-9_]*[?]?")]
+    #[regex("#(?&upper_id)")]
+    HashUpperIdentifier(&'source str),
+    #[regex("_(?&upper_id)[?]?")]
     InvalidUpperIdentifier(&'source str),
-    #[regex("_?[a-z][a-zA-Z0-9_]*[?]?")]
+    #[regex("(?&lower_id)[?]?")]
     LowerIdentifier(&'source str),
-    #[regex("[A-Z][a-zA-Z0-9_]*")]
+    #[regex("(?&upper_id)")]
     UpperIdentifier(&'source str),
-    #[regex(r"\([!|<>=]+\)")]
-    #[regex(r"[!|<>=]+")]
+    #[regex(r"\((?&op_id)\)")]
+    #[regex(r"(?&op_id)")]
     OperatorIdentifier(&'source str),
     #[token("_")]
     NilIdentifier,
 
-    #[regex("([a-zA-Z][a-zA-Z0-9_]*(:))+[A-Z][a-zA-Z0-9_]*")]
+    #[regex("((?&either_id)::)+")]
+    #[regex("((?&either_id)(:))+(?&upper_id)")]
     InvalidUpperPath(&'source str),
-    #[regex("([a-zA-Z][a-zA-Z0-9_]*::)+[A-Z][a-zA-Z0-9_]*")]
-    UpperPath(&'source str),
-    #[regex("([a-zA-Z][a-zA-Z0-9_]*::)+_?[a-z][a-zA-Z0-9_]*[?]?")]
-    LowerPath(&'source str),
+    #[regex("((?&either_id)::)+(?&upper_id)", extract_path)]
+    UpperPath(NonEmpty<String>),
+    #[regex("((?&either_id)::)+(?&lower_id)[?]?", extract_path)]
+    #[regex("((?&either_id)::)+\\((?&op_id)\\)", extract_path)]
+    LowerPath(NonEmpty<String>),
 
     #[regex(r#""([^"\\]|\\t|\\u|\\n|\\")*""#)]
     LiteralString(&'source str),
@@ -176,11 +188,24 @@ pub enum TokenKind<'source> {
     EOF,
 }
 
+fn extract_path<'source>(
+    lex: &mut Lexer<'source, TokenKind<'source>>,
+) -> Result<NonEmpty<String>, EmptyError> {
+    let slice = lex.slice();
+    let segments = slice
+        .split("::")
+        .map(ToString::to_string)
+        .collect::<Vec<_>>();
+
+    NonEmpty::try_from(segments)
+}
+
 #[cfg(test)]
-mod tests {
+mod lexer_tests {
     use super::*;
     use maplit::hashmap;
     use pretty_assertions::assert_eq;
+    use std::fs;
 
     fn assert_lex(source: &str, expected: TokenKind) {
         let mut lex = TokenKind::lexer(source);
@@ -268,9 +293,9 @@ mod tests {
             "(|>)" => TokenKind::OperatorIdentifier("(|>)"),
             "|>" => TokenKind::OperatorIdentifier("|>"),
             "!" => TokenKind::OperatorIdentifier("!"),
-            "(!)" => TokenKind::OperatorIdentifier("!"),
+            "(!)" => TokenKind::OperatorIdentifier("(!)"),
             "!=" => TokenKind::OperatorIdentifier("!="),
-            "(!=)" => TokenKind::OperatorIdentifier("!="),
+            "(!=)" => TokenKind::OperatorIdentifier("(!=)"),
         };
 
         for (source, expected) in source {
@@ -280,17 +305,35 @@ mod tests {
 
     #[test]
     fn test_paths() {
-        let source = hashmap! {
-            "Number::is_positive?" => TokenKind::LowerPath("Number::is_positive?"),
-            "std::Number::is_positive?" => TokenKind::LowerPath("std::Number::is_positive?"),
-            "std::Number" => TokenKind::UpperPath("std::Number"),
-            "std:Number" => TokenKind::InvalidUpperPath("std:Number"),
-            // "std.Number" => TokenKind::InvalidUpperPath("std.Number"),
-            // "std/Number" => TokenKind::InvalidUpperPath("std/Number"),
-        };
+        unsafe {
+            let source = hashmap! {
+                "Number::is_positive?" => TokenKind::LowerPath(NonEmpty::new_unchecked(vec![
+                    "Number".to_string(),
+                    "is_positive?".to_string(),
+                ])),
+                "std::Number::is_positive?" => TokenKind::LowerPath(NonEmpty::new_unchecked(vec![
+                    "std".to_string(),
+                    "Number".to_string(),
+                    "is_positive?".to_string(),
+                ])),
+                "std::function::(|>)" => TokenKind::LowerPath(NonEmpty::new_unchecked(vec![
+                    "std".to_string(),
+                    "function".to_string(),
+                    "(|>)".to_string(),
+                ])),
+                "std::Number::" => TokenKind::InvalidUpperPath("std::Number::"),
+                "std::Number" => TokenKind::UpperPath(NonEmpty::new_unchecked(vec![
+                    "std".to_string(),
+                    "Number".to_string(),
+                ])),
+                "std:Number" => TokenKind::InvalidUpperPath("std:Number"),
+                // "std.Number" => TokenKind::InvalidUpperPath("std.Number"),
+                // "std/Number" => TokenKind::InvalidUpperPath("std/Number"),
+            };
 
-        for (source, expected) in source {
-            assert_lex(source, expected)
+            for (source, expected) in source {
+                assert_lex(source, expected)
+            }
         }
     }
 
@@ -496,5 +539,27 @@ mod tests {
                 TokenKind::EOL,
             ],
         );
+    }
+
+    #[test]
+    fn test_std_lib() {
+        let std_lib = fs::read_dir("../../std")
+            .expect("Something went wrong reading the std lib dir")
+            .map(|res| {
+                res.expect("Something went wrong reading the directory entry")
+                    .path()
+            })
+            .collect::<Vec<_>>();
+
+        for path in std_lib {
+            let file_name = path.to_str().expect("Expected filename");
+
+            let source = fs::read_to_string(file_name).expect(&format!(
+                "Something went wrong reading the file '{:?}'",
+                file_name
+            ));
+
+            assert_no_errors(&source);
+        }
     }
 }

@@ -4,6 +4,7 @@ use std::ops::Range;
 
 use codespan_reporting::diagnostic::{Diagnostic, Label};
 use improved_slice_patterns::match_vec;
+use non_empty_vec::NonEmpty;
 
 use alloy_ast as ast;
 use alloy_lexer::{Token, TokenKind, TokenStream};
@@ -72,13 +73,14 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
             Token { kind: TokenKind::Where,               span: where_token_span },
             remainder @ ..
         ] => {
-            let (type_annotations, values) = parse_module_contents(remainder)?;
+            let (imports, type_annotations, values) = parse_module_contents(remainder)?;
 
             Ok(Spanned::from(
                 module_token_span,
                 where_token_span,
                 Module {
                     name: Spanned::from_span(id_token_span, id.to_string()),
+                    imports,
                     type_annotations,
                     values,
                 },
@@ -128,12 +130,17 @@ fn find_last_span(remainder: &[Token], previous_span: &Span, source_length: usiz
         .map_or_else(|| previous_span.end..source_length, |l| l.span.clone())
 }
 
-type ModuleContents = (Vec<Spanned<TypeAnnotation>>, Vec<Spanned<Value>>);
+type ModuleContents = (
+    Vec<Spanned<Import>>,
+    Vec<Spanned<TypeAnnotation>>,
+    Vec<Spanned<Value>>,
+);
 type ParseResult<'a, T> = Result<(Spanned<T>, Vec<Token<'a>>), ParseError<'a>>;
 
 fn parse_module_contents<'a>(
     input: impl Iterator<Item = Token<'a>>,
 ) -> Result<ModuleContents, ParseError<'a>> {
+    let mut imports = vec![];
     let mut type_annotations = vec![];
     let mut values = vec![];
 
@@ -196,6 +203,46 @@ fn parse_module_contents<'a>(
                 },
 
                 [
+                    Token { kind: TokenKind::Import,          span: import_span },
+                    Token { kind: TokenKind::UpperPath(path), span: path_span },
+                    remainder @ ..
+                ] => {
+                    let import = Spanned {
+                        span: import_span.start..path_span.end,
+                        value: Import {
+                            import: Spanned {
+                                span: path_span,
+                                value: path,
+                            }
+                        },
+                    };
+
+                    imports.push(import);
+
+                    Ok(remainder.collect())
+                },
+
+                [
+                    Token { kind: TokenKind::Import,          span: import_span },
+                    Token { kind: TokenKind::LowerPath(path), span: path_span },
+                    remainder @ ..
+                ] => {
+                    let import = Spanned {
+                        span: import_span.start..path_span.end,
+                        value: Import {
+                            import: Spanned {
+                                span: path_span,
+                                value: path,
+                            }
+                        },
+                    };
+
+                    imports.push(import);
+
+                    Ok(remainder.collect())
+                },
+
+                [
                     Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
                     remainder @ ..
                 ] => {
@@ -218,7 +265,7 @@ fn parse_module_contents<'a>(
         .and_then(convert::identity)?;
     }
 
-    Ok((type_annotations, values))
+    Ok((imports, type_annotations, values))
 }
 
 //
@@ -249,8 +296,14 @@ impl<T> Spanned<T> {
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct Module {
     name: Spanned<String>,
+    imports: Vec<Spanned<Import>>,
     type_annotations: Vec<Spanned<TypeAnnotation>>,
     values: Vec<Spanned<Value>>,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+pub struct Import {
+    import: Spanned<NonEmpty<String>>,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
@@ -564,7 +617,8 @@ impl<'a> ParseError<'a> {
 }
 
 #[cfg(test)]
-mod tests {
+mod parser_tests {
+    use non_empty_vec::NonEmpty;
     use ordered_float::NotNan;
     use pretty_assertions::assert_eq;
 
@@ -742,6 +796,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![],
                 values: vec![],
             },
@@ -827,6 +882,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![],
                 values: vec![Spanned {
                     span: 56..65,
@@ -860,6 +916,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![Spanned {
                     span: 56..67,
                     value: TypeAnnotation {
@@ -904,6 +961,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![],
                 values: vec![Spanned {
                     span: 56..67,
@@ -938,6 +996,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![Spanned {
                     span: 56..69,
                     value: TypeAnnotation {
@@ -1089,6 +1148,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![],
                 values: vec![Spanned {
                     span: 56..72,
@@ -1130,6 +1190,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![],
                 values: vec![Spanned {
                     span: 56..74,
@@ -1267,6 +1328,7 @@ mod tests {
                     span: 22..26,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![Spanned {
                     span: 58..89,
                     value: TypeAnnotation {
@@ -1348,6 +1410,7 @@ mod tests {
                     span: 22..26,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![Spanned {
                     span: 58..100,
                     value: TypeAnnotation {
@@ -1429,6 +1492,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![Spanned {
                     span: 56..96,
                     value: TypeAnnotation {
@@ -1465,7 +1529,7 @@ mod tests {
                                 ast::Expr::lambda(
                                     vec![ast::Pattern::identifier("value")],
                                     ast::Expr::application(
-                                        &ast::QualifiedLowerName::from("f"),
+                                        NonEmpty::new("f"),
                                         vec![ast::Expr::identifier("value")],
                                     ),
                                 ),
@@ -1495,6 +1559,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![Spanned {
                     span: 56..70,
                     value: TypeAnnotation {
@@ -1531,6 +1596,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![],
                 values: vec![Spanned {
                     span: 56..70,
@@ -1567,6 +1633,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![],
                 values: vec![Spanned {
                     span: 56..80,
@@ -1606,6 +1673,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![Spanned {
                     span: 56..82,
                     value: TypeAnnotation {
@@ -1642,6 +1710,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![Spanned {
                     span: 56..90,
                     value: TypeAnnotation {
@@ -1677,6 +1746,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![],
                 values: vec![
                     Spanned {
@@ -1692,7 +1762,7 @@ mod tests {
                                     vec![ast::Pattern::identifier("num")],
                                     ast::Expr::if_then_else(
                                         ast::Expr::application(
-                                            &ast::QualifiedLowerName::from("Number::is_positive?"),
+                                            NonEmpty::from((vec!["Number"], "is_positive?")),
                                             vec![ast::Expr::identifier("num")],
                                         ),
                                         ast::Expr::bin_op(
@@ -1719,7 +1789,7 @@ mod tests {
                                     vec![ast::Pattern::identifier("num")],
                                     ast::Expr::if_then_else(
                                         ast::Expr::application(
-                                            &ast::QualifiedLowerName::from("Number::is_negative?"),
+                                            NonEmpty::from((vec!["Number"], "is_negative?")),
                                             vec![ast::Expr::identifier("num")],
                                         ),
                                         ast::Expr::bin_op(
@@ -1819,6 +1889,7 @@ mod tests {
                     span: 20..24,
                     value: "Test".to_string(),
                 },
+                imports: vec![],
                 type_annotations: vec![],
                 values: vec![Spanned {
                     span: 56..277,
@@ -1833,7 +1904,7 @@ mod tests {
                                 vec![ast::Pattern::identifier("num")],
                                 ast::Expr::if_then_else(
                                     ast::Expr::application(
-                                        &ast::QualifiedLowerName::from("Number::is_positive?"),
+                                        NonEmpty::from((vec!["Number"], "is_positive?")),
                                         vec![ast::Expr::identifier("num")],
                                     ),
                                     ast::Expr::bin_op(
@@ -1843,7 +1914,7 @@ mod tests {
                                     ),
                                     ast::Expr::if_then_else(
                                         ast::Expr::application(
-                                            &ast::QualifiedLowerName::from("Number::is_negative?"),
+                                            NonEmpty::from((vec!["Number"], "is_negative?")),
                                             vec![ast::Expr::identifier("num")],
                                         ),
                                         ast::Expr::bin_op(
@@ -1858,6 +1929,89 @@ mod tests {
                         },
                     },
                 }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_imports() {
+        let source = r#"
+            module Test
+            where
+
+            import std::pretty::long::import::path
+            import std::bool::Bool
+            import std::bool::not
+            import std::function::(<|)
+"#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![
+                    Spanned {
+                        span: 56..94,
+                        value: Import {
+                            import: Spanned {
+                                span: 63..94,
+                                value: NonEmpty::from((
+                                    vec![
+                                        "std".to_string(),
+                                        "pretty".to_string(),
+                                        "long".to_string(),
+                                        "import".to_string(),
+                                    ],
+                                    "path".to_string(),
+                                )),
+                            },
+                        },
+                    },
+                    Spanned {
+                        span: 107..129,
+                        value: Import {
+                            import: Spanned {
+                                span: 114..129,
+                                value: NonEmpty::from((
+                                    vec!["std".to_string(), "bool".to_string()],
+                                    "Bool".to_string(),
+                                )),
+                            },
+                        },
+                    },
+                    Spanned {
+                        span: 142..163,
+                        value: Import {
+                            import: Spanned {
+                                span: 149..163,
+                                value: NonEmpty::from((
+                                    vec!["std".to_string(), "bool".to_string()],
+                                    "not".to_string(),
+                                )),
+                            },
+                        },
+                    },
+                    Spanned {
+                        span: 176..202,
+                        value: Import {
+                            import: Spanned {
+                                span: 183..202,
+                                value: NonEmpty::from((
+                                    vec!["std".to_string(), "function".to_string()],
+                                    "(<|)".to_string(),
+                                )),
+                            },
+                        },
+                    },
+                ],
+                type_annotations: vec![],
+                values: vec![],
             },
         });
 

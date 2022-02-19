@@ -150,7 +150,7 @@ impl Type {
 }
 
 // #[cfg(test)]
-// mod tests {
+// mod types_tests {
 //     use super::Kind;
 //     use pretty_assertions::assert_eq;
 //

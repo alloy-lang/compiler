@@ -183,7 +183,7 @@ fn to_canonical_type_alias(
 }
 
 #[cfg(test)]
-mod tests {
+mod canonical_tests {
     use crate::canonical;
     use crate::canonical::canonicalize;
     use crate::parse;

@@ -2,6 +2,7 @@ use core::convert;
 
 use improved_slice_patterns::match_vec;
 use itertools::Itertools;
+use non_empty_vec::NonEmpty;
 
 use alloy_ast as ast;
 use alloy_lexer::{Token, TokenKind};
@@ -98,19 +99,6 @@ pub fn parse<'a>(
                 ),
             }, remainder))
         },
-        [
-            Token { kind: TokenKind::LiteralInt(i), span },
-        ] => Ok((Spanned {
-            span,
-            value: ast::Expr::int_literal(i),
-        }, Vec::new())),
-
-        [
-            Token { kind: TokenKind::LiteralFloat(f), span },
-        ] => Ok((Spanned {
-            span,
-            value: ast::Expr::float_literal(f),
-        }, Vec::new())),
 
         [
             Token { kind: TokenKind::LiteralInt(i), span },
@@ -132,13 +120,13 @@ pub fn parse<'a>(
             Token { kind: TokenKind::LowerIdentifier(id), span },
             Token { kind: TokenKind::OpenParen,           span: open_paren_span },
             remainder @ ..
-        ] => parens::parse(open_paren_span, remainder, self::parse_vec, |args| ast::Expr::application(&ast::QualifiedLowerName::from(id), args)),
+        ] => parens::parse(open_paren_span, remainder, self::parse_vec, |args| ast::Expr::application(NonEmpty::new(id), args)),
 
         [
-            Token { kind: TokenKind::LowerPath(id), span },
-            Token { kind: TokenKind::OpenParen,           span: open_paren_span },
+            Token { kind: TokenKind::LowerPath(path), span },
+            Token { kind: TokenKind::OpenParen,       span: open_paren_span },
             remainder @ ..
-        ] => parens::parse(open_paren_span, remainder, self::parse_vec, |args| ast::Expr::application(&ast::QualifiedLowerName::from(id), args)),
+        ] => parens::parse(open_paren_span, remainder, self::parse_vec, |args| ast::Expr::application(path, args)),
 
         [
             Token { kind: TokenKind::LowerIdentifier(id), span },
