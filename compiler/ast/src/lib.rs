@@ -57,9 +57,7 @@ impl Type {
         match &types[..] {
             [] => Type::Unit,
             [arg] => arg.clone(),
-            _ => unsafe {
-                Type::Tuple(NonEmpty::new_unchecked(types))
-            },
+            _ => unsafe { Type::Tuple(NonEmpty::new_unchecked(types)) },
         }
     }
 
@@ -182,10 +180,10 @@ impl Expr {
 
     #[must_use]
     pub fn if_then_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr
-        where
-            E: Into<Box<Expr>>,
-            V1: Into<Box<Expr>>,
-            V2: Into<Box<Expr>>,
+    where
+        E: Into<Box<Expr>>,
+        V1: Into<Box<Expr>>,
+        V2: Into<Box<Expr>>,
     {
         Expr::IfElse(expr.into(), then_expr.into(), else_expr.into())
     }
@@ -222,9 +220,7 @@ impl Expr {
         match &args[..] {
             [] => Expr::Unit,
             [arg] => Expr::paren(arg.clone()),
-            _ => unsafe {
-                Expr::Tuple(NonEmpty::new_unchecked(args))
-            },
+            _ => unsafe { Expr::Tuple(NonEmpty::new_unchecked(args)) },
         }
     }
 }
@@ -281,9 +277,7 @@ impl Pattern {
         match &args[..] {
             [] => Pattern::Unit,
             [arg] => arg.clone(),
-            _ => unsafe {
-                Pattern::Tuple(NonEmpty::new_unchecked(args))
-            },
+            _ => unsafe { Pattern::Tuple(NonEmpty::new_unchecked(args)) },
         }
     }
 }
@@ -299,9 +293,7 @@ pub enum LiteralData {
 impl LiteralData {
     #[must_use]
     pub fn fractional(val: f64) -> Self {
-        unsafe {
-            LiteralData::Fractional(NotNan::new_unchecked(val))
-        }
+        unsafe { LiteralData::Fractional(NotNan::new_unchecked(val)) }
     }
 }
 
