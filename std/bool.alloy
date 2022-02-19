@@ -11,7 +11,7 @@ typedef Bool =
   | True
 
 
-/// Boolean 'not'
+--! Boolean 'not'
 not : Bool -> Bool
 not = |x| ->
   if x
@@ -19,7 +19,7 @@ not = |x| ->
   else True
 
 
-/// Boolean 'exclusive or'
+--! Boolean 'exclusive or'
 xor : Bool -> Bool -> Bool
 xor = |x, y| ->
   if x

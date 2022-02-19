@@ -2,13 +2,13 @@ module Either
 where
 
 import std::eq::Eq
-import std::ord::Ord
+import std::order::Ord
 import std::debug::Debug
 import std::functor::Functor
 import std::applicative::Applicative
 import std::monad::Monad
 
-/// `Either` represents either right (`Right`) or left (`Left`)
+--! `Either` represents either right (`Right`) or left (`Left`)
 typedef Either<l, r> =
     | Left(l)
     | Right(r)

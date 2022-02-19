@@ -2,11 +2,11 @@ module Option
 where
 
 import std::eq::Eq
-import std::ord::Ord
+import std::order::Ord
 import std::debug::Debug
 
-/// `Option<t>` represents a value `t` which may not exist.
-/// `Option<t>` requires a "concrete" type as a type argument
+--! `Option<t>` represents a value `t` which may not exist.
+--! `Option<t>` requires a "concrete" type as a type argument
 typedef Option<t> =
     | None
     | Some(t)

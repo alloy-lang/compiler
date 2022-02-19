@@ -10,8 +10,8 @@ typedef Ordering =
   | EQ
   | GT
 
-/// `Ord` defines an ordering on `self`
-/// Any `t` that behaves as `Ord` must also behave as `Eq`
+--! `Ord` defines an ordering on `self`
+--! Any `t` that behaves as `Ord` must also behave as `Eq`
 trait Ord where
   typevar self = Eq
 
@@ -24,7 +24,7 @@ comparing : (t2 -> t1) -> t2 -> t2 -> Ordering where
 comparing = |convert, x, y| -> Ord::compare <| (convert(x), convert(y))
 
 
-/// Returns whether `left` is less than or equal to `right`.
+--! Returns whether `left` is less than or equal to `right`.
 (<=) : t -> t -> Bool where
   typevar t = Ord
 (<=) = |left, right| -> match Ord::compare(left, right) when
@@ -32,7 +32,7 @@ comparing = |convert, x, y| -> Ord::compare <| (convert(x), convert(y))
   | EQ -> True
   | GT -> False
 
-/// Returns whether `left` is less than `right`.
+--! Returns whether `left` is less than `right`.
 (<) : t -> t -> Bool where
   typevar t = Ord
 (<) = |left, right| -> match Ord::compare(left, right) when
@@ -40,7 +40,7 @@ comparing = |convert, x, y| -> Ord::compare <| (convert(x), convert(y))
   | EQ -> False
   | GT -> False
 
-/// Returns whether `left` is greater than `right`.
+--! Returns whether `left` is greater than `right`.
 (>) : t -> t -> Bool where
   typevar t = Ord
 (>) = |left, right| -> match Ord::compare(left, right) when
@@ -48,7 +48,7 @@ comparing = |convert, x, y| -> Ord::compare <| (convert(x), convert(y))
   | EQ -> False
   | GT -> True
 
-/// Returns whether `left` is greater than or equal to `right`.
+--! Returns whether `left` is greater than or equal to `right`.
 (>=) : t -> t -> Bool where
   typevar t = Ord
 (>=) = |left, right| -> match Ord::compare(left, right) when
@@ -56,7 +56,7 @@ comparing = |convert, x, y| -> Ord::compare <| (convert(x), convert(y))
   | EQ -> True
   | GT -> True
 
-/// Returns `left` if `left` is less than or equal to `right`, otherwise `right`.
+--! Returns `left` if `left` is less than or equal to `right`, otherwise `right`.
 min : t -> t -> t where
   typevar t = Ord
 min = |left, right| ->
@@ -64,7 +64,7 @@ min = |left, right| ->
   then left
   else right
 
-/// Returns `left` if `left` is greater than or equal to `right`, otherwise `right`.
+--! Returns `left` if `left` is greater than or equal to `right`, otherwise `right`.
 max : t -> t -> t where
   typevar t = Ord
 max = |left, right| ->
