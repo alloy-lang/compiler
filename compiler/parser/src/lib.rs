@@ -243,6 +243,40 @@ fn parse_module_contents<'a>(
                 },
 
                 [
+                    Token { kind: TokenKind::Import,              span: import_span },
+                    Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
+                    remainder @ ..
+                ] => {
+                    let import = Spanned {
+                        span: import_span.start..id_span.end,
+                        value: Import {
+                            import: Spanned {
+                                span: id_span,
+                                value: NonEmpty::new(id.to_string()),
+                            }
+                        },
+                    };
+
+                    imports.push(import);
+
+                    Ok(remainder.collect())
+                },
+
+                [
+                    Token { kind: TokenKind::Import,                 span: import_span },
+                    Token { kind: TokenKind::InvalidUpperPath(path), span: path_span },
+                    remainder @ ..
+                ] => {
+                    Err(ParseError::InvalidImport {
+                        span: path_span,
+                        message: format!(
+                            "Import must have a path separated by '::'. Found: `{}`",
+                            path
+                        ),
+                    })
+                },
+
+                [
                     Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
                     remainder @ ..
                 ] => {
@@ -340,6 +374,10 @@ pub enum ParseError<'a> {
         span: Span,
         name: String,
     },
+    InvalidImport {
+        span: Span,
+        message: String,
+    },
     ExpectedExpr {
         span: Span,
         actual: Vec<Token<'a>>,
@@ -429,6 +467,12 @@ impl<'a> ParseError<'a> {
                 .with_code("E0005")
                 .with_labels(vec![Label::primary(file_id, span)
                     .with_message(format!("Unexpected identifier '{:?}'", name))]),
+            ParseError::InvalidImport { span, message } => Diagnostic::error()
+                .with_message(
+                    "Imports must follow the format 'import path::to::module::values'.",
+                )
+                .with_code("E0004")
+                .with_labels(vec![Label::primary(file_id, span).with_message(message)]),
             ParseError::ExpectedExpr { span, actual } => Diagnostic::error()
                 .with_message("Expected expression")
                 .with_code("E0006")
@@ -1945,6 +1989,7 @@ mod parser_tests {
             import std::bool::Bool
             import std::bool::not
             import std::function::(<|)
+            import std
 "#;
         let actual = parse(source);
 
@@ -2009,10 +2054,39 @@ mod parser_tests {
                             },
                         },
                     },
+                    Spanned {
+                        span: 215..225,
+                        value: Import {
+                            import: Spanned {
+                                span: 222..225,
+                                value: NonEmpty::from((
+                                    vec![],
+                                    "std".to_string(),
+                                )),
+                            },
+                        },
+                    },
                 ],
                 type_annotations: vec![],
                 values: vec![],
             },
+        });
+
+        assert_eq!(expected, actual);
+    }
+    #[test]
+    fn test_incomplete_import() {
+        let source = r#"
+            module Test
+            where
+
+            import std::pretty::long::unfinished::
+"#;
+        let actual = parse(source);
+
+        let expected = Err(ParseError::InvalidImport {
+            span: 63..94,
+            message: "Import must have a path separated by '::'. Found: `std::pretty::long::unfinished::`".to_string()
         });
 
         assert_eq!(expected, actual);
