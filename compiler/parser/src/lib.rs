@@ -159,7 +159,7 @@ fn parse_module_contents<'a>(
                 ] => {
                     let type_span = id_span.start..colon_span.end;
 
-                    let (t, tokens) = r#type::parse(&type_span, remainder)?;
+                    let (t, remainder) = r#type::parse(&type_span, remainder)?;
 
                     let type_annotation = Spanned {
                         span: type_span.start..t.span.end,
@@ -174,7 +174,7 @@ fn parse_module_contents<'a>(
 
                     type_annotations.push(type_annotation);
 
-                    Ok(tokens)
+                    Ok(remainder)
                 },
 
                 [
@@ -184,7 +184,7 @@ fn parse_module_contents<'a>(
                 ] => {
                     let expr_span = id_span.start..eq_span.end;
 
-                    let (expr, tokens) = expr::parse(&expr_span, remainder)?;
+                    let (expr, remainder) = expr::parse(&expr_span, remainder)?;
 
                     let value = Spanned {
                         span: expr_span.start..expr.span.end,
@@ -199,7 +199,7 @@ fn parse_module_contents<'a>(
 
                     values.push(value);
 
-                    Ok(tokens)
+                    Ok(remainder)
                 },
 
                 [
