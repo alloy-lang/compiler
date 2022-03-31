@@ -1,7 +1,6 @@
 use core::convert;
 
 use improved_slice_patterns::match_vec;
-use non_empty_vec::NonEmpty;
 
 use alloy_ast as ast;
 use alloy_lexer::{Token, TokenKind};
@@ -22,60 +21,38 @@ pub fn parse<'a>(
     let mut remainder = remainder.into_iter().peekable();
 
     let first_span = first_type.span.clone();
-    let mut types = NonEmpty::new(first_type);
-    loop {
-        log::debug!("*parse_type* remainder: {:?}", &remainder);
 
-        match remainder.peek() {
-            Some(Token {
-                kind: TokenKind::RightArrow,
-                span: arrow_span,
-            }) => {
-                let new_span = first_span.start..arrow_span.end;
+    log::debug!("*parse_type* remainder: {:?}", &remainder);
 
-                let (next_type, next_remainder) = parse_single_type(&new_span, remainder.skip(1))
-                    .map_err(|e| match e {
+    match remainder.peek() {
+        Some(Token { kind, span }) if kind == &TokenKind::RightArrow => {
+            let new_span = first_span.start..span.end;
+
+            let (next_type, next_remainder) = parse(&new_span, remainder.skip(1))
+                .map_err(|e| match e {
                     ParseError::ExpectedType { span, actual } => {
                         ParseError::ExpectedLambdaReturnType { span, actual }
                     }
                     _ => e,
                 })?;
 
-                types.push(next_type);
-                remainder = next_remainder.into_iter().peekable();
-            }
-            _ => {
-                break;
-            }
+            let span = first_type.span.start..next_type.span.end;
+            let value = ast::Type::lambda(first_type.value, next_type.value);
+            Ok((Spanned { span, value }, next_remainder))
+        }
+        _ => {
+            Ok((first_type, remainder.collect()))
         }
     }
-
-    let spanned = {
-        let (last_type, types) = types.split_last();
-
-        let span = types.first().map_or_else(
-            || last_type.span.clone(),
-            |o| o.span.start..last_type.span.end,
-        );
-
-        let value = types
-            .iter()
-            .cloned()
-            .rfold(last_type.value.clone(), |func, arg| {
-                ast::Type::lambda(arg.value, func)
-            });
-
-        Spanned { span, value }
-    };
-
-    Ok((spanned, remainder.collect()))
 }
 
 fn parse_single_type<'a>(
     type_span: &Span,
     input: impl Iterator<Item = Token<'a>>,
 ) -> ParseResult<'a, ast::Type> {
-    let input = input.collect::<Vec<_>>();
+    let input = input
+        .skip_while(|t| matches!(t.kind, TokenKind::Pipe))
+        .collect::<Vec<_>>();
     log::debug!("*parse_single_type* input: {:?}", &input);
 
     match_vec!(input.clone();
