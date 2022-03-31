@@ -28,7 +28,7 @@ xor = |x, y| ->
 
 
 behavior Eq for Bool where
-  (==) = |left, right| ->
+  eq = |left, right| ->
     if left
     then right
     else not(right)
