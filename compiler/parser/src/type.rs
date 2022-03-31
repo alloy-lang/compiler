@@ -40,6 +40,15 @@ pub fn parse<'a>(
             let value = ast::Type::lambda(first_type.value, next_type.value);
             Ok((Spanned { span, value }, next_remainder))
         }
+        Some(Token { kind, span }) if kind == &TokenKind::Pipe => {
+            let new_span = first_span.start..span.end;
+
+            let (next_type, next_remainder) = parse(&new_span, remainder.skip(1))?;
+
+            let span = first_type.span.start..next_type.span.end;
+            let value = ast::Type::union(vec![first_type.value, next_type.value]);
+            Ok((Spanned { span, value }, next_remainder))
+        }
         _ => {
             Ok((first_type, remainder.collect()))
         }
@@ -61,13 +70,14 @@ fn parse_single_type<'a>(
             remainder @ ..
         ] => Ok((Spanned { span, value: ast::Type::identifier(id) }, remainder.collect())),
 
-        [
-            Token { kind: TokenKind::LowerIdentifier(id), span },
-            remainder @ ..
-        ] => Ok((
-            Spanned { span, value: ast::Type::variable(id) },
-            remainder.collect(),
-        )),
+        // TODO: use-case for this section
+        // [
+        //     Token { kind: TokenKind::LowerIdentifier(id), span },
+        //     remainder @ ..
+        // ] => Ok((
+        //     Spanned { span, value: ast::Type::variable(id) },
+        //     remainder.collect(),
+        // )),
 
         [
             Token { kind: TokenKind::OpenParen, span: open_paren_span },

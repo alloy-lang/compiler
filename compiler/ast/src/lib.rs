@@ -37,20 +37,18 @@ pub enum Type {
         return_type: Box<Type>,
     },
     Tuple(NonEmpty<Type>),
+    Union(NonEmpty<Type>),
 }
 
 impl Type {
-    // pub fn union(types: Vec<Type>) -> Type {
-    //     match &types[..] {
-    //         [] => Type::Unit,
-    //         [arg] => arg.clone(),
-    //         _ => unsafe {
-    //             Type::Union {
-    //                 types: Type::Tuple(NonEmpty::new_unchecked(types))
-    //             }
-    //         },
-    //     }
-    // }
+    #[must_use]
+    pub fn union(types: Vec<Type>) -> Type {
+        match &types[..] {
+            [] => Type::Unit,
+            [arg] => arg.clone(),
+            _ => unsafe { Type::Union(NonEmpty::new_unchecked(types)) },
+        }
+    }
 
     #[must_use]
     pub fn tuple(types: Vec<Type>) -> Type {

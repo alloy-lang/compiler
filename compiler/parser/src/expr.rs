@@ -137,6 +137,14 @@ pub fn parse<'a>(
         }, remainder.collect())),
 
         [
+            Token { kind: TokenKind::UpperIdentifier(id), span },
+            remainder @ ..
+        ] => Ok((Spanned {
+            span,
+            value: ast::Expr::identifier(id),
+        }, remainder.collect())),
+
+        [
             Token { kind: TokenKind::OpenParen, span: open_paren_span },
             remainder @ ..
         ] => parens::parse(open_paren_span, remainder, self::parse_vec, ast::Expr::tuple),

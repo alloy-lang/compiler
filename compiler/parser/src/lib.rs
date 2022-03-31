@@ -2124,6 +2124,74 @@ mod parser_tests {
         assert_eq!(expected, actual);
     }
 
+    #[test]
+    fn test_simple_typedef_2_union() {
+        let source = r#"
+            module Bool
+            where
+
+            typedef Bool =
+              | False
+              | True
+"#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Bool".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![],
+                values: vec![],
+                type_definitions: vec![Spanned {
+                    span: 56..113,
+                    value: TypeDefinition {
+                        name: Spanned {
+                            span: 64..68,
+                            value: "Bool".to_string(),
+                        },
+                        t: Spanned {
+                            span: 87..113,
+                            value: ast::Type::union(vec![
+                                ast::Type::identifier("False"),
+                                ast::Type::identifier("True"),
+                            ]),
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_incomplete_union() {
+        let source = r#"
+            module Bool
+            where
+
+            typedef IncompleteUnion = False |
+"#;
+        let actual = parse(source);
+
+        let expected: Result<Spanned<Module>, ParseError> =
+            Err(ParseError::ExpectedType {
+                span: 82..89,
+                actual: vec![
+                    Token {
+                        kind: TokenKind::EOF,
+                        span: 90..90,
+                    },
+                ],
+            });
+
+        assert_eq!(expected, actual);
+    }
+
     //
     // #[test]
     // fn test_multi_property_union_type() {
