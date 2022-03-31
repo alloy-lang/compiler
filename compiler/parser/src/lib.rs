@@ -73,7 +73,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
             Token { kind: TokenKind::Where,               span: where_token_span },
             remainder @ ..
         ] => {
-            let (imports, type_annotations, values) = parse_module_contents(remainder)?;
+            let (imports, type_annotations, values, type_definitions) = parse_module_contents(remainder)?;
 
             Ok(Spanned::from(
                 module_token_span,
@@ -83,6 +83,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
                     imports,
                     type_annotations,
                     values,
+                    type_definitions,
                 },
             ))
         },
@@ -134,6 +135,7 @@ type ModuleContents = (
     Vec<Spanned<Import>>,
     Vec<Spanned<TypeAnnotation>>,
     Vec<Spanned<Value>>,
+    Vec<Spanned<TypeDefinition>>,
 );
 type ParseResult<'a, T> = Result<(Spanned<T>, Vec<Token<'a>>), ParseError<'a>>;
 
@@ -143,6 +145,7 @@ fn parse_module_contents<'a>(
     let mut imports = vec![];
     let mut type_annotations = vec![];
     let mut values = vec![];
+    let mut type_definitions = vec![];
 
     // let _doc_comments = extract_doc_comments(stream);
 
@@ -287,6 +290,32 @@ fn parse_module_contents<'a>(
                 },
 
                 [
+                    Token { kind: TokenKind::Typedef,             span: type_def_span },
+                    Token { kind: TokenKind::UpperIdentifier(id), span: id_span },
+                    Token { kind: TokenKind::Eq,                  span: eq_span },
+                    remainder @ ..
+                ] => {
+                    let type_span = id_span.start..eq_span.end;
+
+                    let (t, remainder) = r#type::parse(&type_span, remainder)?;
+
+                    let type_definition = Spanned {
+                        span: type_def_span.start..t.span.end,
+                        value: TypeDefinition {
+                            t,
+                            name: Spanned {
+                                span: id_span,
+                                value: id.to_string(),
+                            },
+                        }
+                    };
+
+                    type_definitions.push(type_definition);
+
+                    Ok(remainder)
+                },
+
+                [
                     Token { kind: TokenKind::EOF, span }
                 ] => {
                     Ok(Vec::new())
@@ -299,7 +328,7 @@ fn parse_module_contents<'a>(
         .and_then(convert::identity)?;
     }
 
-    Ok((imports, type_annotations, values))
+    Ok((imports, type_annotations, values, type_definitions))
 }
 
 //
@@ -333,6 +362,7 @@ pub struct Module {
     imports: Vec<Spanned<Import>>,
     type_annotations: Vec<Spanned<TypeAnnotation>>,
     values: Vec<Spanned<Value>>,
+    type_definitions: Vec<Spanned<TypeDefinition>>,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
@@ -342,6 +372,12 @@ pub struct Import {
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct TypeAnnotation {
+    name: Spanned<String>,
+    t: Spanned<ast::Type>,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+pub struct TypeDefinition {
     name: Spanned<String>,
     t: Spanned<ast::Type>,
 }
@@ -468,9 +504,7 @@ impl<'a> ParseError<'a> {
                 .with_labels(vec![Label::primary(file_id, span)
                     .with_message(format!("Unexpected identifier '{:?}'", name))]),
             ParseError::InvalidImport { span, message } => Diagnostic::error()
-                .with_message(
-                    "Imports must follow the format 'import path::to::module::values'.",
-                )
+                .with_message("Imports must follow the format 'import path::to::module::values'.")
                 .with_code("E0004")
                 .with_labels(vec![Label::primary(file_id, span).with_message(message)]),
             ParseError::ExpectedExpr { span, actual } => Diagnostic::error()
@@ -843,6 +877,7 @@ mod parser_tests {
                 imports: vec![],
                 type_annotations: vec![],
                 values: vec![],
+                type_definitions: vec![],
             },
         });
 
@@ -941,6 +976,7 @@ mod parser_tests {
                         },
                     },
                 }],
+                type_definitions: vec![],
             },
         });
 
@@ -987,6 +1023,7 @@ mod parser_tests {
                         },
                     },
                 }],
+                type_definitions: vec![],
             },
         });
 
@@ -1022,6 +1059,7 @@ mod parser_tests {
                         },
                     },
                 }],
+                type_definitions: vec![],
             },
         });
 
@@ -1069,6 +1107,7 @@ mod parser_tests {
                         },
                     },
                 }],
+                type_definitions: vec![],
             },
         });
 
@@ -1211,6 +1250,7 @@ mod parser_tests {
                         },
                     },
                 }],
+                type_definitions: vec![],
             },
         });
 
@@ -1256,6 +1296,7 @@ mod parser_tests {
                         },
                     },
                 }],
+                type_definitions: vec![],
             },
         });
 
@@ -1427,6 +1468,7 @@ mod parser_tests {
                         },
                     },
                 ],
+                type_definitions: vec![],
             },
         });
 
@@ -1518,6 +1560,7 @@ mod parser_tests {
                         },
                     },
                 ],
+                type_definitions: vec![],
             },
         });
 
@@ -1581,6 +1624,7 @@ mod parser_tests {
                         },
                     },
                 }],
+                type_definitions: vec![],
             },
         });
 
@@ -1618,6 +1662,7 @@ mod parser_tests {
                     },
                 }],
                 values: vec![],
+                type_definitions: vec![],
             },
         });
 
@@ -1655,6 +1700,7 @@ mod parser_tests {
                         },
                     },
                 }],
+                type_definitions: vec![],
             },
         });
 
@@ -1695,6 +1741,7 @@ mod parser_tests {
                         },
                     },
                 }],
+                type_definitions: vec![],
             },
         });
 
@@ -1732,6 +1779,7 @@ mod parser_tests {
                     },
                 }],
                 values: vec![],
+                type_definitions: vec![],
             },
         });
 
@@ -1772,6 +1820,7 @@ mod parser_tests {
                     },
                 }],
                 values: vec![],
+                type_definitions: vec![],
             },
         });
 
@@ -1848,6 +1897,7 @@ mod parser_tests {
                         },
                     },
                 ],
+                type_definitions: vec![],
             },
         });
 
@@ -1973,6 +2023,7 @@ mod parser_tests {
                         },
                     },
                 }],
+                type_definitions: vec![],
             },
         });
 
@@ -2001,79 +2052,21 @@ mod parser_tests {
                     value: "Test".to_string(),
                 },
                 imports: vec![
-                    Spanned {
-                        span: 56..94,
-                        value: Import {
-                            import: Spanned {
-                                span: 63..94,
-                                value: NonEmpty::from((
-                                    vec![
-                                        "std".to_string(),
-                                        "pretty".to_string(),
-                                        "long".to_string(),
-                                        "import".to_string(),
-                                    ],
-                                    "path".to_string(),
-                                )),
-                            },
-                        },
-                    },
-                    Spanned {
-                        span: 107..129,
-                        value: Import {
-                            import: Spanned {
-                                span: 114..129,
-                                value: NonEmpty::from((
-                                    vec!["std".to_string(), "bool".to_string()],
-                                    "Bool".to_string(),
-                                )),
-                            },
-                        },
-                    },
-                    Spanned {
-                        span: 142..163,
-                        value: Import {
-                            import: Spanned {
-                                span: 149..163,
-                                value: NonEmpty::from((
-                                    vec!["std".to_string(), "bool".to_string()],
-                                    "not".to_string(),
-                                )),
-                            },
-                        },
-                    },
-                    Spanned {
-                        span: 176..202,
-                        value: Import {
-                            import: Spanned {
-                                span: 183..202,
-                                value: NonEmpty::from((
-                                    vec!["std".to_string(), "function".to_string()],
-                                    "(<|)".to_string(),
-                                )),
-                            },
-                        },
-                    },
-                    Spanned {
-                        span: 215..225,
-                        value: Import {
-                            import: Spanned {
-                                span: 222..225,
-                                value: NonEmpty::from((
-                                    vec![],
-                                    "std".to_string(),
-                                )),
-                            },
-                        },
-                    },
+                    spanned_import(56, 94, vec!["std", "pretty", "long", "import", "path"]),
+                    spanned_import(107, 129, vec!["std", "bool", "Bool"]),
+                    spanned_import(142, 163, vec!["std", "bool", "not"]),
+                    spanned_import(176, 202, vec!["std", "function", "(<|)"]),
+                    spanned_import(215, 225, vec!["std"]),
                 ],
                 type_annotations: vec![],
                 values: vec![],
+                type_definitions: vec![],
             },
         });
 
         assert_eq!(expected, actual);
     }
+
     #[test]
     fn test_incomplete_import() {
         let source = r#"
@@ -2091,6 +2084,46 @@ mod parser_tests {
 
         assert_eq!(expected, actual);
     }
+
+    #[test]
+    fn test_simple_typedef() {
+        let source = r#"
+            module Test
+            where
+
+            typedef Name = String
+"#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![],
+                values: vec![],
+                type_definitions: vec![Spanned {
+                    span: 56..77,
+                    value: TypeDefinition {
+                        name: Spanned {
+                            span: 64..68,
+                            value: "Name".to_string(),
+                        },
+                        t: Spanned {
+                            span: 71..77,
+                            value: ast::Type::identifier("String"),
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
     //
     // #[test]
     // fn test_multi_property_union_type() {
@@ -2110,4 +2143,20 @@ mod parser_tests {
     //         assert_no_errors(source);
     //     }
     // }
+
+    fn spanned_import(start: usize, end: usize, segments: Vec<&str>) -> Spanned<Import> {
+        Spanned {
+            span: start..end,
+            value: Import {
+                import: Spanned {
+                    span: (start + 7)..end,
+                    value: unsafe {
+                        NonEmpty::new_unchecked(
+                            segments.into_iter().map(ToString::to_string).collect(),
+                        )
+                    },
+                },
+            },
+        }
+    }
 }
