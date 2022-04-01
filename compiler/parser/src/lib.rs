@@ -2169,6 +2169,52 @@ mod parser_tests {
     }
 
     #[test]
+    fn test_simple_typedef_3_union() {
+        let source = r#"
+            module Test
+            where
+
+            typedef Thing =
+              | This
+              | That
+              | TheOther
+"#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![],
+                values: vec![],
+                type_definitions: vec![Spanned {
+                    span: 56..138,
+                    value: TypeDefinition {
+                        name: Spanned {
+                            span: 64..69,
+                            value: "Thing".to_string(),
+                        },
+                        t: Spanned {
+                            span: 88..138,
+                            value: ast::Type::union(vec![
+                                ast::Type::identifier("This"),
+                                ast::Type::identifier("That"),
+                                ast::Type::identifier("TheOther"),
+                            ]),
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
     fn test_incomplete_union() {
         let source = r#"
             module Bool
