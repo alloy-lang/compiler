@@ -46,7 +46,16 @@ impl Type {
         match &types[..] {
             [] => Type::Unit,
             [arg] => arg.clone(),
-            _ => unsafe { Type::Union(NonEmpty::new_unchecked(types)) },
+            _ => {
+                let types = types.into_iter()
+                    .flat_map(|t| match t {
+                        Type::Union(inner) => inner.to_vec(),
+                        _ => vec![t],
+                    })
+                    .collect();
+
+                unsafe { Type::Union(NonEmpty::new_unchecked(types)) }
+            },
         }
     }
 
