@@ -14,6 +14,7 @@ mod expr;
 mod parens;
 mod pattern;
 mod r#type;
+mod type_definition;
 
 //
 // parse functions
@@ -295,18 +296,18 @@ fn parse_module_contents<'a>(
                     Token { kind: T![=],                          span: eq_span },
                     remainder @ ..
                 ] => {
-                    let type_span = id_span.start..eq_span.end;
+                    let type_span = type_def_span.start..eq_span.end;
 
-                    let (t, remainder) = r#type::parse(&type_span, remainder)?;
+                    let (types, remainder) = type_definition::parse(&type_span, remainder)?;
 
                     let type_definition = Spanned {
-                        span: type_def_span.start..t.span.end,
+                        span: type_def_span.start..types.span.end,
                         value: TypeDefinition {
-                            t,
                             name: Spanned {
                                 span: id_span,
                                 value: id.to_string(),
                             },
+                            types,
                         }
                     };
 
@@ -391,7 +392,13 @@ pub struct TypeAnnotation {
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct TypeDefinition {
     name: Spanned<String>,
-    t: Spanned<ast::Type>,
+    types: Spanned<NonEmpty<Spanned<NamedType>>>,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+pub struct NamedType {
+    name: Spanned<String>,
+    t: Option<Spanned<ast::Type>>,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
@@ -431,6 +438,10 @@ pub enum ParseError<'a> {
         actual: Vec<Token<'a>>,
     },
     ExpectedType {
+        span: Span,
+        actual: Vec<Token<'a>>,
+    },
+    ExpectedTypeName {
         span: Span,
         actual: Vec<Token<'a>>,
     },
@@ -540,6 +551,18 @@ impl<'a> ParseError<'a> {
                         .map(|t| {
                             Label::primary(file_id.clone(), span.clone())
                                 .with_message(format!("Expected type, but found: {:?}", t))
+                        })
+                        .collect(),
+                ),
+            ParseError::ExpectedTypeName { span, actual } => Diagnostic::error()
+                .with_message("Expected type name")
+                .with_code("E0007")
+                .with_labels(
+                    actual
+                        .into_iter()
+                        .map(|t| {
+                            Label::primary(file_id.clone(), span.clone())
+                                .with_message(format!("Expected type name, but found: {:?}", t))
                         })
                         .collect(),
                 ),
@@ -2124,9 +2147,14 @@ mod parser_tests {
                             span: 64..68,
                             value: "Name".to_string(),
                         },
-                        t: Spanned {
+                        types: Spanned {
                             span: 71..77,
-                            value: ast::Type::identifier("String"),
+                            value: unsafe {
+                                NonEmpty::new_unchecked(vec![spanned_named_type_empty(
+                                    71..77,
+                                    "String",
+                                )])
+                            },
                         },
                     },
                 }],
@@ -2137,7 +2165,7 @@ mod parser_tests {
     }
 
     #[test]
-    fn test_simple_typedef_2_union() {
+    fn test_typedef_2_union() {
         let source = r#"
             module Bool
             where
@@ -2165,12 +2193,14 @@ mod parser_tests {
                             span: 64..68,
                             value: "Bool".to_string(),
                         },
-                        t: Spanned {
+                        types: Spanned {
                             span: 87..113,
-                            value: ast::Type::union(vec![
-                                ast::Type::identifier("False"),
-                                ast::Type::identifier("True"),
-                            ]),
+                            value: unsafe {
+                                NonEmpty::new_unchecked(vec![
+                                    spanned_named_type_empty(87..92, "False"),
+                                    spanned_named_type_empty(109..113, "True"),
+                                ])
+                            },
                         },
                     },
                 }],
@@ -2181,7 +2211,7 @@ mod parser_tests {
     }
 
     #[test]
-    fn test_simple_typedef_3_union() {
+    fn test_typedef_3_union() {
         let source = r#"
             module Test
             where
@@ -2210,17 +2240,184 @@ mod parser_tests {
                             span: 64..69,
                             value: "Thing".to_string(),
                         },
-                        t: Spanned {
+                        types: Spanned {
                             span: 88..138,
-                            value: ast::Type::union(vec![
-                                ast::Type::identifier("This"),
-                                ast::Type::identifier("That"),
-                                ast::Type::identifier("TheOther"),
-                            ]),
+                            value: unsafe {
+                                NonEmpty::new_unchecked(vec![
+                                    spanned_named_type_empty(88..92, "This"),
+                                    spanned_named_type_empty(109..113, "That"),
+                                    spanned_named_type_empty(130..138, "TheOther"),
+                                ])
+                            },
                         },
                     },
                 }],
             },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_simple_typedef_with_properties() {
+        let source = r#"
+            module Test
+            where
+
+            typedef Shape = Circle (Float, Float, Float)
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![],
+                values: vec![],
+                type_definitions: vec![Spanned {
+                    span: 56..100,
+                    value: TypeDefinition {
+                        name: Spanned {
+                            span: 64..69,
+                            value: "Shape".to_string(),
+                        },
+                        types: Spanned {
+                            span: 72..100,
+                            value: unsafe {
+                                NonEmpty::new_unchecked(vec![spanned_named_type(
+                                    72..78,
+                                    "Circle",
+                                    79..100,
+                                    ast::Type::tuple(vec![
+                                        ast::Type::identifier("Float"),
+                                        ast::Type::identifier("Float"),
+                                        ast::Type::identifier("Float"),
+                                    ]),
+                                )])
+                            },
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_union_typedef_with_properties() {
+        let source = r#"
+            module Test
+            where
+
+            typedef Shape =
+              | Circle (Float, Float, Float)
+              | Rectangle (Float, Float, Float, Float)
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![],
+                values: vec![],
+                type_definitions: vec![Spanned {
+                    span: 56..171,
+                    value: TypeDefinition {
+                        name: Spanned {
+                            span: 64..69,
+                            value: "Shape".to_string(),
+                        },
+                        types: Spanned {
+                            span: 88..171,
+                            value: unsafe {
+                                NonEmpty::new_unchecked(vec![
+                                    spanned_named_type(
+                                        88..94,
+                                        "Circle",
+                                        95..116,
+                                        ast::Type::tuple(vec![
+                                            ast::Type::identifier("Float"),
+                                            ast::Type::identifier("Float"),
+                                            ast::Type::identifier("Float"),
+                                        ]),
+                                    ),
+                                    spanned_named_type(
+                                        133..142,
+                                        "Rectangle",
+                                        143..171,
+                                        ast::Type::tuple(vec![
+                                            ast::Type::identifier("Float"),
+                                            ast::Type::identifier("Float"),
+                                            ast::Type::identifier("Float"),
+                                            ast::Type::identifier("Float"),
+                                        ]),
+                                    ),
+                                ])
+                            },
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_lowercase_union_name() {
+        let source = r#"
+            module Bool
+            where
+
+            typedef Bool =
+              | True
+              | false
+        "#;
+        let actual = parse(source);
+
+        let expected: Result<Spanned<Module>, ParseError> = Err(ParseError::ExpectedTypeName {
+            span: 106..107,
+            actual: vec![
+                Token {
+                    kind: TokenKind::LowerIdentifier("false"),
+                    span: 108..113,
+                },
+                Token {
+                    kind: TokenKind::EOF,
+                    span: 122..122,
+                },
+            ],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_incomplete_typedef() {
+        let source = r#"
+            module Bool
+            where
+
+            typedef IncompleteUnion =
+        "#;
+        let actual = parse(source);
+
+        let expected: Result<Spanned<Module>, ParseError> = Err(ParseError::ExpectedTypeName {
+            span: 56..81,
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 90..90,
+            }],
         });
 
         assert_eq!(expected, actual);
@@ -2279,6 +2476,40 @@ mod parser_tests {
                         )
                     },
                 },
+            },
+        }
+    }
+
+    fn spanned_named_type_empty(span: Span, name: &str) -> Spanned<NamedType> {
+        Spanned {
+            span: span.clone(),
+            value: NamedType {
+                name: Spanned {
+                    span: span.clone(),
+                    value: name.to_string(),
+                },
+                t: None,
+            },
+        }
+    }
+
+    fn spanned_named_type(
+        name_span: Span,
+        name: &str,
+        type_span: Span,
+        t: ast::Type,
+    ) -> Spanned<NamedType> {
+        Spanned {
+            span: name_span.start..type_span.end,
+            value: NamedType {
+                name: Spanned {
+                    span: name_span,
+                    value: name.to_string(),
+                },
+                t: Some(Spanned {
+                    span: type_span,
+                    value: t,
+                }),
             },
         }
     }
