@@ -20,7 +20,7 @@ pub fn parse<'a>(
 
     let mut remainder = remainder.into_iter().peekable();
 
-    let first_span = first_type.span.clone();
+    let first_span = first_type.span();
 
     log::debug!("*parse_type* remainder: {:?}", &remainder);
 

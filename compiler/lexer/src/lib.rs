@@ -39,6 +39,11 @@ impl<'source> Token<'source> {
     fn new(kind: TokenKind<'source>, span: Range<usize>) -> Self {
         Token { kind, span }
     }
+
+    #[must_use]
+    pub fn span(&self) -> Range<usize> {
+        self.span.start..self.span.end
+    }
 }
 
 #[derive(Logos, Debug, PartialEq, Clone)]
