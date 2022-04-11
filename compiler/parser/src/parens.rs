@@ -1,4 +1,4 @@
-use alloy_lexer::{Token, TokenKind};
+use alloy_lexer::{Token, TokenKind, T};
 use itertools::Itertools;
 
 use super::{ParseError, ParseResult, Span, Spanned};
@@ -18,7 +18,7 @@ where
     let mut parens_args = Vec::new();
     loop {
         match parens_remainder.peek().map(|t| t.kind.clone()) {
-            None | Some(TokenKind::CloseParen | TokenKind::EOF) => break,
+            None | Some(T![')'] | TokenKind::EOF) => break,
             _ => {}
         };
 
@@ -35,11 +35,11 @@ where
             let mut remainder = remainder.into_iter().peekable();
 
             match remainder.peek().cloned() {
-                Some(t) if t.kind == TokenKind::Comma => {
+                Some(t) if t.kind == T![,] => {
                     remainder.next();
                     remainder
                 }
-                Some(t) if t.kind == TokenKind::CloseParen || t.kind == TokenKind::EOF => remainder,
+                Some(t) if t.kind == T![')'] || t.kind == TokenKind::EOF => remainder,
                 _ => {
                     return Err(ParseError::ExpectedTupleComma {
                         span: parens_span.clone(),
@@ -51,9 +51,7 @@ where
     }
 
     let (close_paren_span, remainder) = match parens_remainder.peek().cloned() {
-        Some(t) if t.kind == TokenKind::CloseParen => {
-            Ok((t.span, parens_remainder.skip(1).collect_vec()))
-        }
+        Some(t) if t.kind == T![')'] => Ok((t.span, parens_remainder.skip(1).collect_vec())),
         _ => {
             let span = parens_span.clone();
             let span = span.start..parens_remainder.peek().map_or(span, |t| t.span.clone()).end;

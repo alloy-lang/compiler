@@ -7,7 +7,7 @@ use improved_slice_patterns::match_vec;
 use non_empty_vec::NonEmpty;
 
 use alloy_ast as ast;
-use alloy_lexer::{Token, TokenKind, TokenStream};
+use alloy_lexer::{Token, TokenKind, TokenStream, T};
 
 mod docs;
 mod expr;
@@ -40,7 +40,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
     return match_vec!(tokens;
 
         [
-            Token { kind: TokenKind::Module,              span: module_token_span },
+            Token { kind: T![module],                     span: module_token_span },
             Token { kind: TokenKind::LowerIdentifier(id), span: id_token_span },
             remainder @ ..
         ] => {
@@ -54,7 +54,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
         },
 
         [
-            Token { kind: TokenKind::Module,                     span: module_token_span },
+            Token { kind: T![module],                            span: module_token_span },
             Token { kind: TokenKind::InvalidUpperIdentifier(id), span: id_token_span },
             remainder @ ..
         ] => {
@@ -68,9 +68,9 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
         },
 
         [
-            Token { kind: TokenKind::Module,              span: module_token_span },
+            Token { kind: T![module],                     span: module_token_span },
             Token { kind: TokenKind::UpperIdentifier(id), span: id_token_span },
-            Token { kind: TokenKind::Where,               span: where_token_span },
+            Token { kind: T![where],                      span: where_token_span },
             remainder @ ..
         ] => {
             let (imports, type_annotations, values, type_definitions) = parse_module_contents(remainder)?;
@@ -89,7 +89,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
         },
 
         [
-            Token { kind: TokenKind::Module,              span: module_token_span },
+            Token { kind: T![module],                     span: module_token_span },
             Token { kind: TokenKind::UpperIdentifier(id), span: id_token_span },
             remainder @ ..
         ] => {
@@ -103,7 +103,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
         },
 
         [
-            Token { kind: TokenKind::Module,              span: module_token_span },
+            Token { kind: T![module], span: module_token_span },
             remainder @ ..
         ] => {
             let remainder = remainder.into_iter().collect::<Vec<_>>();
@@ -157,7 +157,7 @@ fn parse_module_contents<'a>(
         remainder = match_vec!(remainder;
                 [
                     Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
-                    Token { kind: TokenKind::Colon,               span: colon_span },
+                    Token { kind: T![:],                          span: colon_span },
                     remainder @ ..
                 ] => {
                     let type_span = id_span.start..colon_span.end;
@@ -182,7 +182,7 @@ fn parse_module_contents<'a>(
 
                 [
                     Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
-                    Token { kind: TokenKind::Eq,                  span: eq_span },
+                    Token { kind: T![=],                          span: eq_span },
                     remainder @ ..
                 ] => {
                     let expr_span = id_span.start..eq_span.end;
@@ -206,7 +206,7 @@ fn parse_module_contents<'a>(
                 },
 
                 [
-                    Token { kind: TokenKind::Import,          span: import_span },
+                    Token { kind: T![import],                 span: import_span },
                     Token { kind: TokenKind::UpperPath(path), span: path_span },
                     remainder @ ..
                 ] => {
@@ -226,7 +226,7 @@ fn parse_module_contents<'a>(
                 },
 
                 [
-                    Token { kind: TokenKind::Import,          span: import_span },
+                    Token { kind: T![import],                 span: import_span },
                     Token { kind: TokenKind::LowerPath(path), span: path_span },
                     remainder @ ..
                 ] => {
@@ -246,7 +246,7 @@ fn parse_module_contents<'a>(
                 },
 
                 [
-                    Token { kind: TokenKind::Import,              span: import_span },
+                    Token { kind: T![import],                     span: import_span },
                     Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
                     remainder @ ..
                 ] => {
@@ -266,7 +266,7 @@ fn parse_module_contents<'a>(
                 },
 
                 [
-                    Token { kind: TokenKind::Import,                 span: import_span },
+                    Token { kind: T![import],                        span: import_span },
                     Token { kind: TokenKind::InvalidUpperPath(path), span: path_span },
                     remainder @ ..
                 ] => {
@@ -290,9 +290,9 @@ fn parse_module_contents<'a>(
                 },
 
                 [
-                    Token { kind: TokenKind::Typedef,             span: type_def_span },
+                    Token { kind: T![typedef],                    span: type_def_span },
                     Token { kind: TokenKind::UpperIdentifier(id), span: id_span },
-                    Token { kind: TokenKind::Eq,                  span: eq_span },
+                    Token { kind: T![=],                          span: eq_span },
                     remainder @ ..
                 ] => {
                     let type_span = id_span.start..eq_span.end;
@@ -2178,16 +2178,13 @@ mod parser_tests {
 "#;
         let actual = parse(source);
 
-        let expected: Result<Spanned<Module>, ParseError> =
-            Err(ParseError::ExpectedType {
-                span: 82..89,
-                actual: vec![
-                    Token {
-                        kind: TokenKind::EOF,
-                        span: 90..90,
-                    },
-                ],
-            });
+        let expected: Result<Spanned<Module>, ParseError> = Err(ParseError::ExpectedType {
+            span: 82..89,
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 90..90,
+            }],
+        });
 
         assert_eq!(expected, actual);
     }

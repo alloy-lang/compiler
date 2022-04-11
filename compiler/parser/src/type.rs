@@ -3,7 +3,7 @@ use core::convert;
 use improved_slice_patterns::match_vec;
 
 use alloy_ast as ast;
-use alloy_lexer::{Token, TokenKind};
+use alloy_lexer::{Token, TokenKind, T};
 
 use super::parens;
 use super::{ParseError, ParseResult, Span, Spanned};
@@ -25,11 +25,11 @@ pub fn parse<'a>(
     log::debug!("*parse_type* remainder: {:?}", &remainder);
 
     match remainder.peek() {
-        Some(Token { kind, span }) if kind == &TokenKind::RightArrow => {
+        Some(Token { kind, span }) if kind == &T![->] => {
             let new_span = first_span.start..span.end;
 
-            let (next_type, next_remainder) = parse(&new_span, remainder.skip(1))
-                .map_err(|e| match e {
+            let (next_type, next_remainder) =
+                parse(&new_span, remainder.skip(1)).map_err(|e| match e {
                     ParseError::ExpectedType { span, actual } => {
                         ParseError::ExpectedLambdaReturnType { span, actual }
                     }
@@ -49,9 +49,7 @@ pub fn parse<'a>(
             let value = ast::Type::union(vec![first_type.value, next_type.value]);
             Ok((Spanned { span, value }, next_remainder))
         }
-        _ => {
-            Ok((first_type, remainder.collect()))
-        }
+        _ => Ok((first_type, remainder.collect())),
     }
 }
 
@@ -60,7 +58,7 @@ fn parse_single_type<'a>(
     input: impl Iterator<Item = Token<'a>>,
 ) -> ParseResult<'a, ast::Type> {
     let input = input
-        .skip_while(|t| matches!(t.kind, TokenKind::Pipe))
+        .skip_while(|t| matches!(t.kind, T![|]))
         .collect::<Vec<_>>();
     log::debug!("*parse_single_type* input: {:?}", &input);
 
@@ -80,7 +78,7 @@ fn parse_single_type<'a>(
         // )),
 
         [
-            Token { kind: TokenKind::OpenParen, span: open_paren_span },
+            Token { kind: T!['('], span: open_paren_span },
             remainder @ ..
         ] => parens::parse(open_paren_span, remainder, self::parse_vec, ast::Type::tuple),
 

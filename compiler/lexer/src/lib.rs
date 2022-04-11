@@ -200,6 +200,43 @@ fn extract_path<'source>(
     NonEmpty::try_from(segments)
 }
 
+#[macro_export]
+macro_rules ! T {
+    ["#["] => { $ crate :: TokenKind :: AttributeOpen } ;
+    [import] => { $ crate :: TokenKind :: Import } ;
+    [module] => { $ crate :: TokenKind :: Module } ;
+    [where] => { $ crate :: TokenKind :: Where } ;
+    [when] => { $ crate :: TokenKind :: When } ;
+    [match] => { $ crate :: TokenKind :: Match } ;
+    [trait] => { $ crate :: TokenKind :: Trait } ;
+    [behavior] => { $ crate :: TokenKind :: Behavior } ;
+    [typedef] => { $ crate :: TokenKind :: Typedef } ;
+    [typevar] => { $ crate :: TokenKind :: Typevar } ;
+    [if] => { $ crate :: TokenKind :: If } ;
+    [then] => { $ crate :: TokenKind :: Then } ;
+    [else] => { $ crate :: TokenKind :: Else } ;
+    [->] => { $ crate :: TokenKind :: RightArrow } ;
+    [,] => { $ crate :: TokenKind :: Comma } ;
+    [.] => { $ crate :: TokenKind :: Dot } ;
+    ['('] => { $ crate :: TokenKind :: OpenParen } ;
+    [')'] => { $ crate :: TokenKind :: CloseParen } ;
+    ['{'] => { $ crate :: TokenKind :: OpenBrace } ;
+    ['}'] => { $ crate :: TokenKind :: CloseBrace } ;
+    ['['] => { $ crate :: TokenKind :: OpenBracket } ;
+    [']'] => { $ crate :: TokenKind :: CloseBracket } ;
+    [:] => { $ crate :: TokenKind :: Colon } ;
+    [=] => { $ crate :: TokenKind :: Eq } ;
+    [<] => { $ crate :: TokenKind :: Lt } ;
+    [>] => { $ crate :: TokenKind :: Gt } ;
+    [-] => { $ crate :: TokenKind :: Minus } ;
+    [&&] => { $ crate :: TokenKind :: And } ;
+    [||] => { $ crate :: TokenKind :: Or } ;
+    [+] => { $ crate :: TokenKind :: Plus } ;
+    [|] => { $ crate :: TokenKind :: Pipe } ;
+    [_] => { $ crate :: TokenKind :: NilIdentifier } ;
+}
+// pub use T;
+
 #[cfg(test)]
 mod lexer_tests {
     use super::*;
