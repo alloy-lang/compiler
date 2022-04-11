@@ -3,7 +3,7 @@ use core::convert;
 use improved_slice_patterns::match_vec;
 
 use alloy_ast as ast;
-use alloy_lexer::{Token, TokenKind};
+use alloy_lexer::{Token, TokenKind, T};
 
 use super::parens;
 use super::{ParseError, ParseResult, Span, Spanned};
@@ -60,7 +60,7 @@ pub fn parse<'a>(pattern_span: &Span, input: Vec<Token<'a>>) -> ParseResult<'a, 
         }, remainder.collect())),
 
         [
-            Token { kind: TokenKind::OpenParen, span: open_paren_span },
+            Token { kind: T!['('], span: open_paren_span },
             remainder @ ..
         ] => parens::parse(open_paren_span, remainder, self::parse, ast::Pattern::tuple),
 

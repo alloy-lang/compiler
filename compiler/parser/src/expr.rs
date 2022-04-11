@@ -5,7 +5,7 @@ use itertools::Itertools;
 use non_empty_vec::NonEmpty;
 
 use alloy_ast as ast;
-use alloy_lexer::{Token, TokenKind};
+use alloy_lexer::{Token, TokenKind, T};
 
 use super::{parens, pattern};
 use super::{ParseError, ParseResult, Span, Spanned};
@@ -25,18 +25,18 @@ pub fn parse<'a>(
 
     match_vec!(input.clone();
         [
-            Token { kind: TokenKind::Pipe, span: start_pipe_span },
+            Token { kind: T![|], span: start_pipe_span },
             remainder @ ..
         ] => {
             let mut remainder = remainder.clone();
             let mut pattern_remainder = remainder
-                .take_while_ref(|t| !matches!(t.kind, TokenKind::Pipe))
+                .take_while_ref(|t| !matches!(t.kind, T![|]))
                 .collect::<Vec<_>>();
 
             let (pipe_span, expr, remainder) = match_vec!(remainder.collect::<Vec<_>>();
                 [
-                    Token { kind: TokenKind::Pipe,  span: end_pipe_span },
-                    Token { kind: TokenKind::RightArrow, span: arrow_span },
+                    Token { kind: T![|],  span: end_pipe_span },
+                    Token { kind: T![->], span: arrow_span },
                     remainder @ ..
                 ] => {
                     let pipe_span = start_pipe_span.start..end_pipe_span.end;
@@ -45,7 +45,7 @@ pub fn parse<'a>(
                 },
 
                 [
-                    Token { kind: TokenKind::Pipe,  span: end_pipe_span },
+                    Token { kind: T![|],  span: end_pipe_span },
                     remainder @ ..
                 ] => {
                     let span = start_pipe_span.start..end_pipe_span.end;
@@ -78,7 +78,7 @@ pub fn parse<'a>(
 
                     match_vec!(remainder;
                         [
-                            Token { kind: TokenKind::Comma, span },
+                            Token { kind: T![,], span },
                             remainder @ ..
                         ] => remainder.collect(),
 
@@ -118,13 +118,13 @@ pub fn parse<'a>(
 
         [
             Token { kind: TokenKind::LowerIdentifier(id), span },
-            Token { kind: TokenKind::OpenParen,           span: open_paren_span },
+            Token { kind: T!['('],                        span: open_paren_span },
             remainder @ ..
         ] => parens::parse(open_paren_span, remainder, self::parse_vec, |args| ast::Expr::application(NonEmpty::new(id), args)),
 
         [
             Token { kind: TokenKind::LowerPath(path), span },
-            Token { kind: TokenKind::OpenParen,       span: open_paren_span },
+            Token { kind: T!['('],                    span: open_paren_span },
             remainder @ ..
         ] => parens::parse(open_paren_span, remainder, self::parse_vec, |args| ast::Expr::application(path, args)),
 
@@ -145,24 +145,24 @@ pub fn parse<'a>(
         }, remainder.collect())),
 
         [
-            Token { kind: TokenKind::OpenParen, span: open_paren_span },
+            Token { kind: T!['('], span: open_paren_span },
             remainder @ ..
         ] => parens::parse(open_paren_span, remainder, self::parse_vec, ast::Expr::tuple),
 
         [
-            Token { kind: TokenKind::If, span: if_span },
+            Token { kind: T![if], span: if_span },
             remainder @ ..
         ] => {
             let (if_expr, remainder) = self::parse(&if_span, remainder)?;
             let mut remainder = remainder.into_iter().peekable();
 
             match remainder.peek().cloned() {
-                Some(t) if t.kind == TokenKind::Then => {
+                Some(t) if t.kind == T![then] => {
                     let (then_expr, remainder) = self::parse(&t.span, remainder.skip(1))?;
                     let mut remainder = remainder.into_iter().peekable();
 
                     match remainder.peek().cloned() {
-                        Some(t) if t.kind == TokenKind::Else => {
+                        Some(t) if t.kind == T![else] => {
                             let (else_expr, remainder) = self::parse(&t.span, remainder.skip(1))?;
 
                             Ok((Spanned {
@@ -203,7 +203,7 @@ pub fn parse<'a>(
         .and_then(convert::identity)
         .and_then(|(expr1, remainder)| match_vec!(remainder;
             [
-                Token { kind: TokenKind::Plus, span: op_span },
+                Token { kind: T![+], span: op_span },
                 remainder @ ..
             ] => {
                 let expr_span = expr_span.start..op_span.end;
@@ -216,7 +216,7 @@ pub fn parse<'a>(
                 }, remainder))
             },
             [
-                Token { kind: TokenKind::Minus, span: op_span },
+                Token { kind: T![-], span: op_span },
                 remainder @ ..
             ] => {
                 let expr_span = expr_span.start..op_span.end;
