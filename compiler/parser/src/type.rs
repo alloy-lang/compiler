@@ -40,15 +40,6 @@ pub fn parse<'a>(
             let value = ast::Type::lambda(first_type.value, next_type.value);
             Ok((Spanned { span, value }, next_remainder))
         }
-        Some(Token { kind, span }) if kind == &TokenKind::Pipe => {
-            let new_span = first_span.start..span.end;
-
-            let (next_type, next_remainder) = parse(&new_span, remainder.skip(1))?;
-
-            let span = first_type.span.start..next_type.span.end;
-            let value = ast::Type::union(vec![first_type.value, next_type.value]);
-            Ok((Spanned { span, value }, next_remainder))
-        }
         _ => Ok((first_type, remainder.collect())),
     }
 }
@@ -57,9 +48,7 @@ fn parse_single_type<'a>(
     type_span: &Span,
     input: impl Iterator<Item = Token<'a>>,
 ) -> ParseResult<'a, ast::Type> {
-    let input = input
-        .skip_while(|t| matches!(t.kind, T![|]))
-        .collect::<Vec<_>>();
+    let input = input.collect::<Vec<_>>();
     log::debug!("*parse_single_type* input: {:?}", &input);
 
     match_vec!(input.clone();
