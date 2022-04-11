@@ -128,7 +128,7 @@ fn find_last_span(remainder: &[Token], previous_span: &Span, source_length: usiz
         .iter()
         .filter(|t| !matches!(t.kind, TokenKind::EOF))
         .last()
-        .map_or_else(|| previous_span.end..source_length, |l| l.span.clone())
+        .map_or_else(|| previous_span.end..source_length, Token::span)
 }
 
 type ModuleContents = (
@@ -344,15 +344,27 @@ pub struct Spanned<T> {
 }
 
 impl<T> Spanned<T> {
+    #[must_use]
     fn from_span(span: Span, value: T) -> Self {
         Spanned { span, value }
     }
 
+    #[must_use]
     fn from(start: Span, end: Span, value: T) -> Self {
         Spanned {
             span: start.start..end.end,
             value,
         }
+    }
+
+    #[must_use]
+    fn span(&self) -> Span {
+        self.span.start..self.span.end
+    }
+
+    #[must_use]
+    fn span_end(self) -> usize {
+        self.span.end
     }
 }
 
@@ -917,7 +929,7 @@ mod parser_tests {
                 where
 
                 thing
-    "#;
+        "#;
         let actual = parse(source);
 
         let expected = Err(ParseError::OrphanedIdentifier {
@@ -935,14 +947,14 @@ mod parser_tests {
             where
 
             thing =
-"#;
+        "#;
         let actual = parse(source);
 
         let expected = Err(ParseError::ExpectedExpr {
             span: 56..63,
             actual: vec![Token {
                 kind: TokenKind::EOF,
-                span: 64..64,
+                span: 72..72,
             }],
         });
 
@@ -1913,7 +1925,7 @@ mod parser_tests {
             missing_then = |num| ->
               if Number::is_positive?(num) num + 1
               else num
-"#;
+        "#;
         let actual = parse(source);
 
         let expected = Err(ParseError::ExpectedThenKeyWord {
@@ -1941,7 +1953,7 @@ mod parser_tests {
                 },
                 Token {
                     kind: TokenKind::EOF,
-                    span: 154..154,
+                    span: 162..162,
                 },
             ],
         });
@@ -1957,14 +1969,14 @@ mod parser_tests {
 
             missing_then = |num| ->
               if Number::is_positive?(num) then num + 1
-"#;
+        "#;
         let actual = parse(source);
 
         let expected = Err(ParseError::ExpectedElseKeyWord {
-            span: 136..136,
+            span: 144..144,
             actual: vec![Token {
                 kind: TokenKind::EOF,
-                span: 136..136,
+                span: 144..144,
             }],
         });
 
@@ -2041,7 +2053,7 @@ mod parser_tests {
             import std::bool::not
             import std::function::(<|)
             import std
-"#;
+        "#;
         let actual = parse(source);
 
         let expected = Ok(Spanned {
@@ -2074,12 +2086,12 @@ mod parser_tests {
             where
 
             import std::pretty::long::unfinished::
-"#;
+        "#;
         let actual = parse(source);
 
         let expected = Err(ParseError::InvalidImport {
             span: 63..94,
-            message: "Import must have a path separated by '::'. Found: `std::pretty::long::unfinished::`".to_string()
+            message: "Import must have a path separated by '::'. Found: `std::pretty::long::unfinished::`".to_string(),
         });
 
         assert_eq!(expected, actual);
@@ -2092,7 +2104,7 @@ mod parser_tests {
             where
 
             typedef Name = String
-"#;
+        "#;
         let actual = parse(source);
 
         let expected = Ok(Spanned {
@@ -2133,7 +2145,7 @@ mod parser_tests {
             typedef Bool =
               | False
               | True
-"#;
+        "#;
         let actual = parse(source);
 
         let expected = Ok(Spanned {
@@ -2178,7 +2190,7 @@ mod parser_tests {
               | This
               | That
               | TheOther
-"#;
+        "#;
         let actual = parse(source);
 
         let expected = Ok(Spanned {
@@ -2221,14 +2233,14 @@ mod parser_tests {
             where
 
             typedef IncompleteUnion = False |
-"#;
+        "#;
         let actual = parse(source);
 
-        let expected: Result<Spanned<Module>, ParseError> = Err(ParseError::ExpectedType {
-            span: 82..89,
+        let expected: Result<Spanned<Module>, ParseError> = Err(ParseError::ExpectedTypeName {
+            span: 88..89,
             actual: vec![Token {
                 kind: TokenKind::EOF,
-                span: 90..90,
+                span: 98..98,
             }],
         });
 

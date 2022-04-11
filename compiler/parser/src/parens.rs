@@ -54,7 +54,7 @@ where
         Some(t) if t.kind == T![')'] => Ok((t.span, parens_remainder.skip(1).collect_vec())),
         _ => {
             let span = parens_span.clone();
-            let span = span.start..parens_remainder.peek().map_or(span, |t| t.span.clone()).end;
+            let span = span.start..parens_remainder.peek().map_or(span, Token::span).end;
             Err(ParseError::ExpectedClosedParen {
                 span,
                 actual: parens_remainder.collect(),

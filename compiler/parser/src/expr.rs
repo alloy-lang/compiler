@@ -57,7 +57,7 @@ pub fn parse<'a>(
 
                 [remainder @ ..] => {
                     let span = expr_span.clone();
-                    let span = span.start..pattern_remainder.get(0).map_or(span, |t| t.span.clone()).end;
+                    let span = span.start..pattern_remainder.get(0).map_or(span, Token::span).end;
                     Err(ParseError::ExpectedPipe {
                         span,
                         actual: pattern_remainder.clone(),
