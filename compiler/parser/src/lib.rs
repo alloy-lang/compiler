@@ -16,6 +16,7 @@ mod module;
 mod parens;
 mod pattern;
 mod r#type;
+mod r#trait;
 mod type_definition;
 
 //
@@ -401,6 +402,13 @@ pub struct TypeDefinition {
 pub struct NamedType {
     name: Spanned<String>,
     t: Option<Spanned<ast::Type>>,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+pub struct Trait {
+    name: Spanned<String>,
+    // type_variables: Spanned<NonEmpty<Spanned<String>>>,
+    // values: Spanned<NonEmpty<Spanned<Value>>>,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
