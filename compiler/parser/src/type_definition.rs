@@ -79,3 +79,372 @@ fn parse_named_type<'a>(
         })
     }
 }
+
+#[cfg(test)]
+mod type_definition_parser_tests {
+    use non_empty_vec::NonEmpty;
+    use pretty_assertions::assert_eq;
+
+    use alloy_ast as ast;
+    use alloy_lexer::{Token, TokenKind};
+
+    use crate::{parse, Module, NamedType, ParseError, Span, Spanned, TypeDefinition};
+
+    #[test]
+    fn test_simple_typedef() {
+        let source = r#"
+            module Test
+            where
+
+            typedef Name = String
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![],
+                values: vec![],
+                type_definitions: vec![Spanned {
+                    span: 56..77,
+                    value: TypeDefinition {
+                        name: Spanned {
+                            span: 64..68,
+                            value: "Name".to_string(),
+                        },
+                        types: Spanned {
+                            span: 71..77,
+                            value: unsafe {
+                                NonEmpty::new_unchecked(vec![spanned_named_type_empty(
+                                    71..77,
+                                    "String",
+                                )])
+                            },
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_typedef_2_union() {
+        let source = r#"
+            module Bool
+            where
+
+            typedef Bool =
+              | False
+              | True
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Bool".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![],
+                values: vec![],
+                type_definitions: vec![Spanned {
+                    span: 56..113,
+                    value: TypeDefinition {
+                        name: Spanned {
+                            span: 64..68,
+                            value: "Bool".to_string(),
+                        },
+                        types: Spanned {
+                            span: 87..113,
+                            value: unsafe {
+                                NonEmpty::new_unchecked(vec![
+                                    spanned_named_type_empty(87..92, "False"),
+                                    spanned_named_type_empty(109..113, "True"),
+                                ])
+                            },
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_typedef_3_union() {
+        let source = r#"
+            module Test
+            where
+
+            typedef Thing =
+              | This
+              | That
+              | TheOther
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![],
+                values: vec![],
+                type_definitions: vec![Spanned {
+                    span: 56..138,
+                    value: TypeDefinition {
+                        name: Spanned {
+                            span: 64..69,
+                            value: "Thing".to_string(),
+                        },
+                        types: Spanned {
+                            span: 88..138,
+                            value: unsafe {
+                                NonEmpty::new_unchecked(vec![
+                                    spanned_named_type_empty(88..92, "This"),
+                                    spanned_named_type_empty(109..113, "That"),
+                                    spanned_named_type_empty(130..138, "TheOther"),
+                                ])
+                            },
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_simple_typedef_with_properties() {
+        let source = r#"
+            module Test
+            where
+
+            typedef Shape = Circle (Float, Float, Float)
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![],
+                values: vec![],
+                type_definitions: vec![Spanned {
+                    span: 56..100,
+                    value: TypeDefinition {
+                        name: Spanned {
+                            span: 64..69,
+                            value: "Shape".to_string(),
+                        },
+                        types: Spanned {
+                            span: 72..100,
+                            value: unsafe {
+                                NonEmpty::new_unchecked(vec![spanned_named_type(
+                                    72..78,
+                                    "Circle",
+                                    79..100,
+                                    ast::Type::tuple(vec![
+                                        ast::Type::identifier("Float"),
+                                        ast::Type::identifier("Float"),
+                                        ast::Type::identifier("Float"),
+                                    ]),
+                                )])
+                            },
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_union_typedef_with_properties() {
+        let source = r#"
+            module Test
+            where
+
+            typedef Shape =
+              | Circle (Float, Float, Float)
+              | Rectangle (Float, Float, Float, Float)
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![],
+                values: vec![],
+                type_definitions: vec![Spanned {
+                    span: 56..171,
+                    value: TypeDefinition {
+                        name: Spanned {
+                            span: 64..69,
+                            value: "Shape".to_string(),
+                        },
+                        types: Spanned {
+                            span: 88..171,
+                            value: unsafe {
+                                NonEmpty::new_unchecked(vec![
+                                    spanned_named_type(
+                                        88..94,
+                                        "Circle",
+                                        95..116,
+                                        ast::Type::tuple(vec![
+                                            ast::Type::identifier("Float"),
+                                            ast::Type::identifier("Float"),
+                                            ast::Type::identifier("Float"),
+                                        ]),
+                                    ),
+                                    spanned_named_type(
+                                        133..142,
+                                        "Rectangle",
+                                        143..171,
+                                        ast::Type::tuple(vec![
+                                            ast::Type::identifier("Float"),
+                                            ast::Type::identifier("Float"),
+                                            ast::Type::identifier("Float"),
+                                            ast::Type::identifier("Float"),
+                                        ]),
+                                    ),
+                                ])
+                            },
+                        },
+                    },
+                }],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_lowercase_union_name() {
+        let source = r#"
+            module Bool
+            where
+
+            typedef Bool =
+              | True
+              | false
+        "#;
+        let actual = parse(source);
+
+        let expected: Result<Spanned<Module>, ParseError> = Err(ParseError::ExpectedTypeName {
+            span: 106..107,
+            actual: vec![
+                Token {
+                    kind: TokenKind::LowerIdentifier("false"),
+                    span: 108..113,
+                },
+                Token {
+                    kind: TokenKind::EOF,
+                    span: 122..122,
+                },
+            ],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_incomplete_typedef() {
+        let source = r#"
+            module Bool
+            where
+
+            typedef IncompleteUnion =
+        "#;
+        let actual = parse(source);
+
+        let expected: Result<Spanned<Module>, ParseError> = Err(ParseError::ExpectedTypeName {
+            span: 56..81,
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 90..90,
+            }],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_incomplete_union() {
+        let source = r#"
+            module Bool
+            where
+
+            typedef IncompleteUnion = False |
+        "#;
+        let actual = parse(source);
+
+        let expected: Result<Spanned<Module>, ParseError> = Err(ParseError::ExpectedTypeName {
+            span: 88..89,
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 98..98,
+            }],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    fn spanned_named_type_empty(span: Span, name: &str) -> Spanned<NamedType> {
+        Spanned {
+            span: span.clone(),
+            value: NamedType {
+                name: Spanned {
+                    span: span.clone(),
+                    value: name.to_string(),
+                },
+                t: None,
+            },
+        }
+    }
+
+    fn spanned_named_type(
+        name_span: Span,
+        name: &str,
+        type_span: Span,
+        t: ast::Type,
+    ) -> Spanned<NamedType> {
+        Spanned {
+            span: name_span.start..type_span.end,
+            value: NamedType {
+                name: Spanned {
+                    span: name_span,
+                    value: name.to_string(),
+                },
+                t: Some(Spanned {
+                    span: type_span,
+                    value: t,
+                }),
+            },
+        }
+    }
+}

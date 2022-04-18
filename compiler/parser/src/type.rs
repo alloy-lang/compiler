@@ -79,3 +79,230 @@ fn parse_single_type<'a>(
     .map_err(|remaining| ParseError::ExpectedEOF { input, remaining })
     .and_then(convert::identity)
 }
+
+#[cfg(test)]
+mod type_parser_tests {
+    use pretty_assertions::assert_eq;
+
+    use alloy_ast as ast;
+    use alloy_lexer::{Token, TokenKind};
+
+    use crate::{parse, Module, ParseError, Spanned, TypeAnnotation};
+
+    #[test]
+    fn test_incomplete_function_type_annotation() {
+        let source = r#"
+            module Test
+            where
+
+            incomplete : Int -> 0
+        "#;
+        let actual = parse(source);
+
+        let expected: Result<Spanned<Module>, ParseError> =
+            Err(ParseError::ExpectedLambdaReturnType {
+                span: 69..75,
+                actual: vec![
+                    Token {
+                        span: 76..77,
+                        kind: TokenKind::LiteralInt(0),
+                    },
+                    Token {
+                        kind: TokenKind::EOF,
+                        span: 86..86,
+                    },
+                ],
+            });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_no_close_parens_unit_type_annotation() {
+        let source = r#"
+            module Test
+            where
+
+            no_close_parens : ("#;
+        let actual = parse(source);
+
+        let expected = Err(ParseError::ExpectedClosedParen {
+            span: 74..75,
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 75..75,
+            }],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_no_close_parens_tuple_type_annotation() {
+        let source = r#"
+            module Test
+            where
+
+            no_close_parens : (Int, String
+        "#;
+        let actual = parse(source);
+
+        let expected = Err(ParseError::ExpectedClosedParen {
+            span: 74..95,
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 95..95,
+            }],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_no_comma_tuple_type_annotation() {
+        let source = r#"
+            module Test
+            where
+
+            no_close_parens : (Int String)
+        "#;
+        let actual = parse(source);
+
+        let expected = Err(ParseError::ExpectedTupleComma {
+            span: 74..78,
+            actual: vec![
+                Token {
+                    kind: TokenKind::UpperIdentifier("String"),
+                    span: 79..85,
+                },
+                Token {
+                    kind: TokenKind::CloseParen,
+                    span: 85..86,
+                },
+                Token {
+                    kind: TokenKind::EOF,
+                    span: 95..95,
+                },
+            ],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_unit_type_annotation() {
+        let source = r#"
+            module Test
+            where
+
+            unit_type : ()"#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![Spanned {
+                    span: 56..70,
+                    value: TypeAnnotation {
+                        name: Spanned {
+                            span: 56..65,
+                            value: "unit_type".to_string(),
+                        },
+                        t: Spanned {
+                            span: 68..70,
+                            value: ast::Type::Unit,
+                        },
+                    },
+                }],
+                values: vec![],
+                type_definitions: vec![],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_parens_type_annotation() {
+        let source = r#"
+            module Test
+            where
+
+            single_parens_type : (Int)"#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![Spanned {
+                    span: 56..82,
+                    value: TypeAnnotation {
+                        name: Spanned {
+                            span: 56..74,
+                            value: "single_parens_type".to_string(),
+                        },
+                        t: Spanned {
+                            span: 77..82,
+                            value: ast::Type::identifier("Int"),
+                        },
+                    },
+                }],
+                values: vec![],
+                type_definitions: vec![],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_many_parens() {
+        let source = r#"
+            module Test
+            where
+
+            many_parens_type : ((((), (Int))))"#;
+        let actual: Result<Spanned<Module>, ParseError> = parse(source);
+
+        let expected: Result<Spanned<Module>, ParseError> = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![Spanned {
+                    span: 56..90,
+                    value: TypeAnnotation {
+                        name: Spanned {
+                            span: 56..72,
+                            value: "many_parens_type".to_string(),
+                        },
+                        t: Spanned {
+                            span: 75..90,
+                            value: ast::Type::tuple(vec![
+                                ast::Type::Unit,
+                                ast::Type::identifier("Int"),
+                            ]),
+                        },
+                    },
+                }],
+                values: vec![],
+                type_definitions: vec![],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+}
