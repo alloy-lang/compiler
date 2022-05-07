@@ -36,6 +36,7 @@ mod imports_parser_tests {
                 type_annotations: vec![],
                 values: vec![],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 

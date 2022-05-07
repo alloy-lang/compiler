@@ -128,6 +128,7 @@ mod type_definition_parser_tests {
                         },
                     },
                 }],
+                traits: vec![],
             },
         });
 
@@ -174,6 +175,7 @@ mod type_definition_parser_tests {
                         },
                     },
                 }],
+                traits: vec![],
             },
         });
 
@@ -222,6 +224,7 @@ mod type_definition_parser_tests {
                         },
                     },
                 }],
+                traits: vec![],
             },
         });
 
@@ -272,6 +275,7 @@ mod type_definition_parser_tests {
                         },
                     },
                 }],
+                traits: vec![],
             },
         });
 
@@ -337,6 +341,7 @@ mod type_definition_parser_tests {
                         },
                     },
                 }],
+                traits: vec![],
             },
         });
 
@@ -367,6 +372,27 @@ mod type_definition_parser_tests {
                     span: 122..122,
                 },
             ],
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_incomplete_typedef_no_eq() {
+        let source = r#"
+            module Bool
+            where
+
+            typedef IncompleteUnion
+        "#;
+        let actual = parse(source);
+
+        let expected: Result<Spanned<Module>, ParseError> = Err(ParseError::ExpectedTypeName {
+            span: 56..81,
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 90..90,
+            }],
         });
 
         assert_eq!(expected, actual);

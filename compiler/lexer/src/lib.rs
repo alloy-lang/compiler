@@ -100,6 +100,10 @@ pub enum TokenKind<'source> {
     Then,
     #[token("else")]
     Else,
+    #[token("self")]
+    SelfRef,
+    #[regex("#Type<(_+)>", count_args)]
+    KindMarker(usize),
 
     // Non-alphanumeric
     #[token("->")]
@@ -205,6 +209,14 @@ fn extract_path<'source>(
     NonEmpty::try_from(segments)
 }
 
+fn count_args<'source>(lex: &mut Lexer<'source, TokenKind<'source>>) -> Result<usize, EmptyError> {
+    let slice = lex.slice();
+    let arg_length = slice.split(",").count();
+
+    Ok(arg_length)
+}
+
+#[allow(non_snake_case)]
 #[macro_export]
 macro_rules ! T {
     ["#["] => { $ crate :: TokenKind :: AttributeOpen } ;
@@ -220,6 +232,7 @@ macro_rules ! T {
     [if] => { $ crate :: TokenKind :: If } ;
     [then] => { $ crate :: TokenKind :: Then } ;
     [else] => { $ crate :: TokenKind :: Else } ;
+    [self] => { $ crate :: TokenKind :: SelfRef } ;
     [->] => { $ crate :: TokenKind :: RightArrow } ;
     [,] => { $ crate :: TokenKind :: Comma } ;
     [.] => { $ crate :: TokenKind :: Dot } ;
