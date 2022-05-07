@@ -277,6 +277,7 @@ mod expr_parser_tests {
                     },
                 }],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 
@@ -324,6 +325,7 @@ mod expr_parser_tests {
                     },
                 }],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 
@@ -360,6 +362,7 @@ mod expr_parser_tests {
                     },
                 }],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 
@@ -408,6 +411,7 @@ mod expr_parser_tests {
                     },
                 }],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 
@@ -451,6 +455,7 @@ mod expr_parser_tests {
                     },
                 }],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 
@@ -497,6 +502,7 @@ mod expr_parser_tests {
                     },
                 }],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 
@@ -669,6 +675,7 @@ mod expr_parser_tests {
                     },
                 ],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 
@@ -761,6 +768,7 @@ mod expr_parser_tests {
                     },
                 ],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 
@@ -825,6 +833,7 @@ mod expr_parser_tests {
                     },
                 }],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 
@@ -863,6 +872,7 @@ mod expr_parser_tests {
                     },
                 }],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 
@@ -904,6 +914,7 @@ mod expr_parser_tests {
                     },
                 }],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 
@@ -981,6 +992,7 @@ mod expr_parser_tests {
                     },
                 ],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 
@@ -1107,6 +1119,7 @@ mod expr_parser_tests {
                     },
                 }],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 

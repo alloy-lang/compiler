@@ -221,6 +221,7 @@ mod type_parser_tests {
                 }],
                 values: vec![],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 
@@ -259,6 +260,7 @@ mod type_parser_tests {
                 }],
                 values: vec![],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 
@@ -300,6 +302,7 @@ mod type_parser_tests {
                 }],
                 values: vec![],
                 type_definitions: vec![],
+                traits: vec![],
             },
         });
 

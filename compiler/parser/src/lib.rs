@@ -6,6 +6,7 @@ use codespan_reporting::diagnostic::{Diagnostic, Label};
 use improved_slice_patterns::match_vec;
 use non_empty_vec::NonEmpty;
 
+use crate::docs::extract_doc_comments;
 use alloy_ast as ast;
 use alloy_lexer::{Token, TokenKind, TokenStream, T};
 
@@ -15,8 +16,8 @@ mod imports;
 mod module;
 mod parens;
 mod pattern;
-mod r#type;
 mod r#trait;
+mod r#type;
 mod type_definition;
 
 //
@@ -77,7 +78,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
             Token { kind: T![where],                      span: where_token_span },
             remainder @ ..
         ] => {
-            let (imports, type_annotations, values, type_definitions) = parse_module_contents(remainder)?;
+            let (imports, type_annotations, values, type_definitions, traits) = parse_module_contents(remainder)?;
 
             Ok(Spanned::from(
                 module_token_span,
@@ -88,6 +89,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
                     type_annotations,
                     values,
                     type_definitions,
+                    traits,
                 },
             ))
         },
@@ -140,6 +142,7 @@ type ModuleContents = (
     Vec<Spanned<TypeAnnotation>>,
     Vec<Spanned<Value>>,
     Vec<Spanned<TypeDefinition>>,
+    Vec<Spanned<Trait>>,
 );
 type ParseResult<'a, T> = Result<(Spanned<T>, Vec<Token<'a>>), ParseError<'a>>;
 
@@ -150,8 +153,9 @@ fn parse_module_contents<'a>(
     let mut type_annotations = vec![];
     let mut values = vec![];
     let mut type_definitions = vec![];
+    let mut traits = vec![];
 
-    // let _doc_comments = extract_doc_comments(stream);
+    // let _doc_comments = extract_doc_comments(&mut input);
 
     let mut remainder = input.collect::<Vec<_>>();
 
@@ -320,19 +324,57 @@ fn parse_module_contents<'a>(
                 },
 
                 [
+                    Token { kind: T![typedef],                    span: type_def_span },
+                    Token { kind: TokenKind::UpperIdentifier(id), span: id_span },
+                    remainder @ ..
+                ] => {
+                    Err(ParseError::ExpectedEq {
+                        span: id_span,
+                        actual: remainder.collect(),
+                    })
+                },
+
+                [
+                    Token { kind: T![trait],                      span: trait_keyword_span },
+                    Token { kind: TokenKind::UpperIdentifier(id), span: id_span },
+                    Token { kind: T![where],                      span: where_span },
+                    remainder @ ..
+                ] => {
+                    let trait_span = trait_keyword_span.start..where_span.end;
+
+                    let ((type_variables, self_constraints), trait_end_span, remainder) = r#trait::parse(&trait_span, remainder)?;
+
+                    let traitt = Spanned {
+                        span: trait_span.start..trait_end_span.end,
+                        value: Trait {
+                            name: Spanned {
+                                span: id_span,
+                                value: id.to_string(),
+                            },
+                            self_constraints,
+                            type_variables,
+                        },
+                    };
+
+                    traits.push(traitt);
+
+                    Ok(remainder)
+                },
+
+                [
                     Token { kind: TokenKind::EOF, span }
                 ] => {
                     Ok(Vec::new())
                 }
         )
-        .map_err(|remaining| ParseError::ExpectedEOF {
-            input: vec![],
-            remaining,
-        })
-        .and_then(convert::identity)?;
+            .map_err(|remaining| ParseError::ExpectedEOF {
+                input: vec![],
+                remaining,
+            })
+            .and_then(convert::identity)?;
     }
 
-    Ok((imports, type_annotations, values, type_definitions))
+    Ok((imports, type_annotations, values, type_definitions, traits))
 }
 
 //
@@ -379,6 +421,7 @@ pub struct Module {
     type_annotations: Vec<Spanned<TypeAnnotation>>,
     values: Vec<Spanned<Value>>,
     type_definitions: Vec<Spanned<TypeDefinition>>,
+    traits: Vec<Spanned<Trait>>,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
@@ -405,9 +448,16 @@ pub struct NamedType {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
+pub enum TypeConstraint {
+    Kind { args: usize },
+    Trait(String),
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct Trait {
     name: Spanned<String>,
-    // type_variables: Spanned<NonEmpty<Spanned<String>>>,
+    self_constraints: Vec<Spanned<TypeConstraint>>,
+    type_variables: Vec<Spanned<String>>,
     // values: Spanned<NonEmpty<Spanned<Value>>>,
 }
 
@@ -452,6 +502,10 @@ pub enum ParseError<'a> {
         actual: Vec<Token<'a>>,
     },
     ExpectedTypeName {
+        span: Span,
+        actual: Vec<Token<'a>>,
+    },
+    ExpectedEq {
         span: Span,
         actual: Vec<Token<'a>>,
     },
@@ -573,6 +627,18 @@ impl<'a> ParseError<'a> {
                         .map(|t| {
                             Label::primary(file_id.clone(), span.clone())
                                 .with_message(format!("Expected type name, but found: {:?}", t))
+                        })
+                        .collect(),
+                ),
+            ParseError::ExpectedEq { span, actual } => Diagnostic::error()
+                .with_message("Expected equals sign")
+                .with_code("E0007")
+                .with_labels(
+                    actual
+                        .into_iter()
+                        .map(|t| {
+                            Label::primary(file_id.clone(), span.clone())
+                                .with_message(format!("Expected equals sign, but found: {:?}", t))
                         })
                         .collect(),
                 ),
