@@ -41,7 +41,8 @@ pub fn parse<'a>(
             ] => {
                 let mut remainder = remainder.collect::<Vec<_>>();
 
-                loop {
+                let mut cont = true;
+                while cont {
                     remainder = match_vec!(remainder.clone();
                         [
                             Token { kind: TokenKind::KindMarker(args), span: kind_marker_span },
@@ -77,7 +78,8 @@ pub fn parse<'a>(
                         [
                             remainder @ ..
                         ] => {
-                            break;
+                            cont = false;
+                            remainder.collect()
                         }
                     )
                     .map_err(|remaining| ParseError::ExpectedLambdaArgsComma {
