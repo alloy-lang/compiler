@@ -387,11 +387,11 @@ mod type_definition_parser_tests {
         "#;
         let actual = parse(source);
 
-        let expected: Result<Spanned<Module>, ParseError> = Err(ParseError::ExpectedTypeName {
-            span: 56..81,
+        let expected: Result<Spanned<Module>, ParseError> = Err(ParseError::ExpectedEq {
+            span: 64..79,
             actual: vec![Token {
                 kind: TokenKind::EOF,
-                span: 90..90,
+                span: 88..88,
             }],
         });
 
