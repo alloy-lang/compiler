@@ -32,7 +32,7 @@ pub fn parse<'a>(
 
     let (first_type, _) = types.split_first();
     let (last_type, _) = types.split_last();
-    let span = first_type.span.start..last_type.span.end;
+    let span = first_type.span.start..last_type.span_end();
 
     let spanned = Spanned { span, value: types };
 
@@ -59,7 +59,8 @@ fn parse_named_type<'a>(
 
         let span = {
             let start = id_span.start;
-            let end = type_.clone().map_or_else(|| id_span.end, Spanned::span_end);
+            // let end = type_.map_or_else(|| id_span.end, Spanned::span_end);
+            let end = type_.clone().map_or_else(|| id_span.end, |s| s.span.end);
 
             start..end
         };

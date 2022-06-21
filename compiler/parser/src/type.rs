@@ -36,9 +36,9 @@ pub fn parse<'a>(
                     _ => e,
                 })?;
 
-            let span = first_type.span.start..next_type.span.end;
-            let value = ast::Type::lambda(first_type.value, next_type.value);
-            Ok((Spanned { span, value }, next_remainder))
+            let span = first_span.start..next_type.span_end();
+            let lambda = ast::Type::lambda(first_type.value, next_type.value);
+            Ok((Spanned { span, value: lambda }, next_remainder))
         }
         _ => Ok((first_type, remainder.collect())),
     }
@@ -57,14 +57,13 @@ fn parse_single_type<'a>(
             remainder @ ..
         ] => Ok((Spanned { span, value: ast::Type::identifier(id) }, remainder.collect())),
 
-        // TODO: use-case for this section
-        // [
-        //     Token { kind: TokenKind::LowerIdentifier(id), span },
-        //     remainder @ ..
-        // ] => Ok((
-        //     Spanned { span, value: ast::Type::variable(id) },
-        //     remainder.collect(),
-        // )),
+        [
+            Token { kind: TokenKind::LowerIdentifier(id), span },
+            remainder @ ..
+        ] => Ok((
+            Spanned { span, value: ast::Type::variable(id) },
+            remainder.collect(),
+        )),
 
         [
             Token { kind: T!['('], span: open_paren_span },
@@ -87,7 +86,7 @@ mod type_parser_tests {
     use alloy_ast as ast;
     use alloy_lexer::{Token, TokenKind};
 
-    use crate::{parse, Module, ParseError, Spanned, TypeAnnotation};
+    use crate::{parse, Module, ParseError, Spanned, TypeAnnotation, TypeVariable};
 
     #[test]
     fn test_incomplete_function_type_annotation() {
@@ -301,6 +300,67 @@ mod type_parser_tests {
                             ]),
                         },
                         type_variables: vec![],
+                    },
+                }],
+                values: vec![],
+                type_definitions: vec![],
+                traits: vec![],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_with_multiple_free_typevars() {
+        let source = r#"
+            module Test
+            where
+
+            with_typevars : (a -> b) -> a -> b where
+                typevar a
+                typevar b
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![Spanned {
+                    span: 56..67,
+                    value: TypeAnnotation {
+                        name: Spanned {
+                            span: 56..61,
+                            value: "with_typevars".to_string(),
+                        },
+                        t: Spanned {
+                            span: 64..67,
+                            value: ast::Type::lambda(
+                                ast::Type::lambda(
+                                    ast::Type::identifier("a"),
+                                    ast::Type::identifier("b")
+                                ),
+                                ast::Type::lambda(
+                                    ast::Type::identifier("a"),
+                                    ast::Type::identifier("b")
+                                ),
+                            ),
+                        },
+                        type_variables: vec![
+                            Spanned {
+                                span: 64..67,
+                                value: TypeVariable::new_free("a")
+                            },
+                            Spanned {
+                                span: 64..67,
+                                value: TypeVariable::new_free("b")
+                            },
+                        ],
                     },
                 }],
                 values: vec![],

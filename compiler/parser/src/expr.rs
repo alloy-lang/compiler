@@ -92,7 +92,7 @@ pub fn parse<'a>(
             }
 
             Ok((Spanned {
-                span: start_pipe_span.start..expr.span.end,
+                span: start_pipe_span.start..expr.span_end(),
                 value: ast::Expr::lambda(
                     args,
                     expr.value,
@@ -166,7 +166,7 @@ pub fn parse<'a>(
                             let (else_expr, remainder) = self::parse(&t.span, remainder.skip(1))?;
 
                             Ok((Spanned {
-                                span: if_span.start..else_expr.span.end,
+                                span: if_span.start..else_expr.span_end(),
                                 value: ast::Expr::if_then_else(if_expr.value, then_expr.value, else_expr.value),
                             }, remainder))
                         }
@@ -211,7 +211,7 @@ pub fn parse<'a>(
                 let (expr2, remainder) = parse(&expr_span, remainder)?;
 
                 Ok((Spanned {
-                    span: expr_span.start..expr2.span.end,
+                    span: expr_span.start..expr2.span_end(),
                     value: ast::Expr::bin_op("+", expr1.value.clone(), expr2.value),
                 }, remainder))
             },
@@ -224,7 +224,7 @@ pub fn parse<'a>(
                 let (expr2, remainder) = parse(&expr_span, remainder)?;
 
                 Ok((Spanned {
-                    span: expr_span.start..expr2.span.end,
+                    span: expr_span.start..expr2.span_end(),
                     value: ast::Expr::bin_op("-", expr1.value.clone(), expr2.value),
                 }, remainder))
             },
