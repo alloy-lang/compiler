@@ -309,6 +309,7 @@ mod expr_parser_tests {
                             span: 64..67,
                             value: ast::Type::identifier("Int"),
                         },
+                        type_variables: vec![],
                     },
                 }],
                 values: vec![Spanned {
@@ -393,6 +394,7 @@ mod expr_parser_tests {
                             span: 64..69,
                             value: ast::Type::identifier("Float"),
                         },
+                        type_variables: vec![],
                     },
                 }],
                 values: vec![Spanned {
@@ -634,6 +636,7 @@ mod expr_parser_tests {
                                 ast::Type::identifier("Int"),
                             ),
                         },
+                        type_variables: vec![],
                     },
                 }],
                 values: vec![
@@ -721,6 +724,7 @@ mod expr_parser_tests {
                                 ast::Type::identifier("Int"),
                             ),
                         },
+                        type_variables: vec![],
                     },
                 }],
                 values: vec![
@@ -808,6 +812,7 @@ mod expr_parser_tests {
                                 ),
                             ),
                         },
+                        type_variables: vec![],
                     },
                 }],
                 values: vec![Spanned {
