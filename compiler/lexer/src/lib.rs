@@ -102,6 +102,8 @@ pub enum TokenKind<'source> {
     Else,
     #[token("self")]
     SelfRef,
+    #[token("end")]
+    End,
     #[regex("#Type<(_+)>", count_args)]
     KindMarker(usize),
 
@@ -233,6 +235,7 @@ macro_rules ! T {
     [then] => { $ crate :: TokenKind :: Then } ;
     [else] => { $ crate :: TokenKind :: Else } ;
     [self] => { $ crate :: TokenKind :: SelfRef } ;
+    [end] => { $ crate :: TokenKind :: End } ;
     [->] => { $ crate :: TokenKind :: RightArrow } ;
     [,] => { $ crate :: TokenKind :: Comma } ;
     [.] => { $ crate :: TokenKind :: Dot } ;
@@ -326,6 +329,8 @@ mod lexer_tests {
             "if" => TokenKind::If,
             "then" => TokenKind::Then,
             "else" => TokenKind::Else,
+            "self" => TokenKind::SelfRef,
+            "end" => TokenKind::End,
         };
 
         for (source, expected) in source {

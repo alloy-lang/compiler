@@ -6,7 +6,7 @@ use codespan_reporting::diagnostic::{Diagnostic, Label};
 use improved_slice_patterns::match_vec;
 use non_empty_vec::NonEmpty;
 
-use crate::docs::extract_doc_comments;
+// use crate::docs::extract_doc_comments;
 use alloy_ast as ast;
 use alloy_lexer::{Token, TokenKind, TokenStream, T};
 
@@ -78,7 +78,7 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
             Token { kind: T![where],                      span: where_token_span },
             remainder @ ..
         ] => {
-            let (imports, type_annotations, values, type_definitions, traits) = parse_module_contents(remainder)?;
+            let (imports, type_annotations, values, type_definitions, traits) = module::parse_module_contents(remainder)?;
 
             Ok(Spanned::from(
                 module_token_span,
@@ -137,248 +137,10 @@ fn find_last_span(remainder: &[Token], previous_span: &Span, source_length: usiz
         .map_or_else(|| previous_span.end..source_length, Token::span)
 }
 
-type ModuleContents = (
-    Vec<Spanned<Import>>,
-    Vec<Spanned<TypeAnnotation>>,
-    Vec<Spanned<Value>>,
-    Vec<Spanned<TypeDefinition>>,
-    Vec<Spanned<Trait>>,
-);
 type ParseResult<'a, T> = Result<(Spanned<T>, Vec<Token<'a>>), ParseError<'a>>;
 
-fn parse_module_contents<'a>(
-    input: impl Iterator<Item = Token<'a>>,
-) -> Result<ModuleContents, ParseError<'a>> {
-    let mut imports = vec![];
-    let mut type_annotations = vec![];
-    let mut values = vec![];
-    let mut type_definitions = vec![];
-    let mut traits = vec![];
-
-    // let _doc_comments = extract_doc_comments(&mut input);
-
-    let mut remainder = input.collect::<Vec<_>>();
-
-    while !remainder.is_empty() {
-        log::debug!("*parse_module_contents* remainder: {:?}", remainder);
-
-        remainder = match_vec!(remainder;
-                [
-                    Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
-                    Token { kind: T![:],                          span: colon_span },
-                    remainder @ ..
-                ] => {
-                    let type_span = id_span.start..colon_span.end;
-
-                    let (t, remainder) = r#type::parse(&type_span, remainder)?;
-
-                    let type_annotation = Spanned {
-                        span: type_span.start..t.span.end,
-                        value: TypeAnnotation {
-                            name: Spanned {
-                                span: id_span,
-                                value: id.to_string(),
-                            },
-                            t,
-                        },
-                    };
-
-                    type_annotations.push(type_annotation);
-
-                    Ok(remainder)
-                },
-
-                [
-                    Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
-                    Token { kind: T![=],                          span: eq_span },
-                    remainder @ ..
-                ] => {
-                    let expr_span = id_span.start..eq_span.end;
-
-                    let (expr, remainder) = expr::parse(&expr_span, remainder)?;
-
-                    let value = Spanned {
-                        span: expr_span.start..expr.span.end,
-                        value: Value {
-                            name: Spanned {
-                                span: id_span,
-                                value: id.to_string(),
-                            },
-                            expr,
-                        },
-                    };
-
-                    values.push(value);
-
-                    Ok(remainder)
-                },
-
-                [
-                    Token { kind: T![import],                 span: import_span },
-                    Token { kind: TokenKind::UpperPath(path), span: path_span },
-                    remainder @ ..
-                ] => {
-                    let import = Spanned {
-                        span: import_span.start..path_span.end,
-                        value: Import {
-                            import: Spanned {
-                                span: path_span,
-                                value: path,
-                            }
-                        },
-                    };
-
-                    imports.push(import);
-
-                    Ok(remainder.collect())
-                },
-
-                [
-                    Token { kind: T![import],                 span: import_span },
-                    Token { kind: TokenKind::LowerPath(path), span: path_span },
-                    remainder @ ..
-                ] => {
-                    let import = Spanned {
-                        span: import_span.start..path_span.end,
-                        value: Import {
-                            import: Spanned {
-                                span: path_span,
-                                value: path,
-                            }
-                        },
-                    };
-
-                    imports.push(import);
-
-                    Ok(remainder.collect())
-                },
-
-                [
-                    Token { kind: T![import],                     span: import_span },
-                    Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
-                    remainder @ ..
-                ] => {
-                    let import = Spanned {
-                        span: import_span.start..id_span.end,
-                        value: Import {
-                            import: Spanned {
-                                span: id_span,
-                                value: NonEmpty::new(id.to_string()),
-                            }
-                        },
-                    };
-
-                    imports.push(import);
-
-                    Ok(remainder.collect())
-                },
-
-                [
-                    Token { kind: T![import],                        span: import_span },
-                    Token { kind: TokenKind::InvalidUpperPath(path), span: path_span },
-                    remainder @ ..
-                ] => {
-                    Err(ParseError::InvalidImport {
-                        span: path_span,
-                        message: format!(
-                            "Import must have a path separated by '::'. Found: `{}`",
-                            path
-                        ),
-                    })
-                },
-
-                [
-                    Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
-                    remainder @ ..
-                ] => {
-                    Err(ParseError::OrphanedIdentifier {
-                        span: id_span,
-                        name: id.to_string(),
-                    })
-                },
-
-                [
-                    Token { kind: T![typedef],                    span: type_def_span },
-                    Token { kind: TokenKind::UpperIdentifier(id), span: id_span },
-                    Token { kind: T![=],                          span: eq_span },
-                    remainder @ ..
-                ] => {
-                    let type_span = type_def_span.start..eq_span.end;
-
-                    let (types, remainder) = type_definition::parse(&type_span, remainder)?;
-
-                    let type_definition = Spanned {
-                        span: type_def_span.start..types.span.end,
-                        value: TypeDefinition {
-                            name: Spanned {
-                                span: id_span,
-                                value: id.to_string(),
-                            },
-                            types,
-                        }
-                    };
-
-                    type_definitions.push(type_definition);
-
-                    Ok(remainder)
-                },
-
-                [
-                    Token { kind: T![typedef],                    span: type_def_span },
-                    Token { kind: TokenKind::UpperIdentifier(id), span: id_span },
-                    remainder @ ..
-                ] => {
-                    Err(ParseError::ExpectedEq {
-                        span: id_span,
-                        actual: remainder.collect(),
-                    })
-                },
-
-                [
-                    Token { kind: T![trait],                      span: trait_keyword_span },
-                    Token { kind: TokenKind::UpperIdentifier(id), span: id_span },
-                    Token { kind: T![where],                      span: where_span },
-                    remainder @ ..
-                ] => {
-                    let trait_span = trait_keyword_span.start..where_span.end;
-
-                    let ((type_variables, self_constraints), trait_end_span, remainder) = r#trait::parse(&trait_span, remainder)?;
-
-                    let traitt = Spanned {
-                        span: trait_span.start..trait_end_span.end,
-                        value: Trait {
-                            name: Spanned {
-                                span: id_span,
-                                value: id.to_string(),
-                            },
-                            self_constraints,
-                            type_variables,
-                        },
-                    };
-
-                    traits.push(traitt);
-
-                    Ok(remainder)
-                },
-
-                [
-                    Token { kind: TokenKind::EOF, span }
-                ] => {
-                    Ok(Vec::new())
-                }
-        )
-            .map_err(|remaining| ParseError::ExpectedEOF {
-                input: vec![],
-                remaining,
-            })
-            .and_then(convert::identity)?;
-    }
-
-    Ok((imports, type_annotations, values, type_definitions, traits))
-}
-
 //
-// parsed AST types
+// Types that represent the Parse Tree
 //
 
 type Span = Range<usize>;
@@ -433,6 +195,7 @@ pub struct Import {
 pub struct TypeAnnotation {
     name: Spanned<String>,
     t: Spanned<ast::Type>,
+    type_variables: Vec<Spanned<String>>,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
@@ -458,7 +221,8 @@ pub struct Trait {
     name: Spanned<String>,
     self_constraints: Vec<Spanned<TypeConstraint>>,
     type_variables: Vec<Spanned<String>>,
-    // values: Spanned<NonEmpty<Spanned<Value>>>,
+    type_annotations: Vec<Spanned<TypeAnnotation>>,
+    // values: Vec<Spanned<Value>>,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
@@ -542,6 +306,10 @@ pub enum ParseError<'a> {
         actual: Vec<Token<'a>>,
     },
     ExpectedElseKeyWord {
+        span: Span,
+        actual: Vec<Token<'a>>,
+    },
+    ExpectedTraitEndKeyWord {
         span: Span,
         actual: Vec<Token<'a>>,
     },
@@ -781,7 +549,19 @@ impl<'a> ParseError<'a> {
 
                 Diagnostic::error()
                     .with_message(
-                        "Expected 'else' following 'if then'. Ex: `if (num > 1) then 1 else 0` instead of `if (num > 1) 1 else 0`.",
+                        "Expected 'else' following 'if then'. Ex: `if (num > 1) then 1 else 0` instead of `if (num > 1) then 1 0`.",
+                    )
+                    .with_code("E0013")
+                    .with_labels(labels)
+            }
+            ParseError::ExpectedTraitEndKeyWord { span, actual: _ } => {
+                let labels = vec![
+                    Label::primary(file_id.clone(), span).with_message("Expected 'trait' definition to end with 'end'.")
+                ];
+
+                Diagnostic::error()
+                    .with_message(
+                        "Expected 'trait' definition to end with 'end'. Ex: `trait Example where ... end` instead of `trait Example where ...`.",
                     )
                     .with_code("E0013")
                     .with_labels(labels)
