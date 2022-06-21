@@ -8,7 +8,7 @@ edition = "2018"
 [dependencies]
 #alloy_lexer = { path = "../lexer" }
 non-empty-vec = "0.2"
-ordered-float = "2.8"
+ordered-float = "2.10"
 itertools = "0.10"
 
 [dev-dependencies]
