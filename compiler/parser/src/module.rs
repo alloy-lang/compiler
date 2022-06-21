@@ -6,10 +6,11 @@ use non_empty_vec::NonEmpty;
 use alloy_lexer::{Token, TokenKind, T};
 use super::{Spanned, Import, TypeAnnotation, Value, TypeDefinition, Trait, ParseError};
 
-use crate::r#type;
 use crate::expr;
-use crate::type_definition;
 use crate::r#trait;
+use crate::r#type;
+use crate::type_definition;
+use crate::type_variables;
 
 type ModuleContents = (
     Vec<Spanned<Import>>,
@@ -44,16 +45,17 @@ pub fn parse_module_contents<'a>(
                     let type_span = id_span.start..colon_span.end;
 
                     let (t, remainder) = r#type::parse(&type_span, remainder)?;
+                    let (type_variables, remainder) = type_variables::parse(&t.span, remainder)?;
 
                     let type_annotation = Spanned {
-                        span: type_span.start..t.span.end,
+                        span: type_span.start..t.span_end(),
                         value: TypeAnnotation {
                             name: Spanned {
                                 span: id_span,
                                 value: id.to_string(),
                             },
                             t,
-                            type_variables: vec![],
+                            type_variables,
                         },
                     };
 
@@ -72,7 +74,7 @@ pub fn parse_module_contents<'a>(
                     let (expr, remainder) = expr::parse(&expr_span, remainder)?;
 
                     let value = Spanned {
-                        span: expr_span.start..expr.span.end,
+                        span: expr_span.start..expr.span_end(),
                         value: Value {
                             name: Spanned {
                                 span: id_span,
@@ -182,7 +184,7 @@ pub fn parse_module_contents<'a>(
                     let (types, remainder) = type_definition::parse(&type_span, remainder)?;
 
                     let type_definition = Spanned {
-                        span: type_def_span.start..types.span.end,
+                        span: type_def_span.start..types.span_end(),
                         value: TypeDefinition {
                             name: Spanned {
                                 span: id_span,

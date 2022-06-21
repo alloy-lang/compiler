@@ -1,10 +1,13 @@
 use alloy_lexer::{Token, TokenKind, T};
 use core::convert;
+use std::iter;
 
 use improved_slice_patterns::match_vec;
 
 use super::r#type;
 use super::{ParseError, Span, Spanned, TypeConstraint, TypeAnnotation};
+
+use crate::type_variables;
 
 pub type TraitContents = (
     Vec<Spanned<TypeConstraint>>,
@@ -109,20 +112,21 @@ pub fn parse<'a>(
                 let type_span = id_span.start..colon_span.end;
 
                 let (t, remainder) = r#type::parse(&type_span, remainder)?;
+                let (type_variables, remainder) = type_variables::parse(&t.span, remainder)?;
 
                 let type_annotation = Spanned {
-                    span: type_span.start..t.span.end,
+                    span: type_span.start..t.span_end(),
                     value: TypeAnnotation {
                         name: Spanned {
                             span: id_span,
                             value: id.to_string(),
                         },
                         t,
-                        type_variables: vec![],
+                        type_variables,
                     },
                 };
 
-                furthest_character_position = type_annotation.span.end;
+                furthest_character_position = type_annotation.span_end();
                 type_annotations.push(type_annotation);
 
                 Ok(remainder)
@@ -139,20 +143,16 @@ pub fn parse<'a>(
             },
 
             [
-                Token { kind: TokenKind::EOF, span }
+                remainder @ ..,
+                Token { kind: TokenKind::EOF, span: eof_span }
             ] => {
-                Err(ParseError::ExpectedTraitEndKeyWord {
-                    span: span.clone(),
-                    actual: vec![Token { kind: TokenKind::EOF, span }],
-                })
-            },
-
-            [remainder @ ..] => {
-                let next_token = remainder.clone().next().expect("Expected there to be a next token");
+                let next_span = remainder.clone().next().map_or_else(|| eof_span.clone(), |s| s.span);
 
                 Err(ParseError::ExpectedTraitEndKeyWord {
-                    span: furthest_character_position..next_token.span.start,
-                    actual: remainder.collect(),
+                    span: furthest_character_position..next_span.start,
+                    actual: remainder
+                        .chain(iter::once(Token { kind: TokenKind::EOF, span: eof_span }))
+                        .collect(),
                 })
             }
         )
@@ -195,7 +195,7 @@ mod trait_parser_tests {
         let actual = parse(source);
 
         let expected = Err(ParseError::ExpectedTraitEndKeyWord {
-            span: 134..134,
+            span: 78..134,
             actual: vec![
                 Token {
                     kind: TokenKind::EOF,

@@ -8,7 +8,7 @@ use non_empty_vec::NonEmpty;
 
 // use crate::docs::extract_doc_comments;
 use alloy_ast as ast;
-use alloy_lexer::{Token, TokenKind, TokenStream, T};
+use alloy_lexer::{T, Token, TokenKind, TokenStream};
 
 mod docs;
 mod expr;
@@ -19,6 +19,7 @@ mod pattern;
 mod r#trait;
 mod r#type;
 mod type_definition;
+mod type_variables;
 
 //
 // parse functions
@@ -121,11 +122,11 @@ pub fn parse(source: &str) -> Result<Spanned<Module>, ParseError> {
             })
         }
     )
-    .map_err(|remaining| ParseError::ExpectedModuleDefinition {
-        span: 0..source.len(),
-        actual: remaining,
-    })
-    .and_then(convert::identity);
+        .map_err(|remaining| ParseError::ExpectedModuleDefinition {
+            span: 0..source.len(),
+            actual: remaining,
+        })
+        .and_then(convert::identity);
 }
 
 #[must_use]
@@ -138,6 +139,7 @@ fn find_last_span(remainder: &[Token], previous_span: &Span, source_length: usiz
 }
 
 type ParseResult<'a, T> = Result<(Spanned<T>, Vec<Token<'a>>), ParseError<'a>>;
+type ParseIterResult<'a, T> = Result<(Spanned<T>, impl Iterator<Item = Token<'a>>), ParseError<'a>>;
 
 //
 // Types that represent the Parse Tree
@@ -171,7 +173,7 @@ impl<T> Spanned<T> {
     }
 
     #[must_use]
-    fn span_end(self) -> usize {
+    fn span_end(&self) -> usize {
         self.span.end
     }
 }
@@ -192,10 +194,35 @@ pub struct Import {
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
+pub enum TypeConstraint {
+    Kind { args: usize },
+    Trait(String),
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
+pub struct TypeVariable {
+    id: String,
+    constraints: Vec<Spanned<TypeConstraint>>,
+}
+
+impl TypeVariable {
+    #[must_use]
+    fn new_free<S>(id: S) -> Self
+        where
+            S: Into<String>
+    {
+        TypeVariable {
+            id: id.into(),
+            constraints: vec![],
+        }
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct TypeAnnotation {
     name: Spanned<String>,
     t: Spanned<ast::Type>,
-    type_variables: Vec<Spanned<String>>,
+    type_variables: Vec<Spanned<TypeVariable>>,
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
@@ -208,12 +235,6 @@ pub struct TypeDefinition {
 pub struct NamedType {
     name: Spanned<String>,
     t: Option<Spanned<ast::Type>>,
-}
-
-#[derive(Debug, Eq, PartialEq, Clone, Hash)]
-pub enum TypeConstraint {
-    Kind { args: usize },
-    Trait(String),
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
