@@ -27,6 +27,7 @@ pub struct Behavior {}
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub struct Value {}
 
+// TODO: Type should understand Span
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
 pub enum Type {
     Unit,
@@ -38,6 +39,10 @@ pub enum Type {
     },
     Tuple(NonEmpty<Type>),
     Union(NonEmpty<(String, Type)>),
+    Bound {
+        t: Box<Type>,
+        binds: Vec<Type>,
+    },
 }
 
 impl Type {
@@ -99,12 +104,12 @@ impl Type {
         Type::Variable(id.into())
     }
 
-    // pub fn bound<T>(t: T, binds: Vec<Type>) -> Type
-    //     where
-    //         T: Into<Box<Type>>,
-    // {
-    //     Type::Bound { t: t.into(), binds }
-    // }
+    pub fn bound<T>(t: T, binds: Vec<Type>) -> Type
+        where
+            T: Into<Box<Type>>,
+    {
+        Type::Bound { t: t.into(), binds }
+    }
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]

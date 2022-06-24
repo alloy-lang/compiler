@@ -5,7 +5,7 @@ use std::iter;
 use improved_slice_patterns::match_vec;
 
 use super::r#type;
-use super::{ParseError, Span, Spanned, TypeConstraint, TypeAnnotation};
+use super::{ParseError, Span, Spanned, TypeAnnotation, TypeConstraint};
 
 use crate::type_variables;
 
@@ -61,7 +61,7 @@ pub fn parse<'a>(
                             furthest_character_position = kind_marker_span.end;
                             self_constraints.push(Spanned {
                                 span: kind_marker_span,
-                                value: TypeConstraint::Kind { args },
+                                value: TypeConstraint::new_kind(args),
                             });
 
                             remainder.collect()
@@ -112,7 +112,7 @@ pub fn parse<'a>(
                 let type_span = id_span.start..colon_span.end;
 
                 let (t, remainder) = r#type::parse(&type_span, remainder)?;
-                let (type_variables, remainder) = type_variables::parse(&t.span, remainder)?;
+                let (type_variables, remainder) = type_variables::parse(remainder)?;
 
                 let type_annotation = Spanned {
                     span: type_span.start..t.span_end(),
@@ -196,12 +196,10 @@ mod trait_parser_tests {
 
         let expected = Err(ParseError::ExpectedTraitEndKeyWord {
             span: 78..134,
-            actual: vec![
-                Token {
-                    kind: TokenKind::EOF,
-                    span: 134..134,
-                },
-            ]
+            actual: vec![Token {
+                kind: TokenKind::EOF,
+                span: 134..134,
+            }],
         });
 
         assert_eq!(expected, actual);
@@ -230,9 +228,7 @@ mod trait_parser_tests {
                     span: 139..144,
                 },
                 Token {
-                    kind: TokenKind::UpperIdentifier(
-                        "TestTrait2",
-                    ),
+                    kind: TokenKind::UpperIdentifier("TestTrait2"),
                     span: 145..155,
                 },
                 Token {
@@ -247,7 +243,7 @@ mod trait_parser_tests {
                     kind: TokenKind::EOF,
                     span: 241..241,
                 },
-            ]
+            ],
         });
 
         assert_eq!(expected, actual);
@@ -410,21 +406,20 @@ mod trait_parser_tests {
                     value: "Test".to_string(),
                 },
                 imports: vec![],
-                type_annotations: vec![
-                    Spanned {
-                        span: 142..161,
-                        value: TypeAnnotation {
-                            name: Spanned {
-                                span: 142..155,
-                                value: "outside_trait".to_string(),
-                            },
-                            t: Spanned {
-                                span: 158..161,
-                                value: ast::Type::identifier("Int")                            },
-                            type_variables: vec![],
-                        }
-                    }
-                ],
+                type_annotations: vec![Spanned {
+                    span: 142..161,
+                    value: TypeAnnotation {
+                        name: Spanned {
+                            span: 142..155,
+                            value: "outside_trait".to_string(),
+                        },
+                        t: Spanned {
+                            span: 158..161,
+                            value: ast::Type::identifier("Int"),
+                        },
+                        type_variables: vec![],
+                    },
+                }],
                 values: vec![],
                 type_definitions: vec![],
                 traits: vec![Spanned {
@@ -436,22 +431,20 @@ mod trait_parser_tests {
                         },
                         self_constraints: vec![],
                         type_variables: vec![],
-                        type_annotations: vec![
-                            Spanned {
-                                span: 94..112,
-                                value: TypeAnnotation {
-                                    name: Spanned {
-                                        span: 94..106,
-                                        value: "inside_trait".to_string(),
-                                    },
-                                    t: Spanned {
-                                        span: 109..112,
-                                        value: ast::Type::identifier("Int")                            },
-                                    type_variables: vec![],
-                                }
-                            }
-
-                        ],
+                        type_annotations: vec![Spanned {
+                            span: 94..112,
+                            value: TypeAnnotation {
+                                name: Spanned {
+                                    span: 94..106,
+                                    value: "inside_trait".to_string(),
+                                },
+                                t: Spanned {
+                                    span: 109..112,
+                                    value: ast::Type::identifier("Int"),
+                                },
+                                type_variables: vec![],
+                            },
+                        }],
                     },
                 }],
             },
@@ -493,25 +486,23 @@ mod trait_parser_tests {
                         },
                         self_constraints: vec![],
                         type_variables: vec![],
-                        type_annotations: vec![
-                            Spanned {
-                                span: 0..0,
-                                value: TypeAnnotation {
-                                    name: Spanned {
-                                        span: 0..0,
-                                        value: "wrap".to_string(),
-                                    },
-                                    t: Spanned {
-                                        span: 0..0,
-                                        value: ast::Type::lambda(
-                                            ast::Type::variable("t1"),
-                                            ast::Type::identifier("self"),
-                                        )
-                                    },
-                                    type_variables: vec![],
-                                }
-                            }
-                        ],
+                        type_annotations: vec![Spanned {
+                            span: 0..0,
+                            value: TypeAnnotation {
+                                name: Spanned {
+                                    span: 0..0,
+                                    value: "wrap".to_string(),
+                                },
+                                t: Spanned {
+                                    span: 0..0,
+                                    value: ast::Type::lambda(
+                                        ast::Type::variable("t1"),
+                                        ast::Type::identifier("self"),
+                                    ),
+                                },
+                                type_variables: vec![],
+                            },
+                        }],
                     },
                 }],
             },

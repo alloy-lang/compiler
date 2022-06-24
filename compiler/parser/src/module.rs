@@ -3,8 +3,8 @@ use core::convert;
 use improved_slice_patterns::match_vec;
 use non_empty_vec::NonEmpty;
 
+use super::{Import, ParseError, Spanned, Trait, TypeAnnotation, TypeDefinition, Value};
 use alloy_lexer::{Token, TokenKind, T};
-use super::{Spanned, Import, TypeAnnotation, Value, TypeDefinition, Trait, ParseError};
 
 use crate::expr;
 use crate::r#trait;
@@ -45,7 +45,7 @@ pub fn parse_module_contents<'a>(
                     let type_span = id_span.start..colon_span.end;
 
                     let (t, remainder) = r#type::parse(&type_span, remainder)?;
-                    let (type_variables, remainder) = type_variables::parse(&t.span, remainder)?;
+                    let (type_variables, remainder) = type_variables::parse(remainder)?;
 
                     let type_annotation = Spanned {
                         span: type_span.start..t.span_end(),
@@ -253,7 +253,6 @@ pub fn parse_module_contents<'a>(
 
     Ok((imports, type_annotations, values, type_definitions, traits))
 }
-
 
 #[cfg(test)]
 mod module_parser_tests {
