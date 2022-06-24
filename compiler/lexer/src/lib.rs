@@ -148,6 +148,8 @@ pub enum TokenKind<'source> {
     Lt,
     #[token(">")]
     Gt,
+    #[token("<>")]
+    EmptyAngledBrackets,
     #[token("-")]
     Minus,
     #[token("&&")]
@@ -249,6 +251,7 @@ macro_rules ! T {
     [=] => { $ crate :: TokenKind :: Eq } ;
     [<] => { $ crate :: TokenKind :: Lt } ;
     [>] => { $ crate :: TokenKind :: Gt } ;
+    [<>] => { $ crate :: TokenKind :: EmptyAngledBrackets } ;
     [-] => { $ crate :: TokenKind :: Minus } ;
     [&&] => { $ crate :: TokenKind :: And } ;
     [||] => { $ crate :: TokenKind :: Or } ;
@@ -331,6 +334,7 @@ mod lexer_tests {
             "else" => TokenKind::Else,
             "self" => TokenKind::SelfRef,
             "end" => TokenKind::End,
+            "<>" => TokenKind::EmptyAngledBrackets,
         };
 
         for (source, expected) in source {

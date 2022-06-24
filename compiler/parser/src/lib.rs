@@ -8,7 +8,7 @@ use non_empty_vec::NonEmpty;
 
 // use crate::docs::extract_doc_comments;
 use alloy_ast as ast;
-use alloy_lexer::{T, Token, TokenKind, TokenStream};
+use alloy_lexer::{Token, TokenKind, TokenStream, T};
 
 mod docs;
 mod expr;
@@ -139,7 +139,6 @@ fn find_last_span(remainder: &[Token], previous_span: &Span, source_length: usiz
 }
 
 type ParseResult<'a, T> = Result<(Spanned<T>, Vec<Token<'a>>), ParseError<'a>>;
-type ParseIterResult<'a, T> = Result<(Spanned<T>, impl Iterator<Item = Token<'a>>), ParseError<'a>>;
 
 //
 // Types that represent the Parse Tree
@@ -199,6 +198,13 @@ pub enum TypeConstraint {
     Trait(String),
 }
 
+impl TypeConstraint {
+    #[must_use]
+    fn new_kind(args: usize) -> Self {
+        TypeConstraint::Kind { args }
+    }
+}
+
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct TypeVariable {
     id: String,
@@ -208,8 +214,8 @@ pub struct TypeVariable {
 impl TypeVariable {
     #[must_use]
     fn new_free<S>(id: S) -> Self
-        where
-            S: Into<String>
+    where
+        S: Into<String>,
     {
         TypeVariable {
             id: id.into(),
@@ -295,6 +301,18 @@ pub enum ParseError<'a> {
         actual: Vec<Token<'a>>,
     },
     ExpectedLambdaReturnType {
+        span: Span,
+        actual: Vec<Token<'a>>,
+    },
+    ExpectedBoundTypeConstraint {
+        span: Span,
+        actual: Vec<Token<'a>>,
+    },
+    ExpectedBoundTypeConstraints {
+        span: Span,
+        actual: Vec<Token<'a>>,
+    },
+    ExpectedBoundTypeComma {
         span: Span,
         actual: Vec<Token<'a>>,
     },
@@ -448,6 +466,64 @@ impl<'a> ParseError<'a> {
                     .with_code("E0008")
                     .with_labels(labels)
             }
+            ParseError::ExpectedBoundTypeConstraint { span, actual } => {
+                let labels = actual
+                    .into_iter()
+                    .map(|t| {
+                        Label::secondary(file_id.clone(), t.span).with_message(format!(
+                            "Expected bounded type constraint, but found: {:?}",
+                            t.kind
+                        ))
+                    })
+                    .chain(iter::once(
+                        Label::primary(file_id.clone(), span).with_message("Expected return type"),
+                    ))
+                    .collect();
+
+                Diagnostic::error()
+                    .with_message("We encountered an error while parsing a bound type. We expected the bound type to be constrained by a Type, ex: `List<String>` instead of `List<\"thing\">`")
+                    .with_code("E0008")
+                    .with_labels(labels)
+            }
+            ParseError::ExpectedBoundTypeConstraints { span, actual } => {
+                let labels = actual
+                    .into_iter()
+                    .map(|t| {
+                        Label::secondary(file_id.clone(), t.span).with_message(format!(
+                            "Expected bounded type to have constraints, but found: {:?}",
+                            t.kind
+                        ))
+                    })
+                    .chain(iter::once(
+                        Label::primary(file_id.clone(), span).with_message("Expected return type"),
+                    ))
+                    .collect();
+
+                Diagnostic::error()
+                    .with_message("We encountered an error while parsing a bound type. We expected the bound type to have some constraints, ex: `List<String>` instead of `List<>`")
+                    .with_code("E0008")
+                    .with_labels(labels)
+            }
+            ParseError::ExpectedBoundTypeComma { span, actual } => {
+                let labels = actual
+                    .into_iter()
+                    .map(|t| {
+                        Label::secondary(file_id.clone(), t.span)
+                            .with_message(format!("Expected a comma, but found: {:?}", t.kind))
+                    })
+                    .chain(iter::once(
+                        Label::primary(file_id.clone(), span)
+                            .with_message("Expected a comma between bound type constraints"),
+                    ))
+                    .collect();
+
+                Diagnostic::error()
+                    .with_message(
+                        "We encountered an error while parsing a bound type. We expected the bound type to have a comma between constraints, ex: `Tuple<Int, String>` instead of `Tuple<Int String>`",
+                    )
+                    .with_code("E0013")
+                    .with_labels(labels)
+            }
             ParseError::ExpectedPattern { span, actual } => Diagnostic::error()
                 .with_message("Expected pattern")
                 .with_code("E0009")
@@ -576,9 +652,8 @@ impl<'a> ParseError<'a> {
                     .with_labels(labels)
             }
             ParseError::ExpectedTraitEndKeyWord { span, actual: _ } => {
-                let labels = vec![
-                    Label::primary(file_id.clone(), span).with_message("Expected 'trait' definition to end with 'end'.")
-                ];
+                let labels = vec![Label::primary(file_id.clone(), span)
+                    .with_message("Expected 'trait' definition to end with 'end'.")];
 
                 Diagnostic::error()
                     .with_message(

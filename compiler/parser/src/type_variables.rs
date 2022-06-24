@@ -8,29 +8,27 @@ use alloy_lexer::{Token, TokenKind, T};
 use super::parens;
 use super::{ParseError, ParseResult, Span, Spanned, TypeVariable};
 
-pub fn parse<'a>(
-    starting_type_span: &Span,
-    input: Vec<Token<'a>>,
-) -> Result<(Vec<Spanned<TypeVariable>>, Vec<Token<'a>>), ParseError<'a>> {
+pub fn parse(input: Vec<Token>) -> Result<(Vec<Spanned<TypeVariable>>, Vec<Token>), ParseError> {
     match input.first() {
-        Some(Token { kind: T![where], span: _ }) => inner_parse(starting_type_span, input),
+        Some(Token {
+            kind: T![where],
+            span: _,
+        }) => inner_parse(input),
         _ => Ok((vec![], input)),
     }
 }
 
-fn inner_parse<'a>(
-    starting_type_span: &Span,
-    input: Vec<Token<'a>>,
-) -> Result<(Vec<Spanned<TypeVariable>>, Vec<Token<'a>>), ParseError<'a>> {
+fn inner_parse(input: Vec<Token>) -> Result<(Vec<Spanned<TypeVariable>>, Vec<Token>), ParseError> {
     let mut type_variables = vec![];
 
-    let mut furthest_character_position = starting_type_span.end;
-
-    let mut remainder = &input[1..];
+    let mut remainder: Vec<Token> = input
+        .into_iter()
+        .skip_while(|t| matches!(t.kind, T![where]))
+        .collect();
 
     let mut cont = !remainder.is_empty();
     while cont {
-        dbg!("*parse_type_variables* remainder: {:?}", &remainder);
+        log::debug!("*parse_type_variables* remainder: {:?}", &remainder);
 
         remainder = match_vec!(remainder;
             [
@@ -47,20 +45,18 @@ fn inner_parse<'a>(
             },
 
             [
-                Token { kind: T![end],  span: end_marker_span },
                 remainder @ ..
             ] => {
                 cont = false;
-                furthest_character_position = end_marker_span.end;
 
                 Ok(remainder.collect())
             },
         )
-            .map_err(|remaining| ParseError::ExpectedEOF {
-                input: vec![],
-                remaining,
-            })
-            .and_then(convert::identity)?;
+        .map_err(|remaining| ParseError::ExpectedEOF {
+            input: vec![],
+            remaining,
+        })
+        .and_then(convert::identity)?;
 
         cont = cont && !remainder.is_empty();
     }
