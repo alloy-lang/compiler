@@ -14,7 +14,7 @@ non-empty-vec = "0.2"
 peg = { git = "https://github.com/kevinmehall/rust-peg" }
 itertools = "0.10"
 linked_hash_set = "0.1.4"
-linked-hash-map = "0.5.4"
+linked-hash-map = "0.5.6"
 
 [dev-dependencies]
 wasmtime = "0.28.0"
