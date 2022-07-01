@@ -215,7 +215,7 @@ fn extract_path<'source>(
 
 fn count_args<'source>(lex: &mut Lexer<'source, TokenKind<'source>>) -> Result<usize, EmptyError> {
     let slice = lex.slice();
-    let arg_length = slice.split(",").count();
+    let arg_length = slice.split(',').count();
 
     Ok(arg_length)
 }
