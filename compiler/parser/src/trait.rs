@@ -36,6 +36,7 @@ pub fn parse<'a>(
                 Token { kind: TokenKind::LowerIdentifier(id), span: id_span },
                 remainder @ ..
             ] => {
+                furthest_character_position = id_span.end;
                 type_variables.push(Spanned {
                     span: id_span,
                     value: id.to_string(),
@@ -95,10 +96,11 @@ pub fn parse<'a>(
                             remainder.collect()
                         }
                     )
-                    .map_err(|remaining| ParseError::ExpectedLambdaArgsComma {
-                        span: eq_span.clone(),
-                        actual: remaining,
-                    })?;
+                    .map_err(|remaining| todo!("ParseError: did not match anything...wat? 1234"))?;
+                    // .map_err(|remaining| ParseError::ExpectedLambdaArgsComma {
+                    //     span: eq_span.clone(),
+                    //     actual: remaining,
+                    // })?;
                 }
 
                 Ok(remainder)
@@ -174,14 +176,12 @@ pub fn parse<'a>(
 
 #[cfg(test)]
 mod trait_parser_tests {
-    use non_empty_vec::NonEmpty;
-    use ordered_float::NotNan;
     use pretty_assertions::assert_eq;
 
     use alloy_ast as ast;
     use alloy_lexer::{Token, TokenKind};
 
-    use crate::{parse, Module, ParseError, Spanned, Trait, TypeAnnotation, TypeConstraint, Value};
+    use crate::{parse, Module, ParseError, Spanned, Trait, TypeAnnotation, TypeConstraint};
 
     #[test]
     fn test_single_trait_with_no_end_keyword_returns_error() {
