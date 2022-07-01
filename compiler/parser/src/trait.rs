@@ -181,7 +181,7 @@ mod trait_parser_tests {
     use alloy_ast as ast;
     use alloy_lexer::{Token, TokenKind};
 
-    use crate::{parse, Module, ParseError, Spanned, Trait, TypeAnnotation, TypeConstraint};
+    use crate::{parse, Module, ParseError, Spanned, Trait, TypeAnnotation, TypeConstraint, TypeVariable};
 
     #[test]
     fn test_single_trait_with_no_end_keyword_returns_error() {
@@ -478,29 +478,37 @@ mod trait_parser_tests {
                 values: vec![],
                 type_definitions: vec![],
                 traits: vec![Spanned {
-                    span: 13..42,
+                    span: 56..166,
                     value: Trait {
                         name: Spanned {
-                            span: 20..24,
+                            span: 62..71,
                             value: "TestTrait".to_string(),
                         },
                         self_constraints: vec![],
                         type_variables: vec![],
                         type_annotations: vec![Spanned {
-                            span: 0..0,
+                            span: 94..115,
                             value: TypeAnnotation {
                                 name: Spanned {
-                                    span: 0..0,
+                                    span: 94..98,
                                     value: "wrap".to_string(),
                                 },
                                 t: Spanned {
-                                    span: 0..0,
+                                    span: 101..115,
                                     value: ast::Type::lambda(
                                         ast::Type::variable("t1"),
-                                        ast::Type::identifier("self"),
+                                        ast::Type::bound(
+                                            ast::Type::identifier("self"),
+                                            vec![ast::Type::identifier("t1")],
+                                        ),
                                     ),
                                 },
-                                type_variables: vec![],
+                                type_variables: vec![
+                                    Spanned {
+                                        span: 140..150,
+                                        value: TypeVariable::new_free("t1", 148..150),
+                                    },
+                                ],
                             },
                         }],
                     },
