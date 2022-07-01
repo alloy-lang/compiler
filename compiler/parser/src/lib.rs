@@ -207,18 +207,21 @@ impl TypeConstraint {
 
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct TypeVariable {
-    id: String,
+    id: Spanned<String>,
     constraints: Vec<Spanned<TypeConstraint>>,
 }
 
 impl TypeVariable {
     #[must_use]
-    fn new_free<S>(id: S) -> Self
+    fn new_free<S>(id: S, span: Span) -> Self
     where
         S: Into<String>,
     {
         TypeVariable {
-            id: id.into(),
+            id: Spanned {
+                span,
+                value: id.into(),
+            },
             constraints: vec![],
         }
     }
@@ -652,7 +655,7 @@ impl<'a> ParseError<'a> {
                     .with_labels(labels)
             }
             ParseError::ExpectedTraitEndKeyWord { span, actual: _ } => {
-                let labels = vec![Label::primary(file_id.clone(), span)
+                let labels = vec![Label::primary(file_id, span)
                     .with_message("Expected 'trait' definition to end with 'end'.")];
 
                 Diagnostic::error()
