@@ -102,6 +102,7 @@ pub fn parse<'a>(
                 first_type.clone().value,
                 binds.into_iter().map(|s| s.value).collect(),
             );
+
             Ok((
                 Spanned {
                     span: total_span,
@@ -125,13 +126,24 @@ fn parse_single_type<'a>(
         [
             Token { kind: TokenKind::UpperIdentifier(id), span },
             remainder @ ..
-        ] => Ok((Spanned { span, value: ast::Type::identifier(id) }, remainder.collect())),
+        ] => Ok((
+            Spanned { span, value: ast::Type::identifier(id) },
+            remainder.collect(),
+        )),
 
         [
             Token { kind: TokenKind::LowerIdentifier(id), span },
             remainder @ ..
         ] => Ok((
             Spanned { span, value: ast::Type::variable(id) },
+            remainder.collect(),
+        )),
+
+        [
+            Token { kind: T![self], span },
+            remainder @ ..
+        ] => Ok((
+            Spanned { span, value: ast::Type::identifier("self") },
             remainder.collect(),
         )),
 
