@@ -4,7 +4,6 @@ use std::iter;
 use improved_slice_patterns::match_vec;
 
 use alloy_ast as ast;
-use alloy_ast::Type;
 use alloy_lexer::{Token, TokenKind, T};
 
 use super::parens;
@@ -31,10 +30,10 @@ pub fn parse<'a>(
             kind,
             span: arrow_span,
         }) if kind == &T![->] => {
-            let arrow_span = arrow_span.clone();
+            let previous_span = first_span.start..arrow_span.end;
 
             let (next_type, next_remainder) =
-                parse(&arrow_span, remainder.skip(1)).map_err(|e| match e {
+                parse(&previous_span, remainder.skip(1)).map_err(|e| match e {
                     ParseError::ExpectedType { span, actual } => {
                         ParseError::ExpectedLambdaReturnType { span, actual }
                     }
@@ -87,13 +86,13 @@ pub fn parse<'a>(
                         return Err(ParseError::ExpectedBoundTypeComma {
                             span: furthest_span.end..span.start,
                             actual: remainder.collect(),
-                        })
+                        });
                     }
                     _ => {
                         return Err(ParseError::ExpectedBoundTypeComma {
                             span: furthest_span,
                             actual: remainder.collect(),
-                        })
+                        });
                     }
                 }
             }
@@ -151,7 +150,7 @@ fn parse_single_type<'a>(
                 .collect(),
         }),
 
-        [remainder @ ..,] => Err(ParseError::ExpectedType {
+        [remainder @ ..] => Err(ParseError::ExpectedType {
             span: type_span.clone(),
             actual: remainder.collect(),
         }),
@@ -175,19 +174,17 @@ mod type_parser_tests {
             module Test
             where
 
-            incomplete : Int ->
+            incomplete : Int -> Int ->
         "#;
         let actual = parse(source);
 
         let expected: Result<Spanned<Module>, ParseError> =
             Err(ParseError::ExpectedLambdaReturnType {
-                span: 73..84,
-                actual: vec![
-                    Token {
-                        kind: TokenKind::EOF,
-                        span: 84..84,
-                    },
-                ],
+                span: 76..91,
+                actual: vec![Token {
+                    kind: TokenKind::EOF,
+                    span: 91..91,
+                }],
             });
 
         assert_eq!(expected, actual);
@@ -199,21 +196,21 @@ mod type_parser_tests {
             module Test
             where
 
-            incomplete : Int -> 0
+            incomplete : Int -> Int -> 0
         "#;
         let actual = parse(source);
 
         let expected: Result<Spanned<Module>, ParseError> =
             Err(ParseError::ExpectedLambdaReturnType {
-                span: 69..77,
+                span: 76..84,
                 actual: vec![
                     Token {
-                        span: 76..77,
+                        span: 83..84,
                         kind: TokenKind::LiteralInt(0),
                     },
                     Token {
                         kind: TokenKind::EOF,
-                        span: 86..86,
+                        span: 93..93,
                     },
                 ],
             });
@@ -458,12 +455,12 @@ mod type_parser_tests {
                         },
                         type_variables: vec![
                             Spanned {
-                                span: 121..122,
-                                value: TypeVariable::new_free("a"),
+                                span: 113..122,
+                                value: TypeVariable::new_free("a", 121..122),
                             },
                             Spanned {
-                                span: 147..148,
-                                value: TypeVariable::new_free("b"),
+                                span: 139..148,
+                                value: TypeVariable::new_free("b", 147..148),
                             },
                         ],
                     },
@@ -652,39 +649,36 @@ mod type_parser_tests {
                 },
                 imports: vec![],
                 type_annotations: vec![Spanned {
-                    span: 56..90,
+                    span: 56..76,
                     value: TypeAnnotation {
                         name: Spanned {
                             span: 56..69,
                             value: "with_typevars".to_string(),
                         },
                         t: Spanned {
-                            span: 72..90,
-                            value: ast::Type::lambda(
-                                ast::Type::lambda(
-                                    ast::Type::variable("a"),
-                                    ast::Type::variable("b"),
-                                ),
-                                ast::Type::lambda(
-                                    ast::Type::variable("a"),
-                                    ast::Type::variable("b"),
-                                ),
+                            span: 72..76,
+                            value: ast::Type::bound(
+                                ast::Type::variable("a"),
+                                vec![ast::Type::variable("b")],
                             ),
                         },
                         type_variables: vec![
                             Spanned {
-                                span: 121..122,
+                                span: 99..119,
                                 value: TypeVariable {
-                                    id: "a".to_string(),
+                                    id: Spanned {
+                                        span: 107..108,
+                                        value: "a".to_string(),
+                                    },
                                     constraints: vec![Spanned {
-                                        span: 99..99,
+                                        span: 111..119,
                                         value: TypeConstraint::new_kind(1),
                                     }],
                                 },
                             },
                             Spanned {
-                                span: 147..148,
-                                value: TypeVariable::new_free("b"),
+                                span: 136..145,
+                                value: TypeVariable::new_free("b", 144..145),
                             },
                         ],
                     },
