@@ -193,7 +193,7 @@ pub enum TokenKind<'source> {
 
     #[regex(r#""([^"\\]|\\t|\\u|\\n|\\")*""#)]
     LiteralString(&'source str),
-    #[regex(r#"-?[0-9]+"#, |lex| lex.slice().parse())]
+    #[regex(r#"([-+])?[0-9]+"#, |lex| lex.slice().parse())]
     LiteralInt(i64),
     #[regex(r#"-?[0-9]+\.[0-9]+"#, |lex| lex.slice().parse())]
     LiteralFloat(f64),

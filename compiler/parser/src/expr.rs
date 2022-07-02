@@ -421,6 +421,86 @@ mod expr_parser_tests {
     }
 
     #[test]
+    fn test_prefix_positive() {
+        let source = r#"
+            module Test
+            where
+
+            prefix = +5
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![],
+                values: vec![Spanned {
+                    span: 56..67,
+                    value: Value {
+                        name: Spanned {
+                            span: 56..62,
+                            value: "prefix".to_string(),
+                        },
+                        expr: Spanned {
+                            span: 65..67,
+                            value: ast::Expr::int_literal(5),
+                        },
+                    },
+                }],
+                type_definitions: vec![],
+                traits: vec![],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_prefix_negative() {
+        let source = r#"
+            module Test
+            where
+
+            prefix = -5
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![],
+                values: vec![Spanned {
+                    span: 56..67,
+                    value: Value {
+                        name: Spanned {
+                            span: 56..62,
+                            value: "prefix".to_string(),
+                        },
+                        expr: Spanned {
+                            span: 65..67,
+                            value: ast::Expr::int_literal(-5),
+                        },
+                    },
+                }],
+                type_definitions: vec![],
+                traits: vec![],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
     fn test_parens_expression() {
         let source = r#"
             module Test
