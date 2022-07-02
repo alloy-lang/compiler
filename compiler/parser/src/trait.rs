@@ -181,7 +181,9 @@ mod trait_parser_tests {
     use alloy_ast as ast;
     use alloy_lexer::{Token, TokenKind};
 
-    use crate::{parse, Module, ParseError, Spanned, Trait, TypeAnnotation, TypeConstraint, TypeVariable};
+    use crate::{
+        parse, Module, ParseError, Spanned, Trait, TypeAnnotation, TypeConstraint, TypeVariable,
+    };
 
     #[test]
     fn test_single_trait_with_no_end_keyword_returns_error() {
@@ -499,16 +501,14 @@ mod trait_parser_tests {
                                         ast::Type::variable("t1"),
                                         ast::Type::bound(
                                             ast::Type::identifier("self"),
-                                            vec![ast::Type::identifier("t1")],
+                                            vec![ast::Type::variable("t1")],
                                         ),
                                     ),
                                 },
-                                type_variables: vec![
-                                    Spanned {
-                                        span: 140..150,
-                                        value: TypeVariable::new_free("t1", 148..150),
-                                    },
-                                ],
+                                type_variables: vec![Spanned {
+                                    span: 140..150,
+                                    value: TypeVariable::new_free("t1", 148..150),
+                                }],
                             },
                         }],
                     },
