@@ -55,7 +55,8 @@ impl Type {
             [] => Type::Unit,
             [(_name, t)] => t.clone(),
             _ => {
-                let types = types.into_iter()
+                let types = types
+                    .into_iter()
                     .flat_map(|(name, t)| match t {
                         Type::Union(inner) => inner.to_vec(),
                         _ => vec![(name.into(), t)],
@@ -78,9 +79,9 @@ impl Type {
 
     #[must_use]
     pub fn lambda<T1, T2>(arg_type: T1, return_type: T2) -> Type
-        where
-            T1: Into<Box<Type>>,
-            T2: Into<Box<Type>>,
+    where
+        T1: Into<Box<Type>>,
+        T2: Into<Box<Type>>,
     {
         Type::Lambda {
             arg_type: arg_type.into(),
@@ -90,23 +91,23 @@ impl Type {
 
     #[must_use]
     pub fn identifier<S>(s: S) -> Type
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         Type::Identifier(s.into())
     }
 
     #[must_use]
     pub fn variable<S>(id: S) -> Type
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         Type::Variable(id.into())
     }
 
     pub fn bound<T>(t: T, binds: Vec<Type>) -> Type
-        where
-            T: Into<Box<Type>>,
+    where
+        T: Into<Box<Type>>,
     {
         Type::Bound { t: t.into(), binds }
     }
@@ -129,8 +130,8 @@ pub enum Expr {
 impl Expr {
     #[must_use]
     pub fn string_literal<S>(s: S) -> Expr
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         Expr::Literal(LiteralData::String(s.into()))
     }
@@ -152,16 +153,16 @@ impl Expr {
 
     #[must_use]
     pub fn identifier<S>(s: S) -> Expr
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         Expr::Identifier(s.into())
     }
 
     #[must_use]
     pub fn lambda<A>(args: A, body: Expr) -> Expr
-        where
-            A: Into<Vec<Pattern>>,
+    where
+        A: Into<Vec<Pattern>>,
     {
         args.into()
             .into_iter()
@@ -171,10 +172,10 @@ impl Expr {
 
     #[must_use]
     pub fn bin_op<S, E1, E2>(op: S, first: E1, second: E2) -> Expr
-        where
-            S: Into<String>,
-            E1: Into<Box<Expr>>,
-            E2: Into<Box<Expr>>,
+    where
+        S: Into<String>,
+        E1: Into<Box<Expr>>,
+        E2: Into<Box<Expr>>,
     {
         Expr::OpApply(first.into(), op.into(), second.into())
     }
@@ -195,19 +196,19 @@ impl Expr {
 
     #[must_use]
     pub fn if_then_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr
-        where
-            E: Into<Box<Expr>>,
-            V1: Into<Box<Expr>>,
-            V2: Into<Box<Expr>>,
+    where
+        E: Into<Box<Expr>>,
+        V1: Into<Box<Expr>>,
+        V2: Into<Box<Expr>>,
     {
         Expr::IfElse(expr.into(), then_expr.into(), else_expr.into())
     }
 
     #[must_use]
     pub fn application<S, E>(address: NonEmpty<S>, args: E) -> Expr
-        where
-            S: Into<String>,
-            E: Into<Vec<Expr>>,
+    where
+        S: Into<String>,
+        E: Into<Vec<Expr>>,
     {
         let address = address.into_iter().map(Into::into).join("::");
         let func = Expr::Identifier(address);
@@ -219,16 +220,16 @@ impl Expr {
 
     #[must_use]
     pub fn paren<E>(expr: E) -> Expr
-        where
-            E: Into<Box<Expr>>,
+    where
+        E: Into<Box<Expr>>,
     {
         Expr::Paren(expr.into())
     }
 
     #[must_use]
     pub fn tuple<A>(args: A) -> Expr
-        where
-            A: Into<Vec<Expr>>,
+    where
+        A: Into<Vec<Expr>>,
     {
         let args = args.into();
 
@@ -253,8 +254,8 @@ pub enum Pattern {
 impl Pattern {
     #[must_use]
     pub fn string_literal<S>(s: S) -> Pattern
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         Pattern::Literal(LiteralData::String(s.into()))
     }
@@ -276,16 +277,16 @@ impl Pattern {
 
     #[must_use]
     pub fn identifier<S>(s: S) -> Pattern
-        where
-            S: Into<String>,
+    where
+        S: Into<String>,
     {
         Pattern::Identifier(s.into())
     }
 
     #[must_use]
     pub fn tuple<A>(args: A) -> Pattern
-        where
-            A: Into<Vec<Pattern>>,
+    where
+        A: Into<Vec<Pattern>>,
     {
         let args = args.into();
 

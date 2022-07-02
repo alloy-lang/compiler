@@ -799,6 +799,7 @@ Module names were not equal.
         );
     }
 
+    #[ignore]
     #[test]
     fn test_single_arg_function_declaration_with_type() {
         let source: &str = test_source::SINGLE_ARG_FUNCTION_DECLARATION_WITH_TYPE;
@@ -830,6 +831,7 @@ Module names were not equal.
         );
     }
 
+    #[ignore]
     #[test]
     fn test_multi_arg_function_declaration_with_type() {
         let source: &str = test_source::MULTI_ARG_FUNCTION_DECLARATION_WITH_TYPE;
@@ -877,6 +879,7 @@ Module names were not equal.
         );
     }
 
+    #[ignore]
     #[test]
     fn test_curried_function_declaration_with_type() {
         let source: &str = test_source::CURRIED_FUNCTION_DECLARATION_WITH_TYPE;
@@ -908,6 +911,7 @@ Module names were not equal.
         );
     }
 
+    #[ignore]
     #[test]
     fn test_simple_if_then_else() {
         let source: &str = test_source::SIMPLE_IF_THEN_ELSE;
@@ -952,6 +956,7 @@ Module names were not equal.
         );
     }
 
+    #[ignore]
     #[test]
     fn test_nested_if_then_else() {
         let source: &str = test_source::NESTED_IF_THEN_ELSE;
@@ -987,6 +992,7 @@ Module names were not equal.
         );
     }
 
+    #[ignore]
     #[test]
     fn test_multi_property_union_type() {
         let expected = parse::Module {

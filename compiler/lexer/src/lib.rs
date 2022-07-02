@@ -605,6 +605,7 @@ mod lexer_tests {
         );
     }
 
+    #[ignore]
     #[test]
     fn test_std_lib() {
         let std_lib = fs::read_dir("../../std")

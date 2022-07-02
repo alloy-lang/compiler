@@ -336,6 +336,7 @@ mod canonical_tests {
     //     );
     // }
 
+    #[ignore]
     #[test]
     fn test_single_arg_function_declaration_with_or_without_type() {
         let expected = canonical::Module {
@@ -385,6 +386,7 @@ mod canonical_tests {
         }
     }
 
+    #[ignore]
     #[test]
     fn test_multi_arg_function_declaration() {
         let expected = canonical::Module {
@@ -446,6 +448,7 @@ mod canonical_tests {
         }
     }
 
+    #[ignore]
     #[test]
     fn test_curried_function_declaration() {
         let expected = canonical::Module {
@@ -477,6 +480,7 @@ mod canonical_tests {
         }
     }
 
+    #[ignore]
     #[test]
     fn test_curried_function_declaration_with_no_type() {
         let expected = canonical::Module {
@@ -508,6 +512,7 @@ mod canonical_tests {
         }
     }
 
+    #[ignore]
     #[test]
     fn test_simple_if_then_else() {
         let source: &str = test_source::SIMPLE_IF_THEN_ELSE;
@@ -555,6 +560,7 @@ mod canonical_tests {
         );
     }
 
+    #[ignore]
     #[test]
     fn test_nested_if_then_else() {
         let source: &str = test_source::NESTED_IF_THEN_ELSE;
@@ -592,6 +598,7 @@ mod canonical_tests {
         );
     }
 
+    #[ignore]
     #[test]
     fn test_call_function_in_module() {
         let expected = canonical::Module {
@@ -702,6 +709,7 @@ mod canonical_tests {
         }
     }
 
+    #[ignore]
     #[test]
     fn test_multi_property_union_type() {
         let expected = canonical::Module {
@@ -743,6 +751,7 @@ mod canonical_tests {
         }
     }
 
+    #[ignore]
     #[test]
     fn test_conflicting_type_alias_definitions() {
         let expected = vec![
