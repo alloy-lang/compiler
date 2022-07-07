@@ -15,6 +15,7 @@ peg = { git = "https://github.com/kevinmehall/rust-peg" }
 itertools = "0.10"
 linked_hash_set = "0.1.4"
 linked-hash-map = "0.5.4"
+rowan = "0.15.5"
 
 [dev-dependencies]
 wasmtime = "0.38.1"
