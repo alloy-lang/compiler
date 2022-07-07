@@ -8,7 +8,7 @@ where
 --! * `Functor::map(id) == id`
 --! * `Functor::map(f << g) == Functor::map(f) << Functor::map(g)`
 trait Functor where
-  typevar self = #Type<_>
+  self = #Type<_>
 
   --! Apply the supplied function to the contents of `Self<t1>`, converting it to `Self<t2>`
   --!

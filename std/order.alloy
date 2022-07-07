@@ -13,7 +13,7 @@ typedef Ordering =
 --! `Ord` defines an ordering on `self`
 --! Any `t` that behaves as `Ord` must also behave as `Eq`
 trait Ord where
-  typevar self = Eq
+  self = Eq
 
   compare : self -> self -> Ordering
 

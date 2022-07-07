@@ -32,6 +32,7 @@ behavior Eq for Bool where
     if left
     then right
     else not(right)
+end
 
 
 behavior Ord for Bool where
@@ -41,6 +42,7 @@ behavior Ord for Bool where
     | (False, False) -> Ordering::EQ
     | (True, False)  -> Ordering::GT
     | (False, True)  -> Ordering::LT
+end
 
 
 behavior Debug for Bool where
@@ -48,3 +50,4 @@ behavior Debug for Bool where
     if x
     then "True"
     else "False"
+end

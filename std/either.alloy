@@ -12,6 +12,7 @@ import std::monad::Monad
 typedef Either<l, r> =
     | Left(l)
     | Right(r)
+end
 
 
 behavior Eq for Either<l, r> where
@@ -23,6 +24,7 @@ behavior Eq for Either<l, r> where
       | (Left(l_val), Left(r_val))   -> Eq::eq(l_val, r_val)
       | (Right(l_val), Right(r_val)) -> Eq::eq(l_val, r_val)
       | _ -> False
+end
 
 
 behavior Ord for Either<l, r> where
@@ -35,6 +37,7 @@ behavior Ord for Either<l, r> where
       | (Left(l_val), Left(r_val))   -> Ord::compare(l_val, r_val)
       | (Right(_), Left(_))          -> LT
       | (Left(_), Right(_))          -> GT
+end
 
 
 behavior Debug for Either<l, r> where
@@ -45,6 +48,7 @@ behavior Debug for Either<l, r> where
     match e when
       | Left(x)  -> "Left(#{x})"
       | Right(x) -> "Right(#{x})"
+end
 
 
 behavior Functor for Either<l, _> where
@@ -56,6 +60,7 @@ behavior Functor for Either<l, _> where
   map = |convert, x| -> match x when
     | Right(x_val) -> Right(convert(x_val))
     | Left(x_val)  -> Left(x_val)
+end
 
 
 behavior Applicative for Either<l, _> where
@@ -73,6 +78,7 @@ behavior Applicative for Either<l, _> where
   wrap : r1 -> Either<l, r1> where
     typevar r1
   wrap = |x| -> Right(x)
+end
 
 
 behavior Monad for Either<l, _> where
@@ -84,3 +90,4 @@ behavior Monad for Either<l, _> where
   flat_map = |convert, x| -> match x when
     | Right(x_val) -> convert(x_val)
     | Left(x_val)  -> Left(x_val)
+end

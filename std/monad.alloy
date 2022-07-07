@@ -6,7 +6,7 @@ import std::applicative::Applicative
 
 --! A generalised trait for composing sequential actions
 trait Monad where
-  typevar self = #Type<_> + Applicative
+  self = #Type<_> + Applicative
 
   --! This can be seen as akin to sequential variable binding in an
   --! imperative language. For example in Javascript:
