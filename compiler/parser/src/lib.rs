@@ -686,26 +686,35 @@ impl<'a> ParseError<'a> {
 
 #[cfg(test)]
 mod parser_tests {
-    // use pretty_assertions::assert_eq;
-    // use alloy_ast as ast;
-    //
-    //
-    // #[test]
-    // fn test_multi_property_union_type() {
-    //     {
-    //         let source = test_source::MULTI_PROPERTY_UNION_TYPE_1;
-    //
-    //         assert_no_errors(source);
-    //     }
-    //     {
-    //         let source = test_source::MULTI_PROPERTY_UNION_TYPE_2;
-    //
-    //         assert_no_errors(source);
-    //     }
-    //     {
-    //         let source = test_source::MULTI_PROPERTY_UNION_TYPE_3;
-    //
-    //         assert_no_errors(source);
-    //     }
-    // }
+    use super::parse;
+    use std::fs;
+
+    #[ignore]
+    #[test]
+    fn test_std_lib() {
+        let std_lib = fs::read_dir("../../std")
+            .expect("Something went wrong reading the std lib dir")
+            .map(|res| {
+                res.expect("Something went wrong reading the directory entry")
+                    .path()
+            })
+            .collect::<Vec<_>>();
+
+        for path in std_lib {
+            let file_name = path.to_str().expect("Expected filename");
+
+            let source = fs::read_to_string(file_name).expect(&format!(
+                "Something went wrong reading the file '{:?}'",
+                file_name
+            ));
+            let actual = parse(&source);
+
+            assert!(
+                actual.is_ok(),
+                "file '{}' contained: {:?}",
+                file_name,
+                actual
+            );
+        }
+    }
 }
