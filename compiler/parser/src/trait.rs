@@ -462,8 +462,9 @@ mod trait_parser_tests {
             where
 
             trait TestTrait where
-                wrap : t1 -> self<t1> where
-                  typevar t1
+                apply : self<(t1 -> t2)> -> self<t1> -> self<t2> where
+                    typevar t1
+                    typevar t2
             end
         "#;
         let actual = parse(source);
@@ -480,7 +481,7 @@ mod trait_parser_tests {
                 values: vec![],
                 type_definitions: vec![],
                 traits: vec![Spanned {
-                    span: 56..166,
+                    span: 56..226,
                     value: Trait {
                         name: Spanned {
                             span: 62..71,
@@ -489,26 +490,44 @@ mod trait_parser_tests {
                         self_constraints: vec![],
                         type_variables: vec![],
                         type_annotations: vec![Spanned {
-                            span: 94..115,
+                            span: 94..142,
                             value: TypeAnnotation {
                                 name: Spanned {
-                                    span: 94..98,
-                                    value: "wrap".to_string(),
+                                    span: 94..99,
+                                    value: "apply".to_string(),
                                 },
                                 t: Spanned {
-                                    span: 101..115,
+                                    span: 102..142,
                                     value: ast::Type::lambda(
-                                        ast::Type::variable("t1"),
                                         ast::Type::bound(
-                                            ast::Type::identifier("self"),
-                                            vec![ast::Type::variable("t1")],
+                                            ast::Type::SelfRef,
+                                            vec![ast::Type::lambda(
+                                                ast::Type::variable("t1"),
+                                                ast::Type::variable("t2"),
+                                            )],
+                                        ),
+                                        ast::Type::lambda(
+                                            ast::Type::bound(
+                                                ast::Type::SelfRef,
+                                                vec![ast::Type::variable("t1")],
+                                            ),
+                                            ast::Type::bound(
+                                                ast::Type::SelfRef,
+                                                vec![ast::Type::variable("t2")],
+                                            ),
                                         ),
                                     ),
                                 },
-                                type_variables: vec![Spanned {
-                                    span: 140..150,
-                                    value: TypeVariable::new_free("t1", 148..150),
-                                }],
+                                type_variables: vec![
+                                    Spanned {
+                                        span: 169..179,
+                                        value: TypeVariable::new_free("t1", 177..179),
+                                    },
+                                    Spanned {
+                                        span: 200..210,
+                                        value: TypeVariable::new_free("t2", 208..210),
+                                    },
+                                ],
                             },
                         }],
                     },
@@ -534,7 +553,7 @@ mod trait_parser_tests {
     //         --! * `apply(wrap(f), wrap(x)) == wrap(f(x))`
     //         --! * `apply(u, wrap(y)) == apply(wrap(|g| -> g(x)), u)`
     //         trait Applicative where
-    //             typevar self = #Type<_> + Functor
+    //             self = #Type<_> + Functor
     //
     //             --! Similar to `Functor::map`
     //             --! but this time the supplied function `t1 -> t2` is embedded in `self`

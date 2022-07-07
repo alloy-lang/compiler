@@ -4,6 +4,7 @@ use std::iter;
 use improved_slice_patterns::match_vec;
 
 use alloy_ast as ast;
+use alloy_ast::Type;
 use alloy_lexer::{Token, TokenKind, T};
 
 use super::parens;
@@ -54,6 +55,68 @@ pub fn parse<'a>(
             span: span.clone(),
             actual: remainder.collect(),
         }),
+        _ => Ok((first_type, remainder.collect())),
+    }
+}
+
+fn parse_single_type<'a>(
+    type_span: &Span,
+    input: impl Iterator<Item = Token<'a>>,
+) -> ParseResult<'a, ast::Type> {
+    let input = input.collect::<Vec<_>>();
+    log::debug!("*parse_single_type* input: {:?}", &input);
+
+    let (first_type, remainder): (Spanned<Type>, Vec<Token>) = match_vec!(input.clone();
+        [
+            Token { kind: TokenKind::UpperIdentifier(id), span },
+            remainder @ ..
+        ] => Ok((
+            Spanned { span, value: ast::Type::identifier(id) },
+            remainder.collect(),
+        )),
+
+        [
+            Token { kind: TokenKind::LowerIdentifier(id), span },
+            remainder @ ..
+        ] => Ok((
+            Spanned { span, value: ast::Type::variable(id) },
+            remainder.collect(),
+        )),
+
+        [
+            Token { kind: T![self], span },
+            remainder @ ..
+        ] => Ok((
+            Spanned { span, value: ast::Type::SelfRef },
+            remainder.collect(),
+        )),
+
+        [
+            Token { kind: T!['('], span: open_paren_span },
+            remainder @ ..
+        ] => parens::parse(open_paren_span, remainder, self::parse_vec, ast::Type::tuple),
+
+        [
+            Token { kind, span: other_span },
+            remainder @ ..
+        ] => Err(ParseError::ExpectedType {
+            span: type_span.start..other_span.end,
+            actual: iter::once(Token { kind, span: other_span })
+                .chain(remainder)
+                .collect(),
+        }),
+
+        [remainder @ ..] => Err(ParseError::ExpectedType {
+            span: type_span.clone(),
+            actual: remainder.collect(),
+        }),
+    )
+    .map_err(|remaining| ParseError::ExpectedEOF { input, remaining })
+    .and_then(convert::identity)?;
+
+    let mut remainder = remainder.into_iter().peekable();
+
+    match remainder.peek() {
         Some(Token { kind, span }) if kind == &T![<] => {
             let mut furthest_span = span.clone();
             remainder.next();
@@ -97,7 +160,7 @@ pub fn parse<'a>(
                 }
             }
 
-            let total_span = first_span.start..furthest_span.end;
+            let total_span = first_type.span.start..furthest_span.end;
             let bound = ast::Type::bound(
                 first_type.clone().value,
                 binds.into_iter().map(|s| s.value).collect(),
@@ -113,62 +176,6 @@ pub fn parse<'a>(
         }
         _ => Ok((first_type, remainder.collect())),
     }
-}
-
-fn parse_single_type<'a>(
-    type_span: &Span,
-    input: impl Iterator<Item = Token<'a>>,
-) -> ParseResult<'a, ast::Type> {
-    let input = input.collect::<Vec<_>>();
-    log::debug!("*parse_single_type* input: {:?}", &input);
-
-    match_vec!(input.clone();
-        [
-            Token { kind: TokenKind::UpperIdentifier(id), span },
-            remainder @ ..
-        ] => Ok((
-            Spanned { span, value: ast::Type::identifier(id) },
-            remainder.collect(),
-        )),
-
-        [
-            Token { kind: TokenKind::LowerIdentifier(id), span },
-            remainder @ ..
-        ] => Ok((
-            Spanned { span, value: ast::Type::variable(id) },
-            remainder.collect(),
-        )),
-
-        [
-            Token { kind: T![self], span },
-            remainder @ ..
-        ] => Ok((
-            Spanned { span, value: ast::Type::identifier("self") },
-            remainder.collect(),
-        )),
-
-        [
-            Token { kind: T!['('], span: open_paren_span },
-            remainder @ ..
-        ] => parens::parse(open_paren_span, remainder, self::parse_vec, ast::Type::tuple),
-
-        [
-            Token { kind, span: other_span },
-            remainder @ ..
-        ] => Err(ParseError::ExpectedType {
-            span: type_span.start..other_span.end,
-            actual: iter::once(Token { kind, span: other_span })
-                .chain(remainder)
-                .collect(),
-        }),
-
-        [remainder @ ..] => Err(ParseError::ExpectedType {
-            span: type_span.clone(),
-            actual: remainder.collect(),
-        }),
-    )
-    .map_err(|remaining| ParseError::ExpectedEOF { input, remaining })
-    .and_then(convert::identity)
 }
 
 #[cfg(test)]

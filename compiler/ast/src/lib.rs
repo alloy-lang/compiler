@@ -43,6 +43,7 @@ pub enum Type {
         t: Box<Type>,
         binds: Vec<Type>,
     },
+    SelfRef,
 }
 
 impl Type {
