@@ -1,16 +1,18 @@
 mod event;
 mod expr;
+mod marker;
 mod sink;
 mod source;
 
 use rowan::GreenNode;
 
+use self::expr::expr;
+use self::marker::Marker;
+use self::sink::Sink;
 use crate::lexer::{Lexeme, Lexer, SyntaxKind};
 use crate::parser::event::Event;
 use crate::parser::source::Source;
 use crate::syntax::SyntaxNode;
-use expr::expr;
-use sink::Sink;
 
 pub fn parse(input: &str) -> Parse {
     let lexemes: Vec<_> = Lexer::new(input).collect();
@@ -39,11 +41,18 @@ impl<'l, 'input> Parser<'l, 'input> {
 
     #[must_use]
     fn parse(mut self) -> Vec<Event> {
-        self.start_node(SyntaxKind::Root);
+        let m = self.start();
         expr(&mut self);
-        self.finish_node();
+        m.complete(&mut self, SyntaxKind::Root);
 
         self.events
+    }
+
+    fn start(&mut self) -> Marker {
+        let pos = self.events.len();
+        self.events.push(Event::Placeholder);
+
+        Marker::new(pos)
     }
 
     fn start_node(&mut self, kind: SyntaxKind) {
