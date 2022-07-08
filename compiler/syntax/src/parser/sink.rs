@@ -1,16 +1,20 @@
 use super::event::Event;
-use crate::syntax::AlloyLanguage;
 use rowan::{GreenNode, GreenNodeBuilder, Language};
 
-pub(super) struct Sink {
+use crate::lexer::Lexeme;
+use crate::syntax::AlloyLanguage;
+
+pub(super) struct Sink<'l, 'input> {
     builder: GreenNodeBuilder<'static>,
+    lexemes: &'l [Lexeme<'input>],
     events: Vec<Event>,
 }
 
-impl Sink {
-    pub(super) fn new(events: Vec<Event>) -> Self {
+impl<'l, 'input> Sink<'l, 'input> {
+    pub(super) fn new(lexemes: &'l [Lexeme<'input>], events: Vec<Event>) -> Self {
         Self {
             builder: GreenNodeBuilder::new(),
+            lexemes,
             events,
         }
     }
