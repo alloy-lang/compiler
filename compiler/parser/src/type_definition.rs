@@ -1,4 +1,5 @@
 use non_empty_vec::NonEmpty;
+use alloy_ast::Type;
 
 use alloy_lexer::{Token, TokenKind};
 
@@ -10,7 +11,8 @@ use super::{ParseError, ParseResult, Span, Spanned};
 pub fn parse<'a>(
     type_name_span: &Span,
     input: impl Iterator<Item = Token<'a>>,
-) -> ParseResult<'a, NonEmpty<Spanned<NamedType>>> {
+// ) -> ParseResult<'a, NonEmpty<Spanned<NamedType>>> {
+) -> Result<(Vec<Spanned<Type>>, Spanned<NonEmpty<Spanned<NamedType>>>, Vec<Token<'a>>), ParseError<'a>> {
     let input = input
         .skip_while(|t| matches!(t.kind, TokenKind::Pipe))
         .peekable();
@@ -36,7 +38,7 @@ pub fn parse<'a>(
 
     let spanned = Spanned { span, value: types };
 
-    Ok((spanned, remainder.collect()))
+    Ok((Vec::new(), spanned, remainder.collect()))
 }
 
 fn parse_named_type<'a>(
@@ -118,6 +120,7 @@ mod type_definition_parser_tests {
                             span: 64..68,
                             value: "Name".to_string(),
                         },
+                        binds: vec![],
                         types: Spanned {
                             span: 71..77,
                             value: unsafe {
@@ -165,6 +168,7 @@ mod type_definition_parser_tests {
                             span: 64..68,
                             value: "Bool".to_string(),
                         },
+                        binds: vec![],
                         types: Spanned {
                             span: 87..113,
                             value: unsafe {
@@ -213,6 +217,7 @@ mod type_definition_parser_tests {
                             span: 64..69,
                             value: "Thing".to_string(),
                         },
+                        binds: vec![],
                         types: Spanned {
                             span: 88..138,
                             value: unsafe {
@@ -220,6 +225,115 @@ mod type_definition_parser_tests {
                                     spanned_named_type_empty(88..92, "This"),
                                     spanned_named_type_empty(109..113, "That"),
                                     spanned_named_type_empty(130..138, "TheOther"),
+                                ])
+                            },
+                        },
+                    },
+                }],
+                traits: vec![],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_typedef_with_bound_type() {
+        let source = r#"
+            module Test
+            where
+
+            typedef Option<t> =
+              | None
+              | Some(t)
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![],
+                values: vec![],
+                type_definitions: vec![Spanned {
+                    span: 56..117,
+                    value: TypeDefinition {
+                        name: Spanned {
+                            span: 64..70,
+                            value: "Option".to_string(),
+                        },
+                        binds: vec![],
+                        types: Spanned {
+                            span: 89..117,
+                            value: unsafe {
+                                NonEmpty::new_unchecked(vec![
+                                    spanned_named_type_empty(89..93, "None"),
+                                    spanned_named_type(
+                                        110..114,
+                                        "Some",
+                                        114..117,
+                                        ast::Type::tuple(vec![ast::Type::variable("t")]),
+                                    ),
+                                ])
+                            },
+                        },
+                    },
+                }],
+                traits: vec![],
+            },
+        });
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_typedef_with_self_reference() {
+        let source = r#"
+            module Test
+            where
+
+            typedef Expr<t> =
+              | I (Int64)
+              | B (Bool)
+              | Add (Expr<Int64>, Expr<Int64>)
+              | Multiply (Expr<Int64>, Expr<Int64>)
+              | Equality (Expr<Bool>, Expr<Bool>)
+        "#;
+        let actual = parse(source);
+
+        let expected = Ok(Spanned {
+            span: 13..42,
+            value: Module {
+                name: Spanned {
+                    span: 20..24,
+                    value: "Test".to_string(),
+                },
+                imports: vec![],
+                type_annotations: vec![],
+                values: vec![],
+                type_definitions: vec![Spanned {
+                    span: 56..117,
+                    value: TypeDefinition {
+                        name: Spanned {
+                            span: 64..70,
+                            value: "Option".to_string(),
+                        },
+                        binds: vec![],
+                        types: Spanned {
+                            span: 89..117,
+                            value: unsafe {
+                                NonEmpty::new_unchecked(vec![
+                                    spanned_named_type_empty(89..93, "None"),
+                                    spanned_named_type(
+                                        110..114,
+                                        "Some",
+                                        114..117,
+                                        ast::Type::tuple(vec![ast::Type::variable("t")]),
+                                    ),
                                 ])
                             },
                         },
@@ -259,6 +373,7 @@ mod type_definition_parser_tests {
                             span: 64..69,
                             value: "Shape".to_string(),
                         },
+                        binds: vec![],
                         types: Spanned {
                             span: 72..100,
                             value: unsafe {
@@ -312,6 +427,7 @@ mod type_definition_parser_tests {
                             span: 64..69,
                             value: "Shape".to_string(),
                         },
+                        binds: vec![],
                         types: Spanned {
                             span: 88..171,
                             value: unsafe {

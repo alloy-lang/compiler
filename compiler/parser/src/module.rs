@@ -174,22 +174,23 @@ pub fn parse_module_contents<'a>(
                 },
 
                 [
-                    Token { kind: T![typedef],                    span: type_def_span },
+                    Token { kind: T![typedef],                    span: typedef_span },
                     Token { kind: TokenKind::UpperIdentifier(id), span: id_span },
                     Token { kind: T![=],                          span: eq_span },
                     remainder @ ..
                 ] => {
-                    let type_span = type_def_span.start..eq_span.end;
+                    let type_span = typedef_span.start..eq_span.end;
 
-                    let (types, remainder) = type_definition::parse(&type_span, remainder)?;
+                    let (binds, types, remainder) = type_definition::parse(&type_span, remainder)?;
 
                     let type_definition = Spanned {
-                        span: type_def_span.start..types.span_end(),
+                        span: typedef_span.start..types.span_end(),
                         value: TypeDefinition {
                             name: Spanned {
                                 span: id_span,
                                 value: id.to_string(),
                             },
+                            binds,
                             types,
                         }
                     };
@@ -200,7 +201,36 @@ pub fn parse_module_contents<'a>(
                 },
 
                 [
-                    Token { kind: T![typedef],                    span: type_def_span },
+                    Token { kind: T![typedef],                    span: typedef_span },
+                    Token { kind: TokenKind::UpperIdentifier(id), span: id_span },
+                    Token { kind: T![<],                          span: gt_span },
+                    remainder @ ..
+                ] => {
+                    let type_span = typedef_span.start..gt_span.end;
+                    let (furthest_span, binds, remainder) = r#type::parse_binds(type_span, remainder.peekable())?;
+
+                    let type_span = typedef_span.start..furthest_span.end;
+                    let (binds, types, remainder) = type_definition::parse(&type_span, remainder.into_iter())?;
+
+                    let type_definition = Spanned {
+                        span: typedef_span.start..types.span_end(),
+                        value: TypeDefinition {
+                            name: Spanned {
+                                span: id_span,
+                                value: id.to_string(),
+                            },
+                            binds,
+                            types,
+                        }
+                    };
+
+                    type_definitions.push(type_definition);
+
+                    Ok(remainder)
+                },
+
+                [
+                    Token { kind: T![typedef],                    span: typedef_span },
                     Token { kind: TokenKind::UpperIdentifier(id), span: id_span },
                     remainder @ ..
                 ] => {

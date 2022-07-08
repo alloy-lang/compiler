@@ -106,6 +106,7 @@ impl Type {
         Type::Variable(id.into())
     }
 
+    #[must_use]
     pub fn bound<T>(t: T, binds: Vec<Type>) -> Type
     where
         T: Into<Box<Type>>,

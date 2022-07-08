@@ -1,5 +1,6 @@
 use core::convert;
 use std::iter;
+use std::iter::Peekable;
 
 use improved_slice_patterns::match_vec;
 
@@ -51,10 +52,6 @@ pub fn parse<'a>(
                 next_remainder,
             ))
         }
-        Some(Token { kind: T![<>], span }) => Err(ParseError::ExpectedBoundTypeConstraints {
-            span: span.clone(),
-            actual: remainder.collect(),
-        }),
         _ => Ok((first_type, remainder.collect())),
     }
 }
@@ -117,48 +114,12 @@ fn parse_single_type<'a>(
     let mut remainder = remainder.into_iter().peekable();
 
     match remainder.peek() {
+        Some(Token { kind: T![<>], span }) => Err(ParseError::ExpectedBoundTypeConstraints {
+            span: span.clone(),
+            actual: remainder.collect(),
+        }),
         Some(Token { kind, span }) if kind == &T![<] => {
-            let mut furthest_span = span.clone();
-            remainder.next();
-
-            let mut binds = Vec::new();
-
-            loop {
-                let (next_type, next_remainder) =
-                    parse(&furthest_span, remainder).map_err(|e| match e {
-                        ParseError::ExpectedType { span, actual } => {
-                            ParseError::ExpectedBoundTypeConstraint { span, actual }
-                        }
-                        _ => e,
-                    })?;
-                remainder = next_remainder.into_iter().peekable();
-
-                binds.push(next_type);
-
-                match remainder.peek() {
-                    Some(Token { kind: T![,], span }) => {
-                        furthest_span = span.clone();
-                        remainder.next();
-                    }
-                    Some(Token { kind: T![>], span }) => {
-                        furthest_span = span.clone();
-                        remainder.next();
-                        break;
-                    }
-                    Some(Token { kind: _, span }) => {
-                        return Err(ParseError::ExpectedBoundTypeComma {
-                            span: furthest_span.end..span.start,
-                            actual: remainder.collect(),
-                        });
-                    }
-                    _ => {
-                        return Err(ParseError::ExpectedBoundTypeComma {
-                            span: furthest_span,
-                            actual: remainder.collect(),
-                        });
-                    }
-                }
-            }
+            let (furthest_span, binds, remainder) = parse_binds(span.clone(), remainder)?;
 
             let total_span = first_type.span.start..furthest_span.end;
             let bound = ast::Type::bound(
@@ -171,11 +132,62 @@ fn parse_single_type<'a>(
                     span: total_span,
                     value: bound,
                 },
-                remainder.collect(),
+                remainder,
             ))
         }
         _ => Ok((first_type, remainder.collect())),
     }
+}
+
+pub fn parse_binds(
+    furthest_span: Span,
+    remainder: Peekable<std::vec::IntoIter<Token>>,
+) -> Result<(Span, Vec<Spanned<Type>>, Vec<Token>), ParseError> {
+    let mut furthest_span = furthest_span;
+
+    let mut remainder = remainder;
+    remainder.next();
+
+    let mut binds = Vec::new();
+
+    loop {
+        let (next_type, next_remainder) =
+            parse(&furthest_span, remainder).map_err(|e| match e {
+                ParseError::ExpectedType { span, actual } => {
+                    ParseError::ExpectedBoundTypeConstraint { span, actual }
+                }
+                _ => e,
+            })?;
+        remainder = next_remainder.into_iter().peekable();
+
+        binds.push(next_type);
+
+        match remainder.peek() {
+            Some(Token { kind: T![,], span }) => {
+                furthest_span = span.clone();
+                remainder.next();
+            }
+            Some(Token { kind: T![>], span }) => {
+                furthest_span = span.clone();
+                remainder.next();
+                break;
+            }
+            Some(Token { kind: _, span }) => {
+                return Err(ParseError::ExpectedBoundTypeComma {
+                    span: furthest_span.end..span.start,
+                    actual: remainder.collect(),
+                });
+            }
+            _ => {
+                return Err(ParseError::ExpectedBoundTypeComma {
+                    span: furthest_span,
+                    actual: remainder.collect(),
+                });
+            }
+        }
+    }
+
+    Ok((furthest_span, binds, remainder.collect()))
 }
 
 #[cfg(test)]

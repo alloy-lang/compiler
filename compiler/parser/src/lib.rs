@@ -237,6 +237,7 @@ pub struct TypeAnnotation {
 #[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct TypeDefinition {
     name: Spanned<String>,
+    binds: Vec<Spanned<ast::Type>>,
     types: Spanned<NonEmpty<Spanned<NamedType>>>,
 }
 
