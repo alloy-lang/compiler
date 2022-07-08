@@ -1,7 +1,7 @@
 use rowan::{GreenNode, GreenNodeBuilder, Language};
 use std::mem;
 
-use crate::lexer::{SyntaxKind, Token};
+use crate::lexer::Token;
 use crate::syntax::AlloyLanguage;
 
 use super::event::Event;
@@ -58,7 +58,7 @@ impl<'t, 'input> Sink<'t, 'input> {
                         self.builder.start_node(AlloyLanguage::kind_to_raw(kind));
                     }
                 }
-                Event::AddToken { kind, text } => self.token(kind, &text),
+                Event::AddToken => self.token(),
                 Event::FinishNode => self.builder.finish_node(),
                 Event::Placeholder => {}
             }
@@ -69,8 +69,12 @@ impl<'t, 'input> Sink<'t, 'input> {
         self.builder.finish()
     }
 
-    fn token(&mut self, kind: SyntaxKind, text: &str) {
-        self.builder.token(AlloyLanguage::kind_to_raw(kind), text);
+    fn token(&mut self) {
+        let Token { kind, text } = self.tokens[self.cursor];
+
+        self.builder
+            .token(AlloyLanguage::kind_to_raw(kind), text);
+
         self.cursor += 1;
     }
 
@@ -80,7 +84,7 @@ impl<'t, 'input> Sink<'t, 'input> {
                 break;
             }
 
-            self.token(token.kind, token.text);
+            self.token();
         }
     }
 }
