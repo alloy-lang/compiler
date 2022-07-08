@@ -37,7 +37,7 @@ fn expr_binding_power(p: &mut Parser, minimum_binding_power: u8) {
     let checkpoint = p.checkpoint();
 
     match p.peek() {
-        Some(SyntaxKind::Number) | Some(SyntaxKind::Ident) => p.bump(),
+        Some(SyntaxKind::Number | SyntaxKind::Ident) => p.bump(),
         Some(SyntaxKind::Minus) => {
             let op = PrefixOp::Neg;
             let ((), right_binding_power) = op.binding_power();
