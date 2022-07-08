@@ -4,5 +4,7 @@ members = [
     "compiler/ast",
     "compiler/lexer",
     "compiler/parser",
+    "compiler/syntax",
+    "smith/repl",
     "test_source",
 ]
