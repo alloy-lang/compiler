@@ -1,7 +1,32 @@
 use logos::Logos;
 use num_derive::{FromPrimitive, ToPrimitive};
 
-#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Logos, FromPrimitive, ToPrimitive)]
+pub(crate) struct Lexer<'a> {
+    inner: logos::Lexer<'a, SyntaxKind>,
+}
+
+impl<'a> Lexer<'a> {
+    pub(crate) fn new(input: &'a str) -> Self {
+        Self {
+            inner: SyntaxKind::lexer(input),
+        }
+    }
+}
+
+impl<'a> Iterator for Lexer<'a> {
+    type Item = (SyntaxKind, &'a str);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let kind = self.inner.next()?;
+        let text = self.inner.slice();
+
+        Some((kind, text))
+    }
+}
+
+#[derive(
+    Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Logos, FromPrimitive, ToPrimitive,
+)]
 #[logos(
     subpattern op_id = r"[!|<>=]+",
     subpattern upper_id = r"[A-Z]([a-zA-Z0-9_]*)",
@@ -56,10 +81,9 @@ mod tests {
     use super::*;
 
     fn check(input: &str, kind: SyntaxKind) {
-        let mut lexer = SyntaxKind::lexer(input);
+        let mut lexer = Lexer::new(input);
 
-        assert_eq!(lexer.next(), Some(kind));
-        assert_eq!(lexer.slice(), input);
+        assert_eq!(lexer.next(), Some((kind, input)));
     }
 
     #[test]
