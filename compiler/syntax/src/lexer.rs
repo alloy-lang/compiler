@@ -40,7 +40,7 @@ impl<'a> Iterator for Lexer<'a> {
     subpattern either_id = r"[a-zA-Z]([a-zA-Z0-9_]*)",
 )]
 pub(crate) enum SyntaxKind {
-    #[regex(r"[ \t\f]+")]
+    #[regex(r"[ \t\f\r\n]+")]
     Whitespace,
 
     #[token("fn")]
@@ -82,12 +82,21 @@ pub(crate) enum SyntaxKind {
     #[token(")")]
     RParen,
 
+    #[regex("#.*")]
+    Comment,
+
     #[error]
     Error,
 
     Root,
     BinaryExpr,
     PrefixExpr,
+}
+
+impl SyntaxKind {
+    pub(crate) fn is_trivia(self) -> bool {
+        matches!(self, Self::Whitespace | Self::Comment)
+    }
 }
 
 #[cfg(test)]
@@ -98,6 +107,11 @@ mod tests {
         let mut lexer = Lexer::new(input);
 
         assert_eq!(lexer.next(), Some(Lexeme { kind, text: input }));
+    }
+
+    #[test]
+    fn lex_spaces_and_tabs_and_newlines() {
+        check("  \t  \r \n ", SyntaxKind::Whitespace);
     }
 
     #[test]
@@ -183,5 +197,10 @@ mod tests {
     #[test]
     fn lex_right_parenthesis() {
         check(")", SyntaxKind::RParen);
+    }
+
+    #[test]
+    fn lex_comment() {
+        check("# foo", SyntaxKind::Comment);
     }
 }
