@@ -2,14 +2,14 @@ use super::Parser;
 use crate::lexer::SyntaxKind;
 use crate::parser::marker::CompletedMarker;
 
-enum InfixOp {
+enum BinaryOp {
     Add,
     Sub,
     Mul,
     Div,
 }
 
-impl InfixOp {
+impl BinaryOp {
     fn binding_power(&self) -> (u8, u8) {
         match self {
             Self::Add | Self::Sub => (1, 2),
@@ -18,11 +18,11 @@ impl InfixOp {
     }
 }
 
-enum PrefixOp {
+enum UnaryOp {
     Neg,
 }
 
-impl PrefixOp {
+impl UnaryOp {
     fn binding_power(&self) -> ((), u8) {
         match self {
             Self::Neg => ((), 5),
@@ -43,10 +43,10 @@ fn expr_binding_power(p: &mut Parser, minimum_binding_power: u8) {
 
     loop {
         let op = match p.peek() {
-            Some(SyntaxKind::Plus) => InfixOp::Add,
-            Some(SyntaxKind::Minus) => InfixOp::Sub,
-            Some(SyntaxKind::Star) => InfixOp::Mul,
-            Some(SyntaxKind::Slash) => InfixOp::Div,
+            Some(SyntaxKind::Plus) => BinaryOp::Add,
+            Some(SyntaxKind::Minus) => BinaryOp::Sub,
+            Some(SyntaxKind::Star) => BinaryOp::Mul,
+            Some(SyntaxKind::Slash) => BinaryOp::Div,
             _ => return, // we’ll handle errors later.
         };
 
@@ -61,7 +61,7 @@ fn expr_binding_power(p: &mut Parser, minimum_binding_power: u8) {
 
         let m = lhs.precede(p);
         expr_binding_power(p, right_binding_power);
-        lhs = m.complete(p, SyntaxKind::BinaryExpr);
+        lhs = m.complete(p, SyntaxKind::InfixExpr);
     }
 }
 
@@ -98,7 +98,7 @@ fn prefix_expr(p: &mut Parser) -> CompletedMarker {
 
     let m = p.start();
 
-    let op = PrefixOp::Neg;
+    let op = UnaryOp::Neg;
     let ((), right_binding_power) = op.binding_power();
 
     // Eat the operator’s token.
@@ -151,12 +151,12 @@ Root@0..7
     }
 
     #[test]
-    fn parse_simple_binary_expression() {
+    fn parse_simple_infix_expression() {
         check(
             "1 +2",
             expect![[r#"
 Root@0..4
-  BinaryExpr@0..4
+  InfixExpr@0..4
     Literal@0..2
       Number@0..1 "1"
       Whitespace@1..2 " "
@@ -167,14 +167,14 @@ Root@0..4
     }
 
     #[test]
-    fn parse_left_associative_binary_expression() {
+    fn parse_left_associative_infix_expression() {
         check(
             "1 +  2  +  3 +4",
             expect![[r#"
 Root@0..15
-  BinaryExpr@0..15
-    BinaryExpr@0..13
-      BinaryExpr@0..8
+  InfixExpr@0..15
+    InfixExpr@0..13
+      InfixExpr@0..8
         Literal@0..2
           Number@0..1 "1"
           Whitespace@1..2 " "
@@ -195,19 +195,19 @@ Root@0..15
     }
 
     #[test]
-    fn parse_binary_expression_with_mixed_binding_power() {
+    fn parse_infix_expression_with_mixed_binding_power() {
         check(
             "1 + 2 * 3 - 4",
             expect![[r#"
 Root@0..13
-  BinaryExpr@0..13
-    BinaryExpr@0..10
+  InfixExpr@0..13
+    InfixExpr@0..10
       Literal@0..2
         Number@0..1 "1"
         Whitespace@1..2 " "
       Plus@2..3 "+"
       Whitespace@3..4 " "
-      BinaryExpr@4..10
+      InfixExpr@4..10
         Literal@4..6
           Number@4..5 "2"
           Whitespace@5..6 " "
@@ -243,7 +243,7 @@ Root@0..4
             "-20 + 20",
             expect![[r#"
 Root@0..8
-  BinaryExpr@0..8
+  InfixExpr@0..8
     PrefixExpr@0..4
       Minus@0..1 "-"
       Literal@1..4
@@ -293,7 +293,7 @@ Root@0..16
             "5 *  ( 2 + 1)",
             expect![[r#"
 Root@0..13
-  BinaryExpr@0..13
+  InfixExpr@0..13
     Literal@0..2
       Number@0..1 "5"
       Whitespace@1..2 " "
@@ -302,7 +302,7 @@ Root@0..13
     ParenExpr@5..13
       LParen@5..6 "("
       Whitespace@6..7 " "
-      BinaryExpr@7..12
+      InfixExpr@7..12
         Literal@7..9
           Number@7..8 "2"
           Whitespace@8..9 " "
@@ -352,7 +352,7 @@ Root@0..9
     }
 
     #[test]
-    fn parse_binary_expression_interspersed_with_comments() {
+    fn parse_infix_expression_interspersed_with_comments() {
         check(
             "
 1
@@ -361,8 +361,8 @@ Root@0..9
             expect![[r##"
 Root@0..35
   Whitespace@0..1 "\n"
-  BinaryExpr@1..35
-    BinaryExpr@1..21
+  InfixExpr@1..35
+    InfixExpr@1..21
       Literal@1..5
         Number@1..2 "1"
         Whitespace@2..5 "\n  "
