@@ -1,10 +1,10 @@
+use alloy_rowan_lexer::Token;
 use rowan::{GreenNode, GreenNodeBuilder, Language};
 use std::mem;
 
-use crate::lexer::Token;
-use crate::syntax::AlloyLanguage;
-
 use super::event::Event;
+use crate::syntax::AlloyLanguage;
+use crate::syntax::SyntaxKind;
 
 pub(super) struct Sink<'t, 'input> {
     builder: GreenNodeBuilder<'static>,
@@ -72,14 +72,15 @@ impl<'t, 'input> Sink<'t, 'input> {
     fn token(&mut self) {
         let Token { kind, text } = self.tokens[self.cursor];
 
-        self.builder.token(AlloyLanguage::kind_to_raw(kind), text);
+        self.builder
+            .token(AlloyLanguage::kind_to_raw(kind.into()), text);
 
         self.cursor += 1;
     }
 
     fn eat_trivia(&mut self) {
         while let Some(token) = self.tokens.get(self.cursor) {
-            if !token.kind.is_trivia() {
+            if !SyntaxKind::from(token.kind).is_trivia() {
                 break;
             }
 

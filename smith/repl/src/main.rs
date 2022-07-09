@@ -1,4 +1,4 @@
-use alloy_syntax::parser::parse;
+use alloy_rowan::parser::parse;
 use std::io::{self, Write};
 
 fn main() -> io::Result<()> {
