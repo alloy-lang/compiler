@@ -1,18 +1,20 @@
+use rowan::GreenNode;
+
+use alloy_rowan_lexer::{Lexer, Token};
+
+use crate::parser::event::Event;
+use crate::parser::source::Source;
+use crate::syntax::{SyntaxKind, SyntaxNode};
+
+use self::expr::expr;
+use self::marker::Marker;
+use self::sink::Sink;
+
 mod event;
 mod expr;
 mod marker;
 mod sink;
 mod source;
-
-use rowan::GreenNode;
-
-use self::expr::expr;
-use self::marker::Marker;
-use self::sink::Sink;
-use crate::lexer::{Lexer, SyntaxKind, Token};
-use crate::parser::event::Event;
-use crate::parser::source::Source;
-use crate::syntax::SyntaxNode;
 
 #[must_use]
 pub fn parse(input: &str) -> Parse {
@@ -93,8 +95,9 @@ fn check(input: &str, expected_tree: expect_test::Expect) {
 
 #[cfg(test)]
 mod parser_tests {
-    use super::*;
     use expect_test::expect;
+
+    use super::*;
 
     #[test]
     fn parse_nothing() {
