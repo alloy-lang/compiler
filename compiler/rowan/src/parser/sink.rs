@@ -3,8 +3,8 @@ use rowan::{GreenNode, GreenNodeBuilder, Language};
 use std::mem;
 
 use super::event::Event;
-use crate::syntax::AlloyLanguage;
-use crate::syntax::SyntaxKind;
+use alloy_rowan_syntax::AlloyLanguage;
+use alloy_rowan_syntax::SyntaxKind;
 
 pub(super) struct Sink<'t, 'input> {
     builder: GreenNodeBuilder<'static>,

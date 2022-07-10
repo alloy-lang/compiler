@@ -7,12 +7,9 @@ edition = "2018"
 
 [dependencies]
 drop_bomb = "0.1.5"
-non-empty-vec = "0.2"
-maplit = "1.0"
 rowan = "0.15"
-num-derive = "0.3"
-num-traits = "0.2"
 alloy_rowan_lexer = {path = "./lexer"}
+alloy_rowan_syntax = {path = "./syntax"}
 
 [dev-dependencies]
 expect-test = "1.3"

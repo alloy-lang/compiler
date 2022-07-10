@@ -1,5 +1,5 @@
-use crate::syntax::SyntaxKind;
 use alloy_rowan_lexer::Token;
+use alloy_rowan_syntax::SyntaxKind;
 
 pub(super) struct Source<'t, 'input> {
     tokens: &'t [Token<'input>],

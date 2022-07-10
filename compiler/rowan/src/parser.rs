@@ -4,7 +4,7 @@ use alloy_rowan_lexer::{Lexer, Token};
 
 use crate::parser::event::Event;
 use crate::parser::source::Source;
-use crate::syntax::{SyntaxKind, SyntaxNode};
+use alloy_rowan_syntax::{SyntaxKind, SyntaxNode};
 
 use self::expr::expr;
 use self::marker::Marker;

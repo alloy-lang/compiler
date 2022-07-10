@@ -8,7 +8,6 @@ pub struct Lexer<'a> {
 }
 
 impl<'a> Lexer<'a> {
-
     #[must_use]
     pub fn new(input: &'a str) -> Self {
         Self {

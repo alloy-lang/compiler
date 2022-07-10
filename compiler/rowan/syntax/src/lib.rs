@@ -2,10 +2,10 @@ use alloy_rowan_lexer::TokenKind;
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
 
-pub(crate) type SyntaxNode = rowan::SyntaxNode<AlloyLanguage>;
+pub type SyntaxNode = rowan::SyntaxNode<AlloyLanguage>;
 
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive, ToPrimitive)]
-pub(crate) enum SyntaxKind {
+pub enum SyntaxKind {
     Whitespace,
     FnKw,
     LetKw,
@@ -31,7 +31,8 @@ pub(crate) enum SyntaxKind {
 }
 
 impl SyntaxKind {
-    pub(crate) fn is_trivia(self) -> bool {
+    #[must_use]
+    pub fn is_trivia(self) -> bool {
         matches!(self, Self::Whitespace | Self::Comment)
     }
 }
@@ -66,10 +67,10 @@ impl From<TokenKind> for SyntaxKind {
 }
 
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub(crate) enum AlloyLanguage {}
+pub enum AlloyLanguage {}
 
 impl rowan::Language for AlloyLanguage {
-    type Kind = crate::syntax::SyntaxKind;
+    type Kind = SyntaxKind;
 
     fn kind_from_raw(raw: rowan::SyntaxKind) -> Self::Kind {
         Self::Kind::from_u16(raw.0).unwrap()
