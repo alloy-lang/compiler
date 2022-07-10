@@ -1,6 +1,4 @@
-use super::Parser;
-use crate::parser::marker::CompletedMarker;
-use alloy_rowan_syntax::SyntaxKind;
+use super::*;
 
 enum BinaryOp {
     Add,
@@ -125,7 +123,7 @@ fn paren_expr(p: &mut Parser) -> CompletedMarker {
 
 #[cfg(test)]
 mod tests {
-    use super::super::check;
+    use crate::check;
     use expect_test::expect;
 
     #[test]

@@ -6,12 +6,8 @@ authors = ["theochupp <tclchiam@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-drop_bomb = "0.1.5"
-rowan = "0.15"
 alloy_rowan_lexer = {path = "./lexer"}
+alloy_rowan_parser = {path = "./parser"}
 alloy_rowan_syntax = {path = "./syntax"}
 
 [dev-dependencies]
-expect-test = "1.3"
-pretty_assertions = "1.2.1"
-test_source = { path = "../../test_source" }

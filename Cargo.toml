@@ -6,6 +6,8 @@ members = [
     "compiler/parser",
     "compiler/rowan",
     "compiler/rowan/lexer",
+    "compiler/rowan/parser",
+    "compiler/rowan/syntax",
     "smith/repl",
     "test_source",
 ]
