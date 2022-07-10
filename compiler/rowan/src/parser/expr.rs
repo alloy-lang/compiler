@@ -1,6 +1,6 @@
 use super::Parser;
 use crate::parser::marker::CompletedMarker;
-use crate::syntax::SyntaxKind;
+use alloy_rowan_syntax::SyntaxKind;
 
 enum BinaryOp {
     Add,

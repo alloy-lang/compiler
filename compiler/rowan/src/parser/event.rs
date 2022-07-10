@@ -1,4 +1,4 @@
-use crate::syntax::SyntaxKind;
+use alloy_rowan_syntax::SyntaxKind;
 
 #[derive(Debug, Clone, PartialEq)]
 pub(super) enum Event {
