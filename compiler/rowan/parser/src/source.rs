@@ -1,6 +1,7 @@
+use text_size::TextRange;
+
 use alloy_rowan_lexer::Token;
 use alloy_rowan_syntax::SyntaxKind;
-use text_size::TextRange;
 
 pub(crate) struct Source<'t, 'input> {
     tokens: &'t [Token<'input>],

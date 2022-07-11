@@ -9,8 +9,8 @@ edition = "2018"
 drop_bomb = "0.1.5"
 rowan = "0.15"
 text-size = "1.1.0"
-alloy_rowan_lexer = {path = "../lexer"}
-alloy_rowan_syntax = {path = "../syntax"}
+alloy_rowan_lexer = { path = "../lexer" }
+alloy_rowan_syntax = { path = "../syntax" }
 
 [dev-dependencies]
 expect-test = "1.3"

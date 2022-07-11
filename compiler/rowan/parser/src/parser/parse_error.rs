@@ -1,6 +1,8 @@
-use alloy_rowan_syntax::SyntaxKind;
 use std::fmt;
+
 use text_size::TextRange;
+
+use alloy_rowan_syntax::SyntaxKind;
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct ParseError {
@@ -42,8 +44,9 @@ impl fmt::Display for ParseError {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::ops::Range as StdRange;
+
+    use super::*;
 
     fn check(
         expected: Vec<SyntaxKind>,
