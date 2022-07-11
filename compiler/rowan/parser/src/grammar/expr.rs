@@ -36,14 +36,18 @@ fn expr_binding_power(p: &mut Parser, minimum_binding_power: u8) -> Option<Compl
     let mut lhs = lhs(p)?;
 
     loop {
-        let op = match p.peek() {
-            Some(SyntaxKind::Plus) => BinaryOp::Add,
-            Some(SyntaxKind::Minus) => BinaryOp::Sub,
-            Some(SyntaxKind::Star) => BinaryOp::Mul,
-            Some(SyntaxKind::Slash) => BinaryOp::Div,
-            // We’re not at an operator; we don’t know what to do next
-            // so we return and let the caller decide.
-            _ => break,
+        let op = if p.at(SyntaxKind::Plus) {
+            BinaryOp::Add
+        } else if p.at(SyntaxKind::Minus) {
+            BinaryOp::Sub
+        } else if p.at(SyntaxKind::Star) {
+            BinaryOp::Mul
+        } else if p.at(SyntaxKind::Slash) {
+            BinaryOp::Div
+        } else {
+            // We’re not at an operator; we don’t know what to do next, so we return and let the
+            // caller decide.
+            break;
         };
 
         let (left_binding_power, right_binding_power) = op.binding_power();
@@ -56,23 +60,29 @@ fn expr_binding_power(p: &mut Parser, minimum_binding_power: u8) -> Option<Compl
         p.bump();
 
         let m = lhs.precede(p);
-        expr_binding_power(p, right_binding_power);
+        let parsed_rhs = expr_binding_power(p, right_binding_power).is_some();
         lhs = m.complete(p, SyntaxKind::InfixExpr);
+
+        if !parsed_rhs {
+            break;
+        }
     }
 
     Some(lhs)
 }
 
 fn lhs(p: &mut Parser) -> Option<CompletedMarker> {
-    let cm = match p.peek() {
-        Some(SyntaxKind::Number) => literal(p),
-        Some(SyntaxKind::Ident) => variable_ref(p),
-        Some(SyntaxKind::Minus) => prefix_expr(p),
-        Some(SyntaxKind::LParen) => paren_expr(p),
-        _ => {
-            p.error();
-            return None;
-        }
+    let cm = if p.at(SyntaxKind::Number) {
+        literal(p)
+    } else if p.at(SyntaxKind::Ident) {
+        variable_ref(p)
+    } else if p.at(SyntaxKind::Minus) {
+        prefix_expr(p)
+    } else if p.at(SyntaxKind::LParen) {
+        paren_expr(p)
+    } else {
+        p.error();
+        return None;
     };
 
     Some(cm)
@@ -385,11 +395,29 @@ Root@0..35
         check(
             "(foo",
             expect![[r#"
-Root@0..4
-  ParenExpr@0..4
+                Root@0..4
+                  ParenExpr@0..4
+                    LParen@0..1 "("
+                    VariableRef@1..4
+                      Ident@1..4 "foo"
+                error at 1..4: expected ‘+’, ‘-’, ‘*’, ‘/’ or ‘)’"#]],
+        );
+    }
+
+    #[test]
+    fn do_not_parse_operator_if_gettting_rhs_failed() {
+        check(
+            "(1+",
+            expect![[r#"
+Root@0..3
+  ParenExpr@0..3
     LParen@0..1 "("
-    VariableRef@1..4
-      Ident@1..4 "foo""#]],
+    InfixExpr@1..3
+      Literal@1..2
+        Number@1..2 "1"
+      Plus@2..3 "+"
+error at 2..3: expected number, identifier, ‘-’ or ‘(’
+error at 2..3: expected ‘)’"#]],
         );
     }
 }
