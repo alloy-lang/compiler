@@ -1,15 +1,18 @@
-pub(crate) mod marker;
+use std::mem;
 
-mod parse_error;
+use alloy_rowan_lexer::Token;
+use alloy_rowan_syntax::SyntaxKind;
 pub(crate) use parse_error::ParseError;
 
-use self::marker::Marker;
 use crate::event::Event;
 use crate::grammar;
 use crate::source::Source;
-use alloy_rowan_lexer::Token;
-use alloy_rowan_syntax::SyntaxKind;
-use std::mem;
+
+use self::marker::Marker;
+
+pub(crate) mod marker;
+
+mod parse_error;
 
 const RECOVERY_SET: [SyntaxKind; 1] = [SyntaxKind::LetKw];
 
@@ -107,8 +110,9 @@ impl<'t, 'input> Parser<'t, 'input> {
 
 #[cfg(test)]
 mod parser_tests {
-    use crate::check;
     use expect_test::expect;
+
+    use crate::check;
 
     #[test]
     fn parse_nothing() {

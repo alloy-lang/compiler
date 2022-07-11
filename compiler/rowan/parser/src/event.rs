@@ -1,5 +1,6 @@
-use crate::parser::ParseError;
 use alloy_rowan_syntax::SyntaxKind;
+
+use crate::parser::ParseError;
 
 #[derive(Debug, PartialEq)]
 pub(crate) enum Event {

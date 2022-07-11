@@ -1,7 +1,9 @@
+use drop_bomb::DropBomb;
+
+use alloy_rowan_syntax::SyntaxKind;
+
 use crate::event::Event;
 use crate::parser::Parser;
-use alloy_rowan_syntax::SyntaxKind;
-use drop_bomb::DropBomb;
 
 pub(crate) struct Marker {
     pos: usize,

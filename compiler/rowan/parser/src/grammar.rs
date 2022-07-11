@@ -1,9 +1,10 @@
-mod expr;
-mod stmt;
+use alloy_rowan_syntax::SyntaxKind;
 
 use crate::parser::marker::CompletedMarker;
 use crate::parser::Parser;
-use alloy_rowan_syntax::SyntaxKind;
+
+mod expr;
+mod stmt;
 
 pub(crate) fn root(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
@@ -17,8 +18,9 @@ pub(crate) fn root(p: &mut Parser) -> CompletedMarker {
 
 #[cfg(test)]
 mod tests {
-    use crate::check;
     use expect_test::expect;
+
+    use crate::check;
 
     #[test]
     fn parse_multiple_statements() {

@@ -1,9 +1,11 @@
+use rowan::GreenNode;
+
+use alloy_rowan_lexer::Lexer;
+use alloy_rowan_syntax::SyntaxNode;
+
 use crate::parser::{ParseError, Parser};
 use crate::sink::Sink;
 use crate::source::Source;
-use alloy_rowan_lexer::Lexer;
-use alloy_rowan_syntax::SyntaxNode;
-use rowan::GreenNode;
 
 mod event;
 mod grammar;

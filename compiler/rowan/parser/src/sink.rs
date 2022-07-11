@@ -1,11 +1,15 @@
-use super::event::Event;
-use crate::parser::ParseError;
-use crate::Parse;
+use std::mem;
+
+use rowan::{GreenNodeBuilder, Language};
+
 use alloy_rowan_lexer::Token;
 use alloy_rowan_syntax::AlloyLanguage;
 use alloy_rowan_syntax::SyntaxKind;
-use rowan::{GreenNodeBuilder, Language};
-use std::mem;
+
+use crate::parser::ParseError;
+use crate::Parse;
+
+use super::event::Event;
 
 pub(crate) struct Sink<'t, 'input> {
     builder: GreenNodeBuilder<'static>,
