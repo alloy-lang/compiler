@@ -6,8 +6,8 @@ authors = ["theochupp <tclchiam@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-alloy_rowan_lexer = {path = "./lexer"}
-alloy_rowan_parser = {path = "./parser"}
-alloy_rowan_syntax = {path = "./syntax"}
+alloy_rowan_lexer = { path = "./lexer" }
+alloy_rowan_parser = { path = "./parser" }
+alloy_rowan_syntax = { path = "./syntax" }
 
 [dev-dependencies]

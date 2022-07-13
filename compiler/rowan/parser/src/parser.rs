@@ -1,6 +1,6 @@
 use std::mem;
 
-use alloy_rowan_lexer::Token;
+use alloy_rowan_lexer::{Token, TokenKind};
 use alloy_rowan_syntax::SyntaxKind;
 pub(crate) use parse_error::ParseError;
 
@@ -14,12 +14,12 @@ pub(crate) mod marker;
 
 mod parse_error;
 
-const RECOVERY_SET: [SyntaxKind; 1] = [SyntaxKind::LetKw];
+const RECOVERY_SET: [TokenKind; 1] = [TokenKind::LetKw];
 
 pub(crate) struct Parser<'t, 'input> {
     source: Source<'t, 'input>,
     events: Vec<Event>,
-    expected_kinds: Vec<SyntaxKind>,
+    expected_kinds: Vec<TokenKind>,
 }
 
 impl<'t, 'input> Parser<'t, 'input> {
@@ -45,12 +45,12 @@ impl<'t, 'input> Parser<'t, 'input> {
         Marker::new(pos)
     }
 
-    pub(crate) fn at(&mut self, kind: SyntaxKind) -> bool {
+    pub(crate) fn at(&mut self, kind: TokenKind) -> bool {
         self.expected_kinds.push(kind);
         self.peek() == Some(kind)
     }
 
-    fn at_set(&mut self, set: &[SyntaxKind]) -> bool {
+    fn at_set(&mut self, set: &[TokenKind]) -> bool {
         self.peek().map_or(false, |k| set.contains(&k))
     }
 
@@ -58,7 +58,7 @@ impl<'t, 'input> Parser<'t, 'input> {
         self.peek().is_none()
     }
 
-    fn peek(&mut self) -> Option<SyntaxKind> {
+    fn peek(&mut self) -> Option<TokenKind> {
         self.source.peek_kind()
     }
 
@@ -68,7 +68,7 @@ impl<'t, 'input> Parser<'t, 'input> {
         self.events.push(Event::AddToken);
     }
 
-    pub(crate) fn expect(&mut self, kind: SyntaxKind) {
+    pub(crate) fn expect(&mut self, kind: TokenKind) {
         if self.at(kind) {
             self.bump();
         } else {
@@ -87,7 +87,7 @@ impl<'t, 'input> Parser<'t, 'input> {
         // );
 
         let (found, range) = if let Some(Token { kind, range, .. }) = current_token {
-            (Some(SyntaxKind::from(*kind)), *range)
+            (Some(*kind), *range)
         } else {
             // If we’re at the end of the input we use the range of the very last token in the
             // input.
