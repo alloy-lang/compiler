@@ -1,3 +1,4 @@
+use alloy_rowan_lexer::TokenKind;
 use alloy_rowan_syntax::SyntaxKind;
 
 use crate::parser::marker::CompletedMarker;

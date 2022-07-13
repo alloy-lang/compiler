@@ -4,7 +4,6 @@ use rowan::{GreenNodeBuilder, Language};
 
 use alloy_rowan_lexer::Token;
 use alloy_rowan_syntax::AlloyLanguage;
-use alloy_rowan_syntax::SyntaxKind;
 
 use crate::parser::ParseError;
 use crate::Parse;
@@ -91,7 +90,7 @@ impl<'t, 'input> Sink<'t, 'input> {
 
     fn eat_trivia(&mut self) {
         while let Some(token) = self.tokens.get(self.cursor) {
-            if !SyntaxKind::from(token.kind).is_trivia() {
+            if !token.kind.is_trivia() {
                 break;
             }
 

@@ -1,7 +1,7 @@
-use std::fmt;
-use alloy_rowan_lexer::TokenKind;
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{FromPrimitive, ToPrimitive};
+
+use alloy_rowan_lexer::TokenKind;
 
 pub type SyntaxNode = rowan::SyntaxNode<AlloyLanguage>;
 
@@ -32,36 +32,6 @@ pub enum SyntaxKind {
     VariableRef,
 }
 
-impl fmt::Display for SyntaxKind {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(match self {
-            SyntaxKind::Whitespace => "whitespace",
-            SyntaxKind::FnKw => "‘fn’",
-            SyntaxKind::LetKw => "‘let’",
-            SyntaxKind::Ident => "identifier",
-            SyntaxKind::Number => "number",
-            SyntaxKind::Plus => "‘+’",
-            SyntaxKind::Minus => "‘-’",
-            SyntaxKind::Star => "‘*’",
-            SyntaxKind::Slash => "‘/’",
-            SyntaxKind::Equals => "‘=’",
-            SyntaxKind::LParen => "‘(’",
-            SyntaxKind::RParen => "‘)’",
-            SyntaxKind::LBrace => "‘{’",
-            SyntaxKind::RBrace => "‘}’",
-            SyntaxKind::Comment => "comment",
-            _ => unreachable!(),
-        })
-    }
-}
-
-impl SyntaxKind {
-    #[must_use]
-    pub fn is_trivia(self) -> bool {
-        matches!(self, Self::Whitespace | Self::Comment)
-    }
-}
-
 impl From<TokenKind> for SyntaxKind {
     fn from(token_kind: TokenKind) -> Self {
         match token_kind {
@@ -81,12 +51,6 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::RBrace => Self::RBrace,
             TokenKind::Comment => Self::Comment,
             TokenKind::Error => Self::Error,
-            TokenKind::Root => Self::Root,
-            TokenKind::InfixExpr => Self::InfixExpr,
-            TokenKind::Literal => Self::Literal,
-            TokenKind::ParenExpr => Self::ParenExpr,
-            TokenKind::PrefixExpr => Self::PrefixExpr,
-            TokenKind::VariableRef => Self::VariableRef,
         }
     }
 }

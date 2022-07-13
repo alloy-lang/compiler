@@ -1,10 +1,12 @@
-mod token_kind;
-pub use token_kind::TokenKind;
-
-use logos::Logos;
 use std::convert::TryFrom;
 use std::ops::Range as StdRange;
+
+use logos::Logos;
 use text_size::{TextRange, TextSize};
+
+pub use token_kind::TokenKind;
+
+mod token_kind;
 
 pub struct Lexer<'a> {
     inner: logos::Lexer<'a, TokenKind>,
