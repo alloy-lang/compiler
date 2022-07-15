@@ -4,6 +4,8 @@ use num_traits::{FromPrimitive, ToPrimitive};
 use alloy_rowan_lexer::TokenKind;
 
 pub type SyntaxNode = rowan::SyntaxNode<AlloyLanguage>;
+pub type SyntaxToken = rowan::SyntaxToken<AlloyLanguage>;
+pub type SyntaxElement = rowan::SyntaxElement<AlloyLanguage>;
 
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive, ToPrimitive)]
 pub enum SyntaxKind {
