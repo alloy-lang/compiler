@@ -1,4 +1,4 @@
-use alloy_rowan::parser::parse;
+use alloy_rowan_parser::parse;
 use std::io::{self, Write};
 
 fn main() -> io::Result<()> {
@@ -14,7 +14,17 @@ fn main() -> io::Result<()> {
         stdin.read_line(&mut input)?;
 
         let parse = parse(&input);
-        println!("{}", parse.debug_tree());
+
+        let root = alloy_rowan_ast::Root::cast(parse.syntax()).unwrap();
+
+        dbg!(root
+            .stmts()
+            .filter_map(|stmt| if let alloy_rowan_ast::Stmt::VariableDef(var_def) = stmt {
+                Some(var_def.value())
+            } else {
+                None
+            })
+            .collect::<Vec<_>>());
 
         input.clear();
     }

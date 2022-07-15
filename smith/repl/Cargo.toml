@@ -6,7 +6,8 @@ authors = ["theochupp <tclchiam@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-alloy_rowan = { path = "../../compiler/rowan" }
+alloy_rowan_parser = { path = "../../compiler/rowan/parser" }
+alloy_rowan_ast = { path = "../../compiler/rowan/ast" }
 
 [dev-dependencies]
 expect-test = "1.3"

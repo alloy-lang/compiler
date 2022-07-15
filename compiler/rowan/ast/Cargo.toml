@@ -1,0 +1,9 @@
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[package]
+name = "alloy_rowan_ast"
+version = "0.1.0"
+authors = ["theochupp <tclchiam@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+alloy_rowan_syntax = { path = "../syntax" }
