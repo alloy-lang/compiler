@@ -19,14 +19,16 @@ fn main() -> io::Result<()> {
 
         dbg!(root
             .stmts()
-            .filter_map(|stmt| if let alloy_rowan_ast::Stmt::VariableDef(var_def) = stmt {
-                Some(var_def.value())
-            } else {
-                None
-            })
+            .filter_map(
+                |stmt| if let alloy_rowan_ast::Stmt::VariableDef(var_def) = stmt {
+                    Some(var_def.value())
+                } else {
+                    None
+                }
+            )
             .collect::<Vec<_>>());
 
-        dbg!(alloy_rowan_hir::lower(root).collect::<Vec<_>>());
+        dbg!(alloy_rowan_hir::lower(root));
 
         input.clear();
     }
