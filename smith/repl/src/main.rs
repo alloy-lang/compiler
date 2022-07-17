@@ -26,6 +26,8 @@ fn main() -> io::Result<()> {
             })
             .collect::<Vec<_>>());
 
+        dbg!(alloy_rowan_hir::lower(root).collect::<Vec<_>>());
+
         input.clear();
     }
 }

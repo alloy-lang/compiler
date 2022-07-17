@@ -8,6 +8,7 @@ edition = "2018"
 [dependencies]
 alloy_rowan_parser = { path = "../../compiler/rowan/parser" }
 alloy_rowan_ast = { path = "../../compiler/rowan/ast" }
+alloy_rowan_hir = { path = "../../compiler/rowan/hir" }
 
 [dev-dependencies]
 expect-test = "1.3"
