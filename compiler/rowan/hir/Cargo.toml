@@ -9,3 +9,6 @@ edition = "2018"
 alloy_rowan_ast = { path = "../ast" }
 alloy_rowan_syntax = { path = "../syntax" }
 la-arena = "0.2"
+
+[dev-dependencies]
+alloy_rowan_parser = {path = "../parser"}
