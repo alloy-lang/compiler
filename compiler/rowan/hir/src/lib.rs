@@ -12,7 +12,7 @@ pub fn lower(ast: ast::Root) -> (Database, Vec<Stmt>) {
     (db, stmts)
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Stmt {
     VariableDef { name: String, value: Expr },
     Expr(Expr),
@@ -20,7 +20,7 @@ pub enum Stmt {
 
 type ExprIdx = Idx<Expr>;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Expr {
     Missing,
     Binary {
@@ -29,7 +29,8 @@ pub enum Expr {
         rhs: ExprIdx,
     },
     Literal {
-        n: u64,
+        /// is `None` if the number is too big to fit in a u64
+        n: Option<u64>,
     },
     Unary {
         op: UnaryOp,
@@ -40,7 +41,7 @@ pub enum Expr {
     },
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum BinaryOp {
     Add,
     Sub,
@@ -48,7 +49,7 @@ pub enum BinaryOp {
     Div,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum UnaryOp {
     Neg,
 }
