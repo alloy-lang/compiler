@@ -1,3 +1,5 @@
+pub mod validation;
+
 use alloy_rowan_syntax::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken};
 
 #[derive(Debug)]
@@ -45,6 +47,14 @@ impl BinaryExpr {
 pub struct Literal(SyntaxNode);
 
 impl Literal {
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::Literal {
+            Some(Self(node))
+        } else {
+            None
+        }
+    }
+
     pub fn parse(&self) -> Option<u64> {
         self.0.first_token().unwrap().text().parse().ok()
     }
@@ -79,8 +89,8 @@ impl UnaryExpr {
 pub struct VariableRef(SyntaxNode);
 
 impl VariableRef {
-    pub fn name(&self) -> String {
-        self.0.first_token().unwrap().text().to_string()
+    pub fn name(&self) -> Option<SyntaxToken> {
+        self.0.first_token()
     }
 }
 

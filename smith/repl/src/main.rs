@@ -14,8 +14,15 @@ fn main() -> io::Result<()> {
         stdin.read_line(&mut input)?;
 
         let parse = parse(&input);
+        println!("{}", parse.debug_tree());
 
-        let root = alloy_rowan_ast::Root::cast(parse.syntax()).unwrap();
+        let syntax = parse.syntax();
+
+        for error in alloy_rowan_ast::validation::validate(&syntax) {
+            println!("{}", error);
+        }
+
+        let root = alloy_rowan_ast::Root::cast(syntax).unwrap();
 
         dbg!(root
             .stmts()

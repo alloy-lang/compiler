@@ -7,3 +7,7 @@ edition = "2018"
 
 [dependencies]
 alloy_rowan_syntax = { path = "../syntax" }
+text-size = "1.1"
+
+[dev-dependencies]
+alloy_rowan_parser = {path = "../parser"}
