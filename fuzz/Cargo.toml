@@ -1,0 +1,21 @@
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[package]
+name = "fuzz"
+version = "0.1.0"
+authors = ["theochupp <tclchiam@gmail.com>"]
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[workspace]
+
+[[bin]]
+name = "parse_lower"
+path = "fuzz_targets/parse_lower.rs"
+
+[dependencies]
+alloy_rowan_ast = {path = "../compiler/rowan/ast"}
+alloy_rowan_hir = {path = "../compiler/rowan/hir"}
+alloy_rowan_parser = {path = "../compiler/rowan/parser"}
+libfuzzer-sys = "0.3"
