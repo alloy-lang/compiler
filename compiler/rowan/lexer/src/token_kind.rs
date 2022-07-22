@@ -23,7 +23,16 @@ pub enum TokenKind {
     Ident,
 
     #[regex("[0-9]+")]
-    Number,
+    Integer,
+
+    #[regex(r"[0-9]+\.[0-9]+")]
+    Fractional,
+
+    #[regex(r#""([^"\\]|\\t|\\u|\\n|\\")*""#)]
+    String,
+
+    #[regex(r#"'([^'\\]|\\t|\\u|\\n|\\")*'"#)]
+    Char,
 
     #[token("+")]
     Plus,
@@ -72,7 +81,10 @@ impl fmt::Display for TokenKind {
             Self::FnKw => "‘fn’",
             Self::LetKw => "‘let’",
             Self::Ident => "identifier",
-            Self::Number => "number",
+            Self::Integer => "integer",
+            Self::Fractional => "fractional",
+            Self::String => "string",
+            Self::Char => "char",
             Self::Plus => "‘+’",
             Self::Minus => "‘-’",
             Self::Star => "‘*’",
@@ -90,7 +102,7 @@ impl fmt::Display for TokenKind {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Lexer, Token};
+    use crate::Lexer;
 
     use super::*;
 
@@ -143,8 +155,23 @@ mod tests {
     }
 
     #[test]
-    fn lex_number() {
-        check("123456", TokenKind::Number);
+    fn lex_integral() {
+        check("123456", TokenKind::Integer);
+    }
+
+    #[test]
+    fn lex_fractional() {
+        check("123456.123456", TokenKind::Fractional);
+    }
+
+    #[test]
+    fn lex_string() {
+        check(r#""hello""#, TokenKind::String);
+    }
+
+    #[test]
+    fn lex_char() {
+        check("'char'", TokenKind::Char);
     }
 
     #[test]
