@@ -67,7 +67,7 @@ Root@0..13
                     Whitespace@15..16 " "
                     VariableRef@16..17
                       Ident@16..17 "a"
-                error at 8..11: expected number, identifier, ‘-’ or ‘(’, but found ‘let’"#]],
+                error at 8..11: expected integer, fractional, string, char, identifier, ‘-’ or ‘(’, but found ‘let’"#]],
         );
     }
 
@@ -81,7 +81,7 @@ Root@0..13
                     LetKw@0..3 "let"
                     Whitespace@3..4 " "
                     Error@4..6
-                      Number@4..5 "1"
+                      Integer@4..5 "1"
                       Whitespace@5..6 "\n"
                   VariableDef@6..15
                     LetKw@6..9 "let"
@@ -92,9 +92,9 @@ Root@0..13
                     Whitespace@13..14 " "
                     VariableRef@14..15
                       Ident@14..15 "a"
-                error at 4..5: expected identifier, but found number
+                error at 4..5: expected identifier, but found integer
                 error at 6..9: expected ‘=’, but found ‘let’
-                error at 6..9: expected number, identifier, ‘-’ or ‘(’, but found ‘let’"#]],
+                error at 6..9: expected integer, fractional, string, char, identifier, ‘-’ or ‘(’, but found ‘let’"#]],
         );
     }
 }

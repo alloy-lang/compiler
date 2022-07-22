@@ -72,8 +72,14 @@ fn expr_binding_power(p: &mut Parser, minimum_binding_power: u8) -> Option<Compl
 }
 
 fn lhs(p: &mut Parser) -> Option<CompletedMarker> {
-    let cm = if p.at(TokenKind::Number) {
-        literal(p)
+    let cm = if p.at(TokenKind::Integer) {
+        int_literal(p)
+    } else if p.at(TokenKind::Fractional) {
+        fractional_literal(p)
+    } else if p.at(TokenKind::String) {
+        string_literal(p)
+    } else if p.at(TokenKind::Char) {
+        char_literal(p)
     } else if p.at(TokenKind::Ident) {
         variable_ref(p)
     } else if p.at(TokenKind::Minus) {
@@ -88,12 +94,36 @@ fn lhs(p: &mut Parser) -> Option<CompletedMarker> {
     Some(cm)
 }
 
-fn literal(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::Number));
+fn int_literal(p: &mut Parser) -> CompletedMarker {
+    assert!(p.at(TokenKind::Integer));
 
     let m = p.start();
     p.bump();
-    m.complete(p, SyntaxKind::Literal)
+    m.complete(p, SyntaxKind::IntLiteral)
+}
+
+fn fractional_literal(p: &mut Parser) -> CompletedMarker {
+    assert!(p.at(TokenKind::Fractional));
+
+    let m = p.start();
+    p.bump();
+    m.complete(p, SyntaxKind::FractionalLiteral)
+}
+
+fn string_literal(p: &mut Parser) -> CompletedMarker {
+    assert!(p.at(TokenKind::String));
+
+    let m = p.start();
+    p.bump();
+    m.complete(p, SyntaxKind::StringLiteral)
+}
+
+fn char_literal(p: &mut Parser) -> CompletedMarker {
+    assert!(p.at(TokenKind::Char));
+
+    let m = p.start();
+    p.bump();
+    m.complete(p, SyntaxKind::CharLiteral)
 }
 
 fn variable_ref(p: &mut Parser) -> CompletedMarker {
@@ -138,13 +168,46 @@ mod tests {
     use crate::check;
 
     #[test]
-    fn parse_number() {
+    fn parse_integer() {
         check(
             "123",
             expect![[r#"
 Root@0..3
-  Literal@0..3
-    Number@0..3 "123""#]],
+  IntLiteral@0..3
+    Integer@0..3 "123""#]],
+        );
+    }
+
+    #[test]
+    fn parse_fractional() {
+        check(
+            "123.123",
+            expect![[r#"
+Root@0..7
+  FractionalLiteral@0..7
+    Fractional@0..7 "123.123""#]],
+        );
+    }
+
+    #[test]
+    fn parse_string() {
+        check(
+            r#""hello""#,
+            expect![[r#"
+Root@0..7
+  StringLiteral@0..7
+    String@0..7 "\"hello\"""#]],
+        );
+    }
+
+    #[test]
+    fn parse_char() {
+        check(
+            "'c'",
+            expect![[r#"
+Root@0..3
+  CharLiteral@0..3
+    Char@0..3 "'c'""#]],
         );
     }
 
@@ -166,12 +229,12 @@ Root@0..7
             expect![[r#"
 Root@0..4
   InfixExpr@0..4
-    Literal@0..2
-      Number@0..1 "1"
+    IntLiteral@0..2
+      Integer@0..1 "1"
       Whitespace@1..2 " "
     Plus@2..3 "+"
-    Literal@3..4
-      Number@3..4 "2""#]],
+    IntLiteral@3..4
+      Integer@3..4 "2""#]],
         );
     }
 
@@ -184,22 +247,22 @@ Root@0..15
   InfixExpr@0..15
     InfixExpr@0..13
       InfixExpr@0..8
-        Literal@0..2
-          Number@0..1 "1"
+        IntLiteral@0..2
+          Integer@0..1 "1"
           Whitespace@1..2 " "
         Plus@2..3 "+"
         Whitespace@3..5 "  "
-        Literal@5..8
-          Number@5..6 "2"
+        IntLiteral@5..8
+          Integer@5..6 "2"
           Whitespace@6..8 "  "
       Plus@8..9 "+"
       Whitespace@9..11 "  "
-      Literal@11..13
-        Number@11..12 "3"
+      IntLiteral@11..13
+        Integer@11..12 "3"
         Whitespace@12..13 " "
     Plus@13..14 "+"
-    Literal@14..15
-      Number@14..15 "4""#]],
+    IntLiteral@14..15
+      Integer@14..15 "4""#]],
         );
     }
 
@@ -211,24 +274,24 @@ Root@0..15
 Root@0..13
   InfixExpr@0..13
     InfixExpr@0..10
-      Literal@0..2
-        Number@0..1 "1"
+      IntLiteral@0..2
+        Integer@0..1 "1"
         Whitespace@1..2 " "
       Plus@2..3 "+"
       Whitespace@3..4 " "
       InfixExpr@4..10
-        Literal@4..6
-          Number@4..5 "2"
+        IntLiteral@4..6
+          Integer@4..5 "2"
           Whitespace@5..6 " "
         Star@6..7 "*"
         Whitespace@7..8 " "
-        Literal@8..10
-          Number@8..9 "3"
+        IntLiteral@8..10
+          Integer@8..9 "3"
           Whitespace@9..10 " "
     Minus@10..11 "-"
     Whitespace@11..12 " "
-    Literal@12..13
-      Number@12..13 "4""#]],
+    IntLiteral@12..13
+      Integer@12..13 "4""#]],
         );
     }
 
@@ -241,8 +304,8 @@ Root@0..4
   PrefixExpr@0..4
     Minus@0..1 "-"
     Whitespace@1..2 " "
-    Literal@2..4
-      Number@2..4 "10""#]],
+    IntLiteral@2..4
+      Integer@2..4 "10""#]],
         );
     }
 
@@ -255,13 +318,13 @@ Root@0..8
   InfixExpr@0..8
     PrefixExpr@0..4
       Minus@0..1 "-"
-      Literal@1..4
-        Number@1..3 "20"
+      IntLiteral@1..4
+        Integer@1..3 "20"
         Whitespace@3..4 " "
     Plus@4..5 "+"
     Whitespace@5..6 " "
-    Literal@6..8
-      Number@6..8 "20""#]],
+    IntLiteral@6..8
+      Integer@6..8 "20""#]],
         );
     }
 
@@ -284,8 +347,8 @@ Root@0..16
             ParenExpr@5..10
               LParen@5..6 "("
               Whitespace@6..7 " "
-              Literal@7..9
-                Number@7..9 "10"
+              IntLiteral@7..9
+                Integer@7..9 "10"
               RParen@9..10 ")"
             RParen@10..11 ")"
             Whitespace@11..12 " "
@@ -303,8 +366,8 @@ Root@0..16
             expect![[r#"
 Root@0..13
   InfixExpr@0..13
-    Literal@0..2
-      Number@0..1 "5"
+    IntLiteral@0..2
+      Integer@0..1 "5"
       Whitespace@1..2 " "
     Star@2..3 "*"
     Whitespace@3..5 "  "
@@ -312,13 +375,13 @@ Root@0..13
       LParen@5..6 "("
       Whitespace@6..7 " "
       InfixExpr@7..12
-        Literal@7..9
-          Number@7..8 "2"
+        IntLiteral@7..9
+          Integer@7..8 "2"
           Whitespace@8..9 " "
         Plus@9..10 "+"
         Whitespace@10..11 " "
-        Literal@11..12
-          Number@11..12 "1"
+        IntLiteral@11..12
+          Integer@11..12 "1"
       RParen@12..13 ")""#]],
         );
     }
@@ -330,8 +393,8 @@ Root@0..13
             expect![[r#"
 Root@0..7
   Whitespace@0..3 "   "
-  Literal@3..7
-    Number@3..7 "9876""#]],
+  IntLiteral@3..7
+    Integer@3..7 "9876""#]],
         );
     }
 
@@ -341,8 +404,8 @@ Root@0..7
             "999   ",
             expect![[r#"
 Root@0..6
-  Literal@0..6
-    Number@0..3 "999"
+  IntLiteral@0..6
+    Integer@0..3 "999"
     Whitespace@3..6 "   ""#]],
         );
     }
@@ -354,8 +417,8 @@ Root@0..6
             expect![[r#"
 Root@0..9
   Whitespace@0..1 " "
-  Literal@1..9
-    Number@1..4 "123"
+  IntLiteral@1..9
+    Integer@1..4 "123"
     Whitespace@4..9 "     ""#]],
         );
     }
@@ -372,20 +435,20 @@ Root@0..35
   Whitespace@0..1 "\n"
   InfixExpr@1..35
     InfixExpr@1..21
-      Literal@1..5
-        Number@1..2 "1"
+      IntLiteral@1..5
+        Integer@1..2 "1"
         Whitespace@2..5 "\n  "
       Plus@5..6 "+"
       Whitespace@6..7 " "
-      Literal@7..21
-        Number@7..8 "1"
+      IntLiteral@7..21
+        Integer@7..8 "1"
         Whitespace@8..9 " "
         Comment@9..18 "# Add one"
         Whitespace@18..21 "\n  "
     Plus@21..22 "+"
     Whitespace@22..23 " "
-    Literal@23..35
-      Number@23..25 "10"
+    IntLiteral@23..35
+      Integer@23..25 "10"
       Whitespace@25..26 " "
       Comment@26..35 "# Add ten""##]],
         );
@@ -406,7 +469,7 @@ Root@0..35
     }
 
     #[test]
-    fn do_not_parse_operator_if_gettting_rhs_failed() {
+    fn do_not_parse_operator_if_getting_rhs_failed() {
         check(
             "(1+",
             expect![[r#"
@@ -414,10 +477,10 @@ Root@0..3
   ParenExpr@0..3
     LParen@0..1 "("
     InfixExpr@1..3
-      Literal@1..2
-        Number@1..2 "1"
+      IntLiteral@1..2
+        Integer@1..2 "1"
       Plus@2..3 "+"
-error at 2..3: expected number, identifier, ‘-’ or ‘(’
+error at 2..3: expected integer, fractional, string, char, identifier, ‘-’ or ‘(’
 error at 2..3: expected ‘)’"#]],
         );
     }

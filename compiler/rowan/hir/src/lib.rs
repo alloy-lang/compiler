@@ -1,7 +1,9 @@
 use la_arena::Idx;
+use ordered_float::NotNan;
 
 use alloy_rowan_ast as ast;
-pub use database::Database;
+
+pub use self::database::Database;
 
 mod database;
 
@@ -28,10 +30,16 @@ pub enum Expr {
         lhs: ExprIdx,
         rhs: ExprIdx,
     },
-    Literal {
+    IntLiteral {
         /// is `None` if the number is too big to fit in a u64
         n: Option<u64>,
     },
+    FractionalLiteral {
+        /// is `None` if the number is too big to fit in a f64
+        n: Option<NotNan<f64>>,
+    },
+    StringLiteral(String),
+    CharLiteral(Option<char>),
     Unary {
         op: UnaryOp,
         expr: ExprIdx,

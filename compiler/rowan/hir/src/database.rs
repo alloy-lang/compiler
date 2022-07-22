@@ -26,7 +26,12 @@ impl Database {
         if let Some(ast) = ast {
             match ast {
                 alloy_rowan_ast::Expr::BinaryExpr(ast) => self.lower_binary(ast),
-                alloy_rowan_ast::Expr::Literal(ast) => Expr::Literal { n: ast.parse() },
+                alloy_rowan_ast::Expr::IntLiteral(ast) => Expr::IntLiteral { n: ast.parse() },
+                alloy_rowan_ast::Expr::FractionalLiteral(ast) => {
+                    Expr::FractionalLiteral { n: ast.parse() }
+                }
+                alloy_rowan_ast::Expr::StringLiteral(ast) => Expr::StringLiteral(ast.parse()),
+                alloy_rowan_ast::Expr::CharLiteral(ast) => Expr::CharLiteral(ast.parse()),
                 alloy_rowan_ast::Expr::ParenExpr(ast) => self.lower_expr(ast.expr()),
                 alloy_rowan_ast::Expr::UnaryExpr(ast) => self.lower_unary(ast),
                 alloy_rowan_ast::Expr::VariableRef(ast) => self.lower_variable_ref(ast),
@@ -80,6 +85,7 @@ impl Database {
 mod tests {
     use alloy_rowan_ast as ast;
     use alloy_rowan_parser as parser;
+    use ordered_float::NotNan;
 
     use super::*;
 
@@ -140,13 +146,13 @@ mod tests {
 
     #[test]
     fn lower_expr_stmt() {
-        check_stmt("123", Stmt::Expr(Expr::Literal { n: Some(123) }));
+        check_stmt("123", Stmt::Expr(Expr::IntLiteral { n: Some(123) }));
     }
 
     #[test]
     fn lower_binary_expr_without_rhs() {
         let mut exprs = Arena::new();
-        let lhs = exprs.alloc(Expr::Literal { n: Some(10) });
+        let lhs = exprs.alloc(Expr::IntLiteral { n: Some(10) });
         let rhs = exprs.alloc(Expr::Missing);
 
         check_expr(
@@ -163,8 +169,8 @@ mod tests {
     #[test]
     fn lower_binary_expr() {
         let mut exprs = Arena::new();
-        let lhs = exprs.alloc(Expr::Literal { n: Some(1) });
-        let rhs = exprs.alloc(Expr::Literal { n: Some(2) });
+        let lhs = exprs.alloc(Expr::IntLiteral { n: Some(1) });
+        let rhs = exprs.alloc(Expr::IntLiteral { n: Some(2) });
 
         check_expr(
             "1 + 2",
@@ -178,8 +184,37 @@ mod tests {
     }
 
     #[test]
-    fn lower_literal() {
-        check_expr("999", Expr::Literal { n: Some(999) }, Database::default());
+    fn lower_int_literal() {
+        check_expr(
+            "999",
+            Expr::IntLiteral { n: Some(999) },
+            Database::default(),
+        );
+    }
+
+    #[test]
+    fn lower_fractional_literal() {
+        check_expr(
+            "999.19",
+            Expr::FractionalLiteral {
+                n: Some(NotNan::new(999.19).unwrap()),
+            },
+            Database::default(),
+        );
+    }
+
+    #[test]
+    fn lower_string_literal() {
+        check_expr(
+            r#""hello""#,
+            Expr::StringLiteral("hello".into()),
+            Database::default(),
+        );
+    }
+
+    #[test]
+    fn lower_char_literal() {
+        check_expr("'c'", Expr::CharLiteral(Some('c')), Database::default());
     }
 
     #[test]
@@ -209,7 +244,7 @@ mod tests {
     #[test]
     fn lower_unary_expr() {
         let mut exprs = Arena::new();
-        let ten = exprs.alloc(Expr::Literal { n: Some(10) });
+        let ten = exprs.alloc(Expr::IntLiteral { n: Some(10) });
 
         check_expr(
             "-10",

@@ -1,7 +1,10 @@
-use crate::Literal;
 use std::fmt;
-use alloy_rowan_syntax::SyntaxNode;
+
 use text_size::TextRange;
+
+use alloy_rowan_syntax::SyntaxNode;
+
+use crate::{CharLiteral, IntLiteral};
 
 #[derive(Debug, PartialEq)]
 pub struct ValidationError {
@@ -24,6 +27,7 @@ impl fmt::Display for ValidationError {
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum ValidationErrorKind {
     NumberLiteralTooLarge,
+    CharLiteralTooLarge,
 }
 
 impl fmt::Display for ValidationErrorKind {
@@ -34,6 +38,7 @@ impl fmt::Display for ValidationErrorKind {
                 "number literal is larger than an integer’s maximum value, {}",
                 u64::MAX,
             ),
+            ValidationErrorKind::CharLiteralTooLarge => todo!(),
         }
     }
 }
@@ -42,15 +47,18 @@ pub fn validate(node: &SyntaxNode) -> Vec<ValidationError> {
     let mut errors = Vec::new();
 
     for node in node.descendants() {
-        if let Some(literal) = Literal::cast(node) {
-            validate_literal(literal, &mut errors)
+        if let Some(literal) = IntLiteral::cast(&node) {
+            validate_int_literal(literal, &mut errors)
+        }
+        if let Some(literal) = CharLiteral::cast(&node) {
+            validate_char_literal(literal, &mut errors)
         }
     }
 
     errors
 }
 
-fn validate_literal(literal: Literal, errors: &mut Vec<ValidationError>) {
+fn validate_int_literal(literal: IntLiteral, errors: &mut Vec<ValidationError>) {
     if literal.parse().is_none() {
         errors.push(ValidationError {
             kind: ValidationErrorKind::NumberLiteralTooLarge,
@@ -59,10 +67,20 @@ fn validate_literal(literal: Literal, errors: &mut Vec<ValidationError>) {
     }
 }
 
+fn validate_char_literal(literal: CharLiteral, errors: &mut Vec<ValidationError>) {
+    if literal.parse().is_none() {
+        errors.push(ValidationError {
+            kind: ValidationErrorKind::CharLiteralTooLarge,
+            range: literal.0.first_token().unwrap().text_range(),
+        });
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::ops::Range as StdRange;
+
+    use super::*;
 
     fn check(input: &str, expected_errors: &[(ValidationErrorKind, StdRange<u32>)]) {
         let parse = alloy_rowan_parser::parse(input);
@@ -71,10 +89,7 @@ mod tests {
             .iter()
             .map(|(kind, range)| ValidationError {
                 kind: *kind,
-                range: TextRange::new(
-                    range.start.into(),
-                    range.end.into(),
-                ),
+                range: TextRange::new(range.start.into(), range.end.into()),
             })
             .collect();
 
@@ -91,6 +106,14 @@ mod tests {
         check(
             "99999999999999999999",
             &[(ValidationErrorKind::NumberLiteralTooLarge, (0..20))],
+        );
+    }
+
+    #[test]
+    fn lower_multi_char_literal() {
+        check(
+            "'characters'",
+            &[(ValidationErrorKind::CharLiteralTooLarge, (0..12))],
         );
     }
 }
