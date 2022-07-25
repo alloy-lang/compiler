@@ -61,7 +61,7 @@ pub enum TokenKind {
     #[token(")")]
     RParen,
 
-    #[regex("#.*")]
+    #[regex("--.*")]
     Comment,
 
     #[error]
@@ -221,6 +221,6 @@ mod tests {
 
     #[test]
     fn lex_comment() {
-        check("# foo", TokenKind::Comment);
+        check("-- foo", TokenKind::Comment);
     }
 }
