@@ -428,29 +428,29 @@ Root@0..9
         check(
             "
 1
-  + 1 # Add one
-  + 10 # Add ten",
+  + 1 -- Add one
+  + 10 -- Add ten",
             expect![[r##"
-Root@0..35
+Root@0..37
   Whitespace@0..1 "\n"
-  InfixExpr@1..35
-    InfixExpr@1..21
+  InfixExpr@1..37
+    InfixExpr@1..22
       IntLiteral@1..5
         Integer@1..2 "1"
         Whitespace@2..5 "\n  "
       Plus@5..6 "+"
       Whitespace@6..7 " "
-      IntLiteral@7..21
+      IntLiteral@7..22
         Integer@7..8 "1"
         Whitespace@8..9 " "
-        Comment@9..18 "# Add one"
-        Whitespace@18..21 "\n  "
-    Plus@21..22 "+"
-    Whitespace@22..23 " "
-    IntLiteral@23..35
-      Integer@23..25 "10"
-      Whitespace@25..26 " "
-      Comment@26..35 "# Add ten""##]],
+        Comment@9..19 "-- Add one"
+        Whitespace@19..22 "\n  "
+    Plus@22..23 "+"
+    Whitespace@23..24 " "
+    IntLiteral@24..37
+      Integer@24..26 "10"
+      Whitespace@26..27 " "
+      Comment@27..37 "-- Add ten""##]],
         );
     }
 

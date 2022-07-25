@@ -132,10 +132,10 @@ Root@0..3
     #[test]
     fn parse_comment() {
         check(
-            "# hello!",
+            "-- hello!",
             expect![[r##"
-Root@0..8
-  Comment@0..8 "# hello!""##]],
+Root@0..9
+  Comment@0..9 "-- hello!""##]],
         );
     }
 }
