@@ -61,7 +61,7 @@ pub enum TokenKind {
     #[token(")")]
     RParen,
 
-    #[regex("--.*")]
+    #[regex("--[^\n]*")]
     Comment,
 
     #[error]
