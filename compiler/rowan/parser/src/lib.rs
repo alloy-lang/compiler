@@ -46,6 +46,7 @@ impl Parse {
         s
     }
 
+    #[must_use]
     pub fn syntax(&self) -> SyntaxNode {
         SyntaxNode::new_root(self.green_node.clone())
     }
