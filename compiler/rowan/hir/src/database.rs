@@ -281,7 +281,7 @@ mod tests {
     }
 
     #[test]
-    fn if_else_expr() {
+    fn if_then_else_expr() {
         let mut exprs = Arena::new();
         let cond = exprs.alloc(Expr::VariableRef { var: "test".into() });
         let ten = exprs.alloc(Expr::IntLiteral { n: Some(10) });
@@ -299,7 +299,7 @@ mod tests {
     }
 
     #[test]
-    fn if_else_expr_with_missing_exprs() {
+    fn if_then_else_expr_with_missing_exprs() {
         let mut exprs = Arena::new();
         let cond = exprs.alloc(Expr::Missing);
         let then = exprs.alloc(Expr::Missing);

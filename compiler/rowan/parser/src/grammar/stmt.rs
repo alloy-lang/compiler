@@ -4,7 +4,7 @@ pub(super) fn stmt(p: &mut Parser) -> Option<CompletedMarker> {
     if p.at(TokenKind::LetKw) {
         Some(variable_def(p))
     } else {
-        expr::expr(p)
+        expr::parse_expr(p)
     }
 }
 
@@ -16,7 +16,7 @@ fn variable_def(p: &mut Parser) -> CompletedMarker {
     p.expect(TokenKind::Ident);
     p.expect(TokenKind::Equals);
 
-    expr::expr(p);
+    expr::parse_expr(p);
 
     m.complete(p, SyntaxKind::VariableDef)
 }

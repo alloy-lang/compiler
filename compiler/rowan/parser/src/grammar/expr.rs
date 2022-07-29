@@ -28,12 +28,12 @@ impl UnaryOp {
     }
 }
 
-pub(super) fn expr(p: &mut Parser) -> Option<CompletedMarker> {
-    expr_binding_power(p, 0)
+pub(super) fn parse_expr(p: &mut Parser) -> Option<CompletedMarker> {
+    parse_expr_with_binding_power(p, 0)
 }
 
-fn expr_binding_power(p: &mut Parser, minimum_binding_power: u8) -> Option<CompletedMarker> {
-    let mut lhs = lhs(p)?;
+fn parse_expr_with_binding_power(p: &mut Parser, minimum_binding_power: u8) -> Option<CompletedMarker> {
+    let mut lhs = parse_lhs(p)?;
 
     loop {
         let op = if p.at(TokenKind::Plus) {
@@ -60,7 +60,7 @@ fn expr_binding_power(p: &mut Parser, minimum_binding_power: u8) -> Option<Compl
         p.bump();
 
         let m = lhs.precede(p);
-        let parsed_rhs = expr_binding_power(p, right_binding_power).is_some();
+        let parsed_rhs = parse_expr_with_binding_power(p, right_binding_power).is_some();
         lhs = m.complete(p, SyntaxKind::InfixExpr);
 
         if !parsed_rhs {
@@ -71,23 +71,23 @@ fn expr_binding_power(p: &mut Parser, minimum_binding_power: u8) -> Option<Compl
     Some(lhs)
 }
 
-fn lhs(p: &mut Parser) -> Option<CompletedMarker> {
+fn parse_lhs(p: &mut Parser) -> Option<CompletedMarker> {
     let cm = if p.at(TokenKind::Integer) {
-        int_literal(p)
+        parse_int_literal(p)
     } else if p.at(TokenKind::Fractional) {
-        fractional_literal(p)
+        parse_fractional_literal(p)
     } else if p.at(TokenKind::String) {
-        string_literal(p)
+        parse_string_literal(p)
     } else if p.at(TokenKind::Char) {
-        char_literal(p)
+        parse_char_literal(p)
     } else if p.at(TokenKind::Ident) {
-        variable_ref(p)
+        parse_variable_ref(p)
     } else if p.at(TokenKind::Minus) {
-        prefix_expr(p)
+        parse_prefix_expr(p)
     } else if p.at(TokenKind::LParen) {
-        paren_expr(p)
+        parse_paren_expr(p)
     } else if p.at(TokenKind::IfKw) {
-        if_expr(p)
+        parse_if_then_else_expr(p)
     } else {
         p.error();
         return None;
@@ -96,7 +96,7 @@ fn lhs(p: &mut Parser) -> Option<CompletedMarker> {
     Some(cm)
 }
 
-fn int_literal(p: &mut Parser) -> CompletedMarker {
+fn parse_int_literal(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Integer));
 
     let m = p.start();
@@ -104,7 +104,7 @@ fn int_literal(p: &mut Parser) -> CompletedMarker {
     m.complete(p, SyntaxKind::IntLiteral)
 }
 
-fn fractional_literal(p: &mut Parser) -> CompletedMarker {
+fn parse_fractional_literal(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Fractional));
 
     let m = p.start();
@@ -112,7 +112,7 @@ fn fractional_literal(p: &mut Parser) -> CompletedMarker {
     m.complete(p, SyntaxKind::FractionalLiteral)
 }
 
-fn string_literal(p: &mut Parser) -> CompletedMarker {
+fn parse_string_literal(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::String));
 
     let m = p.start();
@@ -120,7 +120,7 @@ fn string_literal(p: &mut Parser) -> CompletedMarker {
     m.complete(p, SyntaxKind::StringLiteral)
 }
 
-fn char_literal(p: &mut Parser) -> CompletedMarker {
+fn parse_char_literal(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Char));
 
     let m = p.start();
@@ -128,7 +128,7 @@ fn char_literal(p: &mut Parser) -> CompletedMarker {
     m.complete(p, SyntaxKind::CharLiteral)
 }
 
-fn variable_ref(p: &mut Parser) -> CompletedMarker {
+fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Ident));
 
     let m = p.start();
@@ -136,30 +136,30 @@ fn variable_ref(p: &mut Parser) -> CompletedMarker {
     m.complete(p, SyntaxKind::VariableRef)
 }
 
-fn if_expr(p: &mut Parser) -> CompletedMarker {
+fn parse_if_then_else_expr(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::IfKw));
 
     let if_then_else_m = p.start();
     p.bump();
 
     let if_m = p.start();
-    expr(p);
+    parse_expr(p);
     if_m.complete(p, SyntaxKind::IfExpr);
 
     p.expect(TokenKind::ThenKw);
     let then_m = p.start();
-    expr(p);
+    parse_expr(p);
     then_m.complete(p, SyntaxKind::ThenExpr);
 
     p.expect(TokenKind::ElseKw);
     let else_m = p.start();
-    expr(p);
+    parse_expr(p);
     else_m.complete(p, SyntaxKind::ElseExpr);
 
     if_then_else_m.complete(p, SyntaxKind::IfThenElseExpr)
 }
 
-fn prefix_expr(p: &mut Parser) -> CompletedMarker {
+fn parse_prefix_expr(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Minus));
 
     let m = p.start();
@@ -170,17 +170,17 @@ fn prefix_expr(p: &mut Parser) -> CompletedMarker {
     // Eat the operator’s token.
     p.bump();
 
-    expr_binding_power(p, right_binding_power);
+    parse_expr_with_binding_power(p, right_binding_power);
 
     m.complete(p, SyntaxKind::PrefixExpr)
 }
 
-fn paren_expr(p: &mut Parser) -> CompletedMarker {
+fn parse_paren_expr(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::LParen));
 
     let m = p.start();
     p.bump();
-    expr(p);
+    parse_expr(p);
     p.expect(TokenKind::RParen);
 
     m.complete(p, SyntaxKind::ParenExpr)
