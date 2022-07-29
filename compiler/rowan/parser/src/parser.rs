@@ -79,13 +79,6 @@ impl<'t, 'input> Parser<'t, 'input> {
     pub(crate) fn error(&mut self) {
         let current_token = self.source.peek_token();
 
-        // let (found, range) = current_token.map_or_else(
-        //     // If we’re at the end of the input we use the range of the very last token in the input.
-        //     // This is a bit of a hack, but it works.
-        //     || (None, self.source.last_token_range().unwrap()),
-        //     |Token { kind, range, .. }| (Some((*kind).into()), *range),
-        // );
-
         let (found, range) = if let Some(Token { kind, range, .. }) = current_token {
             (Some(*kind), *range)
         } else {

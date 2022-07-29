@@ -5,6 +5,7 @@ use crate::parser::marker::CompletedMarker;
 use crate::parser::Parser;
 
 mod expr;
+mod lambda;
 mod stmt;
 
 pub(crate) fn root(p: &mut Parser) -> CompletedMarker {

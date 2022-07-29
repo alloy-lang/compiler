@@ -49,6 +49,8 @@ pub enum SyntaxKind {
     VariableDef,
     VariableRef,
     LambdaDefExpr,
+    LambdaArgList,
+    LambdaArg,
     LambdaBodyExpr,
 }
 
