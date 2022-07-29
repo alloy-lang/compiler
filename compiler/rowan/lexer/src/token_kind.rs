@@ -13,9 +13,6 @@ pub enum TokenKind {
     #[regex(r"[ \t\f\r\n]+")]
     Whitespace,
 
-    #[token("fn")]
-    FnKw,
-
     #[token("let")]
     LetKw,
 
@@ -86,7 +83,6 @@ impl fmt::Display for TokenKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(match self {
             Self::Whitespace => "whitespace",
-            Self::FnKw => "‘fn’",
             Self::LetKw => "‘let’",
             Self::IfKw => "‘if‘",
             Self::ThenKw => "‘then‘",
@@ -133,11 +129,6 @@ mod tests {
     #[test]
     fn lex_spaces() {
         check("   ", TokenKind::Whitespace);
-    }
-
-    #[test]
-    fn lex_fn_keyword() {
-        check("fn", TokenKind::FnKw);
     }
 
     #[test]

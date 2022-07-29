@@ -10,7 +10,6 @@ pub type SyntaxElement = rowan::SyntaxElement<AlloyLanguage>;
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, FromPrimitive, ToPrimitive)]
 pub enum SyntaxKind {
     Whitespace,
-    FnKw,
     LetKw,
     IfKw,
     ThenKw,
@@ -52,7 +51,6 @@ impl From<TokenKind> for SyntaxKind {
     fn from(token_kind: TokenKind) -> Self {
         match token_kind {
             TokenKind::Whitespace => Self::Whitespace,
-            TokenKind::FnKw => Self::FnKw,
             TokenKind::LetKw => Self::LetKw,
             TokenKind::IfKw => Self::IfKw,
             TokenKind::ThenKw => Self::ThenKw,
