@@ -67,7 +67,7 @@ Root@0..13
                     Whitespace@15..16 " "
                     VariableRef@16..17
                       Ident@16..17 "a"
-                error at 8..11: expected integer, fractional, string, char, identifier, ‘-’, ‘(’ or ‘if‘, but found ‘let’"#]],
+                error at 8..11: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’, but found ‘let’"#]],
         );
     }
 
@@ -94,7 +94,7 @@ Root@0..13
                       Ident@14..15 "a"
                 error at 4..5: expected identifier, but found integer
                 error at 6..9: expected ‘=’, but found ‘let’
-                error at 6..9: expected integer, fractional, string, char, identifier, ‘-’, ‘(’ or ‘if‘, but found ‘let’"#]],
+                error at 6..9: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’, but found ‘let’"#]],
         );
     }
 }

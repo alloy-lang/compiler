@@ -19,6 +19,8 @@ pub enum SyntaxKind {
     Fractional,
     String,
     Char,
+    RightArrow,
+    Comma,
     Plus,
     Minus,
     Star,
@@ -28,6 +30,7 @@ pub enum SyntaxKind {
     RParen,
     LBrace,
     RBrace,
+    Pipe,
     Comment,
     Error,
 
@@ -45,6 +48,8 @@ pub enum SyntaxKind {
     PrefixExpr,
     VariableDef,
     VariableRef,
+    LambdaDefExpr,
+    LambdaBodyExpr,
 }
 
 impl From<TokenKind> for SyntaxKind {
@@ -60,6 +65,8 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::Fractional => Self::Fractional,
             TokenKind::String => Self::String,
             TokenKind::Char => Self::Char,
+            TokenKind::RightArrow => Self::RightArrow,
+            TokenKind::Comma => Self::Comma,
             TokenKind::Plus => Self::Plus,
             TokenKind::Minus => Self::Minus,
             TokenKind::Star => Self::Star,
@@ -69,6 +76,7 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::RParen => Self::RParen,
             TokenKind::LBrace => Self::LBrace,
             TokenKind::RBrace => Self::RBrace,
+            TokenKind::Pipe => Self::Pipe,
             TokenKind::Comment => Self::Comment,
             TokenKind::Error => Self::Error,
         }

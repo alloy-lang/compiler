@@ -32,7 +32,10 @@ pub(super) fn parse_expr(p: &mut Parser) -> Option<CompletedMarker> {
     parse_expr_with_binding_power(p, 0)
 }
 
-fn parse_expr_with_binding_power(p: &mut Parser, minimum_binding_power: u8) -> Option<CompletedMarker> {
+fn parse_expr_with_binding_power(
+    p: &mut Parser,
+    minimum_binding_power: u8,
+) -> Option<CompletedMarker> {
     let mut lhs = parse_lhs(p)?;
 
     loop {
@@ -88,6 +91,8 @@ fn parse_lhs(p: &mut Parser) -> Option<CompletedMarker> {
         parse_paren_expr(p)
     } else if p.at(TokenKind::IfKw) {
         parse_if_then_else_expr(p)
+    } else if p.at(TokenKind::Pipe) {
+        parse_lambda_expr(p)
     } else {
         p.error();
         return None;
@@ -184,6 +189,22 @@ fn parse_paren_expr(p: &mut Parser) -> CompletedMarker {
     p.expect(TokenKind::RParen);
 
     m.complete(p, SyntaxKind::ParenExpr)
+}
+
+fn parse_lambda_expr(p: &mut Parser) -> CompletedMarker {
+    assert!(p.at(TokenKind::Pipe));
+
+    let m = p.start();
+    p.bump();
+    p.expect(TokenKind::Pipe);
+
+    p.expect(TokenKind::RightArrow);
+
+    let lambda_m = p.start();
+    parse_expr(p);
+    lambda_m.complete(p, SyntaxKind::LambdaBodyExpr);
+
+    m.complete(p, SyntaxKind::LambdaDefExpr)
 }
 
 #[cfg(test)]
@@ -498,15 +519,15 @@ Root@0..37
         check(
             "(1+",
             expect![[r#"
-Root@0..3
-  ParenExpr@0..3
-    LParen@0..1 "("
-    InfixExpr@1..3
-      IntLiteral@1..2
-        Integer@1..2 "1"
-      Plus@2..3 "+"
-error at 2..3: expected integer, fractional, string, char, identifier, ‘-’, ‘(’ or ‘if‘
-error at 2..3: expected ‘)’"#]],
+                Root@0..3
+                  ParenExpr@0..3
+                    LParen@0..1 "("
+                    InfixExpr@1..3
+                      IntLiteral@1..2
+                        Integer@1..2 "1"
+                      Plus@2..3 "+"
+                error at 2..3: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+                error at 2..3: expected ‘)’"#]],
         );
     }
 
@@ -534,6 +555,24 @@ error at 2..3: expected ‘)’"#]],
                     ElseExpr@20..21
                       IntLiteral@20..21
                         Integer@20..21 "3""#]],
+        );
+    }
+
+    #[test]
+    fn parse_no_arg_lambda_expr() {
+        check(
+            "|| -> 2",
+            expect![[r#"
+                Root@0..7
+                  LambdaDefExpr@0..7
+                    Pipe@0..1 "|"
+                    Pipe@1..2 "|"
+                    Whitespace@2..3 " "
+                    RightArrow@3..5 "->"
+                    Whitespace@5..6 " "
+                    LambdaBodyExpr@6..7
+                      IntLiteral@6..7
+                        Integer@6..7 "2""#]],
         );
     }
 }

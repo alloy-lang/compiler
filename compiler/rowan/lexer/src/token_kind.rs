@@ -38,6 +38,12 @@ pub enum TokenKind {
     #[regex(r#"'([^'\\]|\\t|\\u|\\n|\\")*'"#)]
     Char,
 
+    #[token(",")]
+    Comma,
+
+    #[token("->")]
+    RightArrow,
+
     #[token("+")]
     Plus,
 
@@ -64,6 +70,9 @@ pub enum TokenKind {
 
     #[token(")")]
     RParen,
+
+    #[token("|")]
+    Pipe,
 
     #[regex("--[^\n]*")]
     Comment,
@@ -92,6 +101,8 @@ impl fmt::Display for TokenKind {
             Self::Fractional => "fractional",
             Self::String => "string",
             Self::Char => "char",
+            Self::Comma => "‘,’",
+            Self::RightArrow => "‘->’",
             Self::Plus => "‘+’",
             Self::Minus => "‘-’",
             Self::Star => "‘*’",
@@ -101,6 +112,7 @@ impl fmt::Display for TokenKind {
             Self::RParen => "‘)’",
             Self::LBrace => "‘{’",
             Self::RBrace => "‘}’",
+            Self::Pipe => "‘|’",
             Self::Comment => "comment",
             Self::Error => "an unrecognized token",
         })
@@ -192,6 +204,16 @@ mod tests {
     }
 
     #[test]
+    fn lex_right_arrow() {
+        check("->", TokenKind::RightArrow);
+    }
+
+    #[test]
+    fn lex_comma() {
+        check(",", TokenKind::Comma);
+    }
+
+    #[test]
     fn lex_plus() {
         check("+", TokenKind::Plus);
     }
@@ -234,6 +256,11 @@ mod tests {
     #[test]
     fn lex_right_parenthesis() {
         check(")", TokenKind::RParen);
+    }
+
+    #[test]
+    fn lex_pipe() {
+        check("|", TokenKind::Pipe);
     }
 
     #[test]
