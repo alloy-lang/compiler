@@ -48,10 +48,10 @@ pub enum SyntaxKind {
     PrefixExpr,
     VariableDef,
     VariableRef,
-    LambdaDefExpr,
+    LambdaExprDef,
     LambdaArgList,
     LambdaArg,
-    LambdaBodyExpr,
+    LambdaExprBody,
 }
 
 impl From<TokenKind> for SyntaxKind {

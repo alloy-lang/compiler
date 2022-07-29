@@ -14,7 +14,7 @@ pub(crate) mod marker;
 
 mod parse_error;
 
-const RECOVERY_SET: [TokenKind; 1] = [TokenKind::LetKw];
+const DEFAULT_RECOVERY_SET: [TokenKind; 1] = [TokenKind::LetKw];
 
 pub(crate) struct Parser<'t, 'input> {
     source: Source<'t, 'input>,
@@ -50,7 +50,7 @@ impl<'t, 'input> Parser<'t, 'input> {
         self.peek() == Some(kind)
     }
 
-    fn at_set(&mut self, set: &[TokenKind]) -> bool {
+    pub(crate) fn at_set(&mut self, set: &[TokenKind]) -> bool {
         self.peek().map_or(false, |k| set.contains(&k))
     }
 
@@ -76,7 +76,19 @@ impl<'t, 'input> Parser<'t, 'input> {
         }
     }
 
+    pub(crate) fn expect_with_recovery(&mut self, kind: TokenKind, recovery_set: &[TokenKind]) {
+        if self.at(kind) {
+            self.bump();
+        } else {
+            self.error_with_recovery(recovery_set);
+        }
+    }
+
     pub(crate) fn error(&mut self) {
+        self.error_with_recovery(&DEFAULT_RECOVERY_SET);
+    }
+
+    pub(crate) fn error_with_recovery(&mut self, recovery_set: &[TokenKind]) {
         let current_token = self.source.peek_token();
 
         let (found, range) = if let Some(Token { kind, range, .. }) = current_token {
@@ -93,7 +105,11 @@ impl<'t, 'input> Parser<'t, 'input> {
             range,
         }));
 
-        if !self.at_set(&RECOVERY_SET) && !self.at_end() {
+        self.recover(recovery_set);
+    }
+
+    fn recover(&mut self, recovery_set: &[TokenKind]) {
+        if !self.at_set(recovery_set) && !self.at_end() {
             let m = self.start();
             self.bump();
             m.complete(self, SyntaxKind::Error);
