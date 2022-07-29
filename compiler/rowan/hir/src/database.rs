@@ -1,5 +1,6 @@
 use la_arena::Arena;
 
+use alloy_rowan_ast::IfThenElseExpr;
 use alloy_rowan_syntax::SyntaxKind;
 
 use crate::{BinaryOp, Expr, Stmt, UnaryOp};
@@ -32,6 +33,7 @@ impl Database {
                 }
                 alloy_rowan_ast::Expr::StringLiteral(ast) => Expr::StringLiteral(ast.parse()),
                 alloy_rowan_ast::Expr::CharLiteral(ast) => Expr::CharLiteral(ast.parse()),
+                alloy_rowan_ast::Expr::IfThenElseExpr(ast) => self.lower_if_then_else(ast),
                 alloy_rowan_ast::Expr::ParenExpr(ast) => self.lower_expr(ast.expr()),
                 alloy_rowan_ast::Expr::UnaryExpr(ast) => self.lower_unary(ast),
                 alloy_rowan_ast::Expr::VariableRef(ast) => self.lower_variable_ref(ast),
@@ -60,6 +62,18 @@ impl Database {
         }
     }
 
+    fn lower_if_then_else(&mut self, ast: IfThenElseExpr) -> Expr {
+        let cond = self.lower_expr(ast.cond());
+        let then = self.lower_expr(ast.then());
+        let else_ = self.lower_expr(ast.else_());
+
+        Expr::IfThenElse {
+            cond: self.exprs.alloc(cond),
+            then: self.exprs.alloc(then),
+            else_: self.exprs.alloc(else_),
+        }
+    }
+
     fn lower_unary(&mut self, ast: alloy_rowan_ast::UnaryExpr) -> Expr {
         let op = match ast.op().unwrap().kind() {
             SyntaxKind::Minus => UnaryOp::Neg,
@@ -83,9 +97,10 @@ impl Database {
 
 #[cfg(test)]
 mod tests {
+    use ordered_float::NotNan;
+
     use alloy_rowan_ast as ast;
     use alloy_rowan_parser as parser;
-    use ordered_float::NotNan;
 
     use super::*;
 
@@ -262,6 +277,38 @@ mod tests {
             "foo",
             Expr::VariableRef { var: "foo".into() },
             Database::default(),
+        );
+    }
+
+    #[test]
+    fn if_else_expr() {
+        let mut exprs = Arena::new();
+        let cond = exprs.alloc(Expr::VariableRef { var: "test".into() });
+        let ten = exprs.alloc(Expr::IntLiteral { n: Some(10) });
+        let five = exprs.alloc(Expr::IntLiteral { n: Some(5) });
+
+        check_expr(
+            "if test then 10 else 5",
+            Expr::IfThenElse {
+                cond,
+                then: ten,
+                else_: five,
+            },
+            Database { exprs },
+        );
+    }
+
+    #[test]
+    fn if_else_expr_with_missing_exprs() {
+        let mut exprs = Arena::new();
+        let cond = exprs.alloc(Expr::Missing);
+        let then = exprs.alloc(Expr::Missing);
+        let else_ = exprs.alloc(Expr::Missing);
+
+        check_expr(
+            "if then else",
+            Expr::IfThenElse { cond, then, else_ },
+            Database { exprs },
         );
     }
 }

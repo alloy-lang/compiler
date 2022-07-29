@@ -40,6 +40,11 @@ pub enum Expr {
     },
     StringLiteral(String),
     CharLiteral(Option<char>),
+    IfThenElse {
+        cond: ExprIdx,
+        then: ExprIdx,
+        else_: ExprIdx,
+    },
     Unary {
         op: UnaryOp,
         expr: ExprIdx,

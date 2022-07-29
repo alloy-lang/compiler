@@ -86,6 +86,8 @@ fn lhs(p: &mut Parser) -> Option<CompletedMarker> {
         prefix_expr(p)
     } else if p.at(TokenKind::LParen) {
         paren_expr(p)
+    } else if p.at(TokenKind::IfKw) {
+        if_expr(p)
     } else {
         p.error();
         return None;
@@ -134,6 +136,29 @@ fn variable_ref(p: &mut Parser) -> CompletedMarker {
     m.complete(p, SyntaxKind::VariableRef)
 }
 
+fn if_expr(p: &mut Parser) -> CompletedMarker {
+    assert!(p.at(TokenKind::IfKw));
+
+    let if_then_else_m = p.start();
+    p.bump();
+
+    let if_m = p.start();
+    expr(p);
+    if_m.complete(p, SyntaxKind::IfExpr);
+
+    p.expect(TokenKind::ThenKw);
+    let then_m = p.start();
+    expr(p);
+    then_m.complete(p, SyntaxKind::ThenExpr);
+
+    p.expect(TokenKind::ElseKw);
+    let else_m = p.start();
+    expr(p);
+    else_m.complete(p, SyntaxKind::ElseExpr);
+
+    if_then_else_m.complete(p, SyntaxKind::IfThenElseExpr)
+}
+
 fn prefix_expr(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Minus));
 
@@ -155,7 +180,7 @@ fn paren_expr(p: &mut Parser) -> CompletedMarker {
 
     let m = p.start();
     p.bump();
-    expr_binding_power(p, 0);
+    expr(p);
     p.expect(TokenKind::RParen);
 
     m.complete(p, SyntaxKind::ParenExpr)
@@ -480,8 +505,35 @@ Root@0..3
       IntLiteral@1..2
         Integer@1..2 "1"
       Plus@2..3 "+"
-error at 2..3: expected integer, fractional, string, char, identifier, ‘-’ or ‘(’
+error at 2..3: expected integer, fractional, string, char, identifier, ‘-’, ‘(’ or ‘if‘
 error at 2..3: expected ‘)’"#]],
+        );
+    }
+
+    #[test]
+    fn parse_if_then_else() {
+        check(
+            "if test then 2 else 3",
+            expect![[r#"
+                Root@0..21
+                  IfThenElseExpr@0..21
+                    IfKw@0..2 "if"
+                    Whitespace@2..3 " "
+                    IfExpr@3..8
+                      VariableRef@3..8
+                        Ident@3..7 "test"
+                        Whitespace@7..8 " "
+                    ThenKw@8..12 "then"
+                    Whitespace@12..13 " "
+                    ThenExpr@13..15
+                      IntLiteral@13..15
+                        Integer@13..14 "2"
+                        Whitespace@14..15 " "
+                    ElseKw@15..19 "else"
+                    Whitespace@19..20 " "
+                    ElseExpr@20..21
+                      IntLiteral@20..21
+                        Integer@20..21 "3""#]],
         );
     }
 }

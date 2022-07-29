@@ -120,6 +120,32 @@ impl CharLiteral {
 }
 
 #[derive(Debug)]
+pub struct IfThenElseExpr(SyntaxNode);
+
+impl IfThenElseExpr {
+    pub fn cond(&self) -> Option<Expr> {
+        self.0
+            .children()
+            .find(|node| matches!(node.kind(), SyntaxKind::IfExpr))
+            .and_then(|parent| parent.children().find_map(Expr::cast))
+    }
+
+    pub fn then(&self) -> Option<Expr> {
+        self.0
+            .children()
+            .find(|node| matches!(node.kind(), SyntaxKind::ThenExpr))
+            .and_then(|parent| parent.children().find_map(Expr::cast))
+    }
+
+    pub fn else_(&self) -> Option<Expr> {
+        self.0
+            .children()
+            .find(|node| matches!(node.kind(), SyntaxKind::ElseExpr))
+            .and_then(|parent| parent.children().find_map(Expr::cast))
+    }
+}
+
+#[derive(Debug)]
 pub struct ParenExpr(SyntaxNode);
 
 impl ParenExpr {
@@ -160,6 +186,7 @@ pub enum Expr {
     FractionalLiteral(FractionalLiteral),
     StringLiteral(StringLiteral),
     CharLiteral(CharLiteral),
+    IfThenElseExpr(IfThenElseExpr),
     ParenExpr(ParenExpr),
     UnaryExpr(UnaryExpr),
     VariableRef(VariableRef),
@@ -173,6 +200,7 @@ impl Expr {
             SyntaxKind::FractionalLiteral => Self::FractionalLiteral(FractionalLiteral(node)),
             SyntaxKind::StringLiteral => Self::StringLiteral(StringLiteral(node)),
             SyntaxKind::CharLiteral => Self::CharLiteral(CharLiteral(node)),
+            SyntaxKind::IfThenElseExpr => Self::IfThenElseExpr(IfThenElseExpr(node)),
             SyntaxKind::ParenExpr => Self::ParenExpr(ParenExpr(node)),
             SyntaxKind::PrefixExpr => Self::UnaryExpr(UnaryExpr(node)),
             SyntaxKind::VariableRef => Self::VariableRef(VariableRef(node)),

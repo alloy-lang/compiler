@@ -19,6 +19,13 @@ pub enum TokenKind {
     #[token("let")]
     LetKw,
 
+    #[token("if")]
+    IfKw,
+    #[token("then")]
+    ThenKw,
+    #[token("else")]
+    ElseKw,
+
     #[regex("[A-Za-z][A-Za-z0-9]*")]
     Ident,
 
@@ -69,6 +76,7 @@ pub enum TokenKind {
 }
 
 impl TokenKind {
+    #[must_use]
     pub fn is_trivia(self) -> bool {
         matches!(self, Self::Whitespace | Self::Comment)
     }
@@ -80,6 +88,9 @@ impl fmt::Display for TokenKind {
             Self::Whitespace => "whitespace",
             Self::FnKw => "‘fn’",
             Self::LetKw => "‘let’",
+            Self::IfKw => "‘if‘",
+            Self::ThenKw => "‘then‘",
+            Self::ElseKw => "‘else‘",
             Self::Ident => "identifier",
             Self::Integer => "integer",
             Self::Fractional => "fractional",
@@ -132,6 +143,21 @@ mod tests {
     #[test]
     fn lex_let_keyword() {
         check("let", TokenKind::LetKw);
+    }
+
+    #[test]
+    fn lex_if_keyword() {
+        check("if", TokenKind::IfKw);
+    }
+
+    #[test]
+    fn lex_then_keyword() {
+        check("then", TokenKind::ThenKw);
+    }
+
+    #[test]
+    fn lex_else_keyword() {
+        check("else", TokenKind::ElseKw);
     }
 
     #[test]
