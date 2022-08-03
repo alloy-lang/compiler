@@ -27,7 +27,7 @@ impl fmt::Display for ValidationError {
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum ValidationErrorKind {
     NumberLiteralTooLarge,
-    CharLiteralTooLarge,
+    CharLiteralInvalid,
 }
 
 impl fmt::Display for ValidationErrorKind {
@@ -38,7 +38,7 @@ impl fmt::Display for ValidationErrorKind {
                 "number literal is larger than an integer’s maximum value, {}",
                 u64::MAX,
             ),
-            ValidationErrorKind::CharLiteralTooLarge => todo!(),
+            ValidationErrorKind::CharLiteralInvalid => todo!(),
         }
     }
 }
@@ -70,7 +70,7 @@ fn validate_int_literal(literal: IntLiteral, errors: &mut Vec<ValidationError>) 
 fn validate_char_literal(literal: CharLiteral, errors: &mut Vec<ValidationError>) {
     if literal.parse().is_none() {
         errors.push(ValidationError {
-            kind: ValidationErrorKind::CharLiteralTooLarge,
+            kind: ValidationErrorKind::CharLiteralInvalid,
             range: literal.0.first_token().unwrap().text_range(),
         });
     }
@@ -113,7 +113,8 @@ mod tests {
     fn lower_multi_char_literal() {
         check(
             "'characters'",
-            &[(ValidationErrorKind::CharLiteralTooLarge, (0..12))],
+            &[(ValidationErrorKind::CharLiteralInvalid, (0..12))],
         );
+        check("''", &[(ValidationErrorKind::CharLiteralInvalid, (0..2))]);
     }
 }
