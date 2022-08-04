@@ -1,6 +1,8 @@
-use crate::grammar::expr::parse_expr;
+use crate::grammar::expr::{parse_expr, parse_int_literal, parse_variable_ref};
 
 use super::*;
+
+const LAMBDA_ARG_SET: [TokenKind; 2] = [TokenKind::Ident, TokenKind::Integer];
 
 pub(crate) fn parse_lambda_expr(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Pipe));
@@ -33,7 +35,7 @@ fn parse_arg_list(p: &mut Parser) -> CompletedMarker {
             break;
         }
 
-        p.expect_with_recovery(TokenKind::Comma, &[TokenKind::Ident]);
+        p.expect_with_recovery(TokenKind::Comma, &LAMBDA_ARG_SET);
     }
 
     p.expect_with_recovery(TokenKind::Pipe, &[TokenKind::RightArrow]);
@@ -48,7 +50,13 @@ fn parse_arg_list(p: &mut Parser) -> CompletedMarker {
 fn parse_arg(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
 
-    p.expect(TokenKind::Ident);
+    if p.at(TokenKind::Ident) {
+        parse_variable_ref(p);
+    } else if p.at(TokenKind::Integer) {
+        parse_int_literal(p);
+    } else {
+        p.error();
+    }
 
     m.complete(p, SyntaxKind::LambdaArg)
 }
@@ -79,7 +87,7 @@ mod tests {
     }
 
     #[test]
-    fn parse_single_arg_lambda_expr() {
+    fn parse_single_identifier_arg_lambda_expr() {
         check(
             "|arg1| -> 2",
             expect![[r#"
@@ -88,7 +96,8 @@ mod tests {
                     LambdaArgList@0..7
                       Pipe@0..1 "|"
                       LambdaArg@1..5
-                        Ident@1..5 "arg1"
+                        VariableRef@1..5
+                          Ident@1..5 "arg1"
                       Pipe@5..6 "|"
                       Whitespace@6..7 " "
                     RightArrow@7..9 "->"
@@ -96,6 +105,50 @@ mod tests {
                     LambdaExprBody@10..11
                       IntLiteral@10..11
                         Integer@10..11 "2""#]],
+        );
+    }
+
+    #[test]
+    fn parse_single_int_literal_arg_lambda_expr() {
+        check(
+            "|0| -> 2",
+            expect![[r#"
+Root@0..8
+  LambdaExprDef@0..8
+    LambdaArgList@0..4
+      Pipe@0..1 "|"
+      LambdaArg@1..2
+        IntLiteral@1..2
+          Integer@1..2 "0"
+      Pipe@2..3 "|"
+      Whitespace@3..4 " "
+    RightArrow@4..6 "->"
+    Whitespace@6..7 " "
+    LambdaExprBody@7..8
+      IntLiteral@7..8
+        Integer@7..8 "2""#]],
+        );
+    }
+
+    #[test]
+    fn parse_single_string_literal_arg_lambda_expr() {
+        check(
+            "|0| -> 2",
+            expect![[r#"
+Root@0..8
+  LambdaExprDef@0..8
+    LambdaArgList@0..4
+      Pipe@0..1 "|"
+      LambdaArg@1..2
+        IntLiteral@1..2
+          Integer@1..2 "0"
+      Pipe@2..3 "|"
+      Whitespace@3..4 " "
+    RightArrow@4..6 "->"
+    Whitespace@6..7 " "
+    LambdaExprBody@7..8
+      IntLiteral@7..8
+        Integer@7..8 "2""#]],
         );
     }
 
@@ -109,15 +162,18 @@ Root@0..24
     LambdaArgList@0..19
       Pipe@0..1 "|"
       LambdaArg@1..5
-        Ident@1..5 "arg1"
+        VariableRef@1..5
+          Ident@1..5 "arg1"
       Comma@5..6 ","
       Whitespace@6..7 " "
       LambdaArg@7..11
-        Ident@7..11 "arg2"
+        VariableRef@7..11
+          Ident@7..11 "arg2"
       Comma@11..12 ","
       Whitespace@12..13 " "
       LambdaArg@13..17
-        Ident@13..17 "arg3"
+        VariableRef@13..17
+          Ident@13..17 "arg3"
       Pipe@17..18 "|"
       Whitespace@18..19 " "
     RightArrow@19..21 "->"
@@ -131,17 +187,19 @@ Root@0..24
     #[test]
     fn parse_multi_arg_lambda_expr_no_comma() {
         check(
-            "|arg1 arg2| -> 8",
+            "|arg1 1001| -> 8",
             expect![[r#"
 Root@0..16
   LambdaExprDef@0..16
     LambdaArgList@0..12
       Pipe@0..1 "|"
       LambdaArg@1..6
-        Ident@1..5 "arg1"
-        Whitespace@5..6 " "
+        VariableRef@1..6
+          Ident@1..5 "arg1"
+          Whitespace@5..6 " "
       LambdaArg@6..10
-        Ident@6..10 "arg2"
+        IntLiteral@6..10
+          Integer@6..10 "1001"
       Pipe@10..11 "|"
       Whitespace@11..12 " "
     RightArrow@12..14 "->"
@@ -149,7 +207,7 @@ Root@0..16
     LambdaExprBody@15..16
       IntLiteral@15..16
         Integer@15..16 "8"
-error at 6..10: expected ‘,’, but found identifier"#]],
+error at 6..10: expected ‘,’, but found integer"#]],
         );
     }
 
@@ -163,12 +221,14 @@ Root@0..16
     LambdaArgList@0..12
       Pipe@0..1 "|"
       LambdaArg@1..5
-        Ident@1..5 "arg1"
+        VariableRef@1..5
+          Ident@1..5 "arg1"
       Comma@5..6 ","
       Whitespace@6..7 " "
       LambdaArg@7..12
-        Ident@7..11 "arg2"
-        Whitespace@11..12 " "
+        VariableRef@7..12
+          Ident@7..11 "arg2"
+          Whitespace@11..12 " "
     RightArrow@12..14 "->"
     Whitespace@14..15 " "
     LambdaExprBody@15..16

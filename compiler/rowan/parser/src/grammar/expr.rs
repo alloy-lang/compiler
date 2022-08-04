@@ -103,7 +103,7 @@ fn parse_lhs(p: &mut Parser) -> Option<CompletedMarker> {
     Some(cm)
 }
 
-fn parse_int_literal(p: &mut Parser) -> CompletedMarker {
+pub(crate) fn parse_int_literal(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Integer));
 
     let m = p.start();
@@ -135,7 +135,7 @@ fn parse_char_literal(p: &mut Parser) -> CompletedMarker {
     m.complete(p, SyntaxKind::CharLiteral)
 }
 
-fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
+pub(crate) fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Ident));
 
     let m = p.start();
