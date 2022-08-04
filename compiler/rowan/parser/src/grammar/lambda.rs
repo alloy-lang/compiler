@@ -1,4 +1,7 @@
-use crate::grammar::expr::{parse_expr, parse_int_literal, parse_variable_ref};
+use crate::grammar::expr::{
+    parse_char_literal, parse_expr, parse_fractional_literal, parse_int_literal,
+    parse_string_literal, parse_variable_ref,
+};
 
 use super::*;
 
@@ -7,16 +10,16 @@ const LAMBDA_ARG_SET: [TokenKind; 2] = [TokenKind::Ident, TokenKind::Integer];
 pub(crate) fn parse_lambda_expr(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Pipe));
 
-    let m = p.start();
+    let lambda_m = p.start();
     parse_arg_list(p);
 
     p.expect(TokenKind::RightArrow);
 
-    let lambda_m = p.start();
+    let body_m = p.start();
     parse_expr(p);
-    lambda_m.complete(p, SyntaxKind::LambdaExprBody);
+    body_m.complete(p, SyntaxKind::LambdaExprBody);
 
-    m.complete(p, SyntaxKind::LambdaExprDef)
+    lambda_m.complete(p, SyntaxKind::LambdaExprDef)
 }
 
 fn parse_arg_list(p: &mut Parser) -> CompletedMarker {
@@ -50,10 +53,16 @@ fn parse_arg_list(p: &mut Parser) -> CompletedMarker {
 fn parse_arg(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
 
-    if p.at(TokenKind::Ident) {
-        parse_variable_ref(p);
-    } else if p.at(TokenKind::Integer) {
+    if p.at(TokenKind::Integer) {
         parse_int_literal(p);
+    } else if p.at(TokenKind::Fractional) {
+        parse_fractional_literal(p);
+    } else if p.at(TokenKind::String) {
+        parse_string_literal(p);
+    } else if p.at(TokenKind::Char) {
+        parse_char_literal(p);
+    } else if p.at(TokenKind::Ident) {
+        parse_variable_ref(p);
     } else {
         p.error();
     }
@@ -131,24 +140,68 @@ Root@0..8
     }
 
     #[test]
+    fn parse_single_fractional_literal_arg_lambda_expr() {
+        check(
+            "|0.4| -> 2",
+            expect![[r#"
+                Root@0..10
+                  LambdaExprDef@0..10
+                    LambdaArgList@0..6
+                      Pipe@0..1 "|"
+                      LambdaArg@1..4
+                        FractionalLiteral@1..4
+                          Fractional@1..4 "0.4"
+                      Pipe@4..5 "|"
+                      Whitespace@5..6 " "
+                    RightArrow@6..8 "->"
+                    Whitespace@8..9 " "
+                    LambdaExprBody@9..10
+                      IntLiteral@9..10
+                        Integer@9..10 "2""#]],
+        );
+    }
+
+    #[test]
     fn parse_single_string_literal_arg_lambda_expr() {
         check(
-            "|0| -> 2",
+            r#"|"hello"| -> 5"#,
             expect![[r#"
-Root@0..8
-  LambdaExprDef@0..8
-    LambdaArgList@0..4
-      Pipe@0..1 "|"
-      LambdaArg@1..2
-        IntLiteral@1..2
-          Integer@1..2 "0"
-      Pipe@2..3 "|"
-      Whitespace@3..4 " "
-    RightArrow@4..6 "->"
-    Whitespace@6..7 " "
-    LambdaExprBody@7..8
-      IntLiteral@7..8
-        Integer@7..8 "2""#]],
+                Root@0..14
+                  LambdaExprDef@0..14
+                    LambdaArgList@0..10
+                      Pipe@0..1 "|"
+                      LambdaArg@1..8
+                        StringLiteral@1..8
+                          String@1..8 "\"hello\""
+                      Pipe@8..9 "|"
+                      Whitespace@9..10 " "
+                    RightArrow@10..12 "->"
+                    Whitespace@12..13 " "
+                    LambdaExprBody@13..14
+                      IntLiteral@13..14
+                        Integer@13..14 "5""#]],
+        );
+    }
+
+    #[test]
+    fn parse_single_char_literal_arg_lambda_expr() {
+        check(
+            "|'c'| -> 1",
+            expect![[r#"
+                Root@0..10
+                  LambdaExprDef@0..10
+                    LambdaArgList@0..6
+                      Pipe@0..1 "|"
+                      LambdaArg@1..4
+                        CharLiteral@1..4
+                          Char@1..4 "'c'"
+                      Pipe@4..5 "|"
+                      Whitespace@5..6 " "
+                    RightArrow@6..8 "->"
+                    Whitespace@8..9 " "
+                    LambdaExprBody@9..10
+                      IntLiteral@9..10
+                        Integer@9..10 "1""#]],
         );
     }
 
@@ -187,27 +240,31 @@ Root@0..24
     #[test]
     fn parse_multi_arg_lambda_expr_no_comma() {
         check(
-            "|arg1 1001| -> 8",
+            "|arg1 1001 'c'| -> 8",
             expect![[r#"
-Root@0..16
-  LambdaExprDef@0..16
-    LambdaArgList@0..12
-      Pipe@0..1 "|"
-      LambdaArg@1..6
-        VariableRef@1..6
-          Ident@1..5 "arg1"
-          Whitespace@5..6 " "
-      LambdaArg@6..10
-        IntLiteral@6..10
-          Integer@6..10 "1001"
-      Pipe@10..11 "|"
-      Whitespace@11..12 " "
-    RightArrow@12..14 "->"
-    Whitespace@14..15 " "
-    LambdaExprBody@15..16
-      IntLiteral@15..16
-        Integer@15..16 "8"
-error at 6..10: expected ‘,’, but found integer"#]],
+                Root@0..20
+                  LambdaExprDef@0..20
+                    LambdaArgList@0..16
+                      Pipe@0..1 "|"
+                      LambdaArg@1..6
+                        VariableRef@1..6
+                          Ident@1..5 "arg1"
+                          Whitespace@5..6 " "
+                      LambdaArg@6..11
+                        IntLiteral@6..11
+                          Integer@6..10 "1001"
+                          Whitespace@10..11 " "
+                      Error@11..14
+                        Char@11..14 "'c'"
+                      Pipe@14..15 "|"
+                      Whitespace@15..16 " "
+                    RightArrow@16..18 "->"
+                    Whitespace@18..19 " "
+                    LambdaExprBody@19..20
+                      IntLiteral@19..20
+                        Integer@19..20 "8"
+                error at 6..10: expected ‘,’, but found integer
+                error at 11..14: expected ‘,’, but found char"#]],
         );
     }
 

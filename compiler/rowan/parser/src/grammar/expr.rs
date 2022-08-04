@@ -111,7 +111,7 @@ pub(crate) fn parse_int_literal(p: &mut Parser) -> CompletedMarker {
     m.complete(p, SyntaxKind::IntLiteral)
 }
 
-fn parse_fractional_literal(p: &mut Parser) -> CompletedMarker {
+pub(crate) fn parse_fractional_literal(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Fractional));
 
     let m = p.start();
@@ -119,7 +119,7 @@ fn parse_fractional_literal(p: &mut Parser) -> CompletedMarker {
     m.complete(p, SyntaxKind::FractionalLiteral)
 }
 
-fn parse_string_literal(p: &mut Parser) -> CompletedMarker {
+pub(crate) fn parse_string_literal(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::String));
 
     let m = p.start();
@@ -127,7 +127,7 @@ fn parse_string_literal(p: &mut Parser) -> CompletedMarker {
     m.complete(p, SyntaxKind::StringLiteral)
 }
 
-fn parse_char_literal(p: &mut Parser) -> CompletedMarker {
+pub(crate) fn parse_char_literal(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Char));
 
     let m = p.start();
