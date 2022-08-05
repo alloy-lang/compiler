@@ -86,6 +86,77 @@ Root@0..25
     }
 
     #[test]
+    fn recover_variable_definition_lambda() {
+        check(
+            r#"
+            let add1 = |a, 9| -
+            let add2 = |a, b| -> a + b
+            "#,
+            expect![[r#"
+                Root@0..84
+                  Whitespace@0..13 "\n            "
+                  VariableDef@13..45
+                    LetKw@13..16 "let"
+                    Whitespace@16..17 " "
+                    Ident@17..21 "add1"
+                    Whitespace@21..22 " "
+                    Equals@22..23 "="
+                    Whitespace@23..24 " "
+                    LambdaExprDef@24..45
+                      LambdaArgList@24..31
+                        Pipe@24..25 "|"
+                        LambdaArg@25..26
+                          VariableRef@25..26
+                            Ident@25..26 "a"
+                        Comma@26..27 ","
+                        Whitespace@27..28 " "
+                        LambdaArg@28..29
+                          IntLiteral@28..29
+                            Integer@28..29 "9"
+                        Pipe@29..30 "|"
+                        Whitespace@30..31 " "
+                      Error@31..45
+                        Minus@31..32 "-"
+                        Whitespace@32..45 "\n            "
+                      LambdaExprBody@45..45
+                  VariableDef@45..84
+                    LetKw@45..48 "let"
+                    Whitespace@48..49 " "
+                    Ident@49..53 "add2"
+                    Whitespace@53..54 " "
+                    Equals@54..55 "="
+                    Whitespace@55..56 " "
+                    LambdaExprDef@56..84
+                      LambdaArgList@56..63
+                        Pipe@56..57 "|"
+                        LambdaArg@57..58
+                          VariableRef@57..58
+                            Ident@57..58 "a"
+                        Comma@58..59 ","
+                        Whitespace@59..60 " "
+                        LambdaArg@60..61
+                          VariableRef@60..61
+                            Ident@60..61 "b"
+                        Pipe@61..62 "|"
+                        Whitespace@62..63 " "
+                      RightArrow@63..65 "->"
+                      Whitespace@65..66 " "
+                      LambdaExprBody@66..84
+                        InfixExpr@66..84
+                          VariableRef@66..68
+                            Ident@66..67 "a"
+                            Whitespace@67..68 " "
+                          Plus@68..69 "+"
+                          Whitespace@69..70 " "
+                          VariableRef@70..84
+                            Ident@70..71 "b"
+                            Whitespace@71..84 "\n            "
+                error at 31..32: expected ‘->’, but found ‘-’
+                error at 45..48: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’, but found ‘let’"#]],
+        );
+    }
+
+    #[test]
     fn recover_on_let_token() {
         check(
             "let a =\nlet b = a",
