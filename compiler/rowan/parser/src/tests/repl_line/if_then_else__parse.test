@@ -1,0 +1,21 @@
+if test then 2 else 3
+===
+Root@0..21
+  IfThenElseExpr@0..21
+    IfKw@0..2 "if"
+    Whitespace@2..3 " "
+    IfExpr@3..8
+      VariableRef@3..8
+        Ident@3..7 "test"
+        Whitespace@7..8 " "
+    ThenKw@8..12 "then"
+    Whitespace@12..13 " "
+    ThenExpr@13..15
+      IntLiteral@13..15
+        Integer@13..14 "2"
+        Whitespace@14..15 " "
+    ElseKw@15..19 "else"
+    Whitespace@19..20 " "
+    ElseExpr@20..21
+      IntLiteral@20..21
+        Integer@20..21 "3"

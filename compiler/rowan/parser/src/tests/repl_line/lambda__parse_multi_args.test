@@ -1,0 +1,26 @@
+|arg1, arg2, arg3| -> 17
+===
+Root@0..24
+  LambdaExprDef@0..24
+    LambdaArgList@0..19
+      Pipe@0..1 "|"
+      LambdaArg@1..5
+        VariableRef@1..5
+          Ident@1..5 "arg1"
+      Comma@5..6 ","
+      Whitespace@6..7 " "
+      LambdaArg@7..11
+        VariableRef@7..11
+          Ident@7..11 "arg2"
+      Comma@11..12 ","
+      Whitespace@12..13 " "
+      LambdaArg@13..17
+        VariableRef@13..17
+          Ident@13..17 "arg3"
+      Pipe@17..18 "|"
+      Whitespace@18..19 " "
+    RightArrow@19..21 "->"
+    Whitespace@21..22 " "
+    LambdaExprBody@22..24
+      IntLiteral@22..24
+        Integer@22..24 "17"

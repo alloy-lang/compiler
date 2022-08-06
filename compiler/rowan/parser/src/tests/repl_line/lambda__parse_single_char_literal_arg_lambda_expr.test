@@ -1,0 +1,16 @@
+|'c'| -> 1
+===
+Root@0..10
+  LambdaExprDef@0..10
+    LambdaArgList@0..6
+      Pipe@0..1 "|"
+      LambdaArg@1..4
+        CharLiteral@1..4
+          Char@1..4 "'c'"
+      Pipe@4..5 "|"
+      Whitespace@5..6 " "
+    RightArrow@6..8 "->"
+    Whitespace@8..9 " "
+    LambdaExprBody@9..10
+      IntLiteral@9..10
+        Integer@9..10 "1"

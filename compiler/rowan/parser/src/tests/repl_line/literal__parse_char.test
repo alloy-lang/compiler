@@ -1,0 +1,5 @@
+'c'
+===
+Root@0..3
+  CharLiteral@0..3
+    Char@0..3 "'c'"

@@ -1,0 +1,21 @@
+|arg1, arg2 -> 8
+===
+Root@0..16
+  LambdaExprDef@0..16
+    LambdaArgList@0..12
+      Pipe@0..1 "|"
+      LambdaArg@1..5
+        VariableRef@1..5
+          Ident@1..5 "arg1"
+      Comma@5..6 ","
+      Whitespace@6..7 " "
+      LambdaArg@7..12
+        VariableRef@7..12
+          Ident@7..11 "arg2"
+          Whitespace@11..12 " "
+    RightArrow@12..14 "->"
+    Whitespace@14..15 " "
+    LambdaExprBody@15..16
+      IntLiteral@15..16
+        Integer@15..16 "8"
+error at 12..14: expected ‘|’, but found ‘->’

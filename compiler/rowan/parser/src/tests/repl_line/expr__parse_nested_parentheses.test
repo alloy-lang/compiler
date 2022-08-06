@@ -1,0 +1,25 @@
+(((((( 10)) ))))
+===
+Root@0..16
+  ParenExpr@0..16
+    LParen@0..1 "("
+    ParenExpr@1..15
+      LParen@1..2 "("
+      ParenExpr@2..14
+        LParen@2..3 "("
+        ParenExpr@3..13
+          LParen@3..4 "("
+          ParenExpr@4..12
+            LParen@4..5 "("
+            ParenExpr@5..10
+              LParen@5..6 "("
+              Whitespace@6..7 " "
+              IntLiteral@7..9
+                Integer@7..9 "10"
+              RParen@9..10 ")"
+            RParen@10..11 ")"
+            Whitespace@11..12 " "
+          RParen@12..13 ")"
+        RParen@13..14 ")"
+      RParen@14..15 ")"
+    RParen@15..16 ")"

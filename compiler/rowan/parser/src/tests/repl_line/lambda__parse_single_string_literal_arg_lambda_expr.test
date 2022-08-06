@@ -1,0 +1,16 @@
+|"hello"| -> 5
+===
+Root@0..14
+  LambdaExprDef@0..14
+    LambdaArgList@0..10
+      Pipe@0..1 "|"
+      LambdaArg@1..8
+        StringLiteral@1..8
+          String@1..8 "\"hello\""
+      Pipe@8..9 "|"
+      Whitespace@9..10 " "
+    RightArrow@10..12 "->"
+    Whitespace@12..13 " "
+    LambdaExprBody@13..14
+      IntLiteral@13..14
+        Integer@13..14 "5"

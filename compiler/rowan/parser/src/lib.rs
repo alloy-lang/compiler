@@ -13,6 +13,9 @@ mod parser;
 mod sink;
 mod source;
 
+#[cfg(test)]
+mod tests;
+
 #[must_use]
 pub fn parse(input: &str) -> Parse {
     let tokens: Vec<_> = Lexer::new(input).collect();

@@ -1,0 +1,5 @@
+"hello"
+===
+Root@0..7
+  StringLiteral@0..7
+    String@0..7 "\"hello\""

@@ -1,0 +1,16 @@
+|0| -> 2
+===
+Root@0..8
+  LambdaExprDef@0..8
+    LambdaArgList@0..4
+      Pipe@0..1 "|"
+      LambdaArg@1..2
+        IntLiteral@1..2
+          Integer@1..2 "0"
+      Pipe@2..3 "|"
+      Whitespace@3..4 " "
+    RightArrow@4..6 "->"
+    Whitespace@6..7 " "
+    LambdaExprBody@7..8
+      IntLiteral@7..8
+        Integer@7..8 "2"

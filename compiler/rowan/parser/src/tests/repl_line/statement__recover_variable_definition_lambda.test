@@ -1,0 +1,61 @@
+let add1 = |a, 9| -
+let add2 = |a, b| -> a + b
+===
+Root@0..46
+  VariableDef@0..20
+    LetKw@0..3 "let"
+    Whitespace@3..4 " "
+    Ident@4..8 "add1"
+    Whitespace@8..9 " "
+    Equals@9..10 "="
+    Whitespace@10..11 " "
+    LambdaExprDef@11..20
+      LambdaArgList@11..18
+        Pipe@11..12 "|"
+        LambdaArg@12..13
+          VariableRef@12..13
+            Ident@12..13 "a"
+        Comma@13..14 ","
+        Whitespace@14..15 " "
+        LambdaArg@15..16
+          IntLiteral@15..16
+            Integer@15..16 "9"
+        Pipe@16..17 "|"
+        Whitespace@17..18 " "
+      Error@18..20
+        Minus@18..19 "-"
+        Whitespace@19..20 "\n"
+      LambdaExprBody@20..20
+  VariableDef@20..46
+    LetKw@20..23 "let"
+    Whitespace@23..24 " "
+    Ident@24..28 "add2"
+    Whitespace@28..29 " "
+    Equals@29..30 "="
+    Whitespace@30..31 " "
+    LambdaExprDef@31..46
+      LambdaArgList@31..38
+        Pipe@31..32 "|"
+        LambdaArg@32..33
+          VariableRef@32..33
+            Ident@32..33 "a"
+        Comma@33..34 ","
+        Whitespace@34..35 " "
+        LambdaArg@35..36
+          VariableRef@35..36
+            Ident@35..36 "b"
+        Pipe@36..37 "|"
+        Whitespace@37..38 " "
+      RightArrow@38..40 "->"
+      Whitespace@40..41 " "
+      LambdaExprBody@41..46
+        InfixExpr@41..46
+          VariableRef@41..43
+            Ident@41..42 "a"
+            Whitespace@42..43 " "
+          Plus@43..44 "+"
+          Whitespace@44..45 " "
+          VariableRef@45..46
+            Ident@45..46 "b"
+error at 18..19: expected ‘->’, but found ‘-’
+error at 20..23: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’, but found ‘let’

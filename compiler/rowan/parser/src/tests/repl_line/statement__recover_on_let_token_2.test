@@ -1,0 +1,22 @@
+let 1
+let b = a
+===
+Root@0..15
+  VariableDef@0..6
+    LetKw@0..3 "let"
+    Whitespace@3..4 " "
+    Error@4..6
+      Integer@4..5 "1"
+      Whitespace@5..6 "\n"
+  VariableDef@6..15
+    LetKw@6..9 "let"
+    Whitespace@9..10 " "
+    Ident@10..11 "b"
+    Whitespace@11..12 " "
+    Equals@12..13 "="
+    Whitespace@13..14 " "
+    VariableRef@14..15
+      Ident@14..15 "a"
+error at 4..5: expected identifier, but found integer
+error at 6..9: expected ‘=’, but found ‘let’
+error at 6..9: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’, but found ‘let’
