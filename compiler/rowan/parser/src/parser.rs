@@ -7,6 +7,7 @@ pub(crate) use parse_error::ParseError;
 use crate::event::Event;
 use crate::grammar;
 use crate::source::Source;
+use crate::token_set::TokenSet;
 
 use self::marker::Marker;
 
@@ -14,7 +15,7 @@ pub(crate) mod marker;
 
 mod parse_error;
 
-const DEFAULT_RECOVERY_SET: [TokenKind; 1] = [TokenKind::LetKw];
+const DEFAULT_RECOVERY_SET: TokenSet = TokenSet::new([TokenKind::LetKw]);
 
 pub(crate) struct Parser<'t, 'input> {
     source: Source<'t, 'input>,
@@ -50,8 +51,8 @@ impl<'t, 'input> Parser<'t, 'input> {
         self.peek() == Some(kind)
     }
 
-    pub(crate) fn at_set(&mut self, set: &[TokenKind]) -> bool {
-        self.peek().map_or(false, |k| set.contains(&k))
+    pub(crate) fn at_set(&mut self, set: TokenSet) -> bool {
+        self.peek().map_or(false, |k| set.contains(k))
     }
 
     pub(crate) fn at_end(&mut self) -> bool {
@@ -76,19 +77,19 @@ impl<'t, 'input> Parser<'t, 'input> {
         }
     }
 
-    pub(crate) fn expect_with_recovery(&mut self, kind: TokenKind, recovery_set: &[TokenKind]) {
+    pub(crate) fn expect_with_recovery(&mut self, kind: TokenKind, recovery_set: TokenSet) {
         if self.at(kind) {
             self.bump();
         } else {
-            self.error_with_recovery(&[recovery_set, &DEFAULT_RECOVERY_SET].concat());
+            self.error_with_recovery(recovery_set.union(DEFAULT_RECOVERY_SET));
         }
     }
 
     pub(crate) fn error(&mut self) {
-        self.error_with_recovery(&DEFAULT_RECOVERY_SET);
+        self.error_with_recovery(DEFAULT_RECOVERY_SET);
     }
 
-    pub(crate) fn error_with_recovery(&mut self, recovery_set: &[TokenKind]) {
+    pub(crate) fn error_with_recovery(&mut self, recovery_set: TokenSet) {
         let current_token = self.source.peek_token();
 
         let (found, range) = if let Some(Token { kind, range, .. }) = current_token {
@@ -108,7 +109,7 @@ impl<'t, 'input> Parser<'t, 'input> {
         self.recover(recovery_set);
     }
 
-    fn recover(&mut self, recovery_set: &[TokenKind]) {
+    fn recover(&mut self, recovery_set: TokenSet) {
         if !self.at_set(recovery_set) && !self.at_end() {
             let m = self.start();
             self.bump();

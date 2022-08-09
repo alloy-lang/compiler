@@ -1,8 +1,9 @@
 use super::*;
 
 use crate::grammar::lambda;
+use crate::token_set::TokenSet;
 
-const EXPR_RECOVERY_SET: [TokenKind; 9] = [
+const EXPR_RECOVERY_SET: TokenSet = TokenSet::new([
     TokenKind::Integer,
     TokenKind::Fractional,
     TokenKind::String,
@@ -12,7 +13,7 @@ const EXPR_RECOVERY_SET: [TokenKind; 9] = [
     TokenKind::LParen,
     TokenKind::IfKw,
     TokenKind::Pipe,
-];
+]);
 
 enum BinaryOp {
     Add,
@@ -165,15 +166,12 @@ fn parse_if_then_else_expr(p: &mut Parser) -> CompletedMarker {
     parse_expr(p);
     if_m.complete(p, SyntaxKind::IfExpr);
 
-    p.expect_with_recovery(
-        TokenKind::ThenKw,
-        &[&[TokenKind::ElseKw], &EXPR_RECOVERY_SET[..]].concat(),
-    );
+    p.expect_with_recovery(TokenKind::ThenKw, EXPR_RECOVERY_SET.plus(TokenKind::ElseKw));
     let then_m = p.start();
     parse_expr(p);
     then_m.complete(p, SyntaxKind::ThenExpr);
 
-    p.expect_with_recovery(TokenKind::ElseKw, &EXPR_RECOVERY_SET);
+    p.expect_with_recovery(TokenKind::ElseKw, EXPR_RECOVERY_SET);
     let else_m = p.start();
     parse_expr(p);
     else_m.complete(p, SyntaxKind::ElseExpr);

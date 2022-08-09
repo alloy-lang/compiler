@@ -2,10 +2,17 @@ use crate::grammar::expr::{
     parse_char_literal, parse_expr, parse_fractional_literal, parse_int_literal,
     parse_string_literal, parse_variable_ref,
 };
+use crate::token_set::TokenSet;
 
 use super::*;
 
-const LAMBDA_ARG_SET: [TokenKind; 2] = [TokenKind::Ident, TokenKind::Integer];
+const LAMBDA_ARG_SET: TokenSet = TokenSet::new([
+    TokenKind::Integer,
+    TokenKind::Fractional,
+    TokenKind::String,
+    TokenKind::Char,
+    TokenKind::Ident,
+]);
 
 pub(crate) fn parse_lambda_expr(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Pipe));
@@ -38,15 +45,15 @@ fn parse_arg_list(p: &mut Parser) -> CompletedMarker {
             break;
         }
 
-        p.expect_with_recovery(TokenKind::Comma, &LAMBDA_ARG_SET);
+        p.expect_with_recovery(TokenKind::Comma, LAMBDA_ARG_SET);
     }
 
-    p.expect_with_recovery(TokenKind::Pipe, &[TokenKind::RightArrow]);
+    p.expect_with_recovery(TokenKind::Pipe, TokenSet::new([TokenKind::RightArrow]));
 
     return m.complete(p, SyntaxKind::LambdaArgList);
 
     fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(&[TokenKind::Pipe, TokenKind::RightArrow]) || p.at_end()
+        p.at_set(TokenSet::new([TokenKind::Pipe, TokenKind::RightArrow])) || p.at_end()
     }
 }
 

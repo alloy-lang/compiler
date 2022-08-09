@@ -12,8 +12,9 @@ Root@0..20
         IntLiteral@6..11
           Integer@6..10 "1001"
           Whitespace@10..11 " "
-      Error@11..14
-        Char@11..14 "'c'"
+      LambdaArg@11..14
+        CharLiteral@11..14
+          Char@11..14 "'c'"
       Pipe@14..15 "|"
       Whitespace@15..16 " "
     RightArrow@16..18 "->"

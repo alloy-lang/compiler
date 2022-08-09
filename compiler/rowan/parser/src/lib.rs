@@ -12,6 +12,7 @@ mod grammar;
 mod parser;
 mod sink;
 mod source;
+mod token_set;
 
 #[cfg(test)]
 mod tests;
