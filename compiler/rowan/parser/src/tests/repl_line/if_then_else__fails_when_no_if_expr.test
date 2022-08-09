@@ -1,12 +1,12 @@
-if test 2 else 3
+if then 2 else 3
 ===
 Root@0..16
   IfThenElseExpr@0..16
     IfKw@0..2 "if"
     Whitespace@2..3 " "
     IfExpr@3..8
-      VariableRef@3..8
-        Ident@3..7 "test"
+      Error@3..8
+        ThenKw@3..7 "then"
         Whitespace@7..8 " "
     ThenExpr@8..10
       IntLiteral@8..10
@@ -17,4 +17,5 @@ Root@0..16
     ElseExpr@15..16
       IntLiteral@15..16
         Integer@15..16 "3"
-error at 8..9: expected ‘+’, ‘-’, ‘*’, ‘/’ or ‘then‘, but found integer
+error at 3..7: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’, but found ‘then‘
+error at 8..9: expected ‘then‘, but found integer

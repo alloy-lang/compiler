@@ -1,0 +1,21 @@
+if test then else 3
+===
+Root@0..19
+  IfThenElseExpr@0..19
+    IfKw@0..2 "if"
+    Whitespace@2..3 " "
+    IfExpr@3..8
+      VariableRef@3..8
+        Ident@3..7 "test"
+        Whitespace@7..8 " "
+    ThenKw@8..12 "then"
+    Whitespace@12..13 " "
+    ThenExpr@13..18
+      Error@13..18
+        ElseKw@13..17 "else"
+        Whitespace@17..18 " "
+    ElseExpr@18..19
+      IntLiteral@18..19
+        Integer@18..19 "3"
+error at 13..17: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’, but found ‘else‘
+error at 18..19: expected ‘else‘, but found integer

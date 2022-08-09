@@ -1,0 +1,13 @@
+if
+===
+Root@0..2
+  IfThenElseExpr@0..2
+    IfKw@0..2 "if"
+    IfExpr@2..2
+    ThenExpr@2..2
+    ElseExpr@2..2
+error at 0..2: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+error at 0..2: expected ‘then‘
+error at 0..2: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+error at 0..2: expected ‘else‘
+error at 0..2: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’

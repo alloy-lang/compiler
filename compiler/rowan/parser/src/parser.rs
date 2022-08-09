@@ -80,7 +80,7 @@ impl<'t, 'input> Parser<'t, 'input> {
         if self.at(kind) {
             self.bump();
         } else {
-            self.error_with_recovery(recovery_set);
+            self.error_with_recovery(&[recovery_set, &DEFAULT_RECOVERY_SET].concat());
         }
     }
 
@@ -115,11 +115,4 @@ impl<'t, 'input> Parser<'t, 'input> {
             m.complete(self, SyntaxKind::Error);
         }
     }
-}
-
-#[cfg(test)]
-mod parser_tests {
-    use expect_test::expect;
-
-    use crate::check;
 }
