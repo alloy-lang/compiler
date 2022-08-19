@@ -2,6 +2,7 @@ use alloy_rowan_lexer::TokenKind;
 use alloy_rowan_syntax::SyntaxKind;
 
 use crate::parser::marker::CompletedMarker;
+use crate::parser::ParseErrorContext;
 use crate::parser::Parser;
 
 mod expr;

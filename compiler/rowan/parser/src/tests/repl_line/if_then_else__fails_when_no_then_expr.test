@@ -17,5 +17,5 @@ Root@0..19
     ElseExpr@18..19
       IntLiteral@18..19
         Integer@18..19 "3"
-error at 13..17: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’, but found ‘else‘
-error at 18..19: expected ‘else‘, but found integer
+error in range 13..17 while parsing an if-then-else expression. Found ‘else‘, but expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+error at position 19 while parsing an if-then-else expression. Missing expected ‘else‘

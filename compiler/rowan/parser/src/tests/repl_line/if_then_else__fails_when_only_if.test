@@ -6,8 +6,8 @@ Root@0..2
     IfExpr@2..2
     ThenExpr@2..2
     ElseExpr@2..2
-error at 0..2: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
-error at 0..2: expected ‘then‘
-error at 0..2: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
-error at 0..2: expected ‘else‘
-error at 0..2: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+error at position 2 while parsing an if-then-else expression. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+error at position 2 while parsing an if-then-else expression. Missing expected ‘then‘
+error at position 2 while parsing an if-then-else expression. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+error at position 2 while parsing an if-then-else expression. Missing expected ‘else‘
+error at position 2 while parsing an if-then-else expression. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’

@@ -43,15 +43,16 @@ impl UnaryOp {
     }
 }
 
-pub(super) fn parse_expr(p: &mut Parser) -> Option<CompletedMarker> {
-    parse_expr_with_binding_power(p, 0)
+pub(super) fn parse_expr(p: &mut Parser, context: ParseErrorContext) -> Option<CompletedMarker> {
+    parse_expr_with_binding_power(p, 0, context)
 }
 
 fn parse_expr_with_binding_power(
     p: &mut Parser,
     minimum_binding_power: u8,
+    context: ParseErrorContext,
 ) -> Option<CompletedMarker> {
-    let mut lhs = parse_lhs(p)?;
+    let mut lhs = parse_lhs(p, context)?;
 
     loop {
         let op = if p.at(TokenKind::Plus) {
@@ -78,7 +79,7 @@ fn parse_expr_with_binding_power(
         p.bump();
 
         let m = lhs.precede(p);
-        let parsed_rhs = parse_expr_with_binding_power(p, right_binding_power).is_some();
+        let parsed_rhs = parse_expr_with_binding_power(p, right_binding_power, context).is_some();
         lhs = m.complete(p, SyntaxKind::InfixExpr);
 
         if !parsed_rhs {
@@ -89,7 +90,7 @@ fn parse_expr_with_binding_power(
     Some(lhs)
 }
 
-fn parse_lhs(p: &mut Parser) -> Option<CompletedMarker> {
+fn parse_lhs(p: &mut Parser, context: ParseErrorContext) -> Option<CompletedMarker> {
     let cm = if p.at(TokenKind::Integer) {
         parse_int_literal(p)
     } else if p.at(TokenKind::Fractional) {
@@ -109,7 +110,7 @@ fn parse_lhs(p: &mut Parser) -> Option<CompletedMarker> {
     } else if p.at(TokenKind::Pipe) {
         lambda::parse_lambda_expr(p)
     } else {
-        p.error();
+        p.error(context);
         return None;
     };
 
@@ -163,17 +164,25 @@ fn parse_if_then_else_expr(p: &mut Parser) -> CompletedMarker {
     p.bump();
 
     let if_m = p.start();
-    parse_expr(p);
+    parse_expr(p, ParseErrorContext::IfThenElseIfExpr);
     if_m.complete(p, SyntaxKind::IfExpr);
 
-    p.expect_with_recovery(TokenKind::ThenKw, EXPR_RECOVERY_SET.plus(TokenKind::ElseKw));
+    p.expect_with_recovery(
+        TokenKind::ThenKw,
+        ParseErrorContext::IfThenElseThenKw,
+        EXPR_RECOVERY_SET.plus(TokenKind::ElseKw),
+    );
     let then_m = p.start();
-    parse_expr(p);
+    parse_expr(p, ParseErrorContext::IfThenElseThenExpr);
     then_m.complete(p, SyntaxKind::ThenExpr);
 
-    p.expect_with_recovery(TokenKind::ElseKw, EXPR_RECOVERY_SET);
+    p.expect_with_recovery(
+        TokenKind::ElseKw,
+        ParseErrorContext::IfThenElseElseKw,
+        EXPR_RECOVERY_SET,
+    );
     let else_m = p.start();
-    parse_expr(p);
+    parse_expr(p, ParseErrorContext::IfThenElseElseExpr);
     else_m.complete(p, SyntaxKind::ElseExpr);
 
     if_then_else_m.complete(p, SyntaxKind::IfThenElseExpr)
@@ -190,7 +199,7 @@ fn parse_prefix_expr(p: &mut Parser) -> CompletedMarker {
     // Eat the operator’s token.
     p.bump();
 
-    parse_expr_with_binding_power(p, right_binding_power);
+    parse_expr_with_binding_power(p, right_binding_power, ParseErrorContext::PrefixExprExpr);
 
     m.complete(p, SyntaxKind::PrefixExpr)
 }
@@ -200,8 +209,8 @@ fn parse_paren_expr(p: &mut Parser) -> CompletedMarker {
 
     let m = p.start();
     p.bump();
-    parse_expr(p);
-    p.expect(TokenKind::RParen);
+    parse_expr(p, ParseErrorContext::ParenExprExpr);
+    p.expect(TokenKind::RParen, ParseErrorContext::ParenExprRightParen);
 
     m.complete(p, SyntaxKind::ParenExpr)
 }

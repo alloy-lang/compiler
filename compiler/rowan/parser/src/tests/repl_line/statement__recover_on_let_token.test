@@ -18,4 +18,4 @@ Root@0..17
     Whitespace@15..16 " "
     VariableRef@16..17
       Ident@16..17 "a"
-error at 8..11: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’, but found ‘let’
+error at position 11 while parsing a variable definition. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’

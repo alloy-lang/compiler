@@ -17,4 +17,4 @@ Root@0..16
     ElseExpr@15..16
       IntLiteral@15..16
         Integer@15..16 "3"
-error at 8..9: expected ‘+’, ‘-’, ‘*’, ‘/’ or ‘then‘, but found integer
+error at position 9 while parsing an if-then-else expression. Missing expected ‘+’, ‘-’, ‘*’, ‘/’ or ‘then‘

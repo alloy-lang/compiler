@@ -57,5 +57,5 @@ Root@0..46
           Whitespace@44..45 " "
           VariableRef@45..46
             Ident@45..46 "b"
-error at 18..19: expected ‘->’, but found ‘-’
-error at 20..23: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’, but found ‘let’
+error in range 18..19 while parsing a lambda expression. Found ‘-’, but expected ‘->’
+error at position 23 while parsing a lambda expression body. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’

@@ -2,12 +2,14 @@ use std::mem;
 
 use alloy_rowan_lexer::{Token, TokenKind};
 use alloy_rowan_syntax::SyntaxKind;
-pub(crate) use parse_error::ParseError;
 
 use crate::event::Event;
 use crate::grammar;
+use crate::parser::parse_error::ParseErrorKind;
 use crate::source::Source;
 use crate::token_set::TokenSet;
+pub(crate) use parse_error::ParseError;
+pub(crate) use parse_error::ParseErrorContext;
 
 use self::marker::Marker;
 
@@ -69,51 +71,68 @@ impl<'t, 'input> Parser<'t, 'input> {
         self.events.push(Event::AddToken);
     }
 
-    pub(crate) fn expect(&mut self, kind: TokenKind) {
+    pub(crate) fn expect(&mut self, kind: TokenKind, context: ParseErrorContext) {
         if self.at(kind) {
             self.bump();
         } else {
-            self.error();
+            self.error(context);
         }
     }
 
-    pub(crate) fn expect_with_recovery(&mut self, kind: TokenKind, recovery_set: TokenSet) {
+    pub(crate) fn expect_with_recovery(
+        &mut self,
+        kind: TokenKind,
+        context: ParseErrorContext,
+        recovery_set: TokenSet,
+    ) {
         if self.at(kind) {
             self.bump();
         } else {
-            self.error_with_recovery(recovery_set.union(DEFAULT_RECOVERY_SET));
+            self.error_with_recovery(context, recovery_set.union(DEFAULT_RECOVERY_SET));
         }
     }
 
-    pub(crate) fn error(&mut self) {
-        self.error_with_recovery(DEFAULT_RECOVERY_SET);
+    pub(crate) fn error(&mut self, context: ParseErrorContext) {
+        self.error_with_recovery(context, DEFAULT_RECOVERY_SET);
     }
 
-    pub(crate) fn error_with_recovery(&mut self, recovery_set: TokenSet) {
+    fn error_with_recovery(&mut self, context: ParseErrorContext, recovery_set: TokenSet) {
+        let last_token_range = self.source.last_token_range().unwrap_or_default();
+
         let current_token = self.source.peek_token();
-
         let (found, range) = if let Some(Token { kind, range, .. }) = current_token {
             (Some(*kind), *range)
         } else {
             // If we’re at the end of the input we use the range of the very last token in the
             // input.
-            (None, self.source.last_token_range().unwrap())
+            (None, last_token_range)
+        };
+
+        let kind = match found {
+            None => ParseErrorKind::Missing {
+                offset: last_token_range.end(),
+            },
+            Some(kind) => {
+                if self.at_set(recovery_set) {
+                    ParseErrorKind::Missing {
+                        offset: range.end(),
+                    }
+                } else {
+                    ParseErrorKind::Unexpected { found: kind, range }
+                }
+            }
         };
 
         self.events.push(Event::Error(ParseError {
             expected: mem::take(&mut self.expected_kinds),
-            found,
-            range,
+            kind,
+            context,
         }));
 
-        self.recover(recovery_set);
-    }
-
-    fn recover(&mut self, recovery_set: TokenSet) {
         if !self.at_set(recovery_set) && !self.at_end() {
             let m = self.start();
             self.bump();
             m.complete(self, SyntaxKind::Error);
-        }
+        };
     }
 }

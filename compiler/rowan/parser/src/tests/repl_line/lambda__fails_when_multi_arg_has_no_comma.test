@@ -22,5 +22,5 @@ Root@0..20
     LambdaExprBody@19..20
       IntLiteral@19..20
         Integer@19..20 "8"
-error at 6..10: expected ‘,’, but found integer
-error at 11..14: expected ‘,’, but found char
+error at position 10 while parsing a lambda argument. Missing expected ‘,’
+error at position 14 while parsing a lambda argument. Missing expected ‘,’

@@ -12,8 +12,8 @@ Root@0..12
       Error@8..12
         ElseKw@8..12 "else"
     ElseExpr@12..12
-error at 3..7: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’, but found ‘then‘
-error at 8..12: expected ‘then‘, but found ‘else‘
-error at 8..12: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’, but found ‘else‘
-error at 8..12: expected ‘else‘
-error at 8..12: expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+error in range 3..7 while parsing an if-then-else expression. Found ‘then‘, but expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+error at position 12 while parsing an if-then-else expression. Missing expected ‘then‘
+error in range 8..12 while parsing an if-then-else expression. Found ‘else‘, but expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+error at position 12 while parsing an if-then-else expression. Missing expected ‘else‘
+error at position 12 while parsing an if-then-else expression. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’

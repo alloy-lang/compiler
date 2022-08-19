@@ -1,24 +1,163 @@
-use std::fmt;
-
-use text_size::TextRange;
-
 use alloy_rowan_lexer::TokenKind;
+use std::fmt;
+use text_size::{TextRange, TextSize};
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct ParseError {
     pub(super) expected: Vec<TokenKind>,
-    pub(super) found: Option<TokenKind>,
-    pub(super) range: TextRange,
+    pub(super) kind: ParseErrorKind,
+    pub(super) context: ParseErrorContext,
+}
+
+#[derive(Debug, PartialEq)]
+pub(crate) enum ParseErrorKind {
+    Missing { offset: TextSize },
+    Unexpected { found: TokenKind, range: TextRange },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub(crate) enum ParseErrorContext {
+    LambdaArgComma,
+    LambdaArgExpr,
+    LambdaArgPipe,
+    LambdaExprRightArrow,
+    LambdaExprExpr,
+    PrefixExprExpr,
+    ParenExprExpr,
+    ParenExprRightParen,
+    IfThenElseIfExpr,
+    IfThenElseThenKw,
+    IfThenElseThenExpr,
+    IfThenElseElseKw,
+    IfThenElseElseExpr,
+    VariableDefIdent,
+    VariableDefEquals,
+    VariableDefExpr,
+    TopLevelExpr,
+}
+
+impl ParseErrorContext {
+    #[must_use]
+    fn long_message<'a>(&self) -> &'a str {
+        match self {
+            ParseErrorContext::LambdaArgComma => {
+                "We expected to see a comma separating the arguments."
+            }
+            ParseErrorContext::LambdaArgExpr => "We expected to see an expression.",
+            ParseErrorContext::LambdaArgPipe => {
+                "We expected to see a pipe at the end of the arguments."
+            }
+            ParseErrorContext::LambdaExprRightArrow => {
+                "We expected to see a right arrow after the lambda arguments."
+            }
+            ParseErrorContext::LambdaExprExpr => {
+                "We expected to see an expression after the lambda arguments."
+            }
+            ParseErrorContext::PrefixExprExpr => {
+                "We expected to see an expression after the prefix operator."
+            }
+            ParseErrorContext::ParenExprExpr => "We expected to see an expression after the ‘(‘.",
+            ParseErrorContext::ParenExprRightParen => {
+                "We expected to see a right parenthesis after the expression."
+            }
+            ParseErrorContext::IfThenElseIfExpr => {
+                "We expected to see an expression after the ‘if‘."
+            }
+            ParseErrorContext::IfThenElseThenKw => {
+                "We expected to see a ‘then‘ after the ‘if‘ expression."
+            }
+            ParseErrorContext::IfThenElseThenExpr => {
+                "We expected to see an expression after the ‘then‘."
+            }
+            ParseErrorContext::IfThenElseElseKw => {
+                "We expected to see a ‘else‘ after the ‘then‘ expression."
+            }
+            ParseErrorContext::IfThenElseElseExpr => {
+                "We expected to see an expression after the ‘else‘."
+            }
+            ParseErrorContext::VariableDefIdent => {
+                "We expected to see an identifier after the ‘let‘."
+            }
+            ParseErrorContext::VariableDefEquals => {
+                "We expected to see an ‘=‘ after the identifier."
+            }
+            ParseErrorContext::VariableDefExpr => "We expected to see an expression after the ‘=‘.",
+            ParseErrorContext::TopLevelExpr => "We expected to see an expression.",
+        }
+    }
+
+    #[must_use]
+    fn context_name<'a>(&self) -> &'a str {
+        match self {
+            ParseErrorContext::LambdaArgComma => "a lambda argument",
+            ParseErrorContext::LambdaArgExpr => "a lambda argument",
+            ParseErrorContext::LambdaArgPipe => "a lambda argument",
+            ParseErrorContext::LambdaExprRightArrow => "a lambda expression",
+            ParseErrorContext::LambdaExprExpr => "a lambda expression body",
+            ParseErrorContext::PrefixExprExpr => "an expression after a prefix operator",
+            ParseErrorContext::ParenExprExpr => "an expression inside parentheses",
+            ParseErrorContext::ParenExprRightParen => "a close parenthesis after an expression",
+            ParseErrorContext::IfThenElseIfExpr => "an if-then-else expression",
+            ParseErrorContext::IfThenElseThenKw => "an if-then-else expression",
+            ParseErrorContext::IfThenElseThenExpr => "an if-then-else expression",
+            ParseErrorContext::IfThenElseElseKw => "an if-then-else expression",
+            ParseErrorContext::IfThenElseElseExpr => "an if-then-else expression",
+            ParseErrorContext::VariableDefIdent => "a variable definition",
+            ParseErrorContext::VariableDefEquals => "a variable definition",
+            ParseErrorContext::VariableDefExpr => "a variable definition",
+            ParseErrorContext::TopLevelExpr => todo!(),
+        }
+    }
+
+    #[must_use]
+    fn short_message<'a>(&self) -> &'a str {
+        match self {
+            ParseErrorContext::LambdaArgComma => "expected ‘,‘ separating arguments",
+            ParseErrorContext::LambdaArgExpr => "expected expression as argument",
+            ParseErrorContext::LambdaArgPipe => "expected a ‘|‘ after the last argument",
+            ParseErrorContext::LambdaExprRightArrow => "expected ‘->‘ after the arguments",
+            ParseErrorContext::LambdaExprExpr => "expected expression as body",
+            ParseErrorContext::PrefixExprExpr => todo!(),
+            ParseErrorContext::ParenExprExpr => todo!(),
+            ParseErrorContext::ParenExprRightParen => "expected ‘)‘ after expression",
+            ParseErrorContext::IfThenElseIfExpr => todo!(),
+            ParseErrorContext::IfThenElseThenKw => "expected ‘then‘ after ‘if‘ expression",
+            ParseErrorContext::IfThenElseThenExpr => todo!(),
+            ParseErrorContext::IfThenElseElseKw => "expected ‘else‘ after ‘then‘ expression",
+            ParseErrorContext::IfThenElseElseExpr => todo!(),
+            ParseErrorContext::VariableDefIdent => todo!(),
+            ParseErrorContext::VariableDefEquals => todo!(),
+            ParseErrorContext::VariableDefExpr => todo!(),
+            ParseErrorContext::TopLevelExpr => todo!(),
+        }
+    }
 }
 
 impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "error at {}..{}: expected ",
-            u32::from(self.range.start()),
-            u32::from(self.range.end()),
-        )?;
+        let context_name = self.context.context_name();
+
+        match self.kind {
+            ParseErrorKind::Missing { offset } => {
+                write!(f, "error at position {:?}", offset)?;
+                write!(f, " while parsing {}. ", context_name)?;
+                f.write_str("Missing expected ")?;
+            }
+            ParseErrorKind::Unexpected { found, range } => {
+                write!(
+                    f,
+                    "error in range {}..{}",
+                    u32::from(range.start()),
+                    u32::from(range.end()),
+                )?;
+                write!(f, " while parsing {}. ", context_name)?;
+                write!(f, "Found {}, but expected ", found)?;
+            }
+        }
+
+        //
+        // Expected
+        //
 
         let num_expected = self.expected.len();
         let is_first = |idx| idx == 0;
@@ -34,10 +173,6 @@ impl fmt::Display for ParseError {
             }
         }
 
-        if let Some(found) = self.found {
-            write!(f, ", but found {}", found)?;
-        }
-
         Ok(())
     }
 }
@@ -48,20 +183,11 @@ mod tests {
 
     use super::*;
 
-    fn check(
-        expected: Vec<TokenKind>,
-        found: Option<TokenKind>,
-        range: StdRange<u32>,
-        output: &str,
-    ) {
+    fn check(expected: Vec<TokenKind>, kind: ParseErrorKind, output: &str) {
         let error = ParseError {
             expected,
-            found,
-            range: {
-                let start = range.start.into();
-                let end = range.end.into();
-                TextRange::new(start, end)
-            },
+            kind,
+            context: ParseErrorContext::ParenExprExpr,
         };
 
         assert_eq!(format!("{}", error), output);
@@ -71,9 +197,10 @@ mod tests {
     fn one_expected_did_find() {
         check(
             vec![TokenKind::Equals],
-            Some(TokenKind::Ident),
-            10..20,
-            "error at 10..20: expected ‘=’, but found identifier",
+            ParseErrorKind::Missing {
+                offset: TextSize::from(20),
+            },
+            "error at position 20 while parsing an expression inside parentheses. Missing expected ‘=’",
         );
     }
 
@@ -81,9 +208,10 @@ mod tests {
     fn one_expected_did_not_find() {
         check(
             vec![TokenKind::RParen],
-            None,
-            5..6,
-            "error at 5..6: expected ‘)’",
+            ParseErrorKind::Missing {
+                offset: TextSize::from(6),
+            },
+            "error at position 6 while parsing an expression inside parentheses. Missing expected ‘)’",
         );
     }
 
@@ -96,19 +224,22 @@ mod tests {
                 TokenKind::Minus,
                 TokenKind::LParen,
             ],
-            Some(TokenKind::LetKw),
-            100..105,
-            "error at 100..105: expected integer, identifier, ‘-’ or ‘(’, but found ‘let’",
+            ParseErrorKind::Unexpected {
+                found: TokenKind::LetKw,
+                range: TextRange::new(100.into(), 105.into()),
+            },
+            "error in range 100..105 while parsing an expression inside parentheses. Found ‘let’, but expected integer, identifier, ‘-’ or ‘(’",
         );
     }
 
     #[test]
-    fn two_expected_did_find() {
+    fn multiple_expected_did_not_find() {
         check(
             vec![TokenKind::Plus, TokenKind::Minus],
-            Some(TokenKind::Equals),
-            0..1,
-            "error at 0..1: expected ‘+’ or ‘-’, but found ‘=’",
+            ParseErrorKind::Missing {
+                offset: TextSize::from(1),
+            },
+            "error at position 1 while parsing an expression inside parentheses. Missing expected ‘+’ or ‘-’",
         );
     }
 }
