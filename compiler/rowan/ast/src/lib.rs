@@ -7,6 +7,7 @@ pub mod validation;
 pub struct VariableDef(SyntaxNode);
 
 impl VariableDef {
+    #[must_use]
     pub fn name(&self) -> Option<SyntaxToken> {
         self.0
             .children_with_tokens()
@@ -23,14 +24,17 @@ impl VariableDef {
 pub struct BinaryExpr(SyntaxNode);
 
 impl BinaryExpr {
+    #[must_use]
     pub fn lhs(&self) -> Option<Expr> {
         self.0.children().find_map(Expr::cast)
     }
 
+    #[must_use]
     pub fn rhs(&self) -> Option<Expr> {
         self.0.children().filter_map(Expr::cast).nth(1)
     }
 
+    #[must_use]
     pub fn op(&self) -> Option<SyntaxToken> {
         self.0
             .children_with_tokens()
@@ -48,6 +52,7 @@ impl BinaryExpr {
 pub struct IntLiteral(SyntaxNode);
 
 impl IntLiteral {
+    #[must_use]
     pub fn cast(node: &SyntaxNode) -> Option<Self> {
         if node.kind() == SyntaxKind::IntLiteral {
             Some(Self(node.clone()))
@@ -56,8 +61,9 @@ impl IntLiteral {
         }
     }
 
+    #[must_use]
     pub fn parse(&self) -> Option<u64> {
-        self.0.first_token().unwrap().text().parse().ok()
+        self.0.first_token().expect("first_token will always exist").text().parse().ok()
     }
 }
 
@@ -65,6 +71,7 @@ impl IntLiteral {
 pub struct FractionalLiteral(SyntaxNode);
 
 impl FractionalLiteral {
+    #[must_use]
     pub fn cast(node: &SyntaxNode) -> Option<Self> {
         if node.kind() == SyntaxKind::FractionalLiteral {
             Some(Self(node.clone()))
@@ -73,8 +80,9 @@ impl FractionalLiteral {
         }
     }
 
+    #[must_use]
     pub fn parse(&self) -> Option<NotNan<f64>> {
-        self.0.first_token().unwrap().text().parse().ok()
+        self.0.first_token().expect("first_token will always exist").text().parse().ok()
     }
 }
 
@@ -82,6 +90,7 @@ impl FractionalLiteral {
 pub struct StringLiteral(SyntaxNode);
 
 impl StringLiteral {
+    #[must_use]
     pub fn cast(node: &SyntaxNode) -> Option<Self> {
         if node.kind() == SyntaxKind::StringLiteral {
             Some(Self(node.clone()))
@@ -90,8 +99,9 @@ impl StringLiteral {
         }
     }
 
+    #[must_use]
     pub fn parse(&self) -> String {
-        let string = self.0.first_token().unwrap().text().to_string();
+        let string = self.0.first_token().expect("first_token will always exist").text().to_string();
 
         string[1..string.len() - 1].to_string()
     }
@@ -101,6 +111,7 @@ impl StringLiteral {
 pub struct CharLiteral(SyntaxNode);
 
 impl CharLiteral {
+    #[must_use]
     pub fn cast(node: &SyntaxNode) -> Option<Self> {
         if node.kind() == SyntaxKind::CharLiteral {
             Some(Self(node.clone()))
@@ -109,13 +120,13 @@ impl CharLiteral {
         }
     }
 
+    #[must_use]
     pub fn parse(&self) -> Option<char> {
         self.0
             .first_token()
             .iter()
             .filter(|token| token.text().len() == 3)
-            .filter_map(|token| token.text().chars().nth(1))
-            .next()
+            .find_map(|token| token.text().chars().nth(1))
     }
 }
 
@@ -123,6 +134,7 @@ impl CharLiteral {
 pub struct IfThenElseExpr(SyntaxNode);
 
 impl IfThenElseExpr {
+    #[must_use]
     pub fn cond(&self) -> Option<Expr> {
         self.0
             .children()
@@ -130,6 +142,7 @@ impl IfThenElseExpr {
             .and_then(|parent| parent.children().find_map(Expr::cast))
     }
 
+    #[must_use]
     pub fn then(&self) -> Option<Expr> {
         self.0
             .children()
@@ -137,6 +150,7 @@ impl IfThenElseExpr {
             .and_then(|parent| parent.children().find_map(Expr::cast))
     }
 
+    #[must_use]
     pub fn else_(&self) -> Option<Expr> {
         self.0
             .children()
@@ -162,6 +176,7 @@ impl UnaryExpr {
         self.0.children().find_map(Expr::cast)
     }
 
+    #[must_use]
     pub fn op(&self) -> Option<SyntaxToken> {
         self.0
             .children_with_tokens()
@@ -174,8 +189,80 @@ impl UnaryExpr {
 pub struct VariableRef(SyntaxNode);
 
 impl VariableRef {
+    #[must_use]
     pub fn name(&self) -> Option<SyntaxToken> {
         self.0.first_token()
+    }
+}
+
+#[derive(Debug)]
+pub struct LambdaExpr(SyntaxNode);
+
+impl LambdaExpr {
+    #[must_use]
+    pub fn args(&self) -> Vec<Pattern> {
+        self.0
+            .children()
+            .find(|node| matches!(node.kind(), SyntaxKind::LambdaArgList))
+            .map(|parent| {
+                parent
+                    .children()
+                    .filter_map(|c| LambdaArg::cast(&c))
+                    .filter_map(|c| c.pattern())
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+
+    #[must_use]
+    pub fn body(&self) -> Option<Expr> {
+        self.0
+            .children()
+            .find(|node| matches!(node.kind(), SyntaxKind::LambdaExprBody))
+            .and_then(|parent| parent.children().find_map(Expr::cast))
+    }
+}
+
+#[derive(Debug)]
+pub struct LambdaArg(SyntaxNode);
+
+impl LambdaArg {
+    #[must_use]
+    pub fn cast(node: &SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::LambdaArg {
+            Some(Self(node.clone()))
+        } else {
+            None
+        }
+    }
+
+    fn pattern(&self) -> Option<Pattern> {
+        self.0.children().find_map(Pattern::cast)
+    }
+}
+
+#[derive(Debug)]
+pub enum Pattern {
+    IntLiteral(IntLiteral),
+    FractionalLiteral(FractionalLiteral),
+    StringLiteral(StringLiteral),
+    CharLiteral(CharLiteral),
+    VariableRef(VariableRef),
+}
+
+impl Pattern {
+    #[must_use]
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        let result = match node.kind() {
+            SyntaxKind::IntLiteral => Self::IntLiteral(IntLiteral(node)),
+            SyntaxKind::FractionalLiteral => Self::FractionalLiteral(FractionalLiteral(node)),
+            SyntaxKind::StringLiteral => Self::StringLiteral(StringLiteral(node)),
+            SyntaxKind::CharLiteral => Self::CharLiteral(CharLiteral(node)),
+            SyntaxKind::VariableRef => Self::VariableRef(VariableRef(node)),
+            _ => return None,
+        };
+
+        Some(result)
     }
 }
 
@@ -190,9 +277,11 @@ pub enum Expr {
     ParenExpr(ParenExpr),
     UnaryExpr(UnaryExpr),
     VariableRef(VariableRef),
+    LambdaExpr(LambdaExpr),
 }
 
 impl Expr {
+    #[must_use]
     pub fn cast(node: SyntaxNode) -> Option<Self> {
         let result = match node.kind() {
             SyntaxKind::InfixExpr => Self::BinaryExpr(BinaryExpr(node)),
@@ -204,6 +293,7 @@ impl Expr {
             SyntaxKind::ParenExpr => Self::ParenExpr(ParenExpr(node)),
             SyntaxKind::PrefixExpr => Self::UnaryExpr(UnaryExpr(node)),
             SyntaxKind::VariableRef => Self::VariableRef(VariableRef(node)),
+            SyntaxKind::LambdaExprDef => Self::LambdaExpr(LambdaExpr(node)),
             _ => return None,
         };
 
@@ -218,6 +308,7 @@ pub enum Stmt {
 }
 
 impl Stmt {
+    #[must_use]
     pub fn cast(node: SyntaxNode) -> Option<Self> {
         let result = match node.kind() {
             SyntaxKind::VariableDef => Self::VariableDef(VariableDef(node)),
@@ -232,6 +323,7 @@ impl Stmt {
 pub struct Root(SyntaxNode);
 
 impl Root {
+    #[must_use]
     pub fn cast(node: SyntaxNode) -> Option<Self> {
         if node.kind() == SyntaxKind::Root {
             Some(Self(node))
@@ -239,7 +331,9 @@ impl Root {
             None
         }
     }
+}
 
+impl Root {
     pub fn stmts(&self) -> impl Iterator<Item = Stmt> {
         self.0.children().filter_map(Stmt::cast)
     }

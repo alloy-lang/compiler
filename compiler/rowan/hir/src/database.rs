@@ -1,13 +1,13 @@
 use la_arena::Arena;
 
-use alloy_rowan_ast::IfThenElseExpr;
 use alloy_rowan_syntax::SyntaxKind;
 
-use crate::{BinaryOp, Expr, Stmt, UnaryOp};
+use crate::{BinaryOp, Expr, Pattern, Stmt, UnaryOp};
 
 #[derive(Debug, PartialEq, Default)]
 pub struct Database {
     exprs: Arena<Expr>,
+    patterns: Arena<Pattern>,
 }
 
 impl Database {
@@ -26,24 +26,39 @@ impl Database {
     pub(crate) fn lower_expr(&mut self, ast: Option<alloy_rowan_ast::Expr>) -> Expr {
         if let Some(ast) = ast {
             match ast {
-                alloy_rowan_ast::Expr::BinaryExpr(ast) => self.lower_binary(ast),
+                alloy_rowan_ast::Expr::BinaryExpr(ast) => self.lower_binary(&ast),
                 alloy_rowan_ast::Expr::IntLiteral(ast) => Expr::IntLiteral { n: ast.parse() },
                 alloy_rowan_ast::Expr::FractionalLiteral(ast) => {
                     Expr::FractionalLiteral { n: ast.parse() }
                 }
                 alloy_rowan_ast::Expr::StringLiteral(ast) => Expr::StringLiteral(ast.parse()),
                 alloy_rowan_ast::Expr::CharLiteral(ast) => Expr::CharLiteral(ast.parse()),
-                alloy_rowan_ast::Expr::IfThenElseExpr(ast) => self.lower_if_then_else(ast),
+                alloy_rowan_ast::Expr::IfThenElseExpr(ast) => self.lower_if_then_else(&ast),
                 alloy_rowan_ast::Expr::ParenExpr(ast) => self.lower_expr(ast.expr()),
-                alloy_rowan_ast::Expr::UnaryExpr(ast) => self.lower_unary(ast),
-                alloy_rowan_ast::Expr::VariableRef(ast) => self.lower_variable_ref(ast),
+                alloy_rowan_ast::Expr::UnaryExpr(ast) => self.lower_unary(&ast),
+                alloy_rowan_ast::Expr::VariableRef(ast) => Self::lower_variable_ref(&ast),
+                alloy_rowan_ast::Expr::LambdaExpr(ast) => self.lower_lambda(&ast),
             }
         } else {
             Expr::Missing
         }
     }
 
-    fn lower_binary(&mut self, ast: alloy_rowan_ast::BinaryExpr) -> Expr {
+    fn lower_pattern(ast: alloy_rowan_ast::Pattern) -> Pattern {
+        match ast {
+            alloy_rowan_ast::Pattern::IntLiteral(ast) => Pattern::IntLiteral(ast.parse()),
+            alloy_rowan_ast::Pattern::FractionalLiteral(ast) => {
+                Pattern::FractionalLiteral(ast.parse())
+            }
+            alloy_rowan_ast::Pattern::StringLiteral(ast) => Pattern::StringLiteral(ast.parse()),
+            alloy_rowan_ast::Pattern::CharLiteral(ast) => Pattern::CharLiteral(ast.parse()),
+            alloy_rowan_ast::Pattern::VariableRef(ast) => Pattern::VariableRef {
+                var: ast.name().unwrap().text().into(),
+            },
+        }
+    }
+
+    fn lower_binary(&mut self, ast: &alloy_rowan_ast::BinaryExpr) -> Expr {
         let op = match ast.op().unwrap().kind() {
             SyntaxKind::Plus => BinaryOp::Add,
             SyntaxKind::Minus => BinaryOp::Sub,
@@ -62,7 +77,7 @@ impl Database {
         }
     }
 
-    fn lower_if_then_else(&mut self, ast: IfThenElseExpr) -> Expr {
+    fn lower_if_then_else(&mut self, ast: &alloy_rowan_ast::IfThenElseExpr) -> Expr {
         let cond = self.lower_expr(ast.cond());
         let then = self.lower_expr(ast.then());
         let else_ = self.lower_expr(ast.else_());
@@ -74,7 +89,7 @@ impl Database {
         }
     }
 
-    fn lower_unary(&mut self, ast: alloy_rowan_ast::UnaryExpr) -> Expr {
+    fn lower_unary(&mut self, ast: &alloy_rowan_ast::UnaryExpr) -> Expr {
         let op = match ast.op().unwrap().kind() {
             SyntaxKind::Minus => UnaryOp::Neg,
             _ => unreachable!(),
@@ -88,9 +103,27 @@ impl Database {
         }
     }
 
-    fn lower_variable_ref(&mut self, ast: alloy_rowan_ast::VariableRef) -> Expr {
+    fn lower_variable_ref(ast: &alloy_rowan_ast::VariableRef) -> Expr {
         Expr::VariableRef {
             var: ast.name().unwrap().text().into(),
+        }
+    }
+
+    fn lower_lambda(&mut self, ast: &alloy_rowan_ast::LambdaExpr) -> Expr {
+        let args = ast
+            .args()
+            .into_iter()
+            .map(|p| {
+                let p = Self::lower_pattern(p);
+                self.patterns.alloc(p)
+            })
+            .collect();
+
+        let body = self.lower_expr(ast.body());
+
+        Expr::Lambda {
+            args,
+            body: self.exprs.alloc(body),
         }
     }
 }
@@ -105,7 +138,9 @@ mod tests {
     use super::*;
 
     fn parse(input: &str) -> ast::Root {
-        ast::Root::cast(parser::parse(input).syntax()).unwrap()
+        let node = parser::parse(input).syntax();
+        dbg!(&node);
+        ast::Root::cast(node).unwrap()
     }
 
     fn check_stmt(input: &str, expected_hir: Stmt) {
@@ -128,6 +163,20 @@ mod tests {
 
         assert_eq!(hir, expected_hir);
         assert_eq!(database, expected_database);
+    }
+
+    fn from_exprs(exprs: Arena<Expr>) -> Database {
+        Database {
+            exprs,
+            patterns: Default::default(),
+        }
+    }
+
+    fn from_patterns(patterns: Arena<Pattern>) -> Database {
+        Database {
+            exprs: Default::default(),
+            patterns,
+        }
     }
 
     #[test]
@@ -177,7 +226,7 @@ mod tests {
                 rhs,
                 op: BinaryOp::Sub,
             },
-            Database { exprs },
+            from_exprs(exprs),
         );
     }
 
@@ -194,7 +243,7 @@ mod tests {
                 rhs,
                 op: BinaryOp::Add,
             },
-            Database { exprs },
+            from_exprs(exprs),
         );
     }
 
@@ -252,7 +301,7 @@ mod tests {
                 expr,
                 op: UnaryOp::Neg,
             },
-            Database { exprs },
+            from_exprs(exprs),
         );
     }
 
@@ -267,7 +316,7 @@ mod tests {
                 expr: ten,
                 op: UnaryOp::Neg,
             },
-            Database { exprs },
+            from_exprs(exprs),
         );
     }
 
@@ -294,7 +343,7 @@ mod tests {
                 then: ten,
                 else_: five,
             },
-            Database { exprs },
+            from_exprs(exprs),
         );
     }
 
@@ -308,7 +357,63 @@ mod tests {
         check_expr(
             "if then else",
             Expr::IfThenElse { cond, then, else_ },
-            Database { exprs },
+            from_exprs(exprs),
+        );
+    }
+
+    #[test]
+    fn lambda_expr_no_args() {
+        let mut exprs = Arena::new();
+        let body = exprs.alloc(Expr::IntLiteral { n: Some(9) });
+
+        check_expr(
+            "|| -> 9",
+            Expr::Lambda { args: vec![], body },
+            from_exprs(exprs),
+        );
+    }
+
+    #[test]
+    fn lambda_expr_one_arg() {
+        let mut exprs = Arena::new();
+        let mut patterns = Arena::new();
+        let arg1 = patterns.alloc(Pattern::VariableRef {
+            var: "arg1".to_string(),
+        });
+        let body = exprs.alloc(Expr::IntLiteral { n: Some(9) });
+
+        check_expr(
+            "|arg1| -> 9",
+            Expr::Lambda {
+                args: vec![arg1],
+                body,
+            },
+            Database { exprs, patterns },
+        );
+    }
+
+    #[test]
+    fn lambda_expr_multiple_args() {
+        let mut exprs = Arena::new();
+        let mut patterns = Arena::new();
+        let arg1 = patterns.alloc(Pattern::VariableRef {
+            var: "arg1".to_string(),
+        });
+        let arg2 = patterns.alloc(Pattern::VariableRef {
+            var: "arg2".to_string(),
+        });
+        let arg3 = patterns.alloc(Pattern::VariableRef {
+            var: "arg3".to_string(),
+        });
+        let body = exprs.alloc(Expr::IntLiteral { n: Some(9) });
+
+        check_expr(
+            "|arg1, arg2, arg3| -> 9",
+            Expr::Lambda {
+                args: vec![arg1, arg2, arg3],
+                body,
+            },
+            Database { exprs, patterns },
         );
     }
 }

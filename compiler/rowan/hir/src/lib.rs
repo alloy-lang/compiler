@@ -7,7 +7,8 @@ pub use self::database::Database;
 
 mod database;
 
-pub fn lower(ast: ast::Root) -> (Database, Vec<Stmt>) {
+#[must_use]
+pub fn lower(ast: &ast::Root) -> (Database, Vec<Stmt>) {
     let mut db = Database::default();
     let stmts = ast.stmts().filter_map(|stmt| db.lower_stmt(stmt)).collect();
 
@@ -18,6 +19,18 @@ pub fn lower(ast: ast::Root) -> (Database, Vec<Stmt>) {
 pub enum Stmt {
     VariableDef { name: String, value: Expr },
     Expr(Expr),
+}
+
+type PatternIdx = Idx<Pattern>;
+
+#[derive(Debug, PartialEq)]
+pub enum Pattern {
+    Missing,
+    IntLiteral(Option<u64>),
+    FractionalLiteral(Option<NotNan<f64>>),
+    StringLiteral(String),
+    CharLiteral(Option<char>),
+    VariableRef { var: String },
 }
 
 type ExprIdx = Idx<Expr>;
@@ -51,6 +64,10 @@ pub enum Expr {
     },
     VariableRef {
         var: String,
+    },
+    Lambda {
+        args: Vec<PatternIdx>,
+        body: ExprIdx,
     },
 }
 

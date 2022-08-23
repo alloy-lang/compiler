@@ -35,7 +35,7 @@ fn main() -> io::Result<()> {
             )
             .collect::<Vec<_>>());
 
-        dbg!(alloy_rowan_hir::lower(root));
+        dbg!(alloy_rowan_hir::lower(&root));
 
         input.clear();
     }
