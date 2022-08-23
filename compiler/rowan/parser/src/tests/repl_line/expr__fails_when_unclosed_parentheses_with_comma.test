@@ -1,0 +1,9 @@
+(foo,
+===
+Root@0..5
+  ParenExpr@0..5
+    LParen@0..1 "("
+    VariableRef@1..4
+      Ident@1..4 "foo"
+    Comma@4..5 ","
+error at position 5 while parsing a close parenthesis after an expression. Missing expected ‘)’

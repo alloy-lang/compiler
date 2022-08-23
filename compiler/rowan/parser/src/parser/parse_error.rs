@@ -24,6 +24,7 @@ pub(crate) enum ParseErrorContext {
     LambdaExprExpr,
     PrefixExprExpr,
     ParenExprExpr,
+    ParenExprComma,
     ParenExprRightParen,
     IfThenElseIfExpr,
     IfThenElseThenKw,
@@ -57,6 +58,7 @@ impl ParseErrorContext {
                 "We expected to see an expression after the prefix operator."
             }
             ParseErrorContext::ParenExprExpr => "We expected to see an expression after the ‘(‘.",
+            ParseErrorContext::ParenExprComma => todo!(),
             ParseErrorContext::ParenExprRightParen => {
                 "We expected to see a right parenthesis after the expression."
             }
@@ -96,6 +98,7 @@ impl ParseErrorContext {
             ParseErrorContext::LambdaExprExpr => "a lambda expression body",
             ParseErrorContext::PrefixExprExpr => "an expression after a prefix operator",
             ParseErrorContext::ParenExprExpr => "an expression inside parentheses",
+            ParseErrorContext::ParenExprComma => "a comma between expressions inside parentheses",
             ParseErrorContext::ParenExprRightParen => "a close parenthesis after an expression",
             ParseErrorContext::IfThenElseIfExpr => "an if-then-else expression",
             ParseErrorContext::IfThenElseThenKw => "an if-then-else expression",
@@ -105,7 +108,7 @@ impl ParseErrorContext {
             ParseErrorContext::VariableDefIdent => "a variable definition",
             ParseErrorContext::VariableDefEquals => "a variable definition",
             ParseErrorContext::VariableDefExpr => "a variable definition",
-            ParseErrorContext::TopLevelExpr => todo!(),
+            ParseErrorContext::TopLevelExpr => "a top level expression",
         }
     }
 
@@ -119,6 +122,7 @@ impl ParseErrorContext {
             ParseErrorContext::LambdaExprExpr => "expected expression as body",
             ParseErrorContext::PrefixExprExpr => todo!(),
             ParseErrorContext::ParenExprExpr => todo!(),
+            ParseErrorContext::ParenExprComma => todo!(),
             ParseErrorContext::ParenExprRightParen => "expected ‘)‘ after expression",
             ParseErrorContext::IfThenElseIfExpr => todo!(),
             ParseErrorContext::IfThenElseThenKw => "expected ‘then‘ after ‘if‘ expression",

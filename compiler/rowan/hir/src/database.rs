@@ -1,4 +1,5 @@
 use la_arena::Arena;
+use non_empty_vec::NonEmpty;
 
 use alloy_rowan_syntax::SyntaxKind;
 
@@ -34,7 +35,9 @@ impl Database {
                 alloy_rowan_ast::Expr::StringLiteral(ast) => Expr::StringLiteral(ast.parse()),
                 alloy_rowan_ast::Expr::CharLiteral(ast) => Expr::CharLiteral(ast.parse()),
                 alloy_rowan_ast::Expr::IfThenElseExpr(ast) => self.lower_if_then_else(&ast),
+                alloy_rowan_ast::Expr::UnitExpr(_ast) => Expr::Unit,
                 alloy_rowan_ast::Expr::ParenExpr(ast) => self.lower_expr(ast.expr()),
+                alloy_rowan_ast::Expr::TupleExpr(ast) => self.lower_tuple_expr(ast.exprs()),
                 alloy_rowan_ast::Expr::UnaryExpr(ast) => self.lower_unary(&ast),
                 alloy_rowan_ast::Expr::VariableRef(ast) => Self::lower_variable_ref(&ast),
                 alloy_rowan_ast::Expr::LambdaExpr(ast) => self.lower_lambda(&ast),
@@ -126,10 +129,23 @@ impl Database {
             body: self.exprs.alloc(body),
         }
     }
+
+    fn lower_tuple_expr(&mut self, args: Vec<alloy_rowan_ast::Expr>) -> Expr {
+        let args = args
+            .into_iter()
+            .map(|arg| {
+                let arg = self.lower_expr(Some(arg));
+                self.exprs.alloc(arg)
+            })
+            .collect();
+
+        unsafe { Expr::Tuple(NonEmpty::new_unchecked(args)) }
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use non_empty_vec::NonEmpty;
     use ordered_float::NotNan;
 
     use alloy_rowan_ast as ast;
@@ -143,17 +159,25 @@ mod tests {
         ast::Root::cast(node).unwrap()
     }
 
+    #[track_caller]
     fn check_stmt(input: &str, expected_hir: Stmt) {
         let root = parse(input);
-        let ast = root.stmts().next().unwrap();
+        let ast = root
+            .stmts()
+            .next()
+            .expect("expected at least one statement");
         let hir = Database::default().lower_stmt(ast).unwrap();
 
         assert_eq!(hir, expected_hir);
     }
 
+    #[track_caller]
     fn check_expr(input: &str, expected_hir: Expr, expected_database: Database) {
         let root = parse(input);
-        let first_stmt = root.stmts().next().unwrap();
+        let first_stmt = root
+            .stmts()
+            .next()
+            .expect("expected at least one expression");
         let ast = match first_stmt {
             ast::Stmt::Expr(ast) => ast,
             _ => unreachable!(),
@@ -169,13 +193,6 @@ mod tests {
         Database {
             exprs,
             patterns: Default::default(),
-        }
-    }
-
-    fn from_patterns(patterns: Arena<Pattern>) -> Database {
-        Database {
-            exprs: Default::default(),
-            patterns,
         }
     }
 
@@ -288,6 +305,26 @@ mod tests {
             Expr::VariableRef { var: "abc".into() },
             Database::default(),
         );
+    }
+
+    #[test]
+    fn lower_unit_expr() {
+        check_expr("(((((())))))", Expr::Unit, Database::default());
+    }
+
+    #[test]
+    fn lower_tuple_expr() {
+        let mut exprs = Arena::new();
+        let foo = exprs.alloc(Expr::VariableRef {
+            var: "foo".to_string(),
+        });
+        let bar = exprs.alloc(Expr::VariableRef {
+            var: "bar".to_string(),
+        });
+
+        let expected = unsafe { Expr::Tuple(NonEmpty::new_unchecked(vec![foo, bar])) };
+
+        check_expr("(foo, bar)", expected, from_exprs(exprs));
     }
 
     #[test]

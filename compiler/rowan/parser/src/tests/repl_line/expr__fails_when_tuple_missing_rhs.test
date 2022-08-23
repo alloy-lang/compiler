@@ -1,0 +1,12 @@
+(1, 2
+===
+Root@0..5
+  TupleExpr@0..5
+    LParen@0..1 "("
+    IntLiteral@1..2
+      Integer@1..2 "1"
+    Comma@2..3 ","
+    Whitespace@3..4 " "
+    IntLiteral@4..5
+      Integer@4..5 "2"
+error at position 5 while parsing a close parenthesis after an expression. Missing expected ‘+’, ‘-’, ‘*’, ‘/’ or ‘)’

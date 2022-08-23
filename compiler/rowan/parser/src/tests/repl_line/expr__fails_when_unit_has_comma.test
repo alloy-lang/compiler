@@ -1,0 +1,9 @@
+(,)
+===
+Root@0..3
+  ParenExpr@0..3
+    LParen@0..1 "("
+    Error@1..2
+      Comma@1..2 ","
+    RParen@2..3 ")"
+error in range 1..2 while parsing an expression inside parentheses. Found ‘,’, but expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’

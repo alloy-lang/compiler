@@ -1,0 +1,12 @@
+(1 2)
+===
+Root@0..5
+  TupleExpr@0..5
+    LParen@0..1 "("
+    IntLiteral@1..3
+      Integer@1..2 "1"
+      Whitespace@2..3 " "
+    IntLiteral@3..4
+      Integer@3..4 "2"
+    RParen@4..5 ")"
+error at position 4 while parsing a comma between expressions inside parentheses. Missing expected ‘+’, ‘-’, ‘*’, ‘/’ or ‘,’

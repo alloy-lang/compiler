@@ -207,10 +207,39 @@ fn parse_prefix_expr(p: &mut Parser) -> CompletedMarker {
 fn parse_paren_expr(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::LParen));
 
-    let m = p.start();
+    let paren_m = p.start();
     p.bump();
-    parse_expr(p, ParseErrorContext::ParenExprExpr);
+
+    let mut arg_len = 0;
+    loop {
+        if should_stop(p) {
+            break;
+        }
+
+        parse_expr(p, ParseErrorContext::ParenExprExpr);
+        arg_len += 1;
+
+        if should_stop(p) {
+            break;
+        }
+
+        p.expect_with_recovery(
+            TokenKind::Comma,
+            ParseErrorContext::ParenExprComma,
+            EXPR_RECOVERY_SET,
+        );
+    }
+
     p.expect(TokenKind::RParen, ParseErrorContext::ParenExprRightParen);
 
-    m.complete(p, SyntaxKind::ParenExpr)
+    let kind = match arg_len {
+        0 => SyntaxKind::UnitExpr,
+        1 => SyntaxKind::ParenExpr,
+        _ => SyntaxKind::TupleExpr,
+    };
+    return paren_m.complete(p, kind);
+
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_set(TokenSet::new([TokenKind::RParen])) || p.at_end()
+    }
 }

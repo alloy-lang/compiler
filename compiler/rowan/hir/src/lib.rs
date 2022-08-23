@@ -1,4 +1,5 @@
 use la_arena::Idx;
+use non_empty_vec::NonEmpty;
 use ordered_float::NotNan;
 
 use alloy_rowan_ast as ast;
@@ -38,6 +39,7 @@ type ExprIdx = Idx<Expr>;
 #[derive(Debug, PartialEq)]
 pub enum Expr {
     Missing,
+    Unit,
     Binary {
         op: BinaryOp,
         lhs: ExprIdx,
@@ -69,6 +71,7 @@ pub enum Expr {
         args: Vec<PatternIdx>,
         body: ExprIdx,
     },
+    Tuple(NonEmpty<ExprIdx>),
 }
 
 #[derive(Debug, PartialEq)]

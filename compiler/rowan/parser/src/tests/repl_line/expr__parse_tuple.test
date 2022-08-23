@@ -1,0 +1,12 @@
+(1, foo)
+===
+Root@0..8
+  TupleExpr@0..8
+    LParen@0..1 "("
+    IntLiteral@1..2
+      Integer@1..2 "1"
+    Comma@2..3 ","
+    Whitespace@3..4 " "
+    VariableRef@4..7
+      Ident@4..7 "foo"
+    RParen@7..8 ")"

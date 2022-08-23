@@ -63,7 +63,12 @@ impl IntLiteral {
 
     #[must_use]
     pub fn parse(&self) -> Option<u64> {
-        self.0.first_token().expect("first_token will always exist").text().parse().ok()
+        self.0
+            .first_token()
+            .expect("first_token will always exist")
+            .text()
+            .parse()
+            .ok()
     }
 }
 
@@ -82,7 +87,12 @@ impl FractionalLiteral {
 
     #[must_use]
     pub fn parse(&self) -> Option<NotNan<f64>> {
-        self.0.first_token().expect("first_token will always exist").text().parse().ok()
+        self.0
+            .first_token()
+            .expect("first_token will always exist")
+            .text()
+            .parse()
+            .ok()
     }
 }
 
@@ -101,7 +111,12 @@ impl StringLiteral {
 
     #[must_use]
     pub fn parse(&self) -> String {
-        let string = self.0.first_token().expect("first_token will always exist").text().to_string();
+        let string = self
+            .0
+            .first_token()
+            .expect("first_token will always exist")
+            .text()
+            .to_string();
 
         string[1..string.len() - 1].to_string()
     }
@@ -160,11 +175,27 @@ impl IfThenElseExpr {
 }
 
 #[derive(Debug)]
+pub struct UnitExpr(SyntaxNode);
+
+impl UnitExpr {}
+
+#[derive(Debug)]
 pub struct ParenExpr(SyntaxNode);
 
 impl ParenExpr {
+    #[must_use]
     pub fn expr(&self) -> Option<Expr> {
         self.0.children().find_map(Expr::cast)
+    }
+}
+
+#[derive(Debug)]
+pub struct TupleExpr(SyntaxNode);
+
+impl TupleExpr {
+    #[must_use]
+    pub fn exprs(&self) -> Vec<Expr> {
+        self.0.children().filter_map(Expr::cast).collect()
     }
 }
 
@@ -172,6 +203,7 @@ impl ParenExpr {
 pub struct UnaryExpr(SyntaxNode);
 
 impl UnaryExpr {
+    #[must_use]
     pub fn expr(&self) -> Option<Expr> {
         self.0.children().find_map(Expr::cast)
     }
@@ -274,7 +306,9 @@ pub enum Expr {
     StringLiteral(StringLiteral),
     CharLiteral(CharLiteral),
     IfThenElseExpr(IfThenElseExpr),
+    UnitExpr(UnitExpr),
     ParenExpr(ParenExpr),
+    TupleExpr(TupleExpr),
     UnaryExpr(UnaryExpr),
     VariableRef(VariableRef),
     LambdaExpr(LambdaExpr),
@@ -290,7 +324,9 @@ impl Expr {
             SyntaxKind::StringLiteral => Self::StringLiteral(StringLiteral(node)),
             SyntaxKind::CharLiteral => Self::CharLiteral(CharLiteral(node)),
             SyntaxKind::IfThenElseExpr => Self::IfThenElseExpr(IfThenElseExpr(node)),
+            SyntaxKind::UnitExpr => Self::UnitExpr(UnitExpr(node)),
             SyntaxKind::ParenExpr => Self::ParenExpr(ParenExpr(node)),
+            SyntaxKind::TupleExpr => Self::TupleExpr(TupleExpr(node)),
             SyntaxKind::PrefixExpr => Self::UnaryExpr(UnaryExpr(node)),
             SyntaxKind::VariableRef => Self::VariableRef(VariableRef(node)),
             SyntaxKind::LambdaExprDef => Self::LambdaExpr(LambdaExpr(node)),
