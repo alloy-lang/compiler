@@ -43,22 +43,23 @@ impl fmt::Display for ValidationErrorKind {
     }
 }
 
+#[must_use]
 pub fn validate(node: &SyntaxNode) -> Vec<ValidationError> {
     let mut errors = Vec::new();
 
     for node in node.descendants() {
         if let Some(literal) = IntLiteral::cast(&node) {
-            validate_int_literal(literal, &mut errors)
+            validate_int_literal(&literal, &mut errors);
         }
         if let Some(literal) = CharLiteral::cast(&node) {
-            validate_char_literal(literal, &mut errors)
+            validate_char_literal(&literal, &mut errors);
         }
     }
 
     errors
 }
 
-fn validate_int_literal(literal: IntLiteral, errors: &mut Vec<ValidationError>) {
+fn validate_int_literal(literal: &IntLiteral, errors: &mut Vec<ValidationError>) {
     if literal.parse().is_none() {
         errors.push(ValidationError {
             kind: ValidationErrorKind::NumberLiteralTooLarge,
@@ -67,7 +68,7 @@ fn validate_int_literal(literal: IntLiteral, errors: &mut Vec<ValidationError>) 
     }
 }
 
-fn validate_char_literal(literal: CharLiteral, errors: &mut Vec<ValidationError>) {
+fn validate_char_literal(literal: &CharLiteral, errors: &mut Vec<ValidationError>) {
     if literal.parse().is_none() {
         errors.push(ValidationError {
             kind: ValidationErrorKind::CharLiteralInvalid,
