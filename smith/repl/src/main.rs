@@ -22,9 +22,9 @@ fn main() -> io::Result<()> {
             println!("{}", error);
         }
 
-        let root = alloy_rowan_ast::Root::cast(syntax).unwrap();
+        let source_file = alloy_rowan_ast::SourceFile::cast(syntax).unwrap();
 
-        dbg!(root
+        dbg!(source_file
             .stmts()
             .filter_map(
                 |stmt| if let alloy_rowan_ast::Stmt::VariableDef(var_def) = stmt {
@@ -35,7 +35,7 @@ fn main() -> io::Result<()> {
             )
             .collect::<Vec<_>>());
 
-        dbg!(alloy_rowan_hir::lower(&root));
+        dbg!(alloy_rowan_hir::lower(&source_file));
 
         input.clear();
     }

@@ -1,6 +1,6 @@
 let foo = bar
 ===
-Root@0..13
+SourceFile@0..13
   VariableDef@0..13
     LetKw@0..3 "let"
     Whitespace@3..4 " "

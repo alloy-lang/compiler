@@ -1,6 +1,6 @@
 1 +2
 ===
-Root@0..4
+SourceFile@0..4
   InfixExpr@0..4
     IntLiteral@0..2
       Integer@0..1 "1"

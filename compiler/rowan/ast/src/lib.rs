@@ -356,12 +356,12 @@ impl Stmt {
 }
 
 #[derive(Debug)]
-pub struct Root(SyntaxNode);
+pub struct SourceFile(SyntaxNode);
 
-impl Root {
+impl SourceFile {
     #[must_use]
     pub fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::Root {
+        if node.kind() == SyntaxKind::SourceFile {
             Some(Self(node))
         } else {
             None
@@ -369,7 +369,7 @@ impl Root {
     }
 }
 
-impl Root {
+impl SourceFile {
     pub fn stmts(&self) -> impl Iterator<Item = Stmt> {
         self.0.children().filter_map(Stmt::cast)
     }

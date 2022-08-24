@@ -1,6 +1,6 @@
 if
 ===
-Root@0..2
+SourceFile@0..2
   IfThenElseExpr@0..2
     IfKw@0..2 "if"
     IfExpr@2..2

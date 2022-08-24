@@ -1,6 +1,6 @@
 |arg1, arg2, arg3| -> 17
 ===
-Root@0..24
+SourceFile@0..24
   LambdaExprDef@0..24
     LambdaArgList@0..19
       Pipe@0..1 "|"

@@ -1,6 +1,6 @@
 5 *  ( 2 + 1)
 ===
-Root@0..13
+SourceFile@0..13
   InfixExpr@0..13
     IntLiteral@0..2
       Integer@0..1 "5"

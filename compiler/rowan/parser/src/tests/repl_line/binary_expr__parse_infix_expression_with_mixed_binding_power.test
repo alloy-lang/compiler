@@ -1,6 +1,6 @@
 1 + 2 * 3 - 4
 ===
-Root@0..13
+SourceFile@0..13
   InfixExpr@0..13
     InfixExpr@0..10
       IntLiteral@0..2

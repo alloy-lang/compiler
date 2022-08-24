@@ -153,16 +153,16 @@ mod tests {
 
     use super::*;
 
-    fn parse(input: &str) -> ast::Root {
+    fn parse(input: &str) -> ast::SourceFile {
         let node = parser::parse(input).syntax();
         dbg!(&node);
-        ast::Root::cast(node).unwrap()
+        ast::SourceFile::cast(node).unwrap()
     }
 
     #[track_caller]
     fn check_stmt(input: &str, expected_hir: Stmt) {
-        let root = parse(input);
-        let ast = root
+        let source_file = parse(input);
+        let ast = source_file
             .stmts()
             .next()
             .expect("expected at least one statement");
@@ -173,8 +173,8 @@ mod tests {
 
     #[track_caller]
     fn check_expr(input: &str, expected_hir: Expr, expected_database: Database) {
-        let root = parse(input);
-        let first_stmt = root
+        let source_file = parse(input);
+        let first_stmt = source_file
             .stmts()
             .next()
             .expect("expected at least one expression");
@@ -198,8 +198,8 @@ mod tests {
 
     #[test]
     fn lower_variable_def_without_name() {
-        let root = parse("let = 10");
-        let ast = root.stmts().next().unwrap();
+        let source_file = parse("let = 10");
+        let ast = source_file.stmts().next().unwrap();
         assert!(Database::default().lower_stmt(ast).is_none());
     }
 

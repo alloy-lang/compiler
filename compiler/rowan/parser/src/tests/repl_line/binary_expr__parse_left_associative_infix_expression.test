@@ -1,6 +1,6 @@
 1 +  2  +  3 +4
 ===
-Root@0..15
+SourceFile@0..15
   InfixExpr@0..15
     InfixExpr@0..13
       InfixExpr@0..8

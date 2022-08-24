@@ -1,6 +1,6 @@
 |arg1 1001 'c'| -> 8
 ===
-Root@0..20
+SourceFile@0..20
   LambdaExprDef@0..20
     LambdaArgList@0..16
       Pipe@0..1 "|"

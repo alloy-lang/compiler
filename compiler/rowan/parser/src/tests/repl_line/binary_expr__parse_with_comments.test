@@ -3,7 +3,7 @@
   + 1 -- Add one
   + 10 -- Add ten
 ===
-Root@0..37
+SourceFile@0..37
   Whitespace@0..1 "\n"
   InfixExpr@1..37
     InfixExpr@1..22

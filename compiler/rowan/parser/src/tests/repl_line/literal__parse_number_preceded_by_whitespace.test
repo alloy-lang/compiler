@@ -1,6 +1,6 @@
    9876
 ===
-Root@0..7
+SourceFile@0..7
   Whitespace@0..3 "   "
   IntLiteral@3..7
     Integer@3..7 "9876"

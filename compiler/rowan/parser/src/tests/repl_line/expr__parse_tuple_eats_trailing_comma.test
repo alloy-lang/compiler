@@ -1,6 +1,6 @@
 (1, foo,)
 ===
-Root@0..9
+SourceFile@0..9
   TupleExpr@0..9
     LParen@0..1 "("
     IntLiteral@1..2

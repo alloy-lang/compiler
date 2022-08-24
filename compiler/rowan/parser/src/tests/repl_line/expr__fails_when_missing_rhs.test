@@ -1,6 +1,6 @@
 (1+
 ===
-Root@0..3
+SourceFile@0..3
   ParenExpr@0..3
     LParen@0..1 "("
     InfixExpr@1..3

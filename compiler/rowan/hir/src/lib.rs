@@ -9,7 +9,7 @@ pub use self::database::Database;
 mod database;
 
 #[must_use]
-pub fn lower(ast: &ast::Root) -> (Database, Vec<Stmt>) {
+pub fn lower(ast: &ast::SourceFile) -> (Database, Vec<Stmt>) {
     let mut db = Database::default();
     let stmts = ast.stmts().filter_map(|stmt| db.lower_stmt(stmt)).collect();
 

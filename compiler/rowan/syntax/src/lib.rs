@@ -34,7 +34,7 @@ pub enum SyntaxKind {
     Comment,
     Error,
 
-    Root,
+    SourceFile,
     InfixExpr,
     IntLiteral,
     FractionalLiteral,

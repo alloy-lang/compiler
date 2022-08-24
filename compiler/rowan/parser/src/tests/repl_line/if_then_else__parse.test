@@ -1,6 +1,6 @@
 if test then 2 else 3
 ===
-Root@0..21
+SourceFile@0..21
   IfThenElseExpr@0..21
     IfKw@0..2 "if"
     Whitespace@2..3 " "

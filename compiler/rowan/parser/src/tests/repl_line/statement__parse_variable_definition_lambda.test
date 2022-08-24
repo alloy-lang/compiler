@@ -1,6 +1,6 @@
 let add = |a, b| -> a + b
 ===
-Root@0..25
+SourceFile@0..25
   VariableDef@0..25
     LetKw@0..3 "let"
     Whitespace@3..4 " "
