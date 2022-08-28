@@ -83,6 +83,7 @@ mod tests {
 
     use super::*;
 
+    #[track_caller]
     fn check(input: &str, expected_errors: &[(ValidationErrorKind, StdRange<u32>)]) {
         let parse = alloy_rowan_parser::parse(input);
 

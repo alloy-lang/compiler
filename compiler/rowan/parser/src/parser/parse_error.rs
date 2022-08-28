@@ -187,6 +187,7 @@ mod tests {
 
     use super::*;
 
+    #[track_caller]
     fn check(expected: Vec<TokenKind>, kind: ParseErrorKind, output: &str) {
         let error = ParseError {
             expected,
