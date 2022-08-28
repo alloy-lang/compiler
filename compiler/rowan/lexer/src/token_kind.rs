@@ -13,15 +13,37 @@ pub enum TokenKind {
     #[regex(r"[ \t\f\r\n]+")]
     Whitespace,
 
+    // Keywords
     #[token("let")]
     LetKw,
-
+    #[token("import")]
+    ImportKw,
+    #[token("module")]
+    ModuleKw,
+    #[token("where")]
+    WhereKw,
+    #[token("when")]
+    WhenKw,
+    #[token("match")]
+    MatchKw,
+    #[token("trait")]
+    TraitKw,
+    #[token("behavior")]
+    BehaviorKw,
+    #[token("typedef")]
+    TypedefKw,
+    #[token("typevar")]
+    TypevarKw,
     #[token("if")]
     IfKw,
     #[token("then")]
     ThenKw,
     #[token("else")]
     ElseKw,
+    #[token("self")]
+    SelfKw,
+    #[token("end")]
+    EndKw,
 
     #[regex("[A-Za-z][A-Za-z0-9]*")]
     Ident,
@@ -37,6 +59,9 @@ pub enum TokenKind {
 
     #[regex(r#"'([^'\\]|\\t|\\u|\\n|\\")*'"#)]
     Char,
+
+    #[token("::")]
+    DoubleColon,
 
     #[token(",")]
     Comma,
@@ -93,14 +118,26 @@ impl fmt::Display for TokenKind {
         f.write_str(match self {
             Self::Whitespace => "whitespace",
             Self::LetKw => "‘let’",
+            Self::ImportKw => "‘import‘",
+            Self::ModuleKw => "‘module‘",
+            Self::WhereKw => "‘where‘",
+            Self::WhenKw => "‘when‘",
+            Self::MatchKw => "‘match‘",
+            Self::TraitKw => "‘trait‘",
+            Self::BehaviorKw => "‘behavior‘",
+            Self::TypedefKw => "‘typedef‘",
+            Self::TypevarKw => "‘typevar‘",
             Self::IfKw => "‘if‘",
             Self::ThenKw => "‘then‘",
             Self::ElseKw => "‘else‘",
+            Self::SelfKw => "‘sekf‘",
+            Self::EndKw => "‘end‘",
             Self::Ident => "identifier",
             Self::Integer => "integer",
             Self::Fractional => "fractional",
             Self::String => "string",
             Self::Char => "char",
+            Self::DoubleColon => "‘::’",
             Self::Comma => "‘,’",
             Self::RightArrow => "‘->’",
             Self::Plus => "‘+’",
@@ -122,9 +159,11 @@ impl fmt::Display for TokenKind {
 #[cfg(test)]
 mod tests {
     use crate::Lexer;
+    use maplit::hashmap;
 
     use super::*;
 
+    #[track_caller]
     fn check(input: &str, kind: TokenKind) {
         let mut lexer = Lexer::new(input);
 
@@ -144,23 +183,50 @@ mod tests {
     }
 
     #[test]
-    fn lex_let_keyword() {
-        check("let", TokenKind::LetKw);
+    fn test_keywords() {
+        let source = hashmap! {
+            "import" => TokenKind::ImportKw,
+            "module" => TokenKind::ModuleKw,
+            "where" => TokenKind::WhereKw,
+            "when" => TokenKind::WhenKw,
+            "match" => TokenKind::MatchKw,
+            "trait" => TokenKind::TraitKw,
+            "behavior" => TokenKind::BehaviorKw,
+            "typedef" => TokenKind::TypedefKw,
+            "typevar" => TokenKind::TypevarKw,
+            "if" => TokenKind::IfKw,
+            "then" => TokenKind::ThenKw,
+            "else" => TokenKind::ElseKw,
+            "self" => TokenKind::SelfKw,
+            "end" => TokenKind::EndKw,
+        };
+
+        for (source, expected) in source {
+            check(source, expected)
+        }
     }
 
     #[test]
-    fn lex_if_keyword() {
-        check("if", TokenKind::IfKw);
-    }
+    fn test_symbols() {
+        let source = hashmap! {
+            "::" => TokenKind::DoubleColon,
+            "," => TokenKind::Comma,
+            "->" => TokenKind::RightArrow,
+            "+" => TokenKind::Plus,
+            "-" => TokenKind::Minus,
+            "*" => TokenKind::Star,
+            "/" => TokenKind::Slash,
+            "=" => TokenKind::Equals,
+            "(" => TokenKind::LParen,
+            ")" => TokenKind::RParen,
+            "{" => TokenKind::LBrace,
+            "}" => TokenKind::RBrace,
+            "|" => TokenKind::Pipe,
+        };
 
-    #[test]
-    fn lex_then_keyword() {
-        check("then", TokenKind::ThenKw);
-    }
-
-    #[test]
-    fn lex_else_keyword() {
-        check("else", TokenKind::ElseKw);
+        for (source, expected) in source {
+            check(source, expected)
+        }
     }
 
     #[test]
@@ -201,66 +267,6 @@ mod tests {
     #[test]
     fn lex_char() {
         check("'char'", TokenKind::Char);
-    }
-
-    #[test]
-    fn lex_right_arrow() {
-        check("->", TokenKind::RightArrow);
-    }
-
-    #[test]
-    fn lex_comma() {
-        check(",", TokenKind::Comma);
-    }
-
-    #[test]
-    fn lex_plus() {
-        check("+", TokenKind::Plus);
-    }
-
-    #[test]
-    fn lex_minus() {
-        check("-", TokenKind::Minus);
-    }
-
-    #[test]
-    fn lex_star() {
-        check("*", TokenKind::Star);
-    }
-
-    #[test]
-    fn lex_slash() {
-        check("/", TokenKind::Slash);
-    }
-
-    #[test]
-    fn lex_equals() {
-        check("=", TokenKind::Equals);
-    }
-
-    #[test]
-    fn lex_left_brace() {
-        check("{", TokenKind::LBrace);
-    }
-
-    #[test]
-    fn lex_right_brace() {
-        check("}", TokenKind::RBrace);
-    }
-
-    #[test]
-    fn lex_left_parenthesis() {
-        check("(", TokenKind::LParen);
-    }
-
-    #[test]
-    fn lex_right_parenthesis() {
-        check(")", TokenKind::RParen);
-    }
-
-    #[test]
-    fn lex_pipe() {
-        check("|", TokenKind::Pipe);
     }
 
     #[test]

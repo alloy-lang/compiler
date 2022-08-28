@@ -13,10 +13,10 @@ use alloy_rowan_lexer::TokenKind;
 // This implementation is mostly stolen from rust-analyzer:
 // https://github.com/rust-analyzer/rust-analyzer/blob/b73b321478d3b2a98d380eb79de717e01620c4e9/crates/parser/src/token_set.rs
 #[derive(Debug, Clone, Copy, Default)]
-pub(crate) struct TokenSet(u32);
+pub(crate) struct TokenSet(u64);
 
 impl TokenSet {
-    // pub(crate) const ALL: Self = Self(u32::MAX);
+    // pub(crate) const ALL: Self = Self(u64::MAX);
 
     pub(crate) const fn new<const LEN: usize>(kinds: [TokenKind; LEN]) -> Self {
         let mut value = 0;
@@ -43,8 +43,8 @@ impl TokenSet {
     }
 }
 
-const fn mask(kind: TokenKind) -> u32 {
-    1 << kind as u32
+const fn mask(kind: TokenKind) -> u64 {
+    1 << kind as u64
 }
 
 #[cfg(test)]
