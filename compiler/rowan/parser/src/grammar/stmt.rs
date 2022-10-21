@@ -3,6 +3,8 @@ use super::*;
 pub(super) fn stmt(p: &mut Parser) -> Option<CompletedMarker> {
     if p.at(TokenKind::LetKw) {
         Some(variable_def(p))
+    } else if p.at(TokenKind::ImportKw) {
+        Some(import::parse_import(p))
     } else {
         expr::parse_expr(p, ParseErrorContext::TopLevelExpr)
     }

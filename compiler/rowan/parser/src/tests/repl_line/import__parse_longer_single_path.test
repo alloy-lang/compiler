@@ -1,0 +1,13 @@
+import std::functor::Functor
+===
+SourceFile@0..28
+  ImportStatement@0..28
+    ImportKw@0..6 "import"
+    Whitespace@6..7 " "
+    Ident@7..10 "std"
+    DoubleColon@10..12 "::"
+    ImportStatementSegment@12..19
+      Ident@12..19 "functor"
+    DoubleColon@19..21 "::"
+    ImportStatementSegment@21..28
+      Ident@21..28 "Functor"

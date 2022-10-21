@@ -6,6 +6,7 @@ use crate::parser::ParseErrorContext;
 use crate::parser::Parser;
 
 mod expr;
+mod import;
 mod lambda;
 mod stmt;
 

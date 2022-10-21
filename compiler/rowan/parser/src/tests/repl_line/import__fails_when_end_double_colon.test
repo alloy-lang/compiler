@@ -1,0 +1,13 @@
+import std::functor::
+===
+SourceFile@0..21
+  ImportStatement@0..21
+    ImportKw@0..6 "import"
+    Whitespace@6..7 " "
+    Ident@7..10 "std"
+    DoubleColon@10..12 "::"
+    ImportStatementSegment@12..19
+      Ident@12..19 "functor"
+    DoubleColon@19..21 "::"
+    ImportStatementSegment@21..21
+error at position 21 while parsing an import statement. Missing expected identifier
