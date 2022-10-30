@@ -34,10 +34,12 @@ pub(crate) enum ParseErrorContext {
     VariableDefIdent,
     VariableDefEquals,
     VariableDefExpr,
-    ImportStatement,
     ImportStatementFirstSegment,
     ImportStatementSegment,
     ImportStatementSeparator,
+    ImportStatementGroupStart,
+    ImportStatementGroupSeparator,
+    ImportStatementGroupEnd,
     TopLevelExpr,
 }
 
@@ -88,10 +90,12 @@ impl ParseErrorContext {
                 "We expected to see an ‘=‘ after the identifier."
             }
             ParseErrorContext::VariableDefExpr => "We expected to see an expression after the ‘=‘.",
-            ParseErrorContext::ImportStatement => todo!(),
             ParseErrorContext::ImportStatementFirstSegment => todo!(),
             ParseErrorContext::ImportStatementSegment => todo!(),
             ParseErrorContext::ImportStatementSeparator => todo!(),
+            ParseErrorContext::ImportStatementGroupStart => todo!(),
+            ParseErrorContext::ImportStatementGroupSeparator => todo!(),
+            ParseErrorContext::ImportStatementGroupEnd => todo!(),
             ParseErrorContext::TopLevelExpr => "We expected to see an expression.",
         }
     }
@@ -116,10 +120,14 @@ impl ParseErrorContext {
             ParseErrorContext::VariableDefIdent => "a variable definition",
             ParseErrorContext::VariableDefEquals => "a variable definition",
             ParseErrorContext::VariableDefExpr => "a variable definition",
-            ParseErrorContext::ImportStatement => todo!(),
-            ParseErrorContext::ImportStatementFirstSegment => todo!(),
+            ParseErrorContext::ImportStatementFirstSegment => "the first import segment",
             ParseErrorContext::ImportStatementSegment => "an import statement",
             ParseErrorContext::ImportStatementSeparator => todo!(),
+            ParseErrorContext::ImportStatementGroupStart => todo!(),
+            ParseErrorContext::ImportStatementGroupSeparator => {
+                "the comma between imports inside an import group"
+            }
+            ParseErrorContext::ImportStatementGroupEnd => "the end of an import group",
             ParseErrorContext::TopLevelExpr => "a top level expression",
         }
     }
@@ -144,10 +152,12 @@ impl ParseErrorContext {
             ParseErrorContext::VariableDefIdent => todo!(),
             ParseErrorContext::VariableDefEquals => todo!(),
             ParseErrorContext::VariableDefExpr => todo!(),
-            ParseErrorContext::ImportStatement => todo!(),
             ParseErrorContext::ImportStatementFirstSegment => todo!(),
             ParseErrorContext::ImportStatementSegment => todo!(),
             ParseErrorContext::ImportStatementSeparator => todo!(),
+            ParseErrorContext::ImportStatementGroupStart => todo!(),
+            ParseErrorContext::ImportStatementGroupSeparator => todo!(),
+            ParseErrorContext::ImportStatementGroupEnd => todo!(),
             ParseErrorContext::TopLevelExpr => todo!(),
         }
     }

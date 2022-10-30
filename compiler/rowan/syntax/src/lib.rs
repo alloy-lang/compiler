@@ -68,6 +68,7 @@ pub enum SyntaxKind {
     LambdaExprBody,
     ImportStatement,
     ImportStatementSegment,
+    ImportStatementGroup,
 }
 
 impl From<TokenKind> for SyntaxKind {

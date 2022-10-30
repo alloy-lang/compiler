@@ -1,0 +1,21 @@
+import std::functor::{Functor, map}
+===
+SourceFile@0..35
+  ImportStatement@0..35
+    ImportKw@0..6 "import"
+    Whitespace@6..7 " "
+    ImportStatementSegment@7..10
+      Ident@7..10 "std"
+    DoubleColon@10..12 "::"
+    ImportStatementSegment@12..19
+      Ident@12..19 "functor"
+    DoubleColon@19..21 "::"
+    ImportStatementGroup@21..35
+      LBrace@21..22 "{"
+      ImportStatementSegment@22..29
+        Ident@22..29 "Functor"
+      Comma@29..30 ","
+      Whitespace@30..31 " "
+      ImportStatementSegment@31..34
+        Ident@31..34 "map"
+      RBrace@34..35 "}"

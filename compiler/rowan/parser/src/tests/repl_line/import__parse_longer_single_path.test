@@ -4,7 +4,8 @@ SourceFile@0..28
   ImportStatement@0..28
     ImportKw@0..6 "import"
     Whitespace@6..7 " "
-    Ident@7..10 "std"
+    ImportStatementSegment@7..10
+      Ident@7..10 "std"
     DoubleColon@10..12 "::"
     ImportStatementSegment@12..19
       Ident@12..19 "functor"

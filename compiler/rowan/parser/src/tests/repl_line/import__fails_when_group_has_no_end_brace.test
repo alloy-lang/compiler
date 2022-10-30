@@ -1,0 +1,41 @@
+import std::functor::{Functor, map
+import std::option::{Some, None}
+===
+SourceFile@0..67
+  ImportStatement@0..35
+    ImportKw@0..6 "import"
+    Whitespace@6..7 " "
+    ImportStatementSegment@7..10
+      Ident@7..10 "std"
+    DoubleColon@10..12 "::"
+    ImportStatementSegment@12..19
+      Ident@12..19 "functor"
+    DoubleColon@19..21 "::"
+    ImportStatementGroup@21..35
+      LBrace@21..22 "{"
+      ImportStatementSegment@22..29
+        Ident@22..29 "Functor"
+      Comma@29..30 ","
+      Whitespace@30..31 " "
+      ImportStatementSegment@31..35
+        Ident@31..34 "map"
+        Whitespace@34..35 "\n"
+  ImportStatement@35..67
+    ImportKw@35..41 "import"
+    Whitespace@41..42 " "
+    ImportStatementSegment@42..45
+      Ident@42..45 "std"
+    DoubleColon@45..47 "::"
+    ImportStatementSegment@47..53
+      Ident@47..53 "option"
+    DoubleColon@53..55 "::"
+    ImportStatementGroup@55..67
+      LBrace@55..56 "{"
+      ImportStatementSegment@56..60
+        Ident@56..60 "Some"
+      Comma@60..61 ","
+      Whitespace@61..62 " "
+      ImportStatementSegment@62..66
+        Ident@62..66 "None"
+      RBrace@66..67 "}"
+error at position 41 while parsing the end of an import group. Missing expected ‘}’

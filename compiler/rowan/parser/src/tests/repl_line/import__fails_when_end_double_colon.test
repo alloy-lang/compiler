@@ -1,13 +1,27 @@
 import std::functor::
+import std::functor::map
 ===
-SourceFile@0..21
-  ImportStatement@0..21
+SourceFile@0..46
+  ImportStatement@0..22
     ImportKw@0..6 "import"
     Whitespace@6..7 " "
-    Ident@7..10 "std"
+    ImportStatementSegment@7..10
+      Ident@7..10 "std"
     DoubleColon@10..12 "::"
     ImportStatementSegment@12..19
       Ident@12..19 "functor"
     DoubleColon@19..21 "::"
-    ImportStatementSegment@21..21
-error at position 21 while parsing an import statement. Missing expected identifier
+    Whitespace@21..22 "\n"
+    ImportStatementSegment@22..22
+  ImportStatement@22..46
+    ImportKw@22..28 "import"
+    Whitespace@28..29 " "
+    ImportStatementSegment@29..32
+      Ident@29..32 "std"
+    DoubleColon@32..34 "::"
+    ImportStatementSegment@34..41
+      Ident@34..41 "functor"
+    DoubleColon@41..43 "::"
+    ImportStatementSegment@43..46
+      Ident@43..46 "map"
+error at position 28 while parsing an import statement. Missing expected ‘{’ or identifier

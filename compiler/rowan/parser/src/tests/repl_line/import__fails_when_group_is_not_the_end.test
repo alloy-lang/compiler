@@ -1,0 +1,36 @@
+import std::{functor, option}::map
+import std::functor::Functor
+===
+SourceFile@0..63
+  ImportStatement@0..29
+    ImportKw@0..6 "import"
+    Whitespace@6..7 " "
+    ImportStatementSegment@7..10
+      Ident@7..10 "std"
+    DoubleColon@10..12 "::"
+    ImportStatementGroup@12..29
+      LBrace@12..13 "{"
+      ImportStatementSegment@13..20
+        Ident@13..20 "functor"
+      Comma@20..21 ","
+      Whitespace@21..22 " "
+      ImportStatementSegment@22..28
+        Ident@22..28 "option"
+      RBrace@28..29 "}"
+  Error@29..31
+    DoubleColon@29..31 "::"
+  VariableRef@31..35
+    Ident@31..34 "map"
+    Whitespace@34..35 "\n"
+  ImportStatement@35..63
+    ImportKw@35..41 "import"
+    Whitespace@41..42 " "
+    ImportStatementSegment@42..45
+      Ident@42..45 "std"
+    DoubleColon@45..47 "::"
+    ImportStatementSegment@47..54
+      Ident@47..54 "functor"
+    DoubleColon@54..56 "::"
+    ImportStatementSegment@56..63
+      Ident@56..63 "Functor"
+error in range 29..31 while parsing a top level expression. Found ‘::’, but expected ‘let’, ‘import‘, integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’

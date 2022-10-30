@@ -1,0 +1,21 @@
+import std::functor::{Functor map}
+===
+SourceFile@0..34
+  ImportStatement@0..34
+    ImportKw@0..6 "import"
+    Whitespace@6..7 " "
+    ImportStatementSegment@7..10
+      Ident@7..10 "std"
+    DoubleColon@10..12 "::"
+    ImportStatementSegment@12..19
+      Ident@12..19 "functor"
+    DoubleColon@19..21 "::"
+    ImportStatementGroup@21..34
+      LBrace@21..22 "{"
+      ImportStatementSegment@22..30
+        Ident@22..29 "Functor"
+        Whitespace@29..30 " "
+      ImportStatementSegment@30..33
+        Ident@30..33 "map"
+      RBrace@33..34 "}"
+error at position 33 while parsing the comma between imports inside an import group. Missing expected ‘,’

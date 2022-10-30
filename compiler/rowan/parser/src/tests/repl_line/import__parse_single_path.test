@@ -4,4 +4,5 @@ SourceFile@0..10
   ImportStatement@0..10
     ImportKw@0..6 "import"
     Whitespace@6..7 " "
-    Ident@7..10 "std"
+    ImportStatementSegment@7..10
+      Ident@7..10 "std"
