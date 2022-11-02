@@ -8,11 +8,12 @@ pub struct VariableDef(SyntaxNode);
 
 impl VariableDef {
     #[must_use]
-    pub fn name(&self) -> Option<SyntaxToken> {
+    pub fn name(&self) -> Option<String> {
         self.0
             .children_with_tokens()
             .filter_map(SyntaxElement::into_token)
             .find(|token| token.kind() == SyntaxKind::Ident)
+            .map(|token| token.text().into())
     }
 
     pub fn value(&self) -> Option<Expr> {
@@ -222,8 +223,8 @@ pub struct VariableRef(SyntaxNode);
 
 impl VariableRef {
     #[must_use]
-    pub fn name(&self) -> Option<SyntaxToken> {
-        self.0.first_token()
+    pub fn name(&self) -> Option<String> {
+        self.0.first_token().map(|t| t.text().to_string())
     }
 }
 

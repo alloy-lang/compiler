@@ -15,7 +15,7 @@ impl Database {
     pub(crate) fn lower_stmt(&mut self, ast: alloy_rowan_ast::Stmt) -> Option<Stmt> {
         let result = match ast {
             alloy_rowan_ast::Stmt::VariableDef(ast) => Stmt::VariableDef {
-                name: ast.name()?.text().into(),
+                name: ast.name()?,
                 value: self.lower_expr(ast.value()),
             },
             alloy_rowan_ast::Stmt::Expr(ast) => Stmt::Expr(self.lower_expr(Some(ast))),
@@ -56,7 +56,7 @@ impl Database {
             alloy_rowan_ast::Pattern::StringLiteral(ast) => Pattern::StringLiteral(ast.parse()),
             alloy_rowan_ast::Pattern::CharLiteral(ast) => Pattern::CharLiteral(ast.parse()),
             alloy_rowan_ast::Pattern::VariableRef(ast) => Pattern::VariableRef {
-                var: ast.name().unwrap().text().into(),
+                var: ast.name().unwrap(),
             },
         }
     }
@@ -108,7 +108,7 @@ impl Database {
 
     fn lower_variable_ref(ast: &alloy_rowan_ast::VariableRef) -> Expr {
         Expr::VariableRef {
-            var: ast.name().unwrap().text().into(),
+            var: ast.name().unwrap(),
         }
     }
 
