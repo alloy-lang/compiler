@@ -4,7 +4,6 @@ use crate::grammar::expr::{
     parse_char_literal, parse_expr, parse_fractional_literal, parse_int_literal,
     parse_string_literal, parse_variable_ref,
 };
-use crate::token_set::TokenSet;
 
 const LAMBDA_ARG_SET: TokenSet = TokenSet::new([
     TokenKind::Integer,

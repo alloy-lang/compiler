@@ -1,7 +1,6 @@
 use super::*;
 
 use crate::grammar::lambda;
-use crate::token_set::TokenSet;
 
 const EXPR_RECOVERY_SET: TokenSet = TokenSet::new([
     TokenKind::Integer,

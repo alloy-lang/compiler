@@ -1,5 +1,4 @@
 use super::*;
-use crate::token_set::TokenSet;
 
 pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::ImportKw));

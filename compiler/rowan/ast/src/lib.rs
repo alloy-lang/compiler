@@ -354,8 +354,7 @@ impl Import {
     pub fn path(&self) -> Vec<String> {
         let (_last, rest) = Self::full_path(self);
 
-        rest
-            .into_iter()
+        rest.into_iter()
             .filter_map(|child| {
                 if let ImportChild::Segment(segment) = child {
                     segment.name()
@@ -376,7 +375,8 @@ impl Import {
     }
 
     fn full_path(&self) -> (ImportChild, Vec<ImportChild>) {
-        let mut full_path = self.0
+        let mut full_path = self
+            .0
             .children()
             .filter_map(ImportChild::cast)
             .collect::<Vec<_>>();
@@ -420,7 +420,8 @@ impl ImportChildSegment {
     }
 
     fn name(&self) -> Option<String> {
-        self.0.children_with_tokens()
+        self.0
+            .children_with_tokens()
             .filter_map(SyntaxElement::into_token)
             .find(|ct| ct.kind() == SyntaxKind::Ident)
             .map(|token| token.text().into())
@@ -432,7 +433,8 @@ pub struct ImportChildGroup(SyntaxNode);
 
 impl ImportChildGroup {
     fn names(&self) -> Vec<String> {
-        self.0.children()
+        self.0
+            .children()
             .filter_map(ImportChildSegment::cast)
             .filter_map(|token| token.name())
             .collect()
@@ -474,7 +476,7 @@ impl SourceFile {
 }
 
 impl SourceFile {
-    pub fn stmts(&self) -> impl Iterator<Item=Stmt> {
+    pub fn stmts(&self) -> impl Iterator<Item = Stmt> {
         self.0.children().filter_map(Stmt::cast)
     }
 }
