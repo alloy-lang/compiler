@@ -37,9 +37,11 @@ pub(crate) enum ParseErrorContext {
     ImportStatementFirstSegment,
     ImportStatementSegment,
     ImportStatementSeparator,
-    ImportStatementGroupStart,
     ImportStatementGroupSeparator,
     ImportStatementGroupEnd,
+    TraitName,
+    TraitWhere,
+    TraitEnd,
     TopLevelExpr,
 }
 
@@ -93,9 +95,11 @@ impl ParseErrorContext {
             ParseErrorContext::ImportStatementFirstSegment => todo!(),
             ParseErrorContext::ImportStatementSegment => todo!(),
             ParseErrorContext::ImportStatementSeparator => todo!(),
-            ParseErrorContext::ImportStatementGroupStart => todo!(),
             ParseErrorContext::ImportStatementGroupSeparator => todo!(),
             ParseErrorContext::ImportStatementGroupEnd => todo!(),
+            ParseErrorContext::TraitName => todo!(),
+            ParseErrorContext::TraitWhere => todo!(),
+            ParseErrorContext::TraitEnd => todo!(),
             ParseErrorContext::TopLevelExpr => "We expected to see an expression.",
         }
     }
@@ -123,11 +127,13 @@ impl ParseErrorContext {
             ParseErrorContext::ImportStatementFirstSegment => "the first import segment",
             ParseErrorContext::ImportStatementSegment => "an import statement",
             ParseErrorContext::ImportStatementSeparator => todo!(),
-            ParseErrorContext::ImportStatementGroupStart => todo!(),
             ParseErrorContext::ImportStatementGroupSeparator => {
                 "the comma between imports inside an import group"
             }
             ParseErrorContext::ImportStatementGroupEnd => "the end of an import group",
+            ParseErrorContext::TraitName => "the name of the trait in a trait definition",
+            ParseErrorContext::TraitWhere => "the where keyword at the start of a trait definition",
+            ParseErrorContext::TraitEnd => "the end keyword after a trait definition",
             ParseErrorContext::TopLevelExpr => "a top level expression",
         }
     }
@@ -155,9 +161,11 @@ impl ParseErrorContext {
             ParseErrorContext::ImportStatementFirstSegment => todo!(),
             ParseErrorContext::ImportStatementSegment => todo!(),
             ParseErrorContext::ImportStatementSeparator => todo!(),
-            ParseErrorContext::ImportStatementGroupStart => todo!(),
             ParseErrorContext::ImportStatementGroupSeparator => todo!(),
             ParseErrorContext::ImportStatementGroupEnd => todo!(),
+            ParseErrorContext::TraitName => todo!(),
+            ParseErrorContext::TraitWhere => todo!(),
+            ParseErrorContext::TraitEnd => todo!(),
             ParseErrorContext::TopLevelExpr => todo!(),
         }
     }

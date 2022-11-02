@@ -69,6 +69,7 @@ pub enum SyntaxKind {
     ImportStatement,
     ImportStatementSegment,
     ImportStatementGroup,
+    TraitDef,
 }
 
 impl From<TokenKind> for SyntaxKind {

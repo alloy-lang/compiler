@@ -5,6 +5,8 @@ pub(super) fn stmt(p: &mut Parser) -> Option<CompletedMarker> {
         Some(variable_def(p))
     } else if p.at(TokenKind::ImportKw) {
         Some(import::parse_import(p))
+    } else if p.at(TokenKind::TraitKw) {
+        Some(r#trait::parse_trait(p))
     } else {
         expr::parse_expr(p, ParseErrorContext::TopLevelExpr)
     }

@@ -1,0 +1,28 @@
+trait TestTrait1 where
+    -- imagine all the things here
+
+trait TestTrait2 where
+    -- imagine all the things here
+end
+===
+SourceFile@0..120
+  TraitDef@0..59
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    Comment@27..57 "-- imagine all the th ..."
+    Whitespace@57..59 "\n\n"
+  TraitDef@59..120
+    TraitKw@59..64 "trait"
+    Whitespace@64..65 " "
+    Ident@65..75 "TestTrait2"
+    Whitespace@75..76 " "
+    WhereKw@76..81 "where"
+    Whitespace@81..86 "\n    "
+    Comment@86..116 "-- imagine all the th ..."
+    Whitespace@116..117 "\n"
+    EndKw@117..120 "end"
+error at position 64 while parsing the end keyword after a trait definition. Missing expected ‘end‘

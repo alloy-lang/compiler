@@ -1,0 +1,15 @@
+trait TestTrait1 where
+    -- imagine all the things here
+end
+===
+SourceFile@0..61
+  TraitDef@0..61
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    Comment@27..57 "-- imagine all the th ..."
+    Whitespace@57..58 "\n"
+    EndKw@58..61 "end"
