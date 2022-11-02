@@ -20,6 +20,7 @@ pub fn lower(ast: &ast::SourceFile) -> (Database, Vec<Stmt>) {
 pub enum Stmt {
     VariableDef { name: String, value: Expr },
     Expr(Expr),
+    Import(Import),
 }
 
 type PatternIdx = Idx<Pattern>;
@@ -85,4 +86,10 @@ pub enum BinaryOp {
 #[derive(Debug, PartialEq)]
 pub enum UnaryOp {
     Neg,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct Import {
+    path: Vec<String>,
+    targets: Vec<String>,
 }

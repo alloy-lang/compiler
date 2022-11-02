@@ -339,9 +339,111 @@ impl Expr {
 }
 
 #[derive(Debug)]
+pub struct Import(SyntaxNode);
+
+impl Import {
+    #[must_use]
+    pub fn cast(node: &SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::ImportStatement {
+            Some(Self(node.clone()))
+        } else {
+            None
+        }
+    }
+
+    pub fn path(&self) -> Vec<String> {
+        let (_last, rest) = Self::full_path(self);
+
+        rest
+            .into_iter()
+            .filter_map(|child| {
+                if let ImportChild::Segment(segment) = child {
+                    segment.name()
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>()
+    }
+
+    pub fn targets(&self) -> Vec<String> {
+        let (last, _) = Self::full_path(self);
+
+        match last {
+            ImportChild::Segment(segment) => vec![segment.name().unwrap()],
+            ImportChild::Group(group) => group.names(),
+        }
+    }
+
+    fn full_path(&self) -> (ImportChild, Vec<ImportChild>) {
+        let mut full_path = self.0
+            .children()
+            .filter_map(ImportChild::cast)
+            .collect::<Vec<_>>();
+
+        let last = full_path.pop().unwrap();
+
+        (last, full_path)
+    }
+}
+
+#[derive(Debug)]
+pub enum ImportChild {
+    Segment(ImportChildSegment),
+    Group(ImportChildGroup),
+}
+
+impl ImportChild {
+    #[must_use]
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::ImportStatementSegment {
+            Some(Self::Segment(ImportChildSegment(node.clone())))
+        } else if node.kind() == SyntaxKind::ImportStatementGroup {
+            Some(Self::Group(ImportChildGroup(node.clone())))
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct ImportChildSegment(SyntaxNode);
+
+impl ImportChildSegment {
+    #[must_use]
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::ImportStatementSegment {
+            Some(ImportChildSegment(node))
+        } else {
+            None
+        }
+    }
+
+    fn name(&self) -> Option<String> {
+        self.0.children_with_tokens()
+            .filter_map(SyntaxElement::into_token)
+            .find(|ct| ct.kind() == SyntaxKind::Ident)
+            .map(|token| token.text().into())
+    }
+}
+
+#[derive(Debug)]
+pub struct ImportChildGroup(SyntaxNode);
+
+impl ImportChildGroup {
+    fn names(&self) -> Vec<String> {
+        self.0.children()
+            .filter_map(ImportChildSegment::cast)
+            .filter_map(|token| token.name())
+            .collect()
+    }
+}
+
+#[derive(Debug)]
 pub enum Stmt {
     VariableDef(VariableDef),
     Expr(Expr),
+    Import(Import),
 }
 
 impl Stmt {
@@ -349,6 +451,7 @@ impl Stmt {
     pub fn cast(node: SyntaxNode) -> Option<Self> {
         let result = match node.kind() {
             SyntaxKind::VariableDef => Self::VariableDef(VariableDef(node)),
+            SyntaxKind::ImportStatement => Self::Import(Import(node)),
             _ => Self::Expr(Expr::cast(node)?),
         };
 
@@ -371,7 +474,7 @@ impl SourceFile {
 }
 
 impl SourceFile {
-    pub fn stmts(&self) -> impl Iterator<Item = Stmt> {
+    pub fn stmts(&self) -> impl Iterator<Item=Stmt> {
         self.0.children().filter_map(Stmt::cast)
     }
 }

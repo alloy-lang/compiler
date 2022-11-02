@@ -3,7 +3,7 @@ use non_empty_vec::NonEmpty;
 
 use alloy_rowan_syntax::SyntaxKind;
 
-use crate::{BinaryOp, Expr, Pattern, Stmt, UnaryOp};
+use crate::{BinaryOp, Expr, Import, Pattern, Stmt, UnaryOp};
 
 #[derive(Debug, PartialEq, Default)]
 pub struct Database {
@@ -19,6 +19,7 @@ impl Database {
                 value: self.lower_expr(ast.value()),
             },
             alloy_rowan_ast::Stmt::Expr(ast) => Stmt::Expr(self.lower_expr(Some(ast))),
+            alloy_rowan_ast::Stmt::Import(ast) => Stmt::Import(self.lower_import(ast)),
         };
 
         Some(result)
@@ -140,6 +141,13 @@ impl Database {
             .collect();
 
         unsafe { Expr::Tuple(NonEmpty::new_unchecked(args)) }
+    }
+
+    fn lower_import(&self, ast: alloy_rowan_ast::Import) -> Import {
+        Import {
+            path: ast.path(),
+            targets: ast.targets(),
+        }
     }
 }
 
@@ -451,6 +459,39 @@ mod tests {
                 body,
             },
             Database { exprs, patterns },
+        );
+    }
+
+    #[test]
+    fn lower_single_import_stmt() {
+        check_stmt(
+            "import std  ",
+            Stmt::Import(Import {
+                path: vec![],
+                targets: vec!["std".to_string()],
+            }),
+        );
+    }
+
+    #[test]
+    fn lower_longer_import_stmt() {
+        check_stmt(
+            "import std :: functor ::Functor",
+            Stmt::Import(Import {
+                path: vec!["std".to_string(), "functor".to_string()],
+                targets: vec!["Functor".to_string()],
+            }),
+        );
+    }
+
+    #[test]
+    fn lower_multi_import_stmt() {
+        check_stmt(
+            "import std :: functor ::{Functor, map}",
+            Stmt::Import(Import {
+                path: vec!["std".to_string(), "functor".to_string()],
+                targets: vec!["Functor".to_string(), "map".to_string()],
+            }),
         );
     }
 }
