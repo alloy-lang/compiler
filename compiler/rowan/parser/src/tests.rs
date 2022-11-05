@@ -19,7 +19,7 @@ fn run_parser_tests(tests_dir: &str, parsing_fn: fn(&str) -> Parse) {
         current_dir.join(format!("src/tests/{}", tests_dir))
     };
 
-    let mut did_any_test_fail = false;
+    let mut failed_count = 0;
 
     for file in fs::read_dir(tests_dir).unwrap() {
         let path = file.unwrap().path();
@@ -41,11 +41,11 @@ fn run_parser_tests(tests_dir: &str, parsing_fn: fn(&str) -> Parse) {
         .is_err();
 
         if did_panic {
-            did_any_test_fail = true;
+            failed_count += 1;
         }
     }
 
-    if did_any_test_fail {
-        panic!("At least one parser test failed");
+    if failed_count > 0 {
+        panic!("{} parser test(s) failed", failed_count);
     }
 }
