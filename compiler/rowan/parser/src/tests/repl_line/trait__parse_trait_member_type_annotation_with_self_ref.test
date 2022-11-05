@@ -10,8 +10,8 @@ SourceFile@0..66
     Whitespace@16..17 " "
     WhereKw@17..22 "where"
     Whitespace@22..27 "\n    "
-    TypeofDef@27..63
-      TypeofKw@27..33 "typeof"
+    TypeOfDef@27..63
+      TypeOfKw@27..33 "typeof"
       Whitespace@33..34 " "
       Ident@34..38 "test"
       Whitespace@38..39 " "

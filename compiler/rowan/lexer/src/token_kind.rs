@@ -35,7 +35,7 @@ pub enum TokenKind {
     #[token("typevar")]
     TypevarKw,
     #[token("typeof")]
-    TypeofKw,
+    TypeOfKw,
     #[token("if")]
     IfKw,
     #[token("then")]
@@ -131,7 +131,7 @@ impl fmt::Display for TokenKind {
             Self::BehaviorKw => "‘behavior‘",
             Self::TypedefKw => "‘typedef‘",
             Self::TypevarKw => "‘typevar‘",
-            Self::TypeofKw => "‘typeof‘",
+            Self::TypeOfKw => "‘typeof‘",
             Self::IfKw => "‘if‘",
             Self::ThenKw => "‘then‘",
             Self::ElseKw => "‘else‘",
@@ -200,7 +200,7 @@ mod tests {
             "behavior" => TokenKind::BehaviorKw,
             "typedef" => TokenKind::TypedefKw,
             "typevar" => TokenKind::TypevarKw,
-            "typeof" => TokenKind::TypeofKw,
+            "typeof" => TokenKind::TypeOfKw,
             "if" => TokenKind::IfKw,
             "then" => TokenKind::ThenKw,
             "else" => TokenKind::ElseKw,

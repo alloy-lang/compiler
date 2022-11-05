@@ -30,7 +30,7 @@ pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
 }
 
 fn parse_trait_member(p: &mut Parser) -> Option<CompletedMarker> {
-    if p.at(TokenKind::TypeofKw) {
+    if p.at(TokenKind::TypeOfKw) {
         Some(parse_trait_typeof(p))
     } else {
         None
@@ -38,17 +38,17 @@ fn parse_trait_member(p: &mut Parser) -> Option<CompletedMarker> {
 }
 
 fn parse_trait_typeof(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::TypeofKw));
+    assert!(p.at(TokenKind::TypeOfKw));
 
     let m = p.start();
     p.bump();
 
-    p.expect(TokenKind::Ident, ParseErrorContext::TypeofName);
-    p.expect(TokenKind::Colon, ParseErrorContext::TypeofColon);
+    p.expect(TokenKind::Ident, ParseErrorContext::TypeOfName);
+    p.expect(TokenKind::Colon, ParseErrorContext::TypeOfColon);
 
     parse_type(p);
 
-    m.complete(p, SyntaxKind::TypeofDef)
+    m.complete(p, SyntaxKind::TypeOfDef)
 }
 
 fn parse_type(p: &mut Parser) -> CompletedMarker {
