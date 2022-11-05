@@ -25,4 +25,4 @@ SourceFile@0..120
     Comment@86..116 "-- imagine all the th ..."
     Whitespace@116..117 "\n"
     EndKw@117..120 "end"
-error at position 64 while parsing the end keyword after a trait definition. Missing expected ‘end‘
+error at position 64 while parsing the end keyword after a trait definition. Missing expected ‘typeof‘ or ‘end‘

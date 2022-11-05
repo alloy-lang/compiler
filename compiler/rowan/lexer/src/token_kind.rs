@@ -34,6 +34,8 @@ pub enum TokenKind {
     TypedefKw,
     #[token("typevar")]
     TypevarKw,
+    #[token("typeof")]
+    TypeofKw,
     #[token("if")]
     IfKw,
     #[token("then")]
@@ -60,6 +62,8 @@ pub enum TokenKind {
     #[regex(r#"'([^'\\]|\\t|\\u|\\n|\\")*'"#)]
     Char,
 
+    #[token(":")]
+    Colon,
     #[token("::")]
     DoubleColon,
 
@@ -127,16 +131,18 @@ impl fmt::Display for TokenKind {
             Self::BehaviorKw => "‘behavior‘",
             Self::TypedefKw => "‘typedef‘",
             Self::TypevarKw => "‘typevar‘",
+            Self::TypeofKw => "‘typeof‘",
             Self::IfKw => "‘if‘",
             Self::ThenKw => "‘then‘",
             Self::ElseKw => "‘else‘",
-            Self::SelfKw => "‘sekf‘",
+            Self::SelfKw => "‘self‘",
             Self::EndKw => "‘end‘",
             Self::Ident => "identifier",
             Self::Integer => "integer",
             Self::Fractional => "fractional",
             Self::String => "string",
             Self::Char => "char",
+            Self::Colon => "‘:’",
             Self::DoubleColon => "‘::’",
             Self::Comma => "‘,’",
             Self::RightArrow => "‘->’",
@@ -194,6 +200,7 @@ mod tests {
             "behavior" => TokenKind::BehaviorKw,
             "typedef" => TokenKind::TypedefKw,
             "typevar" => TokenKind::TypevarKw,
+            "typeof" => TokenKind::TypeofKw,
             "if" => TokenKind::IfKw,
             "then" => TokenKind::ThenKw,
             "else" => TokenKind::ElseKw,
@@ -209,6 +216,7 @@ mod tests {
     #[test]
     fn test_symbols() {
         let source = hashmap! {
+            ":" => TokenKind::Colon,
             "::" => TokenKind::DoubleColon,
             "," => TokenKind::Comma,
             "->" => TokenKind::RightArrow,

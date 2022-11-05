@@ -20,6 +20,7 @@ pub enum SyntaxKind {
     BehaviorKw,
     TypedefKw,
     TypevarKw,
+    TypeofKw,
     IfKw,
     ThenKw,
     ElseKw,
@@ -30,6 +31,7 @@ pub enum SyntaxKind {
     Fractional,
     String,
     Char,
+    Colon,
     DoubleColon,
     Comma,
     RightArrow,
@@ -70,6 +72,8 @@ pub enum SyntaxKind {
     ImportStatementSegment,
     ImportStatementGroup,
     TraitDef,
+    TypeofDef,
+    Type,
 }
 
 impl From<TokenKind> for SyntaxKind {
@@ -86,6 +90,7 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::BehaviorKw => Self::BehaviorKw,
             TokenKind::TypedefKw => Self::TypedefKw,
             TokenKind::TypevarKw => Self::TypevarKw,
+            TokenKind::TypeofKw => Self::TypeofKw,
             TokenKind::IfKw => Self::IfKw,
             TokenKind::ThenKw => Self::ThenKw,
             TokenKind::ElseKw => Self::ElseKw,
@@ -96,6 +101,7 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::Fractional => Self::Fractional,
             TokenKind::String => Self::String,
             TokenKind::Char => Self::Char,
+            TokenKind::Colon => Self::Colon,
             TokenKind::DoubleColon => Self::DoubleColon,
             TokenKind::RightArrow => Self::RightArrow,
             TokenKind::Comma => Self::Comma,

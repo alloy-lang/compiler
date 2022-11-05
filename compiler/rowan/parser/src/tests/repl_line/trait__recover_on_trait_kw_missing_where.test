@@ -24,4 +24,4 @@ SourceFile@0..114
     Whitespace@110..111 "\n"
     EndKw@111..114 "end"
 error at position 58 while parsing the where keyword at the start of a trait definition. Missing expected ‘where‘
-error at position 58 while parsing the end keyword after a trait definition. Missing expected ‘end‘
+error at position 58 while parsing the end keyword after a trait definition. Missing expected ‘typeof‘ or ‘end‘

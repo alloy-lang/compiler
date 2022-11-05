@@ -20,4 +20,4 @@ SourceFile@0..68
     EndKw@65..68 "end"
 error at position 12 while parsing the name of the trait in a trait definition. Missing expected identifier
 error at position 12 while parsing the where keyword at the start of a trait definition. Missing expected ‘where‘
-error at position 12 while parsing the end keyword after a trait definition. Missing expected ‘end‘
+error at position 12 while parsing the end keyword after a trait definition. Missing expected ‘typeof‘ or ‘end‘

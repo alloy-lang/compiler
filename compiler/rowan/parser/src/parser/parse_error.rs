@@ -42,6 +42,9 @@ pub(crate) enum ParseErrorContext {
     TraitName,
     TraitWhere,
     TraitEnd,
+    TypeofName,
+    TypeofColon,
+    TypeofType,
     TopLevelExpr,
 }
 
@@ -100,6 +103,9 @@ impl ParseErrorContext {
             ParseErrorContext::TraitName => todo!(),
             ParseErrorContext::TraitWhere => todo!(),
             ParseErrorContext::TraitEnd => todo!(),
+            ParseErrorContext::TypeofName => todo!(),
+            ParseErrorContext::TypeofColon => todo!(),
+            ParseErrorContext::TypeofType => todo!(),
             ParseErrorContext::TopLevelExpr => "We expected to see an expression.",
         }
     }
@@ -134,6 +140,9 @@ impl ParseErrorContext {
             ParseErrorContext::TraitName => "the name of the trait in a trait definition",
             ParseErrorContext::TraitWhere => "the where keyword at the start of a trait definition",
             ParseErrorContext::TraitEnd => "the end keyword after a trait definition",
+            ParseErrorContext::TypeofName => todo!(),
+            ParseErrorContext::TypeofColon => todo!(),
+            ParseErrorContext::TypeofType => todo!(),
             ParseErrorContext::TopLevelExpr => "a top level expression",
         }
     }
@@ -166,6 +175,9 @@ impl ParseErrorContext {
             ParseErrorContext::TraitName => todo!(),
             ParseErrorContext::TraitWhere => todo!(),
             ParseErrorContext::TraitEnd => todo!(),
+            ParseErrorContext::TypeofName => todo!(),
+            ParseErrorContext::TypeofColon => todo!(),
+            ParseErrorContext::TypeofType => todo!(),
             ParseErrorContext::TopLevelExpr => todo!(),
         }
     }
