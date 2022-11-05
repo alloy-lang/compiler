@@ -44,7 +44,7 @@ pub(crate) enum ParseErrorContext {
     TraitEnd,
     TypeofName,
     TypeofColon,
-    TypeofType,
+    SingleType,
     TopLevelExpr,
 }
 
@@ -105,7 +105,7 @@ impl ParseErrorContext {
             ParseErrorContext::TraitEnd => todo!(),
             ParseErrorContext::TypeofName => todo!(),
             ParseErrorContext::TypeofColon => todo!(),
-            ParseErrorContext::TypeofType => todo!(),
+            ParseErrorContext::SingleType => todo!(),
             ParseErrorContext::TopLevelExpr => "We expected to see an expression.",
         }
     }
@@ -142,7 +142,7 @@ impl ParseErrorContext {
             ParseErrorContext::TraitEnd => "the end keyword after a trait definition",
             ParseErrorContext::TypeofName => todo!(),
             ParseErrorContext::TypeofColon => todo!(),
-            ParseErrorContext::TypeofType => todo!(),
+            ParseErrorContext::SingleType => "the type of a type annotation",
             ParseErrorContext::TopLevelExpr => "a top level expression",
         }
     }
@@ -177,7 +177,7 @@ impl ParseErrorContext {
             ParseErrorContext::TraitEnd => todo!(),
             ParseErrorContext::TypeofName => todo!(),
             ParseErrorContext::TypeofColon => todo!(),
-            ParseErrorContext::TypeofType => todo!(),
+            ParseErrorContext::SingleType => todo!(),
             ParseErrorContext::TopLevelExpr => todo!(),
         }
     }

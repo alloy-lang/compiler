@@ -74,6 +74,7 @@ pub enum SyntaxKind {
     TraitDef,
     TypeofDef,
     Type,
+    SingleType,
 }
 
 impl From<TokenKind> for SyntaxKind {

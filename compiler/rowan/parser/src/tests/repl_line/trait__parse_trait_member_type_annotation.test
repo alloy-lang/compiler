@@ -18,6 +18,7 @@ SourceFile@0..48
       Colon@39..40 ":"
       Whitespace@40..41 " "
       Type@41..45
-        Ident@41..44 "Int"
-        Whitespace@44..45 "\n"
+        SingleType@41..45
+          Ident@41..44 "Int"
+          Whitespace@44..45 "\n"
     EndKw@45..48 "end"

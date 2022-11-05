@@ -54,7 +54,24 @@ fn parse_trait_typeof(p: &mut Parser) -> CompletedMarker {
 fn parse_type(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
 
-    p.expect(TokenKind::Ident, ParseErrorContext::TypeofType);
+    let _single_type_m = parse_single_type(p);
+
+    if p.at(TokenKind::RightArrow) {
+        p.bump();
+        parse_type(p);
+    }
 
     m.complete(p, SyntaxKind::Type)
+}
+
+fn parse_single_type(p: &mut Parser) -> CompletedMarker {
+    let m = p.start();
+
+    if p.at(TokenKind::Ident) || p.at(TokenKind::SelfKw) {
+        p.bump();
+    } else {
+        p.error(ParseErrorContext::SingleType);
+    }
+
+    m.complete(p, SyntaxKind::SingleType)
 }
