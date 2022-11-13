@@ -3,6 +3,10 @@ use ordered_float::NotNan;
 
 pub mod validation;
 
+//
+// Expression
+//
+
 #[derive(Debug)]
 pub struct VariableDef(SyntaxNode);
 
@@ -338,6 +342,10 @@ impl Expr {
     }
 }
 
+//
+// Import
+//
+
 #[derive(Debug)]
 pub struct Import(SyntaxNode);
 
@@ -441,11 +449,155 @@ impl ImportChildGroup {
     }
 }
 
+//
+// Trait
+//
+
+#[derive(Debug)]
+pub struct Trait(SyntaxNode);
+
+impl Trait {
+    #[must_use]
+    pub fn cast(node: &SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::TraitDef {
+            Some(Self(node.clone()))
+        } else {
+            None
+        }
+    }
+
+    #[must_use]
+    pub fn name(&self) -> Option<String> {
+        self.0
+            .children_with_tokens()
+            .filter_map(SyntaxElement::into_token)
+            .find(|token| token.kind() == SyntaxKind::Ident)
+            .map(|token| token.text().into())
+    }
+
+    #[must_use]
+    pub fn members(&self) -> Vec<TraitMember> {
+        self.0.children().filter_map(TraitMember::cast).collect()
+    }
+}
+
+//
+// Trait Members
+//
+
+#[derive(Debug)]
+pub enum TraitMember {
+    TypeAnnotation(TypeAnnotation),
+}
+
+impl TraitMember {
+    #[must_use]
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::TypeAnnotation {
+            Some(Self::TypeAnnotation(TypeAnnotation(node)))
+        } else {
+            None
+        }
+    }
+}
+
+//
+// Type Annotation
+//
+
+#[derive(Debug)]
+pub struct TypeAnnotation(SyntaxNode);
+
+impl TypeAnnotation {
+    #[must_use]
+    pub fn name(&self) -> Option<String> {
+        self.0
+            .children_with_tokens()
+            .filter_map(SyntaxElement::into_token)
+            .find(|token| token.kind() == SyntaxKind::Ident)
+            .map(|token| token.text().into())
+    }
+
+    #[must_use]
+    pub fn t(&self) -> Option<Type> {
+        self.0.children().find_map(Type::cast)
+    }
+}
+
+#[derive(Debug)]
+pub enum Type {
+    SelfRef,
+    Identifier(TypeIdentifier),
+    Lambda(LambdaType),
+}
+
+impl Type {
+    #[must_use]
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        match node.kind() {
+            SyntaxKind::SelfType => Some(Self::SelfRef),
+            SyntaxKind::TypeIdentifier => Some(Self::Identifier(TypeIdentifier(node))),
+            SyntaxKind::LambdaType => Some(Self::Lambda(LambdaType(node))),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TypeIdentifier(SyntaxNode);
+
+impl TypeIdentifier {
+    #[must_use]
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::TypeIdentifier {
+            Some(Self(node))
+        } else {
+            None
+        }
+    }
+
+    #[must_use]
+    pub fn name(&self) -> Option<String> {
+        self.0
+            .children_with_tokens()
+            .filter_map(SyntaxElement::into_token)
+            .find(|token| token.kind() == SyntaxKind::Ident)
+            .map(|token| token.text().into())
+    }
+}
+
+#[derive(Debug)]
+pub struct LambdaType(SyntaxNode);
+
+impl LambdaType {
+    #[must_use]
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::LambdaType {
+            Some(Self(node))
+        } else {
+            None
+        }
+    }
+
+    pub fn arg_type(&self) -> Option<Type> {
+        self.0.children().filter_map(Type::cast).next()
+    }
+
+    pub fn return_type(&self) -> Option<Type> {
+        self.0.children().filter_map(Type::cast).nth(1)
+    }
+}
+
+//
+// Statement
+//
+
 #[derive(Debug)]
 pub enum Stmt {
     VariableDef(VariableDef),
     Expr(Expr),
     Import(Import),
+    Trait(Trait),
 }
 
 impl Stmt {
@@ -454,6 +606,7 @@ impl Stmt {
         let result = match node.kind() {
             SyntaxKind::VariableDef => Self::VariableDef(VariableDef(node)),
             SyntaxKind::ImportStatement => Self::Import(Import(node)),
+            SyntaxKind::TraitDef => Self::Trait(Trait(node)),
             _ => Self::Expr(Expr::cast(node)?),
         };
 

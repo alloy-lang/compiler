@@ -10,15 +10,14 @@ SourceFile@0..48
     Whitespace@16..17 " "
     WhereKw@17..22 "where"
     Whitespace@22..27 "\n    "
-    TypeOfDef@27..45
+    TypeAnnotation@27..45
       TypeOfKw@27..33 "typeof"
       Whitespace@33..34 " "
       Ident@34..38 "test"
       Whitespace@38..39 " "
       Colon@39..40 ":"
       Whitespace@40..41 " "
-      Type@41..45
-        SingleType@41..45
-          Ident@41..44 "Int"
-          Whitespace@44..45 "\n"
+      TypeIdentifier@41..45
+        Ident@41..44 "Int"
+        Whitespace@44..45 "\n"
     EndKw@45..48 "end"

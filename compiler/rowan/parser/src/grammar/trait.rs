@@ -48,30 +48,42 @@ fn parse_trait_typeof(p: &mut Parser) -> CompletedMarker {
 
     parse_type(p);
 
-    m.complete(p, SyntaxKind::TypeOfDef)
+    m.complete(p, SyntaxKind::TypeAnnotation)
 }
 
-fn parse_type(p: &mut Parser) -> CompletedMarker {
-    let m = p.start();
-
-    let _single_type_m = parse_single_type(p);
+fn parse_type(p: &mut Parser) -> Option<CompletedMarker> {
+    let single_type_m = parse_single_type(p)?;
 
     if p.at(TokenKind::RightArrow) {
+        let m = single_type_m.precede(p);
+
         p.bump();
         parse_type(p);
+
+        return Some(m.complete(p, SyntaxKind::LambdaType));
     }
 
-    m.complete(p, SyntaxKind::Type)
+    Some(single_type_m)
 }
 
-fn parse_single_type(p: &mut Parser) -> CompletedMarker {
+fn parse_single_type(p: &mut Parser) -> Option<CompletedMarker> {
     let m = p.start();
 
-    if p.at(TokenKind::Ident) || p.at(TokenKind::SelfKw) {
+    if p.at(TokenKind::Ident) {
         p.bump();
+
+        return Some(m.complete(p, SyntaxKind::TypeIdentifier));
+    } else if p.at(TokenKind::SelfKw) {
+        p.bump();
+
+        return Some(m.complete(p, SyntaxKind::SelfType));
+        // } else if p.at(TokenKind::LParen) {
+        //     p.bump();
+        //     parse_type(p);
+        //     p.expect(TokenKind::RParen, ParseErrorContext::TypeRightParen);
     } else {
         p.error(ParseErrorContext::SingleType);
     }
 
-    m.complete(p, SyntaxKind::SingleType)
+    None
 }

@@ -3,7 +3,9 @@ use non_empty_vec::NonEmpty;
 
 use alloy_rowan_syntax::SyntaxKind;
 
-use crate::{BinaryOp, Expr, Import, Pattern, Stmt, UnaryOp};
+use crate::{
+    BinaryOp, Expr, Import, Pattern, Stmt, Trait, TraitMember, Type, TypeAnnotation, UnaryOp,
+};
 
 #[derive(Debug, PartialEq, Default)]
 pub struct Database {
@@ -20,6 +22,7 @@ impl Database {
             },
             alloy_rowan_ast::Stmt::Expr(ast) => Stmt::Expr(self.lower_expr(Some(ast))),
             alloy_rowan_ast::Stmt::Import(ast) => Stmt::Import(self.lower_import(ast)),
+            alloy_rowan_ast::Stmt::Trait(ast) => Stmt::Trait(self.lower_trait(ast)),
         };
 
         Some(result)
@@ -149,6 +152,46 @@ impl Database {
             targets: ast.targets(),
         }
     }
+
+    fn lower_trait(&self, ast: alloy_rowan_ast::Trait) -> Trait {
+        Trait {
+            name: ast.name().unwrap(),
+            members: self.lower_trait_members(ast),
+        }
+    }
+
+    fn lower_trait_members(&self, ast: alloy_rowan_ast::Trait) -> Vec<TraitMember> {
+        ast.members()
+            .into_iter()
+            .map(|tm| match tm {
+                alloy_rowan_ast::TraitMember::TypeAnnotation(ast) => {
+                    TraitMember::TypeAnnotation(TypeAnnotation {
+                        name: ast.name().unwrap(),
+                        t: self.lower_type(ast.t().unwrap()),
+                    })
+                }
+            })
+            .collect()
+    }
+
+    fn lower_type(&self, ast: alloy_rowan_ast::Type) -> Type {
+        match ast {
+            alloy_rowan_ast::Type::SelfRef => Type::SelfRef,
+            alloy_rowan_ast::Type::Identifier(ast) => self.lower_type_identifier(ast),
+            alloy_rowan_ast::Type::Lambda(ast) => self.lower_lambda_type(ast),
+        }
+    }
+
+    fn lower_type_identifier(&self, ast: alloy_rowan_ast::TypeIdentifier) -> Type {
+        Type::Identifier(ast.name().unwrap())
+    }
+
+    fn lower_lambda_type(&self, ast: alloy_rowan_ast::LambdaType) -> Type {
+        Type::Lambda {
+            arg_type: Box::new(self.lower_type(ast.arg_type().unwrap())),
+            return_type: Box::new(self.lower_type(ast.return_type().unwrap())),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -156,6 +199,7 @@ mod tests {
     use non_empty_vec::NonEmpty;
     use ordered_float::NotNan;
 
+    use crate::{Trait, TraitMember, Type, TypeAnnotation};
     use alloy_rowan_ast as ast;
     use alloy_rowan_parser as parser;
 
@@ -491,6 +535,30 @@ mod tests {
             Stmt::Import(Import {
                 path: vec!["std".to_string(), "functor".to_string()],
                 targets: vec!["Functor".to_string(), "map".to_string()],
+            }),
+        );
+    }
+
+    #[test]
+    fn lower_trait() {
+        check_stmt(
+            "
+            trait TestTrait1 where
+                typeof test : self -> String -> Int
+            end
+            ",
+            Stmt::Trait(Trait {
+                name: "TestTrait1".to_string(),
+                members: vec![TraitMember::TypeAnnotation(TypeAnnotation {
+                    name: "test".to_string(),
+                    t: Type::Lambda {
+                        arg_type: Box::new(Type::SelfRef),
+                        return_type: Box::new(Type::Lambda {
+                            arg_type: Box::new(Type::Identifier("String".to_string())),
+                            return_type: Box::new(Type::Identifier("Int".to_string())),
+                        }),
+                    },
+                })],
             }),
         );
     }

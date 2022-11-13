@@ -72,9 +72,11 @@ pub enum SyntaxKind {
     ImportStatementSegment,
     ImportStatementGroup,
     TraitDef,
-    TypeOfDef,
-    Type,
-    SingleType,
+    TypeAnnotation,
+    LambdaType,
+    SelfType,
+    TypeIdentifier,
+    VariableType,
 }
 
 impl From<TokenKind> for SyntaxKind {

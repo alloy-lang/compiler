@@ -21,6 +21,7 @@ pub enum Stmt {
     VariableDef { name: String, value: Expr },
     Expr(Expr),
     Import(Import),
+    Trait(Trait),
 }
 
 type PatternIdx = Idx<Pattern>;
@@ -92,4 +93,31 @@ pub enum UnaryOp {
 pub struct Import {
     path: Vec<String>,
     targets: Vec<String>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct Trait {
+    name: String,
+    members: Vec<TraitMember>,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum TraitMember {
+    TypeAnnotation(TypeAnnotation),
+}
+
+#[derive(Debug, PartialEq)]
+pub struct TypeAnnotation {
+    name: String,
+    t: Type,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum Type {
+    Identifier(String),
+    SelfRef,
+    Lambda {
+        arg_type: Box<Type>,
+        return_type: Box<Type>,
+    },
 }

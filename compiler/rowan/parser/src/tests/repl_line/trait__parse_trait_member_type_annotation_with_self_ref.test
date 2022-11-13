@@ -10,27 +10,26 @@ SourceFile@0..66
     Whitespace@16..17 " "
     WhereKw@17..22 "where"
     Whitespace@22..27 "\n    "
-    TypeOfDef@27..63
+    TypeAnnotation@27..63
       TypeOfKw@27..33 "typeof"
       Whitespace@33..34 " "
       Ident@34..38 "test"
       Whitespace@38..39 " "
       Colon@39..40 ":"
       Whitespace@40..41 " "
-      Type@41..63
-        SingleType@41..46
+      LambdaType@41..63
+        SelfType@41..46
           SelfKw@41..45 "self"
           Whitespace@45..46 " "
         RightArrow@46..48 "->"
         Whitespace@48..49 " "
-        Type@49..63
-          SingleType@49..56
+        LambdaType@49..63
+          TypeIdentifier@49..56
             Ident@49..55 "String"
             Whitespace@55..56 " "
           RightArrow@56..58 "->"
           Whitespace@58..59 " "
-          Type@59..63
-            SingleType@59..63
-              Ident@59..62 "Int"
-              Whitespace@62..63 "\n"
+          TypeIdentifier@59..63
+            Ident@59..62 "Int"
+            Whitespace@62..63 "\n"
     EndKw@63..66 "end"
