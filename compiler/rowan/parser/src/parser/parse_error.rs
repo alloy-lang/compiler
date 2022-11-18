@@ -107,6 +107,7 @@ impl ParseErrorContext {
             ParseErrorContext::TypeOfName => todo!(),
             ParseErrorContext::TypeOfColon => todo!(),
             ParseErrorContext::SingleType => todo!(),
+            ParseErrorContext::TypeVariableName => todo!(),
             ParseErrorContext::TopLevelExpr => "We expected to see an expression.",
         }
     }
@@ -144,6 +145,7 @@ impl ParseErrorContext {
             ParseErrorContext::TypeOfName => todo!(),
             ParseErrorContext::TypeOfColon => todo!(),
             ParseErrorContext::SingleType => "the type of a type annotation",
+            ParseErrorContext::TypeVariableName => todo!(),
             ParseErrorContext::TopLevelExpr => "a top level expression",
         }
     }
@@ -179,6 +181,7 @@ impl ParseErrorContext {
             ParseErrorContext::TypeOfName => todo!(),
             ParseErrorContext::TypeOfColon => todo!(),
             ParseErrorContext::SingleType => todo!(),
+            ParseErrorContext::TypeVariableName => todo!(),
             ParseErrorContext::TopLevelExpr => todo!(),
         }
     }
