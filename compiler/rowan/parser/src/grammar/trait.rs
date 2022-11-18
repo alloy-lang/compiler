@@ -31,13 +31,13 @@ pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
 
 fn parse_trait_member(p: &mut Parser) -> Option<CompletedMarker> {
     if p.at(TokenKind::TypeOfKw) {
-        Some(parse_trait_typeof(p))
+        Some(parse_trait_type_annotation(p))
     } else {
         None
     }
 }
 
-fn parse_trait_typeof(p: &mut Parser) -> CompletedMarker {
+fn parse_trait_type_annotation(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::TypeOfKw));
 
     let m = p.start();
@@ -48,7 +48,35 @@ fn parse_trait_typeof(p: &mut Parser) -> CompletedMarker {
 
     parse_type(p);
 
+    if p.at(TokenKind::WhereKw) {
+        parse_trait_type_annotation_typevars(p);
+    }
+
     m.complete(p, SyntaxKind::TypeAnnotation)
+}
+
+fn parse_trait_type_annotation_typevars(p: &mut Parser) {
+    assert!(p.at(TokenKind::WhereKw));
+    p.bump();
+
+    loop {
+        if !p.at_set(TokenSet::new([TokenKind::TypevarKw])) {
+            break;
+        }
+
+        parse_trait_type_annotation_typevar(p);
+    }
+}
+
+fn parse_trait_type_annotation_typevar(p: &mut Parser) -> CompletedMarker {
+    assert!(p.at(TokenKind::TypevarKw));
+
+    let m = p.start();
+    p.bump();
+
+    p.expect(TokenKind::Ident, ParseErrorContext::TypeVariableName);
+
+    m.complete(p, SyntaxKind::TypeVariable)
 }
 
 fn parse_type(p: &mut Parser) -> Option<CompletedMarker> {

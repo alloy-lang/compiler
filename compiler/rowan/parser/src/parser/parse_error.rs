@@ -45,6 +45,7 @@ pub(crate) enum ParseErrorContext {
     TypeOfName,
     TypeOfColon,
     SingleType,
+    TypeVariableName,
     TopLevelExpr,
 }
 

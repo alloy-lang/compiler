@@ -77,6 +77,7 @@ pub enum SyntaxKind {
     SelfType,
     TypeIdentifier,
     VariableType,
+    TypeVariable,
 }
 
 impl From<TokenKind> for SyntaxKind {
