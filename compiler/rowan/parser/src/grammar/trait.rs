@@ -95,13 +95,13 @@ fn parse_type(p: &mut Parser) -> Option<CompletedMarker> {
 }
 
 fn parse_single_type(p: &mut Parser) -> Option<CompletedMarker> {
-    let m = p.start();
-
     if p.at(TokenKind::Ident) {
+        let m = p.start();
         p.bump();
 
         return Some(m.complete(p, SyntaxKind::TypeIdentifier));
     } else if p.at(TokenKind::SelfKw) {
+        let m = p.start();
         p.bump();
 
         return Some(m.complete(p, SyntaxKind::SelfType));
