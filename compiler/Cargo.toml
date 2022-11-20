@@ -17,7 +17,7 @@ linked_hash_set = "0.1.4"
 linked-hash-map = "0.5.4"
 
 [dev-dependencies]
-wasmtime = "0.38.1"
+wasmtime = "2.0.2"
 pretty_assertions = "1.2.1"
 test_source = { path = "../test_source" }
 
