@@ -32,6 +32,8 @@ pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
 fn parse_trait_member(p: &mut Parser) -> Option<CompletedMarker> {
     if p.at(TokenKind::TypeOfKw) {
         Some(parse_trait_type_annotation(p))
+    } else if p.at(TokenKind::TypevarKw) {
+        Some(parse_trait_typevar(p))
     } else {
         None
     }
@@ -114,4 +116,15 @@ fn parse_single_type(p: &mut Parser) -> Option<CompletedMarker> {
     }
 
     None
+}
+
+fn parse_trait_typevar(p: &mut Parser) -> CompletedMarker {
+    assert!(p.at(TokenKind::TypevarKw));
+
+    let m = p.start();
+    p.bump();
+
+    p.expect(TokenKind::Ident, ParseErrorContext::TypeVariableName);
+
+    m.complete(p, SyntaxKind::TypeVariable)
 }
