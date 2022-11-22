@@ -19,10 +19,11 @@ fn run_parser_tests(tests_dir: &str, parsing_fn: fn(&str) -> Parse) {
         current_dir.join(format!("src/tests/{}", tests_dir))
     };
 
-    let mut failed_count = 0;
+    let mut failed_tests = vec![];
 
     for file in fs::read_dir(tests_dir).unwrap() {
         let path = file.unwrap().path();
+        let file_name = path.file_name().unwrap().to_os_string();
 
         if path.extension() != Some(OsStr::new("test")) {
             continue;
@@ -41,11 +42,11 @@ fn run_parser_tests(tests_dir: &str, parsing_fn: fn(&str) -> Parse) {
         .is_err();
 
         if did_panic {
-            failed_count += 1;
+            failed_tests.push(file_name);
         }
     }
 
-    if failed_count > 0 {
-        panic!("{} parser test(s) failed", failed_count);
+    if !failed_tests.is_empty() {
+        panic!("{} parser test(s) failed: {:?}", failed_tests.len(), failed_tests);
     }
 }
