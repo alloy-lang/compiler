@@ -18,5 +18,5 @@ SourceFile@0..15
     VariableRef@14..15
       Ident@14..15 "a"
 error in range 4..5 while parsing a variable definition. Found integer, but expected identifier
-error at position 9 while parsing a variable definition. Missing expected ‘=’
-error at position 9 while parsing a variable definition. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+error at position 6 while parsing a variable definition. Missing expected ‘=’
+error at position 6 while parsing a variable definition. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’

@@ -18,4 +18,4 @@ SourceFile@0..34
       ImportStatementSegment@30..33
         Ident@30..33 "map"
       RBrace@33..34 "}"
-error at position 33 while parsing the comma between imports inside an import group. Missing expected ‘,’
+error at position 30 while parsing the comma between imports inside an import group. Missing expected ‘,’

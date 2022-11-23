@@ -14,4 +14,4 @@ SourceFile@0..23
       LBrace@21..22 "{"
       ImportStatementSegment@22..22
       RBrace@22..23 "}"
-error at position 23 while parsing an import statement. Missing expected identifier
+error at position 22 while parsing an import statement. Missing expected identifier

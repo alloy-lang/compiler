@@ -38,4 +38,4 @@ SourceFile@0..67
       ImportStatementSegment@62..66
         Ident@62..66 "None"
       RBrace@66..67 "}"
-error at position 41 while parsing the end of an import group. Missing expected ‘}’
+error at position 35 while parsing the end of an import group. Missing expected ‘}’

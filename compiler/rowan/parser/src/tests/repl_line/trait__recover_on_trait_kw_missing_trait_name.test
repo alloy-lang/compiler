@@ -18,6 +18,6 @@ SourceFile@0..68
     Comment@34..64 "-- imagine all the th ..."
     Whitespace@64..65 "\n"
     EndKw@65..68 "end"
-error at position 12 while parsing the name of the trait in a trait definition. Missing expected identifier
-error at position 12 while parsing the where keyword at the start of a trait definition. Missing expected ‘where‘
-error at position 12 while parsing the end keyword after a trait definition. Missing expected ‘typeof‘, ‘typevar‘ or ‘end‘
+error at position 7 while parsing the name of the trait in a trait definition. Missing expected identifier
+error at position 7 while parsing the where keyword at the start of a trait definition. Missing expected ‘where‘
+error at position 7 while parsing the end keyword after a trait definition. Missing expected ‘typeof‘, ‘typevar‘ or ‘end‘

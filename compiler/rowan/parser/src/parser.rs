@@ -111,12 +111,12 @@ impl<'t, 'input> Parser<'t, 'input> {
 
         let kind = match found {
             None => ParseErrorKind::Missing {
-                offset: last_token_range.end(),
+                offset: range.end(),
             },
             Some(kind) => {
                 if self.at_set(recovery_set) {
                     ParseErrorKind::Missing {
-                        offset: range.end(),
+                        offset: range.start(),
                     }
                 } else {
                     ParseErrorKind::Unexpected { found: kind, range }
