@@ -47,6 +47,10 @@ fn run_parser_tests(tests_dir: &str, parsing_fn: fn(&str) -> Parse) {
     }
 
     if !failed_tests.is_empty() {
-        panic!("{} parser test(s) failed: {:?}", failed_tests.len(), failed_tests);
+        panic!(
+            "{} parser test(s) failed: {:?}",
+            failed_tests.len(),
+            failed_tests
+        );
     }
 }

@@ -4,10 +4,9 @@ SourceFile@0..16
   IfThenElseExpr@0..16
     IfKw@0..2 "if"
     Whitespace@2..3 " "
-    IfExpr@3..8
-      Error@3..8
-        ThenKw@3..7 "then"
-        Whitespace@7..8 " "
+    IfExpr@3..3
+    ThenKw@3..7 "then"
+    Whitespace@7..8 " "
     ThenExpr@8..10
       IntLiteral@8..10
         Integer@8..9 "2"
@@ -17,5 +16,4 @@ SourceFile@0..16
     ElseExpr@15..16
       IntLiteral@15..16
         Integer@15..16 "3"
-error in range 3..7 while parsing an if-then-else expression. Found ‘then‘, but expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
-error at position 9 while parsing an if-then-else expression. Missing expected ‘then‘
+error at position 3 while parsing an if-then-else expression. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’

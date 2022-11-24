@@ -15,5 +15,5 @@ SourceFile@0..11
     ElseExpr@10..11
       IntLiteral@10..11
         Integer@10..11 "3"
-error at position 9 while parsing an if-then-else expression. Missing expected ‘+’, ‘-’, ‘*’, ‘/’ or ‘then‘
-error at position 11 while parsing an if-then-else expression. Missing expected ‘+’, ‘-’, ‘*’, ‘/’ or ‘else‘
+error at position 8 while parsing an if-then-else expression. Missing expected ‘+’, ‘-’, ‘*’, ‘/’ or ‘then‘
+error at position 10 while parsing an if-then-else expression. Missing expected ‘+’, ‘-’, ‘*’, ‘/’ or ‘else‘

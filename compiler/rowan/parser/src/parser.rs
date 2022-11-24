@@ -5,6 +5,7 @@ use alloy_rowan_syntax::SyntaxKind;
 
 use crate::event::Event;
 use crate::grammar;
+use crate::parser::marker::CompletedMarker;
 use crate::parser::parse_error::ParseErrorKind;
 use crate::source::Source;
 use crate::token_set::TokenSet;
@@ -89,15 +90,27 @@ impl<'t, 'input> Parser<'t, 'input> {
         if self.at(kind) {
             self.bump();
         } else {
-            self.error_with_recovery(context, recovery_set.union(DEFAULT_RECOVERY_SET));
+            self.error_with_recovery(context, recovery_set);
         }
     }
 
-    pub(crate) fn error(&mut self, context: ParseErrorContext) {
-        self.error_with_recovery(context, DEFAULT_RECOVERY_SET);
+    pub(crate) fn error(&mut self, context: ParseErrorContext) -> Option<CompletedMarker> {
+        self.error_with_recovery(context, DEFAULT_RECOVERY_SET)
     }
 
-    fn error_with_recovery(&mut self, context: ParseErrorContext, recovery_set: TokenSet) {
+    pub(crate) fn error_with_recovery(
+        &mut self,
+        context: ParseErrorContext,
+        recovery_set: TokenSet,
+    ) -> Option<CompletedMarker> {
+        self.error_with_recovery_no_default(context, recovery_set.union(DEFAULT_RECOVERY_SET))
+    }
+
+    fn error_with_recovery_no_default(
+        &mut self,
+        context: ParseErrorContext,
+        recovery_set: TokenSet,
+    ) -> Option<CompletedMarker> {
         let last_token_range = self.source.last_token_range().unwrap_or_default();
 
         let current_token = self.source.peek_token();
@@ -133,7 +146,8 @@ impl<'t, 'input> Parser<'t, 'input> {
         if !self.at_set(recovery_set) && !self.at_end() {
             let m = self.start();
             self.bump();
-            m.complete(self, SyntaxKind::Error);
+            return Some(m.complete(self, SyntaxKind::Error));
         };
+        None
     }
 }
