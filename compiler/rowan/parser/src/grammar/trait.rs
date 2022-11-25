@@ -97,7 +97,11 @@ fn parse_trait_type_annotation_typevar(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
     p.bump();
 
-    p.expect(TokenKind::Ident, ParseErrorContext::TypeVariableName);
+    p.expect_with_recovery(
+        TokenKind::Ident,
+        ParseErrorContext::TypeVariableName,
+        TRAIT_RECOVERY_SET,
+    );
 
     m.complete(p, SyntaxKind::TypeVariable)
 }
@@ -145,7 +149,11 @@ fn parse_trait_typevar(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
     p.bump();
 
-    p.expect(TokenKind::Ident, ParseErrorContext::TypeVariableName);
+    p.expect_with_recovery(
+        TokenKind::Ident,
+        ParseErrorContext::TypeVariableName,
+        TRAIT_RECOVERY_SET,
+    );
 
     m.complete(p, SyntaxKind::TypeVariable)
 }
