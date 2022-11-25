@@ -81,6 +81,11 @@ impl<'t, 'input> Parser<'t, 'input> {
         }
     }
 
+    pub(crate) fn expect_only(&mut self, kind: TokenKind, context: ParseErrorContext) {
+        self.expected_kinds.clear();
+        self.expect(kind, context);
+    }
+
     pub(crate) fn expect_with_recovery(
         &mut self,
         kind: TokenKind,

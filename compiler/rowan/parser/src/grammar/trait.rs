@@ -1,5 +1,8 @@
 use super::*;
 
+const TRAIT_RECOVERY_SET: TokenSet =
+    TokenSet::new([TokenKind::TypevarKw, TokenKind::TypeOfKw, TokenKind::EndKw]);
+
 pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::TraitKw));
 
@@ -14,13 +17,21 @@ pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
             break;
         }
 
-        let member_m = parse_trait_member(p);
-        if member_m.is_none() {
-            break;
+        let result = parse_trait_member(p);
+        match result {
+            TraitMemberParseResult::TraitMember(_) => {
+                // empty
+            }
+            TraitMemberParseResult::TraitKwFound => {
+                break;
+            }
+            TraitMemberParseResult::UnknownToken => {
+                p.error_with_recovery(ParseErrorContext::TraitMemberFirst, TRAIT_RECOVERY_SET);
+            }
         }
     }
 
-    p.expect(TokenKind::EndKw, ParseErrorContext::TraitEnd);
+    p.expect_only(TokenKind::EndKw, ParseErrorContext::TraitEnd);
 
     return m.complete(p, SyntaxKind::TraitDef);
 
@@ -29,13 +40,23 @@ pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
     }
 }
 
-fn parse_trait_member(p: &mut Parser) -> Option<CompletedMarker> {
+enum TraitMemberParseResult {
+    TraitMember(CompletedMarker),
+    TraitKwFound,
+    UnknownToken,
+}
+
+fn parse_trait_member(p: &mut Parser) -> TraitMemberParseResult {
     if p.at(TokenKind::TypeOfKw) {
-        Some(parse_trait_type_annotation(p))
+        let cm = parse_trait_type_annotation(p);
+        TraitMemberParseResult::TraitMember(cm)
     } else if p.at(TokenKind::TypevarKw) {
-        Some(parse_trait_typevar(p))
+        let cm = parse_trait_typevar(p);
+        TraitMemberParseResult::TraitMember(cm)
+    } else if p.at_set(TokenSet::new([TokenKind::TraitKw])) {
+        TraitMemberParseResult::TraitKwFound
     } else {
-        None
+        TraitMemberParseResult::UnknownToken
     }
 }
 

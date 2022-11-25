@@ -1,0 +1,24 @@
+trait TestTrait1 where
+    unknown
+
+    typevar t1
+end
+===
+SourceFile@0..54
+  TraitDef@0..54
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    Error@27..40
+      Ident@27..34 "unknown"
+      Whitespace@34..40 "\n\n    "
+    TypeVariable@40..51
+      TypevarKw@40..47 "typevar"
+      Whitespace@47..48 " "
+      Ident@48..50 "t1"
+      Whitespace@50..51 "\n"
+    EndKw@51..54 "end"
+error in range 27..34 while parsing the start of a trait member, are you missing a keyword?. Found identifier, but expected ‘typeof‘ or ‘typevar‘
