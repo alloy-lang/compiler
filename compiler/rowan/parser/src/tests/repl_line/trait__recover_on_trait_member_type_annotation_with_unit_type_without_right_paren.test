@@ -1,0 +1,36 @@
+trait TestTrait1 where
+    typeof test : self -> String -> (
+end
+===
+SourceFile@0..64
+  TraitDef@0..64
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    TypeAnnotation@27..61
+      TypeOfKw@27..33 "typeof"
+      Whitespace@33..34 " "
+      Ident@34..38 "test"
+      Whitespace@38..39 " "
+      Colon@39..40 ":"
+      Whitespace@40..41 " "
+      LambdaType@41..61
+        SelfType@41..46
+          SelfKw@41..45 "self"
+          Whitespace@45..46 " "
+        RightArrow@46..48 "->"
+        Whitespace@48..49 " "
+        LambdaType@49..61
+          TypeIdentifier@49..56
+            Ident@49..55 "String"
+            Whitespace@55..56 " "
+          RightArrow@56..58 "->"
+          Whitespace@58..59 " "
+          UnitType@59..61
+            LParen@59..60 "("
+            Whitespace@60..61 "\n"
+    EndKw@61..64 "end"
+error at position 61 while parsing the right parenthesis of a unit type. Missing expected ‘)’

@@ -132,10 +132,13 @@ fn parse_single_type(p: &mut Parser) -> Option<CompletedMarker> {
         p.bump();
 
         return Some(m.complete(p, SyntaxKind::SelfType));
-        // } else if p.at(TokenKind::LParen) {
-        //     p.bump();
-        //     parse_type(p);
-        //     p.expect(TokenKind::RParen, ParseErrorContext::TypeRightParen);
+    } else if p.at(TokenKind::LParen) {
+        let m = p.start();
+        p.bump();
+
+        p.expect_with_recovery(TokenKind::RParen, ParseErrorContext::UnitTypeRightParen, TRAIT_RECOVERY_SET);
+
+        return Some(m.complete(p, SyntaxKind::UnitType));
     } else {
         p.error(ParseErrorContext::SingleType);
     }
