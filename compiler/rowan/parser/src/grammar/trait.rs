@@ -1,3 +1,4 @@
+use crate::parser::DEFAULT_RECOVERY_SET;
 use super::*;
 
 const TRAIT_RECOVERY_SET: TokenSet =
@@ -22,7 +23,7 @@ pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
             TraitMemberParseResult::TraitMember(_) => {
                 // empty
             }
-            TraitMemberParseResult::TraitKwFound => {
+            TraitMemberParseResult::TopLevelKwFound => {
                 break;
             }
             TraitMemberParseResult::UnknownToken => {
@@ -42,7 +43,7 @@ pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
 
 enum TraitMemberParseResult {
     TraitMember(CompletedMarker),
-    TraitKwFound,
+    TopLevelKwFound,
     UnknownToken,
 }
 
@@ -53,8 +54,8 @@ fn parse_trait_member(p: &mut Parser) -> TraitMemberParseResult {
     } else if p.at(TokenKind::TypevarKw) {
         let cm = parse_trait_typevar(p);
         TraitMemberParseResult::TraitMember(cm)
-    } else if p.at_set(TokenSet::new([TokenKind::TraitKw])) {
-        TraitMemberParseResult::TraitKwFound
+    } else if p.at_set(DEFAULT_RECOVERY_SET) {
+        TraitMemberParseResult::TopLevelKwFound
     } else {
         TraitMemberParseResult::UnknownToken
     }
