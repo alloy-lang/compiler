@@ -1,0 +1,36 @@
+trait TestTrait1 where
+    typeof test : self -> (String, Int)
+end
+===
+SourceFile@0..66
+  TraitDef@0..66
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    TypeAnnotation@27..63
+      TypeOfKw@27..33 "typeof"
+      Whitespace@33..34 " "
+      Ident@34..38 "test"
+      Whitespace@38..39 " "
+      Colon@39..40 ":"
+      Whitespace@40..41 " "
+      LambdaType@41..63
+        SelfType@41..46
+          SelfKw@41..45 "self"
+          Whitespace@45..46 " "
+        RightArrow@46..48 "->"
+        Whitespace@48..49 " "
+        TupleType@49..63
+          LParen@49..50 "("
+          TypeIdentifier@50..56
+            Ident@50..56 "String"
+          Comma@56..57 ","
+          Whitespace@57..58 " "
+          TypeIdentifier@58..61
+            Ident@58..61 "Int"
+          RParen@61..62 ")"
+          Whitespace@62..63 "\n"
+    EndKw@63..66 "end"

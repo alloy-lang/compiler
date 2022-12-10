@@ -134,17 +134,59 @@ fn parse_single_type(p: &mut Parser) -> Option<CompletedMarker> {
 
         return Some(m.complete(p, SyntaxKind::SelfType));
     } else if p.at(TokenKind::LParen) {
-        let m = p.start();
-        p.bump();
-
-        p.expect_with_recovery(TokenKind::RParen, ParseErrorContext::UnitTypeRightParen, TRAIT_RECOVERY_SET);
-
-        return Some(m.complete(p, SyntaxKind::UnitType));
+        return Some(parse_parenthesized_type(p));
     } else {
         p.error(ParseErrorContext::SingleType);
     }
 
     None
+}
+
+fn parse_parenthesized_type(p: &mut Parser) -> CompletedMarker {
+    assert!(p.at(TokenKind::LParen));
+
+    let m = p.start();
+    p.bump();
+
+    if p.at(TokenKind::RParen) {
+        p.bump();
+        return m.complete(p, SyntaxKind::UnitType);
+    }
+    if p.at_set(TRAIT_RECOVERY_SET) {
+        p.error_with_recovery(ParseErrorContext::UnitTypeRightParen, TRAIT_RECOVERY_SET);
+        return m.complete(p, SyntaxKind::UnitType);
+    }
+
+    parse_type(p);
+
+    let mut comma_count = 0;
+    if p.at(TokenKind::Comma) {
+        loop {
+            if should_stop(p) {
+                break;
+            }
+
+            comma_count += 1;
+
+            if p.at(TokenKind::Comma) {
+                p.bump();
+            }
+
+            parse_type(p);
+        }
+    }
+
+    p.expect_with_recovery(TokenKind::RParen, ParseErrorContext::UnitTypeRightParen, TRAIT_RECOVERY_SET);
+
+    return if comma_count == 0 {
+        m.complete(p, SyntaxKind::ParenthesizedType)
+    } else {
+        m.complete(p, SyntaxKind::TupleType)
+    };
+
+    fn should_stop(p: &mut Parser) -> bool {
+        !p.at_set(TokenSet::new([TokenKind::Comma])) || p.at_end()
+    }
 }
 
 fn parse_trait_typevar(p: &mut Parser) -> CompletedMarker {

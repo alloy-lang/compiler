@@ -76,6 +76,8 @@ pub enum SyntaxKind {
     LambdaType,
     SelfType,
     UnitType,
+    ParenthesizedType,
+    TupleType,
     TypeIdentifier,
     VariableType,
     TypeVariable,
