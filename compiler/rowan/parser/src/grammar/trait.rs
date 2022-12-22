@@ -247,7 +247,7 @@ fn parse_typevar_constraints(p: &mut Parser) {
 
         p.expect_with_recovery(
             TokenKind::Plus,
-            ParseErrorContext::TraitTypevarConstraintPlus,
+            ParseErrorContext::TypeVariableConstraintPlus,
             TRAIT_RECOVERY_SET.union(TYPEVAR_CONSTRAINT_FIRSTS),
         );
     }
@@ -265,7 +265,7 @@ fn parse_typevar_constraint(p: &mut Parser) {
     } else if p.at(TokenKind::Ident) {
         parse_typevar_constraint_trait_marker(p);
     } else {
-        p.error(ParseErrorContext::TraitTypevarConstraint);
+        p.error(ParseErrorContext::TypeVariableConstraint);
     }
 }
 
@@ -285,17 +285,17 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
 
     p.expect_with_recovery(
         TokenKind::TypeKw,
-        ParseErrorContext::TraitTypevarKindConstraintTypeKw,
+        ParseErrorContext::TypeVariableKindConstraintTypeKw,
         TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
     );
     p.expect_with_recovery(
         TokenKind::LAngle,
-        ParseErrorContext::TraitTypevarKindConstraintLAngle,
+        ParseErrorContext::TypeVariableKindConstraintLAngle,
         TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
     );
     p.expect_with_recovery(
         TokenKind::NilIdentifier,
-        ParseErrorContext::TraitTypevarKindConstraintUnderscore,
+        ParseErrorContext::TypeVariableKindConstraintUnderscore,
         TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
     );
 
@@ -309,7 +309,7 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
 
             p.expect_with_recovery(
                 TokenKind::NilIdentifier,
-                ParseErrorContext::TraitTypevarKindConstraintUnderscore,
+                ParseErrorContext::TypeVariableKindConstraintUnderscore,
                 TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
             );
 
@@ -319,7 +319,7 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
 
             p.expect_with_recovery(
                 TokenKind::Comma,
-                ParseErrorContext::TraitTypevarKindConstraintUnderscoreComma,
+                ParseErrorContext::TypeVariableKindConstraintUnderscoreComma,
                 TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
             );
         }
@@ -327,7 +327,7 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
 
     p.expect_with_recovery(
         TokenKind::RAngle,
-        ParseErrorContext::TraitTypevarKindConstraintRAngle,
+        ParseErrorContext::TypeVariableKindConstraintRAngle,
         TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
     );
 
