@@ -73,6 +73,9 @@ pub enum TokenKind {
     #[token("->")]
     RightArrow,
 
+    #[token("#")]
+    Hash,
+
     #[token("+")]
     Plus,
 
@@ -99,6 +102,15 @@ pub enum TokenKind {
 
     #[token(")")]
     RParen,
+
+    #[token("<")]
+    LAngle,
+
+    #[token(">")]
+    RAngle,
+
+    #[token("_")]
+    NilIdentifier,
 
     #[token("|")]
     Pipe,
@@ -146,6 +158,7 @@ impl fmt::Display for TokenKind {
             Self::DoubleColon => "‘::’",
             Self::Comma => "‘,’",
             Self::RightArrow => "‘->’",
+            Self::Hash => "‘#’",
             Self::Plus => "‘+’",
             Self::Minus => "‘-’",
             Self::Star => "‘*’",
@@ -155,6 +168,9 @@ impl fmt::Display for TokenKind {
             Self::RParen => "‘)’",
             Self::LBrace => "‘{’",
             Self::RBrace => "‘}’",
+            Self::LAngle => "‘<’",
+            Self::RAngle => "‘>’",
+            Self::NilIdentifier => "‘_’",
             Self::Pipe => "‘|’",
             Self::Comment => "comment",
             Self::Error => "an unrecognized token",

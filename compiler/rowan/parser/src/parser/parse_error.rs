@@ -48,6 +48,10 @@ pub(crate) enum ParseErrorContext {
     UnitTypeRightParen,
     SingleType,
     TypeVariableName,
+    TraitSelfConstraintsEquals,
+    TraitTypevarConstraint,
+    TraitTypevarConstraintPlus,
+    TraitTypevarKindConstraint,
     TopLevelExpr,
 }
 
@@ -112,6 +116,10 @@ impl ParseErrorContext {
             ParseErrorContext::UnitTypeRightParen => todo!(),
             ParseErrorContext::SingleType => todo!(),
             ParseErrorContext::TypeVariableName => todo!(),
+            ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
+            ParseErrorContext::TraitTypevarConstraint => todo!(),
+            ParseErrorContext::TraitTypevarConstraintPlus => todo!(),
+            ParseErrorContext::TraitTypevarKindConstraint => todo!(),
             ParseErrorContext::TopLevelExpr => "We expected to see an expression.",
         }
     }
@@ -154,6 +162,10 @@ impl ParseErrorContext {
             ParseErrorContext::UnitTypeRightParen => "the right parenthesis of a unit type",
             ParseErrorContext::SingleType => "the type of a type annotation",
             ParseErrorContext::TypeVariableName => "the name of a type variable",
+            ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
+            ParseErrorContext::TraitTypevarConstraint => todo!(),
+            ParseErrorContext::TraitTypevarConstraintPlus => todo!(),
+            ParseErrorContext::TraitTypevarKindConstraint => todo!(),
             ParseErrorContext::TopLevelExpr => "a top level expression",
         }
     }
@@ -192,6 +204,10 @@ impl ParseErrorContext {
             ParseErrorContext::UnitTypeRightParen => todo!(),
             ParseErrorContext::SingleType => todo!(),
             ParseErrorContext::TypeVariableName => todo!(),
+            ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
+            ParseErrorContext::TraitTypevarConstraint => todo!(),
+            ParseErrorContext::TraitTypevarConstraintPlus => todo!(),
+            ParseErrorContext::TraitTypevarKindConstraint => todo!(),
             ParseErrorContext::TopLevelExpr => todo!(),
         }
     }
