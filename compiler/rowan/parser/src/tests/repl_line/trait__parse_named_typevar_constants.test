@@ -19,7 +19,7 @@ SourceFile@0..62
       Whitespace@39..40 " "
       TypeVariableKindConstraint@40..49
         Hash@40..41 "#"
-        Ident@41..45 "Type"
+        TypeKw@41..45 "Type"
         LAngle@45..46 "<"
         NilIdentifier@46..47 "_"
         RAngle@47..48 ">"

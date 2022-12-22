@@ -1,0 +1,40 @@
+trait TestTrait1 where
+    self = #Type<_, _, _,_,_,   _,  >
+end
+===
+SourceFile@0..64
+  TraitDef@0..64
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    TypeVariable@27..61
+      SelfKw@27..31 "self"
+      Whitespace@31..32 " "
+      Equals@32..33 "="
+      Whitespace@33..34 " "
+      TypeVariableKindConstraint@34..61
+        Hash@34..35 "#"
+        TypeKw@35..39 "Type"
+        LAngle@39..40 "<"
+        NilIdentifier@40..41 "_"
+        Comma@41..42 ","
+        Whitespace@42..43 " "
+        NilIdentifier@43..44 "_"
+        Comma@44..45 ","
+        Whitespace@45..46 " "
+        NilIdentifier@46..47 "_"
+        Comma@47..48 ","
+        NilIdentifier@48..49 "_"
+        Comma@49..50 ","
+        NilIdentifier@50..51 "_"
+        Comma@51..52 ","
+        Whitespace@52..55 "   "
+        NilIdentifier@55..56 "_"
+        Comma@56..57 ","
+        Whitespace@57..59 "  "
+        RAngle@59..60 ">"
+        Whitespace@60..61 "\n"
+    EndKw@61..64 "end"

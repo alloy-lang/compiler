@@ -234,6 +234,9 @@ fn parse_trait_self(p: &mut Parser) -> CompletedMarker {
     m.complete(p, SyntaxKind::TypeVariable)
 }
 
+const TYPEVAR_CONSTRAINT_FIRSTS: TokenSet =
+    TokenSet::new([TokenKind::Hash, TokenKind::Ident, TokenKind::Plus]);
+
 fn parse_typevar_constraints(p: &mut Parser) {
     loop {
         parse_typevar_constraint(p);
@@ -252,13 +255,9 @@ fn parse_typevar_constraints(p: &mut Parser) {
     return;
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(TokenSet::new([TokenKind::Plus])) || p.at_end()
+        !p.at_set(TYPEVAR_CONSTRAINT_FIRSTS) || p.at_end()
     }
 }
-
-const TYPEVAR_CONSTRAINT_FIRSTS: TokenSet =
-    // TokenSet::new([TokenKind::Hash, TokenKind::Ident, TokenKind::Plus]);
-    TokenSet::new([]);
 
 fn parse_typevar_constraint(p: &mut Parser) {
     if p.at(TokenKind::Hash) {
@@ -270,6 +269,14 @@ fn parse_typevar_constraint(p: &mut Parser) {
     }
 }
 
+const TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY: TokenSet =
+    TRAIT_RECOVERY_SET
+        .union(TYPEVAR_CONSTRAINT_FIRSTS)
+        .plus(TokenKind::LAngle)
+        .plus(TokenKind::NilIdentifier)
+        .plus(TokenKind::RAngle)
+;
+
 fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Hash));
 
@@ -277,27 +284,58 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
     p.bump();
 
     p.expect_with_recovery(
-        TokenKind::Ident,
-        ParseErrorContext::TraitTypevarKindConstraint,
-        TRAIT_RECOVERY_SET.union(TYPEVAR_CONSTRAINT_FIRSTS),
+        TokenKind::TypeKw,
+        ParseErrorContext::TraitTypevarKindConstraintTypeKw,
+        TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
     );
     p.expect_with_recovery(
         TokenKind::LAngle,
-        ParseErrorContext::TraitTypevarKindConstraint,
-        TRAIT_RECOVERY_SET.union(TYPEVAR_CONSTRAINT_FIRSTS),
+        ParseErrorContext::TraitTypevarKindConstraintLAngle,
+        TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
     );
     p.expect_with_recovery(
         TokenKind::NilIdentifier,
-        ParseErrorContext::TraitTypevarKindConstraint,
-        TRAIT_RECOVERY_SET.union(TYPEVAR_CONSTRAINT_FIRSTS),
-    );
-    p.expect_with_recovery(
-        TokenKind::RAngle,
-        ParseErrorContext::TraitTypevarKindConstraint,
-        TRAIT_RECOVERY_SET.union(TYPEVAR_CONSTRAINT_FIRSTS),
+        ParseErrorContext::TraitTypevarKindConstraintUnderscore,
+        TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
     );
 
-    m.complete(p, SyntaxKind::TypeVariableKindConstraint)
+    if p.at_set(TokenSet::new([TokenKind::Comma])) {
+        p.bump();
+
+        loop {
+            if should_stop(p) {
+                break;
+            }
+
+            p.expect_with_recovery(
+                TokenKind::NilIdentifier,
+                ParseErrorContext::TraitTypevarKindConstraintUnderscore,
+                TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
+            );
+
+            if should_stop(p) {
+                break;
+            }
+
+            p.expect_with_recovery(
+                TokenKind::Comma,
+                ParseErrorContext::TraitTypevarKindConstraintUnderscoreComma,
+                TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
+            );
+        }
+    }
+
+    p.expect_with_recovery(
+        TokenKind::RAngle,
+        ParseErrorContext::TraitTypevarKindConstraintRAngle,
+        TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
+    );
+
+    return m.complete(p, SyntaxKind::TypeVariableKindConstraint);
+
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_set(TokenSet::new([TokenKind::RAngle])) || p.at_end()
+    }
 }
 
 fn parse_typevar_constraint_trait_marker(p: &mut Parser) -> CompletedMarker {

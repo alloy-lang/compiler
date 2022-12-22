@@ -46,6 +46,8 @@ pub enum TokenKind {
     SelfKw,
     #[token("end")]
     EndKw,
+    #[token("Type")]
+    TypeKw,
 
     #[regex("[A-Za-z][A-Za-z0-9]*")]
     Ident,
@@ -149,6 +151,7 @@ impl fmt::Display for TokenKind {
             Self::ElseKw => "‘else‘",
             Self::SelfKw => "‘self‘",
             Self::EndKw => "‘end‘",
+            Self::TypeKw => "‘Type‘",
             Self::Ident => "identifier",
             Self::Integer => "integer",
             Self::Fractional => "fractional",

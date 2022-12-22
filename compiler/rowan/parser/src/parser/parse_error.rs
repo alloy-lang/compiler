@@ -51,7 +51,11 @@ pub(crate) enum ParseErrorContext {
     TraitSelfConstraintsEquals,
     TraitTypevarConstraint,
     TraitTypevarConstraintPlus,
-    TraitTypevarKindConstraint,
+    TraitTypevarKindConstraintTypeKw,
+    TraitTypevarKindConstraintLAngle,
+    TraitTypevarKindConstraintUnderscore,
+    TraitTypevarKindConstraintUnderscoreComma,
+    TraitTypevarKindConstraintRAngle,
     TopLevelExpr,
 }
 
@@ -119,7 +123,11 @@ impl ParseErrorContext {
             ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
             ParseErrorContext::TraitTypevarConstraint => todo!(),
             ParseErrorContext::TraitTypevarConstraintPlus => todo!(),
-            ParseErrorContext::TraitTypevarKindConstraint => todo!(),
+            ParseErrorContext::TraitTypevarKindConstraintTypeKw => todo!(),
+            ParseErrorContext::TraitTypevarKindConstraintLAngle => todo!(),
+            ParseErrorContext::TraitTypevarKindConstraintUnderscore => todo!(),
+            ParseErrorContext::TraitTypevarKindConstraintUnderscoreComma => todo!(),
+            ParseErrorContext::TraitTypevarKindConstraintRAngle => todo!(),
             ParseErrorContext::TopLevelExpr => "We expected to see an expression.",
         }
     }
@@ -164,8 +172,12 @@ impl ParseErrorContext {
             ParseErrorContext::TypeVariableName => "the name of a type variable",
             ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
             ParseErrorContext::TraitTypevarConstraint => todo!(),
-            ParseErrorContext::TraitTypevarConstraintPlus => todo!(),
-            ParseErrorContext::TraitTypevarKindConstraint => todo!(),
+            ParseErrorContext::TraitTypevarConstraintPlus => "the plus between type constraints",
+            ParseErrorContext::TraitTypevarKindConstraintTypeKw => "the Type keyword before the <_> pattern thingy",
+            ParseErrorContext::TraitTypevarKindConstraintLAngle => "the < before the <_> pattern thingy",
+            ParseErrorContext::TraitTypevarKindConstraintUnderscore => "the _ in the <_> pattern thingy",
+            ParseErrorContext::TraitTypevarKindConstraintUnderscoreComma => todo!(),
+            ParseErrorContext::TraitTypevarKindConstraintRAngle => "the > after the <_> pattern thingy",
             ParseErrorContext::TopLevelExpr => "a top level expression",
         }
     }
@@ -207,7 +219,11 @@ impl ParseErrorContext {
             ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
             ParseErrorContext::TraitTypevarConstraint => todo!(),
             ParseErrorContext::TraitTypevarConstraintPlus => todo!(),
-            ParseErrorContext::TraitTypevarKindConstraint => todo!(),
+            ParseErrorContext::TraitTypevarKindConstraintTypeKw => todo!(),
+            ParseErrorContext::TraitTypevarKindConstraintLAngle => todo!(),
+            ParseErrorContext::TraitTypevarKindConstraintUnderscore => todo!(),
+            ParseErrorContext::TraitTypevarKindConstraintUnderscoreComma => todo!(),
+            ParseErrorContext::TraitTypevarKindConstraintRAngle => todo!(),
             ParseErrorContext::TopLevelExpr => todo!(),
         }
     }

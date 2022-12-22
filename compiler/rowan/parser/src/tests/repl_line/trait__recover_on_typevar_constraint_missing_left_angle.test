@@ -1,0 +1,25 @@
+trait TestTrait1 where
+    self = #Type_>
+end
+===
+SourceFile@0..45
+  TraitDef@0..45
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    TypeVariable@27..42
+      SelfKw@27..31 "self"
+      Whitespace@31..32 " "
+      Equals@32..33 "="
+      Whitespace@33..34 " "
+      TypeVariableKindConstraint@34..42
+        Hash@34..35 "#"
+        TypeKw@35..39 "Type"
+        NilIdentifier@39..40 "_"
+        RAngle@40..41 ">"
+        Whitespace@41..42 "\n"
+    EndKw@42..45 "end"
+error at position 39 while parsing the < before the <_> pattern thingy. Missing expected ‘<’
