@@ -173,11 +173,19 @@ impl ParseErrorContext {
             ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
             ParseErrorContext::TypeVariableConstraint => todo!(),
             ParseErrorContext::TypeVariableConstraintPlus => "the plus between type constraints",
-            ParseErrorContext::TypeVariableKindConstraintTypeKw => "the Type keyword before the <_> pattern thingy",
-            ParseErrorContext::TypeVariableKindConstraintLAngle => "the < before the <_> pattern thingy",
-            ParseErrorContext::TypeVariableKindConstraintUnderscore => "the _ in the <_> pattern thingy",
+            ParseErrorContext::TypeVariableKindConstraintTypeKw => {
+                "the Type keyword before the <_> pattern thingy"
+            }
+            ParseErrorContext::TypeVariableKindConstraintLAngle => {
+                "the < before the <_> pattern thingy"
+            }
+            ParseErrorContext::TypeVariableKindConstraintUnderscore => {
+                "the _ in the <_> pattern thingy"
+            }
             ParseErrorContext::TypeVariableKindConstraintUnderscoreComma => todo!(),
-            ParseErrorContext::TypeVariableKindConstraintRAngle => "the > after the <_> pattern thingy",
+            ParseErrorContext::TypeVariableKindConstraintRAngle => {
+                "the > after the <_> pattern thingy"
+            }
             ParseErrorContext::TopLevelExpr => "a top level expression",
         }
     }

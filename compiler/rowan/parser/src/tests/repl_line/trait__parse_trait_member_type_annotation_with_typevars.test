@@ -1,0 +1,49 @@
+trait TestTrait1 where
+    typeof apply : self -> self -> self where
+        typevar t1
+        typevar t2
+end
+===
+SourceFile@0..110
+  TraitDef@0..110
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    TypeAnnotation@27..107
+      TypeOfKw@27..33 "typeof"
+      Whitespace@33..34 " "
+      Ident@34..39 "apply"
+      Whitespace@39..40 " "
+      Colon@40..41 ":"
+      Whitespace@41..42 " "
+      LambdaType@42..63
+        SelfType@42..47
+          SelfKw@42..46 "self"
+          Whitespace@46..47 " "
+        RightArrow@47..49 "->"
+        Whitespace@49..50 " "
+        LambdaType@50..63
+          SelfType@50..55
+            SelfKw@50..54 "self"
+            Whitespace@54..55 " "
+          RightArrow@55..57 "->"
+          Whitespace@57..58 " "
+          SelfType@58..63
+            SelfKw@58..62 "self"
+            Whitespace@62..63 " "
+      WhereKw@63..68 "where"
+      Whitespace@68..77 "\n        "
+      TypeVariable@77..96
+        TypevarKw@77..84 "typevar"
+        Whitespace@84..85 " "
+        Ident@85..87 "t1"
+        Whitespace@87..96 "\n        "
+      TypeVariable@96..107
+        TypevarKw@96..103 "typevar"
+        Whitespace@103..104 " "
+        Ident@104..106 "t2"
+        Whitespace@106..107 "\n"
+    EndKw@107..110 "end"

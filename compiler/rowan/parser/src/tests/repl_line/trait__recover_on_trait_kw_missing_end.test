@@ -1,12 +1,16 @@
 trait TestTrait1 where
     -- imagine all the things here
 
+    typevar t1
+
 trait TestTrait2 where
     -- imagine all the things here
+
+    typevar t1
 end
 ===
-SourceFile@0..120
-  TraitDef@0..59
+SourceFile@0..152
+  TraitDef@0..75
     TraitKw@0..5 "trait"
     Whitespace@5..6 " "
     Ident@6..16 "TestTrait1"
@@ -14,15 +18,25 @@ SourceFile@0..120
     WhereKw@17..22 "where"
     Whitespace@22..27 "\n    "
     Comment@27..57 "-- imagine all the th ..."
-    Whitespace@57..59 "\n\n"
-  TraitDef@59..120
-    TraitKw@59..64 "trait"
-    Whitespace@64..65 " "
-    Ident@65..75 "TestTrait2"
-    Whitespace@75..76 " "
-    WhereKw@76..81 "where"
-    Whitespace@81..86 "\n    "
-    Comment@86..116 "-- imagine all the th ..."
-    Whitespace@116..117 "\n"
-    EndKw@117..120 "end"
-error at position 59 while parsing the end keyword after a trait definition. Missing expected ‘end‘
+    Whitespace@57..63 "\n\n    "
+    TypeVariable@63..75
+      TypevarKw@63..70 "typevar"
+      Whitespace@70..71 " "
+      Ident@71..73 "t1"
+      Whitespace@73..75 "\n\n"
+  TraitDef@75..152
+    TraitKw@75..80 "trait"
+    Whitespace@80..81 " "
+    Ident@81..91 "TestTrait2"
+    Whitespace@91..92 " "
+    WhereKw@92..97 "where"
+    Whitespace@97..102 "\n    "
+    Comment@102..132 "-- imagine all the th ..."
+    Whitespace@132..138 "\n\n    "
+    TypeVariable@138..149
+      TypevarKw@138..145 "typevar"
+      Whitespace@145..146 " "
+      Ident@146..148 "t1"
+      Whitespace@148..149 "\n"
+    EndKw@149..152 "end"
+error at position 75 while parsing the end keyword after a trait definition. Missing expected ‘end‘
