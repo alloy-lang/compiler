@@ -85,7 +85,7 @@ fn parse_trait_type_annotation(p: &mut Parser) -> CompletedMarker {
     p.expect(TokenKind::Ident, ParseErrorContext::TypeOfName);
     p.expect(TokenKind::Colon, ParseErrorContext::TypeOfColon);
 
-    parse_type(p);
+    parse_type(p, TokenSet::EMPTY);
 
     if p.at(TokenKind::WhereKw) {
         parse_trait_type_annotation_type_variables(p);
@@ -113,14 +113,22 @@ fn parse_trait_type_annotation_type_variables(p: &mut Parser) {
     }
 }
 
-fn parse_type(p: &mut Parser) -> Option<CompletedMarker> {
-    let single_type_m = parse_single_type(p)?;
+fn parse_type(p: &mut Parser, recovery_set: TokenSet) -> Option<CompletedMarker> {
+    let single_type_m = match parse_single_type(p) {
+        Some(m) => m,
+        None => {
+            p.error_with_recovery(ParseErrorContext::SingleType, recovery_set);
+            return None;
+        },
+    };
+
+    let single_type_m = maybe_parse_bounded_type(p, single_type_m);
 
     if p.at(TokenKind::RightArrow) {
         let m = single_type_m.precede(p);
 
         p.bump();
-        parse_type(p);
+        parse_type(p, TokenSet::EMPTY);
 
         return Some(m.complete(p, SyntaxKind::LambdaType));
     }
@@ -128,24 +136,25 @@ fn parse_type(p: &mut Parser) -> Option<CompletedMarker> {
     Some(single_type_m)
 }
 
+const SINGLE_TYPE_RECOVERY_SET: TokenSet =
+    TokenSet::new([TokenKind::Ident, TokenKind::SelfKw, TokenKind::LParen]);
+
 fn parse_single_type(p: &mut Parser) -> Option<CompletedMarker> {
     if p.at(TokenKind::Ident) {
         let m = p.start();
         p.bump();
 
-        return Some(m.complete(p, SyntaxKind::TypeIdentifier));
+        Some(m.complete(p, SyntaxKind::TypeIdentifier))
     } else if p.at(TokenKind::SelfKw) {
         let m = p.start();
         p.bump();
 
-        return Some(m.complete(p, SyntaxKind::SelfType));
+        Some(m.complete(p, SyntaxKind::SelfType))
     } else if p.at(TokenKind::LParen) {
-        return Some(parse_parenthesized_type(p));
+        Some(parse_parenthesized_type(p))
     } else {
-        p.error(ParseErrorContext::SingleType);
+        None
     }
-
-    None
 }
 
 fn parse_parenthesized_type(p: &mut Parser) -> CompletedMarker {
@@ -163,7 +172,7 @@ fn parse_parenthesized_type(p: &mut Parser) -> CompletedMarker {
         return m.complete(p, SyntaxKind::UnitType);
     }
 
-    parse_type(p);
+    parse_type(p, TokenSet::EMPTY);
 
     let mut comma_count = 0;
     if p.at(TokenKind::Comma) {
@@ -178,7 +187,7 @@ fn parse_parenthesized_type(p: &mut Parser) -> CompletedMarker {
                 p.bump();
             }
 
-            parse_type(p);
+            parse_type(p, TokenSet::EMPTY);
         }
     }
 
@@ -196,6 +205,68 @@ fn parse_parenthesized_type(p: &mut Parser) -> CompletedMarker {
 
     fn should_stop(p: &mut Parser) -> bool {
         !p.at_set(TokenSet::new([TokenKind::Comma])) || p.at_end()
+    }
+}
+
+const ACCEPTABLE_BOUNDED_TYPE_FIRSTS: TokenSet =
+    TokenSet::new([TokenKind::LAngle]);
+
+fn maybe_parse_bounded_type(
+    p: &mut Parser,
+    cm: CompletedMarker,
+) -> CompletedMarker {
+    if !(p.at_set(ACCEPTABLE_BOUNDED_TYPE_FIRSTS)) {
+        return cm;
+    }
+
+    let cm = cm.precede(p).complete(p, SyntaxKind::BoundedTypeBase);
+    parse_bounded_type_args(p);
+
+    cm.precede(p).complete(p, SyntaxKind::BoundedType)
+}
+
+fn parse_bounded_type_args(p: &mut Parser) {
+    p.expect_with_recovery(
+        TokenKind::LAngle,
+        ParseErrorContext::BoundedTypeLAngle,
+        TokenSet::new([TokenKind::Ident]),
+    );
+
+    loop {
+        if should_stop(p) {
+            break;
+        }
+
+        let m = p.start();
+        parse_type(p, TokenSet::new([TokenKind::Comma]));
+        m.complete(p, SyntaxKind::BoundedTypeArg);
+
+        if should_stop(p) {
+            break;
+        }
+
+        p.expect_with_recovery(
+            TokenKind::Comma,
+            ParseErrorContext::BoundedTypeComma,
+            SINGLE_TYPE_RECOVERY_SET,
+        );
+    }
+
+    p.expect_with_recovery(
+        TokenKind::RAngle,
+        ParseErrorContext::BoundedTypeRAngle,
+        TRAIT_RECOVERY_SET
+            .plus(TokenKind::WhereKw),
+    );
+
+    return;
+
+    const RECOVERY_SET: TokenSet = TRAIT_RECOVERY_SET
+        .plus(TokenKind::RAngle)
+        .plus(TokenKind::WhereKw);
+
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_set(RECOVERY_SET) || p.at_end()
     }
 }
 

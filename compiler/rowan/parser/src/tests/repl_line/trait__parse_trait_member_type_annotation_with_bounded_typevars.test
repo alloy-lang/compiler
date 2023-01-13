@@ -1,0 +1,79 @@
+trait TestTrait1 where
+    typeof apply : self<(t1 -> t2)> -> self<t1> -> self<t2> where
+        typevar t1
+        typevar t2
+end
+===
+SourceFile@0..130
+  TraitDef@0..130
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    TypeAnnotation@27..127
+      TypeOfKw@27..33 "typeof"
+      Whitespace@33..34 " "
+      Ident@34..39 "apply"
+      Whitespace@39..40 " "
+      Colon@40..41 ":"
+      Whitespace@41..42 " "
+      LambdaType@42..83
+        BoundedType@42..59
+          BoundedTypeBase@42..46
+            SelfType@42..46
+              SelfKw@42..46 "self"
+          LAngle@46..47 "<"
+          BoundedTypeArg@47..57
+            ParenthesizedType@47..57
+              LParen@47..48 "("
+              LambdaType@48..56
+                TypeIdentifier@48..51
+                  Ident@48..50 "t1"
+                  Whitespace@50..51 " "
+                RightArrow@51..53 "->"
+                Whitespace@53..54 " "
+                TypeIdentifier@54..56
+                  Ident@54..56 "t2"
+              RParen@56..57 ")"
+          RAngle@57..58 ">"
+          Whitespace@58..59 " "
+        RightArrow@59..61 "->"
+        Whitespace@61..62 " "
+        LambdaType@62..83
+          BoundedType@62..71
+            BoundedTypeBase@62..66
+              SelfType@62..66
+                SelfKw@62..66 "self"
+            LAngle@66..67 "<"
+            BoundedTypeArg@67..69
+              TypeIdentifier@67..69
+                Ident@67..69 "t1"
+            RAngle@69..70 ">"
+            Whitespace@70..71 " "
+          RightArrow@71..73 "->"
+          Whitespace@73..74 " "
+          BoundedType@74..83
+            BoundedTypeBase@74..78
+              SelfType@74..78
+                SelfKw@74..78 "self"
+            LAngle@78..79 "<"
+            BoundedTypeArg@79..81
+              TypeIdentifier@79..81
+                Ident@79..81 "t2"
+            RAngle@81..82 ">"
+            Whitespace@82..83 " "
+      WhereKw@83..88 "where"
+      Whitespace@88..97 "\n        "
+      TypeVariable@97..116
+        TypevarKw@97..104 "typevar"
+        Whitespace@104..105 " "
+        Ident@105..107 "t1"
+        Whitespace@107..116 "\n        "
+      TypeVariable@116..127
+        TypevarKw@116..123 "typevar"
+        Whitespace@123..124 " "
+        Ident@124..126 "t2"
+        Whitespace@126..127 "\n"
+    EndKw@127..130 "end"

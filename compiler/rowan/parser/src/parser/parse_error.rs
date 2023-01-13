@@ -56,6 +56,9 @@ pub(crate) enum ParseErrorContext {
     TypeVariableKindConstraintUnderscore,
     TypeVariableKindConstraintUnderscoreComma,
     TypeVariableKindConstraintRAngle,
+    BoundedTypeLAngle,
+    BoundedTypeComma,
+    BoundedTypeRAngle,
     TopLevelExpr,
 }
 
@@ -128,6 +131,9 @@ impl ParseErrorContext {
             ParseErrorContext::TypeVariableKindConstraintUnderscore => todo!(),
             ParseErrorContext::TypeVariableKindConstraintUnderscoreComma => todo!(),
             ParseErrorContext::TypeVariableKindConstraintRAngle => todo!(),
+            ParseErrorContext::BoundedTypeLAngle => todo!(),
+            ParseErrorContext::BoundedTypeComma => todo!(),
+            ParseErrorContext::BoundedTypeRAngle => todo!(),
             ParseErrorContext::TopLevelExpr => "We expected to see an expression.",
         }
     }
@@ -186,6 +192,9 @@ impl ParseErrorContext {
             ParseErrorContext::TypeVariableKindConstraintRAngle => {
                 "the > at the end of the <_> pattern thingy"
             }
+            ParseErrorContext::BoundedTypeLAngle => "the < at the start of a bounded type",
+            ParseErrorContext::BoundedTypeComma => "the comma between arguments in a bounded type",
+            ParseErrorContext::BoundedTypeRAngle => "the > at the end of a bounded type",
             ParseErrorContext::TopLevelExpr => "a top level expression",
         }
     }
@@ -232,6 +241,9 @@ impl ParseErrorContext {
             ParseErrorContext::TypeVariableKindConstraintUnderscore => todo!(),
             ParseErrorContext::TypeVariableKindConstraintUnderscoreComma => todo!(),
             ParseErrorContext::TypeVariableKindConstraintRAngle => todo!(),
+            ParseErrorContext::BoundedTypeLAngle => todo!(),
+            ParseErrorContext::BoundedTypeComma => todo!(),
+            ParseErrorContext::BoundedTypeRAngle => todo!(),
             ParseErrorContext::TopLevelExpr => todo!(),
         }
     }

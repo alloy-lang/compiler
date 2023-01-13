@@ -1,0 +1,48 @@
+trait TestTrait1 where
+    typeof apply : self<, t2> where
+        typevar t1
+        typevar t2
+end
+===
+SourceFile@0..100
+  TraitDef@0..100
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    TypeAnnotation@27..97
+      TypeOfKw@27..33 "typeof"
+      Whitespace@33..34 " "
+      Ident@34..39 "apply"
+      Whitespace@39..40 " "
+      Colon@40..41 ":"
+      Whitespace@41..42 " "
+      BoundedType@42..53
+        BoundedTypeBase@42..46
+          SelfType@42..46
+            SelfKw@42..46 "self"
+        LAngle@46..47 "<"
+        BoundedTypeArg@47..47
+        Comma@47..48 ","
+        Whitespace@48..49 " "
+        BoundedTypeArg@49..51
+          TypeIdentifier@49..51
+            Ident@49..51 "t2"
+        RAngle@51..52 ">"
+        Whitespace@52..53 " "
+      WhereKw@53..58 "where"
+      Whitespace@58..67 "\n        "
+      TypeVariable@67..86
+        TypevarKw@67..74 "typevar"
+        Whitespace@74..75 " "
+        Ident@75..77 "t1"
+        Whitespace@77..86 "\n        "
+      TypeVariable@86..97
+        TypevarKw@86..93 "typevar"
+        Whitespace@93..94 " "
+        Ident@94..96 "t2"
+        Whitespace@96..97 "\n"
+    EndKw@97..100 "end"
+error at position 47 while parsing the type of a type annotation. Missing expected identifier, ‘self‘ or ‘(’

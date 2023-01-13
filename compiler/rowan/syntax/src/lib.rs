@@ -88,6 +88,9 @@ pub enum SyntaxKind {
     TypeVariable,
     TypeVariableKindConstraint,
     TypeVariableTraitConstraint,
+    BoundedType,
+    BoundedTypeBase,
+    BoundedTypeArg,
 }
 
 impl From<TokenKind> for SyntaxKind {

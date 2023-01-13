@@ -1,0 +1,49 @@
+trait TestTrait1 where
+    typeof apply : self<t1 t2> where
+        typevar t1
+        typevar t2
+end
+===
+SourceFile@0..101
+  TraitDef@0..101
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    TypeAnnotation@27..98
+      TypeOfKw@27..33 "typeof"
+      Whitespace@33..34 " "
+      Ident@34..39 "apply"
+      Whitespace@39..40 " "
+      Colon@40..41 ":"
+      Whitespace@41..42 " "
+      BoundedType@42..54
+        BoundedTypeBase@42..46
+          SelfType@42..46
+            SelfKw@42..46 "self"
+        LAngle@46..47 "<"
+        BoundedTypeArg@47..50
+          TypeIdentifier@47..50
+            Ident@47..49 "t1"
+            Whitespace@49..50 " "
+        BoundedTypeArg@50..52
+          TypeIdentifier@50..52
+            Ident@50..52 "t2"
+        RAngle@52..53 ">"
+        Whitespace@53..54 " "
+      WhereKw@54..59 "where"
+      Whitespace@59..68 "\n        "
+      TypeVariable@68..87
+        TypevarKw@68..75 "typevar"
+        Whitespace@75..76 " "
+        Ident@76..78 "t1"
+        Whitespace@78..87 "\n        "
+      TypeVariable@87..98
+        TypevarKw@87..94 "typevar"
+        Whitespace@94..95 " "
+        Ident@95..97 "t2"
+        Whitespace@97..98 "\n"
+    EndKw@98..101 "end"
+error at position 50 while parsing the comma between arguments in a bounded type. Missing expected ‘->’ or ‘,’
