@@ -16,6 +16,7 @@ use alloy_rowan_lexer::TokenKind;
 pub(crate) struct TokenSet(u64);
 
 impl TokenSet {
+    pub(crate) const EMPTY: Self = Self(0);
     // pub(crate) const ALL: Self = Self(u64::MAX);
 
     pub(crate) const fn new<const LEN: usize>(kinds: [TokenKind; LEN]) -> Self {

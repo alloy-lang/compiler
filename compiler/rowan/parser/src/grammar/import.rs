@@ -16,7 +16,7 @@ pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
         p.expect_with_recovery(
             TokenKind::DoubleColon,
             ParseErrorContext::ImportStatementSeparator,
-            TokenSet::new([]),
+            TokenSet::EMPTY,
         );
 
         if p.at(TokenKind::LBrace) {
@@ -60,7 +60,7 @@ fn parse_import_group(p: &mut Parser) -> CompletedMarker {
     p.expect_with_recovery(
         TokenKind::RBrace,
         ParseErrorContext::ImportStatementGroupEnd,
-        TokenSet::new([]),
+        TokenSet::EMPTY,
     );
 
     return m.complete(p, SyntaxKind::ImportStatementGroup);
