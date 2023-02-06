@@ -1,0 +1,40 @@
+module TestModule1
+    import really::really::real::Thing1
+    import really::real::other::Thing2
+===
+SourceFile@0..97
+  ModuleDef@0..97
+    ModuleKw@0..6 "module"
+    Whitespace@6..7 " "
+    Ident@7..18 "TestModule1"
+    Whitespace@18..23 "\n    "
+    ImportStatement@23..63
+      ImportKw@23..29 "import"
+      Whitespace@29..30 " "
+      ImportStatementSegment@30..36
+        Ident@30..36 "really"
+      DoubleColon@36..38 "::"
+      ImportStatementSegment@38..44
+        Ident@38..44 "really"
+      DoubleColon@44..46 "::"
+      ImportStatementSegment@46..50
+        Ident@46..50 "real"
+      DoubleColon@50..52 "::"
+      ImportStatementSegment@52..63
+        Ident@52..58 "Thing1"
+        Whitespace@58..63 "\n    "
+    ImportStatement@63..97
+      ImportKw@63..69 "import"
+      Whitespace@69..70 " "
+      ImportStatementSegment@70..76
+        Ident@70..76 "really"
+      DoubleColon@76..78 "::"
+      ImportStatementSegment@78..82
+        Ident@78..82 "real"
+      DoubleColon@82..84 "::"
+      ImportStatementSegment@84..89
+        Ident@84..89 "other"
+      DoubleColon@89..91 "::"
+      ImportStatementSegment@91..97
+        Ident@91..97 "Thing2"
+error at position 23 while parsing the where keyword at the start of a module definition. Missing expected ‘where‘

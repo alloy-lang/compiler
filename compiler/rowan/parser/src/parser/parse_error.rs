@@ -17,6 +17,8 @@ pub(crate) enum ParseErrorKind {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) enum ParseErrorContext {
+    ModuleName,
+    ModuleWhere,
     LambdaArgComma,
     LambdaArgExpr,
     LambdaArgPipe,
@@ -66,6 +68,8 @@ impl ParseErrorContext {
     #[must_use]
     fn long_message<'a>(&self) -> &'a str {
         match self {
+            ParseErrorContext::ModuleName => todo!(),
+            ParseErrorContext::ModuleWhere => todo!(),
             ParseErrorContext::LambdaArgComma => {
                 "We expected to see a comma separating the arguments."
             }
@@ -141,6 +145,8 @@ impl ParseErrorContext {
     #[must_use]
     fn context_name<'a>(&self) -> &'a str {
         match self {
+            ParseErrorContext::ModuleName => "the name of the module in a module definition",
+            ParseErrorContext::ModuleWhere => "the where keyword at the start of a module definition",
             ParseErrorContext::LambdaArgComma => "a lambda argument",
             ParseErrorContext::LambdaArgExpr => "a lambda argument",
             ParseErrorContext::LambdaArgPipe => "a lambda argument",
@@ -202,6 +208,8 @@ impl ParseErrorContext {
     #[must_use]
     fn short_message<'a>(&self) -> &'a str {
         match self {
+            ParseErrorContext::ModuleName => todo!(),
+            ParseErrorContext::ModuleWhere => todo!(),
             ParseErrorContext::LambdaArgComma => "expected ‘,‘ separating arguments",
             ParseErrorContext::LambdaArgExpr => "expected expression as argument",
             ParseErrorContext::LambdaArgPipe => "expected a ‘|‘ after the last argument",

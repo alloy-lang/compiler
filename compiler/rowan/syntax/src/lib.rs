@@ -54,6 +54,7 @@ pub enum SyntaxKind {
     Error,
 
     SourceFile,
+    ModuleDef,
     InfixExpr,
     IntLiteral,
     FractionalLiteral,
