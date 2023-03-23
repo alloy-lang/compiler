@@ -146,7 +146,9 @@ impl ParseErrorContext {
     fn context_name<'a>(&self) -> &'a str {
         match self {
             ParseErrorContext::ModuleName => "the name of the module in a module definition",
-            ParseErrorContext::ModuleWhere => "the where keyword at the start of a module definition",
+            ParseErrorContext::ModuleWhere => {
+                "the where keyword at the start of a module definition"
+            }
             ParseErrorContext::LambdaArgComma => "a lambda argument",
             ParseErrorContext::LambdaArgExpr => "a lambda argument",
             ParseErrorContext::LambdaArgPipe => "a lambda argument",

@@ -119,7 +119,7 @@ fn parse_type(p: &mut Parser, recovery_set: TokenSet) -> Option<CompletedMarker>
         None => {
             p.error_with_recovery(ParseErrorContext::SingleType, recovery_set);
             return None;
-        },
+        }
     };
 
     let single_type_m = maybe_parse_bounded_type(p, single_type_m);
@@ -208,13 +208,9 @@ fn parse_parenthesized_type(p: &mut Parser) -> CompletedMarker {
     }
 }
 
-const ACCEPTABLE_BOUNDED_TYPE_FIRSTS: TokenSet =
-    TokenSet::new([TokenKind::LAngle]);
+const ACCEPTABLE_BOUNDED_TYPE_FIRSTS: TokenSet = TokenSet::new([TokenKind::LAngle]);
 
-fn maybe_parse_bounded_type(
-    p: &mut Parser,
-    cm: CompletedMarker,
-) -> CompletedMarker {
+fn maybe_parse_bounded_type(p: &mut Parser, cm: CompletedMarker) -> CompletedMarker {
     if !(p.at_set(ACCEPTABLE_BOUNDED_TYPE_FIRSTS)) {
         return cm;
     }
@@ -255,8 +251,7 @@ fn parse_bounded_type_args(p: &mut Parser) {
     p.expect_with_recovery(
         TokenKind::RAngle,
         ParseErrorContext::BoundedTypeRAngle,
-        TRAIT_RECOVERY_SET
-            .plus(TokenKind::WhereKw),
+        TRAIT_RECOVERY_SET.plus(TokenKind::WhereKw),
     );
 
     return;
