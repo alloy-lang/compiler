@@ -359,6 +359,19 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
         ParseErrorContext::TypeVariableKindConstraintTypeKw,
         TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
     );
+
+    if p.at_set(TokenSet::new([TokenKind::ClosedAngle])) {
+        // this is a bit of a hack to allow better error reporting for `#Type<>`
+        p.expect_with_recovery(
+            TokenKind::NilIdentifier,
+            ParseErrorContext::TypeVariableKindConstraintUnderscore,
+            TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY.plus(TokenKind::ClosedAngle),
+        );
+        p.bump();
+
+        return m.complete(p, SyntaxKind::TypeVariableKindConstraint);
+    }
+
     p.expect_with_recovery(
         TokenKind::LAngle,
         ParseErrorContext::TypeVariableKindConstraintLAngle,

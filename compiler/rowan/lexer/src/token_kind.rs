@@ -4,7 +4,7 @@ use logos::Logos;
 
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Logos)]
 #[logos(
-    subpattern op_id = r"[!|<>=]+",
+    subpattern op_id = r"([<>=]+[|<>=][<>=]+)|([|<>=][<>=]+)|([<>=]+[|<>=])|([<>=]+)",
     subpattern upper_id = r"[A-Z]([a-zA-Z0-9_]*)",
     subpattern lower_id = r"_?[a-z]([a-zA-Z0-9_]*)",
     subpattern either_id = r"[a-zA-Z]([a-zA-Z0-9_]*)",
@@ -49,7 +49,9 @@ pub enum TokenKind {
     #[token("Type")]
     TypeKw,
 
-    #[regex("[A-Za-z][A-Za-z0-9]*")]
+    #[regex("_?[A-Za-z][A-Za-z0-9]*")]
+    #[regex(r"\((?&op_id)\)")]
+    #[regex(r"(?&op_id)")]
     Ident,
 
     #[regex("[0-9]+")]
@@ -110,6 +112,9 @@ pub enum TokenKind {
 
     #[token(">")]
     RAngle,
+
+    #[token("<>")]
+    ClosedAngle,
 
     #[token("_")]
     NilIdentifier,
@@ -173,6 +178,7 @@ impl fmt::Display for TokenKind {
             Self::RBrace => "‘}’",
             Self::LAngle => "‘<’",
             Self::RAngle => "‘>’",
+            Self::ClosedAngle => "‘<>’",
             Self::NilIdentifier => "‘_’",
             Self::Pipe => "‘|’",
             Self::Comment => "comment",
@@ -184,7 +190,8 @@ impl fmt::Display for TokenKind {
 #[cfg(test)]
 mod tests {
     use crate::Lexer;
-    use maplit::hashmap;
+    use maplit::btreemap;
+    use std::collections::BTreeMap;
 
     use super::*;
 
@@ -193,8 +200,25 @@ mod tests {
         let mut lexer = Lexer::new(input);
 
         let token = lexer.next().unwrap();
-        assert_eq!(token.kind, kind);
-        assert_eq!(token.text, input);
+        assert_eq!((token.text, token.kind), (input, kind));
+    }
+
+    #[track_caller]
+    fn check_multiple(input: &str, kinds: &[TokenKind]) {
+        let (actual_text, actual_kinds) = Lexer::new(input)
+            .map(|token| (token.text.to_owned(), vec![token.kind]))
+            .reduce(|(mut acc_text, mut acc_kinds), (text, kind)| {
+                acc_text.push_str(&text);
+                acc_kinds.push(kind[0]);
+
+                (acc_text, acc_kinds)
+            })
+            .expect("lexer should have completed non-empty");
+
+        assert_eq!(
+            (input.to_owned(), kinds),
+            (actual_text, actual_kinds.as_slice())
+        );
     }
 
     #[test]
@@ -209,7 +233,7 @@ mod tests {
 
     #[test]
     fn test_keywords() {
-        let source = hashmap! {
+        let source = btreemap! {
             "import" => TokenKind::ImportKw,
             "module" => TokenKind::ModuleKw,
             "where" => TokenKind::WhereKw,
@@ -234,7 +258,7 @@ mod tests {
 
     #[test]
     fn test_symbols() {
-        let source = hashmap! {
+        let source = btreemap! {
             ":" => TokenKind::Colon,
             "::" => TokenKind::DoubleColon,
             "," => TokenKind::Comma,
@@ -249,10 +273,23 @@ mod tests {
             "{" => TokenKind::LBrace,
             "}" => TokenKind::RBrace,
             "|" => TokenKind::Pipe,
+            "<>" => TokenKind::ClosedAngle,
         };
 
         for (source, expected) in source {
             check(source, expected)
+        }
+    }
+
+    #[test]
+    fn test_non_ident_symbols() {
+        let source: BTreeMap<&str, Vec<TokenKind>> = btreemap! {
+            "||" => vec![TokenKind::Pipe, TokenKind::Pipe],
+            "<::>" => vec![TokenKind::LAngle, TokenKind::DoubleColon, TokenKind::RAngle],
+        };
+
+        for (source, expected) in source {
+            check_multiple(source, &expected)
         }
     }
 
@@ -274,6 +311,32 @@ mod tests {
     #[test]
     fn lex_mixed_case_identifier() {
         check("ABCdef", TokenKind::Ident);
+    }
+
+    #[test]
+    fn operator_identifiers() {
+        let source = btreemap! {
+            "asdf" => TokenKind::Ident,
+            "_asdf" => TokenKind::Ident,
+            "Asdf" => TokenKind::Ident,
+            "_Asdf" => TokenKind::Ident,
+            "(>>=)" => TokenKind::Ident,
+            ">>=" => TokenKind::Ident,
+            "(<=<)" => TokenKind::Ident,
+            "<=<" => TokenKind::Ident,
+            "(|>)" => TokenKind::Ident,
+            "|>" => TokenKind::Ident,
+            "(<|)" => TokenKind::Ident,
+            "<|" => TokenKind::Ident,
+            "(<|>)" => TokenKind::Ident,
+            "<|>" => TokenKind::Ident,
+            "(<=>)" => TokenKind::Ident,
+            "<=>" => TokenKind::Ident,
+        };
+
+        for (source, expected) in source {
+            check(source, expected)
+        }
     }
 
     #[test]

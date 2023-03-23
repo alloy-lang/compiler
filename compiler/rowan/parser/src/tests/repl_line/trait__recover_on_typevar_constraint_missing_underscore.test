@@ -18,8 +18,7 @@ SourceFile@0..45
       TypeVariableKindConstraint@34..42
         Hash@34..35 "#"
         TypeKw@35..39 "Type"
-        LAngle@39..40 "<"
-        RAngle@40..41 ">"
+        ClosedAngle@39..41 "<>"
         Whitespace@41..42 "\n"
     EndKw@42..45 "end"
-error at position 40 while parsing the _ in the <_> pattern thingy. Missing expected ‘_’
+error at position 39 while parsing the _ in the <_> pattern thingy. Missing expected ‘_’
