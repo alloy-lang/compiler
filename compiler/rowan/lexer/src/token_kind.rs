@@ -5,9 +5,7 @@ use logos::Logos;
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Logos)]
 #[logos(
     subpattern op_id = r"([<>=]+[|<>=][<>=]+)|([|<>=][<>=]+)|([<>=]+[|<>=])|([<>=]+)",
-    subpattern upper_id = r"[A-Z]([a-zA-Z0-9_]*)",
-    subpattern lower_id = r"_?[a-z]([a-zA-Z0-9_]*)",
-    subpattern either_id = r"[a-zA-Z]([a-zA-Z0-9_]*)",
+    subpattern alpha_num_id = r"[A-Za-z][A-Za-z0-9]*",
 )]
 pub enum TokenKind {
     #[regex(r"[ \t\f\r\n]+")]
@@ -49,7 +47,8 @@ pub enum TokenKind {
     #[token("Type")]
     TypeKw,
 
-    #[regex("_?[A-Za-z][A-Za-z0-9]*")]
+    // #[regex("_?(?&alpha_num_id)(_(?&alpha_num_id))+")]
+    #[regex("_?(?&alpha_num_id)")]
     #[regex(r"\((?&op_id)\)")]
     #[regex(r"(?&op_id)")]
     Ident,
@@ -249,6 +248,7 @@ mod tests {
             "else" => TokenKind::ElseKw,
             "self" => TokenKind::SelfKw,
             "end" => TokenKind::EndKw,
+            "Type" => TokenKind::TypeKw,
         };
 
         for (source, expected) in source {
@@ -294,32 +294,56 @@ mod tests {
     }
 
     #[test]
-    fn lex_alphabetic_identifier() {
-        check("abcd", TokenKind::Ident);
-    }
-
-    #[test]
-    fn lex_alphanumeric_identifier() {
-        check("ab123cde456", TokenKind::Ident);
-    }
-
-    #[test]
-    fn lex_single_char_identifier() {
-        check("x", TokenKind::Ident);
-    }
-
-    #[test]
-    fn lex_mixed_case_identifier() {
-        check("ABCdef", TokenKind::Ident);
-    }
-
-    #[test]
-    fn operator_identifiers() {
+    fn character_identifiers() {
         let source = btreemap! {
             "asdf" => TokenKind::Ident,
             "_asdf" => TokenKind::Ident,
             "Asdf" => TokenKind::Ident,
             "_Asdf" => TokenKind::Ident,
+            "abcd" => TokenKind::Ident,
+            "ab123cde456" => TokenKind::Ident,
+            "x" => TokenKind::Ident,
+            "ABCdef" => TokenKind::Ident,
+            "thingThing" => TokenKind::Ident,
+            "thingThing" => TokenKind::Ident,
+            "thingThingThingThing" => TokenKind::Ident,
+        };
+
+        for (source, expected) in source {
+            check(source, expected)
+        }
+    }
+
+    #[test]
+    fn followed_by_nil() {
+        let source: BTreeMap<&str, Vec<TokenKind>> = btreemap! {
+            "thing_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            "import_" => vec![TokenKind::ImportKw, TokenKind::NilIdentifier],
+            "module_" => vec![TokenKind::ModuleKw, TokenKind::NilIdentifier],
+            "where_" => vec![TokenKind::WhereKw, TokenKind::NilIdentifier],
+            "when_" => vec![TokenKind::WhenKw, TokenKind::NilIdentifier],
+            "match_" => vec![TokenKind::MatchKw, TokenKind::NilIdentifier],
+            "trait_" => vec![TokenKind::TraitKw, TokenKind::NilIdentifier],
+            "behavior_" => vec![TokenKind::BehaviorKw, TokenKind::NilIdentifier],
+            "typedef_" => vec![TokenKind::TypedefKw, TokenKind::NilIdentifier],
+            "typevar_" => vec![TokenKind::TypevarKw, TokenKind::NilIdentifier],
+            "typeof_" => vec![TokenKind::TypeOfKw, TokenKind::NilIdentifier],
+            "if_" => vec![TokenKind::IfKw, TokenKind::NilIdentifier],
+            "then_" => vec![TokenKind::ThenKw, TokenKind::NilIdentifier],
+            "else_" => vec![TokenKind::ElseKw, TokenKind::NilIdentifier],
+            "self_" => vec![TokenKind::SelfKw, TokenKind::NilIdentifier],
+            "end_" => vec![TokenKind::EndKw, TokenKind::NilIdentifier],
+            "Type_" => vec![TokenKind::TypeKw, TokenKind::NilIdentifier],
+        };
+
+        for (source, expected) in source {
+            check_multiple(source, &expected)
+        }
+    }
+
+    #[test]
+    fn operator_identifiers() {
+        let source = btreemap! {
             "(>>=)" => TokenKind::Ident,
             ">>=" => TokenKind::Ident,
             "(<=<)" => TokenKind::Ident,
