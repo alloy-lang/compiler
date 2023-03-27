@@ -1,0 +1,31 @@
+let a (1 + 2)
+let b = a
+===
+SourceFile@0..23
+  VariableDef@0..14
+    LetKw@0..3 "let"
+    Whitespace@3..4 " "
+    Ident@4..5 "a"
+    Whitespace@5..6 " "
+    ParenExpr@6..14
+      LParen@6..7 "("
+      InfixExpr@7..12
+        IntLiteral@7..9
+          Integer@7..8 "1"
+          Whitespace@8..9 " "
+        Plus@9..10 "+"
+        Whitespace@10..11 " "
+        IntLiteral@11..12
+          Integer@11..12 "2"
+      RParen@12..13 ")"
+      Whitespace@13..14 "\n"
+  VariableDef@14..23
+    LetKw@14..17 "let"
+    Whitespace@17..18 " "
+    Ident@18..19 "b"
+    Whitespace@19..20 " "
+    Equals@20..21 "="
+    Whitespace@21..22 " "
+    VariableRef@22..23
+      Ident@22..23 "a"
+error at position 6 while parsing a variable definition. Missing expected ‘=’

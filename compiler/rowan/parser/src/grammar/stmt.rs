@@ -1,4 +1,5 @@
 use super::*;
+use crate::grammar::expr::EXPR_FIRSTS;
 
 pub(super) fn stmt(p: &mut Parser) -> Option<CompletedMarker> {
     if p.at(TokenKind::LetKw) {
@@ -19,8 +20,16 @@ fn variable_def(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
     p.bump();
 
-    p.expect(TokenKind::Ident, ParseErrorContext::VariableDefIdent);
-    p.expect(TokenKind::Equals, ParseErrorContext::VariableDefEquals);
+    p.expect_with_recovery(
+        TokenKind::Ident,
+        ParseErrorContext::VariableDefIdent,
+        TokenSet::new([TokenKind::Equals]),
+    );
+    p.expect_with_recovery(
+        TokenKind::Equals,
+        ParseErrorContext::VariableDefEquals,
+        EXPR_FIRSTS,
+    );
 
     expr::parse_expr(p, ParseErrorContext::VariableDefExpr);
 

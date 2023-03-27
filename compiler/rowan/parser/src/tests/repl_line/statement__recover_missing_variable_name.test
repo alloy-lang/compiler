@@ -1,0 +1,22 @@
+let = 1
+let b = a
+===
+SourceFile@0..17
+  VariableDef@0..8
+    LetKw@0..3 "let"
+    Whitespace@3..4 " "
+    Equals@4..5 "="
+    Whitespace@5..6 " "
+    IntLiteral@6..8
+      Integer@6..7 "1"
+      Whitespace@7..8 "\n"
+  VariableDef@8..17
+    LetKw@8..11 "let"
+    Whitespace@11..12 " "
+    Ident@12..13 "b"
+    Whitespace@13..14 " "
+    Equals@14..15 "="
+    Whitespace@15..16 " "
+    VariableRef@16..17
+      Ident@16..17 "a"
+error at position 4 while parsing a variable definition. Missing expected identifier

@@ -2,7 +2,7 @@ use super::*;
 
 use crate::grammar::lambda;
 
-const EXPR_RECOVERY_SET: TokenSet = TokenSet::new([
+pub(crate) const EXPR_FIRSTS: TokenSet = TokenSet::new([
     TokenKind::Integer,
     TokenKind::Fractional,
     TokenKind::String,
@@ -191,7 +191,7 @@ fn parse_if_then_else_expr(p: &mut Parser) -> CompletedMarker {
     p.expect_with_recovery(
         TokenKind::ThenKw,
         ParseErrorContext::IfThenElseThenKw,
-        EXPR_RECOVERY_SET,
+        EXPR_FIRSTS,
     );
     let then_m = p.start();
     parse_expr_with_recovery(
@@ -204,7 +204,7 @@ fn parse_if_then_else_expr(p: &mut Parser) -> CompletedMarker {
     p.expect_with_recovery(
         TokenKind::ElseKw,
         ParseErrorContext::IfThenElseElseKw,
-        EXPR_RECOVERY_SET,
+        EXPR_FIRSTS,
     );
     let else_m = p.start();
     parse_expr(p, ParseErrorContext::IfThenElseElseExpr);
@@ -256,7 +256,7 @@ fn parse_paren_expr(p: &mut Parser) -> CompletedMarker {
         p.expect_with_recovery(
             TokenKind::Comma,
             ParseErrorContext::ParenExprComma,
-            EXPR_RECOVERY_SET,
+            EXPR_FIRSTS,
         );
     }
 
