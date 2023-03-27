@@ -24,4 +24,4 @@ SourceFile@0..46
     DoubleColon@41..43 "::"
     ImportStatementSegment@43..46
       Ident@43..46 "map"
-error at position 22 while parsing an import statement. Missing expected ‘{’ or identifier
+error at position 22 while parsing an import statement. Missing expected ‘{’, operator identifier or identifier

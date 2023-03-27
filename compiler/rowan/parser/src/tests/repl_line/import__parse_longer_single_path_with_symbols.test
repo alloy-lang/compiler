@@ -11,4 +11,4 @@ SourceFile@0..26
       Ident@12..20 "function"
     DoubleColon@20..22 "::"
     ImportStatementSegment@22..26
-      Ident@22..26 "(<|)"
+      OpIdent@22..26 "(<|)"

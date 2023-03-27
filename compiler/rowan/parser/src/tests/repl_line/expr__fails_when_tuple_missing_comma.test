@@ -9,4 +9,4 @@ SourceFile@0..5
     IntLiteral@3..4
       Integer@3..4 "2"
     RParen@4..5 ")"
-error at position 3 while parsing a comma between expressions inside parentheses. Missing expected ‘+’, ‘-’, ‘*’, ‘/’ or ‘,’
+error at position 3 while parsing a comma between expressions inside parentheses. Missing expected ‘+’, ‘-’, ‘*’, ‘/’, operator identifier or ‘,’

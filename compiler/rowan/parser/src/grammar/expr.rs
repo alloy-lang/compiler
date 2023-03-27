@@ -15,6 +15,7 @@ const EXPR_RECOVERY_SET: TokenSet = TokenSet::new([
 ]);
 
 enum BinaryOp {
+    Custom,
     Add,
     Sub,
     Mul,
@@ -24,8 +25,9 @@ enum BinaryOp {
 impl BinaryOp {
     fn binding_power(&self) -> (u8, u8) {
         match self {
-            Self::Add | Self::Sub => (1, 2),
-            Self::Mul | Self::Div => (3, 4),
+            Self::Custom => (1, 2),
+            Self::Add | Self::Sub => (3, 4),
+            Self::Mul | Self::Div => (5, 6),
         }
     }
 }
@@ -71,6 +73,8 @@ fn parse_expr_with_binding_power(
             BinaryOp::Mul
         } else if p.at(TokenKind::Slash) {
             BinaryOp::Div
+        } else if p.at(TokenKind::OpIdent) {
+            BinaryOp::Custom
         } else {
             // We’re not at an operator; we don’t know what to do next, so we return and let the
             // caller decide.

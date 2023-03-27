@@ -33,4 +33,4 @@ SourceFile@0..63
     DoubleColon@54..56 "::"
     ImportStatementSegment@56..63
       Ident@56..63 "Functor"
-error in range 29..31 while parsing a top level expression. Found ‘::’, but expected ‘module‘, ‘let’, ‘import‘, ‘trait‘, integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+error in range 29..31 while parsing a top level expression. Found ‘::’, but expected ‘module‘, ‘let’, ‘import‘, ‘trait‘, ‘typeof‘, integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’

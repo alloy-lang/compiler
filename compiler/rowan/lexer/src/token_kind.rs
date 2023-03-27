@@ -49,9 +49,11 @@ pub enum TokenKind {
 
     // #[regex("_?(?&alpha_num_id)(_(?&alpha_num_id))+")]
     #[regex("_?(?&alpha_num_id)")]
+    Ident,
+
     #[regex(r"\((?&op_id)\)")]
     #[regex(r"(?&op_id)")]
-    Ident,
+    OpIdent,
 
     #[regex("[0-9]+")]
     Integer,
@@ -157,6 +159,7 @@ impl fmt::Display for TokenKind {
             Self::EndKw => "‘end‘",
             Self::TypeKw => "‘Type‘",
             Self::Ident => "identifier",
+            Self::OpIdent => "operator identifier",
             Self::Integer => "integer",
             Self::Fractional => "fractional",
             Self::String => "string",
@@ -344,18 +347,18 @@ mod tests {
     #[test]
     fn operator_identifiers() {
         let source = btreemap! {
-            "(>>=)" => TokenKind::Ident,
-            ">>=" => TokenKind::Ident,
-            "(<=<)" => TokenKind::Ident,
-            "<=<" => TokenKind::Ident,
-            "(|>)" => TokenKind::Ident,
-            "|>" => TokenKind::Ident,
-            "(<|)" => TokenKind::Ident,
-            "<|" => TokenKind::Ident,
-            "(<|>)" => TokenKind::Ident,
-            "<|>" => TokenKind::Ident,
-            "(<=>)" => TokenKind::Ident,
-            "<=>" => TokenKind::Ident,
+            "(>>=)" => TokenKind::OpIdent,
+            ">>=" => TokenKind::OpIdent,
+            "(<=<)" => TokenKind::OpIdent,
+            "<=<" => TokenKind::OpIdent,
+            "(|>)" => TokenKind::OpIdent,
+            "|>" => TokenKind::OpIdent,
+            "(<|)" => TokenKind::OpIdent,
+            "<|" => TokenKind::OpIdent,
+            "(<|>)" => TokenKind::OpIdent,
+            "<|>" => TokenKind::OpIdent,
+            "(<=>)" => TokenKind::OpIdent,
+            "<=>" => TokenKind::OpIdent,
         };
 
         for (source, expected) in source {
