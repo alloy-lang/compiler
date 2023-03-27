@@ -10,8 +10,8 @@ pub(crate) fn parse_type_annotation(
     let m = p.start();
     p.bump();
 
-    p.expect_with_recovery(
-        TokenKind::Ident,
+    ident::parse_ident_or_op(
+        p,
         ParseErrorContext::TypeOfName,
         TokenSet::new([TokenKind::Colon]),
     );

@@ -31,4 +31,4 @@ SourceFile@0..52
         Whitespace@48..49 " "
         TypeIdentifier@49..52
           Ident@49..52 "Int"
-error at position 7 while parsing the name of a type. Missing expected identifier
+error at position 7 while parsing the name of a type. Missing expected operator identifier or identifier

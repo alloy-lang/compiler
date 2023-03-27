@@ -7,6 +7,7 @@ use crate::parser::Parser;
 use crate::token_set::TokenSet;
 
 mod expr;
+mod ident;
 mod import;
 mod lambda;
 mod module;

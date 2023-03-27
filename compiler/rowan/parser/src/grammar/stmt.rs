@@ -20,8 +20,8 @@ fn variable_def(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
     p.bump();
 
-    p.expect_with_recovery(
-        TokenKind::Ident,
+    ident::parse_ident_or_op(
+        p,
         ParseErrorContext::VariableDefIdent,
         TokenSet::new([TokenKind::Equals]),
     );

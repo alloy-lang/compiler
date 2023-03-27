@@ -19,4 +19,4 @@ SourceFile@0..17
     Whitespace@15..16 " "
     VariableRef@16..17
       Ident@16..17 "a"
-error at position 4 while parsing a variable definition. Missing expected identifier
+error at position 4 while parsing a variable definition. Missing expected operator identifier or identifier
