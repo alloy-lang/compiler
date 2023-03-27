@@ -1,43 +1,45 @@
 trait TestTrait1 where
-    typeof test1 : self -> String -> (
+    typeof test1 : self -> String -> (String
 
     typevar t1
 end
 ===
-SourceFile@0..81
-  TraitDef@0..81
+SourceFile@0..87
+  TraitDef@0..87
     TraitKw@0..5 "trait"
     Whitespace@5..6 " "
     Ident@6..16 "TestTrait1"
     Whitespace@16..17 " "
     WhereKw@17..22 "where"
     Whitespace@22..27 "\n    "
-    TypeAnnotation@27..67
+    TypeAnnotation@27..73
       TypeOfKw@27..33 "typeof"
       Whitespace@33..34 " "
       Ident@34..39 "test1"
       Whitespace@39..40 " "
       Colon@40..41 ":"
       Whitespace@41..42 " "
-      LambdaType@42..67
+      LambdaType@42..73
         SelfType@42..47
           SelfKw@42..46 "self"
           Whitespace@46..47 " "
         RightArrow@47..49 "->"
         Whitespace@49..50 " "
-        LambdaType@50..67
+        LambdaType@50..73
           TypeIdentifier@50..57
             Ident@50..56 "String"
             Whitespace@56..57 " "
           RightArrow@57..59 "->"
           Whitespace@59..60 " "
-          UnitType@60..67
+          ParenthesizedType@60..73
             LParen@60..61 "("
-            Whitespace@61..67 "\n\n    "
-    TypeVariable@67..78
-      TypevarKw@67..74 "typevar"
-      Whitespace@74..75 " "
-      Ident@75..77 "t1"
-      Whitespace@77..78 "\n"
-    EndKw@78..81 "end"
-error at position 67 while parsing the right parenthesis of a unit type. Missing expected ‘)’
+            TypeIdentifier@61..73
+              Ident@61..67 "String"
+              Whitespace@67..73 "\n\n    "
+    TypeVariable@73..84
+      TypevarKw@73..80 "typevar"
+      Whitespace@80..81 " "
+      Ident@81..83 "t1"
+      Whitespace@83..84 "\n"
+    EndKw@84..87 "end"
+error at position 73 while parsing the right parenthesis of a parenthesized type. Missing expected ‘->’, ‘,’ or ‘)’

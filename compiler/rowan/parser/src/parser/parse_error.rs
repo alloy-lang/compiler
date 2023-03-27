@@ -48,6 +48,8 @@ pub(crate) enum ParseErrorContext {
     TypeOfName,
     TypeOfColon,
     UnitTypeRightParen,
+    ParenthesizedTypeRightParen,
+    TupleTypeRightParen,
     SingleType,
     TypeVariableName,
     TraitSelfConstraintsEquals,
@@ -125,6 +127,8 @@ impl ParseErrorContext {
             ParseErrorContext::TypeOfName => todo!(),
             ParseErrorContext::TypeOfColon => todo!(),
             ParseErrorContext::UnitTypeRightParen => todo!(),
+            ParseErrorContext::ParenthesizedTypeRightParen => todo!(),
+            ParseErrorContext::TupleTypeRightParen => todo!(),
             ParseErrorContext::SingleType => todo!(),
             ParseErrorContext::TypeVariableName => todo!(),
             ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
@@ -180,8 +184,12 @@ impl ParseErrorContext {
                 "the start of a trait member, are you missing a keyword?"
             }
             ParseErrorContext::TypeOfName => todo!(),
-            ParseErrorContext::TypeOfColon => todo!(),
+            ParseErrorContext::TypeOfColon => "the colon after the name of a type",
             ParseErrorContext::UnitTypeRightParen => "the right parenthesis of a unit type",
+            ParseErrorContext::ParenthesizedTypeRightParen => {
+                "the right parenthesis of a parenthesized type"
+            }
+            ParseErrorContext::TupleTypeRightParen => "the right parenthesis of a tuple type",
             ParseErrorContext::SingleType => "the type of a type annotation",
             ParseErrorContext::TypeVariableName => "the name of a type variable",
             ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
@@ -241,6 +249,8 @@ impl ParseErrorContext {
             ParseErrorContext::TypeOfName => todo!(),
             ParseErrorContext::TypeOfColon => todo!(),
             ParseErrorContext::UnitTypeRightParen => todo!(),
+            ParseErrorContext::ParenthesizedTypeRightParen => todo!(),
+            ParseErrorContext::TupleTypeRightParen => todo!(),
             ParseErrorContext::SingleType => todo!(),
             ParseErrorContext::TypeVariableName => todo!(),
             ParseErrorContext::TraitSelfConstraintsEquals => todo!(),

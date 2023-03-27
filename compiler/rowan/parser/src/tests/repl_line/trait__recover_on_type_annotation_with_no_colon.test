@@ -1,0 +1,43 @@
+trait TestTrait1 where
+    typeof test1
+    typeof test2 : self -> String -> Int
+end
+===
+SourceFile@0..84
+  TraitDef@0..84
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    TypeAnnotation@27..44
+      TypeOfKw@27..33 "typeof"
+      Whitespace@33..34 " "
+      Ident@34..39 "test1"
+      Whitespace@39..44 "\n    "
+    TypeAnnotation@44..81
+      TypeOfKw@44..50 "typeof"
+      Whitespace@50..51 " "
+      Ident@51..56 "test2"
+      Whitespace@56..57 " "
+      Colon@57..58 ":"
+      Whitespace@58..59 " "
+      LambdaType@59..81
+        SelfType@59..64
+          SelfKw@59..63 "self"
+          Whitespace@63..64 " "
+        RightArrow@64..66 "->"
+        Whitespace@66..67 " "
+        LambdaType@67..81
+          TypeIdentifier@67..74
+            Ident@67..73 "String"
+            Whitespace@73..74 " "
+          RightArrow@74..76 "->"
+          Whitespace@76..77 " "
+          TypeIdentifier@77..81
+            Ident@77..80 "Int"
+            Whitespace@80..81 "\n"
+    EndKw@81..84 "end"
+error at position 44 while parsing the colon after the name of a type. Missing expected ‘:’
+error at position 44 while parsing the type of a type annotation. Missing expected identifier, ‘self‘ or ‘(’

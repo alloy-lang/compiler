@@ -1,16 +1,17 @@
 trait TestTrait1 where
     self = #Type<_> Functor
+    typevar t1
 end
 ===
-SourceFile@0..54
-  TraitDef@0..54
+SourceFile@0..69
+  TraitDef@0..69
     TraitKw@0..5 "trait"
     Whitespace@5..6 " "
     Ident@6..16 "TestTrait1"
     Whitespace@16..17 " "
     WhereKw@17..22 "where"
     Whitespace@22..27 "\n    "
-    TypeVariable@27..51
+    TypeVariable@27..55
       SelfKw@27..31 "self"
       Whitespace@31..32 " "
       Equals@32..33 "="
@@ -22,8 +23,13 @@ SourceFile@0..54
         NilIdentifier@40..41 "_"
         RAngle@41..42 ">"
         Whitespace@42..43 " "
-      TypeVariableTraitConstraint@43..51
+      TypeVariableTraitConstraint@43..55
         Ident@43..50 "Functor"
-        Whitespace@50..51 "\n"
-    EndKw@51..54 "end"
+        Whitespace@50..55 "\n    "
+    TypeVariable@55..66
+      TypevarKw@55..62 "typevar"
+      Whitespace@62..63 " "
+      Ident@63..65 "t1"
+      Whitespace@65..66 "\n"
+    EndKw@66..69 "end"
 error at position 43 while parsing the plus between type constraints. Missing expected ‘+’

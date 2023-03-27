@@ -12,6 +12,8 @@ mod lambda;
 mod module;
 mod stmt;
 mod r#trait;
+mod r#type;
+mod type_variable;
 
 pub(crate) fn source_file(p: &mut Parser) -> CompletedMarker {
     let m = p.start();

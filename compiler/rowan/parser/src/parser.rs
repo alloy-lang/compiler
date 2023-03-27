@@ -18,8 +18,12 @@ pub(crate) mod marker;
 
 mod parse_error;
 
-pub(crate) const DEFAULT_RECOVERY_SET: TokenSet =
-    TokenSet::new([TokenKind::LetKw, TokenKind::ImportKw, TokenKind::TraitKw]);
+pub(crate) const DEFAULT_RECOVERY_SET: TokenSet = TokenSet::new([
+    TokenKind::LetKw,
+    TokenKind::ImportKw,
+    TokenKind::TraitKw,
+    TokenKind::TypeOfKw,
+]);
 
 pub(crate) struct Parser<'t, 'input> {
     source: Source<'t, 'input>,

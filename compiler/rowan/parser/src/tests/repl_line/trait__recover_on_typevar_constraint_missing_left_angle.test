@@ -1,25 +1,31 @@
 trait TestTrait1 where
     self = #Type_>
+    typevar t1
 end
 ===
-SourceFile@0..45
-  TraitDef@0..45
+SourceFile@0..60
+  TraitDef@0..60
     TraitKw@0..5 "trait"
     Whitespace@5..6 " "
     Ident@6..16 "TestTrait1"
     Whitespace@16..17 " "
     WhereKw@17..22 "where"
     Whitespace@22..27 "\n    "
-    TypeVariable@27..42
+    TypeVariable@27..46
       SelfKw@27..31 "self"
       Whitespace@31..32 " "
       Equals@32..33 "="
       Whitespace@33..34 " "
-      TypeVariableKindConstraint@34..42
+      TypeVariableKindConstraint@34..46
         Hash@34..35 "#"
         TypeKw@35..39 "Type"
         NilIdentifier@39..40 "_"
         RAngle@40..41 ">"
-        Whitespace@41..42 "\n"
-    EndKw@42..45 "end"
+        Whitespace@41..46 "\n    "
+    TypeVariable@46..57
+      TypevarKw@46..53 "typevar"
+      Whitespace@53..54 " "
+      Ident@54..56 "t1"
+      Whitespace@56..57 "\n"
+    EndKw@57..60 "end"
 error at position 39 while parsing the < at the start of the <_> pattern thingy. Missing expected ‘<’
