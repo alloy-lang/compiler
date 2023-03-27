@@ -183,7 +183,7 @@ impl ParseErrorContext {
             ParseErrorContext::TraitMemberFirst => {
                 "the start of a trait member, are you missing a keyword?"
             }
-            ParseErrorContext::TypeOfName => todo!(),
+            ParseErrorContext::TypeOfName => "the name of a type",
             ParseErrorContext::TypeOfColon => "the colon after the name of a type",
             ParseErrorContext::UnitTypeRightParen => "the right parenthesis of a unit type",
             ParseErrorContext::ParenthesizedTypeRightParen => {

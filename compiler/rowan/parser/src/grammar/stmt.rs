@@ -7,6 +7,8 @@ pub(super) fn stmt(p: &mut Parser) -> Option<CompletedMarker> {
         Some(import::parse_import(p))
     } else if p.at(TokenKind::TraitKw) {
         Some(r#trait::parse_trait(p))
+    } else if p.at(TokenKind::TypeOfKw) {
+        Some(r#type::parse_type_annotation(p, TokenSet::EMPTY))
     } else {
         expr::parse_expr(p, ParseErrorContext::TopLevelExpr)
     }

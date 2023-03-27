@@ -1,0 +1,44 @@
+typeof test1 : self -> String -> (String
+typeof test2 : self -> String
+===
+SourceFile@0..70
+  TypeAnnotation@0..41
+    TypeOfKw@0..6 "typeof"
+    Whitespace@6..7 " "
+    Ident@7..12 "test1"
+    Whitespace@12..13 " "
+    Colon@13..14 ":"
+    Whitespace@14..15 " "
+    LambdaType@15..41
+      SelfType@15..20
+        SelfKw@15..19 "self"
+        Whitespace@19..20 " "
+      RightArrow@20..22 "->"
+      Whitespace@22..23 " "
+      LambdaType@23..41
+        TypeIdentifier@23..30
+          Ident@23..29 "String"
+          Whitespace@29..30 " "
+        RightArrow@30..32 "->"
+        Whitespace@32..33 " "
+        ParenthesizedType@33..41
+          LParen@33..34 "("
+          TypeIdentifier@34..41
+            Ident@34..40 "String"
+            Whitespace@40..41 "\n"
+  TypeAnnotation@41..70
+    TypeOfKw@41..47 "typeof"
+    Whitespace@47..48 " "
+    Ident@48..53 "test2"
+    Whitespace@53..54 " "
+    Colon@54..55 ":"
+    Whitespace@55..56 " "
+    LambdaType@56..70
+      SelfType@56..61
+        SelfKw@56..60 "self"
+        Whitespace@60..61 " "
+      RightArrow@61..63 "->"
+      Whitespace@63..64 " "
+      TypeIdentifier@64..70
+        Ident@64..70 "String"
+error at position 41 while parsing the right parenthesis of a parenthesized type. Missing expected ‘->’, ‘,’ or ‘)’

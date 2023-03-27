@@ -10,8 +10,16 @@ pub(crate) fn parse_type_annotation(
     let m = p.start();
     p.bump();
 
-    p.expect(TokenKind::Ident, ParseErrorContext::TypeOfName);
-    p.expect(TokenKind::Colon, ParseErrorContext::TypeOfColon);
+    p.expect_with_recovery(
+        TokenKind::Ident,
+        ParseErrorContext::TypeOfName,
+        TokenSet::new([TokenKind::Colon]),
+    );
+    p.expect_with_recovery(
+        TokenKind::Colon,
+        ParseErrorContext::TypeOfColon,
+        TokenSet::new([TokenKind::Ident]),
+    );
 
     parse_type(p, TokenSet::EMPTY, parent_recovery_set);
 
@@ -99,6 +107,7 @@ fn parse_single_type(p: &mut Parser, parent_recovery_set: TokenSet) -> Option<Co
 
         Some(m.complete(p, SyntaxKind::TypeIdentifier))
     } else if p.at(TokenKind::SelfKw) {
+        // TODO: don't accept Self when parsing outside a module
         let m = p.start();
         p.bump();
 

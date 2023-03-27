@@ -1,0 +1,34 @@
+typeof apply : self<t1> -> self<t2> where
+===
+SourceFile@0..41
+  TypeAnnotation@0..41
+    TypeOfKw@0..6 "typeof"
+    Whitespace@6..7 " "
+    Ident@7..12 "apply"
+    Whitespace@12..13 " "
+    Colon@13..14 ":"
+    Whitespace@14..15 " "
+    LambdaType@15..36
+      BoundedType@15..24
+        BoundedTypeBase@15..19
+          SelfType@15..19
+            SelfKw@15..19 "self"
+        LAngle@19..20 "<"
+        BoundedTypeArg@20..22
+          TypeIdentifier@20..22
+            Ident@20..22 "t1"
+        RAngle@22..23 ">"
+        Whitespace@23..24 " "
+      RightArrow@24..26 "->"
+      Whitespace@26..27 " "
+      BoundedType@27..36
+        BoundedTypeBase@27..31
+          SelfType@27..31
+            SelfKw@27..31 "self"
+        LAngle@31..32 "<"
+        BoundedTypeArg@32..34
+          TypeIdentifier@32..34
+            Ident@32..34 "t2"
+        RAngle@34..35 ">"
+        Whitespace@35..36 " "
+    WhereKw@36..41 "where"

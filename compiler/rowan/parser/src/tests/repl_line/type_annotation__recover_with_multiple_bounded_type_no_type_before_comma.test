@@ -1,0 +1,37 @@
+typeof apply : self<, t2> where
+    typevar t1
+    typevar t2
+===
+SourceFile@0..61
+  TypeAnnotation@0..61
+    TypeOfKw@0..6 "typeof"
+    Whitespace@6..7 " "
+    Ident@7..12 "apply"
+    Whitespace@12..13 " "
+    Colon@13..14 ":"
+    Whitespace@14..15 " "
+    BoundedType@15..26
+      BoundedTypeBase@15..19
+        SelfType@15..19
+          SelfKw@15..19 "self"
+      LAngle@19..20 "<"
+      BoundedTypeArg@20..20
+      Comma@20..21 ","
+      Whitespace@21..22 " "
+      BoundedTypeArg@22..24
+        TypeIdentifier@22..24
+          Ident@22..24 "t2"
+      RAngle@24..25 ">"
+      Whitespace@25..26 " "
+    WhereKw@26..31 "where"
+    Whitespace@31..36 "\n    "
+    TypeVariable@36..51
+      TypevarKw@36..43 "typevar"
+      Whitespace@43..44 " "
+      Ident@44..46 "t1"
+      Whitespace@46..51 "\n    "
+    TypeVariable@51..61
+      TypevarKw@51..58 "typevar"
+      Whitespace@58..59 " "
+      Ident@59..61 "t2"
+error at position 20 while parsing the type of a type annotation. Missing expected identifier, ‘self‘ or ‘(’

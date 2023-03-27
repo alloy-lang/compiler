@@ -1,0 +1,38 @@
+typeof test : t1 -> t2 -> self where
+    typevar
+    typevar t2
+===
+SourceFile@0..63
+  TypeAnnotation@0..61
+    TypeOfKw@0..6 "typeof"
+    Whitespace@6..7 " "
+    Ident@7..11 "test"
+    Whitespace@11..12 " "
+    Colon@12..13 ":"
+    Whitespace@13..14 " "
+    LambdaType@14..31
+      TypeIdentifier@14..17
+        Ident@14..16 "t1"
+        Whitespace@16..17 " "
+      RightArrow@17..19 "->"
+      Whitespace@19..20 " "
+      LambdaType@20..31
+        TypeIdentifier@20..23
+          Ident@20..22 "t2"
+          Whitespace@22..23 " "
+        RightArrow@23..25 "->"
+        Whitespace@25..26 " "
+        SelfType@26..31
+          SelfKw@26..30 "self"
+          Whitespace@30..31 " "
+    WhereKw@31..36 "where"
+    Whitespace@36..41 "\n    "
+    TypeVariable@41..61
+      TypevarKw@41..48 "typevar"
+      Whitespace@48..53 "\n    "
+      Error@53..61
+        TypevarKw@53..60 "typevar"
+        Whitespace@60..61 " "
+  VariableRef@61..63
+    Ident@61..63 "t2"
+error in range 53..60 while parsing the name of a type variable. Found ‘typevar‘, but expected identifier

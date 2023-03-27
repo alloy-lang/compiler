@@ -1,0 +1,32 @@
+typeof test1
+typeof test2 : self -> String -> Int
+===
+SourceFile@0..49
+  TypeAnnotation@0..13
+    TypeOfKw@0..6 "typeof"
+    Whitespace@6..7 " "
+    Ident@7..12 "test1"
+    Whitespace@12..13 "\n"
+  TypeAnnotation@13..49
+    TypeOfKw@13..19 "typeof"
+    Whitespace@19..20 " "
+    Ident@20..25 "test2"
+    Whitespace@25..26 " "
+    Colon@26..27 ":"
+    Whitespace@27..28 " "
+    LambdaType@28..49
+      SelfType@28..33
+        SelfKw@28..32 "self"
+        Whitespace@32..33 " "
+      RightArrow@33..35 "->"
+      Whitespace@35..36 " "
+      LambdaType@36..49
+        TypeIdentifier@36..43
+          Ident@36..42 "String"
+          Whitespace@42..43 " "
+        RightArrow@43..45 "->"
+        Whitespace@45..46 " "
+        TypeIdentifier@46..49
+          Ident@46..49 "Int"
+error at position 13 while parsing the colon after the name of a type. Missing expected ‘:’
+error at position 13 while parsing the type of a type annotation. Missing expected identifier, ‘self‘ or ‘(’
