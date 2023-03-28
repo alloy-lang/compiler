@@ -31,7 +31,10 @@ fn parse_typevar_constraint(p: &mut Parser) {
     } else if p.at(TokenKind::Ident) {
         parse_typevar_constraint_trait_marker(p);
     } else {
-        p.error(ParseErrorContext::TypeVariableConstraint);
+        p.error_with_recovery(
+            ParseErrorContext::TypeVariableConstraint,
+            TokenSet::new([TokenKind::TypevarKw]),
+        );
     }
 }
 
@@ -119,8 +122,10 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
 fn parse_typevar_constraint_trait_marker(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Ident));
 
-    let m = p.start();
-    p.bump();
-
-    m.complete(p, SyntaxKind::TypeVariableTraitConstraint)
+    path::parse_path(
+        p,
+        ParseErrorContext::TypeVariableTraitConstraint,
+        TokenSet::EMPTY,
+        SyntaxKind::TypeVariableTraitConstraint,
+    )
 }

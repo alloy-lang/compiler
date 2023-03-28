@@ -1,0 +1,20 @@
+typeof test1 : String -> ResultThing::More
+===
+SourceFile@0..42
+  TypeAnnotation@0..42
+    TypeOfKw@0..6 "typeof"
+    Whitespace@6..7 " "
+    Ident@7..12 "test1"
+    Whitespace@12..13 " "
+    Colon@13..14 ":"
+    Whitespace@14..15 " "
+    LambdaType@15..42
+      TypeIdentifier@15..22
+        Ident@15..21 "String"
+        Whitespace@21..22 " "
+      RightArrow@22..24 "->"
+      Whitespace@24..25 " "
+      TypeIdentifier@25..42
+        Ident@25..36 "ResultThing"
+        DoubleColon@36..38 "::"
+        Ident@38..42 "More"

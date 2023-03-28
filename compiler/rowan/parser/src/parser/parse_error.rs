@@ -36,6 +36,7 @@ pub(crate) enum ParseErrorContext {
     VariableDefIdent,
     VariableDefEquals,
     VariableDefExpr,
+    VariableRef,
     ImportStatementFirstSegment,
     ImportStatementSegment,
     ImportStatementSeparator,
@@ -55,6 +56,7 @@ pub(crate) enum ParseErrorContext {
     TraitSelfConstraintsEquals,
     TypeVariableConstraint,
     TypeVariableConstraintPlus,
+    TypeVariableTraitConstraint,
     TypeVariableKindConstraintTypeKw,
     TypeVariableKindConstraintLAngle,
     TypeVariableKindConstraintUnderscore,
@@ -115,6 +117,7 @@ impl ParseErrorContext {
                 "We expected to see an ‘=‘ after the identifier."
             }
             ParseErrorContext::VariableDefExpr => "We expected to see an expression after the ‘=‘.",
+            ParseErrorContext::VariableRef => todo!(),
             ParseErrorContext::ImportStatementFirstSegment => todo!(),
             ParseErrorContext::ImportStatementSegment => todo!(),
             ParseErrorContext::ImportStatementSeparator => todo!(),
@@ -134,6 +137,7 @@ impl ParseErrorContext {
             ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
             ParseErrorContext::TypeVariableConstraint => todo!(),
             ParseErrorContext::TypeVariableConstraintPlus => todo!(),
+            ParseErrorContext::TypeVariableTraitConstraint => todo!(),
             ParseErrorContext::TypeVariableKindConstraintTypeKw => todo!(),
             ParseErrorContext::TypeVariableKindConstraintLAngle => todo!(),
             ParseErrorContext::TypeVariableKindConstraintUnderscore => todo!(),
@@ -170,6 +174,7 @@ impl ParseErrorContext {
             ParseErrorContext::VariableDefIdent => "a variable definition",
             ParseErrorContext::VariableDefEquals => "a variable definition",
             ParseErrorContext::VariableDefExpr => "a variable definition",
+            ParseErrorContext::VariableRef => "a variable reference",
             ParseErrorContext::ImportStatementFirstSegment => "the first import segment",
             ParseErrorContext::ImportStatementSegment => "an import statement",
             ParseErrorContext::ImportStatementSeparator => "the ‘::’ between import segments",
@@ -193,8 +198,9 @@ impl ParseErrorContext {
             ParseErrorContext::SingleType => "the type of a type annotation",
             ParseErrorContext::TypeVariableName => "the name of a type variable",
             ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
-            ParseErrorContext::TypeVariableConstraint => todo!(),
+            ParseErrorContext::TypeVariableConstraint => "the type of a type variable constraint",
             ParseErrorContext::TypeVariableConstraintPlus => "the plus between type constraints",
+            ParseErrorContext::TypeVariableTraitConstraint => todo!(),
             ParseErrorContext::TypeVariableKindConstraintTypeKw => {
                 "the Type keyword before the <_> pattern thingy"
             }
@@ -237,6 +243,7 @@ impl ParseErrorContext {
             ParseErrorContext::VariableDefIdent => todo!(),
             ParseErrorContext::VariableDefEquals => todo!(),
             ParseErrorContext::VariableDefExpr => todo!(),
+            ParseErrorContext::VariableRef => todo!(),
             ParseErrorContext::ImportStatementFirstSegment => todo!(),
             ParseErrorContext::ImportStatementSegment => todo!(),
             ParseErrorContext::ImportStatementSeparator => todo!(),
@@ -256,6 +263,7 @@ impl ParseErrorContext {
             ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
             ParseErrorContext::TypeVariableConstraint => todo!(),
             ParseErrorContext::TypeVariableConstraintPlus => todo!(),
+            ParseErrorContext::TypeVariableTraitConstraint => todo!(),
             ParseErrorContext::TypeVariableKindConstraintTypeKw => todo!(),
             ParseErrorContext::TypeVariableKindConstraintLAngle => todo!(),
             ParseErrorContext::TypeVariableKindConstraintUnderscore => todo!(),

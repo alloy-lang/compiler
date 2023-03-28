@@ -11,6 +11,7 @@ mod ident;
 mod import;
 mod lambda;
 mod module;
+mod path;
 mod stmt;
 mod r#trait;
 mod r#type;

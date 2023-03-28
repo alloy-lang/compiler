@@ -102,12 +102,15 @@ const SINGLE_TYPE_RECOVERY_SET: TokenSet =
 
 fn parse_single_type(p: &mut Parser, parent_recovery_set: TokenSet) -> Option<CompletedMarker> {
     if p.at(TokenKind::Ident) {
-        let m = p.start();
-        p.bump();
-
-        Some(m.complete(p, SyntaxKind::TypeIdentifier))
+        Some(path::parse_path(
+            p,
+            ParseErrorContext::SingleType,
+            TokenSet::EMPTY,
+            SyntaxKind::TypeIdentifier,
+        ))
     } else if p.at(TokenKind::SelfKw) {
         // TODO: don't accept Self when parsing outside a module
+        // or maybe catch this later, like when translating to the AST
         let m = p.start();
         p.bump();
 

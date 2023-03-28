@@ -1,0 +1,39 @@
+typeof test1 : String -> ResultThing::
+typeof test2 : String -> ResultThing::More
+===
+SourceFile@0..81
+  TypeAnnotation@0..39
+    TypeOfKw@0..6 "typeof"
+    Whitespace@6..7 " "
+    Ident@7..12 "test1"
+    Whitespace@12..13 " "
+    Colon@13..14 ":"
+    Whitespace@14..15 " "
+    LambdaType@15..39
+      TypeIdentifier@15..22
+        Ident@15..21 "String"
+        Whitespace@21..22 " "
+      RightArrow@22..24 "->"
+      Whitespace@24..25 " "
+      TypeIdentifier@25..39
+        Ident@25..36 "ResultThing"
+        DoubleColon@36..38 "::"
+        Whitespace@38..39 "\n"
+  TypeAnnotation@39..81
+    TypeOfKw@39..45 "typeof"
+    Whitespace@45..46 " "
+    Ident@46..51 "test2"
+    Whitespace@51..52 " "
+    Colon@52..53 ":"
+    Whitespace@53..54 " "
+    LambdaType@54..81
+      TypeIdentifier@54..61
+        Ident@54..60 "String"
+        Whitespace@60..61 " "
+      RightArrow@61..63 "->"
+      Whitespace@63..64 " "
+      TypeIdentifier@64..81
+        Ident@64..75 "ResultThing"
+        DoubleColon@75..77 "::"
+        Ident@77..81 "More"
+error at position 39 while parsing the type of a type annotation. Missing expected identifier

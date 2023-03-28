@@ -169,9 +169,12 @@ pub(crate) fn parse_char_literal(p: &mut Parser) -> CompletedMarker {
 pub(crate) fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Ident));
 
-    let m = p.start();
-    p.bump();
-    m.complete(p, SyntaxKind::VariableRef)
+    path::parse_path(
+        p,
+        ParseErrorContext::VariableRef,
+        TokenSet::EMPTY,
+        SyntaxKind::VariableRef,
+    )
 }
 
 fn parse_if_then_else_expr(p: &mut Parser) -> CompletedMarker {

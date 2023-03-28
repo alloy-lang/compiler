@@ -1,0 +1,32 @@
+trait TestTrait1 where
+    self = #Type<_> + functor::Functor
+end
+===
+SourceFile@0..65
+  TraitDef@0..65
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    TypeVariable@27..62
+      SelfKw@27..31 "self"
+      Whitespace@31..32 " "
+      Equals@32..33 "="
+      Whitespace@33..34 " "
+      TypeVariableKindConstraint@34..43
+        Hash@34..35 "#"
+        TypeKw@35..39 "Type"
+        LAngle@39..40 "<"
+        NilIdentifier@40..41 "_"
+        RAngle@41..42 ">"
+        Whitespace@42..43 " "
+      Plus@43..44 "+"
+      Whitespace@44..45 " "
+      TypeVariableTraitConstraint@45..62
+        Ident@45..52 "functor"
+        DoubleColon@52..54 "::"
+        Ident@54..61 "Functor"
+        Whitespace@61..62 "\n"
+    EndKw@62..65 "end"
