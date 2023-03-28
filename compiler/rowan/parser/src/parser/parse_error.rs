@@ -172,7 +172,7 @@ impl ParseErrorContext {
             ParseErrorContext::VariableDefExpr => "a variable definition",
             ParseErrorContext::ImportStatementFirstSegment => "the first import segment",
             ParseErrorContext::ImportStatementSegment => "an import statement",
-            ParseErrorContext::ImportStatementSeparator => todo!(),
+            ParseErrorContext::ImportStatementSeparator => "the ‘::’ between import segments",
             ParseErrorContext::ImportStatementGroupSeparator => {
                 "the comma between imports inside an import group"
             }

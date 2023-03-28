@@ -1,0 +1,28 @@
+import std::functor Functor
+import std::functor::map
+===
+SourceFile@0..52
+  ImportStatement@0..28
+    ImportKw@0..6 "import"
+    Whitespace@6..7 " "
+    ImportStatementSegment@7..10
+      Ident@7..10 "std"
+    DoubleColon@10..12 "::"
+    ImportStatementSegment@12..20
+      Ident@12..19 "functor"
+      Whitespace@19..20 " "
+    ImportStatementSegment@20..28
+      Ident@20..27 "Functor"
+      Whitespace@27..28 "\n"
+  ImportStatement@28..52
+    ImportKw@28..34 "import"
+    Whitespace@34..35 " "
+    ImportStatementSegment@35..38
+      Ident@35..38 "std"
+    DoubleColon@38..40 "::"
+    ImportStatementSegment@40..47
+      Ident@40..47 "functor"
+    DoubleColon@47..49 "::"
+    ImportStatementSegment@49..52
+      Ident@49..52 "map"
+error at position 20 while parsing the ‘::’ between import segments. Missing expected ‘::’

@@ -1,5 +1,7 @@
 use super::*;
 
+const IMPORT_RECOVERY_SET: TokenSet = TokenSet::new([TokenKind::Ident, TokenKind::LBrace]);
+
 pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::ImportKw));
 
@@ -16,7 +18,7 @@ pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
         p.expect_with_recovery(
             TokenKind::DoubleColon,
             ParseErrorContext::ImportStatementSeparator,
-            TokenSet::EMPTY,
+            IMPORT_RECOVERY_SET,
         );
 
         if p.at(TokenKind::LBrace) {
@@ -31,7 +33,7 @@ pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
     return m.complete(p, SyntaxKind::ImportStatement);
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(TokenSet::new([TokenKind::DoubleColon])) || p.at_end()
+        !p.at_set(IMPORT_RECOVERY_SET.plus(TokenKind::DoubleColon)) || p.at_end()
     }
 }
 
