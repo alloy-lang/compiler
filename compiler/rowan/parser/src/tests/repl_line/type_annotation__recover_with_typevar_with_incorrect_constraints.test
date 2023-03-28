@@ -41,4 +41,4 @@ SourceFile@0..70
       TypevarKw@60..67 "typevar"
       Whitespace@67..68 " "
       Ident@68..70 "t2"
-error in range 54..55 while parsing the type of a type variable constraint. Found integer, but expected ‘#’ or identifier
+error in range 54..55 while parsing the constraints for a type variable. Found integer, but expected ‘#’ or identifier

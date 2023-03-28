@@ -198,7 +198,7 @@ impl ParseErrorContext {
             ParseErrorContext::SingleType => "the type of a type annotation",
             ParseErrorContext::TypeVariableName => "the name of a type variable",
             ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
-            ParseErrorContext::TypeVariableConstraint => "the type of a type variable constraint",
+            ParseErrorContext::TypeVariableConstraint => "the constraints for a type variable",
             ParseErrorContext::TypeVariableConstraintPlus => "the plus between type constraints",
             ParseErrorContext::TypeVariableTraitConstraint => todo!(),
             ParseErrorContext::TypeVariableKindConstraintTypeKw => {
