@@ -1,0 +1,45 @@
+typeof test : t1 -> t2 -> self where
+    typevar t1 = functor::
+    typevar t2
+===
+SourceFile@0..78
+  TypeAnnotation@0..78
+    TypeOfKw@0..6 "typeof"
+    Whitespace@6..7 " "
+    Ident@7..11 "test"
+    Whitespace@11..12 " "
+    Colon@12..13 ":"
+    Whitespace@13..14 " "
+    LambdaType@14..31
+      TypeIdentifier@14..17
+        Ident@14..16 "t1"
+        Whitespace@16..17 " "
+      RightArrow@17..19 "->"
+      Whitespace@19..20 " "
+      LambdaType@20..31
+        TypeIdentifier@20..23
+          Ident@20..22 "t2"
+          Whitespace@22..23 " "
+        RightArrow@23..25 "->"
+        Whitespace@25..26 " "
+        SelfType@26..31
+          SelfKw@26..30 "self"
+          Whitespace@30..31 " "
+    WhereKw@31..36 "where"
+    Whitespace@36..41 "\n    "
+    TypeVariable@41..68
+      TypevarKw@41..48 "typevar"
+      Whitespace@48..49 " "
+      Ident@49..51 "t1"
+      Whitespace@51..52 " "
+      Equals@52..53 "="
+      Whitespace@53..54 " "
+      TypeVariableTraitConstraint@54..68
+        Ident@54..61 "functor"
+        DoubleColon@61..63 "::"
+        Whitespace@63..68 "\n    "
+    TypeVariable@68..78
+      TypevarKw@68..75 "typevar"
+      Whitespace@75..76 " "
+      Ident@76..78 "t2"
+error at position 68 while parsing the trait name in a type variable constraint. Missing expected identifier

@@ -200,7 +200,9 @@ impl ParseErrorContext {
             ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
             ParseErrorContext::TypeVariableConstraint => "the constraints for a type variable",
             ParseErrorContext::TypeVariableConstraintPlus => "the plus between type constraints",
-            ParseErrorContext::TypeVariableTraitConstraint => todo!(),
+            ParseErrorContext::TypeVariableTraitConstraint => {
+                "the trait name in a type variable constraint"
+            }
             ParseErrorContext::TypeVariableKindConstraintTypeKw => {
                 "the Type keyword before the <_> pattern thingy"
             }

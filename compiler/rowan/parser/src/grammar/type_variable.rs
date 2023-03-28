@@ -60,9 +60,7 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
         p.expect_with_recovery(
             TokenKind::NilIdentifier,
             ParseErrorContext::TypeVariableKindConstraintUnderscore,
-            TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY
-                // .union(TRAIT_RECOVERY_SET)
-                .plus(TokenKind::ClosedAngle),
+            TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY.plus(TokenKind::ClosedAngle),
         );
         p.bump();
 
@@ -125,7 +123,7 @@ fn parse_typevar_constraint_trait_marker(p: &mut Parser) -> CompletedMarker {
     path::parse_path(
         p,
         ParseErrorContext::TypeVariableTraitConstraint,
-        TokenSet::EMPTY,
+        TokenSet::new([TokenKind::TypevarKw]),
         SyntaxKind::TypeVariableTraitConstraint,
     )
 }

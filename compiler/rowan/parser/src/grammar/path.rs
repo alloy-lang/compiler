@@ -16,8 +16,8 @@ pub(super) fn parse_path(
             break;
         }
 
-        p.expect_with_recovery(TokenKind::DoubleColon, context, TokenSet::EMPTY);
-        p.expect_with_recovery(TokenKind::Ident, context, TokenSet::EMPTY);
+        p.expect_with_recovery(TokenKind::DoubleColon, context, recovery_set);
+        p.expect_with_recovery(TokenKind::Ident, context, recovery_set);
     }
 
     return m.complete(p, kind);
