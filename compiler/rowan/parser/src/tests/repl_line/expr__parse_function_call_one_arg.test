@@ -1,0 +1,12 @@
+funky(x)
+===
+SourceFile@0..8
+  FunctionCall@0..8
+    FunctionCallTarget@0..5
+      VariableRef@0..5
+        Ident@0..5 "funky"
+    FunctionCallArgList@5..8
+      LParen@5..6 "("
+      VariableRef@6..7
+        Ident@6..7 "x"
+      RParen@7..8 ")"

@@ -45,7 +45,7 @@ impl UnaryOp {
 }
 
 pub(super) fn parse_expr(p: &mut Parser, context: ParseErrorContext) -> Option<CompletedMarker> {
-    parse_expr_with_recovery(p, TokenSet::default(), context)
+    parse_expr_with_recovery(p, TokenSet::EMPTY, context)
 }
 
 fn parse_expr_with_recovery(
@@ -169,12 +169,58 @@ pub(crate) fn parse_char_literal(p: &mut Parser) -> CompletedMarker {
 pub(crate) fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Ident));
 
-    path::parse_path(
+    let path_m = path::parse_path(
         p,
         ParseErrorContext::VariableRef,
         TokenSet::EMPTY,
         SyntaxKind::VariableRef,
-    )
+    );
+
+    maybe_parse_function_call(p, path_m)
+}
+
+fn maybe_parse_function_call(p: &mut Parser, lhs: CompletedMarker) -> CompletedMarker {
+    if !p.at_set(TokenSet::new([TokenKind::LParen])) {
+        return lhs;
+    }
+
+    let cm = lhs.precede(p).complete(p, SyntaxKind::FunctionCallTarget);
+    parse_function_call(p);
+
+    cm.precede(p).complete(p, SyntaxKind::FunctionCall)
+}
+
+fn parse_function_call(p: &mut Parser) -> CompletedMarker {
+    assert!(p.at(TokenKind::LParen));
+
+    let paren_m = p.start();
+    p.bump();
+
+    loop {
+        if should_stop(p) {
+            break;
+        }
+
+        parse_expr_with_recovery(p, TokenSet::new([TokenKind::RParen, TokenKind::Comma]), ParseErrorContext::FunctionCallArgExpr);
+
+        if should_stop(p) {
+            break;
+        }
+
+        p.expect_with_recovery(
+            TokenKind::Comma,
+            ParseErrorContext::FunctionCallArgComma,
+            EXPR_FIRSTS,
+        );
+    }
+
+    p.expect(TokenKind::RParen, ParseErrorContext::FunctionCallRightParen);
+
+    return paren_m.complete(p, SyntaxKind::FunctionCallArgList);
+
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_set(DEFAULT_RECOVERY_SET.plus(TokenKind::RParen)) || p.at_end()
+    }
 }
 
 fn parse_if_then_else_expr(p: &mut Parser) -> CompletedMarker {

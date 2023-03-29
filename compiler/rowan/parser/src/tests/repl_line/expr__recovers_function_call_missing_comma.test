@@ -1,0 +1,31 @@
+funky(x y z)
+let a = 1
+===
+SourceFile@0..22
+  FunctionCall@0..13
+    FunctionCallTarget@0..5
+      VariableRef@0..5
+        Ident@0..5 "funky"
+    FunctionCallArgList@5..13
+      LParen@5..6 "("
+      VariableRef@6..8
+        Ident@6..7 "x"
+        Whitespace@7..8 " "
+      VariableRef@8..10
+        Ident@8..9 "y"
+        Whitespace@9..10 " "
+      VariableRef@10..11
+        Ident@10..11 "z"
+      RParen@11..12 ")"
+      Whitespace@12..13 "\n"
+  VariableDef@13..22
+    LetKw@13..16 "let"
+    Whitespace@16..17 " "
+    Ident@17..18 "a"
+    Whitespace@18..19 " "
+    Equals@19..20 "="
+    Whitespace@20..21 " "
+    IntLiteral@21..22
+      Integer@21..22 "1"
+error at position 8 while parsing a comma between arguments in a function call. Missing expected ‘+’, ‘-’, ‘*’, ‘/’, operator identifier or ‘,’
+error at position 10 while parsing a comma between arguments in a function call. Missing expected ‘+’, ‘-’, ‘*’, ‘/’, operator identifier or ‘,’

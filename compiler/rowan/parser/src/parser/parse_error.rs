@@ -24,6 +24,9 @@ pub(crate) enum ParseErrorContext {
     LambdaArgPipe,
     LambdaExprRightArrow,
     LambdaExprExpr,
+    FunctionCallArgExpr,
+    FunctionCallArgComma,
+    FunctionCallRightParen,
     PrefixExprExpr,
     ParenExprExpr,
     ParenExprComma,
@@ -87,6 +90,9 @@ impl ParseErrorContext {
             ParseErrorContext::LambdaExprExpr => {
                 "We expected to see an expression after the lambda arguments."
             }
+            ParseErrorContext::FunctionCallArgExpr => todo!(),
+            ParseErrorContext::FunctionCallArgComma => todo!(),
+            ParseErrorContext::FunctionCallRightParen => todo!(),
             ParseErrorContext::PrefixExprExpr => {
                 "We expected to see an expression after the prefix operator."
             }
@@ -162,6 +168,13 @@ impl ParseErrorContext {
             ParseErrorContext::LambdaArgPipe => "a lambda argument",
             ParseErrorContext::LambdaExprRightArrow => "a lambda expression",
             ParseErrorContext::LambdaExprExpr => "a lambda expression body",
+            ParseErrorContext::FunctionCallArgExpr => "a function call argument",
+            ParseErrorContext::FunctionCallArgComma => {
+                "a comma between arguments in a function call"
+            }
+            ParseErrorContext::FunctionCallRightParen => {
+                "a close parenthesis after a function call"
+            }
             ParseErrorContext::PrefixExprExpr => "an expression after a prefix operator",
             ParseErrorContext::ParenExprExpr => "an expression inside parentheses",
             ParseErrorContext::ParenExprComma => "a comma between expressions inside parentheses",
@@ -233,6 +246,9 @@ impl ParseErrorContext {
             ParseErrorContext::LambdaArgPipe => "expected a ‘|‘ after the last argument",
             ParseErrorContext::LambdaExprRightArrow => "expected ‘->‘ after the arguments",
             ParseErrorContext::LambdaExprExpr => "expected expression as body",
+            ParseErrorContext::FunctionCallArgExpr => todo!(),
+            ParseErrorContext::FunctionCallArgComma => todo!(),
+            ParseErrorContext::FunctionCallRightParen => todo!(),
             ParseErrorContext::PrefixExprExpr => todo!(),
             ParseErrorContext::ParenExprExpr => todo!(),
             ParseErrorContext::ParenExprComma => todo!(),

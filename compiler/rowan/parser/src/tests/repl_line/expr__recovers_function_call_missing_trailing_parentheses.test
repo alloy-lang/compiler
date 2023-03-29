@@ -1,0 +1,31 @@
+funky(x, y, z
+let a = 1
+===
+SourceFile@0..23
+  FunctionCall@0..14
+    FunctionCallTarget@0..5
+      VariableRef@0..5
+        Ident@0..5 "funky"
+    FunctionCallArgList@5..14
+      LParen@5..6 "("
+      VariableRef@6..7
+        Ident@6..7 "x"
+      Comma@7..8 ","
+      Whitespace@8..9 " "
+      VariableRef@9..10
+        Ident@9..10 "y"
+      Comma@10..11 ","
+      Whitespace@11..12 " "
+      VariableRef@12..14
+        Ident@12..13 "z"
+        Whitespace@13..14 "\n"
+  VariableDef@14..23
+    LetKw@14..17 "let"
+    Whitespace@17..18 " "
+    Ident@18..19 "a"
+    Whitespace@19..20 " "
+    Equals@20..21 "="
+    Whitespace@21..22 " "
+    IntLiteral@22..23
+      Integer@22..23 "1"
+error at position 14 while parsing a close parenthesis after a function call. Missing expected ‘+’, ‘-’, ‘*’, ‘/’, operator identifier or ‘)’

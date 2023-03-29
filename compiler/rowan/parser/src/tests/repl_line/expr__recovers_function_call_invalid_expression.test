@@ -1,0 +1,28 @@
+funky(1 + )
+let a = 1
+===
+SourceFile@0..21
+  FunctionCall@0..12
+    FunctionCallTarget@0..5
+      VariableRef@0..5
+        Ident@0..5 "funky"
+    FunctionCallArgList@5..12
+      LParen@5..6 "("
+      InfixExpr@6..10
+        IntLiteral@6..8
+          Integer@6..7 "1"
+          Whitespace@7..8 " "
+        Plus@8..9 "+"
+        Whitespace@9..10 " "
+      RParen@10..11 ")"
+      Whitespace@11..12 "\n"
+  VariableDef@12..21
+    LetKw@12..15 "let"
+    Whitespace@15..16 " "
+    Ident@16..17 "a"
+    Whitespace@17..18 " "
+    Equals@18..19 "="
+    Whitespace@19..20 " "
+    IntLiteral@20..21
+      Integer@20..21 "1"
+error at position 10 while parsing a function call argument. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
