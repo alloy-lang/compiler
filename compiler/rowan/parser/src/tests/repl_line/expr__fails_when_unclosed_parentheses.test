@@ -5,4 +5,4 @@ SourceFile@0..4
     LParen@0..1 "("
     VariableRef@1..4
       Ident@1..4 "foo"
-error at position 4 while parsing a close parenthesis after an expression. Missing expected ‘+’, ‘-’, ‘*’, ‘/’, operator identifier or ‘)’
+error at position 4 while parsing a close parenthesis after an expression. Missing expected ‘)’

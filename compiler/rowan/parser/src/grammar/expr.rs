@@ -56,6 +56,14 @@ fn parse_expr_with_recovery(
     parse_expr_with_binding_power(p, 0, recovery_set, context)
 }
 
+const SUPPORTED_OPERATORS: TokenSet = TokenSet::new([
+    TokenKind::Plus,
+    TokenKind::Minus,
+    TokenKind::Star,
+    TokenKind::Slash,
+    TokenKind::OpIdent,
+]);
+
 fn parse_expr_with_binding_power(
     p: &mut Parser,
     minimum_binding_power: u8,
@@ -65,6 +73,12 @@ fn parse_expr_with_binding_power(
     let mut lhs = parse_lhs(p, recovery_set, context)?;
 
     loop {
+        if !p.at_set(SUPPORTED_OPERATORS) {
+            // We’re not at an operator we recognize;
+            // we don’t know what to do next, so we return and let caller decide.
+            break;
+        }
+
         let op = if p.at(TokenKind::Plus) {
             BinaryOp::Add
         } else if p.at(TokenKind::Minus) {
@@ -76,9 +90,7 @@ fn parse_expr_with_binding_power(
         } else if p.at(TokenKind::OpIdent) {
             BinaryOp::Custom
         } else {
-            // We’re not at an operator; we don’t know what to do next, so we return and let the
-            // caller decide.
-            break;
+            unreachable!("we should never end up here, since the list of known operators is checked beforehand")
         };
 
         let (left_binding_power, right_binding_power) = op.binding_power();
@@ -201,7 +213,11 @@ fn parse_function_call(p: &mut Parser) -> CompletedMarker {
             break;
         }
 
-        parse_expr_with_recovery(p, TokenSet::new([TokenKind::RParen, TokenKind::Comma]), ParseErrorContext::FunctionCallArgExpr);
+        parse_expr_with_recovery(
+            p,
+            TokenSet::new([TokenKind::RParen, TokenKind::Comma]),
+            ParseErrorContext::FunctionCallArgExpr,
+        );
 
         if should_stop(p) {
             break;

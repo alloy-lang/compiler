@@ -28,4 +28,4 @@ SourceFile@0..23
     Whitespace@21..22 " "
     IntLiteral@22..23
       Integer@22..23 "1"
-error at position 14 while parsing a close parenthesis after a function call. Missing expected ‘+’, ‘-’, ‘*’, ‘/’, operator identifier or ‘)’
+error at position 14 while parsing a close parenthesis after a function call. Missing expected ‘)’

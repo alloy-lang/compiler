@@ -9,4 +9,4 @@ SourceFile@0..5
     Whitespace@3..4 " "
     IntLiteral@4..5
       Integer@4..5 "2"
-error at position 5 while parsing a close parenthesis after an expression. Missing expected ‘+’, ‘-’, ‘*’, ‘/’, operator identifier or ‘)’
+error at position 5 while parsing a close parenthesis after an expression. Missing expected ‘)’

@@ -27,5 +27,5 @@ SourceFile@0..22
     Whitespace@20..21 " "
     IntLiteral@21..22
       Integer@21..22 "1"
-error at position 8 while parsing a comma between arguments in a function call. Missing expected ‘+’, ‘-’, ‘*’, ‘/’, operator identifier or ‘,’
-error at position 10 while parsing a comma between arguments in a function call. Missing expected ‘+’, ‘-’, ‘*’, ‘/’, operator identifier or ‘,’
+error at position 8 while parsing a comma between arguments in a function call. Missing expected ‘,’
+error at position 10 while parsing a comma between arguments in a function call. Missing expected ‘,’

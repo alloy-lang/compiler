@@ -45,7 +45,7 @@ SourceFile@0..71
     Whitespace@68..69 " "
   VariableRef@69..71
     Ident@69..71 "t2"
-error in range 34..35 while parsing a top level expression. Found ‘>’, but expected ‘+’, ‘-’, ‘*’, ‘/’, operator identifier, ‘module‘, ‘let’, ‘import‘, ‘trait‘, ‘typeof‘, integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+error in range 34..35 while parsing a top level expression. Found ‘>’, but expected ‘module‘, ‘let’, ‘import‘, ‘trait‘, ‘typeof‘, integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
 error in range 36..41 while parsing a top level expression. Found ‘where‘, but expected ‘module‘, ‘let’, ‘import‘, ‘trait‘, ‘typeof‘, integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
 error in range 46..53 while parsing a top level expression. Found ‘typevar‘, but expected ‘module‘, ‘let’, ‘import‘, ‘trait‘, ‘typeof‘, integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
-error in range 61..68 while parsing a top level expression. Found ‘typevar‘, but expected ‘+’, ‘-’, ‘*’, ‘/’, operator identifier, ‘module‘, ‘let’, ‘import‘, ‘trait‘, ‘typeof‘, integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+error in range 61..68 while parsing a top level expression. Found ‘typevar‘, but expected ‘module‘, ‘let’, ‘import‘, ‘trait‘, ‘typeof‘, integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’

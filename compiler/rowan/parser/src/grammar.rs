@@ -4,6 +4,7 @@ use alloy_rowan_syntax::SyntaxKind;
 use crate::parser::marker::CompletedMarker;
 use crate::parser::ParseErrorContext;
 use crate::parser::Parser;
+use crate::parser::DEFAULT_RECOVERY_SET;
 use crate::token_set::TokenSet;
 
 mod expr;
