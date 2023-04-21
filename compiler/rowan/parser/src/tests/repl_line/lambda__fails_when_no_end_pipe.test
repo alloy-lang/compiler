@@ -18,4 +18,4 @@ SourceFile@0..16
     LambdaExprBody@15..16
       IntLiteral@15..16
         Integer@15..16 "8"
-error at position 12 while parsing a lambda argument. Missing expected ‘|’
+error at position 12 while parsing the pipe at the end of a lambda expression's argument list. Missing expected ‘|’

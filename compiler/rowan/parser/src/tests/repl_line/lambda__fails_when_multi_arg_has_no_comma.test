@@ -22,5 +22,5 @@ SourceFile@0..20
     LambdaExprBody@19..20
       IntLiteral@19..20
         Integer@19..20 "8"
-error at position 6 while parsing a lambda argument. Missing expected ‘,’
-error at position 11 while parsing a lambda argument. Missing expected ‘,’
+error at position 6 while parsing a comma between arguments in a lambda expression. Missing expected ‘,’
+error at position 11 while parsing a comma between arguments in a lambda expression. Missing expected ‘,’

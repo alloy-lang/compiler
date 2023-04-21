@@ -163,9 +163,11 @@ impl ParseErrorContext {
             ParseErrorContext::ModuleWhere => {
                 "the where keyword at the start of a module definition"
             }
-            ParseErrorContext::LambdaArgComma => "a lambda argument",
-            ParseErrorContext::LambdaArgExpr => "a lambda argument",
-            ParseErrorContext::LambdaArgPipe => "a lambda argument",
+            ParseErrorContext::LambdaArgComma => "a comma between arguments in a lambda expression",
+            ParseErrorContext::LambdaArgExpr => "an argument in a lambda expression",
+            ParseErrorContext::LambdaArgPipe => {
+                "the pipe at the end of a lambda expression's argument list"
+            }
             ParseErrorContext::LambdaExprRightArrow => "a lambda expression",
             ParseErrorContext::LambdaExprExpr => "a lambda expression body",
             ParseErrorContext::FunctionCallArgExpr => "a function call argument",
