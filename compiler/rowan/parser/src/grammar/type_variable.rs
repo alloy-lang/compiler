@@ -1,3 +1,4 @@
+#[allow(clippy::wildcard_imports)]
 use super::*;
 
 const TYPEVAR_CONSTRAINT_FIRSTS: TokenSet =

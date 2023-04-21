@@ -1,4 +1,5 @@
 use rowan::GreenNode;
+use std::fmt::Write as _;
 
 use alloy_rowan_lexer::Lexer;
 use alloy_rowan_syntax::SyntaxNode;
@@ -44,7 +45,7 @@ impl Parse {
         s.push_str(&tree[0..tree.len() - 1]);
 
         for error in &self.errors {
-            s.push_str(&format!("\n{}", error));
+            let _ = write!(s, "\n{}", error);
         }
 
         s

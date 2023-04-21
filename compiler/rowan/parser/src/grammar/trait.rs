@@ -1,5 +1,5 @@
+#[allow(clippy::wildcard_imports)]
 use super::*;
-use crate::parser::DEFAULT_RECOVERY_SET;
 
 const TRAIT_RECOVERY_SET: TokenSet = TokenSet::new([TokenKind::TypevarKw, TokenKind::EndKw]);
 

@@ -21,8 +21,8 @@ impl Database {
                 value: self.lower_expr(ast.value()),
             },
             alloy_rowan_ast::Stmt::Expr(ast) => Stmt::Expr(self.lower_expr(Some(ast))),
-            alloy_rowan_ast::Stmt::Import(ast) => Stmt::Import(self.lower_import(ast)),
-            alloy_rowan_ast::Stmt::Trait(ast) => Stmt::Trait(self.lower_trait(ast)),
+            alloy_rowan_ast::Stmt::Import(ast) => Stmt::Import(Self::lower_import(&ast)),
+            alloy_rowan_ast::Stmt::Trait(ast) => Stmt::Trait(self.lower_trait(&ast)),
         };
 
         Some(result)
@@ -146,21 +146,21 @@ impl Database {
         unsafe { Expr::Tuple(NonEmpty::new_unchecked(args)) }
     }
 
-    fn lower_import(&self, ast: alloy_rowan_ast::Import) -> Import {
+    fn lower_import(ast: &alloy_rowan_ast::Import) -> Import {
         Import {
             path: ast.path(),
             targets: ast.targets(),
         }
     }
 
-    fn lower_trait(&self, ast: alloy_rowan_ast::Trait) -> Trait {
+    fn lower_trait(&self, ast: &alloy_rowan_ast::Trait) -> Trait {
         Trait {
             name: ast.name().unwrap(),
             members: self.lower_trait_members(ast),
         }
     }
 
-    fn lower_trait_members(&self, ast: alloy_rowan_ast::Trait) -> Vec<TraitMember> {
+    fn lower_trait_members(&self, ast: &alloy_rowan_ast::Trait) -> Vec<TraitMember> {
         ast.members()
             .into_iter()
             .map(|tm| match tm {
@@ -177,16 +177,16 @@ impl Database {
     fn lower_type(&self, ast: alloy_rowan_ast::Type) -> Type {
         match ast {
             alloy_rowan_ast::Type::SelfRef => Type::SelfRef,
-            alloy_rowan_ast::Type::Identifier(ast) => self.lower_type_identifier(ast),
-            alloy_rowan_ast::Type::Lambda(ast) => self.lower_lambda_type(ast),
+            alloy_rowan_ast::Type::Identifier(ast) => Self::lower_type_identifier(&ast),
+            alloy_rowan_ast::Type::Lambda(ast) => self.lower_lambda_type(&ast),
         }
     }
 
-    fn lower_type_identifier(&self, ast: alloy_rowan_ast::TypeIdentifier) -> Type {
+    fn lower_type_identifier(ast: &alloy_rowan_ast::TypeIdentifier) -> Type {
         Type::Identifier(ast.name().unwrap())
     }
 
-    fn lower_lambda_type(&self, ast: alloy_rowan_ast::LambdaType) -> Type {
+    fn lower_lambda_type(&self, ast: &alloy_rowan_ast::LambdaType) -> Type {
         Type::Lambda {
             arg_type: Box::new(self.lower_type(ast.arg_type().unwrap())),
             return_type: Box::new(self.lower_type(ast.return_type().unwrap())),

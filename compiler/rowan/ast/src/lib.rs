@@ -359,6 +359,7 @@ impl Import {
         }
     }
 
+    #[must_use]
     pub fn path(&self) -> Vec<String> {
         let (_last, rest) = Self::full_path(self);
 
@@ -373,6 +374,7 @@ impl Import {
             .collect::<Vec<_>>()
     }
 
+    #[must_use]
     pub fn targets(&self) -> Vec<String> {
         let (last, _) = Self::full_path(self);
 
@@ -405,9 +407,9 @@ impl ImportChild {
     #[must_use]
     pub fn cast(node: SyntaxNode) -> Option<Self> {
         if node.kind() == SyntaxKind::ImportStatementSegment {
-            Some(Self::Segment(ImportChildSegment(node.clone())))
+            Some(Self::Segment(ImportChildSegment(node)))
         } else if node.kind() == SyntaxKind::ImportStatementGroup {
-            Some(Self::Group(ImportChildGroup(node.clone())))
+            Some(Self::Group(ImportChildGroup(node)))
         } else {
             None
         }
@@ -579,10 +581,12 @@ impl LambdaType {
         }
     }
 
+    #[must_use]
     pub fn arg_type(&self) -> Option<Type> {
-        self.0.children().filter_map(Type::cast).next()
+        self.0.children().find_map(Type::cast)
     }
 
+    #[must_use]
     pub fn return_type(&self) -> Option<Type> {
         self.0.children().filter_map(Type::cast).nth(1)
     }

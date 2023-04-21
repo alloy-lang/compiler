@@ -1,3 +1,4 @@
+#[allow(clippy::wildcard_imports)]
 use super::*;
 
 const IMPORT_RECOVERY_SET: TokenSet = TokenSet::new([TokenKind::Ident, TokenKind::LBrace]);

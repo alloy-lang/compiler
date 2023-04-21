@@ -1,3 +1,4 @@
+#[allow(clippy::wildcard_imports)]
 use super::*;
 
 pub(super) fn parse_ident_or_op(

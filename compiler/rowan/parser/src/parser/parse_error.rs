@@ -157,7 +157,7 @@ impl ParseErrorContext {
     // }
 
     #[must_use]
-    fn context_name<'a>(&self) -> &'a str {
+    fn context_name<'a>(self) -> &'a str {
         match self {
             ParseErrorContext::ModuleName => "the name of the module in a module definition",
             ParseErrorContext::ModuleWhere => {

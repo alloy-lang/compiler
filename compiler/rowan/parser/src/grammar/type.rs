@@ -1,5 +1,5 @@
+#[allow(clippy::wildcard_imports)]
 use super::*;
-use crate::parser::DEFAULT_RECOVERY_SET;
 
 pub(crate) fn parse_type_annotation(
     p: &mut Parser,
@@ -230,9 +230,7 @@ fn parse_bounded_type_args(p: &mut Parser, parent_recovery_set: TokenSet) {
 
     return;
 
-    const RECOVERY_SET: TokenSet = TokenSet::new([TokenKind::RAngle, TokenKind::WhereKw]);
-
     fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(RECOVERY_SET) || p.at_end()
+        p.at_set(ts![TokenKind::RAngle, TokenKind::WhereKw]) || p.at_end()
     }
 }
