@@ -33,7 +33,7 @@ fn parse_typevar_constraint(p: &mut Parser) {
     } else {
         p.error_with_recovery(
             ParseErrorContext::TypeVariableConstraint,
-            TokenSet::new([TokenKind::TypevarKw]),
+            ts![TokenKind::TypevarKw],
         );
     }
 }
@@ -55,7 +55,7 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
         TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
     );
 
-    if p.at_set(TokenSet::new([TokenKind::ClosedAngle])) {
+    if p.at_set(ts![TokenKind::ClosedAngle]) {
         // this is a bit of a hack to allow better error reporting for `#Type<>`
         p.expect_with_recovery(
             TokenKind::NilIdentifier,
@@ -78,7 +78,7 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
         TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY.plus(TokenKind::TypevarKw),
     );
 
-    if p.at_set(TokenSet::new([TokenKind::Comma])) {
+    if p.at_set(ts![TokenKind::Comma]) {
         p.bump();
 
         loop {
@@ -113,7 +113,7 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
     return m.complete(p, SyntaxKind::TypeVariableKindConstraint);
 
     fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(TokenSet::new([TokenKind::RAngle])) || p.at_end()
+        p.at_set(ts![TokenKind::RAngle]) || p.at_end()
     }
 }
 
@@ -123,7 +123,7 @@ fn parse_typevar_constraint_trait_marker(p: &mut Parser) -> CompletedMarker {
     path::parse_path(
         p,
         ParseErrorContext::TypeVariableTraitConstraint,
-        TokenSet::new([TokenKind::TypevarKw]),
+        ts![TokenKind::TypevarKw],
         SyntaxKind::TypeVariableTraitConstraint,
     )
 }

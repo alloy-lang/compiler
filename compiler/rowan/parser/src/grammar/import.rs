@@ -53,7 +53,7 @@ fn parse_import_group(p: &mut Parser) -> CompletedMarker {
         p.expect_with_recovery(
             TokenKind::Comma,
             ParseErrorContext::ImportStatementGroupSeparator,
-            TokenSet::new([TokenKind::Ident]),
+            ts![TokenKind::Ident],
         );
 
         parse_import_segment(p, ParseErrorContext::ImportStatementSegment);
@@ -68,7 +68,7 @@ fn parse_import_group(p: &mut Parser) -> CompletedMarker {
     return m.complete(p, SyntaxKind::ImportStatementGroup);
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(TokenSet::new([TokenKind::Comma, TokenKind::Ident])) || p.at_end()
+        !p.at_set(ts![TokenKind::Comma, TokenKind::Ident]) || p.at_end()
     }
 }
 

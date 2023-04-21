@@ -23,7 +23,7 @@ fn variable_def(p: &mut Parser) -> CompletedMarker {
     ident::parse_ident_or_op(
         p,
         ParseErrorContext::VariableDefIdent,
-        TokenSet::new([TokenKind::Equals]),
+        ts![TokenKind::Equals],
     );
     p.expect_with_recovery(
         TokenKind::Equals,

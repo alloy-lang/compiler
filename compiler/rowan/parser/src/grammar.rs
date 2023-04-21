@@ -6,6 +6,7 @@ use crate::parser::ParseErrorContext;
 use crate::parser::Parser;
 use crate::parser::DEFAULT_RECOVERY_SET;
 use crate::token_set::TokenSet;
+use crate::ts;
 
 mod expr;
 mod ident;

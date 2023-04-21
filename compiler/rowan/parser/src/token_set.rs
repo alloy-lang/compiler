@@ -48,6 +48,16 @@ const fn mask(kind: TokenKind) -> u64 {
     1 << kind as u64
 }
 
+#[macro_export]
+macro_rules! ts {
+    () => (
+        $crate::token_set::TokenSet::EMPTY
+    );
+    ($($x:expr),+ $(,)?) => (
+        $crate::token_set::TokenSet::new([$($x),+])
+    );
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -66,5 +76,17 @@ mod tests {
         assert!(set.contains(TokenKind::Integer));
         assert!(set.contains(TokenKind::String));
         assert!(!set.contains(TokenKind::Ident));
+    }
+
+    #[test]
+    fn macro_works() {
+        let set1 = TokenSet::new([TokenKind::LetKw, TokenKind::Integer]);
+        let set2 = ts![TokenKind::LetKw, TokenKind::Integer];
+
+        assert!(set1.contains(TokenKind::LetKw));
+        assert!(set2.contains(TokenKind::LetKw));
+
+        assert!(set1.contains(TokenKind::Integer));
+        assert!(set2.contains(TokenKind::Integer));
     }
 }

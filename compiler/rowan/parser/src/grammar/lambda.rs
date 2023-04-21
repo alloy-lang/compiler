@@ -57,13 +57,13 @@ fn parse_arg_list(p: &mut Parser) -> CompletedMarker {
     p.expect_with_recovery(
         TokenKind::Pipe,
         ParseErrorContext::LambdaArgPipe,
-        TokenSet::new([TokenKind::RightArrow]),
+        ts![TokenKind::RightArrow],
     );
 
     return m.complete(p, SyntaxKind::LambdaArgList);
 
     fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(TokenSet::new([TokenKind::Pipe, TokenKind::RightArrow])) || p.at_end()
+        p.at_set(ts![TokenKind::Pipe, TokenKind::RightArrow]) || p.at_end()
     }
 }
 

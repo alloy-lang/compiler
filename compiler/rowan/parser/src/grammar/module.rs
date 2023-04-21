@@ -9,7 +9,7 @@ pub(crate) fn parse_module(p: &mut Parser) -> CompletedMarker {
     p.expect_with_recovery(
         TokenKind::Ident,
         ParseErrorContext::ModuleName,
-        TokenSet::new([TokenKind::WhereKw]),
+        ts![TokenKind::WhereKw],
     );
     p.expect(TokenKind::WhereKw, ParseErrorContext::ModuleWhere);
 

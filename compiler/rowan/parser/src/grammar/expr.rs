@@ -192,7 +192,7 @@ pub(crate) fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
 }
 
 fn maybe_parse_function_call(p: &mut Parser, lhs: CompletedMarker) -> CompletedMarker {
-    if !p.at_set(TokenSet::new([TokenKind::LParen])) {
+    if !p.at_set(ts![TokenKind::LParen]) {
         return lhs;
     }
 
@@ -215,7 +215,7 @@ fn parse_function_call(p: &mut Parser) -> CompletedMarker {
 
         parse_expr_with_recovery(
             p,
-            TokenSet::new([TokenKind::RParen, TokenKind::Comma]),
+            ts![TokenKind::RParen, TokenKind::Comma],
             ParseErrorContext::FunctionCallArgExpr,
         );
 
@@ -248,7 +248,7 @@ fn parse_if_then_else_expr(p: &mut Parser) -> CompletedMarker {
     let if_m = p.start();
     parse_expr_with_recovery(
         p,
-        TokenSet::new([TokenKind::ThenKw]),
+        ts![TokenKind::ThenKw],
         ParseErrorContext::IfThenElseIfExpr,
     );
     if_m.complete(p, SyntaxKind::IfExpr);
@@ -261,7 +261,7 @@ fn parse_if_then_else_expr(p: &mut Parser) -> CompletedMarker {
     let then_m = p.start();
     parse_expr_with_recovery(
         p,
-        TokenSet::new([TokenKind::ElseKw]),
+        ts![TokenKind::ElseKw],
         ParseErrorContext::IfThenElseThenExpr,
     );
     then_m.complete(p, SyntaxKind::ThenExpr);
@@ -335,6 +335,6 @@ fn parse_paren_expr(p: &mut Parser) -> CompletedMarker {
     return paren_m.complete(p, kind);
 
     fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(TokenSet::new([TokenKind::RParen])) || p.at_end()
+        p.at_set(ts![TokenKind::RParen]) || p.at_end()
     }
 }

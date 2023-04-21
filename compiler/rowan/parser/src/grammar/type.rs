@@ -10,15 +10,11 @@ pub(crate) fn parse_type_annotation(
     let m = p.start();
     p.bump();
 
-    ident::parse_ident_or_op(
-        p,
-        ParseErrorContext::TypeOfName,
-        TokenSet::new([TokenKind::Colon]),
-    );
+    ident::parse_ident_or_op(p, ParseErrorContext::TypeOfName, ts![TokenKind::Colon]);
     p.expect_with_recovery(
         TokenKind::Colon,
         ParseErrorContext::TypeOfColon,
-        TokenSet::new([TokenKind::Ident]),
+        ts![TokenKind::Ident],
     );
 
     parse_type(p, TokenSet::EMPTY, parent_recovery_set);
@@ -45,7 +41,7 @@ fn parse_type_annotation_type_variables(p: &mut Parser, parent_recovery_set: Tok
     return;
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(TokenSet::new([TokenKind::TypevarKw])) || p.at_end()
+        !p.at_set(ts![TokenKind::TypevarKw]) || p.at_end()
     }
 }
 
@@ -178,7 +174,7 @@ fn parse_parenthesized_type(p: &mut Parser, parent_recovery_set: TokenSet) -> Co
     };
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(TokenSet::new([TokenKind::Comma])) || p.at_end()
+        !p.at_set(ts![TokenKind::Comma]) || p.at_end()
     }
 }
 
@@ -203,7 +199,7 @@ fn parse_bounded_type_args(p: &mut Parser, parent_recovery_set: TokenSet) {
     p.expect_with_recovery(
         TokenKind::LAngle,
         ParseErrorContext::BoundedTypeLAngle,
-        TokenSet::new([TokenKind::Ident]),
+        ts![TokenKind::Ident],
     );
 
     loop {
@@ -212,7 +208,7 @@ fn parse_bounded_type_args(p: &mut Parser, parent_recovery_set: TokenSet) {
         }
 
         let m = p.start();
-        parse_type(p, TokenSet::new([TokenKind::Comma]), parent_recovery_set);
+        parse_type(p, ts![TokenKind::Comma], parent_recovery_set);
         m.complete(p, SyntaxKind::BoundedTypeArg);
 
         if should_stop(p) {
@@ -229,7 +225,7 @@ fn parse_bounded_type_args(p: &mut Parser, parent_recovery_set: TokenSet) {
     p.expect_with_recovery(
         TokenKind::RAngle,
         ParseErrorContext::BoundedTypeRAngle,
-        TokenSet::new([TokenKind::WhereKw]),
+        ts![TokenKind::WhereKw],
     );
 
     return;
