@@ -1,0 +1,25 @@
+|(a b)| -> 5
+===
+SourceFile@0..12
+  LambdaExprDef@0..12
+    LambdaArgList@0..8
+      Pipe@0..1 "|"
+      LambdaArg@1..6
+        TupleExpr@1..6
+          LParen@1..2 "("
+          LambdaArg@2..4
+            VariableRef@2..4
+              Ident@2..3 "a"
+              Whitespace@3..4 " "
+          LambdaArg@4..5
+            VariableRef@4..5
+              Ident@4..5 "b"
+          RParen@5..6 ")"
+      Pipe@6..7 "|"
+      Whitespace@7..8 " "
+    RightArrow@8..10 "->"
+    Whitespace@10..11 " "
+    LambdaExprBody@11..12
+      IntLiteral@11..12
+        Integer@11..12 "5"
+error at position 4 while parsing a comma between expressions inside parentheses. Missing expected ‘,’

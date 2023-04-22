@@ -12,6 +12,7 @@ const LAMBDA_ARG_SET: TokenSet = TokenSet::new([
     TokenKind::String,
     TokenKind::Char,
     TokenKind::Ident,
+    TokenKind::LParen,
 ]);
 
 pub(crate) fn parse_lambda_expr(p: &mut Parser) -> CompletedMarker {
@@ -81,9 +82,51 @@ fn parse_arg(p: &mut Parser) -> CompletedMarker {
         parse_char_literal(p);
     } else if p.at(TokenKind::Ident) {
         parse_variable_ref(p);
+    } else if p.at(TokenKind::LParen) {
+        parse_tuple_arg(p);
     } else {
         p.error(ParseErrorContext::LambdaArgExpr);
     }
 
     m.complete(p, SyntaxKind::LambdaArg)
+}
+
+fn parse_tuple_arg(p: &mut Parser) -> CompletedMarker {
+    assert!(p.at(TokenKind::LParen));
+
+    let paren_m = p.start();
+    p.bump();
+
+    let mut arg_len = 0;
+    loop {
+        if should_stop(p) {
+            break;
+        }
+
+        parse_arg(p);
+        arg_len += 1;
+
+        if should_stop(p) {
+            break;
+        }
+
+        p.expect_with_recovery(
+            TokenKind::Comma,
+            ParseErrorContext::ParenExprComma,
+            LAMBDA_ARG_SET,
+        );
+    }
+
+    p.expect(TokenKind::RParen, ParseErrorContext::ParenExprRightParen);
+
+    let kind = match arg_len {
+        0 => SyntaxKind::UnitExpr,
+        1 => SyntaxKind::ParenExpr,
+        _ => SyntaxKind::TupleExpr,
+    };
+    return paren_m.complete(p, kind);
+
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_set(ts![TokenKind::RParen]) || p.at_end()
+    }
 }

@@ -4,19 +4,18 @@ SourceFile@0..13
   LambdaExprDef@0..13
     LambdaArgList@0..9
       Pipe@0..1 "|"
-      LambdaArg@1..2
-        Error@1..2
+      LambdaArg@1..7
+        TupleExpr@1..7
           LParen@1..2 "("
-      LambdaArg@2..3
-        VariableRef@2..3
-          Ident@2..3 "a"
-      Comma@3..4 ","
-      Whitespace@4..5 " "
-      LambdaArg@5..6
-        VariableRef@5..6
-          Ident@5..6 "b"
-      Error@6..7
-        RParen@6..7 ")"
+          LambdaArg@2..3
+            VariableRef@2..3
+              Ident@2..3 "a"
+          Comma@3..4 ","
+          Whitespace@4..5 " "
+          LambdaArg@5..6
+            VariableRef@5..6
+              Ident@5..6 "b"
+          RParen@6..7 ")"
       Pipe@7..8 "|"
       Whitespace@8..9 " "
     RightArrow@9..11 "->"
@@ -24,6 +23,3 @@ SourceFile@0..13
     LambdaExprBody@12..13
       IntLiteral@12..13
         Integer@12..13 "5"
-error in range 1..2 while parsing an argument in a lambda expression. Found ‘(’, but expected integer, fractional, string, char or identifier
-error at position 2 while parsing a comma between arguments in a lambda expression. Missing expected ‘,’
-error in range 6..7 while parsing a comma between arguments in a lambda expression. Found ‘)’, but expected ‘,’
