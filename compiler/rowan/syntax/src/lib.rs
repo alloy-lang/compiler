@@ -69,6 +69,7 @@ pub enum SyntaxKind {
     UnitExpr,
     ParenExpr,
     TupleExpr,
+    TupleExprArg,
     PrefixExpr,
     VariableDef,
     VariableRef,

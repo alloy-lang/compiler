@@ -8,6 +8,7 @@ use crate::parser::DEFAULT_RECOVERY_SET;
 use crate::token_set::TokenSet;
 use crate::ts;
 
+mod argument;
 mod expr;
 mod ident;
 mod import;
