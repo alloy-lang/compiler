@@ -137,6 +137,8 @@ fn parse_lhs(
         parse_paren_expr(p)
     } else if p.at(TokenKind::IfKw) {
         parse_if_then_else_expr(p)
+    } else if p.at(TokenKind::MatchKw) {
+        parse_match_when_expr(p)
     } else if p.at(TokenKind::Pipe) {
         lambda::parse_lambda_expr(p)
     } else {

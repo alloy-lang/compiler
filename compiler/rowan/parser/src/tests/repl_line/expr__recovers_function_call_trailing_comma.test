@@ -26,4 +26,4 @@ SourceFile@0..22
     Whitespace@20..21 " "
     IntLiteral@21..22
       Integer@21..22 "1"
-error at position 10 while parsing a function call argument. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘ or ‘|’
+error at position 10 while parsing a function call argument. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’

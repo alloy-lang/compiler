@@ -7,12 +7,12 @@ SourceFile@0..13
       LambdaArg@1..7
         TupleExpr@1..7
           LParen@1..2 "("
-          LambdaArg@2..3
+          TupleExprArg@2..3
             VariableRef@2..3
               Ident@2..3 "a"
           Comma@3..4 ","
           Whitespace@4..5 " "
-          LambdaArg@5..6
+          TupleExprArg@5..6
             VariableRef@5..6
               Ident@5..6 "b"
           RParen@6..7 ")"
