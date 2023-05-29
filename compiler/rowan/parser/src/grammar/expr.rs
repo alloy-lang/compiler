@@ -1,6 +1,7 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
+use crate::grammar::argument::{parse_argument, ARGUMENT_RECOVERY_SET};
 use crate::grammar::lambda;
 
 pub(crate) const EXPR_FIRSTS: TokenSet = TokenSet::new([
@@ -279,6 +280,57 @@ fn parse_if_then_else_expr(p: &mut Parser) -> CompletedMarker {
     else_m.complete(p, SyntaxKind::ElseExpr);
 
     if_then_else_m.complete(p, SyntaxKind::IfThenElseExpr)
+}
+
+fn parse_match_when_expr(p: &mut Parser) -> CompletedMarker {
+    assert!(p.at(TokenKind::MatchKw));
+
+    let match_when_m = p.start();
+    p.bump();
+
+    let match_m = p.start();
+    parse_expr_with_recovery(p, ts![TokenKind::WhenKw], ParseErrorContext::MatchExprArg);
+    match_m.complete(p, SyntaxKind::MatchExprArg);
+
+    p.expect_with_recovery(
+        TokenKind::WhenKw,
+        ParseErrorContext::MatchExprWhenKw,
+        EXPR_FIRSTS,
+    );
+
+    loop {
+        let when_m = p.start();
+        p.expect_with_recovery(
+            TokenKind::Pipe,
+            ParseErrorContext::MatchTargetPipe,
+            ARGUMENT_RECOVERY_SET,
+        );
+
+        parse_argument(
+            p,
+            SyntaxKind::MatchTargetCondition,
+            ParseErrorContext::MatchTargetCondition,
+            ts![TokenKind::RightArrow],
+        );
+
+        p.expect_with_recovery(
+            TokenKind::RightArrow,
+            ParseErrorContext::MatchTargetRightArrow,
+            EXPR_FIRSTS,
+        );
+
+        let when_value_m = p.start();
+        parse_expr_with_recovery(p, ts![TokenKind::Pipe], ParseErrorContext::MatchTargetValue);
+        when_value_m.complete(p, SyntaxKind::MatchTargetValue);
+
+        when_m.complete(p, SyntaxKind::MatchTarget);
+
+        if !p.at(TokenKind::Pipe) || p.at_end() {
+            break;
+        }
+    }
+
+    match_when_m.complete(p, SyntaxKind::MatchExpr)
 }
 
 fn parse_prefix_expr(p: &mut Parser) -> CompletedMarker {
