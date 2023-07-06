@@ -35,4 +35,4 @@ SourceFile@0..41
       MatchTargetValue@40..41
         IntLiteral@40..41
           Integer@40..41 "1"
-error at position 25 while parsing a match expression. Missing expected ‘->’
+error at position 25 while parsing the `->` in a match expression branch. Missing expected ‘->’

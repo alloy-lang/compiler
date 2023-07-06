@@ -35,4 +35,4 @@ SourceFile@0..42
       MatchTargetValue@41..42
         IntLiteral@41..42
           Integer@41..42 "1"
-error at position 18 while parsing a match expression. Missing expected ‘|’
+error at position 18 while parsing the `|` at the start of a match expression branch. Missing expected ‘|’

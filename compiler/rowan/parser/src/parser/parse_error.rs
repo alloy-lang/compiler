@@ -192,12 +192,14 @@ impl ParseErrorContext {
             ParseErrorContext::IfThenElseThenExpr => "an if-then-else expression",
             ParseErrorContext::IfThenElseElseKw => "an if-then-else expression",
             ParseErrorContext::IfThenElseElseExpr => "an if-then-else expression",
-            ParseErrorContext::MatchExprArg => "a match expression a",
-            ParseErrorContext::MatchExprWhenKw => "a match expression",
-            ParseErrorContext::MatchTargetPipe => "a match expression",
-            ParseErrorContext::MatchTargetRightArrow => "a match expression",
-            ParseErrorContext::MatchTargetCondition => "a match expression",
-            ParseErrorContext::MatchTargetValue => "a match expression",
+            ParseErrorContext::MatchExprArg => "the argument of a match expression",
+            ParseErrorContext::MatchExprWhenKw => "the when keyword of a match expression",
+            ParseErrorContext::MatchTargetPipe => {
+                "the `|` at the start of a match expression branch"
+            }
+            ParseErrorContext::MatchTargetRightArrow => "the `->` in a match expression branch",
+            ParseErrorContext::MatchTargetCondition => "the condition in a match expression branch",
+            ParseErrorContext::MatchTargetValue => "the value in a match expression branch",
             ParseErrorContext::VariableDefIdent => "a variable definition",
             ParseErrorContext::VariableDefEquals => "a variable definition",
             ParseErrorContext::VariableDefExpr => "a variable definition",

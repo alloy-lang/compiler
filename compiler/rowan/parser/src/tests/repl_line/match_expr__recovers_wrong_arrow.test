@@ -38,4 +38,4 @@ SourceFile@0..43
       MatchTargetValue@42..43
         IntLiteral@42..43
           Integer@42..43 "1"
-error in range 25..26 while parsing a match expression. Found ‘>’, but expected ‘->’
+error in range 25..26 while parsing the `->` in a match expression branch. Found ‘>’, but expected ‘->’

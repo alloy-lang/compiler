@@ -35,4 +35,4 @@ SourceFile@0..39
       MatchTargetValue@38..39
         IntLiteral@38..39
           Integer@38..39 "1"
-error at position 13 while parsing a match expression. Missing expected ‘when‘
+error at position 13 while parsing the when keyword of a match expression. Missing expected ‘when‘
