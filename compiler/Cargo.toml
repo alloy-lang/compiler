@@ -12,7 +12,7 @@ edition = "2018"
 #cranelift-jit = "0.73.0"
 non-empty-vec = "0.2"
 peg = { git = "https://github.com/kevinmehall/rust-peg" }
-itertools = "0.10"
+itertools = "0.11"
 linked_hash_set = "0.1.4"
 linked-hash-map = "0.5.4"
 rowan = "0.15"
