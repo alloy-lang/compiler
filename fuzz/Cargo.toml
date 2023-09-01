@@ -18,4 +18,4 @@ path = "fuzz_targets/main.rs"
 alloy_rowan_ast = {path = "../compiler/rowan/ast"}
 alloy_rowan_hir = {path = "../compiler/rowan/hir"}
 alloy_rowan_parser = {path = "../compiler/rowan/parser"}
-libfuzzer-sys = "0.3"
+libfuzzer-sys = "0.4"
