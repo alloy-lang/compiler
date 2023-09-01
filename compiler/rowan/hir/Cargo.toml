@@ -8,7 +8,7 @@ edition = "2018"
 [dependencies]
 alloy_rowan_ast = { path = "../ast" }
 alloy_rowan_syntax = { path = "../syntax" }
-la-arena = "0.2"
+la-arena = "0.3"
 non-empty-vec = "0.2"
 ordered-float = "3.0"
 
