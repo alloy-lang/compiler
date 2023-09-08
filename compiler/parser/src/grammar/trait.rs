@@ -44,7 +44,7 @@ pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
     return m.complete(p, SyntaxKind::TraitDef);
 
     fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(ts![TokenKind::EndKw]) || p.at_end()
+        p.maybe_at(TokenKind::EndKw) || p.at_end()
     }
 }
 

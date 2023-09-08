@@ -56,7 +56,7 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
         TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
     );
 
-    if p.at_set(ts![TokenKind::ClosedAngle]) {
+    if p.maybe_at(TokenKind::ClosedAngle) {
         // this is a bit of a hack to allow better error reporting for `#Type<>`
         p.expect_with_recovery(
             TokenKind::NilIdentifier,

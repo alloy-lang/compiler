@@ -196,7 +196,7 @@ pub(crate) fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
 }
 
 fn maybe_parse_function_call(p: &mut Parser, lhs: CompletedMarker) -> CompletedMarker {
-    if !p.at_set(ts![TokenKind::LParen]) {
+    if !p.maybe_at(TokenKind::LParen) {
         return lhs;
     }
 
@@ -390,6 +390,6 @@ fn parse_paren_expr(p: &mut Parser) -> CompletedMarker {
     return paren_m.complete(p, kind);
 
     fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(ts![TokenKind::RParen]) || p.at_end()
+        p.maybe_at(TokenKind::RParen) || p.at_end()
     }
 }

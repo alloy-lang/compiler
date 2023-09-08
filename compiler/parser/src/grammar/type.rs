@@ -41,7 +41,7 @@ fn parse_type_annotation_type_variables(p: &mut Parser, parent_recovery_set: Tok
     return;
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(ts![TokenKind::TypevarKw]) || p.at_end()
+        !p.maybe_at(TokenKind::TypevarKw) || p.at_end()
     }
 }
 
