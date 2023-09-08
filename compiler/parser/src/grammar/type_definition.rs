@@ -14,25 +14,57 @@ pub(crate) fn parse_type_definition(p: &mut Parser) -> CompletedMarker {
         ParseErrorContext::TypeDefName,
         ts![TokenKind::Equals],
     );
+
+    if p.maybe_at(TokenKind::LAngle) {
+        parse_type_definition_bounds(p);
+    }
+
     p.expect_with_recovery(TokenKind::Equals, ParseErrorContext::TypeDefEquals, ts![]);
 
-    parse_type_definition_member(p);
-
-    loop {
-        if should_stop(p) {
-            break;
-        }
-
-        p.expect_with_recovery(TokenKind::Pipe, ParseErrorContext::TypeDefMemberPipe, ts![]);
-
-        parse_type_definition_member(p);
-    }
+    parse_type_definition_members(p);
 
     if p.maybe_at(TokenKind::EndKw) {
         p.bump();
     }
 
-    return m.complete(p, SyntaxKind::TypeDef);
+    m.complete(p, SyntaxKind::TypeDef)
+}
+
+fn parse_type_definition_bounds(p: &mut Parser) {
+    assert!(p.at(TokenKind::LAngle));
+    p.bump();
+
+    loop {
+        let m = p.start();
+        r#type::parse_type(p, ts![], ts![TokenKind::RAngle]);
+        m.complete(p, SyntaxKind::BoundedTypeArg);
+
+        if !p.at_set(ts![TokenKind::Comma]) || p.at_end() {
+            break;
+        }
+
+        p.expect_with_recovery(TokenKind::Comma, ParseErrorContext::BoundedTypeComma, ts![]);
+    }
+
+    p.expect_with_recovery(
+        TokenKind::RAngle,
+        ParseErrorContext::BoundedTypeRAngle,
+        ts![TokenKind::LBrace],
+    );
+}
+
+fn parse_type_definition_members(p: &mut Parser) {
+    loop {
+        parse_type_definition_member(p);
+
+        if should_stop(p) {
+            break;
+        }
+
+        p.expect_with_recovery(TokenKind::Pipe, ParseErrorContext::TypeDefMemberPipe, ts![]);
+    }
+
+    return;
 
     fn should_stop(p: &mut Parser) -> bool {
         !p.maybe_at(TokenKind::Pipe) || p.at_end()
