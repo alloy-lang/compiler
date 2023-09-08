@@ -6,10 +6,9 @@ authors = ["theochupp <tclchiam@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-#alloy_lexer = { path = "../lexer" }
-non-empty-vec = "0.2"
+alloy_syntax = { path = "../syntax" }
 ordered-float = "3.0"
-itertools = "0.11.0"
+text-size = "1.1"
 
 [dev-dependencies]
-pretty_assertions = "1.2.1"
+alloy_parser = {path = "../parser"}

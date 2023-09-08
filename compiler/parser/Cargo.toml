@@ -6,16 +6,12 @@ authors = ["theochupp <tclchiam@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-alloy_ast = { path = "../ast" }
+drop_bomb = "0.1.5"
+rowan = "0.15"
+text-size = "1.1"
 alloy_lexer = { path = "../lexer" }
-codespan-reporting = "0.11"
-improved_slice_patterns = "2.0"
-non-empty-vec = "0.2"
-itertools = "0.11"
-peekmore = "1.0"
-log = "0.4"
+alloy_syntax = { path = "../syntax" }
 
 [dev-dependencies]
+expect-test = "1.3"
 pretty_assertions = "1.2.1"
-test_source = { path = "../../test_source" }
-ordered-float = "3.0"

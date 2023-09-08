@@ -1,320 +1,639 @@
-use itertools::Itertools;
-use non_empty_vec::NonEmpty;
+use alloy_syntax::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken};
 use ordered_float::NotNan;
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub struct Module {
-    name: String,
-    imports: Vec<Import>,
-    typedefs: Vec<Typedef>,
-    traits: Vec<Trait>,
-    behavior: Vec<Behavior>,
-    values: Vec<Value>,
-}
+pub mod validation;
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub struct Import {}
+//
+// Expression
+//
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub struct Typedef {}
+#[derive(Debug)]
+pub struct VariableDef(SyntaxNode);
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub struct Trait {}
-
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub struct Behavior {}
-
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub struct Value {}
-
-// TODO: Type should understand Span
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub enum Type {
-    Unit,
-    Identifier(String),
-    Variable(String),
-    Lambda {
-        arg_type: Box<Type>,
-        return_type: Box<Type>,
-    },
-    Tuple(NonEmpty<Type>),
-    Union(NonEmpty<(String, Type)>),
-    Bound {
-        t: Box<Type>,
-        binds: Vec<Type>,
-    },
-    SelfRef,
-}
-
-impl Type {
+impl VariableDef {
     #[must_use]
-    pub fn union<S>(types: Vec<(S, Type)>) -> Type
-    where
-        S: Into<String>,
-    {
-        match &types[..] {
-            [] => Type::Unit,
-            [(_name, t)] => t.clone(),
-            _ => {
-                let types = types
-                    .into_iter()
-                    .flat_map(|(name, t)| match t {
-                        Type::Union(inner) => inner.to_vec(),
-                        _ => vec![(name.into(), t)],
-                    })
-                    .collect();
+    pub fn name(&self) -> Option<String> {
+        self.0
+            .children_with_tokens()
+            .filter_map(SyntaxElement::into_token)
+            .find(|token| token.kind() == SyntaxKind::Ident)
+            .map(|token| token.text().into())
+    }
 
-                unsafe { Type::Union(NonEmpty::new_unchecked(types)) }
-            }
+    pub fn value(&self) -> Option<Expr> {
+        self.0.children().find_map(Expr::cast)
+    }
+}
+
+#[derive(Debug)]
+pub struct BinaryExpr(SyntaxNode);
+
+impl BinaryExpr {
+    #[must_use]
+    pub fn lhs(&self) -> Option<Expr> {
+        self.0.children().find_map(Expr::cast)
+    }
+
+    #[must_use]
+    pub fn rhs(&self) -> Option<Expr> {
+        self.0.children().filter_map(Expr::cast).nth(1)
+    }
+
+    #[must_use]
+    pub fn op(&self) -> Option<SyntaxToken> {
+        self.0
+            .children_with_tokens()
+            .filter_map(SyntaxElement::into_token)
+            .find(|token| {
+                matches!(
+                    token.kind(),
+                    SyntaxKind::Plus | SyntaxKind::Minus | SyntaxKind::Star | SyntaxKind::Slash,
+                )
+            })
+    }
+}
+
+#[derive(Debug)]
+pub struct IntLiteral(SyntaxNode);
+
+impl IntLiteral {
+    #[must_use]
+    pub fn cast(node: &SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::IntLiteral {
+            Some(Self(node.clone()))
+        } else {
+            None
         }
     }
 
     #[must_use]
-    pub fn tuple(types: Vec<Type>) -> Type {
-        match &types[..] {
-            [] => Type::Unit,
-            [arg] => arg.clone(),
-            _ => unsafe { Type::Tuple(NonEmpty::new_unchecked(types)) },
+    pub fn parse(&self) -> Option<u64> {
+        self.0
+            .first_token()
+            .expect("first_token will always exist")
+            .text()
+            .parse()
+            .ok()
+    }
+}
+
+#[derive(Debug)]
+pub struct FractionalLiteral(SyntaxNode);
+
+impl FractionalLiteral {
+    #[must_use]
+    pub fn cast(node: &SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::FractionalLiteral {
+            Some(Self(node.clone()))
+        } else {
+            None
         }
     }
 
     #[must_use]
-    pub fn lambda<T1, T2>(arg_type: T1, return_type: T2) -> Type
-    where
-        T1: Into<Box<Type>>,
-        T2: Into<Box<Type>>,
-    {
-        Type::Lambda {
-            arg_type: arg_type.into(),
-            return_type: return_type.into(),
+    pub fn parse(&self) -> Option<NotNan<f64>> {
+        self.0
+            .first_token()
+            .expect("first_token will always exist")
+            .text()
+            .parse()
+            .ok()
+    }
+}
+
+#[derive(Debug)]
+pub struct StringLiteral(SyntaxNode);
+
+impl StringLiteral {
+    #[must_use]
+    pub fn cast(node: &SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::StringLiteral {
+            Some(Self(node.clone()))
+        } else {
+            None
         }
     }
 
     #[must_use]
-    pub fn identifier<S>(s: S) -> Type
-    where
-        S: Into<String>,
-    {
-        Type::Identifier(s.into())
-    }
+    pub fn parse(&self) -> String {
+        let string = self
+            .0
+            .first_token()
+            .expect("first_token will always exist")
+            .text()
+            .to_string();
 
-    #[must_use]
-    pub fn variable<S>(id: S) -> Type
-    where
-        S: Into<String>,
-    {
-        Type::Variable(id.into())
-    }
-
-    pub fn bound<T>(t: T, binds: Vec<Type>) -> Type
-    where
-        T: Into<Box<Type>>,
-    {
-        Type::Bound { t: t.into(), binds }
+        string[1..string.len() - 1].to_string()
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub enum Expr {
-    Unit,
-    Identifier(String),
-    Apply(Box<Expr>, Box<Expr>),
-    OpApply(Box<Expr>, String, Box<Expr>),
-    Literal(LiteralData),
-    Lambda(Pattern, Box<Expr>),
-    // Case(Box<Expr>, NonEmpty<Alternative>),
-    IfElse(Box<Expr>, Box<Expr>, Box<Expr>),
-    Paren(Box<Expr>),
-    Tuple(NonEmpty<Expr>),
-}
+#[derive(Debug)]
+pub struct CharLiteral(SyntaxNode);
 
-impl Expr {
+impl CharLiteral {
     #[must_use]
-    pub fn string_literal<S>(s: S) -> Expr
-    where
-        S: Into<String>,
-    {
-        Expr::Literal(LiteralData::String(s.into()))
-    }
-
-    #[must_use]
-    pub fn int_literal(int: i64) -> Expr {
-        Expr::Literal(LiteralData::Integral(int))
-    }
-
-    #[must_use]
-    pub fn float_literal(float: f64) -> Expr {
-        Expr::Literal(LiteralData::fractional(float))
-    }
-
-    #[must_use]
-    pub fn char_literal(c: char) -> Expr {
-        Expr::Literal(LiteralData::Char(c))
-    }
-
-    #[must_use]
-    pub fn identifier<S>(s: S) -> Expr
-    where
-        S: Into<String>,
-    {
-        Expr::Identifier(s.into())
-    }
-
-    #[must_use]
-    pub fn lambda<A>(args: A, body: Expr) -> Expr
-    where
-        A: Into<Vec<Pattern>>,
-    {
-        args.into()
-            .into_iter()
-            .rev()
-            .fold(body, |body, arg| Expr::Lambda(arg, Box::new(body)))
-    }
-
-    #[must_use]
-    pub fn bin_op<S, E1, E2>(op: S, first: E1, second: E2) -> Expr
-    where
-        S: Into<String>,
-        E1: Into<Box<Expr>>,
-        E2: Into<Box<Expr>>,
-    {
-        Expr::OpApply(first.into(), op.into(), second.into())
-    }
-
-    // #[must_use]
-    // pub fn case<E>(expr: E, alts: Vec<Alternative>) -> Expr
-    //     where
-    //         E: Into<Box<Expr>>,
-    // {
-    //     if alts.is_empty() {
-    //         return *expr.into();
-    //     }
-    //
-    //     NonEmpty::try_from(alts)
-    //         .map(|alts| Expr::Case(expr.into(), alts))
-    //         .unwrap_or_else(|| *expr.into())
-    // }
-
-    #[must_use]
-    pub fn if_then_else<E, V1, V2>(expr: E, then_expr: V1, else_expr: V2) -> Expr
-    where
-        E: Into<Box<Expr>>,
-        V1: Into<Box<Expr>>,
-        V2: Into<Box<Expr>>,
-    {
-        Expr::IfElse(expr.into(), then_expr.into(), else_expr.into())
-    }
-
-    #[must_use]
-    pub fn application<S, E>(address: NonEmpty<S>, args: E) -> Expr
-    where
-        S: Into<String>,
-        E: Into<Vec<Expr>>,
-    {
-        let address = address.into_iter().map(Into::into).join("::");
-        let func = Expr::Identifier(address);
-
-        args.into()
-            .into_iter()
-            .fold(func, |func, arg| Expr::Apply(Box::new(func), arg.into()))
-    }
-
-    #[must_use]
-    pub fn paren<E>(expr: E) -> Expr
-    where
-        E: Into<Box<Expr>>,
-    {
-        Expr::Paren(expr.into())
-    }
-
-    #[must_use]
-    pub fn tuple<A>(args: A) -> Expr
-    where
-        A: Into<Vec<Expr>>,
-    {
-        let args = args.into();
-
-        match &args[..] {
-            [] => Expr::Unit,
-            [arg] => Expr::paren(arg.clone()),
-            _ => unsafe { Expr::Tuple(NonEmpty::new_unchecked(args)) },
+    pub fn cast(node: &SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::CharLiteral {
+            Some(Self(node.clone()))
+        } else {
+            None
         }
     }
+
+    #[must_use]
+    pub fn parse(&self) -> Option<char> {
+        self.0
+            .first_token()
+            .iter()
+            .filter(|token| token.text().len() == 3)
+            .find_map(|token| token.text().chars().nth(1))
+    }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
+#[derive(Debug)]
+pub struct IfThenElseExpr(SyntaxNode);
+
+impl IfThenElseExpr {
+    #[must_use]
+    pub fn cond(&self) -> Option<Expr> {
+        self.0
+            .children()
+            .find(|node| matches!(node.kind(), SyntaxKind::IfExpr))
+            .and_then(|parent| parent.children().find_map(Expr::cast))
+    }
+
+    #[must_use]
+    pub fn then(&self) -> Option<Expr> {
+        self.0
+            .children()
+            .find(|node| matches!(node.kind(), SyntaxKind::ThenExpr))
+            .and_then(|parent| parent.children().find_map(Expr::cast))
+    }
+
+    #[must_use]
+    pub fn else_(&self) -> Option<Expr> {
+        self.0
+            .children()
+            .find(|node| matches!(node.kind(), SyntaxKind::ElseExpr))
+            .and_then(|parent| parent.children().find_map(Expr::cast))
+    }
+}
+
+#[derive(Debug)]
+pub struct UnitExpr(SyntaxNode);
+
+impl UnitExpr {}
+
+#[derive(Debug)]
+pub struct ParenExpr(SyntaxNode);
+
+impl ParenExpr {
+    #[must_use]
+    pub fn expr(&self) -> Option<Expr> {
+        self.0.children().find_map(Expr::cast)
+    }
+}
+
+#[derive(Debug)]
+pub struct TupleExpr(SyntaxNode);
+
+impl TupleExpr {
+    #[must_use]
+    pub fn exprs(&self) -> Vec<Expr> {
+        self.0.children().filter_map(Expr::cast).collect()
+    }
+}
+
+#[derive(Debug)]
+pub struct UnaryExpr(SyntaxNode);
+
+impl UnaryExpr {
+    #[must_use]
+    pub fn expr(&self) -> Option<Expr> {
+        self.0.children().find_map(Expr::cast)
+    }
+
+    #[must_use]
+    pub fn op(&self) -> Option<SyntaxToken> {
+        self.0
+            .children_with_tokens()
+            .filter_map(SyntaxElement::into_token)
+            .find(|token| token.kind() == SyntaxKind::Minus)
+    }
+}
+
+#[derive(Debug)]
+pub struct VariableRef(SyntaxNode);
+
+impl VariableRef {
+    #[must_use]
+    pub fn name(&self) -> Option<String> {
+        self.0.first_token().map(|t| t.text().to_string())
+    }
+}
+
+#[derive(Debug)]
+pub struct LambdaExpr(SyntaxNode);
+
+impl LambdaExpr {
+    #[must_use]
+    pub fn args(&self) -> Vec<Pattern> {
+        self.0
+            .children()
+            .find(|node| matches!(node.kind(), SyntaxKind::LambdaArgList))
+            .map(|parent| {
+                parent
+                    .children()
+                    .filter_map(|c| LambdaArg::cast(&c))
+                    .filter_map(|c| c.pattern())
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+
+    #[must_use]
+    pub fn body(&self) -> Option<Expr> {
+        self.0
+            .children()
+            .find(|node| matches!(node.kind(), SyntaxKind::LambdaExprBody))
+            .and_then(|parent| parent.children().find_map(Expr::cast))
+    }
+}
+
+#[derive(Debug)]
+pub struct LambdaArg(SyntaxNode);
+
+impl LambdaArg {
+    #[must_use]
+    pub fn cast(node: &SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::LambdaArg {
+            Some(Self(node.clone()))
+        } else {
+            None
+        }
+    }
+
+    fn pattern(&self) -> Option<Pattern> {
+        self.0.children().find_map(Pattern::cast)
+    }
+}
+
+#[derive(Debug)]
 pub enum Pattern {
-    Unit,
-    Literal(LiteralData),
-    Identifier(String),
-    Tuple(NonEmpty<Pattern>),
-    // Constructor(String, NonEmpty<Pattern>),
-    // WildCard,
+    IntLiteral(IntLiteral),
+    FractionalLiteral(FractionalLiteral),
+    StringLiteral(StringLiteral),
+    CharLiteral(CharLiteral),
+    VariableRef(VariableRef),
 }
 
 impl Pattern {
     #[must_use]
-    pub fn string_literal<S>(s: S) -> Pattern
-    where
-        S: Into<String>,
-    {
-        Pattern::Literal(LiteralData::String(s.into()))
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        let result = match node.kind() {
+            SyntaxKind::IntLiteral => Self::IntLiteral(IntLiteral(node)),
+            SyntaxKind::FractionalLiteral => Self::FractionalLiteral(FractionalLiteral(node)),
+            SyntaxKind::StringLiteral => Self::StringLiteral(StringLiteral(node)),
+            SyntaxKind::CharLiteral => Self::CharLiteral(CharLiteral(node)),
+            SyntaxKind::VariableRef => Self::VariableRef(VariableRef(node)),
+            _ => return None,
+        };
+
+        Some(result)
+    }
+}
+
+#[derive(Debug)]
+pub enum Expr {
+    BinaryExpr(BinaryExpr),
+    IntLiteral(IntLiteral),
+    FractionalLiteral(FractionalLiteral),
+    StringLiteral(StringLiteral),
+    CharLiteral(CharLiteral),
+    IfThenElseExpr(IfThenElseExpr),
+    UnitExpr(UnitExpr),
+    ParenExpr(ParenExpr),
+    TupleExpr(TupleExpr),
+    UnaryExpr(UnaryExpr),
+    VariableRef(VariableRef),
+    LambdaExpr(LambdaExpr),
+}
+
+impl Expr {
+    #[must_use]
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        let result = match node.kind() {
+            SyntaxKind::InfixExpr => Self::BinaryExpr(BinaryExpr(node)),
+            SyntaxKind::IntLiteral => Self::IntLiteral(IntLiteral(node)),
+            SyntaxKind::FractionalLiteral => Self::FractionalLiteral(FractionalLiteral(node)),
+            SyntaxKind::StringLiteral => Self::StringLiteral(StringLiteral(node)),
+            SyntaxKind::CharLiteral => Self::CharLiteral(CharLiteral(node)),
+            SyntaxKind::IfThenElseExpr => Self::IfThenElseExpr(IfThenElseExpr(node)),
+            SyntaxKind::UnitExpr => Self::UnitExpr(UnitExpr(node)),
+            SyntaxKind::ParenExpr => Self::ParenExpr(ParenExpr(node)),
+            SyntaxKind::TupleExpr => Self::TupleExpr(TupleExpr(node)),
+            SyntaxKind::PrefixExpr => Self::UnaryExpr(UnaryExpr(node)),
+            SyntaxKind::VariableRef => Self::VariableRef(VariableRef(node)),
+            SyntaxKind::LambdaExprDef => Self::LambdaExpr(LambdaExpr(node)),
+            _ => return None,
+        };
+
+        Some(result)
+    }
+}
+
+//
+// Import
+//
+
+#[derive(Debug)]
+pub struct Import(SyntaxNode);
+
+impl Import {
+    #[must_use]
+    pub fn cast(node: &SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::ImportStatement {
+            Some(Self(node.clone()))
+        } else {
+            None
+        }
     }
 
     #[must_use]
-    pub fn int_literal(int: i64) -> Pattern {
-        Pattern::Literal(LiteralData::Integral(int))
+    pub fn path(&self) -> Vec<String> {
+        let (_last, rest) = Self::full_path(self);
+
+        rest.into_iter()
+            .filter_map(|child| {
+                if let ImportChild::Segment(segment) = child {
+                    segment.name()
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>()
     }
 
     #[must_use]
-    pub fn float_literal(float: f64) -> Pattern {
-        Pattern::Literal(LiteralData::fractional(float))
+    pub fn targets(&self) -> Vec<String> {
+        let (last, _) = Self::full_path(self);
+
+        match last {
+            ImportChild::Segment(segment) => vec![segment.name().unwrap()],
+            ImportChild::Group(group) => group.names(),
+        }
     }
 
-    #[must_use]
-    pub fn char_literal(c: char) -> Pattern {
-        Pattern::Literal(LiteralData::Char(c))
+    fn full_path(&self) -> (ImportChild, Vec<ImportChild>) {
+        let mut full_path = self
+            .0
+            .children()
+            .filter_map(ImportChild::cast)
+            .collect::<Vec<_>>();
+
+        let last = full_path.pop().unwrap();
+
+        (last, full_path)
     }
+}
 
+#[derive(Debug)]
+pub enum ImportChild {
+    Segment(ImportChildSegment),
+    Group(ImportChildGroup),
+}
+
+impl ImportChild {
     #[must_use]
-    pub fn identifier<S>(s: S) -> Pattern
-    where
-        S: Into<String>,
-    {
-        Pattern::Identifier(s.into())
-    }
-
-    #[must_use]
-    pub fn tuple<A>(args: A) -> Pattern
-    where
-        A: Into<Vec<Pattern>>,
-    {
-        let args = args.into();
-
-        match &args[..] {
-            [] => Pattern::Unit,
-            [arg] => arg.clone(),
-            _ => unsafe { Pattern::Tuple(NonEmpty::new_unchecked(args)) },
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::ImportStatementSegment {
+            Some(Self::Segment(ImportChildSegment(node)))
+        } else if node.kind() == SyntaxKind::ImportStatementGroup {
+            Some(Self::Group(ImportChildGroup(node)))
+        } else {
+            None
         }
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Hash, Ord, PartialOrd)]
-pub enum LiteralData {
-    Integral(i64),
-    Fractional(NotNan<f64>),
-    String(String),
-    Char(char),
-}
+#[derive(Debug)]
+pub struct ImportChildSegment(SyntaxNode);
 
-impl LiteralData {
+impl ImportChildSegment {
     #[must_use]
-    pub fn fractional(val: f64) -> Self {
-        unsafe { LiteralData::Fractional(NotNan::new_unchecked(val)) }
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::ImportStatementSegment {
+            Some(ImportChildSegment(node))
+        } else {
+            None
+        }
+    }
+
+    fn name(&self) -> Option<String> {
+        self.0
+            .children_with_tokens()
+            .filter_map(SyntaxElement::into_token)
+            .find(|ct| ct.kind() == SyntaxKind::Ident)
+            .map(|token| token.text().into())
     }
 }
 
-#[cfg(test)]
-mod ast_tests {
-    use pretty_assertions::{assert_eq, assert_ne};
+#[derive(Debug)]
+pub struct ImportChildGroup(SyntaxNode);
+
+impl ImportChildGroup {
+    fn names(&self) -> Vec<String> {
+        self.0
+            .children()
+            .filter_map(ImportChildSegment::cast)
+            .filter_map(|token| token.name())
+            .collect()
+    }
+}
+
+//
+// Trait
+//
+
+#[derive(Debug)]
+pub struct Trait(SyntaxNode);
+
+impl Trait {
+    #[must_use]
+    pub fn cast(node: &SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::TraitDef {
+            Some(Self(node.clone()))
+        } else {
+            None
+        }
+    }
+
+    #[must_use]
+    pub fn name(&self) -> Option<String> {
+        self.0
+            .children_with_tokens()
+            .filter_map(SyntaxElement::into_token)
+            .find(|token| token.kind() == SyntaxKind::Ident)
+            .map(|token| token.text().into())
+    }
+
+    #[must_use]
+    pub fn members(&self) -> Vec<TraitMember> {
+        self.0.children().filter_map(TraitMember::cast).collect()
+    }
+}
+
+//
+// Trait Members
+//
+
+#[derive(Debug)]
+pub enum TraitMember {
+    TypeAnnotation(TypeAnnotation),
+}
+
+impl TraitMember {
+    #[must_use]
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::TypeAnnotation {
+            Some(Self::TypeAnnotation(TypeAnnotation(node)))
+        } else {
+            None
+        }
+    }
+}
+
+//
+// Type Annotation
+//
+
+#[derive(Debug)]
+pub struct TypeAnnotation(SyntaxNode);
+
+impl TypeAnnotation {
+    #[must_use]
+    pub fn name(&self) -> Option<String> {
+        self.0
+            .children_with_tokens()
+            .filter_map(SyntaxElement::into_token)
+            .find(|token| token.kind() == SyntaxKind::Ident)
+            .map(|token| token.text().into())
+    }
+
+    #[must_use]
+    pub fn t(&self) -> Option<Type> {
+        self.0.children().find_map(Type::cast)
+    }
+}
+
+#[derive(Debug)]
+pub enum Type {
+    SelfRef,
+    Identifier(TypeIdentifier),
+    Lambda(LambdaType),
+}
+
+impl Type {
+    #[must_use]
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        match node.kind() {
+            SyntaxKind::SelfType => Some(Self::SelfRef),
+            SyntaxKind::TypeIdentifier => Some(Self::Identifier(TypeIdentifier(node))),
+            SyntaxKind::LambdaType => Some(Self::Lambda(LambdaType(node))),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct TypeIdentifier(SyntaxNode);
+
+impl TypeIdentifier {
+    #[must_use]
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::TypeIdentifier {
+            Some(Self(node))
+        } else {
+            None
+        }
+    }
+
+    #[must_use]
+    pub fn name(&self) -> Option<String> {
+        self.0
+            .children_with_tokens()
+            .filter_map(SyntaxElement::into_token)
+            .find(|token| token.kind() == SyntaxKind::Ident)
+            .map(|token| token.text().into())
+    }
+}
+
+#[derive(Debug)]
+pub struct LambdaType(SyntaxNode);
+
+impl LambdaType {
+    #[must_use]
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::LambdaType {
+            Some(Self(node))
+        } else {
+            None
+        }
+    }
+
+    #[must_use]
+    pub fn arg_type(&self) -> Option<Type> {
+        self.0.children().find_map(Type::cast)
+    }
+
+    #[must_use]
+    pub fn return_type(&self) -> Option<Type> {
+        self.0.children().filter_map(Type::cast).nth(1)
+    }
+}
+
+//
+// Statement
+//
+
+#[derive(Debug)]
+pub enum Stmt {
+    VariableDef(VariableDef),
+    Expr(Expr),
+    Import(Import),
+    Trait(Trait),
+}
+
+impl Stmt {
+    #[must_use]
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        let result = match node.kind() {
+            SyntaxKind::VariableDef => Self::VariableDef(VariableDef(node)),
+            SyntaxKind::ImportStatement => Self::Import(Import(node)),
+            SyntaxKind::TraitDef => Self::Trait(Trait(node)),
+            _ => Self::Expr(Expr::cast(node)?),
+        };
+
+        Some(result)
+    }
+}
+
+#[derive(Debug)]
+pub struct SourceFile(SyntaxNode);
+
+impl SourceFile {
+    #[must_use]
+    pub fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::SourceFile {
+            Some(Self(node))
+        } else {
+            None
+        }
+    }
+}
+
+impl SourceFile {
+    pub fn stmts(&self) -> impl Iterator<Item = Stmt> {
+        self.0.children().filter_map(Stmt::cast)
+    }
 }

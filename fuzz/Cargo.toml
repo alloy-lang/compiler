@@ -15,7 +15,7 @@ name = "main"
 path = "fuzz_targets/main.rs"
 
 [dependencies]
-alloy_rowan_ast = {path = "../compiler/rowan/ast"}
-alloy_rowan_hir = {path = "../compiler/rowan/hir"}
-alloy_rowan_parser = {path = "../compiler/rowan/parser"}
+alloy_ast = {path = "../compiler/rowan/ast"}
+alloy_hir = {path = "../compiler/rowan/hir"}
+alloy_parser = {path = "../compiler/rowan/parser"}
 libfuzzer-sys = "0.3"

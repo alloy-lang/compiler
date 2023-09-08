@@ -1,11 +1,11 @@
 extern crate dirs;
 
-use alloy_rowan_parser::parse;
+use alloy_compiler::parser::parse;
 use nu_ansi_term::{Color as AnsiColor, Style};
 use std::path::PathBuf;
 
 use reedline::{
-    default_emacs_keybindings, Color, ColumnarMenu, DefaultCompleter, DefaultHinter, DefaultPrompt,
+    default_emacs_keybindings, ColumnarMenu, DefaultCompleter, DefaultHinter, DefaultPrompt,
     DefaultPromptSegment, EditCommand, Emacs, ExampleHighlighter, FileBackedHistory, KeyCode,
     KeyModifiers, Reedline, ReedlineEvent, ReedlineMenu, Signal,
 };
@@ -81,16 +81,14 @@ fn reedline_repl() {
 
                     let syntax = parse.syntax();
 
-                    for error in alloy_rowan_ast::validation::validate(&syntax) {
+                    for error in alloy_ast::validation::validate(&syntax) {
                         println!("{}", error);
                     }
 
-                    let source_file = alloy_rowan_ast::SourceFile::cast(syntax).unwrap();
+                    let source_file = alloy_ast::SourceFile::cast(syntax).unwrap();
 
-                    let ast_statements = source_file
-                        .stmts()
-                        .collect::<Vec<_>>();
-                    let hir_statements = alloy_rowan_hir::lower(&source_file);
+                    let ast_statements = source_file.stmts().collect::<Vec<_>>();
+                    let hir_statements = alloy_hir::lower(&source_file);
 
                     dbg!(ast_statements);
                     dbg!(hir_statements);

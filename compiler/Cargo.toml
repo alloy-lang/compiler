@@ -1,5 +1,5 @@
 [package]
-name = "compiler"
+name = "alloy_compiler"
 version = "0.1.0"
 authors = ["theochupp <tclchiam@gmail.com>"]
 edition = "2018"
@@ -7,20 +7,6 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-#cranelift = "0.73.0"
-#cranelift-module = "0.73.0"
-#cranelift-jit = "0.73.0"
-non-empty-vec = "0.2"
-peg = { git = "https://github.com/kevinmehall/rust-peg" }
-itertools = "0.11"
-linked_hash_set = "0.1.4"
-linked-hash-map = "0.5.4"
-rowan = "0.15"
-
-[dev-dependencies]
-wasmtime = "0.38.1"
-pretty_assertions = "1.2.1"
-test_source = { path = "../test_source" }
-
-[features]
-trace = ["peg/trace"]
+alloy_lexer = { path = "./lexer" }
+alloy_parser = { path = "./parser" }
+alloy_syntax = { path = "./syntax" }

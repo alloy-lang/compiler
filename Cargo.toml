@@ -2,14 +2,9 @@
 members = [
     "compiler",
     "compiler/ast",
+    "compiler/hir",
     "compiler/lexer",
     "compiler/parser",
-    "compiler/rowan",
-    "compiler/rowan/ast",
-    "compiler/rowan/hir",
-    "compiler/rowan/lexer",
-    "compiler/rowan/parser",
-    "compiler/rowan/syntax",
+    "compiler/syntax",
     "smith/repl",
-    "test_source",
 ]

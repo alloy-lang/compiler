@@ -1,13 +1,16 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [package]
-name = "alloy_lexer"
+name = "alloy_hir"
 version = "0.1.0"
 authors = ["theochupp <tclchiam@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-logos = "0.12"
-text-size = "1.1"
+alloy_ast = { path = "../ast" }
+alloy_syntax = { path = "../syntax" }
+la-arena = "0.2"
+non-empty-vec = "0.2"
+ordered-float = "3.0"
 
 [dev-dependencies]
-maplit = "1.0"
+alloy_parser = {path = "../parser"}
