@@ -18,10 +18,28 @@ pub(crate) fn parse_type_definition(p: &mut Parser) -> CompletedMarker {
 
     parse_type_definition_member(p);
 
-    m.complete(p, SyntaxKind::TypeDef)
+    loop {
+        if should_stop(p) {
+            break;
+        }
+
+        p.expect_with_recovery(TokenKind::Pipe, ParseErrorContext::TypeDefMemberPipe, ts![]);
+
+        parse_type_definition_member(p);
+    }
+
+    return m.complete(p, SyntaxKind::TypeDef);
+
+    fn should_stop(p: &mut Parser) -> bool {
+        !p.maybe_at(TokenKind::Pipe) || p.at_end()
+    }
 }
 
 fn parse_type_definition_member(p: &mut Parser) -> CompletedMarker {
+    if p.maybe_at(TokenKind::Pipe) {
+        p.bump();
+    }
+
     let m = p.start();
     p.expect_with_recovery(
         TokenKind::Ident,

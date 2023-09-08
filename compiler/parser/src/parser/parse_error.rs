@@ -60,6 +60,7 @@ pub(crate) enum ParseErrorContext {
     TypeDefName,
     TypeDefEquals,
     TypeDefMemberName,
+    TypeDefMemberPipe,
     UnitTypeRightParen,
     ParenthesizedTypeRightParen,
     TupleTypeRightParen,
@@ -225,6 +226,7 @@ impl ParseErrorContext {
             ParseErrorContext::TypeDefName => todo!(),
             ParseErrorContext::TypeDefEquals => todo!(),
             ParseErrorContext::TypeDefMemberName => todo!(),
+            ParseErrorContext::TypeDefMemberPipe => todo!(),
             ParseErrorContext::UnitTypeRightParen => "the right parenthesis of a unit type",
             ParseErrorContext::ParenthesizedTypeRightParen => {
                 "the right parenthesis of a parenthesized type"
