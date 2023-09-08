@@ -57,7 +57,7 @@ fn parse_generic_type_variable(p: &mut Parser, parent_recovery_set: TokenSet) ->
         parent_recovery_set,
     );
 
-    if p.at(TokenKind::Equals) {
+    if p.maybe_at(TokenKind::Equals) {
         p.bump();
 
         type_variable::parse_typevar_constraints(p);
@@ -66,7 +66,7 @@ fn parse_generic_type_variable(p: &mut Parser, parent_recovery_set: TokenSet) ->
     m.complete(p, SyntaxKind::TypeVariable)
 }
 
-fn parse_type(
+pub(crate) fn parse_type(
     p: &mut Parser,
     single_type_recovery_set: TokenSet,
     parent_recovery_set: TokenSet,

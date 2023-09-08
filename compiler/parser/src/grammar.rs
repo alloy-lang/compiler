@@ -18,6 +18,7 @@ mod path;
 mod stmt;
 mod r#trait;
 mod r#type;
+mod type_definition;
 mod type_variable;
 
 pub(crate) fn source_file(p: &mut Parser) -> CompletedMarker {
