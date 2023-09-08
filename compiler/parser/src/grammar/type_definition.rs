@@ -28,6 +28,10 @@ pub(crate) fn parse_type_definition(p: &mut Parser) -> CompletedMarker {
         parse_type_definition_member(p);
     }
 
+    if p.maybe_at(TokenKind::EndKw) {
+        p.bump();
+    }
+
     return m.complete(p, SyntaxKind::TypeDef);
 
     fn should_stop(p: &mut Parser) -> bool {
