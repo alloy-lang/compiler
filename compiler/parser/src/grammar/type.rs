@@ -14,7 +14,7 @@ pub(crate) fn parse_type_annotation(
     p.expect_with_recovery(
         TokenKind::Colon,
         ParseErrorContext::TypeOfColon,
-        ts![TokenKind::Ident],
+        SINGLE_TYPE_RECOVERY_SET,
     );
 
     parse_type(p, TokenSet::EMPTY, parent_recovery_set);
