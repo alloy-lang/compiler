@@ -239,7 +239,7 @@ fn parse_function_call(p: &mut Parser) -> CompletedMarker {
     return paren_m.complete(p, SyntaxKind::FunctionCallArgList);
 
     fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(DEFAULT_RECOVERY_SET.plus(TokenKind::RParen)) || p.at_end()
+        p.maybe_at(TokenKind::RParen) || p.at_top_level_token() || p.at_end()
     }
 }
 

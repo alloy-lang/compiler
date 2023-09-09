@@ -67,6 +67,11 @@ impl<'t, 'input> Parser<'t, 'input> {
         self.peek().map_or(false, |k| set.contains(k))
     }
 
+    pub(crate) fn at_top_level_token(&mut self) -> bool {
+        self.peek()
+            .map_or(false, |k| DEFAULT_RECOVERY_SET.contains(k))
+    }
+
     pub(crate) fn at_end(&mut self) -> bool {
         self.peek().is_none()
     }
