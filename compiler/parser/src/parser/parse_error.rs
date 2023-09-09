@@ -223,9 +223,9 @@ impl ParseErrorContext {
             }
             ParseErrorContext::TypeOfName => "the name of a type",
             ParseErrorContext::TypeOfColon => "the colon after the name of a type",
-            ParseErrorContext::TypeDefName => todo!(),
-            ParseErrorContext::TypeDefEquals => todo!(),
-            ParseErrorContext::TypeDefMemberName => todo!(),
+            ParseErrorContext::TypeDefName => "the name in a type definition",
+            ParseErrorContext::TypeDefEquals => "the equals sign in a type definition",
+            ParseErrorContext::TypeDefMemberName => "the name of a type definition member",
             ParseErrorContext::TypeDefMemberPipe => todo!(),
             ParseErrorContext::UnitTypeRightParen => "the right parenthesis of a unit type",
             ParseErrorContext::ParenthesizedTypeRightParen => {

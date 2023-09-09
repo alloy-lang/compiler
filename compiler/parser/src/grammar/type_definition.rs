@@ -19,7 +19,11 @@ pub(crate) fn parse_type_definition(p: &mut Parser) -> CompletedMarker {
         parse_type_definition_bounds(p);
     }
 
-    p.expect_with_recovery(TokenKind::Equals, ParseErrorContext::TypeDefEquals, ts![]);
+    p.expect_with_recovery(
+        TokenKind::Equals,
+        ParseErrorContext::TypeDefEquals,
+        ts![TokenKind::Ident],
+    );
 
     parse_type_definition_members(p);
 
@@ -67,7 +71,7 @@ fn parse_type_definition_members(p: &mut Parser) {
     return;
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.maybe_at(TokenKind::Pipe) || p.at_end()
+        !p.maybe_at(TokenKind::Pipe) || p.at_top_level_token() || p.at_end()
     }
 }
 
@@ -80,7 +84,7 @@ fn parse_type_definition_member(p: &mut Parser) -> CompletedMarker {
     p.expect_with_recovery(
         TokenKind::Ident,
         ParseErrorContext::TypeDefMemberName,
-        ts![],
+        ts![TokenKind::Pipe],
     );
 
     loop {
@@ -89,13 +93,13 @@ fn parse_type_definition_member(p: &mut Parser) -> CompletedMarker {
         }
 
         let m = p.start();
-        r#type::parse_type(p, TokenSet::EMPTY, ts![]);
+        r#type::parse_type(p, ts![], ts![]);
         m.complete(p, SyntaxKind::TypeDefMemberProperty);
     }
 
     return m.complete(p, SyntaxKind::TypeDefMember);
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(TYPEDEF_MEMBER_PROPERTY_FIRSTS) || p.at_end()
+        !p.at_set(TYPEDEF_MEMBER_PROPERTY_FIRSTS) || p.at_top_level_token() || p.at_end()
     }
 }

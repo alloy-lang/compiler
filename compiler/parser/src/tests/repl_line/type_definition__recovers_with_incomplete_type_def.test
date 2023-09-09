@@ -1,0 +1,21 @@
+typedef Test1
+typedef Test2 = Empty
+===
+SourceFile@0..35
+  TypeDef@0..14
+    TypedefKw@0..7 "typedef"
+    Whitespace@7..8 " "
+    Ident@8..13 "Test1"
+    Whitespace@13..14 "\n"
+    TypeDefMember@14..14
+  TypeDef@14..35
+    TypedefKw@14..21 "typedef"
+    Whitespace@21..22 " "
+    Ident@22..27 "Test2"
+    Whitespace@27..28 " "
+    Equals@28..29 "="
+    Whitespace@29..30 " "
+    TypeDefMember@30..35
+      Ident@30..35 "Empty"
+error at position 14 while parsing the equals sign in a type definition. Missing expected ‘=’
+error at position 14 while parsing the name of a type definition member. Missing expected identifier

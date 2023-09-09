@@ -1,0 +1,22 @@
+typedef Test1   Empty
+typedef Test2 = Empty
+===
+SourceFile@0..43
+  TypeDef@0..22
+    TypedefKw@0..7 "typedef"
+    Whitespace@7..8 " "
+    Ident@8..13 "Test1"
+    Whitespace@13..16 "   "
+    TypeDefMember@16..22
+      Ident@16..21 "Empty"
+      Whitespace@21..22 "\n"
+  TypeDef@22..43
+    TypedefKw@22..29 "typedef"
+    Whitespace@29..30 " "
+    Ident@30..35 "Test2"
+    Whitespace@35..36 " "
+    Equals@36..37 "="
+    Whitespace@37..38 " "
+    TypeDefMember@38..43
+      Ident@38..43 "Empty"
+error at position 16 while parsing the equals sign in a type definition. Missing expected ‘=’

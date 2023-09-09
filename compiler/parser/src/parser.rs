@@ -23,6 +23,7 @@ pub(crate) const DEFAULT_RECOVERY_SET: TokenSet = TokenSet::new([
     TokenKind::ImportKw,
     TokenKind::TraitKw,
     TokenKind::TypeOfKw,
+    TokenKind::TypedefKw,
 ]);
 
 pub(crate) struct Parser<'t, 'input> {
