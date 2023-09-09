@@ -1,0 +1,30 @@
+trait TestTrait1 where
+    self
+
+    typeof distraction : String
+end
+===
+SourceFile@0..68
+  TraitDef@0..68
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    TypeVariable@27..37
+      SelfKw@27..31 "self"
+      Whitespace@31..37 "\n\n    "
+    TypeAnnotation@37..65
+      TypeOfKw@37..43 "typeof"
+      Whitespace@43..44 " "
+      Ident@44..55 "distraction"
+      Whitespace@55..56 " "
+      Colon@56..57 ":"
+      Whitespace@57..58 " "
+      TypeIdentifier@58..65
+        Ident@58..64 "String"
+        Whitespace@64..65 "\n"
+    EndKw@65..68 "end"
+error at position 37 while parsing the equals sign in a trait `self` constraint. Missing expected ‘=’
+error at position 37 while parsing the constraints for a type variable. Missing expected ‘#’ or identifier

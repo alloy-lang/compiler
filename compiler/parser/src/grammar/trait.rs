@@ -1,3 +1,4 @@
+use crate::grammar::type_variable::TYPEVAR_CONSTRAINT_FIRSTS;
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
@@ -84,7 +85,7 @@ fn parse_trait_self(p: &mut Parser) -> CompletedMarker {
     p.expect_with_recovery(
         TokenKind::Equals,
         ParseErrorContext::TraitSelfConstraintsEquals,
-        TRAIT_RECOVERY_SET,
+        TRAIT_RECOVERY_SET.union(TYPEVAR_CONSTRAINT_FIRSTS),
     );
 
     type_variable::parse_typevar_constraints(p);

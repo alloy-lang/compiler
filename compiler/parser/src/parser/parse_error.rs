@@ -234,7 +234,7 @@ impl ParseErrorContext {
             ParseErrorContext::TupleTypeRightParen => "the right parenthesis of a tuple type",
             ParseErrorContext::SingleType => "the type of a type annotation",
             ParseErrorContext::TypeVariableName => "the name of a type variable",
-            ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
+            ParseErrorContext::TraitSelfConstraintsEquals => "the equals sign in a trait `self` constraint",
             ParseErrorContext::TypeVariableConstraint => "the constraints for a type variable",
             ParseErrorContext::TypeVariableConstraintPlus => "the plus between type constraints",
             ParseErrorContext::TypeVariableTraitConstraint => {

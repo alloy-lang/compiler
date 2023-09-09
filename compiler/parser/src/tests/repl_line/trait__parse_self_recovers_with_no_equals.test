@@ -1,0 +1,22 @@
+trait TestTrait1 where
+    self functor::Functor
+end
+===
+SourceFile@0..52
+  TraitDef@0..52
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    TypeVariable@27..49
+      SelfKw@27..31 "self"
+      Whitespace@31..32 " "
+      TypeVariableTraitConstraint@32..49
+        Ident@32..39 "functor"
+        DoubleColon@39..41 "::"
+        Ident@41..48 "Functor"
+        Whitespace@48..49 "\n"
+    EndKw@49..52 "end"
+error at position 32 while parsing the equals sign in a trait `self` constraint. Missing expected ‘=’
