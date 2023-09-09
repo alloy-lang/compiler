@@ -1,0 +1,17 @@
+trait TestTrait1 where
+    typevar t1 =
+end
+===
+SourceFile@0..38
+  TraitDef@0..38
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    TypeVariable@27..35
+      TypevarKw@27..34 "typevar"
+      Whitespace@34..35 "\n"
+    EndKw@35..38 "end"
+error at position 35 while parsing the name of a type variable. Missing expected identifier

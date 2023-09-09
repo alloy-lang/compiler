@@ -1,7 +1,7 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-const TYPEVAR_CONSTRAINT_FIRSTS: TokenSet =
+pub(crate) const TYPEVAR_CONSTRAINT_FIRSTS: TokenSet =
     TokenSet::new([TokenKind::Hash, TokenKind::Ident, TokenKind::Plus]);
 
 pub(crate) fn parse_typevar_constraints(p: &mut Parser) {
@@ -34,7 +34,7 @@ fn parse_typevar_constraint(p: &mut Parser) {
     } else {
         p.error_with_recovery(
             ParseErrorContext::TypeVariableConstraint,
-            ts![TokenKind::TypevarKw],
+            ts![TokenKind::TypevarKw, TokenKind::EndKw],
         );
     }
 }
