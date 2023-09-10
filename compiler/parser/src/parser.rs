@@ -73,7 +73,7 @@ impl<'t, 'input> Parser<'t, 'input> {
             .map_or(false, |k| DEFAULT_RECOVERY_SET.contains(k))
     }
 
-    pub(crate) fn at_end(&mut self) -> bool {
+    pub(crate) fn at_eof(&mut self) -> bool {
         self.peek().is_none()
     }
 
@@ -162,7 +162,7 @@ impl<'t, 'input> Parser<'t, 'input> {
             context,
         }));
 
-        if !self.at_set(recovery_set) && !self.at_end() {
+        if !self.at_set(recovery_set) && !self.at_eof() {
             let m = self.start();
             self.bump();
             return Some(m.complete(self, SyntaxKind::Error));

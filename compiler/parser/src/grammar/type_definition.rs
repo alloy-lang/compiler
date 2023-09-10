@@ -43,7 +43,7 @@ fn parse_type_definition_bounds(p: &mut Parser) {
         r#type::parse_type(p, ts![], ts![TokenKind::RAngle]);
         m.complete(p, SyntaxKind::BoundedTypeArg);
 
-        if !p.at_set(ts![TokenKind::Comma]) || p.at_end() {
+        if !p.at_set(ts![TokenKind::Comma]) || p.at_eof() {
             break;
         }
 
@@ -71,7 +71,7 @@ fn parse_type_definition_members(p: &mut Parser) {
     return;
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.maybe_at(TokenKind::Pipe) || p.at_top_level_token() || p.at_end()
+        !p.maybe_at(TokenKind::Pipe) || p.at_top_level_token() || p.at_eof()
     }
 }
 
@@ -100,6 +100,6 @@ fn parse_type_definition_member(p: &mut Parser) -> CompletedMarker {
     return m.complete(p, SyntaxKind::TypeDefMember);
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(TYPEDEF_MEMBER_PROPERTY_FIRSTS) || p.at_top_level_token() || p.at_end()
+        !p.at_set(TYPEDEF_MEMBER_PROPERTY_FIRSTS) || p.at_top_level_token() || p.at_eof()
     }
 }

@@ -24,7 +24,7 @@ mod type_variable;
 pub(crate) fn source_file(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
 
-    while !p.at_end() {
+    while !p.at_eof() {
         if p.at(TokenKind::ModuleKw) {
             module::parse_module(p);
         } else {

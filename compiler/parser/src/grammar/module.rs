@@ -14,7 +14,7 @@ pub(crate) fn parse_module(p: &mut Parser) -> CompletedMarker {
     );
     p.expect(TokenKind::WhereKw, ParseErrorContext::ModuleWhere);
 
-    while !p.at_end() && stmt::stmt(p).is_some() {
+    while !p.at_eof() && stmt::stmt(p).is_some() {
         // continue
     }
 

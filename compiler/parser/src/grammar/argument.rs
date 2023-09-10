@@ -95,6 +95,6 @@ fn parse_tuple_arg(p: &mut Parser) -> CompletedMarker {
     return paren_m.complete(p, kind);
 
     fn should_stop(p: &mut Parser) -> bool {
-        p.maybe_at(TokenKind::RParen) || p.at_end()
+        p.maybe_at(TokenKind::RParen) || p.at_eof()
     }
 }

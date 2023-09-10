@@ -41,7 +41,7 @@ fn parse_type_annotation_type_variables(p: &mut Parser, parent_recovery_set: Tok
     return;
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.maybe_at(TokenKind::TypevarKw) || p.at_end()
+        !p.maybe_at(TokenKind::TypevarKw) || p.at_eof()
     }
 }
 
@@ -174,7 +174,7 @@ fn parse_parenthesized_type(p: &mut Parser, parent_recovery_set: TokenSet) -> Co
     };
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(ts![TokenKind::Comma]) || p.at_end()
+        !p.at_set(ts![TokenKind::Comma]) || p.at_eof()
     }
 }
 
@@ -231,6 +231,6 @@ fn parse_bounded_type_args(p: &mut Parser, parent_recovery_set: TokenSet) {
     return;
 
     fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(ts![TokenKind::RAngle, TokenKind::WhereKw]) || p.at_end()
+        p.at_set(ts![TokenKind::RAngle, TokenKind::WhereKw]) || p.at_eof()
     }
 }

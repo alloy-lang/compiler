@@ -239,7 +239,7 @@ fn parse_function_call(p: &mut Parser) -> CompletedMarker {
     return paren_m.complete(p, SyntaxKind::FunctionCallArgList);
 
     fn should_stop(p: &mut Parser) -> bool {
-        p.maybe_at(TokenKind::RParen) || p.at_top_level_token() || p.at_end()
+        p.maybe_at(TokenKind::RParen) || p.at_top_level_token() || p.at_eof()
     }
 }
 
@@ -325,7 +325,7 @@ fn parse_match_when_expr(p: &mut Parser) -> CompletedMarker {
 
         when_m.complete(p, SyntaxKind::MatchTarget);
 
-        if !p.at(TokenKind::Pipe) || p.at_end() {
+        if !p.at(TokenKind::Pipe) || p.at_eof() {
             break;
         }
     }
@@ -390,6 +390,6 @@ fn parse_paren_expr(p: &mut Parser) -> CompletedMarker {
     return paren_m.complete(p, kind);
 
     fn should_stop(p: &mut Parser) -> bool {
-        p.maybe_at(TokenKind::RParen) || p.at_end()
+        p.maybe_at(TokenKind::RParen) || p.at_eof()
     }
 }

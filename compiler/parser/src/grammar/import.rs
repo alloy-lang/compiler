@@ -34,7 +34,7 @@ pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
     return m.complete(p, SyntaxKind::ImportStatement);
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(IMPORT_RECOVERY_SET.plus(TokenKind::DoubleColon)) || p.at_end()
+        !p.at_set(IMPORT_RECOVERY_SET.plus(TokenKind::DoubleColon)) || p.at_eof()
     }
 }
 
@@ -69,7 +69,7 @@ fn parse_import_group(p: &mut Parser) -> CompletedMarker {
     return m.complete(p, SyntaxKind::ImportStatementGroup);
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(ts![TokenKind::Comma, TokenKind::Ident]) || p.at_end()
+        !p.at_set(ts![TokenKind::Comma, TokenKind::Ident]) || p.at_eof()
     }
 }
 

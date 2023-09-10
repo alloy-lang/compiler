@@ -22,7 +22,7 @@ pub(crate) fn parse_typevar_constraints(p: &mut Parser) {
     return;
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(TYPEVAR_CONSTRAINT_FIRSTS) || p.at_end()
+        !p.at_set(TYPEVAR_CONSTRAINT_FIRSTS) || p.at_eof()
     }
 }
 
@@ -114,7 +114,7 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
     return m.complete(p, SyntaxKind::TypeVariableKindConstraint);
 
     fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(ts![TokenKind::RAngle]) || p.at_end()
+        p.at_set(ts![TokenKind::RAngle]) || p.at_eof()
     }
 }
 

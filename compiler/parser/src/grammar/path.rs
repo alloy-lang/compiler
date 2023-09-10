@@ -24,6 +24,6 @@ pub(super) fn parse_path(
     return m.complete(p, kind);
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(ts![TokenKind::DoubleColon, TokenKind::Colon]) || p.at_end()
+        !p.at_set(ts![TokenKind::DoubleColon, TokenKind::Colon]) || p.at_eof()
     }
 }
