@@ -15,6 +15,17 @@ pub(crate) fn parse_type_definition(p: &mut Parser) -> CompletedMarker {
         ts![TokenKind::Equals],
     );
 
+    if p.maybe_at(TokenKind::ClosedAngle) {
+        // this is a bit of a hack to allow better error reporting for empty generic constraints
+        // 'ClosedAngle' is necessary because otherwise `<>` would be parsed as an OperatorIdentifier
+        p.expect_with_recovery(
+            TokenKind::Ident,
+            ParseErrorContext::TypeDefGenericConstraintName,
+            ts![TokenKind::Equals, TokenKind::ClosedAngle],
+        );
+        p.bump();
+    }
+
     if p.maybe_at(TokenKind::LAngle) {
         parse_type_definition_bounds(p);
     }

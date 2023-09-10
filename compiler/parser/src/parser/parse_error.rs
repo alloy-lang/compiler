@@ -61,6 +61,7 @@ pub(crate) enum ParseErrorContext {
     TypeDefEquals,
     TypeDefMemberName,
     TypeDefMemberPipe,
+    TypeDefGenericConstraintName,
     UnitTypeRightParen,
     ParenthesizedTypeRightParen,
     TupleTypeRightParen,
@@ -77,6 +78,7 @@ pub(crate) enum ParseErrorContext {
     TypeVariableKindConstraintRAngle,
     BoundedTypeLAngle,
     BoundedTypeComma,
+    BoundedTypeName,
     BoundedTypeRAngle,
     TopLevelExpr,
 }
@@ -227,6 +229,9 @@ impl ParseErrorContext {
             ParseErrorContext::TypeDefEquals => "the equals sign in a type definition",
             ParseErrorContext::TypeDefMemberName => "the name of a type definition member",
             ParseErrorContext::TypeDefMemberPipe => todo!(),
+            ParseErrorContext::TypeDefGenericConstraintName => {
+                "a generic constraint in a type definition"
+            }
             ParseErrorContext::UnitTypeRightParen => "the right parenthesis of a unit type",
             ParseErrorContext::ParenthesizedTypeRightParen => {
                 "the right parenthesis of a parenthesized type"
@@ -234,7 +239,9 @@ impl ParseErrorContext {
             ParseErrorContext::TupleTypeRightParen => "the right parenthesis of a tuple type",
             ParseErrorContext::SingleType => "the type of a type annotation",
             ParseErrorContext::TypeVariableName => "the name of a type variable",
-            ParseErrorContext::TraitSelfConstraintsEquals => "the equals sign in a trait `self` constraint",
+            ParseErrorContext::TraitSelfConstraintsEquals => {
+                "the equals sign in a trait `self` constraint"
+            }
             ParseErrorContext::TypeVariableConstraint => "the constraints for a type variable",
             ParseErrorContext::TypeVariableConstraintPlus => "the plus between type constraints",
             ParseErrorContext::TypeVariableTraitConstraint => {
@@ -256,6 +263,7 @@ impl ParseErrorContext {
             ParseErrorContext::BoundedTypeLAngle => "the < at the start of a bounded type",
             ParseErrorContext::BoundedTypeComma => "the comma between arguments in a bounded type",
             ParseErrorContext::BoundedTypeRAngle => "the > at the end of a bounded type",
+            ParseErrorContext::BoundedTypeName => todo!(),
             ParseErrorContext::TopLevelExpr => "a top level expression",
         }
     }
