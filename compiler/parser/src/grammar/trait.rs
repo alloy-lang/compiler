@@ -1,6 +1,6 @@
-use crate::grammar::type_variable::TYPEVAR_CONSTRAINT_FIRSTS;
 #[allow(clippy::wildcard_imports)]
 use super::*;
+use crate::grammar::type_variable::TYPEVAR_CONSTRAINT_FIRSTS;
 
 const TRAIT_RECOVERY_SET: TokenSet = TokenSet::new([TokenKind::TypevarKw, TokenKind::EndKw]);
 

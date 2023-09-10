@@ -7,13 +7,11 @@ SourceFile@0..34
     Ident@8..12 "Test"
     LAngle@12..13 "<"
     BoundedTypeArg@13..15
-      TypeIdentifier@13..15
-        Ident@13..15 "t1"
+      Ident@13..15 "t1"
     Comma@15..16 ","
     Whitespace@16..17 " "
     BoundedTypeArg@17..19
-      TypeIdentifier@17..19
-        Ident@17..19 "t2"
+      Ident@17..19 "t2"
     RAngle@19..20 ">"
     Whitespace@20..21 " "
     Equals@21..22 "="
