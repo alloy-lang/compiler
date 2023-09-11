@@ -1,71 +1,6 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-pub(crate) fn parse_type_annotation(
-    p: &mut Parser,
-    parent_recovery_set: TokenSet,
-) -> CompletedMarker {
-    assert!(p.at(TokenKind::TypeOfKw));
-
-    let m = p.start();
-    p.bump();
-
-    ident::parse_ident_or_op(p, ParseErrorContext::TypeOfName, ts![TokenKind::Colon]);
-    p.expect_with_recovery(
-        TokenKind::Colon,
-        ParseErrorContext::TypeOfColon,
-        SINGLE_TYPE_RECOVERY_SET,
-    );
-
-    parse_type(p, TokenSet::EMPTY, parent_recovery_set);
-
-    if p.at(TokenKind::WhereKw) {
-        parse_type_annotation_type_variables(p, parent_recovery_set);
-    }
-
-    m.complete(p, SyntaxKind::TypeAnnotation)
-}
-
-fn parse_type_annotation_type_variables(p: &mut Parser, parent_recovery_set: TokenSet) {
-    assert!(p.at(TokenKind::WhereKw));
-    p.bump();
-
-    loop {
-        if should_stop(p) {
-            break;
-        }
-
-        parse_generic_type_variable(p, parent_recovery_set);
-    }
-
-    return;
-
-    fn should_stop(p: &mut Parser) -> bool {
-        !p.maybe_at(TokenKind::TypevarKw) || p.at_eof()
-    }
-}
-
-fn parse_generic_type_variable(p: &mut Parser, parent_recovery_set: TokenSet) -> CompletedMarker {
-    assert!(p.at(TokenKind::TypevarKw));
-
-    let m = p.start();
-    p.bump();
-
-    p.expect_with_recovery(
-        TokenKind::Ident,
-        ParseErrorContext::TypeVariableName,
-        parent_recovery_set,
-    );
-
-    if p.maybe_at(TokenKind::Equals) {
-        p.bump();
-
-        type_variable::parse_typevar_constraints(p);
-    }
-
-    m.complete(p, SyntaxKind::TypeVariable)
-}
-
 pub(crate) fn parse_type(
     p: &mut Parser,
     single_type_recovery_set: TokenSet,
@@ -93,7 +28,7 @@ pub(crate) fn parse_type(
     Some(single_type_m)
 }
 
-const SINGLE_TYPE_RECOVERY_SET: TokenSet =
+pub(crate) const SINGLE_TYPE_RECOVERY_SET: TokenSet =
     TokenSet::new([TokenKind::Ident, TokenKind::SelfKw, TokenKind::LParen]);
 
 fn parse_single_type(p: &mut Parser, parent_recovery_set: TokenSet) -> Option<CompletedMarker> {
@@ -129,12 +64,8 @@ fn parse_parenthesized_type(p: &mut Parser, parent_recovery_set: TokenSet) -> Co
         return m.complete(p, SyntaxKind::UnitType);
     }
 
-    let local_parent_recovery_set = DEFAULT_RECOVERY_SET.union(parent_recovery_set);
-    if p.at_set(local_parent_recovery_set) {
-        p.error_with_recovery(
-            ParseErrorContext::UnitTypeRightParen,
-            local_parent_recovery_set,
-        );
+    if p.at_set(parent_recovery_set) || p.at_top_level_token() {
+        p.error_with_recovery(ParseErrorContext::UnitTypeRightParen, parent_recovery_set);
         return m.complete(p, SyntaxKind::UnitType);
     }
 

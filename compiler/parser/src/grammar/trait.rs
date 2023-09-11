@@ -57,7 +57,7 @@ enum TraitMemberParseResult {
 
 fn parse_trait_member(p: &mut Parser) -> TraitMemberParseResult {
     if p.at(TokenKind::TypeOfKw) {
-        let cm = r#type::parse_type_annotation(p, TRAIT_RECOVERY_SET);
+        let cm = type_annotation::parse_type_annotation(p, TRAIT_RECOVERY_SET);
         TraitMemberParseResult::TraitMember(cm)
     } else if p.at(TokenKind::TypevarKw) {
         let cm = parse_trait_type_variable(p);

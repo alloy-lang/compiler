@@ -18,6 +18,7 @@ mod path;
 mod stmt;
 mod r#trait;
 mod r#type;
+mod type_annotation;
 mod type_definition;
 mod type_variable;
 

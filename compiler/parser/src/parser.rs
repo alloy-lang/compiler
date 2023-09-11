@@ -4,11 +4,11 @@ use alloy_lexer::{Token, TokenKind};
 use alloy_syntax::SyntaxKind;
 
 use crate::event::Event;
-use crate::grammar;
 use crate::parser::marker::CompletedMarker;
 use crate::parser::parse_error::ParseErrorKind;
 use crate::source::Source;
 use crate::token_set::TokenSet;
+use crate::{grammar, ts};
 pub(crate) use parse_error::ParseError;
 pub(crate) use parse_error::ParseErrorContext;
 
@@ -69,8 +69,7 @@ impl<'t, 'input> Parser<'t, 'input> {
     }
 
     pub(crate) fn at_top_level_token(&mut self) -> bool {
-        self.peek()
-            .map_or(false, |k| DEFAULT_RECOVERY_SET.contains(k))
+        self.at_set(DEFAULT_RECOVERY_SET)
     }
 
     pub(crate) fn at_eof(&mut self) -> bool {
@@ -114,7 +113,7 @@ impl<'t, 'input> Parser<'t, 'input> {
     }
 
     pub(crate) fn error(&mut self, context: ParseErrorContext) -> Option<CompletedMarker> {
-        self.error_with_recovery(context, DEFAULT_RECOVERY_SET)
+        self.error_with_recovery(context, ts![])
     }
 
     pub(crate) fn error_with_recovery(
