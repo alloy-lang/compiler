@@ -49,7 +49,7 @@ fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
     path::parse_path(
         p,
         ParseErrorContext::VariableRef,
-        TokenSet::EMPTY,
+        ts![],
         SyntaxKind::VariableRef,
     )
 }

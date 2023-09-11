@@ -20,7 +20,7 @@ pub(crate) fn parse_type(
         let m = single_type_m.precede(p);
 
         p.bump();
-        parse_type(p, TokenSet::EMPTY, parent_recovery_set);
+        parse_type(p, ts![], parent_recovery_set);
 
         return Some(m.complete(p, SyntaxKind::LambdaType));
     }
@@ -36,7 +36,7 @@ fn parse_single_type(p: &mut Parser, parent_recovery_set: TokenSet) -> Option<Co
         Some(path::parse_path(
             p,
             ParseErrorContext::SingleType,
-            TokenSet::EMPTY,
+            ts![],
             SyntaxKind::TypeIdentifier,
         ))
     } else if p.at(TokenKind::SelfKw) {
@@ -69,7 +69,7 @@ fn parse_parenthesized_type(p: &mut Parser, parent_recovery_set: TokenSet) -> Co
         return m.complete(p, SyntaxKind::UnitType);
     }
 
-    parse_type(p, TokenSet::EMPTY, parent_recovery_set);
+    parse_type(p, ts![], parent_recovery_set);
 
     let mut comma_count = 0;
     let mut arg_count = 1;
@@ -85,7 +85,7 @@ fn parse_parenthesized_type(p: &mut Parser, parent_recovery_set: TokenSet) -> Co
                 p.bump();
             }
 
-            parse_type(p, TokenSet::EMPTY, parent_recovery_set);
+            parse_type(p, ts![], parent_recovery_set);
 
             arg_count += 1;
         }

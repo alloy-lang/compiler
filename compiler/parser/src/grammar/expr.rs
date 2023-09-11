@@ -47,7 +47,7 @@ impl UnaryOp {
 }
 
 pub(super) fn parse_expr(p: &mut Parser, context: ParseErrorContext) -> Option<CompletedMarker> {
-    parse_expr_with_recovery(p, TokenSet::EMPTY, context)
+    parse_expr_with_recovery(p, ts![], context)
 }
 
 fn parse_expr_with_recovery(
@@ -188,7 +188,7 @@ pub(crate) fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
     let path_m = path::parse_path(
         p,
         ParseErrorContext::VariableRef,
-        TokenSet::EMPTY,
+        ts![],
         SyntaxKind::VariableRef,
     );
 

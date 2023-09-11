@@ -63,7 +63,7 @@ fn parse_import_group(p: &mut Parser) -> CompletedMarker {
     p.expect_with_recovery(
         TokenKind::RBrace,
         ParseErrorContext::ImportStatementGroupEnd,
-        TokenSet::EMPTY,
+        ts![],
     );
 
     return m.complete(p, SyntaxKind::ImportStatementGroup);
