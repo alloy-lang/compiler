@@ -256,7 +256,9 @@ impl ParseErrorContext {
             ParseErrorContext::TypeVariableKindConstraintUnderscore => {
                 "the _ in the <_> pattern thingy"
             }
-            ParseErrorContext::TypeVariableKindConstraintUnderscoreComma => todo!(),
+            ParseErrorContext::TypeVariableKindConstraintUnderscoreComma => {
+                "the comma between `_` in the <_> pattern thingy"
+            }
             ParseErrorContext::TypeVariableKindConstraintRAngle => {
                 "the > at the end of the <_> pattern thingy"
             }

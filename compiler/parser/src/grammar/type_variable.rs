@@ -43,6 +43,7 @@ const TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY: TokenSet = TYPEVAR_CONSTRAINT_FIR
     .plus(TokenKind::LAngle)
     .plus(TokenKind::NilIdentifier)
     .plus(TokenKind::RAngle);
+const TYPEVAR_CONSTRAINT_KIND_MARKER_CONTINUE: TokenSet = ts![TokenKind::Comma, TokenKind::NilIdentifier];
 
 fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Hash));
@@ -80,17 +81,15 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
         TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY.plus(TokenKind::TypevarKw),
     );
 
-    if p.maybe_at(TokenKind::Comma) {
-        p.bump();
-
+    if p.at_set(TYPEVAR_CONSTRAINT_KIND_MARKER_CONTINUE) {
         loop {
             if should_stop(p) {
                 break;
             }
 
             p.expect_with_recovery(
-                TokenKind::NilIdentifier,
-                ParseErrorContext::TypeVariableKindConstraintUnderscore,
+                TokenKind::Comma,
+                ParseErrorContext::TypeVariableKindConstraintUnderscoreComma,
                 TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
             );
 
@@ -99,8 +98,8 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
             }
 
             p.expect_with_recovery(
-                TokenKind::Comma,
-                ParseErrorContext::TypeVariableKindConstraintUnderscoreComma,
+                TokenKind::NilIdentifier,
+                ParseErrorContext::TypeVariableKindConstraintUnderscore,
                 TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
             );
         }
@@ -115,7 +114,7 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
     return m.complete(p, SyntaxKind::TypeVariableKindConstraint);
 
     fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(ts![TokenKind::RAngle]) || p.at_eof()
+        !p.at_set(TYPEVAR_CONSTRAINT_KIND_MARKER_CONTINUE) || p.at_eof()
     }
 }
 
