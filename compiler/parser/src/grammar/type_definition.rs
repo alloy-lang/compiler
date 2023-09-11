@@ -1,8 +1,6 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-const TYPEDEF_MEMBER_PROPERTY_FIRSTS: TokenSet = ts![TokenKind::LParen, TokenKind::Ident];
-
 pub(crate) fn parse_type_definition(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::TypedefKw));
 
@@ -107,14 +105,13 @@ fn parse_type_definition_member(p: &mut Parser) -> CompletedMarker {
             break;
         }
 
-        let m = p.start();
-        r#type::parse_type(p, ts![], ts![]);
-        m.complete(p, SyntaxKind::TypeDefMemberProperty);
+        r#type::parse_type(p, r#type::SINGLE_TYPE_RECOVERY_SET, ts![])
+            .map(|cm| cm.precede(p).complete(p, SyntaxKind::TypeDefMemberProperty));
     }
 
     return m.complete(p, SyntaxKind::TypeDefMember);
 
     fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(TYPEDEF_MEMBER_PROPERTY_FIRSTS) || p.at_top_level_token() || p.at_eof()
+        p.at_set(ts![TokenKind::EndKw, TokenKind::Pipe]) || p.at_top_level_token() || p.at_eof()
     }
 }
