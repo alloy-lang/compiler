@@ -16,9 +16,10 @@ SourceFile@0..70
     TypeDefMember@20..35
       Ident@20..26 "Thing1"
       Whitespace@26..27 " "
-      Error@27..29
-        Integer@27..28 "0"
-        Whitespace@28..29 " "
+      TypeDefMemberProperty@27..29
+        Error@27..29
+          Integer@27..28 "0"
+          Whitespace@28..29 " "
       TypeDefMemberProperty@29..35
         TypeIdentifier@29..35
           Ident@29..32 "Int"
@@ -28,9 +29,10 @@ SourceFile@0..70
     TypeDefMember@37..51
       Ident@37..43 "Thing2"
       Whitespace@43..44 " "
-      Error@44..51
-        String@44..48 "\"hi\""
-        Whitespace@48..51 "\n  "
+      TypeDefMemberProperty@44..51
+        Error@44..51
+          String@44..48 "\"hi\""
+          Whitespace@48..51 "\n  "
     Pipe@51..52 "|"
     Whitespace@52..53 " "
     TypeDefMember@53..70
@@ -43,5 +45,5 @@ SourceFile@0..70
       TypeDefMemberProperty@67..70
         TypeIdentifier@67..70
           Ident@67..70 "Int"
-error in range 27..28 while parsing the type of a type annotation. Found integer, but expected identifier, ‘self‘ or ‘(’
-error in range 44..48 while parsing the type of a type annotation. Found string, but expected identifier, ‘self‘ or ‘(’
+error in range 27..28 while parsing the type of a type annotation. Found integer, but expected identifier or ‘(’
+error in range 44..48 while parsing the type of a type annotation. Found string, but expected identifier or ‘(’

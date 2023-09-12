@@ -12,7 +12,11 @@ pub(super) fn stmt(p: &mut Parser) -> Option<CompletedMarker> {
     } else if p.at(TokenKind::TypedefKw) {
         Some(type_definition::parse_type_definition(p))
     } else if p.at(TokenKind::TypeOfKw) {
-        Some(type_annotation::parse_type_annotation(p, ts![]))
+        Some(type_annotation::parse_type_annotation(
+            p,
+            r#type::ParseMode::OutsideSelfContext,
+            ts![],
+        ))
     } else {
         expr::parse_expr(p, ParseErrorContext::TopLevelExpr)
     }

@@ -109,8 +109,14 @@ fn parse_type_definition_member(p: &mut Parser) -> CompletedMarker {
             break;
         }
 
-        r#type::parse_type(p, r#type::SINGLE_TYPE_RECOVERY_SET, ts![])
-            .map(|cm| cm.precede(p).complete(p, SyntaxKind::TypeDefMemberProperty));
+        let m = p.start();
+        r#type::parse_type(
+            p,
+            r#type::ParseMode::OutsideSelfContext,
+            r#type::SINGLE_TYPE_RECOVERY_SET,
+            ts![],
+        );
+        m.complete(p, SyntaxKind::TypeDefMemberProperty);
     }
 
     return m.complete(p, SyntaxKind::TypeDefMember);

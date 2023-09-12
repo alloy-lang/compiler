@@ -66,6 +66,7 @@ pub(crate) enum ParseErrorContext {
     ParenthesizedTypeRightParen,
     TupleTypeRightParen,
     SingleType,
+    SelfTypeOutsideContext,
     TypeVariableName,
     TraitSelfConstraintsEquals,
     TypeVariableConstraint,
@@ -164,6 +165,7 @@ impl ParseErrorContext {
             }
             ParseErrorContext::TupleTypeRightParen => "the right parenthesis of a tuple type",
             ParseErrorContext::SingleType => "the type of a type annotation",
+            ParseErrorContext::SelfTypeOutsideContext => "a type, encountered an unexpected `self` reference outside a trait or behavior context",
             ParseErrorContext::TypeVariableName => "the name of a type variable",
             ParseErrorContext::TraitSelfConstraintsEquals => {
                 "the `=` sign in a trait `self` constraint"
