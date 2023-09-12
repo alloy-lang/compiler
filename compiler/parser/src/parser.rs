@@ -112,7 +112,7 @@ impl<'t, 'input> Parser<'t, 'input> {
         }
     }
 
-    pub(crate) fn error(&mut self, context: ParseErrorContext) -> Option<CompletedMarker> {
+    fn error(&mut self, context: ParseErrorContext) -> Option<CompletedMarker> {
         self.error_with_recovery(context, ts![])
     }
 
