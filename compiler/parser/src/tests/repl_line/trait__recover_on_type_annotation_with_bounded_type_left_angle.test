@@ -41,4 +41,4 @@ SourceFile@0..86
         Ident@80..82 "t1"
         Whitespace@82..83 "\n"
     EndKw@83..86 "end"
-error at position 58 while parsing the > at the end of a bounded type. Missing expected ‘->’ or ‘>’
+error at position 58 while parsing the > at the end of the bounded type arguments. Missing expected ‘->’ or ‘>’

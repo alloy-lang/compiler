@@ -262,9 +262,9 @@ impl ParseErrorContext {
             ParseErrorContext::TypeVariableKindConstraintRAngle => {
                 "the > at the end of the <_> pattern thingy"
             }
-            ParseErrorContext::BoundedTypeLAngle => "the < at the start of a bounded type",
+            ParseErrorContext::BoundedTypeLAngle => "the `<` at the start of the bounded type arguments",
             ParseErrorContext::BoundedTypeComma => "the comma between arguments in a bounded type",
-            ParseErrorContext::BoundedTypeRAngle => "the > at the end of a bounded type",
+            ParseErrorContext::BoundedTypeRAngle => "the `>` at the end of the bounded type arguments",
             ParseErrorContext::BoundedTypeName => todo!(),
             ParseErrorContext::TopLevelExpr => "a top level expression",
         }
