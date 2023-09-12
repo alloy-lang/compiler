@@ -1,0 +1,31 @@
+typedef Test1<t1, > = Empty
+typedef Test2       = Empty
+===
+SourceFile@0..55
+  TypeDef@0..28
+    TypedefKw@0..7 "typedef"
+    Whitespace@7..8 " "
+    Ident@8..13 "Test1"
+    LAngle@13..14 "<"
+    BoundedTypeArg@14..16
+      Ident@14..16 "t1"
+    Comma@16..17 ","
+    Whitespace@17..18 " "
+    BoundedTypeArg@18..18
+    RAngle@18..19 ">"
+    Whitespace@19..20 " "
+    Equals@20..21 "="
+    Whitespace@21..22 " "
+    TypeDefMember@22..28
+      Ident@22..27 "Empty"
+      Whitespace@27..28 "\n"
+  TypeDef@28..55
+    TypedefKw@28..35 "typedef"
+    Whitespace@35..36 " "
+    Ident@36..41 "Test2"
+    Whitespace@41..48 "       "
+    Equals@48..49 "="
+    Whitespace@49..50 " "
+    TypeDefMember@50..55
+      Ident@50..55 "Empty"
+error at position 18 while parsing the name of a bounded type argument. Missing expected identifier

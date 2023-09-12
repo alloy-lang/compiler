@@ -265,7 +265,7 @@ impl ParseErrorContext {
             ParseErrorContext::BoundedTypeLAngle => "the `<` at the start of the bounded type arguments",
             ParseErrorContext::BoundedTypeComma => "the comma between arguments in a bounded type",
             ParseErrorContext::BoundedTypeRAngle => "the `>` at the end of the bounded type arguments",
-            ParseErrorContext::BoundedTypeName => todo!(),
+            ParseErrorContext::BoundedTypeName => "the name of a bounded type argument",
             ParseErrorContext::TopLevelExpr => "a top level expression",
         }
     }

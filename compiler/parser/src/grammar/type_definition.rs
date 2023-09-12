@@ -49,10 +49,14 @@ fn parse_type_definition_bounds(p: &mut Parser) {
 
     loop {
         let m = p.start();
-        p.expect_with_recovery(TokenKind::Ident, ParseErrorContext::BoundedTypeName, ts![]);
+        p.expect_with_recovery(
+            TokenKind::Ident,
+            ParseErrorContext::BoundedTypeName,
+            ts![TokenKind::RAngle, TokenKind::Comma],
+        );
         m.complete(p, SyntaxKind::BoundedTypeArg);
 
-        if p.at_set(ts![TokenKind::RAngle]) || p.at_eof() {
+        if p.maybe_at(TokenKind::RAngle) || p.at_eof() {
             break;
         }
 
