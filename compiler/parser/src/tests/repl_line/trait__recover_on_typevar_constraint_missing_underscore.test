@@ -27,4 +27,4 @@ SourceFile@0..60
       Ident@54..56 "t1"
       Whitespace@56..57 "\n"
     EndKw@57..60 "end"
-error at position 39 while parsing the _ in the <_> pattern thingy. Missing expected ‘_’
+error at position 39 while parsing the `_` in the <_> pattern thingy. Missing expected ‘_’

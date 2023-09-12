@@ -30,4 +30,4 @@ SourceFile@0..51
       TypevarKw@41..48 "typevar"
       Whitespace@48..49 " "
       Ident@49..51 "t1"
-error at position 31 while parsing the > at the end of the bounded type arguments. Missing expected ‘->’ or ‘>’
+error at position 31 while parsing the `>` at the end of the bounded type arguments. Missing expected ‘->’ or ‘>’

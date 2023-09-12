@@ -28,4 +28,4 @@ SourceFile@0..57
       Ident@51..53 "t1"
       Whitespace@53..54 "\n"
     EndKw@54..57 "end"
-error at position 35 while parsing the Type keyword before the <_> pattern thingy. Missing expected ‘Type‘
+error at position 35 while parsing the `Type` keyword before the <_> pattern thingy. Missing expected ‘Type‘

@@ -43,7 +43,8 @@ const TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY: TokenSet = TYPEVAR_CONSTRAINT_FIR
     .plus(TokenKind::LAngle)
     .plus(TokenKind::NilIdentifier)
     .plus(TokenKind::RAngle);
-const TYPEVAR_CONSTRAINT_KIND_MARKER_CONTINUE: TokenSet = ts![TokenKind::Comma, TokenKind::NilIdentifier];
+const TYPEVAR_CONSTRAINT_KIND_MARKER_CONTINUE: TokenSet =
+    ts![TokenKind::Comma, TokenKind::NilIdentifier];
 
 fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Hash));

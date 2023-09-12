@@ -19,4 +19,4 @@ SourceFile@0..52
         Ident@41..48 "Functor"
         Whitespace@48..49 "\n"
     EndKw@49..52 "end"
-error at position 32 while parsing the equals sign in a trait `self` constraint. Missing expected ‘=’
+error at position 32 while parsing the `=` sign in a trait `self` constraint. Missing expected ‘=’

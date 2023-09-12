@@ -32,4 +32,4 @@ SourceFile@0..69
       Ident@63..65 "t1"
       Whitespace@65..66 "\n"
     EndKw@66..69 "end"
-error at position 42 while parsing the plus between type constraints. Missing expected ‘+’
+error at position 42 while parsing the `+` between type constraints. Missing expected ‘+’

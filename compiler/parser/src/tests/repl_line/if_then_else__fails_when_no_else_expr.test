@@ -16,4 +16,4 @@ SourceFile@0..19
         Whitespace@14..15 " "
     ElseKw@15..19 "else"
     ElseExpr@19..19
-error at position 19 while parsing an if-then-else expression. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error at position 19 while parsing the `else` expression in an if-then-else expression. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’

@@ -17,4 +17,4 @@ SourceFile@0..16
     ElseExpr@15..16
       IntLiteral@15..16
         Integer@15..16 "3"
-error at position 15 while parsing an if-then-else expression. Missing expected ‘else‘
+error at position 15 while parsing the `else` keyword in an if-then-else expression. Missing expected ‘else‘

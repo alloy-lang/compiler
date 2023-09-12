@@ -84,90 +84,6 @@ pub(crate) enum ParseErrorContext {
 }
 
 impl ParseErrorContext {
-    // #[must_use]
-    // fn long_message<'a>(&self) -> &'a str {
-    //     match self {
-    //         ParseErrorContext::ModuleName => todo!(),
-    //         ParseErrorContext::ModuleWhere => todo!(),
-    //         ParseErrorContext::LambdaArgComma => {
-    //             "We expected to see a comma separating the arguments."
-    //         }
-    //         ParseErrorContext::LambdaArgExpr => "We expected to see an expression.",
-    //         ParseErrorContext::LambdaArgPipe => {
-    //             "We expected to see a pipe at the end of the arguments."
-    //         }
-    //         ParseErrorContext::LambdaExprRightArrow => {
-    //             "We expected to see a right arrow after the lambda arguments."
-    //         }
-    //         ParseErrorContext::LambdaExprExpr => {
-    //             "We expected to see an expression after the lambda arguments."
-    //         }
-    //         ParseErrorContext::FunctionCallArgExpr => todo!(),
-    //         ParseErrorContext::FunctionCallArgComma => todo!(),
-    //         ParseErrorContext::FunctionCallRightParen => todo!(),
-    //         ParseErrorContext::PrefixExprExpr => {
-    //             "We expected to see an expression after the prefix operator."
-    //         }
-    //         ParseErrorContext::ParenExprExpr => "We expected to see an expression after the ‘(‘.",
-    //         ParseErrorContext::ParenExprComma => todo!(),
-    //         ParseErrorContext::ParenExprRightParen => {
-    //             "We expected to see a right parenthesis after the expression."
-    //         }
-    //         ParseErrorContext::IfThenElseIfExpr => {
-    //             "We expected to see an expression after the ‘if‘."
-    //         }
-    //         ParseErrorContext::IfThenElseThenKw => {
-    //             "We expected to see a ‘then‘ after the ‘if‘ expression."
-    //         }
-    //         ParseErrorContext::IfThenElseThenExpr => {
-    //             "We expected to see an expression after the ‘then‘."
-    //         }
-    //         ParseErrorContext::IfThenElseElseKw => {
-    //             "We expected to see a ‘else‘ after the ‘then‘ expression."
-    //         }
-    //         ParseErrorContext::IfThenElseElseExpr => {
-    //             "We expected to see an expression after the ‘else‘."
-    //         }
-    //         ParseErrorContext::VariableDefIdent => {
-    //             "We expected to see an identifier after the ‘let‘."
-    //         }
-    //         ParseErrorContext::VariableDefEquals => {
-    //             "We expected to see an ‘=‘ after the identifier."
-    //         }
-    //         ParseErrorContext::VariableDefExpr => "We expected to see an expression after the ‘=‘.",
-    //         ParseErrorContext::VariableRef => todo!(),
-    //         ParseErrorContext::ImportStatementFirstSegment => todo!(),
-    //         ParseErrorContext::ImportStatementSegment => todo!(),
-    //         ParseErrorContext::ImportStatementSeparator => todo!(),
-    //         ParseErrorContext::ImportStatementGroupSeparator => todo!(),
-    //         ParseErrorContext::ImportStatementGroupEnd => todo!(),
-    //         ParseErrorContext::TraitName => todo!(),
-    //         ParseErrorContext::TraitWhere => todo!(),
-    //         ParseErrorContext::TraitEnd => todo!(),
-    //         ParseErrorContext::TraitMemberFirst => todo!(),
-    //         ParseErrorContext::TypeOfName => todo!(),
-    //         ParseErrorContext::TypeOfColon => todo!(),
-    //         ParseErrorContext::UnitTypeRightParen => todo!(),
-    //         ParseErrorContext::ParenthesizedTypeRightParen => todo!(),
-    //         ParseErrorContext::TupleTypeRightParen => todo!(),
-    //         ParseErrorContext::SingleType => todo!(),
-    //         ParseErrorContext::TypeVariableName => todo!(),
-    //         ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
-    //         ParseErrorContext::TypeVariableConstraint => todo!(),
-    //         ParseErrorContext::TypeVariableConstraintPlus => todo!(),
-    //         ParseErrorContext::TypeVariableTraitConstraint => todo!(),
-    //         ParseErrorContext::TypeVariableKindConstraintTypeKw => todo!(),
-    //         ParseErrorContext::TypeVariableKindConstraintLAngle => todo!(),
-    //         ParseErrorContext::TypeVariableKindConstraintUnderscore => todo!(),
-    //         ParseErrorContext::TypeVariableKindConstraintUnderscoreComma => todo!(),
-    //         ParseErrorContext::TypeVariableKindConstraintRAngle => todo!(),
-    //         ParseErrorContext::BoundedTypeLAngle => todo!(),
-    //         ParseErrorContext::BoundedTypeComma => todo!(),
-    //         ParseErrorContext::BoundedTypeRAngle => todo!(),
-    //         ParseErrorContext::TopLevelExpr => "We expected to see an expression.",
-    //     }
-    // }
-
     #[must_use]
     fn context_name<'a>(self) -> &'a str {
         match self {
@@ -193,11 +109,21 @@ impl ParseErrorContext {
             ParseErrorContext::ParenExprExpr => "an expression inside parentheses",
             ParseErrorContext::ParenExprComma => "a comma between expressions inside parentheses",
             ParseErrorContext::ParenExprRightParen => "a close parenthesis after an expression",
-            ParseErrorContext::IfThenElseIfExpr => "an if-then-else expression",
-            ParseErrorContext::IfThenElseThenKw => "an if-then-else expression",
-            ParseErrorContext::IfThenElseThenExpr => "an if-then-else expression",
-            ParseErrorContext::IfThenElseElseKw => "an if-then-else expression",
-            ParseErrorContext::IfThenElseElseExpr => "an if-then-else expression",
+            ParseErrorContext::IfThenElseIfExpr => {
+                "the conditional expression in an if-then-else expression"
+            }
+            ParseErrorContext::IfThenElseThenKw => {
+                "the `then` keyword in an if-then-else expression"
+            }
+            ParseErrorContext::IfThenElseThenExpr => {
+                "the `then` expression in an if-then-else expression"
+            }
+            ParseErrorContext::IfThenElseElseKw => {
+                "the `else` keyword in an if-then-else expression"
+            }
+            ParseErrorContext::IfThenElseElseExpr => {
+                "the `else` expression in an if-then-else expression"
+            }
             ParseErrorContext::MatchExprArg => "the argument of a match expression",
             ParseErrorContext::MatchExprWhenKw => "the when keyword of a match expression",
             ParseErrorContext::MatchTargetPipe => {
@@ -240,21 +166,21 @@ impl ParseErrorContext {
             ParseErrorContext::SingleType => "the type of a type annotation",
             ParseErrorContext::TypeVariableName => "the name of a type variable",
             ParseErrorContext::TraitSelfConstraintsEquals => {
-                "the equals sign in a trait `self` constraint"
+                "the `=` sign in a trait `self` constraint"
             }
             ParseErrorContext::TypeVariableConstraint => "the constraints for a type variable",
-            ParseErrorContext::TypeVariableConstraintPlus => "the plus between type constraints",
+            ParseErrorContext::TypeVariableConstraintPlus => "the `+` between type constraints",
             ParseErrorContext::TypeVariableTraitConstraint => {
                 "the trait name in a type variable constraint"
             }
             ParseErrorContext::TypeVariableKindConstraintTypeKw => {
-                "the Type keyword before the <_> pattern thingy"
+                "the `Type` keyword before the <_> pattern thingy"
             }
             ParseErrorContext::TypeVariableKindConstraintLAngle => {
-                "the < at the start of the <_> pattern thingy"
+                "the `<` at the start of the <_> pattern thingy"
             }
             ParseErrorContext::TypeVariableKindConstraintUnderscore => {
-                "the _ in the <_> pattern thingy"
+                "the `_` in the <_> pattern thingy"
             }
             ParseErrorContext::TypeVariableKindConstraintUnderscoreComma => {
                 "the comma between `_` in the <_> pattern thingy"
@@ -262,71 +188,17 @@ impl ParseErrorContext {
             ParseErrorContext::TypeVariableKindConstraintRAngle => {
                 "the > at the end of the <_> pattern thingy"
             }
-            ParseErrorContext::BoundedTypeLAngle => "the `<` at the start of the bounded type arguments",
+            ParseErrorContext::BoundedTypeLAngle => {
+                "the `<` at the start of the bounded type arguments"
+            }
             ParseErrorContext::BoundedTypeComma => "the comma between arguments in a bounded type",
-            ParseErrorContext::BoundedTypeRAngle => "the `>` at the end of the bounded type arguments",
+            ParseErrorContext::BoundedTypeRAngle => {
+                "the `>` at the end of the bounded type arguments"
+            }
             ParseErrorContext::BoundedTypeName => "the name of a bounded type argument",
             ParseErrorContext::TopLevelExpr => "a top level expression",
         }
     }
-
-    // #[must_use]
-    // fn short_message<'a>(&self) -> &'a str {
-    //     match self {
-    //         ParseErrorContext::ModuleName => todo!(),
-    //         ParseErrorContext::ModuleWhere => todo!(),
-    //         ParseErrorContext::LambdaArgComma => "expected ‘,‘ separating arguments",
-    //         ParseErrorContext::LambdaArgExpr => "expected expression as argument",
-    //         ParseErrorContext::LambdaArgPipe => "expected a ‘|‘ after the last argument",
-    //         ParseErrorContext::LambdaExprRightArrow => "expected ‘->‘ after the arguments",
-    //         ParseErrorContext::LambdaExprExpr => "expected expression as body",
-    //         ParseErrorContext::FunctionCallArgExpr => todo!(),
-    //         ParseErrorContext::FunctionCallArgComma => todo!(),
-    //         ParseErrorContext::FunctionCallRightParen => todo!(),
-    //         ParseErrorContext::PrefixExprExpr => todo!(),
-    //         ParseErrorContext::ParenExprExpr => todo!(),
-    //         ParseErrorContext::ParenExprComma => todo!(),
-    //         ParseErrorContext::ParenExprRightParen => "expected ‘)‘ after expression",
-    //         ParseErrorContext::IfThenElseIfExpr => todo!(),
-    //         ParseErrorContext::IfThenElseThenKw => "expected ‘then‘ after ‘if‘ expression",
-    //         ParseErrorContext::IfThenElseThenExpr => todo!(),
-    //         ParseErrorContext::IfThenElseElseKw => "expected ‘else‘ after ‘then‘ expression",
-    //         ParseErrorContext::IfThenElseElseExpr => todo!(),
-    //         ParseErrorContext::VariableDefIdent => todo!(),
-    //         ParseErrorContext::VariableDefEquals => todo!(),
-    //         ParseErrorContext::VariableDefExpr => todo!(),
-    //         ParseErrorContext::VariableRef => todo!(),
-    //         ParseErrorContext::ImportStatementFirstSegment => todo!(),
-    //         ParseErrorContext::ImportStatementSegment => todo!(),
-    //         ParseErrorContext::ImportStatementSeparator => todo!(),
-    //         ParseErrorContext::ImportStatementGroupSeparator => todo!(),
-    //         ParseErrorContext::ImportStatementGroupEnd => todo!(),
-    //         ParseErrorContext::TraitName => todo!(),
-    //         ParseErrorContext::TraitWhere => todo!(),
-    //         ParseErrorContext::TraitEnd => todo!(),
-    //         ParseErrorContext::TraitMemberFirst => todo!(),
-    //         ParseErrorContext::TypeOfName => todo!(),
-    //         ParseErrorContext::TypeOfColon => todo!(),
-    //         ParseErrorContext::UnitTypeRightParen => todo!(),
-    //         ParseErrorContext::ParenthesizedTypeRightParen => todo!(),
-    //         ParseErrorContext::TupleTypeRightParen => todo!(),
-    //         ParseErrorContext::SingleType => todo!(),
-    //         ParseErrorContext::TypeVariableName => todo!(),
-    //         ParseErrorContext::TraitSelfConstraintsEquals => todo!(),
-    //         ParseErrorContext::TypeVariableConstraint => todo!(),
-    //         ParseErrorContext::TypeVariableConstraintPlus => todo!(),
-    //         ParseErrorContext::TypeVariableTraitConstraint => todo!(),
-    //         ParseErrorContext::TypeVariableKindConstraintTypeKw => todo!(),
-    //         ParseErrorContext::TypeVariableKindConstraintLAngle => todo!(),
-    //         ParseErrorContext::TypeVariableKindConstraintUnderscore => todo!(),
-    //         ParseErrorContext::TypeVariableKindConstraintUnderscoreComma => todo!(),
-    //         ParseErrorContext::TypeVariableKindConstraintRAngle => todo!(),
-    //         ParseErrorContext::BoundedTypeLAngle => todo!(),
-    //         ParseErrorContext::BoundedTypeComma => todo!(),
-    //         ParseErrorContext::BoundedTypeRAngle => todo!(),
-    //         ParseErrorContext::TopLevelExpr => todo!(),
-    //     }
-    // }
 }
 
 impl fmt::Display for ParseError {

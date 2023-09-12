@@ -6,8 +6,8 @@ SourceFile@0..2
     IfExpr@2..2
     ThenExpr@2..2
     ElseExpr@2..2
-error at position 2 while parsing an if-then-else expression. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
-error at position 2 while parsing an if-then-else expression. Missing expected ‘then‘
-error at position 2 while parsing an if-then-else expression. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
-error at position 2 while parsing an if-then-else expression. Missing expected ‘else‘
-error at position 2 while parsing an if-then-else expression. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error at position 2 while parsing the conditional expression in an if-then-else expression. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error at position 2 while parsing the `then` keyword in an if-then-else expression. Missing expected ‘then‘
+error at position 2 while parsing the `then` expression in an if-then-else expression. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error at position 2 while parsing the `else` keyword in an if-then-else expression. Missing expected ‘else‘
+error at position 2 while parsing the `else` expression in an if-then-else expression. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
