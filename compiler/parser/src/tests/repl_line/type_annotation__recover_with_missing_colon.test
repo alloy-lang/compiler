@@ -1,34 +1,34 @@
-typeof test1 String
-typeof test2 : self -> String -> Int
+typeof test1   String
+typeof test2 : Test -> String -> Int
 ===
-SourceFile@0..56
-  TypeAnnotation@0..20
+SourceFile@0..58
+  TypeAnnotation@0..22
     TypeOfKw@0..6 "typeof"
     Whitespace@6..7 " "
     Ident@7..12 "test1"
-    Whitespace@12..13 " "
-    TypeIdentifier@13..20
-      Ident@13..19 "String"
-      Whitespace@19..20 "\n"
-  TypeAnnotation@20..56
-    TypeOfKw@20..26 "typeof"
-    Whitespace@26..27 " "
-    Ident@27..32 "test2"
-    Whitespace@32..33 " "
-    Colon@33..34 ":"
+    Whitespace@12..15 "   "
+    TypeIdentifier@15..22
+      Ident@15..21 "String"
+      Whitespace@21..22 "\n"
+  TypeAnnotation@22..58
+    TypeOfKw@22..28 "typeof"
+    Whitespace@28..29 " "
+    Ident@29..34 "test2"
     Whitespace@34..35 " "
-    LambdaType@35..56
-      SelfType@35..40
-        SelfKw@35..39 "self"
-        Whitespace@39..40 " "
-      RightArrow@40..42 "->"
-      Whitespace@42..43 " "
-      LambdaType@43..56
-        TypeIdentifier@43..50
-          Ident@43..49 "String"
-          Whitespace@49..50 " "
-        RightArrow@50..52 "->"
-        Whitespace@52..53 " "
-        TypeIdentifier@53..56
-          Ident@53..56 "Int"
-error at position 13 while parsing the colon after the name of a type. Missing expected ‘:’
+    Colon@35..36 ":"
+    Whitespace@36..37 " "
+    LambdaType@37..58
+      TypeIdentifier@37..42
+        Ident@37..41 "Test"
+        Whitespace@41..42 " "
+      RightArrow@42..44 "->"
+      Whitespace@44..45 " "
+      LambdaType@45..58
+        TypeIdentifier@45..52
+          Ident@45..51 "String"
+          Whitespace@51..52 " "
+        RightArrow@52..54 "->"
+        Whitespace@54..55 " "
+        TypeIdentifier@55..58
+          Ident@55..58 "Int"
+error at position 15 while parsing the colon after the name of a type. Missing expected ‘:’

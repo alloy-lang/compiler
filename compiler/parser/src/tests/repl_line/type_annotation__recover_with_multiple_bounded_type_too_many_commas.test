@@ -1,4 +1,4 @@
-typeof apply : self<t1, , t2> where
+typeof apply : Test<t1, , t2> where
     typevar t1
     typevar t2
 ===
@@ -12,8 +12,8 @@ SourceFile@0..65
     Whitespace@14..15 " "
     BoundedType@15..30
       BoundedTypeBase@15..19
-        SelfType@15..19
-          SelfKw@15..19 "self"
+        TypeIdentifier@15..19
+          Ident@15..19 "Test"
       LAngle@19..20 "<"
       BoundedTypeArg@20..22
         TypeIdentifier@20..22
@@ -39,4 +39,4 @@ SourceFile@0..65
       TypevarKw@55..62 "typevar"
       Whitespace@62..63 " "
       Ident@63..65 "t2"
-error at position 24 while parsing the type of a type annotation. Missing expected identifier, ‘self‘ or ‘(’
+error at position 24 while parsing the type of a type annotation. Missing expected identifier or ‘(’
