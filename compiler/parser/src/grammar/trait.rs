@@ -2,7 +2,15 @@
 use super::*;
 use crate::grammar::type_variable::TYPEVAR_CONSTRAINT_FIRSTS;
 
-const TRAIT_RECOVERY_SET: TokenSet = TokenSet::new([TokenKind::TypevarKw, TokenKind::EndKw]);
+const TRAIT_RECOVERY_SET: TokenSet = ts![
+    // TokenKind::SelfKw,
+    // TokenKind::TypeOfKw,
+    TokenKind::TypevarKw,
+    TokenKind::EndKw,
+];
+const TRAIT_TITLE_RECOVERY_SET: TokenSet = TRAIT_RECOVERY_SET.union(ts![
+    TokenKind::WhereKw,
+]);
 
 pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::TraitKw));
@@ -13,7 +21,7 @@ pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
     p.expect_with_recovery(
         TokenKind::Ident,
         ParseErrorContext::TraitName,
-        TRAIT_RECOVERY_SET.plus(TokenKind::WhereKw),
+        TRAIT_TITLE_RECOVERY_SET,
     );
     p.expect_with_recovery(
         TokenKind::WhereKw,

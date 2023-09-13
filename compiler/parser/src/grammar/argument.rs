@@ -4,7 +4,7 @@ use crate::grammar::expr::{
     parse_char_literal, parse_fractional_literal, parse_int_literal, parse_string_literal,
 };
 
-pub(crate) const ARGUMENT_RECOVERY_SET: TokenSet = TokenSet::new([
+pub(crate) const ARGUMENT_RECOVERY_SET: TokenSet = ts![
     TokenKind::Integer,
     TokenKind::Fractional,
     TokenKind::String,
@@ -12,7 +12,7 @@ pub(crate) const ARGUMENT_RECOVERY_SET: TokenSet = TokenSet::new([
     TokenKind::Ident,
     TokenKind::LParen,
     TokenKind::NilIdentifier,
-]);
+];
 
 pub(crate) fn parse_argument(
     p: &mut Parser,

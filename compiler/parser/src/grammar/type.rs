@@ -36,7 +36,7 @@ pub(crate) fn parse_type(
 }
 
 pub(crate) const SINGLE_TYPE_RECOVERY_SET: TokenSet =
-    TokenSet::new([TokenKind::Ident, TokenKind::SelfKw, TokenKind::LParen]);
+    ts![TokenKind::Ident, TokenKind::SelfKw, TokenKind::LParen];
 
 fn parse_single_type(
     p: &mut Parser,
@@ -132,7 +132,7 @@ fn parse_parenthesized_type(
     }
 }
 
-const ACCEPTABLE_BOUNDED_TYPE_FIRSTS: TokenSet = TokenSet::new([TokenKind::LAngle]);
+const ACCEPTABLE_BOUNDED_TYPE_FIRSTS: TokenSet = ts![TokenKind::LAngle];
 
 fn maybe_parse_bounded_type(
     p: &mut Parser,

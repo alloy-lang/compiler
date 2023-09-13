@@ -18,13 +18,13 @@ pub(crate) mod marker;
 
 mod parse_error;
 
-pub(crate) const DEFAULT_RECOVERY_SET: TokenSet = TokenSet::new([
+pub(crate) const DEFAULT_RECOVERY_SET: TokenSet = ts![
     TokenKind::LetKw,
     TokenKind::ImportKw,
     TokenKind::TraitKw,
     TokenKind::TypeOfKw,
     TokenKind::TypedefKw,
-]);
+];
 
 pub(crate) struct Parser<'t, 'input> {
     source: Source<'t, 'input>,

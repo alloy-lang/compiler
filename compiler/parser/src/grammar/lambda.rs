@@ -4,14 +4,14 @@ use super::*;
 use crate::grammar::argument::parse_argument;
 use crate::grammar::expr::parse_expr;
 
-const LAMBDA_ARG_SET: TokenSet = TokenSet::new([
+const LAMBDA_ARG_SET: TokenSet = ts![
     TokenKind::Integer,
     TokenKind::Fractional,
     TokenKind::String,
     TokenKind::Char,
     TokenKind::Ident,
     TokenKind::LParen,
-]);
+];
 
 pub(crate) fn parse_lambda_expr(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Pipe));

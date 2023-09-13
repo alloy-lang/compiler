@@ -1,7 +1,7 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-const IMPORT_RECOVERY_SET: TokenSet = TokenSet::new([TokenKind::Ident, TokenKind::LBrace]);
+const IMPORT_RECOVERY_SET: TokenSet = ts![TokenKind::Ident, TokenKind::LBrace];
 
 pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::ImportKw));
@@ -73,7 +73,7 @@ fn parse_import_group(p: &mut Parser) -> CompletedMarker {
     }
 }
 
-const IMPORT_SEGMENT_RECOVERY_SET: TokenSet = TokenSet::new([TokenKind::RBrace]);
+const IMPORT_SEGMENT_RECOVERY_SET: TokenSet = ts![TokenKind::RBrace];
 
 fn parse_first_import_segment(p: &mut Parser, context: ParseErrorContext) -> CompletedMarker {
     let segment_m = p.start();

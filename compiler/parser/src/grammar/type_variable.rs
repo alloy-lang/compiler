@@ -2,7 +2,7 @@
 use super::*;
 
 pub(crate) const TYPEVAR_CONSTRAINT_FIRSTS: TokenSet =
-    TokenSet::new([TokenKind::Hash, TokenKind::Ident, TokenKind::Plus]);
+    ts![TokenKind::Hash, TokenKind::Ident, TokenKind::Plus];
 
 pub(crate) fn parse_typevar_constraints(p: &mut Parser) {
     loop {

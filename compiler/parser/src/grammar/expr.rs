@@ -4,7 +4,7 @@ use super::*;
 use crate::grammar::argument::{parse_argument, ARGUMENT_RECOVERY_SET};
 use crate::grammar::lambda;
 
-pub(crate) const EXPR_FIRSTS: TokenSet = TokenSet::new([
+pub(crate) const EXPR_FIRSTS: TokenSet = ts![
     TokenKind::Integer,
     TokenKind::Fractional,
     TokenKind::String,
@@ -14,7 +14,7 @@ pub(crate) const EXPR_FIRSTS: TokenSet = TokenSet::new([
     TokenKind::LParen,
     TokenKind::IfKw,
     TokenKind::Pipe,
-]);
+];
 
 enum BinaryOp {
     Custom,
@@ -58,13 +58,13 @@ fn parse_expr_with_recovery(
     parse_expr_with_binding_power(p, 0, recovery_set, context)
 }
 
-const SUPPORTED_OPERATORS: TokenSet = TokenSet::new([
+const SUPPORTED_OPERATORS: TokenSet = ts![
     TokenKind::Plus,
     TokenKind::Minus,
     TokenKind::Star,
     TokenKind::Slash,
     TokenKind::OpIdent,
-]);
+];
 
 fn parse_expr_with_binding_power(
     p: &mut Parser,
