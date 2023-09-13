@@ -39,4 +39,4 @@ SourceFile@0..152
       Ident@146..148 "t1"
       Whitespace@148..149 "\n"
     EndKw@149..152 "end"
-error at position 75 while parsing the end keyword after a trait definition. Missing expected ‘end‘
+error at position 75 while parsing the `end` keyword after a trait definition. Missing expected ‘end‘

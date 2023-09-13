@@ -9,6 +9,8 @@ pub(super) fn stmt(p: &mut Parser) -> Option<CompletedMarker> {
         Some(import::parse_import(p))
     } else if p.at(TokenKind::TraitKw) {
         Some(r#trait::parse_trait(p))
+    } else if p.at(TokenKind::BehaviorKw) {
+        None
     } else if p.at(TokenKind::TypedefKw) {
         Some(type_definition::parse_type_definition(p))
     } else if p.at(TokenKind::TypeOfKw) {

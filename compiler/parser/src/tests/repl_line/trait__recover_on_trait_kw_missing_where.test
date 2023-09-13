@@ -39,4 +39,4 @@ SourceFile@0..149
       Ident@143..145 "t1"
       Whitespace@145..146 "\n"
     EndKw@146..149 "end"
-error at position 56 while parsing the where keyword at the start of a trait definition. Missing expected ‘where‘
+error at position 56 while parsing the `where` keyword at the start of a trait definition. Missing expected ‘where‘
