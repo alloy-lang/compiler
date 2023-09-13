@@ -1,0 +1,35 @@
+behavior for Type1 where
+    -- imagine all the things here
+end
+
+trait Trait1 where
+    -- imagine all the things here
+end
+===
+SourceFile@0..122
+  BehaviorDef@0..65
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..9
+    ForKw@9..12 "for"
+    Whitespace@12..13 " "
+    TypeIdentifier@13..19
+      Ident@13..18 "Type1"
+      Whitespace@18..19 " "
+    WhereKw@19..24 "where"
+    Whitespace@24..29 "\n    "
+    Comment@29..59 "-- imagine all the th ..."
+    Whitespace@59..60 "\n"
+    EndKw@60..63 "end"
+    Whitespace@63..65 "\n\n"
+  TraitDef@65..122
+    TraitKw@65..70 "trait"
+    Whitespace@70..71 " "
+    Ident@71..77 "Trait1"
+    Whitespace@77..78 " "
+    WhereKw@78..83 "where"
+    Whitespace@83..88 "\n    "
+    Comment@88..118 "-- imagine all the th ..."
+    Whitespace@118..119 "\n"
+    EndKw@119..122 "end"
+error at position 9 while parsing the name of a trait at the start of a behavior definition. Missing expected identifier

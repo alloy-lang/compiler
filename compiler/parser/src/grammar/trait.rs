@@ -8,9 +8,7 @@ const TRAIT_RECOVERY_SET: TokenSet = ts![
     TokenKind::TypevarKw,
     TokenKind::EndKw,
 ];
-const TRAIT_TITLE_RECOVERY_SET: TokenSet = TRAIT_RECOVERY_SET.union(ts![
-    TokenKind::WhereKw,
-]);
+const TRAIT_TITLE_RECOVERY_SET: TokenSet = TRAIT_RECOVERY_SET.union(ts![TokenKind::WhereKw]);
 
 pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::TraitKw));

@@ -20,6 +20,8 @@ pub enum TokenKind {
     ModuleKw,
     #[token("where")]
     WhereKw,
+    #[token("for")]
+    ForKw,
     #[token("when")]
     WhenKw,
     #[token("match")]
@@ -145,6 +147,7 @@ impl fmt::Display for TokenKind {
             Self::ImportKw => "‘import‘",
             Self::ModuleKw => "‘module‘",
             Self::WhereKw => "‘where‘",
+            Self::ForKw => "‘for‘",
             Self::WhenKw => "‘when‘",
             Self::MatchKw => "‘match‘",
             Self::TraitKw => "‘trait‘",
@@ -239,6 +242,7 @@ mod tests {
             "import" => TokenKind::ImportKw,
             "module" => TokenKind::ModuleKw,
             "where" => TokenKind::WhereKw,
+            "for" => TokenKind::ForKw,
             "when" => TokenKind::WhenKw,
             "match" => TokenKind::MatchKw,
             "trait" => TokenKind::TraitKw,
@@ -324,6 +328,7 @@ mod tests {
             "import_" => vec![TokenKind::ImportKw, TokenKind::NilIdentifier],
             "module_" => vec![TokenKind::ModuleKw, TokenKind::NilIdentifier],
             "where_" => vec![TokenKind::WhereKw, TokenKind::NilIdentifier],
+            "for_" => vec![TokenKind::ForKw, TokenKind::NilIdentifier],
             "when_" => vec![TokenKind::WhenKw, TokenKind::NilIdentifier],
             "match_" => vec![TokenKind::MatchKw, TokenKind::NilIdentifier],
             "trait_" => vec![TokenKind::TraitKw, TokenKind::NilIdentifier],

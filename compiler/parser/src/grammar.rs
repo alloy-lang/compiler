@@ -9,6 +9,7 @@ use crate::token_set::TokenSet;
 use crate::ts;
 
 mod argument;
+mod behavior;
 mod expr;
 mod ident;
 mod import;

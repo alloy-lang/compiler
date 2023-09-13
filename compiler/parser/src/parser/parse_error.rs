@@ -55,6 +55,11 @@ pub(crate) enum ParseErrorContext {
     TraitWhere,
     TraitEnd,
     TraitMemberFirst,
+    BehaviorTraitName,
+    BehaviorFor,
+    BehaviorTypeName,
+    BehaviorWhere,
+    BehaviorEnd,
     TypeOfName,
     TypeOfColon,
     TypeDefName,
@@ -89,47 +94,27 @@ impl ParseErrorContext {
     fn context_name<'a>(self) -> &'a str {
         match self {
             ParseErrorContext::ModuleName => "the name of the module in a module definition",
-            ParseErrorContext::ModuleWhere => {
-                "the where keyword at the start of a module definition"
-            }
+            ParseErrorContext::ModuleWhere => "the where keyword at the start of a module definition",
             ParseErrorContext::LambdaArgComma => "a comma between arguments in a lambda expression",
             ParseErrorContext::LambdaArgExpr => "an argument in a lambda expression",
-            ParseErrorContext::LambdaArgPipe => {
-                "the pipe at the end of a lambda expression's argument list"
-            }
+            ParseErrorContext::LambdaArgPipe => "the pipe at the end of a lambda expression's argument list",
             ParseErrorContext::LambdaExprRightArrow => "a lambda expression",
             ParseErrorContext::LambdaExprExpr => "a lambda expression body",
             ParseErrorContext::FunctionCallArgExpr => "a function call argument",
-            ParseErrorContext::FunctionCallArgComma => {
-                "a comma between arguments in a function call"
-            }
-            ParseErrorContext::FunctionCallRightParen => {
-                "a close parenthesis after a function call"
-            }
+            ParseErrorContext::FunctionCallArgComma => "a comma between arguments in a function call",
+            ParseErrorContext::FunctionCallRightParen => "a close parenthesis after a function call",
             ParseErrorContext::PrefixExprExpr => "an expression after a prefix operator",
             ParseErrorContext::ParenExprExpr => "an expression inside parentheses",
             ParseErrorContext::ParenExprComma => "a comma between expressions inside parentheses",
             ParseErrorContext::ParenExprRightParen => "a close parenthesis after an expression",
-            ParseErrorContext::IfThenElseIfExpr => {
-                "the conditional expression in an if-then-else expression"
-            }
-            ParseErrorContext::IfThenElseThenKw => {
-                "the `then` keyword in an if-then-else expression"
-            }
-            ParseErrorContext::IfThenElseThenExpr => {
-                "the `then` expression in an if-then-else expression"
-            }
-            ParseErrorContext::IfThenElseElseKw => {
-                "the `else` keyword in an if-then-else expression"
-            }
-            ParseErrorContext::IfThenElseElseExpr => {
-                "the `else` expression in an if-then-else expression"
-            }
+            ParseErrorContext::IfThenElseIfExpr => "the conditional expression in an if-then-else expression",
+            ParseErrorContext::IfThenElseThenKw => "the `then` keyword in an if-then-else expression",
+            ParseErrorContext::IfThenElseThenExpr => "the `then` expression in an if-then-else expression",
+            ParseErrorContext::IfThenElseElseKw => "the `else` keyword in an if-then-else expression",
+            ParseErrorContext::IfThenElseElseExpr => "the `else` expression in an if-then-else expression",
             ParseErrorContext::MatchExprArg => "the argument of a match expression",
             ParseErrorContext::MatchExprWhenKw => "the when keyword of a match expression",
-            ParseErrorContext::MatchTargetPipe => {
-                "the `|` at the start of a match expression branch"
-            }
+            ParseErrorContext::MatchTargetPipe => "the `|` at the start of a match expression branch",
             ParseErrorContext::MatchTargetRightArrow => "the `->` in a match expression branch",
             ParseErrorContext::MatchTargetCondition => "the condition in a match expression branch",
             ParseErrorContext::MatchTargetValue => "the value in a match expression branch",
@@ -140,63 +125,42 @@ impl ParseErrorContext {
             ParseErrorContext::ImportStatementFirstSegment => "the first import segment",
             ParseErrorContext::ImportStatementSegment => "an import statement",
             ParseErrorContext::ImportStatementSeparator => "the ‘::’ between import segments",
-            ParseErrorContext::ImportStatementGroupSeparator => {
-                "the comma between imports inside an import group"
-            }
+            ParseErrorContext::ImportStatementGroupSeparator => "the comma between imports inside an import group",
             ParseErrorContext::ImportStatementGroupEnd => "the end of an import group",
             ParseErrorContext::TraitName => "the name of the trait in a trait definition",
-            ParseErrorContext::TraitWhere => "the where keyword at the start of a trait definition",
-            ParseErrorContext::TraitEnd => "the end keyword after a trait definition",
-            ParseErrorContext::TraitMemberFirst => {
-                "the start of a trait member, are you missing a keyword?"
-            }
+            ParseErrorContext::TraitWhere => "the `where` keyword at the start of a trait definition",
+            ParseErrorContext::TraitEnd => "the `end` keyword after a trait definition",
+            ParseErrorContext::TraitMemberFirst => "the start of a trait member, are you missing a keyword?",
+            ParseErrorContext::BehaviorTraitName => "the name of a trait at the start of a behavior definition",
+            ParseErrorContext::BehaviorFor => "the `for` keyword at the start of a behavior definition",
+            ParseErrorContext::BehaviorTypeName => "the name of a type at the start of a behavior definition",
+            ParseErrorContext::BehaviorWhere => "the `where` keyword at the start of a behavior definition",
+            ParseErrorContext::BehaviorEnd => "the `end` keyword after a behavior definition",
             ParseErrorContext::TypeOfName => "the name of a type",
             ParseErrorContext::TypeOfColon => "the colon after the name of a type",
             ParseErrorContext::TypeDefName => "the name in a type definition",
             ParseErrorContext::TypeDefEquals => "the equals sign in a type definition",
             ParseErrorContext::TypeDefMemberName => "the name of a type definition member",
             ParseErrorContext::TypeDefMemberPipe => todo!(),
-            ParseErrorContext::TypeDefGenericConstraintName => {
-                "a generic constraint in a type definition"
-            }
+            ParseErrorContext::TypeDefGenericConstraintName => "a generic constraint in a type definition",
             ParseErrorContext::UnitTypeRightParen => "the right parenthesis of a unit type",
-            ParseErrorContext::ParenthesizedTypeRightParen => {
-                "the right parenthesis of a parenthesized type"
-            }
+            ParseErrorContext::ParenthesizedTypeRightParen => "the right parenthesis of a parenthesized type",
             ParseErrorContext::TupleTypeRightParen => "the right parenthesis of a tuple type",
             ParseErrorContext::SingleType => "the type of a type annotation",
             ParseErrorContext::SelfTypeOutsideContext => "a type, encountered an unexpected `self` reference outside a trait or behavior context",
             ParseErrorContext::TypeVariableName => "the name of a type variable",
-            ParseErrorContext::TraitSelfConstraintsEquals => {
-                "the `=` sign in a trait `self` constraint"
-            }
+            ParseErrorContext::TraitSelfConstraintsEquals => "the `=` sign in a trait `self` constraint",
             ParseErrorContext::TypeVariableConstraint => "the constraints for a type variable",
             ParseErrorContext::TypeVariableConstraintPlus => "the `+` between type constraints",
-            ParseErrorContext::TypeVariableTraitConstraint => {
-                "the trait name in a type variable constraint"
-            }
-            ParseErrorContext::TypeVariableKindConstraintTypeKw => {
-                "the `Type` keyword before the <_> pattern thingy"
-            }
-            ParseErrorContext::TypeVariableKindConstraintLAngle => {
-                "the `<` at the start of the <_> pattern thingy"
-            }
-            ParseErrorContext::TypeVariableKindConstraintUnderscore => {
-                "the `_` in the <_> pattern thingy"
-            }
-            ParseErrorContext::TypeVariableKindConstraintUnderscoreComma => {
-                "the comma between `_` in the <_> pattern thingy"
-            }
-            ParseErrorContext::TypeVariableKindConstraintRAngle => {
-                "the > at the end of the <_> pattern thingy"
-            }
-            ParseErrorContext::BoundedTypeLAngle => {
-                "the `<` at the start of the bounded type arguments"
-            }
+            ParseErrorContext::TypeVariableTraitConstraint => "the trait name in a type variable constraint",
+            ParseErrorContext::TypeVariableKindConstraintTypeKw => "the `Type` keyword before the <_> pattern thingy",
+            ParseErrorContext::TypeVariableKindConstraintLAngle => "the `<` at the start of the <_> pattern thingy",
+            ParseErrorContext::TypeVariableKindConstraintUnderscore => "the `_` in the <_> pattern thingy",
+            ParseErrorContext::TypeVariableKindConstraintUnderscoreComma => "the comma between `_` in the <_> pattern thingy",
+            ParseErrorContext::TypeVariableKindConstraintRAngle => "the > at the end of the <_> pattern thingy",
+            ParseErrorContext::BoundedTypeLAngle => "the `<` at the start of the bounded type arguments",
             ParseErrorContext::BoundedTypeComma => "the comma between arguments in a bounded type",
-            ParseErrorContext::BoundedTypeRAngle => {
-                "the `>` at the end of the bounded type arguments"
-            }
+            ParseErrorContext::BoundedTypeRAngle => "the `>` at the end of the bounded type arguments",
             ParseErrorContext::BoundedTypeName => "the name of a bounded type argument",
             ParseErrorContext::TopLevelExpr => "a top level expression",
         }

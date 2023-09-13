@@ -10,7 +10,7 @@ pub(super) fn stmt(p: &mut Parser) -> Option<CompletedMarker> {
     } else if p.at(TokenKind::TraitKw) {
         Some(r#trait::parse_trait(p))
     } else if p.at(TokenKind::BehaviorKw) {
-        None
+        Some(behavior::parse_behavior(p))
     } else if p.at(TokenKind::TypedefKw) {
         Some(type_definition::parse_type_definition(p))
     } else if p.at(TokenKind::TypeOfKw) {

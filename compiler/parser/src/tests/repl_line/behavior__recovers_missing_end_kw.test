@@ -1,0 +1,34 @@
+behavior Trait1 for Type1 where
+    -- imagine all the things here
+
+trait Trait1 where
+    -- imagine all the things here
+end
+===
+SourceFile@0..125
+  BehaviorDef@0..68
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..16
+      Ident@9..15 "Trait1"
+      Whitespace@15..16 " "
+    ForKw@16..19 "for"
+    Whitespace@19..20 " "
+    TypeIdentifier@20..26
+      Ident@20..25 "Type1"
+      Whitespace@25..26 " "
+    WhereKw@26..31 "where"
+    Whitespace@31..36 "\n    "
+    Comment@36..66 "-- imagine all the th ..."
+    Whitespace@66..68 "\n\n"
+  TraitDef@68..125
+    TraitKw@68..73 "trait"
+    Whitespace@73..74 " "
+    Ident@74..80 "Trait1"
+    Whitespace@80..81 " "
+    WhereKw@81..86 "where"
+    Whitespace@86..91 "\n    "
+    Comment@91..121 "-- imagine all the th ..."
+    Whitespace@121..122 "\n"
+    EndKw@122..125 "end"
+error at position 68 while parsing the `end` keyword after a behavior definition. Missing expected ‘end‘

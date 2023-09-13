@@ -1,0 +1,23 @@
+behavior other::Trait1 for Type1 where
+    -- imagine all the things here
+end
+===
+SourceFile@0..77
+  BehaviorDef@0..77
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..23
+      Ident@9..14 "other"
+      DoubleColon@14..16 "::"
+      Ident@16..22 "Trait1"
+      Whitespace@22..23 " "
+    ForKw@23..26 "for"
+    Whitespace@26..27 " "
+    TypeIdentifier@27..33
+      Ident@27..32 "Type1"
+      Whitespace@32..33 " "
+    WhereKw@33..38 "where"
+    Whitespace@38..43 "\n    "
+    Comment@43..73 "-- imagine all the th ..."
+    Whitespace@73..74 "\n"
+    EndKw@74..77 "end"

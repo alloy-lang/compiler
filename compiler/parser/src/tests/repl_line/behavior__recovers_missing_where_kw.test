@@ -1,0 +1,35 @@
+behavior Trait1 for Type1
+    -- imagine all the things here
+end
+
+trait Trait1 where
+    -- imagine all the things here
+end
+===
+SourceFile@0..123
+  BehaviorDef@0..66
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..16
+      Ident@9..15 "Trait1"
+      Whitespace@15..16 " "
+    ForKw@16..19 "for"
+    Whitespace@19..20 " "
+    TypeIdentifier@20..61
+      Ident@20..25 "Type1"
+      Whitespace@25..30 "\n    "
+      Comment@30..60 "-- imagine all the th ..."
+      Whitespace@60..61 "\n"
+    EndKw@61..64 "end"
+    Whitespace@64..66 "\n\n"
+  TraitDef@66..123
+    TraitKw@66..71 "trait"
+    Whitespace@71..72 " "
+    Ident@72..78 "Trait1"
+    Whitespace@78..79 " "
+    WhereKw@79..84 "where"
+    Whitespace@84..89 "\n    "
+    Comment@89..119 "-- imagine all the th ..."
+    Whitespace@119..120 "\n"
+    EndKw@120..123 "end"
+error at position 61 while parsing the `where` keyword at the start of a behavior definition. Missing expected ‘where‘

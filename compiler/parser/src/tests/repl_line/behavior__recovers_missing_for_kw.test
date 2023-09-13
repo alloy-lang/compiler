@@ -1,0 +1,35 @@
+behavior Trait1 Type1 where
+    -- imagine all the things here
+end
+
+trait Trait1 where
+    -- imagine all the things here
+end
+===
+SourceFile@0..125
+  BehaviorDef@0..68
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..16
+      Ident@9..15 "Trait1"
+      Whitespace@15..16 " "
+    TypeIdentifier@16..22
+      Ident@16..21 "Type1"
+      Whitespace@21..22 " "
+    WhereKw@22..27 "where"
+    Whitespace@27..32 "\n    "
+    Comment@32..62 "-- imagine all the th ..."
+    Whitespace@62..63 "\n"
+    EndKw@63..66 "end"
+    Whitespace@66..68 "\n\n"
+  TraitDef@68..125
+    TraitKw@68..73 "trait"
+    Whitespace@73..74 " "
+    Ident@74..80 "Trait1"
+    Whitespace@80..81 " "
+    WhereKw@81..86 "where"
+    Whitespace@86..91 "\n    "
+    Comment@91..121 "-- imagine all the th ..."
+    Whitespace@121..122 "\n"
+    EndKw@122..125 "end"
+error at position 16 while parsing the `for` keyword at the start of a behavior definition. Missing expected ‘for‘

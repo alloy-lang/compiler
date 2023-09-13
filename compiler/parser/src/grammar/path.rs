@@ -7,10 +7,8 @@ pub(super) fn parse_path(
     recovery_set: TokenSet,
     kind: SyntaxKind,
 ) -> CompletedMarker {
-    assert!(p.at(TokenKind::Ident));
-
     let m = p.start();
-    p.bump();
+    p.expect_with_recovery(TokenKind::Ident, context, recovery_set);
 
     loop {
         if should_stop(p) {
