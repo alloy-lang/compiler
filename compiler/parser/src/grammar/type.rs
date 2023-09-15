@@ -9,14 +9,15 @@ pub(crate) enum ParseMode {
 
 pub(crate) fn parse_type(
     p: &mut Parser,
+    context: ParseErrorContext,
     mode: ParseMode,
     single_type_recovery_set: TokenSet,
     parent_recovery_set: TokenSet,
 ) -> Option<CompletedMarker> {
-    let single_type_m = match parse_single_type(p, mode, parent_recovery_set) {
+    let single_type_m = match parse_single_type(p, context, mode, parent_recovery_set) {
         Some(m) => m,
         None => {
-            p.error_with_recovery(ParseErrorContext::SingleType, single_type_recovery_set);
+            p.error_with_recovery(context, single_type_recovery_set);
             return None;
         }
     };
@@ -27,7 +28,7 @@ pub(crate) fn parse_type(
         let m = single_type_m.precede(p);
 
         p.bump();
-        parse_type(p, mode, ts![], parent_recovery_set);
+        parse_type(p, context, mode, ts![], parent_recovery_set);
 
         return Some(m.complete(p, SyntaxKind::LambdaType));
     }
@@ -40,13 +41,14 @@ pub(crate) const SINGLE_TYPE_RECOVERY_SET: TokenSet =
 
 fn parse_single_type(
     p: &mut Parser,
+    context: ParseErrorContext,
     mode: ParseMode,
     parent_recovery_set: TokenSet,
 ) -> Option<CompletedMarker> {
     if p.at(TokenKind::Ident) {
         Some(path::parse_path(
             p,
-            ParseErrorContext::SingleType,
+            context,
             ts![],
             SyntaxKind::TypeIdentifier,
         ))
@@ -66,7 +68,7 @@ fn parse_single_type(
 
         Some(cm)
     } else if p.at(TokenKind::LParen) {
-        Some(parse_parenthesized_type(p, mode, parent_recovery_set))
+        Some(parse_parenthesized_type(p, context, mode, parent_recovery_set))
     } else {
         None
     }
@@ -74,6 +76,7 @@ fn parse_single_type(
 
 fn parse_parenthesized_type(
     p: &mut Parser,
+    context: ParseErrorContext,
     mode: ParseMode,
     parent_recovery_set: TokenSet,
 ) -> CompletedMarker {
@@ -92,7 +95,7 @@ fn parse_parenthesized_type(
         return m.complete(p, SyntaxKind::UnitType);
     }
 
-    parse_type(p, mode, ts![], parent_recovery_set);
+    parse_type(p, context, mode, ts![], parent_recovery_set);
 
     let mut comma_count = 0;
     let mut arg_count = 1;
@@ -108,7 +111,7 @@ fn parse_parenthesized_type(
                 p.bump();
             }
 
-            parse_type(p, mode, ts![], parent_recovery_set);
+            parse_type(p, context, mode, ts![], parent_recovery_set);
 
             arg_count += 1;
         }
@@ -163,7 +166,7 @@ fn parse_bounded_type_args(p: &mut Parser, mode: ParseMode, parent_recovery_set:
         }
 
         let m = p.start();
-        parse_type(p, mode, ts![TokenKind::Comma], parent_recovery_set);
+        parse_type(p, ParseErrorContext::BoundedTypeArgType, mode, ts![TokenKind::Comma], parent_recovery_set);
         m.complete(p, SyntaxKind::BoundedTypeArg);
 
         if should_stop(p) {

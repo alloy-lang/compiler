@@ -51,7 +51,7 @@ fn parse_type_definition_bounds(p: &mut Parser) {
         let m = p.start();
         p.expect_with_recovery(
             TokenKind::Ident,
-            ParseErrorContext::BoundedTypeName,
+            ParseErrorContext::BoundedTypeArgName,
             ts![TokenKind::RAngle, TokenKind::Comma],
         );
         m.complete(p, SyntaxKind::BoundedTypeArg);
@@ -112,6 +112,7 @@ fn parse_type_definition_member(p: &mut Parser) -> CompletedMarker {
         let m = p.start();
         r#type::parse_type(
             p,
+            ParseErrorContext::TypeDefMemberPropertyType,
             r#type::ParseMode::OutsideSelfContext,
             r#type::SINGLE_TYPE_RECOVERY_SET,
             ts![],

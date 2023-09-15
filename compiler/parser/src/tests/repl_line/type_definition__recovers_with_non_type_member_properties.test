@@ -45,5 +45,5 @@ SourceFile@0..70
       TypeDefMemberProperty@67..70
         TypeIdentifier@67..70
           Ident@67..70 "Int"
-error in range 27..28 while parsing the type of a type annotation. Found integer, but expected identifier or ‘(’
-error in range 44..48 while parsing the type of a type annotation. Found string, but expected identifier or ‘(’
+error in range 27..28 while parsing the type of a type definition member. Found integer, but expected identifier or ‘(’
+error in range 44..48 while parsing the type of a type definition member. Found string, but expected identifier or ‘(’

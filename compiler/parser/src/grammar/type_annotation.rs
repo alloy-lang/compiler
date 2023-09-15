@@ -18,7 +18,7 @@ pub(crate) fn parse_type_annotation(
         r#type::SINGLE_TYPE_RECOVERY_SET,
     );
 
-    r#type::parse_type(p, mode, ts![], parent_recovery_set);
+    r#type::parse_type(p, ParseErrorContext::TypeOfType, mode, ts![], parent_recovery_set);
 
     if p.at(TokenKind::WhereKw) {
         parse_type_annotation_type_variables(p, parent_recovery_set);

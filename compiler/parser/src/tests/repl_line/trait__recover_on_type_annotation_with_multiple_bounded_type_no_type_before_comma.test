@@ -45,4 +45,4 @@ SourceFile@0..100
         Ident@94..96 "t2"
         Whitespace@96..97 "\n"
     EndKw@97..100 "end"
-error at position 47 while parsing the type of a type annotation. Missing expected identifier, ‘self‘ or ‘(’
+error at position 47 while parsing the type of a bounded type argument. Missing expected identifier, ‘self‘ or ‘(’

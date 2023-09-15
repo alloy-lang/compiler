@@ -34,4 +34,4 @@ SourceFile@0..61
       TypevarKw@51..58 "typevar"
       Whitespace@58..59 " "
       Ident@59..61 "t2"
-error at position 20 while parsing the type of a type annotation. Missing expected identifier or ‘(’
+error at position 20 while parsing the type of a bounded type argument. Missing expected identifier or ‘(’
