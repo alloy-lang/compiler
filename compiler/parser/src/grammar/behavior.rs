@@ -24,18 +24,18 @@ pub(crate) fn parse_behavior(p: &mut Parser) -> CompletedMarker {
         ParseErrorContext::BehaviorFor,
         BEHAVIOR_TITLE_RECOVERY_SET,
     );
-    path::parse_path(
+    r#type::parse_type(
         p,
         ParseErrorContext::BehaviorTypeName,
+        r#type::ParseMode::OutsideSelfContext,
         BEHAVIOR_TITLE_RECOVERY_SET,
-        SyntaxKind::TypeIdentifier,
+        ts![],
     );
     p.expect_with_recovery(
         TokenKind::WhereKw,
         ParseErrorContext::BehaviorWhere,
         BEHAVIOR_RECOVERY_SET,
     );
-
 
     p.expect_only(TokenKind::EndKw, ParseErrorContext::BehaviorEnd);
 
