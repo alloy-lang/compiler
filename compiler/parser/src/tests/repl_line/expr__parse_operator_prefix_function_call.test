@@ -1,0 +1,16 @@
+>>(func1, func2)
+===
+SourceFile@0..16
+  FunctionCall@0..16
+    FunctionCallTarget@0..2
+      VariableRef@0..2
+        OpIdent@0..2 ">>"
+    FunctionCallArgList@2..16
+      LParen@2..3 "("
+      VariableRef@3..8
+        Ident@3..8 "func1"
+      Comma@8..9 ","
+      Whitespace@9..10 " "
+      VariableRef@10..15
+        Ident@10..15 "func2"
+      RParen@15..16 ")"

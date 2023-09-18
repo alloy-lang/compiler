@@ -130,7 +130,7 @@ fn parse_lhs(
         parse_string_literal(p)
     } else if p.at(TokenKind::Char) {
         parse_char_literal(p)
-    } else if p.at(TokenKind::Ident) {
+    } else if p.at(TokenKind::Ident) || p.at(TokenKind::OpIdent) {
         parse_variable_ref(p)
     } else if p.at(TokenKind::Minus) {
         parse_prefix_expr(p)
@@ -183,16 +183,24 @@ pub(crate) fn parse_char_literal(p: &mut Parser) -> CompletedMarker {
 }
 
 pub(crate) fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::Ident));
+    let cm = if p.at(TokenKind::OpIdent) {
+        let m = p.start();
+        p.expect_with_recovery(
+            TokenKind::OpIdent,
+            ParseErrorContext::VariableRef,
+            EXPR_FIRSTS,
+        );
+        m.complete(p, SyntaxKind::VariableRef)
+    } else {
+        path::parse_path(
+            p,
+            ParseErrorContext::VariableRef,
+            ts![],
+            SyntaxKind::VariableRef,
+        )
+    };
 
-    let path_m = path::parse_path(
-        p,
-        ParseErrorContext::VariableRef,
-        ts![],
-        SyntaxKind::VariableRef,
-    );
-
-    maybe_parse_function_call(p, path_m)
+    maybe_parse_function_call(p, cm)
 }
 
 fn maybe_parse_function_call(p: &mut Parser, lhs: CompletedMarker) -> CompletedMarker {

@@ -37,4 +37,4 @@ SourceFile@0..44
       MatchTargetValue@43..44
         IntLiteral@43..44
           Integer@43..44 "1"
-error in range 28..29 while parsing the value in a match expression branch. Found ‘_’, but expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error in range 28..29 while parsing the value in a match expression branch. Found ‘_’, but expected integer, fractional, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’

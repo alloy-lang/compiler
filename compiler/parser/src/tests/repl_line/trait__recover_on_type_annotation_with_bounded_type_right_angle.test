@@ -54,6 +54,6 @@ SourceFile@0..110
       Ident@104..106 "t2"
       Whitespace@106..107 "\n"
     EndKw@107..110 "end"
-error in range 59..61 while parsing the start of a trait member, are you missing a keyword?. Found identifier, but expected ‘->’, ‘where‘, ‘typeof‘, ‘typevar‘ or ‘self‘
-error in range 61..62 while parsing the start of a trait member, are you missing a keyword?. Found ‘>’, but expected ‘typeof‘, ‘typevar‘ or ‘self‘
-error in range 63..68 while parsing the start of a trait member, are you missing a keyword?. Found ‘where‘, but expected ‘typeof‘, ‘typevar‘ or ‘self‘
+error in range 59..61 while parsing the start of a trait member, are you missing a keyword?. Found identifier, but expected ‘->’, ‘where‘, ‘typeof‘, ‘let’, ‘typevar‘ or ‘self‘
+error in range 61..62 while parsing the start of a trait member, are you missing a keyword?. Found ‘>’, but expected ‘typeof‘, ‘let’, ‘typevar‘ or ‘self‘
+error in range 63..68 while parsing the start of a trait member, are you missing a keyword?. Found ‘where‘, but expected ‘typeof‘, ‘let’, ‘typevar‘ or ‘self‘

@@ -6,4 +6,4 @@ SourceFile@0..3
     Error@1..2
       Comma@1..2 ","
     RParen@2..3 ")"
-error in range 1..2 while parsing an expression inside parentheses. Found ‘,’, but expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error in range 1..2 while parsing an expression inside parentheses. Found ‘,’, but expected integer, fractional, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’

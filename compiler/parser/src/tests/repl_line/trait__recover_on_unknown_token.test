@@ -21,4 +21,4 @@ SourceFile@0..54
       Ident@48..50 "t1"
       Whitespace@50..51 "\n"
     EndKw@51..54 "end"
-error in range 27..34 while parsing the start of a trait member, are you missing a keyword?. Found identifier, but expected ‘typeof‘, ‘typevar‘ or ‘self‘
+error in range 27..34 while parsing the start of a trait member, are you missing a keyword?. Found identifier, but expected ‘typeof‘, ‘let’, ‘typevar‘ or ‘self‘

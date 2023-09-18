@@ -58,4 +58,4 @@ SourceFile@0..46
           VariableRef@45..46
             Ident@45..46 "b"
 error in range 18..19 while parsing the `->` in a lambda expression. Found ‘-’, but expected ‘->’
-error at position 20 while parsing the body of a lambda expression. Missing expected integer, fractional, string, char, identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error at position 20 while parsing the body of a lambda expression. Missing expected integer, fractional, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
