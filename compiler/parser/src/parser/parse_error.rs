@@ -1,4 +1,5 @@
 use alloy_lexer::TokenKind;
+use itertools::Itertools;
 use std::fmt;
 use text_size::{TextRange, TextSize};
 
@@ -60,6 +61,7 @@ pub(crate) enum ParseErrorContext {
     BehaviorTypeName,
     BehaviorWhere,
     BehaviorEnd,
+    BehaviorMemberFirst,
     TypeOfName,
     TypeOfColon,
     TypeOfType,
@@ -72,9 +74,10 @@ pub(crate) enum ParseErrorContext {
     UnitTypeRightParen,
     ParenthesizedTypeRightParen,
     TupleTypeRightParen,
-    SingleType,
+    LambdaTypeRightArrow,
     SelfTypeOutsideContext,
     TypeVariableName,
+    TypeVariableConstraintsEquals,
     TraitSelfConstraintsEquals,
     TypeVariableConstraint,
     TypeVariableConstraintPlus,
@@ -139,6 +142,7 @@ impl ParseErrorContext {
             ParseErrorContext::BehaviorTypeName => "the name of a type at the start of a behavior definition",
             ParseErrorContext::BehaviorWhere => "the `where` keyword at the start of a behavior definition",
             ParseErrorContext::BehaviorEnd => "the `end` keyword after a behavior definition",
+            ParseErrorContext::BehaviorMemberFirst => "the start of a trait member, are you missing a keyword?",
             ParseErrorContext::TypeOfName => "the name of a type",
             ParseErrorContext::TypeOfColon => "the colon after the name of a type",
             ParseErrorContext::TypeOfType => "a type in a type annotation",
@@ -151,9 +155,10 @@ impl ParseErrorContext {
             ParseErrorContext::UnitTypeRightParen => "the right parenthesis of a unit type",
             ParseErrorContext::ParenthesizedTypeRightParen => "the right parenthesis of a parenthesized type",
             ParseErrorContext::TupleTypeRightParen => "the right parenthesis of a tuple type",
-            ParseErrorContext::SingleType => "the type of a type annotation",
+            ParseErrorContext::LambdaTypeRightArrow => todo!(),
             ParseErrorContext::SelfTypeOutsideContext => "a type, encountered an unexpected `self` reference outside a trait or behavior context",
             ParseErrorContext::TypeVariableName => "the name of a type variable",
+            ParseErrorContext::TypeVariableConstraintsEquals => "the `=` sign in a typevar constraint",
             ParseErrorContext::TraitSelfConstraintsEquals => "the `=` sign in a trait `self` constraint",
             ParseErrorContext::TypeVariableConstraint => "the constraints for a type variable",
             ParseErrorContext::TypeVariableConstraintPlus => "the `+` between type constraints",
@@ -199,11 +204,14 @@ impl fmt::Display for ParseError {
         // Expected
         //
 
-        let num_expected = self.expected.len();
+        let vec = self.expected.iter()
+            .unique()
+            .collect::<Vec<_>>();
+        let num_expected = vec.len();
         let is_first = |idx| idx == 0;
         let is_last = |idx| idx == num_expected - 1;
 
-        for (idx, expected_kind) in self.expected.iter().enumerate() {
+        for (idx, expected_kind) in vec.iter().enumerate() {
             if is_first(idx) {
                 write!(f, "{}", expected_kind)?;
             } else if is_last(idx) {
@@ -236,6 +244,17 @@ mod tests {
     fn one_expected_did_find() {
         check(
             vec![TokenKind::Equals],
+            ParseErrorKind::Missing {
+                offset: TextSize::from(20),
+            },
+            "error at position 20 while parsing an expression inside parentheses. Missing expected ‘=’",
+        );
+    }
+
+    #[test]
+    fn duplicate_expected_did_find() {
+        check(
+            vec![TokenKind::Equals, TokenKind::Equals],
             ParseErrorKind::Missing {
                 offset: TextSize::from(20),
             },
