@@ -38,4 +38,4 @@ SourceFile@0..68
       TypevarKw@58..65 "typevar"
       Whitespace@65..66 " "
       Ident@66..68 "t2"
-error at position 58 while parsing the constraints for a type variable. Missing expected ‘#’ or identifier
+error at position 58 while parsing the constraints for a type variable. Missing expected identifier

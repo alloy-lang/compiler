@@ -101,7 +101,7 @@ fn parse_trait_self(p: &mut Parser) -> CompletedMarker {
         TRAIT_RECOVERY_SET.union(TYPEVAR_CONSTRAINT_FIRSTS),
     );
 
-    type_variable::parse_typevar_constraints(p);
+    type_variable::parse_typevar_constraints_with_kind(p);
 
     m.complete(p, SyntaxKind::TypeVariable)
 }
@@ -121,7 +121,7 @@ fn parse_trait_type_variable(p: &mut Parser) -> CompletedMarker {
     if p.at(TokenKind::Equals) {
         p.bump();
 
-        type_variable::parse_typevar_constraints(p);
+        type_variable::parse_typevar_constraints_with_kind(p);
     }
 
     m.complete(p, SyntaxKind::TypeVariable)

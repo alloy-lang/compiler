@@ -1,12 +1,26 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
+pub(crate) enum ParseMode {
+    InsideKindContext,
+    OutsideKindContext,
+}
+
 pub(crate) const TYPEVAR_CONSTRAINT_FIRSTS: TokenSet =
     ts![TokenKind::Hash, TokenKind::Ident, TokenKind::Plus];
 
 pub(crate) fn parse_typevar_constraints(p: &mut Parser) {
+    inner_parse_typevar_constraints(p, ParseMode::OutsideKindContext);
+}
+
+pub(crate) fn parse_typevar_constraints_with_kind(p: &mut Parser) {
+    inner_parse_typevar_constraints(p, ParseMode::InsideKindContext);
+}
+
+fn inner_parse_typevar_constraints(p: &mut Parser, mode: ParseMode) {
     loop {
-        parse_typevar_constraint(p);
+        parse_typevar_constraint(p, mode);
 
         if should_stop(p) {
             break;
@@ -26,8 +40,8 @@ pub(crate) fn parse_typevar_constraints(p: &mut Parser) {
     }
 }
 
-fn parse_typevar_constraint(p: &mut Parser) {
-    if p.at(TokenKind::Hash) {
+fn parse_typevar_constraint(p: &mut Parser, mode: ParseMode) {
+    if mode == ParseMode::InsideKindContext && p.at(TokenKind::Hash) {
         parse_typevar_constraint_kind_marker(p);
     } else if p.at(TokenKind::Ident) {
         parse_typevar_constraint_trait_marker(p);
