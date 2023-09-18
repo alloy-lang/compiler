@@ -1,0 +1,71 @@
+typeof apply : self<(t1 -> t2)> -> self<t1> -> self<t2> where
+    typevar t1
+    typevar t2
+===
+SourceFile@0..91
+  TypeAnnotation@0..91
+    TypeOfKw@0..6 "typeof"
+    Whitespace@6..7 " "
+    Ident@7..12 "apply"
+    Whitespace@12..13 " "
+    Colon@13..14 ":"
+    Whitespace@14..15 " "
+    LambdaType@15..56
+      BoundedType@15..32
+        BoundedTypeBase@15..19
+          SelfType@15..19
+            SelfKw@15..19 "self"
+        LAngle@19..20 "<"
+        BoundedTypeArg@20..30
+          ParenthesizedType@20..30
+            LParen@20..21 "("
+            LambdaType@21..29
+              TypeIdentifier@21..24
+                Ident@21..23 "t1"
+                Whitespace@23..24 " "
+              RightArrow@24..26 "->"
+              Whitespace@26..27 " "
+              TypeIdentifier@27..29
+                Ident@27..29 "t2"
+            RParen@29..30 ")"
+        RAngle@30..31 ">"
+        Whitespace@31..32 " "
+      RightArrow@32..34 "->"
+      Whitespace@34..35 " "
+      LambdaType@35..56
+        BoundedType@35..44
+          BoundedTypeBase@35..39
+            SelfType@35..39
+              SelfKw@35..39 "self"
+          LAngle@39..40 "<"
+          BoundedTypeArg@40..42
+            TypeIdentifier@40..42
+              Ident@40..42 "t1"
+          RAngle@42..43 ">"
+          Whitespace@43..44 " "
+        RightArrow@44..46 "->"
+        Whitespace@46..47 " "
+        BoundedType@47..56
+          BoundedTypeBase@47..51
+            SelfType@47..51
+              SelfKw@47..51 "self"
+          LAngle@51..52 "<"
+          BoundedTypeArg@52..54
+            TypeIdentifier@52..54
+              Ident@52..54 "t2"
+          RAngle@54..55 ">"
+          Whitespace@55..56 " "
+    WhereKw@56..61 "where"
+    Whitespace@61..66 "\n    "
+    TypeVariable@66..81
+      TypevarKw@66..73 "typevar"
+      Whitespace@73..74 " "
+      Ident@74..76 "t1"
+      Whitespace@76..81 "\n    "
+    TypeVariable@81..91
+      TypevarKw@81..88 "typevar"
+      Whitespace@88..89 " "
+      Ident@89..91 "t2"
+error at position 15 while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context. Missing expected identifier
+error at position 35 while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context. Missing expected identifier
+error at position 47 while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context. Missing expected identifier

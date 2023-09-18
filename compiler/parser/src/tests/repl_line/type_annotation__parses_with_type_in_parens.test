@@ -1,0 +1,22 @@
+typeof test : self -> (String)
+===
+SourceFile@0..30
+  TypeAnnotation@0..30
+    TypeOfKw@0..6 "typeof"
+    Whitespace@6..7 " "
+    Ident@7..11 "test"
+    Whitespace@11..12 " "
+    Colon@12..13 ":"
+    Whitespace@13..14 " "
+    LambdaType@14..30
+      SelfType@14..19
+        SelfKw@14..18 "self"
+        Whitespace@18..19 " "
+      RightArrow@19..21 "->"
+      Whitespace@21..22 " "
+      ParenthesizedType@22..30
+        LParen@22..23 "("
+        TypeIdentifier@23..29
+          Ident@23..29 "String"
+        RParen@29..30 ")"
+error at position 14 while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context. Missing expected identifier

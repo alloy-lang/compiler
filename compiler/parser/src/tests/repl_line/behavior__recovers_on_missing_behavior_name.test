@@ -1,0 +1,50 @@
+behavior for Type1 where
+    typevar t1
+end
+
+behavior TestTrait2 for Type1 where
+    -- imagine all the things here
+
+    typevar t1
+end
+===
+SourceFile@0..135
+  BehaviorDef@0..45
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    ForKw@9..12 "for"
+    Whitespace@12..13 " "
+    TypeIdentifier@13..19
+      Ident@13..18 "Type1"
+      Whitespace@18..19 " "
+    WhereKw@19..24 "where"
+    Whitespace@24..29 "\n    "
+    TypeVariable@29..40
+      TypevarKw@29..36 "typevar"
+      Whitespace@36..37 " "
+      Ident@37..39 "t1"
+      Whitespace@39..40 "\n"
+    EndKw@40..43 "end"
+    Whitespace@43..45 "\n\n"
+  BehaviorDef@45..135
+    BehaviorKw@45..53 "behavior"
+    Whitespace@53..54 " "
+    TypeIdentifier@54..65
+      Ident@54..64 "TestTrait2"
+      Whitespace@64..65 " "
+    ForKw@65..68 "for"
+    Whitespace@68..69 " "
+    TypeIdentifier@69..75
+      Ident@69..74 "Type1"
+      Whitespace@74..75 " "
+    WhereKw@75..80 "where"
+    Whitespace@80..85 "\n    "
+    Comment@85..115 "-- imagine all the th ..."
+    Whitespace@115..121 "\n\n    "
+    TypeVariable@121..132
+      TypevarKw@121..128 "typevar"
+      Whitespace@128..129 " "
+      Ident@129..131 "t1"
+      Whitespace@131..132 "\n"
+    EndKw@132..135 "end"
+error at position 9 while parsing the name of a trait at the start of a behavior definition. Missing expected identifier or ‘(’

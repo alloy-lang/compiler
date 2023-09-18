@@ -1,7 +1,7 @@
 typedef Test1<t1 t2> = Empty
-typedef Test2   = Empty
+typedef Test2        = Empty
 ===
-SourceFile@0..52
+SourceFile@0..57
   TypeDef@0..29
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
@@ -19,13 +19,13 @@ SourceFile@0..52
     TypeDefMember@23..29
       Ident@23..28 "Empty"
       Whitespace@28..29 "\n"
-  TypeDef@29..52
+  TypeDef@29..57
     TypedefKw@29..36 "typedef"
     Whitespace@36..37 " "
     Ident@37..42 "Test2"
-    Whitespace@42..45 "   "
-    Equals@45..46 "="
-    Whitespace@46..47 " "
-    TypeDefMember@47..52
-      Ident@47..52 "Empty"
+    Whitespace@42..50 "        "
+    Equals@50..51 "="
+    Whitespace@51..52 " "
+    TypeDefMember@52..57
+      Ident@52..57 "Empty"
 error at position 17 while parsing the comma between arguments in a bounded type. Missing expected ‘,’
