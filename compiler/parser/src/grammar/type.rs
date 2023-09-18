@@ -68,7 +68,12 @@ fn parse_single_type(
 
         Some(cm)
     } else if p.at(TokenKind::LParen) {
-        Some(parse_parenthesized_type(p, context, mode, parent_recovery_set))
+        Some(parse_parenthesized_type(
+            p,
+            context,
+            mode,
+            parent_recovery_set,
+        ))
     } else {
         None
     }
