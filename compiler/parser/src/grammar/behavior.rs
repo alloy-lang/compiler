@@ -13,11 +13,12 @@ pub(crate) fn parse_behavior(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
     p.bump();
 
-    path::parse_path(
+    r#type::parse_type(
         p,
         ParseErrorContext::BehaviorTraitName,
+        r#type::ParseMode::OutsideSelfContext,
         BEHAVIOR_TITLE_RECOVERY_SET,
-        SyntaxKind::TypeIdentifier,
+        ts![],
     );
     p.expect_with_recovery(
         TokenKind::ForKw,

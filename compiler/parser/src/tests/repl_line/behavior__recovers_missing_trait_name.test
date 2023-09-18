@@ -10,7 +10,6 @@ SourceFile@0..122
   BehaviorDef@0..65
     BehaviorKw@0..8 "behavior"
     Whitespace@8..9 " "
-    TypeIdentifier@9..9
     ForKw@9..12 "for"
     Whitespace@12..13 " "
     TypeIdentifier@13..19
@@ -32,4 +31,4 @@ SourceFile@0..122
     Comment@88..118 "-- imagine all the th ..."
     Whitespace@118..119 "\n"
     EndKw@119..122 "end"
-error at position 9 while parsing the name of a trait at the start of a behavior definition. Missing expected identifier
+error at position 9 while parsing the name of a trait at the start of a behavior definition. Missing expected identifier or ‘(’

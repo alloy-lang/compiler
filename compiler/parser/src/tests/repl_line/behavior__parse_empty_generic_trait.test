@@ -1,0 +1,33 @@
+behavior Trait1<t1, t2> for Type1 where
+    -- imagine all the things here
+end
+===
+SourceFile@0..78
+  BehaviorDef@0..78
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    BoundedType@9..24
+      BoundedTypeBase@9..15
+        TypeIdentifier@9..15
+          Ident@9..15 "Trait1"
+      LAngle@15..16 "<"
+      BoundedTypeArg@16..18
+        TypeIdentifier@16..18
+          Ident@16..18 "t1"
+      Comma@18..19 ","
+      Whitespace@19..20 " "
+      BoundedTypeArg@20..22
+        TypeIdentifier@20..22
+          Ident@20..22 "t2"
+      RAngle@22..23 ">"
+      Whitespace@23..24 " "
+    ForKw@24..27 "for"
+    Whitespace@27..28 " "
+    TypeIdentifier@28..34
+      Ident@28..33 "Type1"
+      Whitespace@33..34 " "
+    WhereKw@34..39 "where"
+    Whitespace@39..44 "\n    "
+    Comment@44..74 "-- imagine all the th ..."
+    Whitespace@74..75 "\n"
+    EndKw@75..78 "end"
