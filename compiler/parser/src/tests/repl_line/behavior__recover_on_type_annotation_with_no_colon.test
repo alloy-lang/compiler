@@ -1,0 +1,63 @@
+behavior TestTrait1 for Type1 where
+    typeof test1   self -> String -> Int
+    typeof test2 : self -> String -> Int
+end
+===
+SourceFile@0..121
+  BehaviorDef@0..121
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..20
+      Ident@9..19 "TestTrait1"
+      Whitespace@19..20 " "
+    ForKw@20..23 "for"
+    Whitespace@23..24 " "
+    TypeIdentifier@24..30
+      Ident@24..29 "Type1"
+      Whitespace@29..30 " "
+    WhereKw@30..35 "where"
+    Whitespace@35..40 "\n    "
+    TypeAnnotation@40..81
+      TypeOfKw@40..46 "typeof"
+      Whitespace@46..47 " "
+      Ident@47..52 "test1"
+      Whitespace@52..55 "   "
+      LambdaType@55..81
+        SelfType@55..60
+          SelfKw@55..59 "self"
+          Whitespace@59..60 " "
+        RightArrow@60..62 "->"
+        Whitespace@62..63 " "
+        LambdaType@63..81
+          TypeIdentifier@63..70
+            Ident@63..69 "String"
+            Whitespace@69..70 " "
+          RightArrow@70..72 "->"
+          Whitespace@72..73 " "
+          TypeIdentifier@73..81
+            Ident@73..76 "Int"
+            Whitespace@76..81 "\n    "
+    TypeAnnotation@81..118
+      TypeOfKw@81..87 "typeof"
+      Whitespace@87..88 " "
+      Ident@88..93 "test2"
+      Whitespace@93..94 " "
+      Colon@94..95 ":"
+      Whitespace@95..96 " "
+      LambdaType@96..118
+        SelfType@96..101
+          SelfKw@96..100 "self"
+          Whitespace@100..101 " "
+        RightArrow@101..103 "->"
+        Whitespace@103..104 " "
+        LambdaType@104..118
+          TypeIdentifier@104..111
+            Ident@104..110 "String"
+            Whitespace@110..111 " "
+          RightArrow@111..113 "->"
+          Whitespace@113..114 " "
+          TypeIdentifier@114..118
+            Ident@114..117 "Int"
+            Whitespace@117..118 "\n"
+    EndKw@118..121 "end"
+error at position 55 while parsing the colon after the name of a type. Missing expected ‘:’

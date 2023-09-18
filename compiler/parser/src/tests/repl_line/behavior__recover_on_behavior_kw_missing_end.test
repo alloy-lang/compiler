@@ -1,0 +1,60 @@
+behavior TestTrait1 for Type1 where
+    -- imagine all the things here
+
+    typevar t1
+
+behavior TestTrait2 for Type1 where
+    -- imagine all the things here
+
+    typevar t1
+end
+===
+SourceFile@0..178
+  BehaviorDef@0..178
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..20
+      Ident@9..19 "TestTrait1"
+      Whitespace@19..20 " "
+    ForKw@20..23 "for"
+    Whitespace@23..24 " "
+    TypeIdentifier@24..30
+      Ident@24..29 "Type1"
+      Whitespace@29..30 " "
+    WhereKw@30..35 "where"
+    Whitespace@35..40 "\n    "
+    Comment@40..70 "-- imagine all the th ..."
+    Whitespace@70..76 "\n\n    "
+    TypeVariable@76..88
+      TypevarKw@76..83 "typevar"
+      Whitespace@83..84 " "
+      Ident@84..86 "t1"
+      Whitespace@86..88 "\n\n"
+    Error@88..97
+      BehaviorKw@88..96 "behavior"
+      Whitespace@96..97 " "
+    Error@97..108
+      Ident@97..107 "TestTrait2"
+      Whitespace@107..108 " "
+    Error@108..112
+      ForKw@108..111 "for"
+      Whitespace@111..112 " "
+    Error@112..118
+      Ident@112..117 "Type1"
+      Whitespace@117..118 " "
+    Error@118..164
+      WhereKw@118..123 "where"
+      Whitespace@123..128 "\n    "
+      Comment@128..158 "-- imagine all the th ..."
+      Whitespace@158..164 "\n\n    "
+    TypeVariable@164..175
+      TypevarKw@164..171 "typevar"
+      Whitespace@171..172 " "
+      Ident@172..174 "t1"
+      Whitespace@174..175 "\n"
+    EndKw@175..178 "end"
+error in range 88..96 while parsing the start of a trait member, are you missing a keyword?. Found ‘behavior‘, but expected ‘=’, ‘typeof‘, ‘let’ or ‘typevar‘
+error in range 97..107 while parsing the start of a trait member, are you missing a keyword?. Found identifier, but expected ‘typeof‘, ‘let’ or ‘typevar‘
+error in range 108..111 while parsing the start of a trait member, are you missing a keyword?. Found ‘for‘, but expected ‘typeof‘, ‘let’ or ‘typevar‘
+error in range 112..117 while parsing the start of a trait member, are you missing a keyword?. Found identifier, but expected ‘typeof‘, ‘let’ or ‘typevar‘
+error in range 118..123 while parsing the start of a trait member, are you missing a keyword?. Found ‘where‘, but expected ‘typeof‘, ‘let’ or ‘typevar‘

@@ -1,0 +1,49 @@
+behavior TestTrait1 for Type1 where
+    typeof test1
+    typeof test2 : self -> String -> Int
+end
+===
+SourceFile@0..97
+  BehaviorDef@0..97
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..20
+      Ident@9..19 "TestTrait1"
+      Whitespace@19..20 " "
+    ForKw@20..23 "for"
+    Whitespace@23..24 " "
+    TypeIdentifier@24..30
+      Ident@24..29 "Type1"
+      Whitespace@29..30 " "
+    WhereKw@30..35 "where"
+    Whitespace@35..40 "\n    "
+    TypeAnnotation@40..57
+      TypeOfKw@40..46 "typeof"
+      Whitespace@46..47 " "
+      Ident@47..52 "test1"
+      Whitespace@52..57 "\n    "
+    TypeAnnotation@57..94
+      TypeOfKw@57..63 "typeof"
+      Whitespace@63..64 " "
+      Ident@64..69 "test2"
+      Whitespace@69..70 " "
+      Colon@70..71 ":"
+      Whitespace@71..72 " "
+      LambdaType@72..94
+        SelfType@72..77
+          SelfKw@72..76 "self"
+          Whitespace@76..77 " "
+        RightArrow@77..79 "->"
+        Whitespace@79..80 " "
+        LambdaType@80..94
+          TypeIdentifier@80..87
+            Ident@80..86 "String"
+            Whitespace@86..87 " "
+          RightArrow@87..89 "->"
+          Whitespace@89..90 " "
+          TypeIdentifier@90..94
+            Ident@90..93 "Int"
+            Whitespace@93..94 "\n"
+    EndKw@94..97 "end"
+error at position 57 while parsing the colon after the name of a type. Missing expected ‘:’
+error at position 57 while parsing a type in a type annotation. Missing expected identifier, ‘self‘ or ‘(’

@@ -1,0 +1,51 @@
+behavior TestTrait1 for Type1 where
+    typeof test1 : self -> String -> (String
+
+    typevar t1
+end
+===
+SourceFile@0..100
+  BehaviorDef@0..100
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..20
+      Ident@9..19 "TestTrait1"
+      Whitespace@19..20 " "
+    ForKw@20..23 "for"
+    Whitespace@23..24 " "
+    TypeIdentifier@24..30
+      Ident@24..29 "Type1"
+      Whitespace@29..30 " "
+    WhereKw@30..35 "where"
+    Whitespace@35..40 "\n    "
+    TypeAnnotation@40..86
+      TypeOfKw@40..46 "typeof"
+      Whitespace@46..47 " "
+      Ident@47..52 "test1"
+      Whitespace@52..53 " "
+      Colon@53..54 ":"
+      Whitespace@54..55 " "
+      LambdaType@55..86
+        SelfType@55..60
+          SelfKw@55..59 "self"
+          Whitespace@59..60 " "
+        RightArrow@60..62 "->"
+        Whitespace@62..63 " "
+        LambdaType@63..86
+          TypeIdentifier@63..70
+            Ident@63..69 "String"
+            Whitespace@69..70 " "
+          RightArrow@70..72 "->"
+          Whitespace@72..73 " "
+          ParenthesizedType@73..86
+            LParen@73..74 "("
+            TypeIdentifier@74..86
+              Ident@74..80 "String"
+              Whitespace@80..86 "\n\n    "
+    TypeVariable@86..97
+      TypevarKw@86..93 "typevar"
+      Whitespace@93..94 " "
+      Ident@94..96 "t1"
+      Whitespace@96..97 "\n"
+    EndKw@97..100 "end"
+error at position 86 while parsing the right parenthesis of a parenthesized type. Missing expected ‘->’, ‘,’ or ‘)’

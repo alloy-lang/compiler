@@ -1,0 +1,41 @@
+behavior TestTrait1 for Type1 where
+    typeof test : Int
+
+    let thing = test
+end
+===
+SourceFile@0..83
+  BehaviorDef@0..83
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..20
+      Ident@9..19 "TestTrait1"
+      Whitespace@19..20 " "
+    ForKw@20..23 "for"
+    Whitespace@23..24 " "
+    TypeIdentifier@24..30
+      Ident@24..29 "Type1"
+      Whitespace@29..30 " "
+    WhereKw@30..35 "where"
+    Whitespace@35..40 "\n    "
+    TypeAnnotation@40..63
+      TypeOfKw@40..46 "typeof"
+      Whitespace@46..47 " "
+      Ident@47..51 "test"
+      Whitespace@51..52 " "
+      Colon@52..53 ":"
+      Whitespace@53..54 " "
+      TypeIdentifier@54..63
+        Ident@54..57 "Int"
+        Whitespace@57..63 "\n\n    "
+    VariableDef@63..80
+      LetKw@63..66 "let"
+      Whitespace@66..67 " "
+      Ident@67..72 "thing"
+      Whitespace@72..73 " "
+      Equals@73..74 "="
+      Whitespace@74..75 " "
+      VariableRef@75..80
+        Ident@75..79 "test"
+        Whitespace@79..80 "\n"
+    EndKw@80..83 "end"

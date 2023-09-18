@@ -1,0 +1,30 @@
+behavior TestTrait1 for Type1 where
+    typevar t1 functor::Functor
+end
+===
+SourceFile@0..71
+  BehaviorDef@0..71
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..20
+      Ident@9..19 "TestTrait1"
+      Whitespace@19..20 " "
+    ForKw@20..23 "for"
+    Whitespace@23..24 " "
+    TypeIdentifier@24..30
+      Ident@24..29 "Type1"
+      Whitespace@29..30 " "
+    WhereKw@30..35 "where"
+    Whitespace@35..40 "\n    "
+    TypeVariable@40..68
+      TypevarKw@40..47 "typevar"
+      Whitespace@47..48 " "
+      Ident@48..50 "t1"
+      Whitespace@50..51 " "
+      TypeVariableTraitConstraint@51..68
+        Ident@51..58 "functor"
+        DoubleColon@58..60 "::"
+        Ident@60..67 "Functor"
+        Whitespace@67..68 "\n"
+    EndKw@68..71 "end"
+error at position 51 while parsing the constraints for a type variable. Missing expected ‘=’

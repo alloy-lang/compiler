@@ -1,0 +1,29 @@
+behavior TestTrait1 for Type1 where
+    typevar t1 = Functor
+end
+===
+SourceFile@0..64
+  BehaviorDef@0..64
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..20
+      Ident@9..19 "TestTrait1"
+      Whitespace@19..20 " "
+    ForKw@20..23 "for"
+    Whitespace@23..24 " "
+    TypeIdentifier@24..30
+      Ident@24..29 "Type1"
+      Whitespace@29..30 " "
+    WhereKw@30..35 "where"
+    Whitespace@35..40 "\n    "
+    TypeVariable@40..61
+      TypevarKw@40..47 "typevar"
+      Whitespace@47..48 " "
+      Ident@48..50 "t1"
+      Whitespace@50..51 " "
+      Equals@51..52 "="
+      Whitespace@52..53 " "
+      TypeVariableTraitConstraint@53..61
+        Ident@53..60 "Functor"
+        Whitespace@60..61 "\n"
+    EndKw@61..64 "end"

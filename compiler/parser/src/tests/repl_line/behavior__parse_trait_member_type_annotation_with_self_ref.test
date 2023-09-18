@@ -1,0 +1,41 @@
+behavior TestTrait1 for Type1 where
+    typeof test : self -> String -> Int
+end
+===
+SourceFile@0..79
+  BehaviorDef@0..79
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..20
+      Ident@9..19 "TestTrait1"
+      Whitespace@19..20 " "
+    ForKw@20..23 "for"
+    Whitespace@23..24 " "
+    TypeIdentifier@24..30
+      Ident@24..29 "Type1"
+      Whitespace@29..30 " "
+    WhereKw@30..35 "where"
+    Whitespace@35..40 "\n    "
+    TypeAnnotation@40..76
+      TypeOfKw@40..46 "typeof"
+      Whitespace@46..47 " "
+      Ident@47..51 "test"
+      Whitespace@51..52 " "
+      Colon@52..53 ":"
+      Whitespace@53..54 " "
+      LambdaType@54..76
+        SelfType@54..59
+          SelfKw@54..58 "self"
+          Whitespace@58..59 " "
+        RightArrow@59..61 "->"
+        Whitespace@61..62 " "
+        LambdaType@62..76
+          TypeIdentifier@62..69
+            Ident@62..68 "String"
+            Whitespace@68..69 " "
+          RightArrow@69..71 "->"
+          Whitespace@71..72 " "
+          TypeIdentifier@72..76
+            Ident@72..75 "Int"
+            Whitespace@75..76 "\n"
+    EndKw@76..79 "end"

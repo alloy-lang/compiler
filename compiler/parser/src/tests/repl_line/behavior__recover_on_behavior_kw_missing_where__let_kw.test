@@ -1,0 +1,28 @@
+behavior TestTrait1 for Type1
+    let a = 1
+end
+===
+SourceFile@0..47
+  BehaviorDef@0..47
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..20
+      Ident@9..19 "TestTrait1"
+      Whitespace@19..20 " "
+    ForKw@20..23 "for"
+    Whitespace@23..24 " "
+    TypeIdentifier@24..34
+      Ident@24..29 "Type1"
+      Whitespace@29..34 "\n    "
+    VariableDef@34..44
+      LetKw@34..37 "let"
+      Whitespace@37..38 " "
+      Ident@38..39 "a"
+      Whitespace@39..40 " "
+      Equals@40..41 "="
+      Whitespace@41..42 " "
+      IntLiteral@42..44
+        Integer@42..43 "1"
+        Whitespace@43..44 "\n"
+    EndKw@44..47 "end"
+error at position 34 while parsing the `where` keyword at the start of a behavior definition. Missing expected ‘->’ or ‘where‘

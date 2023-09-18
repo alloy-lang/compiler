@@ -1,0 +1,40 @@
+behavior Trait1 for Type1<t1, _> where
+    typevar t1
+    -- imagine all the things here
+end
+===
+SourceFile@0..92
+  BehaviorDef@0..92
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..16
+      Ident@9..15 "Trait1"
+      Whitespace@15..16 " "
+    ForKw@16..19 "for"
+    Whitespace@19..20 " "
+    BoundedType@20..33
+      BoundedTypeBase@20..25
+        TypeIdentifier@20..25
+          Ident@20..25 "Type1"
+      LAngle@25..26 "<"
+      BoundedTypeArg@26..28
+        TypeIdentifier@26..28
+          Ident@26..28 "t1"
+      Comma@28..29 ","
+      Whitespace@29..30 " "
+      BoundedTypeArg@30..31
+        Error@30..31
+          NilIdentifier@30..31 "_"
+      RAngle@31..32 ">"
+      Whitespace@32..33 " "
+    WhereKw@33..38 "where"
+    Whitespace@38..43 "\n    "
+    TypeVariable@43..89
+      TypevarKw@43..50 "typevar"
+      Whitespace@50..51 " "
+      Ident@51..53 "t1"
+      Whitespace@53..58 "\n    "
+      Comment@58..88 "-- imagine all the th ..."
+      Whitespace@88..89 "\n"
+    EndKw@89..92 "end"
+error in range 30..31 while parsing the type of a bounded type argument. Found ‘_’, but expected identifier or ‘(’

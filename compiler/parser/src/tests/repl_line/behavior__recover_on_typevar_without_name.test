@@ -1,0 +1,29 @@
+behavior TestTrait1 for Type1 where
+    typevar
+    typevar t2
+end
+===
+SourceFile@0..66
+  BehaviorDef@0..66
+    BehaviorKw@0..8 "behavior"
+    Whitespace@8..9 " "
+    TypeIdentifier@9..20
+      Ident@9..19 "TestTrait1"
+      Whitespace@19..20 " "
+    ForKw@20..23 "for"
+    Whitespace@23..24 " "
+    TypeIdentifier@24..30
+      Ident@24..29 "Type1"
+      Whitespace@29..30 " "
+    WhereKw@30..35 "where"
+    Whitespace@35..40 "\n    "
+    TypeVariable@40..52
+      TypevarKw@40..47 "typevar"
+      Whitespace@47..52 "\n    "
+    TypeVariable@52..63
+      TypevarKw@52..59 "typevar"
+      Whitespace@59..60 " "
+      Ident@60..62 "t2"
+      Whitespace@62..63 "\n"
+    EndKw@63..66 "end"
+error at position 52 while parsing the name of a type variable. Missing expected identifier
