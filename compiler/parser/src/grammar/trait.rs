@@ -69,6 +69,9 @@ fn parse_trait_member(p: &mut Parser) -> TraitMemberParseResult {
             TRAIT_RECOVERY_SET,
         );
         TraitMemberParseResult::TraitMember(cm)
+    } else if p.at(TokenKind::LetKw) {
+        let cm = variable_def::parse_variable_def(p);
+        TraitMemberParseResult::TraitMember(cm)
     } else if p.at(TokenKind::TypevarKw) {
         let cm = parse_trait_type_variable(p);
         TraitMemberParseResult::TraitMember(cm)
