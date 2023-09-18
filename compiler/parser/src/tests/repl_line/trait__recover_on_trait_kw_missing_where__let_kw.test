@@ -1,0 +1,22 @@
+trait TestTrait1
+    let a = 1
+end
+===
+SourceFile@0..34
+  TraitDef@0..34
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..21 "\n    "
+    VariableDef@21..31
+      LetKw@21..24 "let"
+      Whitespace@24..25 " "
+      Ident@25..26 "a"
+      Whitespace@26..27 " "
+      Equals@27..28 "="
+      Whitespace@28..29 " "
+      IntLiteral@29..31
+        Integer@29..30 "1"
+        Whitespace@30..31 "\n"
+    EndKw@31..34 "end"
+error at position 21 while parsing the `where` keyword at the start of a trait definition. Missing expected ‘where‘

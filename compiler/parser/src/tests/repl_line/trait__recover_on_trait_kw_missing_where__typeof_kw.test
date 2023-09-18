@@ -1,0 +1,22 @@
+trait TestTrait1
+    typeof test : String
+end
+===
+SourceFile@0..45
+  TraitDef@0..45
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..21 "\n    "
+    TypeAnnotation@21..42
+      TypeOfKw@21..27 "typeof"
+      Whitespace@27..28 " "
+      Ident@28..32 "test"
+      Whitespace@32..33 " "
+      Colon@33..34 ":"
+      Whitespace@34..35 " "
+      TypeIdentifier@35..42
+        Ident@35..41 "String"
+        Whitespace@41..42 "\n"
+    EndKw@42..45 "end"
+error at position 21 while parsing the `where` keyword at the start of a trait definition. Missing expected ‘where‘

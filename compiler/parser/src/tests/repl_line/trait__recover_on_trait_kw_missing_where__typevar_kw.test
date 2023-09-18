@@ -1,0 +1,17 @@
+trait TestTrait1
+    typevar t1
+end
+===
+SourceFile@0..35
+  TraitDef@0..35
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..21 "\n    "
+    TypeVariable@21..32
+      TypevarKw@21..28 "typevar"
+      Whitespace@28..29 " "
+      Ident@29..31 "t1"
+      Whitespace@31..32 "\n"
+    EndKw@32..35 "end"
+error at position 21 while parsing the `where` keyword at the start of a trait definition. Missing expected ‘where‘

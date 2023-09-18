@@ -3,8 +3,7 @@ use super::*;
 use crate::grammar::type_variable::TYPEVAR_CONSTRAINT_FIRSTS;
 
 const TRAIT_RECOVERY_SET: TokenSet = ts![
-    // TokenKind::SelfKw,
-    // TokenKind::TypeOfKw,
+    TokenKind::SelfKw,
     TokenKind::TypevarKw,
     TokenKind::EndKw,
 ];
