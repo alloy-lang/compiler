@@ -123,6 +123,15 @@ fn parse_trait_type_variable(p: &mut Parser) -> CompletedMarker {
 
         type_variable::parse_typevar_constraints_with_kind(p);
     }
+    if p.maybe_at(TokenKind::Ident) {
+        p.expect_with_recovery(
+            TokenKind::Equals,
+            ParseErrorContext::TypeVariableConstraint,
+            ts![TokenKind::Ident],
+        );
+
+        type_variable::parse_typevar_constraints_with_kind(p);
+    }
 
     m.complete(p, SyntaxKind::TypeVariable)
 }
