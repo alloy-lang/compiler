@@ -4,7 +4,7 @@ use logos::Logos;
 
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Logos)]
 #[logos(
-    subpattern op_id = r"([<>=]+[|<>=][<>=]+)|([|<>=][<>=]+)|([<>=]+[|<>=])|([<>=]+)",
+    subpattern op_id = r"([!]?[<>=]+[|<>=][<>=]+)|([!]?[|<>=][<>=]+)|([!]?[<>=]+[|<>=])|([!]?[<>=]+)",
     subpattern alpha_num_id = r"[A-Za-z][A-Za-z0-9]*",
 )]
 pub enum TokenKind {
@@ -367,6 +367,8 @@ mod tests {
             "<|>" => TokenKind::OpIdent,
             "(<=>)" => TokenKind::OpIdent,
             "<=>" => TokenKind::OpIdent,
+            "==" => TokenKind::OpIdent,
+            "!=" => TokenKind::OpIdent,
         };
 
         for (source, expected) in source {

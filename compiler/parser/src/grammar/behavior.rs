@@ -1,10 +1,7 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-const BEHAVIOR_RECOVERY_SET: TokenSet = ts![
-    TokenKind::TypevarKw,
-    TokenKind::EndKw,
-];
+const BEHAVIOR_RECOVERY_SET: TokenSet = ts![TokenKind::TypevarKw, TokenKind::EndKw];
 const BEHAVIOR_TITLE_RECOVERY_SET: TokenSet =
     BEHAVIOR_RECOVERY_SET.union(ts![TokenKind::Ident, TokenKind::ForKw, TokenKind::WhereKw,]);
 
