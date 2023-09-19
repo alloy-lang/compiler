@@ -55,7 +55,6 @@ impl<'t, 'input> Source<'t, 'input> {
             }
 
             non_trivia_tokens_found += 1;
-
         }
         None
     }
@@ -76,8 +75,8 @@ impl<'t, 'input> Source<'t, 'input> {
 
 #[cfg(test)]
 mod tests {
-    use alloy_lexer::Lexer;
     use super::*;
+    use alloy_lexer::Lexer;
 
     #[test]
     fn peek_nth_kind_0_empty() {
@@ -85,10 +84,7 @@ mod tests {
         let tokens: Vec<_> = Lexer::new(input).collect();
         let mut source = Source::new(&tokens);
 
-        assert_eq!(
-            source.peek_nth_kind(0),
-            None
-        )
+        assert_eq!(source.peek_nth_kind(0), None)
     }
 
     #[test]
@@ -97,10 +93,7 @@ mod tests {
         let tokens: Vec<_> = Lexer::new(input).collect();
         let mut source = Source::new(&tokens);
 
-        assert_eq!(
-            source.peek_nth_kind(1),
-            None
-        )
+        assert_eq!(source.peek_nth_kind(1), None)
     }
 
     #[test]
@@ -111,10 +104,7 @@ mod tests {
         let tokens: Vec<_> = Lexer::new(input).collect();
         let mut source = Source::new(&tokens);
 
-        assert_eq!(
-            source.peek_nth_kind(0),
-            Some(TokenKind::TypeOfKw)
-        )
+        assert_eq!(source.peek_nth_kind(0), Some(TokenKind::TypeOfKw))
     }
 
     #[test]
@@ -125,9 +115,6 @@ mod tests {
         let tokens: Vec<_> = Lexer::new(input).collect();
         let mut source = Source::new(&tokens);
 
-        assert_eq!(
-            source.peek_nth_kind(1),
-            Some(TokenKind::Ident)
-        )
+        assert_eq!(source.peek_nth_kind(1), Some(TokenKind::Ident))
     }
 }
