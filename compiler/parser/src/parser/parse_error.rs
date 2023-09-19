@@ -204,9 +204,7 @@ impl fmt::Display for ParseError {
         // Expected
         //
 
-        let vec = self.expected.iter()
-            .unique()
-            .collect::<Vec<_>>();
+        let vec = self.expected.iter().unique().collect::<Vec<_>>();
         let num_expected = vec.len();
         let is_first = |idx| idx == 0;
         let is_last = |idx| idx == num_expected - 1;
