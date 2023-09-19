@@ -1,4 +1,4 @@
-typedef Test1<> = Empty
+typedef Test1[] = Empty
 typedef Test2   = Empty
 ===
 SourceFile@0..47
@@ -6,7 +6,9 @@ SourceFile@0..47
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
     Ident@8..13 "Test1"
-    ClosedAngle@13..15 "<>"
+    LBracket@13..14 "["
+    BoundedTypeArg@14..14
+    RBracket@14..15 "]"
     Whitespace@15..16 " "
     Equals@16..17 "="
     Whitespace@17..18 " "
@@ -22,4 +24,4 @@ SourceFile@0..47
     Whitespace@41..42 " "
     TypeDefMember@42..47
       Ident@42..47 "Empty"
-error at position 13 while parsing a generic constraint in a type definition. Missing expected identifier
+error at position 14 while parsing the name of a bounded type argument. Missing expected identifier

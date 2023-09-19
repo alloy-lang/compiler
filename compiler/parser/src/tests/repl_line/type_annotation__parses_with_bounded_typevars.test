@@ -1,4 +1,4 @@
-typeof apply : self<(t1 -> t2)> -> self<t1> -> self<t2> where
+typeof apply : self[(t1 -> t2)] -> self[t1] -> self[t2] where
     typevar t1
     typevar t2
 ===
@@ -15,7 +15,7 @@ SourceFile@0..91
         BoundedTypeBase@15..19
           SelfType@15..19
             SelfKw@15..19 "self"
-        LAngle@19..20 "<"
+        LBracket@19..20 "["
         BoundedTypeArg@20..30
           ParenthesizedType@20..30
             LParen@20..21 "("
@@ -28,7 +28,7 @@ SourceFile@0..91
               TypeIdentifier@27..29
                 Ident@27..29 "t2"
             RParen@29..30 ")"
-        RAngle@30..31 ">"
+        RBracket@30..31 "]"
         Whitespace@31..32 " "
       RightArrow@32..34 "->"
       Whitespace@34..35 " "
@@ -37,11 +37,11 @@ SourceFile@0..91
           BoundedTypeBase@35..39
             SelfType@35..39
               SelfKw@35..39 "self"
-          LAngle@39..40 "<"
+          LBracket@39..40 "["
           BoundedTypeArg@40..42
             TypeIdentifier@40..42
               Ident@40..42 "t1"
-          RAngle@42..43 ">"
+          RBracket@42..43 "]"
           Whitespace@43..44 " "
         RightArrow@44..46 "->"
         Whitespace@46..47 " "
@@ -49,11 +49,11 @@ SourceFile@0..91
           BoundedTypeBase@47..51
             SelfType@47..51
               SelfKw@47..51 "self"
-          LAngle@51..52 "<"
+          LBracket@51..52 "["
           BoundedTypeArg@52..54
             TypeIdentifier@52..54
               Ident@52..54 "t2"
-          RAngle@54..55 ">"
+          RBracket@54..55 "]"
           Whitespace@55..56 " "
     WhereKw@56..61 "where"
     Whitespace@61..66 "\n    "

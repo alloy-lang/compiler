@@ -104,6 +104,12 @@ pub enum TokenKind {
     #[token("}")]
     RBrace,
 
+    #[token("[")]
+    LBracket,
+
+    #[token("]")]
+    RBracket,
+
     #[token("(")]
     LParen,
 
@@ -115,9 +121,6 @@ pub enum TokenKind {
 
     #[token(">")]
     RAngle,
-
-    #[token("<>")]
-    ClosedAngle,
 
     #[token("_")]
     NilIdentifier,
@@ -181,9 +184,10 @@ impl fmt::Display for TokenKind {
             Self::RParen => "‘)’",
             Self::LBrace => "‘{’",
             Self::RBrace => "‘}’",
+            Self::LBracket => "‘[’",
+            Self::RBracket => "‘]’",
             Self::LAngle => "‘<’",
             Self::RAngle => "‘>’",
-            Self::ClosedAngle => "‘<>’",
             Self::NilIdentifier => "‘_’",
             Self::Pipe => "‘|’",
             Self::Comment => "comment",
@@ -280,7 +284,6 @@ mod tests {
             "{" => TokenKind::LBrace,
             "}" => TokenKind::RBrace,
             "|" => TokenKind::Pipe,
-            "<>" => TokenKind::ClosedAngle,
         };
 
         for (source, expected) in source {

@@ -1,4 +1,4 @@
-behavior Trait1 for Type1<t1, t2> where
+behavior Trait1 for Type1[t1, t2] where
     -- imagine all the things here
 end
 ===
@@ -15,7 +15,7 @@ SourceFile@0..78
       BoundedTypeBase@20..25
         TypeIdentifier@20..25
           Ident@20..25 "Type1"
-      LAngle@25..26 "<"
+      LBracket@25..26 "["
       BoundedTypeArg@26..28
         TypeIdentifier@26..28
           Ident@26..28 "t1"
@@ -24,7 +24,7 @@ SourceFile@0..78
       BoundedTypeArg@30..32
         TypeIdentifier@30..32
           Ident@30..32 "t2"
-      RAngle@32..33 ">"
+      RBracket@32..33 "]"
       Whitespace@33..34 " "
     WhereKw@34..39 "where"
     Whitespace@39..44 "\n    "

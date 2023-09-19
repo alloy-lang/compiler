@@ -1,4 +1,4 @@
-behavior Trait1 for Type1<t1, _> where
+behavior Trait1 for Type1[t1, _] where
     typevar t1
     -- imagine all the things here
 end
@@ -16,7 +16,7 @@ SourceFile@0..92
       BoundedTypeBase@20..25
         TypeIdentifier@20..25
           Ident@20..25 "Type1"
-      LAngle@25..26 "<"
+      LBracket@25..26 "["
       BoundedTypeArg@26..28
         TypeIdentifier@26..28
           Ident@26..28 "t1"
@@ -25,7 +25,7 @@ SourceFile@0..92
       BoundedTypeArg@30..31
         Error@30..31
           NilIdentifier@30..31 "_"
-      RAngle@31..32 ">"
+      RBracket@31..32 "]"
       Whitespace@32..33 " "
     WhereKw@33..38 "where"
     Whitespace@38..43 "\n    "

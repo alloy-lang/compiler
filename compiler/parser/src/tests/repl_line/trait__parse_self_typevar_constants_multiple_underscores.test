@@ -1,5 +1,5 @@
 trait TestTrait1 where
-    self = #Type<_, _, _,_,_,   _,  >
+    self = #Type[_, _, _,_,_,   _,  ]
 end
 ===
 SourceFile@0..64
@@ -18,7 +18,7 @@ SourceFile@0..64
       TypeVariableKindConstraint@34..61
         Hash@34..35 "#"
         TypeKw@35..39 "Type"
-        LAngle@39..40 "<"
+        LBracket@39..40 "["
         NilIdentifier@40..41 "_"
         Comma@41..42 ","
         Whitespace@42..43 " "
@@ -35,6 +35,6 @@ SourceFile@0..64
         NilIdentifier@55..56 "_"
         Comma@56..57 ","
         Whitespace@57..59 "  "
-        RAngle@59..60 ">"
+        RBracket@59..60 "]"
         Whitespace@60..61 "\n"
     EndKw@61..64 "end"

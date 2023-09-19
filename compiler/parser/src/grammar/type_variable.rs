@@ -54,9 +54,9 @@ fn parse_typevar_constraint(p: &mut Parser, mode: ParseMode) {
 }
 
 const TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY: TokenSet = TYPEVAR_CONSTRAINT_FIRSTS
-    .plus(TokenKind::LAngle)
+    .plus(TokenKind::LBracket)
     .plus(TokenKind::NilIdentifier)
-    .plus(TokenKind::RAngle);
+    .plus(TokenKind::RBracket);
 const TYPEVAR_CONSTRAINT_KIND_MARKER_CONTINUE: TokenSet =
     ts![TokenKind::Comma, TokenKind::NilIdentifier];
 
@@ -72,22 +72,9 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
         TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
     );
 
-    if p.maybe_at(TokenKind::ClosedAngle) {
-        // this is a bit of a hack to allow better error reporting for `#Type<>`
-        // 'ClosedAngle' is necessary because otherwise `<>` would be parsed as an OperatorIdentifier
-        p.expect_with_recovery(
-            TokenKind::NilIdentifier,
-            ParseErrorContext::TypeVariableKindConstraintUnderscore,
-            TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY.plus(TokenKind::ClosedAngle),
-        );
-        p.bump();
-
-        return m.complete(p, SyntaxKind::TypeVariableKindConstraint);
-    }
-
     p.expect_with_recovery(
-        TokenKind::LAngle,
-        ParseErrorContext::TypeVariableKindConstraintLAngle,
+        TokenKind::LBracket,
+        ParseErrorContext::TypeVariableKindConstraintLBracket,
         TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
     );
     p.expect_with_recovery(
@@ -121,8 +108,8 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
     }
 
     p.expect_with_recovery(
-        TokenKind::RAngle,
-        ParseErrorContext::TypeVariableKindConstraintRAngle,
+        TokenKind::RBracket,
+        ParseErrorContext::TypeVariableKindConstraintRBracket,
         TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY.plus(TokenKind::TypevarKw),
     );
 

@@ -153,12 +153,12 @@ fn maybe_parse_bounded_type(
     single_type_recovery_set: TokenSet,
     parent_recovery_set: TokenSet,
 ) -> CompletedMarker {
-    if !p.maybe_at(TokenKind::LAngle) {
+    if !p.maybe_at(TokenKind::LBracket) {
         // if this isn't explicitly a bounded type, guess based on the next token
         if !p.at_set(SINGLE_TYPE_RECOVERY_SET) || p.at_set(single_type_recovery_set) {
             return cm;
         }
-        if !p.maybe_at_nth(TokenKind::RAngle, 1) {
+        if !p.maybe_at_nth(TokenKind::RBracket, 1) {
             return cm;
         }
     }
@@ -199,8 +199,8 @@ fn maybe_parse_lambda_type(
 
 fn parse_bounded_type_args(p: &mut Parser, mode: ParseMode, parent_recovery_set: TokenSet) {
     p.expect_with_recovery(
-        TokenKind::LAngle,
-        ParseErrorContext::BoundedTypeLAngle,
+        TokenKind::LBracket,
+        ParseErrorContext::BoundedTypeLBracket,
         SINGLE_TYPE_RECOVERY_SET,
     );
 
@@ -231,14 +231,16 @@ fn parse_bounded_type_args(p: &mut Parser, mode: ParseMode, parent_recovery_set:
     }
 
     p.expect_with_recovery(
-        TokenKind::RAngle,
-        ParseErrorContext::BoundedTypeRAngle,
+        TokenKind::RBracket,
+        ParseErrorContext::BoundedTypeRBracket,
         ts![TokenKind::WhereKw],
     );
 
     return;
 
     fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(ts![TokenKind::RAngle, TokenKind::WhereKw]) || p.at_top_level_token() || p.at_eof()
+        p.at_set(ts![TokenKind::RBracket, TokenKind::WhereKw])
+            || p.at_top_level_token()
+            || p.at_eof()
     }
 }

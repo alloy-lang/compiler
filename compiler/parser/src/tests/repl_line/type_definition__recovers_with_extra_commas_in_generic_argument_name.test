@@ -1,4 +1,4 @@
-typedef Test1<t1, , t3> = Empty
+typedef Test1[t1, , t3] = Empty
 typedef Test2           = Empty
 ===
 SourceFile@0..63
@@ -6,7 +6,7 @@ SourceFile@0..63
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
     Ident@8..13 "Test1"
-    LAngle@13..14 "<"
+    LBracket@13..14 "["
     BoundedTypeArg@14..16
       Ident@14..16 "t1"
     Comma@16..17 ","
@@ -16,7 +16,7 @@ SourceFile@0..63
     Whitespace@19..20 " "
     BoundedTypeArg@20..22
       Ident@20..22 "t3"
-    RAngle@22..23 ">"
+    RBracket@22..23 "]"
     Whitespace@23..24 " "
     Equals@24..25 "="
     Whitespace@25..26 " "

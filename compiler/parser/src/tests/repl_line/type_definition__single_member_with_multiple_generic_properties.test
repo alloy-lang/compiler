@@ -1,18 +1,18 @@
-typedef Test<t1, t2> = Thing t1 t2
+typedef Test[t1, t2] = Thing t1 t2
 ===
 SourceFile@0..34
   TypeDef@0..34
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
     Ident@8..12 "Test"
-    LAngle@12..13 "<"
+    LBracket@12..13 "["
     BoundedTypeArg@13..15
       Ident@13..15 "t1"
     Comma@15..16 ","
     Whitespace@16..17 " "
     BoundedTypeArg@17..19
       Ident@17..19 "t2"
-    RAngle@19..20 ">"
+    RBracket@19..20 "]"
     Whitespace@20..21 " "
     Equals@21..22 "="
     Whitespace@22..23 " "

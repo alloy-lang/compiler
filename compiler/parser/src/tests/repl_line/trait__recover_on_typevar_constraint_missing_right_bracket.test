@@ -1,5 +1,5 @@
 trait TestTrait1 where
-    self = #Type<_
+    self = #Type[_
     typevar t1
 end
 ===
@@ -19,7 +19,7 @@ SourceFile@0..60
       TypeVariableKindConstraint@34..46
         Hash@34..35 "#"
         TypeKw@35..39 "Type"
-        LAngle@39..40 "<"
+        LBracket@39..40 "["
         NilIdentifier@40..41 "_"
         Whitespace@41..46 "\n    "
     TypeVariable@46..57
@@ -28,4 +28,4 @@ SourceFile@0..60
       Ident@54..56 "t1"
       Whitespace@56..57 "\n"
     EndKw@57..60 "end"
-error at position 46 while parsing the > at the end of the <_> pattern thingy. Missing expected ‘>’
+error at position 46 while parsing the `]` at the end of the [_] pattern thingy. Missing expected ‘]’

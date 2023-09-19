@@ -1,4 +1,4 @@
-typeof apply : Test<, t2> where
+typeof apply : Test[, t2] where
     typevar t1
     typevar t2
 ===
@@ -14,14 +14,14 @@ SourceFile@0..61
       BoundedTypeBase@15..19
         TypeIdentifier@15..19
           Ident@15..19 "Test"
-      LAngle@19..20 "<"
+      LBracket@19..20 "["
       BoundedTypeArg@20..20
       Comma@20..21 ","
       Whitespace@21..22 " "
       BoundedTypeArg@22..24
         TypeIdentifier@22..24
           Ident@22..24 "t2"
-      RAngle@24..25 ">"
+      RBracket@24..25 "]"
       Whitespace@25..26 " "
     WhereKw@26..31 "where"
     Whitespace@31..36 "\n    "

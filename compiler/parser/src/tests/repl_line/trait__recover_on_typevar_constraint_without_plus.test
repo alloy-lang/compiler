@@ -1,5 +1,5 @@
 trait TestTrait1 where
-    self = #Type<_> Functor
+    self = #Type[_] Functor
     typevar t1
 end
 ===
@@ -19,9 +19,9 @@ SourceFile@0..69
       TypeVariableKindConstraint@34..43
         Hash@34..35 "#"
         TypeKw@35..39 "Type"
-        LAngle@39..40 "<"
+        LBracket@39..40 "["
         NilIdentifier@40..41 "_"
-        RAngle@41..42 ">"
+        RBracket@41..42 "]"
         Whitespace@42..43 " "
       TypeVariableTraitConstraint@43..55
         Ident@43..50 "Functor"

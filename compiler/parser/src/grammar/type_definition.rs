@@ -13,18 +13,7 @@ pub(crate) fn parse_type_definition(p: &mut Parser) -> CompletedMarker {
         ts![TokenKind::Equals],
     );
 
-    if p.maybe_at(TokenKind::ClosedAngle) {
-        // this is a bit of a hack to allow better error reporting for empty generic constraints
-        // 'ClosedAngle' is necessary because otherwise `<>` would be parsed as an OperatorIdentifier
-        p.expect_with_recovery(
-            TokenKind::Ident,
-            ParseErrorContext::TypeDefGenericConstraintName,
-            ts![TokenKind::Equals, TokenKind::ClosedAngle],
-        );
-        p.bump();
-    }
-
-    if p.maybe_at(TokenKind::LAngle) {
+    if p.maybe_at(TokenKind::LBracket) {
         parse_type_definition_bounds(p);
     }
 
@@ -44,7 +33,7 @@ pub(crate) fn parse_type_definition(p: &mut Parser) -> CompletedMarker {
 }
 
 fn parse_type_definition_bounds(p: &mut Parser) {
-    assert!(p.at(TokenKind::LAngle));
+    assert!(p.at(TokenKind::LBracket));
     p.bump();
 
     loop {
@@ -52,11 +41,11 @@ fn parse_type_definition_bounds(p: &mut Parser) {
         p.expect_with_recovery(
             TokenKind::Ident,
             ParseErrorContext::BoundedTypeArgName,
-            ts![TokenKind::RAngle, TokenKind::Comma],
+            ts![TokenKind::RBracket, TokenKind::Comma],
         );
         m.complete(p, SyntaxKind::BoundedTypeArg);
 
-        if p.maybe_at(TokenKind::RAngle) || p.at_eof() {
+        if p.maybe_at(TokenKind::RBracket) || p.at_eof() {
             break;
         }
 
@@ -68,8 +57,8 @@ fn parse_type_definition_bounds(p: &mut Parser) {
     }
 
     p.expect_with_recovery(
-        TokenKind::RAngle,
-        ParseErrorContext::BoundedTypeRAngle,
+        TokenKind::RBracket,
+        ParseErrorContext::BoundedTypeRBracket,
         ts![TokenKind::LBrace],
     );
 }
