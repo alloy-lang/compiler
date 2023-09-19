@@ -27,4 +27,4 @@ SourceFile@0..67
       Ident@61..63 "t1"
       Whitespace@63..64 "\n"
     EndKw@64..67 "end"
-error in range 40..47 while parsing the start of a trait member, are you missing a keyword?. Found identifier, but expected ‘typeof‘, ‘let’ or ‘typevar‘
+error in range 40..47 while parsing the start of a behavior member, are you missing a keyword?. Found identifier, but expected ‘typeof‘, ‘let’ or ‘typevar‘

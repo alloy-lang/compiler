@@ -21,6 +21,7 @@ mod parse_error;
 pub(crate) const DEFAULT_RECOVERY_SET: TokenSet = ts![
     TokenKind::LetKw,
     TokenKind::ImportKw,
+    TokenKind::BehaviorKw,
     TokenKind::TraitKw,
     TokenKind::TypeOfKw,
     TokenKind::TypedefKw,

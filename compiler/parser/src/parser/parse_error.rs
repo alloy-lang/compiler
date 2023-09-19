@@ -141,7 +141,7 @@ impl ParseErrorContext {
             ParseErrorContext::BehaviorTypeName => "the name of a type at the start of a behavior definition",
             ParseErrorContext::BehaviorWhere => "the `where` keyword at the start of a behavior definition",
             ParseErrorContext::BehaviorEnd => "the `end` keyword after a behavior definition",
-            ParseErrorContext::BehaviorMemberFirst => "the start of a trait member, are you missing a keyword?",
+            ParseErrorContext::BehaviorMemberFirst => "the start of a behavior member, are you missing a keyword?",
             ParseErrorContext::TypeOfName => "the name of a type",
             ParseErrorContext::TypeOfColon => "the colon after the name of a type",
             ParseErrorContext::TypeOfType => "a type in a type annotation",
