@@ -45,4 +45,4 @@ SourceFile@0..78
       Whitespace@71..72 " "
       TypeIdentifier@72..78
         Ident@72..78 "String"
-error at position 49 while parsing the right parenthesis of a tuple type. Missing expected ‘->’ or ‘)’
+error at position 49 while parsing the right parenthesis of a tuple type. Missing expected ‘)’

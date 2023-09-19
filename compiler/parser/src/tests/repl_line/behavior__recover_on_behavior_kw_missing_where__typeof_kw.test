@@ -25,4 +25,4 @@ SourceFile@0..58
         Ident@48..54 "String"
         Whitespace@54..55 "\n"
     EndKw@55..58 "end"
-error at position 34 while parsing the `where` keyword at the start of a behavior definition. Missing expected ‘->’ or ‘where‘
+error at position 34 while parsing the `where` keyword at the start of a behavior definition. Missing expected ‘where‘

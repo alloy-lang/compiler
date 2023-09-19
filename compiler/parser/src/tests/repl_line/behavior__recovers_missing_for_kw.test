@@ -32,4 +32,4 @@ SourceFile@0..125
     Comment@91..121 "-- imagine all the th ..."
     Whitespace@121..122 "\n"
     EndKw@122..125 "end"
-error at position 16 while parsing the `for` keyword at the start of a behavior definition. Missing expected ‘->’ or ‘for‘
+error at position 16 while parsing the `for` keyword at the start of a behavior definition. Missing expected ‘for‘

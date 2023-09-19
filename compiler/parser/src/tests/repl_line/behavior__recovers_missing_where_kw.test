@@ -32,4 +32,4 @@ SourceFile@0..123
     Comment@89..119 "-- imagine all the th ..."
     Whitespace@119..120 "\n"
     EndKw@120..123 "end"
-error at position 61 while parsing the `where` keyword at the start of a behavior definition. Missing expected ‘->’ or ‘where‘
+error at position 61 while parsing the `where` keyword at the start of a behavior definition. Missing expected ‘where‘

@@ -57,15 +57,21 @@ impl<'t, 'input> Parser<'t, 'input> {
 
     pub(crate) fn at(&mut self, kind: TokenKind) -> bool {
         self.expected_kinds.push(kind);
-        self.peek() == Some(kind)
+        self.source.peek_nth_kind(0) == Some(kind)
     }
 
     pub(crate) fn maybe_at(&mut self, kind: TokenKind) -> bool {
-        self.peek() == Some(kind)
+        self.source.peek_nth_kind(0) == Some(kind)
+    }
+
+    pub(crate) fn maybe_at_nth(&mut self, kind: TokenKind, skip: usize) -> bool {
+        self.peek_nth(skip) == Some(kind)
     }
 
     pub(crate) fn at_set(&mut self, set: TokenSet) -> bool {
-        self.peek().map_or(false, |k| set.contains(k))
+        self.source
+            .peek_nth_kind(0)
+            .map_or(false, |k| set.contains(k))
     }
 
     pub(crate) fn at_top_level_token(&mut self) -> bool {
@@ -73,11 +79,11 @@ impl<'t, 'input> Parser<'t, 'input> {
     }
 
     pub(crate) fn at_eof(&mut self) -> bool {
-        self.peek().is_none()
+        self.source.peek_nth_kind(0).is_none()
     }
 
-    fn peek(&mut self) -> Option<TokenKind> {
-        self.source.peek_kind()
+    fn peek_nth(&mut self, skip: usize) -> Option<TokenKind> {
+        self.source.peek_nth_kind(skip)
     }
 
     pub(crate) fn bump(&mut self) {
@@ -131,7 +137,7 @@ impl<'t, 'input> Parser<'t, 'input> {
     ) -> Option<CompletedMarker> {
         let last_token_range = self.source.last_token_range().unwrap_or_default();
 
-        let current_token = self.source.peek_token();
+        let current_token = self.source.peek_nth_token(0);
         let (found, range) = if let Some(Token { kind, range, .. }) = current_token {
             (Some(*kind), *range)
         } else {

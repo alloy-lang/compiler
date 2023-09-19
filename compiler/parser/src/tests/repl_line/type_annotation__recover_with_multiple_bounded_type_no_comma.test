@@ -35,4 +35,4 @@ SourceFile@0..62
       TypevarKw@52..59 "typevar"
       Whitespace@59..60 " "
       Ident@60..62 "t2"
-error at position 23 while parsing the comma between arguments in a bounded type. Missing expected ‘->’ or ‘,’
+error at position 23 while parsing the comma between arguments in a bounded type. Missing expected ‘,’

@@ -42,4 +42,4 @@ SourceFile@0..87
       Ident@81..83 "t1"
       Whitespace@83..84 "\n"
     EndKw@84..87 "end"
-error at position 73 while parsing the right parenthesis of a parenthesized type. Missing expected ‘->’, ‘,’ or ‘)’
+error at position 73 while parsing the right parenthesis of a parenthesized type. Missing expected ‘,’ or ‘)’

@@ -155,7 +155,7 @@ impl ParseErrorContext {
             ParseErrorContext::UnitTypeRightParen => "the right parenthesis of a unit type",
             ParseErrorContext::ParenthesizedTypeRightParen => "the right parenthesis of a parenthesized type",
             ParseErrorContext::TupleTypeRightParen => "the right parenthesis of a tuple type",
-            ParseErrorContext::LambdaTypeRightArrow => todo!(),
+            ParseErrorContext::LambdaTypeRightArrow => "the `->` in a lambda type",
             ParseErrorContext::SelfTypeOutsideContext => "a type, encountered an unexpected `self` reference outside a trait or behavior context",
             ParseErrorContext::TypeVariableName => "the name of a type variable",
             ParseErrorContext::TypeVariableConstraintsEquals => "the `=` sign in a typevar constraint",
