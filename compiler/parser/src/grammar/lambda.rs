@@ -43,7 +43,7 @@ fn parse_arg_list(p: &mut Parser) -> CompletedMarker {
 
         parse_argument(
             p,
-            SyntaxKind::LambdaArg,
+            SyntaxKind::LambdaExprArg,
             ParseErrorContext::LambdaArgExpr,
             ts![],
         );
@@ -65,7 +65,7 @@ fn parse_arg_list(p: &mut Parser) -> CompletedMarker {
         ts![TokenKind::RightArrow],
     );
 
-    return m.complete(p, SyntaxKind::LambdaArgList);
+    return m.complete(p, SyntaxKind::LambdaExprArgList);
 
     fn should_stop(p: &mut Parser) -> bool {
         p.at_set(ts![TokenKind::Pipe, TokenKind::RightArrow]) || p.at_eof()

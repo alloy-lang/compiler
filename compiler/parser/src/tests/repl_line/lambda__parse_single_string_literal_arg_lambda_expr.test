@@ -2,9 +2,9 @@
 ===
 SourceFile@0..14
   LambdaExprDef@0..14
-    LambdaArgList@0..10
+    LambdaExprArgList@0..10
       Pipe@0..1 "|"
-      LambdaArg@1..8
+      LambdaExprArg@1..8
         StringLiteral@1..8
           String@1..8 "\"hello\""
       Pipe@8..9 "|"

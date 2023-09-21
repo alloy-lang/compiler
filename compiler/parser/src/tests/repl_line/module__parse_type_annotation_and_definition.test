@@ -74,19 +74,19 @@ SourceFile@0..208
       Equals@152..153 "="
       Whitespace@153..154 " "
       LambdaExprDef@154..208
-        LambdaArgList@154..168
+        LambdaExprArgList@154..168
           Pipe@154..155 "|"
-          LambdaArg@155..160
+          LambdaExprArg@155..160
             VariableRef@155..160
               Ident@155..160 "funky"
           Comma@160..161 ","
           Whitespace@161..162 " "
-          LambdaArg@162..163
+          LambdaExprArg@162..163
             VariableRef@162..163
               Ident@162..163 "x"
           Comma@163..164 ","
           Whitespace@164..165 " "
-          LambdaArg@165..166
+          LambdaExprArg@165..166
             VariableRef@165..166
               Ident@165..166 "y"
           Pipe@166..167 "|"

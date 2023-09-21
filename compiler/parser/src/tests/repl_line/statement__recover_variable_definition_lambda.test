@@ -10,14 +10,14 @@ SourceFile@0..46
     Equals@9..10 "="
     Whitespace@10..11 " "
     LambdaExprDef@11..20
-      LambdaArgList@11..18
+      LambdaExprArgList@11..18
         Pipe@11..12 "|"
-        LambdaArg@12..13
+        LambdaExprArg@12..13
           VariableRef@12..13
             Ident@12..13 "a"
         Comma@13..14 ","
         Whitespace@14..15 " "
-        LambdaArg@15..16
+        LambdaExprArg@15..16
           IntLiteral@15..16
             Integer@15..16 "9"
         Pipe@16..17 "|"
@@ -34,14 +34,14 @@ SourceFile@0..46
     Equals@29..30 "="
     Whitespace@30..31 " "
     LambdaExprDef@31..46
-      LambdaArgList@31..38
+      LambdaExprArgList@31..38
         Pipe@31..32 "|"
-        LambdaArg@32..33
+        LambdaExprArg@32..33
           VariableRef@32..33
             Ident@32..33 "a"
         Comma@33..34 ","
         Whitespace@34..35 " "
-        LambdaArg@35..36
+        LambdaExprArg@35..36
           VariableRef@35..36
             Ident@35..36 "b"
         Pipe@36..37 "|"

@@ -23,10 +23,10 @@ SourceFile@0..42
       Whitespace@27..30 "\n  "
       MatchTargetValue@30..42
         LambdaExprDef@30..42
-          LambdaArgList@30..38
+          LambdaExprArgList@30..38
             Pipe@30..31 "|"
             Whitespace@31..32 " "
-            LambdaArg@32..38
+            LambdaExprArg@32..38
               VariableRef@32..38
                 Ident@32..37 "False"
                 Whitespace@37..38 " "

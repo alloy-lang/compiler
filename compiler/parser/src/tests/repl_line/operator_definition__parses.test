@@ -55,14 +55,14 @@ SourceFile@0..103
     Equals@82..83 "="
     Whitespace@83..84 " "
     LambdaExprDef@84..103
-      LambdaArgList@84..91
+      LambdaExprArgList@84..91
         Pipe@84..85 "|"
-        LambdaArg@85..86
+        LambdaExprArg@85..86
           VariableRef@85..86
             Ident@85..86 "x"
         Comma@86..87 ","
         Whitespace@87..88 " "
-        LambdaArg@88..89
+        LambdaExprArg@88..89
           VariableRef@88..89
             Ident@88..89 "f"
         Pipe@89..90 "|"

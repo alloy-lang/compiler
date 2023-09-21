@@ -2,9 +2,9 @@
 ===
 SourceFile@0..11
   LambdaExprDef@0..11
-    LambdaArgList@0..7
+    LambdaExprArgList@0..7
       Pipe@0..1 "|"
-      LambdaArg@1..5
+      LambdaExprArg@1..5
         VariableRef@1..5
           Ident@1..5 "arg1"
       Pipe@5..6 "|"

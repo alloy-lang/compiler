@@ -240,7 +240,7 @@ impl LambdaExpr {
     pub fn args(&self) -> Vec<Pattern> {
         self.0
             .children()
-            .find(|node| matches!(node.kind(), SyntaxKind::LambdaArgList))
+            .find(|node| matches!(node.kind(), SyntaxKind::LambdaExprArgList))
             .map(|parent| {
                 parent
                     .children()
@@ -266,7 +266,7 @@ pub struct LambdaArg(SyntaxNode);
 impl LambdaArg {
     #[must_use]
     pub fn cast(node: &SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::LambdaArg {
+        if node.kind() == SyntaxKind::LambdaExprArg {
             Some(Self(node.clone()))
         } else {
             None

@@ -2,17 +2,17 @@
 ===
 SourceFile@0..20
   LambdaExprDef@0..20
-    LambdaArgList@0..16
+    LambdaExprArgList@0..16
       Pipe@0..1 "|"
-      LambdaArg@1..6
+      LambdaExprArg@1..6
         VariableRef@1..6
           Ident@1..5 "arg1"
           Whitespace@5..6 " "
-      LambdaArg@6..11
+      LambdaExprArg@6..11
         IntLiteral@6..11
           Integer@6..10 "1001"
           Whitespace@10..11 " "
-      LambdaArg@11..14
+      LambdaExprArg@11..14
         CharLiteral@11..14
           Char@11..14 "'c'"
       Pipe@14..15 "|"

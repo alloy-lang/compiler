@@ -2,7 +2,7 @@
 ===
 SourceFile@0..7
   LambdaExprDef@0..7
-    LambdaArgList@0..3
+    LambdaExprArgList@0..3
       Pipe@0..1 "|"
       Pipe@1..2 "|"
       Whitespace@2..3 " "
