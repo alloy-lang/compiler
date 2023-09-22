@@ -4,10 +4,10 @@ typedef Either[l, r] =
 end
 
 match test when
-  | Left(l) -> l
-  | Right(r) -> r
+  | Either::Left(l)  -> l
+  | Either::Right(r) -> r
 ===
-SourceFile@0..103
+SourceFile@0..120
   TypeDef@0..53
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
@@ -47,7 +47,7 @@ SourceFile@0..103
           Whitespace@47..48 "\n"
     EndKw@48..51 "end"
     Whitespace@51..53 "\n\n"
-  MatchExpr@53..103
+  MatchExpr@53..120
     MatchKw@53..58 "match"
     Whitespace@58..59 " "
     MatchExprArg@59..64
@@ -56,44 +56,48 @@ SourceFile@0..103
         Whitespace@63..64 " "
     WhenKw@64..68 "when"
     Whitespace@68..71 "\n  "
-    MatchTarget@71..88
+    MatchTarget@71..97
       Pipe@71..72 "|"
       Whitespace@72..73 " "
-      MatchTargetCondition@73..81
-        Destructor@73..81
-          DestructorTarget@73..77
-            VariableRef@73..77
-              Ident@73..77 "Left"
-          DestructorArgList@77..81
-            LParen@77..78 "("
-            DestructorArg@78..79
-              VariableRef@78..79
-                Ident@78..79 "l"
-            RParen@79..80 ")"
-            Whitespace@80..81 " "
-      RightArrow@81..83 "->"
-      Whitespace@83..84 " "
-      MatchTargetValue@84..88
-        VariableRef@84..88
-          Ident@84..85 "l"
-          Whitespace@85..88 "\n  "
-    MatchTarget@88..103
-      Pipe@88..89 "|"
-      Whitespace@89..90 " "
-      MatchTargetCondition@90..99
-        Destructor@90..99
-          DestructorTarget@90..95
-            VariableRef@90..95
-              Ident@90..95 "Right"
-          DestructorArgList@95..99
-            LParen@95..96 "("
-            DestructorArg@96..97
-              VariableRef@96..97
-                Ident@96..97 "r"
-            RParen@97..98 ")"
-            Whitespace@98..99 " "
-      RightArrow@99..101 "->"
-      Whitespace@101..102 " "
-      MatchTargetValue@102..103
-        VariableRef@102..103
-          Ident@102..103 "r"
+      MatchTargetCondition@73..90
+        Destructor@73..90
+          DestructorTarget@73..85
+            VariableRef@73..85
+              Ident@73..79 "Either"
+              DoubleColon@79..81 "::"
+              Ident@81..85 "Left"
+          DestructorArgList@85..90
+            LParen@85..86 "("
+            DestructorArg@86..87
+              VariableRef@86..87
+                Ident@86..87 "l"
+            RParen@87..88 ")"
+            Whitespace@88..90 "  "
+      RightArrow@90..92 "->"
+      Whitespace@92..93 " "
+      MatchTargetValue@93..97
+        VariableRef@93..97
+          Ident@93..94 "l"
+          Whitespace@94..97 "\n  "
+    MatchTarget@97..120
+      Pipe@97..98 "|"
+      Whitespace@98..99 " "
+      MatchTargetCondition@99..116
+        Destructor@99..116
+          DestructorTarget@99..112
+            VariableRef@99..112
+              Ident@99..105 "Either"
+              DoubleColon@105..107 "::"
+              Ident@107..112 "Right"
+          DestructorArgList@112..116
+            LParen@112..113 "("
+            DestructorArg@113..114
+              VariableRef@113..114
+                Ident@113..114 "r"
+            RParen@114..115 ")"
+            Whitespace@115..116 " "
+      RightArrow@116..118 "->"
+      Whitespace@118..119 " "
+      MatchTargetValue@119..120
+        VariableRef@119..120
+          Ident@119..120 "r"
