@@ -1,0 +1,18 @@
+|Option::None| -> x
+===
+SourceFile@0..19
+  LambdaExprDef@0..19
+    LambdaExprArgList@0..15
+      Pipe@0..1 "|"
+      LambdaExprArg@1..13
+        VariableRef@1..13
+          Ident@1..7 "Option"
+          DoubleColon@7..9 "::"
+          Ident@9..13 "None"
+      Pipe@13..14 "|"
+      Whitespace@14..15 " "
+    RightArrow@15..17 "->"
+    Whitespace@17..18 " "
+    LambdaExprBody@18..19
+      VariableRef@18..19
+        Ident@18..19 "x"

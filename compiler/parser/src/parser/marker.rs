@@ -33,6 +33,20 @@ impl Marker {
 
         CompletedMarker { pos: self.pos }
     }
+
+    pub(crate) fn cancel(mut self, p: &mut Parser) {
+        self.bomb.defuse();
+
+        loop {
+            match p.events.pop() {
+                Some(Event::AddToken) => {
+                    p.source.undo_token().unwrap();
+                }
+                Some(Event::Placeholder) | None => break,
+                _ => {}
+            }
+        }
+    }
 }
 
 pub(crate) struct CompletedMarker {

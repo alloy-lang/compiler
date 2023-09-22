@@ -46,12 +46,72 @@ pub(crate) fn parse_argument(
 fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
     assert!(p.at(TokenKind::Ident));
 
-    path::parse_path(
-        p,
-        ParseErrorContext::VariableRef,
-        ts![],
-        SyntaxKind::VariableRef,
-    )
+    let m = p.start();
+    p.bump();
+
+    let cm = if !(p.maybe_at(TokenKind::DoubleColon)) {
+        m.complete(p, SyntaxKind::VariableRef)
+    } else {
+        m.cancel(p);
+
+        path::parse_path(
+            p,
+            ParseErrorContext::VariableRef,
+            ts![],
+            SyntaxKind::VariableRef,
+        )
+    };
+
+    maybe_parse_typedef_destructuring(p, cm)
+}
+
+fn maybe_parse_typedef_destructuring(p: &mut Parser, lhs: CompletedMarker) -> CompletedMarker {
+    if !p.maybe_at(TokenKind::LParen) {
+        return lhs;
+    }
+
+    let cm = lhs.precede(p).complete(p, SyntaxKind::DestructorTarget);
+    parse_typedef_destructuring(p);
+
+    cm.precede(p).complete(p, SyntaxKind::Destructor)
+}
+
+fn parse_typedef_destructuring(p: &mut Parser) -> CompletedMarker {
+    assert!(p.at(TokenKind::LParen));
+
+    let paren_m = p.start();
+    p.bump();
+
+    loop {
+        if should_stop(p) {
+            break;
+        }
+
+        parse_argument(
+            p,
+            SyntaxKind::DestructorArg,
+            ParseErrorContext::DestructorArgPattern,
+            ts![TokenKind::RParen, TokenKind::Comma],
+        );
+
+        if should_stop(p) {
+            break;
+        }
+
+        p.expect_with_recovery(
+            TokenKind::Comma,
+            ParseErrorContext::DestructorArgComma,
+            ARGUMENT_RECOVERY_SET,
+        );
+    }
+
+    p.expect(TokenKind::RParen, ParseErrorContext::DestructorRightParen);
+
+    return paren_m.complete(p, SyntaxKind::DestructorArgList);
+
+    fn should_stop(p: &mut Parser) -> bool {
+        p.maybe_at(TokenKind::RParen) || p.at_top_level_token() || p.at_eof()
+    }
 }
 
 fn parse_tuple_arg(p: &mut Parser) -> CompletedMarker {
