@@ -225,11 +225,13 @@ fn parse_function_call(p: &mut Parser) -> CompletedMarker {
             break;
         }
 
+        let arg_m = p.start();
         parse_expr_with_recovery(
             p,
             ts![TokenKind::RParen, TokenKind::Comma],
             ParseErrorContext::FunctionCallArgExpr,
         );
+        arg_m.complete(p, SyntaxKind::FunctionCallArg);
 
         if should_stop(p) {
             break;

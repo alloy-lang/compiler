@@ -110,8 +110,9 @@ SourceFile@0..208
                     Ident@189..194 "funky"
                 FunctionCallArgList@194..197
                   LParen@194..195 "("
-                  VariableRef@195..196
-                    Ident@195..196 "x"
+                  FunctionCallArg@195..196
+                    VariableRef@195..196
+                      Ident@195..196 "x"
                   RParen@196..197 ")"
               Comma@197..198 ","
               Whitespace@198..199 " "
@@ -121,7 +122,8 @@ SourceFile@0..208
                     Ident@199..204 "funky"
                 FunctionCallArgList@204..207
                   LParen@204..205 "("
-                  VariableRef@205..206
-                    Ident@205..206 "y"
+                  FunctionCallArg@205..206
+                    VariableRef@205..206
+                      Ident@205..206 "y"
                   RParen@206..207 ")"
               RParen@207..208 ")"

@@ -8,14 +8,17 @@ SourceFile@0..22
         Ident@0..5 "funky"
     FunctionCallArgList@5..13
       LParen@5..6 "("
-      VariableRef@6..8
-        Ident@6..7 "x"
-        Whitespace@7..8 " "
-      VariableRef@8..10
-        Ident@8..9 "y"
-        Whitespace@9..10 " "
-      VariableRef@10..11
-        Ident@10..11 "z"
+      FunctionCallArg@6..8
+        VariableRef@6..8
+          Ident@6..7 "x"
+          Whitespace@7..8 " "
+      FunctionCallArg@8..10
+        VariableRef@8..10
+          Ident@8..9 "y"
+          Whitespace@9..10 " "
+      FunctionCallArg@10..11
+        VariableRef@10..11
+          Ident@10..11 "z"
       RParen@11..12 ")"
       Whitespace@12..13 "\n"
   VariableDef@13..22
