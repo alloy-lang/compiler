@@ -1,6 +1,7 @@
 use crate::Parse;
 use expect_test::expect_file;
 use std::ffi::OsStr;
+use std::path::PathBuf;
 use std::{env, fs};
 
 // #[test]
@@ -11,6 +12,17 @@ use std::{env, fs};
 #[test]
 fn repl_line() {
     run_parser_tests("repl_line", crate::parse);
+}
+
+fn run_parser_test(path: PathBuf, parsing_fn: fn(&str) -> Parse) {
+    let test_content = fs::read_to_string(&path).unwrap();
+    let (input, _expected_parse) = test_content.split_once("\n===\n").unwrap();
+
+    let actual_parse = parsing_fn(input);
+
+    let expected_test_content = format!("{}\n===\n{}\n", input, actual_parse.debug_tree());
+
+    expect_file![path].assert_eq(&expected_test_content);
 }
 
 fn run_parser_tests(tests_dir: &str, parsing_fn: fn(&str) -> Parse) {
@@ -29,17 +41,7 @@ fn run_parser_tests(tests_dir: &str, parsing_fn: fn(&str) -> Parse) {
             continue;
         }
 
-        let did_panic = std::panic::catch_unwind(|| {
-            let test_content = fs::read_to_string(&path).unwrap();
-            let (input, _expected_parse) = test_content.split_once("\n===\n").unwrap();
-
-            let actual_parse = parsing_fn(input);
-
-            let expected_test_content = format!("{}\n===\n{}\n", input, actual_parse.debug_tree());
-
-            expect_file![path].assert_eq(&expected_test_content);
-        })
-        .is_err();
+        let did_panic = std::panic::catch_unwind(|| run_parser_test(path, parsing_fn)).is_err();
 
         if did_panic {
             failed_tests.push(file_name);
