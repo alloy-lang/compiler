@@ -87,15 +87,20 @@ impl<'t, 'input> Parser<'t, 'input> {
         self.source.peek_nth_kind(skip)
     }
 
-    pub(crate) fn bump(&mut self) {
+    pub(crate) fn bump_any(&mut self) {
         self.expected_kinds.clear();
         self.source.next_token().unwrap();
         self.events.push(Event::AddToken);
     }
 
+    pub(crate) fn bump(&mut self, kind: TokenKind) {
+        assert!(self.at(kind));
+        self.bump_any();
+    }
+
     pub(crate) fn expect(&mut self, kind: TokenKind, context: ParseErrorContext) {
         if self.at(kind) {
-            self.bump();
+            self.bump(kind);
         } else {
             self.error(context);
         }
@@ -113,7 +118,7 @@ impl<'t, 'input> Parser<'t, 'input> {
         recovery_set: TokenSet,
     ) {
         if self.at(kind) {
-            self.bump();
+            self.bump(kind);
         } else {
             self.error_with_recovery(context, recovery_set);
         }
@@ -170,7 +175,7 @@ impl<'t, 'input> Parser<'t, 'input> {
 
         if !self.at_set(recovery_set) && !self.at_eof() {
             let m = self.start();
-            self.bump();
+            self.bump_any();
             return Some(m.complete(self, SyntaxKind::Error));
         };
         None

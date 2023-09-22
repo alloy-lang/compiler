@@ -32,9 +32,8 @@ pub(crate) fn parse_lambda_expr(p: &mut Parser) -> CompletedMarker {
 }
 
 fn parse_arg_list(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::Pipe));
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::Pipe);
 
     loop {
         if should_stop(p) {

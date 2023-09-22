@@ -61,10 +61,8 @@ const TYPEVAR_CONSTRAINT_KIND_MARKER_CONTINUE: TokenSet =
     ts![TokenKind::Comma, TokenKind::NilIdentifier];
 
 fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::Hash));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::Hash);
 
     p.expect_with_recovery(
         TokenKind::TypeKw,

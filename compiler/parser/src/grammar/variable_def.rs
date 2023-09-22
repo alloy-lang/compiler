@@ -3,9 +3,8 @@ use super::*;
 use crate::grammar::expr::EXPR_FIRSTS;
 
 pub(crate) fn parse_variable_def(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::LetKw));
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::LetKw);
 
     ident::parse_ident_or_op(
         p,

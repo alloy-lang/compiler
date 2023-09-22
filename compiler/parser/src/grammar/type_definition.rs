@@ -2,10 +2,8 @@
 use super::*;
 
 pub(crate) fn parse_type_definition(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::TypedefKw));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::TypedefKw);
 
     p.expect_with_recovery(
         TokenKind::Ident,
@@ -26,15 +24,14 @@ pub(crate) fn parse_type_definition(p: &mut Parser) -> CompletedMarker {
     parse_type_definition_members(p);
 
     if p.maybe_at(TokenKind::EndKw) {
-        p.bump();
+        p.bump(TokenKind::EndKw);
     }
 
     m.complete(p, SyntaxKind::TypeDef)
 }
 
 fn parse_type_definition_bounds(p: &mut Parser) {
-    assert!(p.at(TokenKind::LBracket));
-    p.bump();
+    p.bump(TokenKind::LBracket);
 
     loop {
         let m = p.start();
@@ -83,7 +80,7 @@ fn parse_type_definition_members(p: &mut Parser) {
 
 fn parse_type_definition_member(p: &mut Parser) -> CompletedMarker {
     if p.maybe_at(TokenKind::Pipe) {
-        p.bump();
+        p.bump(TokenKind::Pipe);
     }
 
     let m = p.start();

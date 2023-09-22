@@ -102,7 +102,7 @@ fn parse_expr_with_binding_power(
         }
 
         // Eat the operator’s token.
-        p.bump();
+        p.bump_any();
 
         let m = lhs.precede(p);
         let parsed_rhs =
@@ -151,34 +151,26 @@ fn parse_lhs(
 }
 
 pub(crate) fn parse_int_literal(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::Integer));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::Integer);
     m.complete(p, SyntaxKind::IntLiteral)
 }
 
 pub(crate) fn parse_fractional_literal(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::Fractional));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::Fractional);
     m.complete(p, SyntaxKind::FractionalLiteral)
 }
 
 pub(crate) fn parse_string_literal(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::String));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::String);
     m.complete(p, SyntaxKind::StringLiteral)
 }
 
 pub(crate) fn parse_char_literal(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::Char));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::Char);
     m.complete(p, SyntaxKind::CharLiteral)
 }
 
@@ -215,10 +207,8 @@ fn maybe_parse_function_call(p: &mut Parser, lhs: CompletedMarker) -> CompletedM
 }
 
 fn parse_function_call(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::LParen));
-
     let paren_m = p.start();
-    p.bump();
+    p.bump(TokenKind::LParen);
 
     loop {
         if should_stop(p) {
@@ -254,10 +244,8 @@ fn parse_function_call(p: &mut Parser) -> CompletedMarker {
 }
 
 fn parse_if_then_else_expr(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::IfKw));
-
     let if_then_else_m = p.start();
-    p.bump();
+    p.bump(TokenKind::IfKw);
 
     let if_m = p.start();
     parse_expr_with_recovery(
@@ -293,10 +281,8 @@ fn parse_if_then_else_expr(p: &mut Parser) -> CompletedMarker {
 }
 
 fn parse_match_when_expr(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::MatchKw));
-
     let match_when_m = p.start();
-    p.bump();
+    p.bump(TokenKind::MatchKw);
 
     let match_m = p.start();
     parse_expr_with_recovery(p, ts![TokenKind::WhenKw], ParseErrorContext::MatchExprArg);
@@ -344,15 +330,13 @@ fn parse_match_when_expr(p: &mut Parser) -> CompletedMarker {
 }
 
 fn parse_prefix_expr(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::Minus));
-
     let m = p.start();
 
     let op = UnaryOp::Neg;
     let ((), right_binding_power) = op.binding_power();
 
     // Eat the operator’s token.
-    p.bump();
+    p.bump(TokenKind::Minus);
 
     parse_expr_with_binding_power(
         p,
@@ -365,10 +349,8 @@ fn parse_prefix_expr(p: &mut Parser) -> CompletedMarker {
 }
 
 fn parse_paren_expr(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::LParen));
-
     let paren_m = p.start();
-    p.bump();
+    p.bump(TokenKind::LParen);
 
     let mut arg_len = 0;
     loop {

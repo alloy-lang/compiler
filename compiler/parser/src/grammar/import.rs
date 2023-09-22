@@ -4,10 +4,8 @@ use super::*;
 const IMPORT_RECOVERY_SET: TokenSet = ts![TokenKind::Ident, TokenKind::LBrace];
 
 pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::ImportKw));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::ImportKw);
 
     parse_first_import_segment(p, ParseErrorContext::ImportStatementFirstSegment);
 
@@ -39,10 +37,8 @@ pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
 }
 
 fn parse_import_group(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::LBrace));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::LBrace);
 
     parse_import_segment(p, ParseErrorContext::ImportStatementSegment);
 

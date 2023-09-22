@@ -35,7 +35,7 @@ pub(crate) fn parse_argument(
     } else if p.at(TokenKind::LParen) {
         parse_tuple_arg(p);
     } else if p.at(TokenKind::NilIdentifier) {
-        p.bump();
+        p.bump(TokenKind::NilIdentifier);
     } else {
         p.error_with_recovery(context, recovery_set);
     }
@@ -44,10 +44,8 @@ pub(crate) fn parse_argument(
 }
 
 fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::Ident));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::Ident);
 
     let cm = if !(p.maybe_at(TokenKind::DoubleColon)) {
         m.complete(p, SyntaxKind::VariableRef)
@@ -77,10 +75,8 @@ fn maybe_parse_typedef_destructuring(p: &mut Parser, lhs: CompletedMarker) -> Co
 }
 
 fn parse_typedef_destructuring(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::LParen));
-
     let paren_m = p.start();
-    p.bump();
+    p.bump(TokenKind::LParen);
 
     loop {
         if should_stop(p) {
@@ -115,10 +111,8 @@ fn parse_typedef_destructuring(p: &mut Parser) -> CompletedMarker {
 }
 
 fn parse_tuple_arg(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::LParen));
-
     let paren_m = p.start();
-    p.bump();
+    p.bump(TokenKind::LParen);
 
     let mut arg_len = 0;
     loop {

@@ -60,7 +60,7 @@ fn parse_single_type(
         ))
     } else if mode == ParseMode::InsideSelfContext && p.at(TokenKind::SelfKw) {
         let m = p.start();
-        p.bump();
+        p.bump(TokenKind::SelfKw);
 
         Some(m.complete(p, SyntaxKind::SelfType))
     } else if mode == ParseMode::OutsideSelfContext && p.maybe_at(TokenKind::SelfKw) {
@@ -69,7 +69,7 @@ fn parse_single_type(
             ts![TokenKind::SelfKw],
         );
         let m = p.start();
-        p.bump();
+        p.bump(TokenKind::SelfKw);
         let cm = m.complete(p, SyntaxKind::SelfType);
 
         Some(cm)
@@ -91,13 +91,11 @@ fn parse_parenthesized_type(
     mode: ParseMode,
     parent_recovery_set: TokenSet,
 ) -> CompletedMarker {
-    assert!(p.at(TokenKind::LParen));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::LParen);
 
     if p.at(TokenKind::RParen) {
-        p.bump();
+        p.bump(TokenKind::RParen);
         return m.complete(p, SyntaxKind::UnitType);
     }
 
@@ -119,7 +117,7 @@ fn parse_parenthesized_type(
             comma_count += 1;
 
             if p.at(TokenKind::Comma) {
-                p.bump();
+                p.bump(TokenKind::Comma);
             }
 
             parse_type(p, context, mode, ts![], parent_recovery_set);

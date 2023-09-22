@@ -2,10 +2,8 @@
 use super::*;
 
 pub(crate) fn parse_module(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::ModuleKw));
-
     let module_m = p.start();
-    p.bump();
+    p.bump(TokenKind::ModuleKw);
 
     p.expect_with_recovery(
         TokenKind::Ident,

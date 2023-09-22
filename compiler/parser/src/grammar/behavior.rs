@@ -6,10 +6,8 @@ const BEHAVIOR_TITLE_RECOVERY_SET: TokenSet =
     BEHAVIOR_RECOVERY_SET.union(ts![TokenKind::Ident, TokenKind::ForKw, TokenKind::WhereKw,]);
 
 pub(crate) fn parse_behavior(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::BehaviorKw));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::BehaviorKw);
 
     r#type::parse_type(
         p,
@@ -95,10 +93,8 @@ fn parse_trait_member(p: &mut Parser) -> BehaviorMemberParseResult {
 }
 
 fn parse_behavior_type_variable(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::TypevarKw));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::TypevarKw);
 
     p.expect_with_recovery(
         TokenKind::Ident,
@@ -107,7 +103,7 @@ fn parse_behavior_type_variable(p: &mut Parser) -> CompletedMarker {
     );
 
     if p.at(TokenKind::Equals) {
-        p.bump();
+        p.bump(TokenKind::Equals);
 
         type_variable::parse_typevar_constraints(p);
     }

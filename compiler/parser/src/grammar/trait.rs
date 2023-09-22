@@ -6,10 +6,8 @@ const TRAIT_RECOVERY_SET: TokenSet = ts![TokenKind::SelfKw, TokenKind::TypevarKw
 const TRAIT_TITLE_RECOVERY_SET: TokenSet = TRAIT_RECOVERY_SET.union(ts![TokenKind::WhereKw]);
 
 pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::TraitKw));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::TraitKw);
 
     p.expect_with_recovery(
         TokenKind::Ident,
@@ -85,10 +83,8 @@ fn parse_trait_member(p: &mut Parser) -> TraitMemberParseResult {
 //
 
 fn parse_trait_self(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::SelfKw));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::SelfKw);
 
     p.expect_with_recovery(
         TokenKind::Equals,
@@ -102,10 +98,8 @@ fn parse_trait_self(p: &mut Parser) -> CompletedMarker {
 }
 
 fn parse_trait_type_variable(p: &mut Parser) -> CompletedMarker {
-    assert!(p.at(TokenKind::TypevarKw));
-
     let m = p.start();
-    p.bump();
+    p.bump(TokenKind::TypevarKw);
 
     p.expect_with_recovery(
         TokenKind::Ident,
@@ -114,7 +108,7 @@ fn parse_trait_type_variable(p: &mut Parser) -> CompletedMarker {
     );
 
     if p.at(TokenKind::Equals) {
-        p.bump();
+        p.bump(TokenKind::Equals);
 
         type_variable::parse_typevar_constraints_with_kind(p);
     }
