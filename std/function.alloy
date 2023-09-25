@@ -1,0 +1,50 @@
+module Function
+where
+
+--! The identity function, where `id(x) == x`
+typeof id : t -> t where
+  typevar t
+let id = |x| -> x
+
+--! `const(x)` creates a function that always returns `x`
+typeof const : t1 -> t2 -> t1 where
+  typevar t1
+  typevar t2
+let const = |x, _| -> x
+
+--! flip `f` creates a new function that takes its two arguments in reverse order
+typeof flip : (t1 -> t2 -> t3) -> (t2 -> t1 -> t3) where
+  typevar t1
+  typevar t2
+  typevar t3
+let flip = |f, x, y| -> f(y, x)
+
+--! Backward function application, where `f <| x == f(x)`
+--#[infix(right, 0)]
+typeof (<|) : (t1 -> t2) -> t1 -> t2 where
+  typevar t1
+  typevar t2
+let (<|) = |f, x| -> f(x)
+
+--! Forward function application, where `x |> f == f(x)`
+--#[infix(left, 0)]
+typeof (|>) : t1 -> (t1 -> t2) -> t2 where
+  typevar t1
+  typevar t2
+let (|>) = |x, f| -> f(x)
+
+--! Right-to-left function composition
+--#[infix(right, 9)]
+typeof (<<) : (t2 -> t3) -> (t1 -> t2) -> (t1 -> t3) where
+  typevar t1
+  typevar t2
+  typevar t3
+let (<<) = |f, g, x| -> f(g(x))
+
+--! Left-to-right function composition
+--#[infix(left, 9)]
+typeof (>>) : (t1 -> t2) -> (t2 -> t3) -> (t1 -> t3) where
+  typevar t1
+  typevar t2
+  typevar t3
+let (>>) = flip((<<))

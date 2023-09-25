@@ -1,0 +1,6 @@
+module Debug
+where
+
+trait Debug where
+  typeof debug : self -> String
+end

@@ -20,5 +20,4 @@ Cargo.lock
 # pegviz
 pegviz.html
 
-*.alloy
 *.future_test

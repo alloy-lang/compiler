@@ -1,0 +1,14 @@
+module Eq
+where
+
+import std::bool::Bool
+import std::bool::not
+
+trait Eq where
+  typeof eq : self -> self -> Bool
+
+  --#[infix(left, 4)]
+  let (==) = eq
+  --#[infix(left, 4)]
+  let (!=) = not(eq)
+end

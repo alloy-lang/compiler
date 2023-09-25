@@ -1,0 +1,54 @@
+module Bool
+where
+
+import std::eq::Eq
+import std::order::Ord
+import std::order::Ordering
+import std::debug::Debug
+
+
+typedef Bool =
+  | False
+  | True
+end
+
+--! Boolean 'not'
+typeof not : Bool -> Bool
+let not = |x| ->
+  if x
+  then False
+  else True
+
+
+--! Boolean 'exclusive or'
+typeof xor : Bool -> Bool -> Bool
+let xor = |x, y| ->
+  if x
+  then not(y)
+  else y
+
+
+behavior Eq for Bool where
+  let eq = |left, right| ->
+    if left
+    then right
+    else not(right)
+end
+
+
+behavior Ord for Bool where
+  let compare = |left, right| ->
+    match (left, right) when
+      | (True, True)   -> Ordering::EQ
+      | (False, False) -> Ordering::EQ
+      | (True, False)  -> Ordering::GT
+      | (False, True)  -> Ordering::LT
+end
+
+
+behavior Debug for Bool where
+  let debug = |x| ->
+    if x
+    then "True"
+    else "False"
+end

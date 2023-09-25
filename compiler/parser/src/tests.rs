@@ -56,3 +56,29 @@ fn run_parser_tests(tests_dir: &str, parsing_fn: fn(&str) -> Parse) {
         );
     }
 }
+
+#[test]
+fn test_std_lib() {
+    let std_lib = fs::read_dir("../../std")
+        .expect("Something went wrong reading the std lib dir")
+        .map(|res| {
+            res.expect("Something went wrong reading the directory entry")
+                .path()
+        })
+        .collect::<Vec<_>>();
+
+    for path in std_lib {
+        let file_name = path.to_str().expect("Expected filename");
+
+        let source = fs::read_to_string(file_name)
+            .unwrap_or_else(|_| panic!("Something went wrong reading the file '{:?}'", file_name));
+        let actual = crate::parse(&source);
+
+        assert!(
+            actual.errors.is_empty(),
+            "file '{}' contained: {}",
+            file_name,
+            actual.debug_tree(),
+        );
+    }
+}

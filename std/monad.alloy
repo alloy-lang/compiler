@@ -1,0 +1,80 @@
+module Monad
+where
+
+import std::bool::Bool
+import std::applicative::Applicative
+
+--! A generalised trait for composing sequential actions
+trait Monad where
+  self = #Type[_] + Applicative
+
+  --! This can be seen as akin to sequential variable binding in an
+  --! imperative language. For example in Javascript:
+  --!
+  --! ```js
+  --! var x = call_fallible("hello");
+  --! do_something(x);
+  --! ```
+  --!
+  --! In alloy this would look like:
+  --!
+  --! ```alloy
+  --! import std::monad::Monad
+  --! import std::option::Option
+  --!
+  --! call_fallible("hello")
+  --!   |> Monad::flat_map(|x| -> do_something(x))
+  --! ```
+  --!
+  --! Note that it is sometimes more ergonomic to use the `(>>=)` operator:
+  --!
+  --! ```alloy
+  --! import std::monad::(>>=)
+  --!
+  --! call_fallible("hello") >>= |x| -> do_something(x)
+  --! ```
+  --!
+  --! # Note
+  --!
+  --! * Known as `Option::and_then` and `Result::and_then` in Rust
+  --! * Known as `flat_map` or `flat_map` in other languages
+  typeof flat_map : (a -> self[b]) -> self[a] -> self[b]
+end
+
+--#[infix(right, 1)]
+typeof (=<<) : (t1 -> m[t2]) -> m[t1] -> m[t2] where
+  typevar m = Monad
+  typevar t1
+  typevar t2
+let (=<<) = Monad::flat_map
+
+--#[infix(left, 1)]
+typeof (>>=) : m[t1] -> (t1 -> m[t2]) -> m[t2] where
+  typevar m = Monad
+  typevar t1
+  typevar t2
+let (>>=) = |x, f| -> Monad::flat_map(f, x)
+
+
+typeof join : m[m[t1]] -> m[t1] where
+  typevar m = Monad
+  typevar t1
+let join = |mm| -> (mm >>= |x| -> x)
+
+
+-- Kleisli composition
+--#[infix(right, 9)]
+typeof (<=<) : (t2 -> m[t3]) -> (t1 -> m[t2]) -> t1 -> m[t3] where
+  typevar m = Monad
+  typevar t1
+  typevar t2
+  typevar t3
+let (<=<) = |g, f, x| -> g =<< f(x)
+
+--#[infix(left, 9)]
+typeof (>=>) : (t1 -> m[t2]) -> (t2 -> m[t3]) -> t1 -> m[t3] where
+  typevar m = Monad
+  typevar t1
+  typevar t2
+  typevar t3
+let (>=>) = |f, g, x| -> f(x) >>= g

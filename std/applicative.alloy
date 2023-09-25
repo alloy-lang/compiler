@@ -1,0 +1,31 @@
+module Applicative
+where
+
+import std::functor::Functor
+
+--! `Functor` with application.
+--!
+--! The following laws should hold:
+--!
+--! * `apply(wrap(id), v) == v`
+--! * `apply(apply(apply(wrap(<<), u), v), w) == apply(u, apply(v, w))`
+--! * `apply(wrap(f), wrap(x)) == wrap(f(x))`
+--! * `apply(u, wrap(y)) == apply(wrap(|g| -> g(x)), u)`
+trait Applicative where
+    self = #Type[_] + Functor
+
+    --! Similar to `Functor::map`
+    --! but the supplied function `t1 -> t2` is embedded in `self`
+    typeof apply : self[(t1 -> t2)] -> self[t1] -> self[t2] where
+      typevar t1
+      typevar t2
+
+    --! Wrap the supplied value into `self<_>`
+    --!
+    --! # Examples
+    --!
+    --! * `Applicative[Option[_]]::wrap(1) == Option::Some(1)`
+    --! * `Applicative[Either[_, _]]::wrap(1) == Either::Right(1)`
+    typeof wrap : t1 -> self[t1] where
+      typevar t1
+end
