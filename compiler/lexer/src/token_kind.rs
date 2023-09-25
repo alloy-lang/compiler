@@ -131,7 +131,6 @@ pub enum TokenKind {
     #[regex("--[^\n]*")]
     Comment,
 
-    #[error]
     Error,
 }
 
