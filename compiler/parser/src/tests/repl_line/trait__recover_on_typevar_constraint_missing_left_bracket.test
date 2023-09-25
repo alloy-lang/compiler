@@ -18,7 +18,8 @@ SourceFile@0..60
       Whitespace@33..34 " "
       TypeVariableKindConstraint@34..46
         Hash@34..35 "#"
-        TypeKw@35..39 "Type"
+        Error@35..39
+          Ident@35..39 "Type"
         NilIdentifier@39..40 "_"
         RBracket@40..41 "]"
         Whitespace@41..46 "\n    "
@@ -28,4 +29,5 @@ SourceFile@0..60
       Ident@54..56 "t1"
       Whitespace@56..57 "\n"
     EndKw@57..60 "end"
+error in range 35..39 while parsing the `Type` keyword before the [_] pattern thingy. Found identifier, but expected ‘Type‘
 error at position 39 while parsing the `[` at the start of the [_] pattern thingy. Missing expected ‘[’

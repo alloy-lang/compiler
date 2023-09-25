@@ -42,6 +42,10 @@ impl TokenSet {
     pub(crate) const fn plus(self, kind: TokenKind) -> Self {
         Self(self.0 | mask(kind))
     }
+
+    pub(crate) const fn minus(self, kind: TokenKind) -> Self {
+        Self(self.0 & !mask(kind))
+    }
 }
 
 const fn mask(kind: TokenKind) -> u64 {
@@ -88,5 +92,27 @@ mod tests {
 
         assert!(set1.contains(TokenKind::Integer));
         assert!(set2.contains(TokenKind::Integer));
+    }
+
+    #[test]
+    fn plus_works() {
+        let set1 = TokenSet::new([TokenKind::LetKw, TokenKind::Integer]);
+        let set2 = ts![TokenKind::LetKw].plus(TokenKind::Integer);
+
+        assert!(set1.contains(TokenKind::LetKw));
+        assert!(set2.contains(TokenKind::LetKw));
+
+        assert!(set1.contains(TokenKind::Integer));
+        assert!(set2.contains(TokenKind::Integer));
+    }
+
+    #[test]
+    fn minus_works() {
+        let set1 = TokenSet::new([TokenKind::LetKw, TokenKind::Integer, TokenKind::Ident])
+            .minus(TokenKind::Ident);
+
+        assert!(set1.contains(TokenKind::LetKw));
+        assert!(set1.contains(TokenKind::Integer));
+        assert!(!set1.contains(TokenKind::Ident));
     }
 }

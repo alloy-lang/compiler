@@ -67,7 +67,7 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
     p.expect_with_recovery(
         TokenKind::TypeKw,
         ParseErrorContext::TypeVariableKindConstraintTypeKw,
-        TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY,
+        TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY.minus(TokenKind::Ident),
     );
 
     p.expect_with_recovery(

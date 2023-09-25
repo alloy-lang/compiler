@@ -49,7 +49,7 @@ pub enum TokenKind {
     #[token("Type")]
     TypeKw,
 
-    // #[regex("_?(?&alpha_num_id)(_(?&alpha_num_id))+")]
+    #[regex("_?(?&alpha_num_id)(_(?&alpha_num_id))+")]
     #[regex("_?(?&alpha_num_id)")]
     Ident,
 
@@ -327,23 +327,40 @@ mod tests {
     fn followed_by_nil() {
         let source: BTreeMap<&str, Vec<TokenKind>> = btreemap! {
             "thing_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
-            "import_" => vec![TokenKind::ImportKw, TokenKind::NilIdentifier],
-            "module_" => vec![TokenKind::ModuleKw, TokenKind::NilIdentifier],
-            "where_" => vec![TokenKind::WhereKw, TokenKind::NilIdentifier],
-            "for_" => vec![TokenKind::ForKw, TokenKind::NilIdentifier],
-            "when_" => vec![TokenKind::WhenKw, TokenKind::NilIdentifier],
-            "match_" => vec![TokenKind::MatchKw, TokenKind::NilIdentifier],
-            "trait_" => vec![TokenKind::TraitKw, TokenKind::NilIdentifier],
-            "behavior_" => vec![TokenKind::BehaviorKw, TokenKind::NilIdentifier],
-            "typedef_" => vec![TokenKind::TypedefKw, TokenKind::NilIdentifier],
-            "typevar_" => vec![TokenKind::TypevarKw, TokenKind::NilIdentifier],
-            "typeof_" => vec![TokenKind::TypeOfKw, TokenKind::NilIdentifier],
-            "if_" => vec![TokenKind::IfKw, TokenKind::NilIdentifier],
-            "then_" => vec![TokenKind::ThenKw, TokenKind::NilIdentifier],
-            "else_" => vec![TokenKind::ElseKw, TokenKind::NilIdentifier],
-            "self_" => vec![TokenKind::SelfKw, TokenKind::NilIdentifier],
-            "end_" => vec![TokenKind::EndKw, TokenKind::NilIdentifier],
-            "Type_" => vec![TokenKind::TypeKw, TokenKind::NilIdentifier],
+            "import_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "import_" => vec![TokenKind::ImportKw, TokenKind::NilIdentifier],
+            "module_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "module_" => vec![TokenKind::ModuleKw, TokenKind::NilIdentifier],
+            "where_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "where_" => vec![TokenKind::WhereKw, TokenKind::NilIdentifier],
+            "for_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "for_" => vec![TokenKind::ForKw, TokenKind::NilIdentifier],
+            "when_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "when_" => vec![TokenKind::WhenKw, TokenKind::NilIdentifier],
+            "match_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "match_" => vec![TokenKind::MatchKw, TokenKind::NilIdentifier],
+            "trait_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "trait_" => vec![TokenKind::TraitKw, TokenKind::NilIdentifier],
+            "behavior_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "behavior_" => vec![TokenKind::BehaviorKw, TokenKind::NilIdentifier],
+            "typedef_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "typedef_" => vec![TokenKind::TypedefKw, TokenKind::NilIdentifier],
+            "typevar_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "typevar_" => vec![TokenKind::TypevarKw, TokenKind::NilIdentifier],
+            "typeof_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "typeof_" => vec![TokenKind::TypeOfKw, TokenKind::NilIdentifier],
+            "if_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "if_" => vec![TokenKind::IfKw, TokenKind::NilIdentifier],
+            "then_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "then_" => vec![TokenKind::ThenKw, TokenKind::NilIdentifier],
+            "else_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "else_" => vec![TokenKind::ElseKw, TokenKind::NilIdentifier],
+            "self_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "self_" => vec![TokenKind::SelfKw, TokenKind::NilIdentifier],
+            "end_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "end_" => vec![TokenKind::EndKw, TokenKind::NilIdentifier],
+            "Type_" => vec![TokenKind::Ident, TokenKind::NilIdentifier],
+            // "Type_" => vec![TokenKind::TypeKw, TokenKind::NilIdentifier],
         };
 
         for (source, expected) in source {
