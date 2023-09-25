@@ -23,8 +23,7 @@ SourceFile@0..92
       Comma@28..29 ","
       Whitespace@29..30 " "
       BoundedTypeArg@30..31
-        Error@30..31
-          NilIdentifier@30..31 "_"
+        NilIdentifier@30..31 "_"
       RBracket@31..32 "]"
       Whitespace@32..33 " "
     WhereKw@33..38 "where"
@@ -37,4 +36,3 @@ SourceFile@0..92
       Comment@58..88 "-- imagine all the th ..."
       Whitespace@88..89 "\n"
     EndKw@89..92 "end"
-error in range 30..31 while parsing the type of a bounded type argument. Found ‘_’, but expected identifier or ‘(’

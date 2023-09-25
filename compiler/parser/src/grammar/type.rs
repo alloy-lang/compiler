@@ -208,13 +208,17 @@ fn parse_bounded_type_args(p: &mut Parser, mode: ParseMode, parent_recovery_set:
         }
 
         let m = p.start();
-        parse_type(
-            p,
-            ParseErrorContext::BoundedTypeArgType,
-            mode,
-            ts![TokenKind::Comma, TokenKind::Ident],
-            parent_recovery_set,
-        );
+        if p.maybe_at(TokenKind::NilIdentifier) {
+            p.bump(TokenKind::NilIdentifier);
+        } else {
+            parse_type(
+                p,
+                ParseErrorContext::BoundedTypeArgType,
+                mode,
+                ts![TokenKind::Comma, TokenKind::Ident],
+                parent_recovery_set,
+            );
+        }
         m.complete(p, SyntaxKind::BoundedTypeArg);
 
         if should_stop(p) {
