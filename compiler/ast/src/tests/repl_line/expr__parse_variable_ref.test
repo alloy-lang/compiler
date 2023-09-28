@@ -1,0 +1,18 @@
+counter
+===
+[
+    Expression(
+        VariableRef(
+            VariableRef {
+                name: Some(
+                    Path {
+                        segments: [
+                            "counter",
+                        ],
+                    },
+                ),
+            },
+        ),
+    ),
+]
+[]

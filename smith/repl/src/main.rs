@@ -1,6 +1,6 @@
 extern crate dirs;
 
-use alloy_compiler::parser::parse;
+use alloy_compiler::parser::parse_repl_line;
 use nu_ansi_term::{Color as AnsiColor, Style};
 use std::path::PathBuf;
 
@@ -76,7 +76,7 @@ fn reedline_repl() {
                     break;
                 }
                 _ => {
-                    let parse = parse(buffer.as_str());
+                    let parse = parse_repl_line(buffer.as_str());
                     println!("{}", parse.debug_tree());
 
                     let syntax = parse.syntax();

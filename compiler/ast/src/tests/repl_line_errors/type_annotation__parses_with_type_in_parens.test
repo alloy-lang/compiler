@@ -1,0 +1,22 @@
+typeof test : self -> (String)
+===
+[
+    TypeAnnotation(
+        TypeAnnotation {
+            name: Some(
+                "test",
+            ),
+            type: Some(
+                Lambda(
+                    LambdaType {
+                        arg_type: Some(
+                            SelfRef,
+                        ),
+                        return_type: None,
+                    },
+                ),
+            ),
+        },
+    ),
+]
+[]

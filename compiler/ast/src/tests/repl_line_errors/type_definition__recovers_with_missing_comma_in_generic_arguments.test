@@ -1,0 +1,12 @@
+typedef Test1[t1 t2] = Empty
+typedef Test2        = Empty
+===
+[
+    TypeDefinition(
+        TypeDefinition,
+    ),
+    TypeDefinition(
+        TypeDefinition,
+    ),
+]
+[]

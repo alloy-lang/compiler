@@ -1,0 +1,42 @@
+if test then 2 else 3
+===
+[
+    Expression(
+        IfThenElseExpr(
+            IfThenElseExpr {
+                cond: Some(
+                    VariableRef(
+                        VariableRef {
+                            name: Some(
+                                Path {
+                                    segments: [
+                                        "test",
+                                    ],
+                                },
+                            ),
+                        },
+                    ),
+                ),
+                then: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                2,
+                            ),
+                        },
+                    ),
+                ),
+                else_: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                3,
+                            ),
+                        },
+                    ),
+                ),
+            },
+        ),
+    ),
+]
+[]

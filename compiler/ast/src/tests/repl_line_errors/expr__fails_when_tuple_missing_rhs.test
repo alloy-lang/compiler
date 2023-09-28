@@ -1,0 +1,27 @@
+(1, 2
+===
+[
+    Expression(
+        TupleExpr(
+            TupleExpr {
+                exprs: [
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                1,
+                            ),
+                        },
+                    ),
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                2,
+                            ),
+                        },
+                    ),
+                ],
+            },
+        ),
+    ),
+]
+[]

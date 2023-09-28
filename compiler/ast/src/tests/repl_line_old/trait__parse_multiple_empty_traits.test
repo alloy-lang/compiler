@@ -1,0 +1,27 @@
+trait TestTrait1 where
+    -- imagine all the things here
+end
+
+trait TestTrait2 where
+    -- imagine all the things here
+end
+===
+[
+    Trait(
+        Trait {
+            name: Some(
+                "TestTrait1",
+            ),
+            members: [],
+        },
+    ),
+    Trait(
+        Trait {
+            name: Some(
+                "TestTrait2",
+            ),
+            members: [],
+        },
+    ),
+]
+[]

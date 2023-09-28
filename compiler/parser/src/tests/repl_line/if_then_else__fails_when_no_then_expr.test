@@ -16,4 +16,4 @@ SourceFile@0..19
     ElseExpr@18..19
       IntLiteral@18..19
         Integer@18..19 "3"
-error at position 13 while parsing the `then` expression in an if-then-else expression. Missing expected integer, fractional, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error at position 13 while parsing the `then` expression in an if-then-else expression. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’

@@ -1,0 +1,10 @@
+typedef Test =
+  | Empty1
+  | Empty2
+===
+[
+    TypeDefinition(
+        TypeDefinition,
+    ),
+]
+[]

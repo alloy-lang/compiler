@@ -1,0 +1,58 @@
+>>(func1, func2)
+===
+[
+    Expression(
+        FunctionCall(
+            FunctionCall {
+                target: Some(
+                    FunctionCallTarget {
+                        target: Some(
+                            VariableRef {
+                                name: Some(
+                                    Path {
+                                        segments: [
+                                            ">>",
+                                        ],
+                                    },
+                                ),
+                            },
+                        ),
+                    },
+                ),
+                args: [
+                    FunctionCallArg {
+                        expression: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "func1",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                    FunctionCallArg {
+                        expression: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "func2",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ],
+            },
+        ),
+    ),
+]
+[]

@@ -61,7 +61,7 @@ pub enum TokenKind {
     Integer,
 
     #[regex(r"[0-9]+\.[0-9]+")]
-    Fractional,
+    Fraction,
 
     #[regex(r#""([^"\\]|\\t|\\u|\\n|\\")*""#)]
     String,
@@ -166,7 +166,7 @@ impl fmt::Display for TokenKind {
             Self::Ident => "identifier",
             Self::OpIdent => "operator identifier",
             Self::Integer => "integer",
-            Self::Fractional => "fractional",
+            Self::Fraction => "fraction",
             Self::String => "string",
             Self::Char => "char",
             Self::Colon => "‘:’",
@@ -398,8 +398,8 @@ mod tests {
     }
 
     #[test]
-    fn lex_fractional() {
-        check("123456.123456", TokenKind::Fractional);
+    fn lex_fraction() {
+        check("123456.123456", TokenKind::Fraction);
     }
 
     #[test]

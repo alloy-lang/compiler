@@ -1,0 +1,35 @@
+module TestModule1 where
+    import really::really::real::Thing1
+    import really::real::other::Thing2
+===
+Some(
+    Module {
+        definitions: [
+            Import(
+                Import {
+                    path: [
+                        "really",
+                        "really",
+                        "real",
+                    ],
+                    targets: [
+                        "Thing1",
+                    ],
+                },
+            ),
+            Import(
+                Import {
+                    path: [
+                        "really",
+                        "real",
+                        "other",
+                    ],
+                    targets: [
+                        "Thing2",
+                    ],
+                },
+            ),
+        ],
+    },
+)
+[]

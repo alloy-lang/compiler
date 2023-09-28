@@ -1,0 +1,27 @@
+typedef Test =
+  | Empty1
+  | Empty2
+end
+===
+[
+    TypeDefinition(
+        TypeDefinition {
+            type_args: [],
+            types: [
+                TypeDefinitionMember {
+                    name: Some(
+                        "Empty1",
+                    ),
+                    properties: [],
+                },
+                TypeDefinitionMember {
+                    name: Some(
+                        "Empty2",
+                    ),
+                    properties: [],
+                },
+            ],
+        },
+    ),
+]
+[]

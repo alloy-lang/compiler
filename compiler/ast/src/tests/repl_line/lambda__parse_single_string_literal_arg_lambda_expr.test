@@ -1,0 +1,27 @@
+|"hello"| -> 5
+===
+[
+    Expression(
+        LambdaExpr(
+            LambdaExpr {
+                args: [
+                    StringLiteral(
+                        StringLiteral {
+                            value: "hello",
+                        },
+                    ),
+                ],
+                body: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                5,
+                            ),
+                        },
+                    ),
+                ),
+            },
+        ),
+    ),
+]
+[]

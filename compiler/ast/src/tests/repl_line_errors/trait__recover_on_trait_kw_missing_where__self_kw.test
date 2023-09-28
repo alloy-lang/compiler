@@ -1,0 +1,26 @@
+trait TestTrait1
+    self = Functor
+end
+===
+[
+    Trait(
+        Trait {
+            name: Some(
+                "TestTrait1",
+            ),
+            members: [
+                TypeVariable(
+                    TypeVariable {
+                        name: None,
+                        constraints: [
+                            Trait(
+                                TypeVariableTraitConstraint,
+                            ),
+                        ],
+                    },
+                ),
+            ],
+        },
+    ),
+]
+[]

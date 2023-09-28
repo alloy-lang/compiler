@@ -30,7 +30,7 @@ type PatternIdx = Idx<Pattern>;
 pub enum Pattern {
     Missing,
     IntLiteral(Option<u64>),
-    FractionalLiteral(Option<NotNan<f64>>),
+    FractionLiteral(Option<NotNan<f64>>),
     StringLiteral(String),
     CharLiteral(Option<char>),
     VariableRef { var: String },
@@ -52,7 +52,7 @@ pub enum Expr {
         /// is `None` if the number is too big to fit in a u64
         n: Option<u64>,
     },
-    FractionalLiteral {
+    FractionLiteral {
         /// is `None` if the number is too big to fit in a f64
         n: Option<NotNan<f64>>,
     },

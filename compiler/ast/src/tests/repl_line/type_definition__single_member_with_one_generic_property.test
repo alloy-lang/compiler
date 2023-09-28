@@ -1,0 +1,32 @@
+typedef Test[t] = Thing t
+===
+[
+    TypeDefinition(
+        TypeDefinition {
+            type_args: [
+                "t",
+            ],
+            types: [
+                TypeDefinitionMember {
+                    name: Some(
+                        "Thing",
+                    ),
+                    properties: [
+                        Identifier(
+                            TypeIdentifier {
+                                name: Some(
+                                    Path {
+                                        segments: [
+                                            "t",
+                                        ],
+                                    },
+                                ),
+                            },
+                        ),
+                    ],
+                },
+            ],
+        },
+    ),
+]
+[]

@@ -1,0 +1,94 @@
+behavior TestTrait1 for Type1 where
+    -- imagine all the things here
+
+    typevar t1
+
+behavior TestTrait2 for Type1 where
+    -- imagine all the things here
+
+    typevar t1
+end
+===
+[
+    Behavior(
+        Behavior {
+            trait_: Some(
+                Identifier(
+                    TypeIdentifier {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    "TestTrait1",
+                                ],
+                            },
+                        ),
+                    },
+                ),
+            ),
+            type_: Some(
+                Identifier(
+                    TypeIdentifier {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    "Type1",
+                                ],
+                            },
+                        ),
+                    },
+                ),
+            ),
+            members: [
+                TypeVariable(
+                    TypeVariable {
+                        name: Some(
+                            "t1",
+                        ),
+                        constraints: [],
+                    },
+                ),
+            ],
+        },
+    ),
+    Behavior(
+        Behavior {
+            trait_: Some(
+                Identifier(
+                    TypeIdentifier {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    "TestTrait2",
+                                ],
+                            },
+                        ),
+                    },
+                ),
+            ),
+            type_: Some(
+                Identifier(
+                    TypeIdentifier {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    "Type1",
+                                ],
+                            },
+                        ),
+                    },
+                ),
+            ),
+            members: [
+                TypeVariable(
+                    TypeVariable {
+                        name: Some(
+                            "t1",
+                        ),
+                        constraints: [],
+                    },
+                ),
+            ],
+        },
+    ),
+]
+[]

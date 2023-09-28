@@ -1,0 +1,12 @@
+"hello"
+===
+[
+    Expression(
+        StringLiteral(
+            StringLiteral {
+                value: "hello",
+            },
+        ),
+    ),
+]
+[]

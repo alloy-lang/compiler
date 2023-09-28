@@ -1,0 +1,31 @@
+trait TestTrait1 where
+    typevar
+    typevar t2
+end
+===
+[
+    Trait(
+        Trait {
+            name: Some(
+                "TestTrait1",
+            ),
+            members: [
+                TypeVariable(
+                    TypeVariable {
+                        name: None,
+                        constraints: [],
+                    },
+                ),
+                TypeVariable(
+                    TypeVariable {
+                        name: Some(
+                            "t2",
+                        ),
+                        constraints: [],
+                    },
+                ),
+            ],
+        },
+    ),
+]
+[]

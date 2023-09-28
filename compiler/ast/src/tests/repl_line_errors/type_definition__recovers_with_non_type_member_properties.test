@@ -1,0 +1,11 @@
+typedef Test1 =
+  | Thing1 0 Int
+  | Thing2 "hi"
+  | Thing3 String Int
+===
+[
+    TypeDefinition(
+        TypeDefinition,
+    ),
+]
+[]

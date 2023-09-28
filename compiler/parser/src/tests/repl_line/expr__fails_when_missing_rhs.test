@@ -7,5 +7,5 @@ SourceFile@0..3
       IntLiteral@1..2
         Integer@1..2 "1"
       Plus@2..3 "+"
-error at position 3 while parsing an expression inside parentheses. Missing expected integer, fractional, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error at position 3 while parsing an expression inside parentheses. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
 error at position 3 while parsing a close parenthesis after an expression. Missing expected ‘)’

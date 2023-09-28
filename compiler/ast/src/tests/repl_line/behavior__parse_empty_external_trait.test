@@ -1,0 +1,39 @@
+behavior other::Trait1 for Type1 where
+    -- imagine all the things here
+end
+===
+[
+    Behavior(
+        Behavior {
+            trait_: Some(
+                Identifier(
+                    TypeIdentifier {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    "other",
+                                    "Trait1",
+                                ],
+                            },
+                        ),
+                    },
+                ),
+            ),
+            type_: Some(
+                Identifier(
+                    TypeIdentifier {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    "Type1",
+                                ],
+                            },
+                        ),
+                    },
+                ),
+            ),
+            members: [],
+        },
+    ),
+]
+[]

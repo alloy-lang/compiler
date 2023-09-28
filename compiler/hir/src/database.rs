@@ -33,8 +33,8 @@ impl Database {
             match ast {
                 alloy_ast::Expr::BinaryExpr(ast) => self.lower_binary(&ast),
                 alloy_ast::Expr::IntLiteral(ast) => Expr::IntLiteral { n: ast.parse() },
-                alloy_ast::Expr::FractionalLiteral(ast) => {
-                    Expr::FractionalLiteral { n: ast.parse() }
+                alloy_ast::Expr::FractionLiteral(ast) => {
+                    Expr::FractionLiteral { n: ast.parse() }
                 }
                 alloy_ast::Expr::StringLiteral(ast) => Expr::StringLiteral(ast.parse()),
                 alloy_ast::Expr::CharLiteral(ast) => Expr::CharLiteral(ast.parse()),
@@ -54,7 +54,7 @@ impl Database {
     fn lower_pattern(ast: alloy_ast::Pattern) -> Pattern {
         match ast {
             alloy_ast::Pattern::IntLiteral(ast) => Pattern::IntLiteral(ast.parse()),
-            alloy_ast::Pattern::FractionalLiteral(ast) => Pattern::FractionalLiteral(ast.parse()),
+            alloy_ast::Pattern::FractionLiteral(ast) => Pattern::FractionLiteral(ast.parse()),
             alloy_ast::Pattern::StringLiteral(ast) => Pattern::StringLiteral(ast.parse()),
             alloy_ast::Pattern::CharLiteral(ast) => Pattern::CharLiteral(ast.parse()),
             alloy_ast::Pattern::VariableRef(ast) => Pattern::VariableRef {
@@ -204,7 +204,7 @@ mod tests {
     use super::*;
 
     fn parse(input: &str) -> ast::SourceFile {
-        let node = parser::parse(input).syntax();
+        let node = parser::parse_repl_line(input).syntax();
         dbg!(&node);
         ast::SourceFile::cast(node).unwrap()
     }
@@ -324,10 +324,10 @@ mod tests {
     }
 
     #[test]
-    fn lower_fractional_literal() {
+    fn lower_fraction_literal() {
         check_expr(
             "999.19",
-            Expr::FractionalLiteral {
+            Expr::FractionLiteral {
                 n: Some(NotNan::new(999.19).unwrap()),
             },
             Database::default(),

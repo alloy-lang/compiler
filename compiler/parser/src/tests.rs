@@ -6,13 +6,25 @@ use std::{env, fs};
 
 // #[test]
 // fn source_file() {
-//     run_parser_tests("source_file", crate::parse_source_file);
+//     run_parser_tests("source_file", crate::parse);
 // }
 
 #[test]
 fn repl_line() {
-    run_parser_tests("repl_line", crate::parse);
+    run_parser_tests("repl_line", crate::parse_repl_line);
 }
+
+// #[test]
+// fn lambda__parse_destructured_argument() {
+//     let file_name = "lambda__parse_destructured_argument.test";
+//
+//     let test_file = {
+//         let current_dir = env::current_dir().unwrap();
+//         current_dir.join(format!("src/tests/repl_line/{}", file_name))
+//     };
+//
+//     run_parser_test(test_file, crate::parse);
+// }
 
 fn run_parser_test(path: PathBuf, parsing_fn: fn(&str) -> Parse) {
     let test_content = fs::read_to_string(&path).unwrap();
@@ -72,7 +84,7 @@ fn test_std_lib() {
 
         let source = fs::read_to_string(file_name)
             .unwrap_or_else(|_| panic!("Something went wrong reading the file '{:?}'", file_name));
-        let actual = crate::parse(&source);
+        let actual = crate::parse_source_file(&source);
 
         assert!(
             actual.errors.is_empty(),

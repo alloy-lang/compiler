@@ -4,7 +4,7 @@ use std::fmt;
 use text_size::{TextRange, TextSize};
 
 #[derive(Debug, PartialEq)]
-pub(crate) struct ParseError {
+pub struct ParseError {
     pub(super) expected: Vec<TokenKind>,
     pub(super) kind: ParseErrorKind,
     pub(super) context: ParseErrorContext,

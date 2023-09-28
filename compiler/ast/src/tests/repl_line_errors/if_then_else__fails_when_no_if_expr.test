@@ -1,0 +1,30 @@
+if then 2 else 3
+===
+[
+    Expression(
+        IfThenElseExpr(
+            IfThenElseExpr {
+                cond: None,
+                then: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                2,
+                            ),
+                        },
+                    ),
+                ),
+                else_: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                3,
+                            ),
+                        },
+                    ),
+                ),
+            },
+        ),
+    ),
+]
+[]

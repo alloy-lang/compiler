@@ -1,0 +1,91 @@
+typeof test1 : Test -> String -> (String
+typeof test2 : Test -> String
+===
+[
+    TypeAnnotation(
+        TypeAnnotation {
+            name: Some(
+                "test1",
+            ),
+            type: Some(
+                Lambda(
+                    LambdaType {
+                        arg_type: Some(
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "Test",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                        return_type: Some(
+                            Lambda(
+                                LambdaType {
+                                    arg_type: Some(
+                                        Identifier(
+                                            TypeIdentifier {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "String",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                    return_type: None,
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            ),
+        },
+    ),
+    TypeAnnotation(
+        TypeAnnotation {
+            name: Some(
+                "test2",
+            ),
+            type: Some(
+                Lambda(
+                    LambdaType {
+                        arg_type: Some(
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "Test",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                        return_type: Some(
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "String",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            ),
+        },
+    ),
+]
+[]

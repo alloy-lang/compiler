@@ -1,0 +1,85 @@
+typeof test1 : String -> ResultThing::
+typeof test2 : String -> ResultThing::More
+===
+[
+    TypeAnnotation(
+        TypeAnnotation {
+            name: Some(
+                "test1",
+            ),
+            type: Some(
+                Lambda(
+                    LambdaType {
+                        arg_type: Some(
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "String",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                        return_type: Some(
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "ResultThing",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            ),
+        },
+    ),
+    TypeAnnotation(
+        TypeAnnotation {
+            name: Some(
+                "test2",
+            ),
+            type: Some(
+                Lambda(
+                    LambdaType {
+                        arg_type: Some(
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "String",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                        return_type: Some(
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "ResultThing",
+                                                "More",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            ),
+        },
+    ),
+]
+[]

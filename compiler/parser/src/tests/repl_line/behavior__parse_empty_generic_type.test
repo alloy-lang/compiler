@@ -6,26 +6,28 @@ SourceFile@0..78
   BehaviorDef@0..78
     BehaviorKw@0..8 "behavior"
     Whitespace@8..9 " "
-    TypeIdentifier@9..16
-      Ident@9..15 "Trait1"
-      Whitespace@15..16 " "
+    BehaviorTraitName@9..16
+      TypeIdentifier@9..16
+        Ident@9..15 "Trait1"
+        Whitespace@15..16 " "
     ForKw@16..19 "for"
     Whitespace@19..20 " "
-    BoundedType@20..34
-      BoundedTypeBase@20..25
-        TypeIdentifier@20..25
-          Ident@20..25 "Type1"
-      LBracket@25..26 "["
-      BoundedTypeArg@26..28
-        TypeIdentifier@26..28
-          Ident@26..28 "t1"
-      Comma@28..29 ","
-      Whitespace@29..30 " "
-      BoundedTypeArg@30..32
-        TypeIdentifier@30..32
-          Ident@30..32 "t2"
-      RBracket@32..33 "]"
-      Whitespace@33..34 " "
+    BehaviorTypeName@20..34
+      BoundedType@20..34
+        BoundedTypeBase@20..25
+          TypeIdentifier@20..25
+            Ident@20..25 "Type1"
+        LBracket@25..26 "["
+        BoundedTypeArg@26..28
+          TypeIdentifier@26..28
+            Ident@26..28 "t1"
+        Comma@28..29 ","
+        Whitespace@29..30 " "
+        BoundedTypeArg@30..32
+          TypeIdentifier@30..32
+            Ident@30..32 "t2"
+        RBracket@32..33 "]"
+        Whitespace@33..34 " "
     WhereKw@34..39 "where"
     Whitespace@39..44 "\n    "
     Comment@44..74 "-- imagine all the th ..."

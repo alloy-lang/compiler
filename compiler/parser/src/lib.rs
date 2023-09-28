@@ -19,11 +19,22 @@ mod token_set;
 mod tests;
 
 #[must_use]
-pub fn parse(input: &str) -> Parse {
+pub fn parse_source_file(input: &str) -> Parse {
     let tokens: Vec<_> = Lexer::new(input).collect();
     let source = Source::new(&tokens);
     let parser = Parser::new(source);
-    let events = parser.parse();
+    let events = parser.parse_source_file();
+    let sink = Sink::new(&tokens, events);
+
+    sink.finish()
+}
+
+#[must_use]
+pub fn parse_repl_line(input: &str) -> Parse {
+    let tokens: Vec<_> = Lexer::new(input).collect();
+    let source = Source::new(&tokens);
+    let parser = Parser::new(source);
+    let events = parser.parse_repl_line();
     let sink = Sink::new(&tokens, events);
 
     sink.finish()
@@ -54,5 +65,10 @@ impl Parse {
     #[must_use]
     pub fn syntax(&self) -> SyntaxNode {
         SyntaxNode::new_root(self.green_node.clone())
+    }
+
+    #[must_use]
+    pub fn errors(&self) -> &Vec<ParseError> {
+        &self.errors
     }
 }

@@ -1,0 +1,73 @@
+funky(x, y, z)
+===
+[
+    Expression(
+        FunctionCall(
+            FunctionCall {
+                target: Some(
+                    FunctionCallTarget {
+                        target: Some(
+                            VariableRef {
+                                name: Some(
+                                    Path {
+                                        segments: [
+                                            "funky",
+                                        ],
+                                    },
+                                ),
+                            },
+                        ),
+                    },
+                ),
+                args: [
+                    FunctionCallArg {
+                        expression: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "x",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                    FunctionCallArg {
+                        expression: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "y",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                    FunctionCallArg {
+                        expression: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "z",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ],
+            },
+        ),
+    ),
+]
+[]

@@ -1,0 +1,29 @@
+|0| -> 2
+===
+[
+    Expression(
+        LambdaExpr(
+            LambdaExpr {
+                args: [
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                0,
+                            ),
+                        },
+                    ),
+                ],
+                body: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                2,
+                            ),
+                        },
+                    ),
+                ),
+            },
+        ),
+    ),
+]
+[]

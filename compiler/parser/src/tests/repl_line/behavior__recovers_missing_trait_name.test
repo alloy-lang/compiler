@@ -10,11 +10,13 @@ SourceFile@0..122
   BehaviorDef@0..65
     BehaviorKw@0..8 "behavior"
     Whitespace@8..9 " "
+    BehaviorTraitName@9..9
     ForKw@9..12 "for"
     Whitespace@12..13 " "
-    TypeIdentifier@13..19
-      Ident@13..18 "Type1"
-      Whitespace@18..19 " "
+    BehaviorTypeName@13..19
+      TypeIdentifier@13..19
+        Ident@13..18 "Type1"
+        Whitespace@18..19 " "
     WhereKw@19..24 "where"
     Whitespace@24..29 "\n    "
     Comment@29..59 "-- imagine all the th ..."

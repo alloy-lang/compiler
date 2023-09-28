@@ -1,0 +1,79 @@
+let add = |a, b| -> a + b
+===
+[
+    Value(
+        ValueDefinition {
+            name: Some(
+                "add",
+            ),
+            value: Some(
+                LambdaExpr(
+                    LambdaExpr {
+                        args: [
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "a",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "b",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ],
+                        body: Some(
+                            BinaryExpr(
+                                BinaryExpr {
+                                    lhs: Some(
+                                        VariableRef(
+                                            VariableRef {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "a",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                    rhs: Some(
+                                        VariableRef(
+                                            VariableRef {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "b",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                    op: Some(
+                                        BinaryOp {
+                                            name: "+",
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            ),
+        },
+    ),
+]
+[]

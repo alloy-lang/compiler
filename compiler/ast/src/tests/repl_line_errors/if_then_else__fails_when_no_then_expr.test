@@ -1,0 +1,22 @@
+if test then else 3
+===
+[
+    Expression(
+        IfThenElseExpr(
+            IfThenElseExpr {
+                cond: None,
+                then: None,
+                else_: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                3,
+                            ),
+                        },
+                    ),
+                ),
+            },
+        ),
+    ),
+]
+[]

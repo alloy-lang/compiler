@@ -1,0 +1,14 @@
+if
+===
+[
+    Expression(
+        IfThenElseExpr(
+            IfThenElseExpr {
+                cond: None,
+                then: None,
+                else_: None,
+            },
+        ),
+    ),
+]
+[]

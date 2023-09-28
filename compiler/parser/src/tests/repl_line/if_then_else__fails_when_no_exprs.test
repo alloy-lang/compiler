@@ -10,6 +10,6 @@ SourceFile@0..12
     ThenExpr@8..8
     ElseKw@8..12 "else"
     ElseExpr@12..12
-error at position 3 while parsing the conditional expression in an if-then-else expression. Missing expected integer, fractional, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
-error at position 8 while parsing the `then` expression in an if-then-else expression. Missing expected integer, fractional, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
-error at position 12 while parsing the `else` expression in an if-then-else expression. Missing expected integer, fractional, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error at position 3 while parsing the conditional expression in an if-then-else expression. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error at position 8 while parsing the `then` expression in an if-then-else expression. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error at position 12 while parsing the `else` expression in an if-then-else expression. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’

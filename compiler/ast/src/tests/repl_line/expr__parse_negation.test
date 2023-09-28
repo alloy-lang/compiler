@@ -1,0 +1,23 @@
+- 10
+===
+[
+    Expression(
+        UnaryExpr(
+            UnaryExpr {
+                op: Some(
+                    Minus@0..1 "-",
+                ),
+                expr: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                10,
+                            ),
+                        },
+                    ),
+                ),
+            },
+        ),
+    ),
+]
+[]

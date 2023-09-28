@@ -1,0 +1,70 @@
+typedef Either[l, r] =
+  | Left(l)
+  | Right(r)
+end
+
+match test when
+  | Either::Left(l)  -> l
+  | Either::Right(r) -> r
+===
+[
+    TypeDefinition(
+        TypeDefinition {
+            type_args: [
+                "l",
+                "r",
+            ],
+            types: [
+                TypeDefinitionMember {
+                    name: Some(
+                        "Left",
+                    ),
+                    properties: [
+                        Parenthesized(
+                            ParenthesizedType {
+                                inner: Some(
+                                    Identifier(
+                                        TypeIdentifier {
+                                            name: Some(
+                                                Path {
+                                                    segments: [
+                                                        "l",
+                                                    ],
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                ),
+                            },
+                        ),
+                    ],
+                },
+                TypeDefinitionMember {
+                    name: Some(
+                        "Right",
+                    ),
+                    properties: [
+                        Parenthesized(
+                            ParenthesizedType {
+                                inner: Some(
+                                    Identifier(
+                                        TypeIdentifier {
+                                            name: Some(
+                                                Path {
+                                                    segments: [
+                                                        "r",
+                                                    ],
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                ),
+                            },
+                        ),
+                    ],
+                },
+            ],
+        },
+    ),
+]
+[]

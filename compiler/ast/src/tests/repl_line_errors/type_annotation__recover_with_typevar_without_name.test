@@ -1,0 +1,65 @@
+typeof test : t1 -> t2 -> Test where
+    typevar
+    typevar t2
+===
+[
+    TypeAnnotation(
+        TypeAnnotation {
+            name: Some(
+                "test",
+            ),
+            type: Some(
+                Lambda(
+                    LambdaType {
+                        arg_type: Some(
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "t1",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                        return_type: Some(
+                            Lambda(
+                                LambdaType {
+                                    arg_type: Some(
+                                        Identifier(
+                                            TypeIdentifier {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "t2",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                    return_type: Some(
+                                        Identifier(
+                                            TypeIdentifier {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "Test",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            ),
+        },
+    ),
+]
+[]

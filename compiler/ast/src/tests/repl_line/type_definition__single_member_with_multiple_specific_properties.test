@@ -1,0 +1,41 @@
+typedef Test = Thing Int String
+===
+[
+    TypeDefinition(
+        TypeDefinition {
+            type_args: [],
+            types: [
+                TypeDefinitionMember {
+                    name: Some(
+                        "Thing",
+                    ),
+                    properties: [
+                        Identifier(
+                            TypeIdentifier {
+                                name: Some(
+                                    Path {
+                                        segments: [
+                                            "Int",
+                                        ],
+                                    },
+                                ),
+                            },
+                        ),
+                        Identifier(
+                            TypeIdentifier {
+                                name: Some(
+                                    Path {
+                                        segments: [
+                                            "String",
+                                        ],
+                                    },
+                                ),
+                            },
+                        ),
+                    ],
+                },
+            ],
+        },
+    ),
+]
+[]

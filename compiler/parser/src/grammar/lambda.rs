@@ -6,7 +6,7 @@ use crate::grammar::expr::parse_expr;
 
 const LAMBDA_ARG_SET: TokenSet = ts![
     TokenKind::Integer,
-    TokenKind::Fractional,
+    TokenKind::Fraction,
     TokenKind::String,
     TokenKind::Char,
     TokenKind::Ident,

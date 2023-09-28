@@ -1,0 +1,32 @@
+1 +2
+===
+[
+    Expression(
+        BinaryExpr(
+            BinaryExpr {
+                lhs: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                1,
+                            ),
+                        },
+                    ),
+                ),
+                rhs: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                2,
+                            ),
+                        },
+                    ),
+                ),
+                op: Some(
+                    Plus@2..3 "+",
+                ),
+            },
+        ),
+    ),
+]
+[]

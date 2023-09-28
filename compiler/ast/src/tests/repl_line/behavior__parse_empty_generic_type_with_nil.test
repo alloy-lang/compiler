@@ -1,0 +1,70 @@
+behavior Trait1 for Type1[t1, _] where
+    typevar t1
+    -- imagine all the things here
+end
+===
+[
+    Behavior(
+        Behavior {
+            trait_: Some(
+                Identifier(
+                    TypeIdentifier {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    "Trait1",
+                                ],
+                            },
+                        ),
+                    },
+                ),
+            ),
+            type_: Some(
+                Bounded(
+                    BoundedType {
+                        base: Some(
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "Type1",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                        args: [
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "t1",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                            NilRef,
+                        ],
+                    },
+                ),
+            ),
+            members: [
+                TypeVariable(
+                    Named(
+                        NamedTypeVariable {
+                            name: Some(
+                                "t1",
+                            ),
+                            constraints: [],
+                        },
+                    ),
+                ),
+            ],
+        },
+    ),
+]
+[]

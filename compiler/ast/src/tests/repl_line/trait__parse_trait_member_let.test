@@ -1,0 +1,58 @@
+trait TestTrait1 where
+    typeof test : Int
+
+    let thing = test
+end
+===
+[
+    Trait(
+        Trait {
+            name: Some(
+                "TestTrait1",
+            ),
+            members: [
+                TypeAnnotation(
+                    TypeAnnotation {
+                        name: Some(
+                            "test",
+                        ),
+                        type: Some(
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "Int",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+                Value(
+                    ValueDefinition {
+                        name: Some(
+                            "thing",
+                        ),
+                        value: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "test",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            ],
+        },
+    ),
+]
+[]

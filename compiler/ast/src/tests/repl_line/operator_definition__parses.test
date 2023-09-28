@@ -1,0 +1,137 @@
+typeof (|>) : t1 -> (t1 -> t2) -> t2 where
+    typevar t1
+    typevar t2
+let (|>) = |x, f| -> fakeStuff
+===
+[
+    TypeAnnotation(
+        TypeAnnotation {
+            name: None,
+            type: Some(
+                Lambda(
+                    LambdaType {
+                        arg_type: Some(
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "t1",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                        return_type: Some(
+                            Lambda(
+                                LambdaType {
+                                    arg_type: Some(
+                                        Parenthesized(
+                                            ParenthesizedType {
+                                                inner: Some(
+                                                    Lambda(
+                                                        LambdaType {
+                                                            arg_type: Some(
+                                                                Identifier(
+                                                                    TypeIdentifier {
+                                                                        name: Some(
+                                                                            Path {
+                                                                                segments: [
+                                                                                    "t1",
+                                                                                ],
+                                                                            },
+                                                                        ),
+                                                                    },
+                                                                ),
+                                                            ),
+                                                            return_type: Some(
+                                                                Identifier(
+                                                                    TypeIdentifier {
+                                                                        name: Some(
+                                                                            Path {
+                                                                                segments: [
+                                                                                    "t2",
+                                                                                ],
+                                                                            },
+                                                                        ),
+                                                                    },
+                                                                ),
+                                                            ),
+                                                        },
+                                                    ),
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                    return_type: Some(
+                                        Identifier(
+                                            TypeIdentifier {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "t2",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            ),
+        },
+    ),
+    Value(
+        ValueDefinition {
+            name: None,
+            value: Some(
+                LambdaExpr(
+                    LambdaExpr {
+                        args: [
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "x",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "f",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ],
+                        body: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "fakeStuff",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            ),
+        },
+    ),
+]
+[]

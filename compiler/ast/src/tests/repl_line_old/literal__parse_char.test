@@ -1,0 +1,14 @@
+'c'
+===
+[
+    Expression(
+        CharLiteral(
+            CharLiteral {
+                value: Some(
+                    'c',
+                ),
+            },
+        ),
+    ),
+]
+[]

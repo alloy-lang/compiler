@@ -1,0 +1,35 @@
+trait TestTrait1 where
+    self = #Type[_ _]
+    typevar t1
+end
+===
+[
+    Trait(
+        Trait {
+            name: Some(
+                "TestTrait1",
+            ),
+            members: [
+                TypeVariable(
+                    TypeVariable {
+                        name: None,
+                        constraints: [
+                            Kind(
+                                TypeVariableKindConstraint,
+                            ),
+                        ],
+                    },
+                ),
+                TypeVariable(
+                    TypeVariable {
+                        name: Some(
+                            "t1",
+                        ),
+                        constraints: [],
+                    },
+                ),
+            ],
+        },
+    ),
+]
+[]

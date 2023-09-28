@@ -1,5 +1,5 @@
 123.123
 ===
 SourceFile@0..7
-  FractionalLiteral@0..7
-    Fractional@0..7 "123.123"
+  FractionLiteral@0..7
+    Fraction@0..7 "123.123"

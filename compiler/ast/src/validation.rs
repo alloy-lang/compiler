@@ -4,7 +4,7 @@ use text_size::TextRange;
 
 use alloy_syntax::SyntaxNode;
 
-use crate::{CharLiteral, IntLiteral};
+use crate::ast::{CharLiteral, IntLiteral};
 
 #[derive(Debug, PartialEq)]
 pub struct ValidationError {
@@ -48,10 +48,10 @@ pub fn validate(node: &SyntaxNode) -> Vec<ValidationError> {
     let mut errors = Vec::new();
 
     for node in node.descendants() {
-        if let Some(literal) = IntLiteral::cast(&node) {
+        if let Some(literal) = IntLiteral::cast(node.clone()) {
             validate_int_literal(&literal, &mut errors);
         }
-        if let Some(literal) = CharLiteral::cast(&node) {
+        if let Some(literal) = CharLiteral::cast(node) {
             validate_char_literal(&literal, &mut errors);
         }
     }
@@ -60,19 +60,19 @@ pub fn validate(node: &SyntaxNode) -> Vec<ValidationError> {
 }
 
 fn validate_int_literal(literal: &IntLiteral, errors: &mut Vec<ValidationError>) {
-    if literal.parse().is_none() {
+    if literal.value().is_none() {
         errors.push(ValidationError {
             kind: ValidationErrorKind::NumberLiteralTooLarge,
-            range: literal.0.first_token().unwrap().text_range(),
+            range: literal.span(),
         });
     }
 }
 
 fn validate_char_literal(literal: &CharLiteral, errors: &mut Vec<ValidationError>) {
-    if literal.parse().is_none() {
+    if literal.value().is_none() {
         errors.push(ValidationError {
             kind: ValidationErrorKind::CharLiteralInvalid,
-            range: literal.0.first_token().unwrap().text_range(),
+            range: literal.span(),
         });
     }
 }
@@ -85,7 +85,7 @@ mod tests {
 
     #[track_caller]
     fn check(input: &str, expected_errors: &[(ValidationErrorKind, StdRange<u32>)]) {
-        let parse = alloy_parser::parse(input);
+        let parse = alloy_parser::parse_repl_line(input);
 
         let expected_errors: Vec<_> = expected_errors
             .iter()

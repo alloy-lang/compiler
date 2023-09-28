@@ -1,0 +1,268 @@
+module TestModule1 where
+    typeof testThing : (t2 -> t1) -> t2 -> t2 -> ResultThing where
+      typevar t1 = Thing
+      typevar t2
+    let testThing = |funky, x, y| -> TestType::new <| (funky(x), funky(y))
+===
+Some(
+    Module {
+        definitions: [
+            TypeAnnotation(
+                TypeAnnotation {
+                    name: Some(
+                        "testThing",
+                    ),
+                    type: Some(
+                        Lambda(
+                            LambdaType {
+                                arg_type: Some(
+                                    Parenthesized(
+                                        ParenthesizedType {
+                                            inner: Some(
+                                                Lambda(
+                                                    LambdaType {
+                                                        arg_type: Some(
+                                                            Identifier(
+                                                                TypeIdentifier {
+                                                                    name: Some(
+                                                                        Path {
+                                                                            segments: [
+                                                                                "t2",
+                                                                            ],
+                                                                        },
+                                                                    ),
+                                                                },
+                                                            ),
+                                                        ),
+                                                        return_type: Some(
+                                                            Identifier(
+                                                                TypeIdentifier {
+                                                                    name: Some(
+                                                                        Path {
+                                                                            segments: [
+                                                                                "t1",
+                                                                            ],
+                                                                        },
+                                                                    ),
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ),
+                                            ),
+                                        },
+                                    ),
+                                ),
+                                return_type: Some(
+                                    Lambda(
+                                        LambdaType {
+                                            arg_type: Some(
+                                                Identifier(
+                                                    TypeIdentifier {
+                                                        name: Some(
+                                                            Path {
+                                                                segments: [
+                                                                    "t2",
+                                                                ],
+                                                            },
+                                                        ),
+                                                    },
+                                                ),
+                                            ),
+                                            return_type: Some(
+                                                Lambda(
+                                                    LambdaType {
+                                                        arg_type: Some(
+                                                            Identifier(
+                                                                TypeIdentifier {
+                                                                    name: Some(
+                                                                        Path {
+                                                                            segments: [
+                                                                                "t2",
+                                                                            ],
+                                                                        },
+                                                                    ),
+                                                                },
+                                                            ),
+                                                        ),
+                                                        return_type: Some(
+                                                            Identifier(
+                                                                TypeIdentifier {
+                                                                    name: Some(
+                                                                        Path {
+                                                                            segments: [
+                                                                                "ResultThing",
+                                                                            ],
+                                                                        },
+                                                                    ),
+                                                                },
+                                                            ),
+                                                        ),
+                                                    },
+                                                ),
+                                            ),
+                                        },
+                                    ),
+                                ),
+                            },
+                        ),
+                    ),
+                },
+            ),
+            Value(
+                ValueDefinition {
+                    name: Some(
+                        "testThing",
+                    ),
+                    value: Some(
+                        LambdaExpr(
+                            LambdaExpr {
+                                args: [
+                                    VariableRef(
+                                        VariableRef {
+                                            name: Some(
+                                                Path {
+                                                    segments: [
+                                                        "funky",
+                                                    ],
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                    VariableRef(
+                                        VariableRef {
+                                            name: Some(
+                                                Path {
+                                                    segments: [
+                                                        "x",
+                                                    ],
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                    VariableRef(
+                                        VariableRef {
+                                            name: Some(
+                                                Path {
+                                                    segments: [
+                                                        "y",
+                                                    ],
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                ],
+                                body: Some(
+                                    BinaryExpr(
+                                        BinaryExpr {
+                                            lhs: Some(
+                                                VariableRef(
+                                                    VariableRef {
+                                                        name: Some(
+                                                            Path {
+                                                                segments: [
+                                                                    "TestType",
+                                                                    "new",
+                                                                ],
+                                                            },
+                                                        ),
+                                                    },
+                                                ),
+                                            ),
+                                            rhs: Some(
+                                                TupleExpr(
+                                                    TupleExpr {
+                                                        exprs: [
+                                                            FunctionCall(
+                                                                FunctionCall {
+                                                                    target: Some(
+                                                                        FunctionCallTarget {
+                                                                            target: Some(
+                                                                                VariableRef {
+                                                                                    name: Some(
+                                                                                        Path {
+                                                                                            segments: [
+                                                                                                "funky",
+                                                                                            ],
+                                                                                        },
+                                                                                    ),
+                                                                                },
+                                                                            ),
+                                                                        },
+                                                                    ),
+                                                                    args: [
+                                                                        FunctionCallArg {
+                                                                            expression: Some(
+                                                                                VariableRef(
+                                                                                    VariableRef {
+                                                                                        name: Some(
+                                                                                            Path {
+                                                                                                segments: [
+                                                                                                    "x",
+                                                                                                ],
+                                                                                            },
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                            ),
+                                                                        },
+                                                                    ],
+                                                                },
+                                                            ),
+                                                            FunctionCall(
+                                                                FunctionCall {
+                                                                    target: Some(
+                                                                        FunctionCallTarget {
+                                                                            target: Some(
+                                                                                VariableRef {
+                                                                                    name: Some(
+                                                                                        Path {
+                                                                                            segments: [
+                                                                                                "funky",
+                                                                                            ],
+                                                                                        },
+                                                                                    ),
+                                                                                },
+                                                                            ),
+                                                                        },
+                                                                    ),
+                                                                    args: [
+                                                                        FunctionCallArg {
+                                                                            expression: Some(
+                                                                                VariableRef(
+                                                                                    VariableRef {
+                                                                                        name: Some(
+                                                                                            Path {
+                                                                                                segments: [
+                                                                                                    "y",
+                                                                                                ],
+                                                                                            },
+                                                                                        ),
+                                                                                    },
+                                                                                ),
+                                                                            ),
+                                                                        },
+                                                                    ],
+                                                                },
+                                                            ),
+                                                        ],
+                                                    },
+                                                ),
+                                            ),
+                                            op: Some(
+                                                BinaryOp {
+                                                    name: "<|",
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                ),
+                            },
+                        ),
+                    ),
+                },
+            ),
+        ],
+    },
+)
+[]

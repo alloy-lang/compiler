@@ -1,0 +1,46 @@
+typeof apply : Test[, t2] where
+    typevar t1
+    typevar t2
+===
+[
+    TypeAnnotation(
+        TypeAnnotation {
+            name: Some(
+                "apply",
+            ),
+            type: Some(
+                Bounded(
+                    BoundedType {
+                        base: Some(
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "Test",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                        args: [
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "t2",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ],
+                    },
+                ),
+            ),
+        },
+    ),
+]
+[]

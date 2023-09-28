@@ -6,7 +6,7 @@ use crate::grammar::lambda;
 
 pub(crate) const EXPR_FIRSTS: TokenSet = ts![
     TokenKind::Integer,
-    TokenKind::Fractional,
+    TokenKind::Fraction,
     TokenKind::String,
     TokenKind::Char,
     TokenKind::Ident,
@@ -124,8 +124,8 @@ fn parse_lhs(
 ) -> Option<CompletedMarker> {
     let cm = if p.at(TokenKind::Integer) {
         parse_int_literal(p)
-    } else if p.at(TokenKind::Fractional) {
-        parse_fractional_literal(p)
+    } else if p.at(TokenKind::Fraction) {
+        parse_fraction_literal(p)
     } else if p.at(TokenKind::String) {
         parse_string_literal(p)
     } else if p.at(TokenKind::Char) {
@@ -156,10 +156,10 @@ pub(crate) fn parse_int_literal(p: &mut Parser) -> CompletedMarker {
     m.complete(p, SyntaxKind::IntLiteral)
 }
 
-pub(crate) fn parse_fractional_literal(p: &mut Parser) -> CompletedMarker {
+pub(crate) fn parse_fraction_literal(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
-    p.bump(TokenKind::Fractional);
-    m.complete(p, SyntaxKind::FractionalLiteral)
+    p.bump(TokenKind::Fraction);
+    m.complete(p, SyntaxKind::FractionLiteral)
 }
 
 pub(crate) fn parse_string_literal(p: &mut Parser) -> CompletedMarker {

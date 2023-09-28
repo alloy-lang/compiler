@@ -1,12 +1,12 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 use crate::grammar::expr::{
-    parse_char_literal, parse_fractional_literal, parse_int_literal, parse_string_literal,
+    parse_char_literal, parse_fraction_literal, parse_int_literal, parse_string_literal,
 };
 
 pub(crate) const ARGUMENT_RECOVERY_SET: TokenSet = ts![
     TokenKind::Integer,
-    TokenKind::Fractional,
+    TokenKind::Fraction,
     TokenKind::String,
     TokenKind::Char,
     TokenKind::Ident,
@@ -24,8 +24,8 @@ pub(crate) fn parse_argument(
 
     if p.at(TokenKind::Integer) {
         parse_int_literal(p);
-    } else if p.at(TokenKind::Fractional) {
-        parse_fractional_literal(p);
+    } else if p.at(TokenKind::Fraction) {
+        parse_fraction_literal(p);
     } else if p.at(TokenKind::String) {
         parse_string_literal(p);
     } else if p.at(TokenKind::Char) {

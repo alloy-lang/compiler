@@ -1,0 +1,38 @@
+behavior Trait1 for where
+    -- imagine all the things here
+end
+
+trait Trait1 where
+    -- imagine all the things here
+end
+===
+[
+    Behavior(
+        Behavior {
+            trait_: Some(
+                Identifier(
+                    TypeIdentifier {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    "Trait1",
+                                ],
+                            },
+                        ),
+                    },
+                ),
+            ),
+            type_: None,
+            members: [],
+        },
+    ),
+    Trait(
+        Trait {
+            name: Some(
+                "Trait1",
+            ),
+            members: [],
+        },
+    ),
+]
+[]

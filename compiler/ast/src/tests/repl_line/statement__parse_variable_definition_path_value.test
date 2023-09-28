@@ -1,0 +1,28 @@
+let foo = ResultThing::More::Stuff::here
+===
+[
+    Value(
+        ValueDefinition {
+            name: Some(
+                "foo",
+            ),
+            value: Some(
+                VariableRef(
+                    VariableRef {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    "ResultThing",
+                                    "More",
+                                    "Stuff",
+                                    "here",
+                                ],
+                            },
+                        ),
+                    },
+                ),
+            ),
+        },
+    ),
+]
+[]

@@ -1,0 +1,15 @@
+trait TestTrait1
+    let a = 1
+end
+===
+[
+    Trait(
+        Trait {
+            name: Some(
+                "TestTrait1",
+            ),
+            members: [],
+        },
+    ),
+]
+[]

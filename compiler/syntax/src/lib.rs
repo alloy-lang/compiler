@@ -4,6 +4,7 @@ use num_traits::{FromPrimitive, ToPrimitive};
 use alloy_lexer::TokenKind;
 
 pub type SyntaxNode = rowan::SyntaxNode<AlloyLanguage>;
+pub type SyntaxNodeChildren = rowan::SyntaxNodeChildren<AlloyLanguage>;
 pub type SyntaxToken = rowan::SyntaxToken<AlloyLanguage>;
 pub type SyntaxElement = rowan::SyntaxElement<AlloyLanguage>;
 
@@ -31,7 +32,7 @@ pub enum SyntaxKind {
     Ident,
     OpIdent,
     Integer,
-    Fractional,
+    Fraction,
     String,
     Char,
     Colon,
@@ -61,7 +62,7 @@ pub enum SyntaxKind {
     ModuleDef,
     InfixExpr,
     IntLiteral,
-    FractionalLiteral,
+    FractionLiteral,
     StringLiteral,
     CharLiteral,
     IfThenElseExpr,
@@ -97,6 +98,8 @@ pub enum SyntaxKind {
     DestructorArg,
     TraitDef,
     BehaviorDef,
+    BehaviorTraitName,
+    BehaviorTypeName,
     TypeAnnotation,
     TypeDef,
     TypeDefMember,
@@ -141,7 +144,7 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::Ident => Self::Ident,
             TokenKind::OpIdent => Self::OpIdent,
             TokenKind::Integer => Self::Integer,
-            TokenKind::Fractional => Self::Fractional,
+            TokenKind::Fraction => Self::Fraction,
             TokenKind::String => Self::String,
             TokenKind::Char => Self::Char,
             TokenKind::Colon => Self::Colon,

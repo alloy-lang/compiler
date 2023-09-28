@@ -1,0 +1,68 @@
+1 + 2 * 3 - 4
+===
+[
+    Expression(
+        BinaryExpr(
+            BinaryExpr {
+                lhs: Some(
+                    BinaryExpr(
+                        BinaryExpr {
+                            lhs: Some(
+                                IntLiteral(
+                                    IntLiteral {
+                                        value: Some(
+                                            1,
+                                        ),
+                                    },
+                                ),
+                            ),
+                            rhs: Some(
+                                BinaryExpr(
+                                    BinaryExpr {
+                                        lhs: Some(
+                                            IntLiteral(
+                                                IntLiteral {
+                                                    value: Some(
+                                                        2,
+                                                    ),
+                                                },
+                                            ),
+                                        ),
+                                        rhs: Some(
+                                            IntLiteral(
+                                                IntLiteral {
+                                                    value: Some(
+                                                        3,
+                                                    ),
+                                                },
+                                            ),
+                                        ),
+                                        op: Some(
+                                            Star@6..7 "*",
+                                        ),
+                                    },
+                                ),
+                            ),
+                            op: Some(
+                                Plus@2..3 "+",
+                            ),
+                        },
+                    ),
+                ),
+                rhs: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                4,
+                            ),
+                        },
+                    ),
+                ),
+                op: Some(
+                    Minus@10..11 "-",
+                ),
+            },
+        ),
+    ),
+]
+[]

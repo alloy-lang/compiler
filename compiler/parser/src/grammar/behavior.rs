@@ -9,6 +9,7 @@ pub(crate) fn parse_behavior(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
     p.bump(TokenKind::BehaviorKw);
 
+    let trait_m = p.start();
     r#type::parse_type(
         p,
         ParseErrorContext::BehaviorTraitName,
@@ -16,11 +17,15 @@ pub(crate) fn parse_behavior(p: &mut Parser) -> CompletedMarker {
         BEHAVIOR_TITLE_RECOVERY_SET,
         ts![],
     );
+    trait_m.complete(p, SyntaxKind::BehaviorTraitName);
+
     p.expect_with_recovery(
         TokenKind::ForKw,
         ParseErrorContext::BehaviorFor,
         BEHAVIOR_TITLE_RECOVERY_SET,
     );
+
+    let type_m = p.start();
     r#type::parse_type(
         p,
         ParseErrorContext::BehaviorTypeName,
@@ -28,6 +33,8 @@ pub(crate) fn parse_behavior(p: &mut Parser) -> CompletedMarker {
         BEHAVIOR_TITLE_RECOVERY_SET,
         ts![],
     );
+    type_m.complete(p, SyntaxKind::BehaviorTypeName);
+
     p.expect_with_recovery(
         TokenKind::WhereKw,
         ParseErrorContext::BehaviorWhere,
@@ -39,7 +46,7 @@ pub(crate) fn parse_behavior(p: &mut Parser) -> CompletedMarker {
             break;
         }
 
-        let result = parse_trait_member(p);
+        let result = parse_behavior_member(p);
         match result {
             BehaviorMemberParseResult::BehaviorMember(_) => {
                 // empty
@@ -71,7 +78,7 @@ enum BehaviorMemberParseResult {
     UnknownToken,
 }
 
-fn parse_trait_member(p: &mut Parser) -> BehaviorMemberParseResult {
+fn parse_behavior_member(p: &mut Parser) -> BehaviorMemberParseResult {
     if p.at(TokenKind::TypeOfKw) {
         let cm = type_annotation::parse_type_annotation(
             p,

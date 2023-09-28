@@ -1,0 +1,62 @@
+behavior TestTrait1 for Type1 where
+    typevar t1 = functor::Functor
+end
+===
+[
+    Behavior(
+        Behavior {
+            trait_: Some(
+                Identifier(
+                    TypeIdentifier {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    "TestTrait1",
+                                ],
+                            },
+                        ),
+                    },
+                ),
+            ),
+            type_: Some(
+                Identifier(
+                    TypeIdentifier {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    "Type1",
+                                ],
+                            },
+                        ),
+                    },
+                ),
+            ),
+            members: [
+                TypeVariable(
+                    Named(
+                        NamedTypeVariable {
+                            name: Some(
+                                "t1",
+                            ),
+                            constraints: [
+                                Trait(
+                                    TypeVariableTraitConstraint {
+                                        trait_: Some(
+                                            Path {
+                                                segments: [
+                                                    "functor",
+                                                    "Functor",
+                                                ],
+                                            },
+                                        ),
+                                    },
+                                ),
+                            ],
+                        },
+                    ),
+                ),
+            ],
+        },
+    ),
+]
+[]

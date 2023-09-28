@@ -1,0 +1,36 @@
+|arg1 1001 'c'| -> 8
+===
+[
+    Expression(
+        LambdaExpr(
+            LambdaExpr {
+                args: [
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                1001,
+                            ),
+                        },
+                    ),
+                    CharLiteral(
+                        CharLiteral {
+                            value: Some(
+                                'c',
+                            ),
+                        },
+                    ),
+                ],
+                body: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                8,
+                            ),
+                        },
+                    ),
+                ),
+            },
+        ),
+    ),
+]
+[]

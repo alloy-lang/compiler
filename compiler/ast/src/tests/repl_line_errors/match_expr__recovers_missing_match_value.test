@@ -1,0 +1,6 @@
+match test when
+  | True ->
+  | False -> 1
+===
+[]
+[]

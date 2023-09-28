@@ -5,8 +5,8 @@ SourceFile@0..10
     LambdaExprArgList@0..6
       Pipe@0..1 "|"
       LambdaExprArg@1..4
-        FractionalLiteral@1..4
-          Fractional@1..4 "0.4"
+        FractionLiteral@1..4
+          Fraction@1..4 "0.4"
       Pipe@4..5 "|"
       Whitespace@5..6 " "
     RightArrow@6..8 "->"

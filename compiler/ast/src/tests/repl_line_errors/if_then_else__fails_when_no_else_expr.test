@@ -1,0 +1,22 @@
+if test then 2 else
+===
+[
+    Expression(
+        IfThenElseExpr(
+            IfThenElseExpr {
+                cond: None,
+                then: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                2,
+                            ),
+                        },
+                    ),
+                ),
+                else_: None,
+            },
+        ),
+    ),
+]
+[]

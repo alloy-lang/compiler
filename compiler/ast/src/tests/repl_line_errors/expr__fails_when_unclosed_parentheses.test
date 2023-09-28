@@ -1,0 +1,12 @@
+(foo
+===
+[
+    Expression(
+        ParenExpr(
+            ParenExpr {
+                expr: None,
+            },
+        ),
+    ),
+]
+[]

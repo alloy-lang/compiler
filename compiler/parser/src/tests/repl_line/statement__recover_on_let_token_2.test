@@ -19,4 +19,4 @@ SourceFile@0..15
       Ident@14..15 "a"
 error in range 4..5 while parsing a variable definition. Found integer, but expected operator identifier or identifier
 error at position 6 while parsing a variable definition. Missing expected ‘=’
-error at position 6 while parsing a variable definition. Missing expected integer, fractional, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error at position 6 while parsing a variable definition. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’

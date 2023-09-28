@@ -1,0 +1,53 @@
+
+1
+  + 1 -- Add one
+  + 10 -- Add ten
+===
+[
+    Expression(
+        BinaryExpr(
+            BinaryExpr {
+                lhs: Some(
+                    BinaryExpr(
+                        BinaryExpr {
+                            lhs: Some(
+                                IntLiteral(
+                                    IntLiteral {
+                                        value: Some(
+                                            1,
+                                        ),
+                                    },
+                                ),
+                            ),
+                            rhs: Some(
+                                IntLiteral(
+                                    IntLiteral {
+                                        value: Some(
+                                            1,
+                                        ),
+                                    },
+                                ),
+                            ),
+                            op: Some(
+                                Plus@5..6 "+",
+                            ),
+                        },
+                    ),
+                ),
+                rhs: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                10,
+                            ),
+                        },
+                    ),
+                ),
+                op: Some(
+                    Plus@22..23 "+",
+                ),
+            },
+        ),
+    ),
+]
+[]

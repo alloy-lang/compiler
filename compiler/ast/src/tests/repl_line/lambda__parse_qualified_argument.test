@@ -1,0 +1,38 @@
+|Option::None| -> x
+===
+[
+    Expression(
+        LambdaExpr(
+            LambdaExpr {
+                args: [
+                    VariableRef(
+                        VariableRef {
+                            name: Some(
+                                Path {
+                                    segments: [
+                                        "Option",
+                                        "None",
+                                    ],
+                                },
+                            ),
+                        },
+                    ),
+                ],
+                body: Some(
+                    VariableRef(
+                        VariableRef {
+                            name: Some(
+                                Path {
+                                    segments: [
+                                        "x",
+                                    ],
+                                },
+                            ),
+                        },
+                    ),
+                ),
+            },
+        ),
+    ),
+]
+[]

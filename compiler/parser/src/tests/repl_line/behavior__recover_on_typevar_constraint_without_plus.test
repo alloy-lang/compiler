@@ -7,14 +7,16 @@ SourceFile@0..89
   BehaviorDef@0..89
     BehaviorKw@0..8 "behavior"
     Whitespace@8..9 " "
-    TypeIdentifier@9..20
-      Ident@9..19 "TestTrait1"
-      Whitespace@19..20 " "
+    BehaviorTraitName@9..20
+      TypeIdentifier@9..20
+        Ident@9..19 "TestTrait1"
+        Whitespace@19..20 " "
     ForKw@20..23 "for"
     Whitespace@23..24 " "
-    TypeIdentifier@24..30
-      Ident@24..29 "Type1"
-      Whitespace@29..30 " "
+    BehaviorTypeName@24..30
+      TypeIdentifier@24..30
+        Ident@24..29 "Type1"
+        Whitespace@29..30 " "
     WhereKw@30..35 "where"
     Whitespace@35..40 "\n    "
     TypeVariable@40..75

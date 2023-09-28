@@ -1,0 +1,81 @@
+behavior TestTrait1 for Type1 where
+    typeof test : Int
+
+    let thing = test
+end
+===
+[
+    Behavior(
+        Behavior {
+            trait_: Some(
+                Identifier(
+                    TypeIdentifier {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    "TestTrait1",
+                                ],
+                            },
+                        ),
+                    },
+                ),
+            ),
+            type_: Some(
+                Identifier(
+                    TypeIdentifier {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    "Type1",
+                                ],
+                            },
+                        ),
+                    },
+                ),
+            ),
+            members: [
+                TypeAnnotation(
+                    TypeAnnotation {
+                        name: Some(
+                            "test",
+                        ),
+                        type: Some(
+                            Identifier(
+                                TypeIdentifier {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "Int",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+                Value(
+                    ValueDefinition {
+                        name: Some(
+                            "thing",
+                        ),
+                        value: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "test",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            ],
+        },
+    ),
+]
+[]

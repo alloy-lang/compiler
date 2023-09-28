@@ -1,0 +1,526 @@
+module Bool
+where
+
+import std::eq::Eq
+import std::order::Ord
+import std::order::Ordering
+import std::debug::Debug
+
+typedef Bool =
+  | False
+  | True
+end
+
+--! Boolean 'not'
+typeof not : Bool -> Bool
+let not = |x| ->
+  if x
+  then False
+  else True
+
+
+--! Boolean 'exclusive or'
+typeof xor : Bool -> Bool -> Bool
+let xor = |x, y| ->
+  if x
+  then not(y)
+  else y
+
+
+behavior Eq for Bool where
+  let eq = |left, right| ->
+    if left
+    then right
+    else not(right)
+end
+
+
+behavior Ord for Bool where
+  let compare = |left, right| ->
+    match (left, right) when
+      | (True, True)   -> Ordering::EQ
+      | (False, False) -> Ordering::EQ
+      | (True, False)  -> Ordering::GT
+      | (False, True)  -> Ordering::LT
+end
+
+
+behavior Debug for Bool where
+  let debug = |x| ->
+    if x
+    then "True"
+    else "False"
+end
+
+===
+SourceFile@0..819
+  ModuleDef@0..819
+    ModuleKw@0..6 "module"
+    Whitespace@6..7 " "
+    Ident@7..11 "Bool"
+    Whitespace@11..12 "\n"
+    WhereKw@12..17 "where"
+    Whitespace@17..19 "\n\n"
+    ImportStatement@19..38
+      ImportKw@19..25 "import"
+      Whitespace@25..26 " "
+      ImportStatementSegment@26..29
+        Ident@26..29 "std"
+      DoubleColon@29..31 "::"
+      ImportStatementSegment@31..33
+        Ident@31..33 "eq"
+      DoubleColon@33..35 "::"
+      ImportStatementSegment@35..38
+        Ident@35..37 "Eq"
+        Whitespace@37..38 "\n"
+    ImportStatement@38..61
+      ImportKw@38..44 "import"
+      Whitespace@44..45 " "
+      ImportStatementSegment@45..48
+        Ident@45..48 "std"
+      DoubleColon@48..50 "::"
+      ImportStatementSegment@50..55
+        Ident@50..55 "order"
+      DoubleColon@55..57 "::"
+      ImportStatementSegment@57..61
+        Ident@57..60 "Ord"
+        Whitespace@60..61 "\n"
+    ImportStatement@61..89
+      ImportKw@61..67 "import"
+      Whitespace@67..68 " "
+      ImportStatementSegment@68..71
+        Ident@68..71 "std"
+      DoubleColon@71..73 "::"
+      ImportStatementSegment@73..78
+        Ident@73..78 "order"
+      DoubleColon@78..80 "::"
+      ImportStatementSegment@80..89
+        Ident@80..88 "Ordering"
+        Whitespace@88..89 "\n"
+    ImportStatement@89..115
+      ImportKw@89..95 "import"
+      Whitespace@95..96 " "
+      ImportStatementSegment@96..99
+        Ident@96..99 "std"
+      DoubleColon@99..101 "::"
+      ImportStatementSegment@101..106
+        Ident@101..106 "debug"
+      DoubleColon@106..108 "::"
+      ImportStatementSegment@108..115
+        Ident@108..113 "Debug"
+        Whitespace@113..115 "\n\n"
+    TypeDef@115..172
+      TypedefKw@115..122 "typedef"
+      Whitespace@122..123 " "
+      Ident@123..127 "Bool"
+      Whitespace@127..128 " "
+      Equals@128..129 "="
+      Whitespace@129..132 "\n  "
+      Pipe@132..133 "|"
+      Whitespace@133..134 " "
+      TypeDefMember@134..142
+        Ident@134..139 "False"
+        Whitespace@139..142 "\n  "
+      Pipe@142..143 "|"
+      Whitespace@143..144 " "
+      TypeDefMember@144..149
+        Ident@144..148 "True"
+        Whitespace@148..149 "\n"
+      EndKw@149..152 "end"
+      Whitespace@152..154 "\n\n"
+      Comment@154..171 "--! Boolean 'not'"
+      Whitespace@171..172 "\n"
+    TypeAnnotation@172..198
+      TypeOfKw@172..178 "typeof"
+      Whitespace@178..179 " "
+      Ident@179..182 "not"
+      Whitespace@182..183 " "
+      Colon@183..184 ":"
+      Whitespace@184..185 " "
+      LambdaType@185..198
+        TypeIdentifier@185..190
+          Ident@185..189 "Bool"
+          Whitespace@189..190 " "
+        RightArrow@190..192 "->"
+        Whitespace@192..193 " "
+        TypeIdentifier@193..198
+          Ident@193..197 "Bool"
+          Whitespace@197..198 "\n"
+    VariableDef@198..276
+      LetKw@198..201 "let"
+      Whitespace@201..202 " "
+      Ident@202..205 "not"
+      Whitespace@205..206 " "
+      Equals@206..207 "="
+      Whitespace@207..208 " "
+      LambdaExprDef@208..276
+        LambdaExprArgList@208..212
+          Pipe@208..209 "|"
+          LambdaExprArg@209..210
+            VariableRef@209..210
+              Ident@209..210 "x"
+          Pipe@210..211 "|"
+          Whitespace@211..212 " "
+        RightArrow@212..214 "->"
+        Whitespace@214..217 "\n  "
+        LambdaExprBody@217..276
+          IfThenElseExpr@217..276
+            IfKw@217..219 "if"
+            Whitespace@219..220 " "
+            IfExpr@220..224
+              VariableRef@220..224
+                Ident@220..221 "x"
+                Whitespace@221..224 "\n  "
+            ThenKw@224..228 "then"
+            Whitespace@228..229 " "
+            ThenExpr@229..237
+              VariableRef@229..237
+                Ident@229..234 "False"
+                Whitespace@234..237 "\n  "
+            ElseKw@237..241 "else"
+            Whitespace@241..242 " "
+            ElseExpr@242..276
+              VariableRef@242..276
+                Ident@242..246 "True"
+                Whitespace@246..249 "\n\n\n"
+                Comment@249..275 "--! Boolean 'exclusiv ..."
+                Whitespace@275..276 "\n"
+    TypeAnnotation@276..310
+      TypeOfKw@276..282 "typeof"
+      Whitespace@282..283 " "
+      Ident@283..286 "xor"
+      Whitespace@286..287 " "
+      Colon@287..288 ":"
+      Whitespace@288..289 " "
+      LambdaType@289..310
+        TypeIdentifier@289..294
+          Ident@289..293 "Bool"
+          Whitespace@293..294 " "
+        RightArrow@294..296 "->"
+        Whitespace@296..297 " "
+        LambdaType@297..310
+          TypeIdentifier@297..302
+            Ident@297..301 "Bool"
+            Whitespace@301..302 " "
+          RightArrow@302..304 "->"
+          Whitespace@304..305 " "
+          TypeIdentifier@305..310
+            Ident@305..309 "Bool"
+            Whitespace@309..310 "\n"
+    VariableDef@310..362
+      LetKw@310..313 "let"
+      Whitespace@313..314 " "
+      Ident@314..317 "xor"
+      Whitespace@317..318 " "
+      Equals@318..319 "="
+      Whitespace@319..320 " "
+      LambdaExprDef@320..362
+        LambdaExprArgList@320..327
+          Pipe@320..321 "|"
+          LambdaExprArg@321..322
+            VariableRef@321..322
+              Ident@321..322 "x"
+          Comma@322..323 ","
+          Whitespace@323..324 " "
+          LambdaExprArg@324..325
+            VariableRef@324..325
+              Ident@324..325 "y"
+          Pipe@325..326 "|"
+          Whitespace@326..327 " "
+        RightArrow@327..329 "->"
+        Whitespace@329..332 "\n  "
+        LambdaExprBody@332..362
+          IfThenElseExpr@332..362
+            IfKw@332..334 "if"
+            Whitespace@334..335 " "
+            IfExpr@335..339
+              VariableRef@335..339
+                Ident@335..336 "x"
+                Whitespace@336..339 "\n  "
+            ThenKw@339..343 "then"
+            Whitespace@343..344 " "
+            ThenExpr@344..353
+              FunctionCall@344..353
+                FunctionCallTarget@344..347
+                  VariableRef@344..347
+                    Ident@344..347 "not"
+                FunctionCallArgList@347..353
+                  LParen@347..348 "("
+                  FunctionCallArg@348..349
+                    VariableRef@348..349
+                      Ident@348..349 "y"
+                  RParen@349..350 ")"
+                  Whitespace@350..353 "\n  "
+            ElseKw@353..357 "else"
+            Whitespace@357..358 " "
+            ElseExpr@358..362
+              VariableRef@358..362
+                Ident@358..359 "y"
+                Whitespace@359..362 "\n\n\n"
+    BehaviorDef@362..470
+      BehaviorKw@362..370 "behavior"
+      Whitespace@370..371 " "
+      TypeIdentifier@371..374
+        Ident@371..373 "Eq"
+        Whitespace@373..374 " "
+      ForKw@374..377 "for"
+      Whitespace@377..378 " "
+      TypeIdentifier@378..383
+        Ident@378..382 "Bool"
+        Whitespace@382..383 " "
+      WhereKw@383..388 "where"
+      Whitespace@388..391 "\n  "
+      VariableDef@391..464
+        LetKw@391..394 "let"
+        Whitespace@394..395 " "
+        Ident@395..397 "eq"
+        Whitespace@397..398 " "
+        Equals@398..399 "="
+        Whitespace@399..400 " "
+        LambdaExprDef@400..464
+          LambdaExprArgList@400..414
+            Pipe@400..401 "|"
+            LambdaExprArg@401..405
+              VariableRef@401..405
+                Ident@401..405 "left"
+            Comma@405..406 ","
+            Whitespace@406..407 " "
+            LambdaExprArg@407..412
+              VariableRef@407..412
+                Ident@407..412 "right"
+            Pipe@412..413 "|"
+            Whitespace@413..414 " "
+          RightArrow@414..416 "->"
+          Whitespace@416..421 "\n    "
+          LambdaExprBody@421..464
+            IfThenElseExpr@421..464
+              IfKw@421..423 "if"
+              Whitespace@423..424 " "
+              IfExpr@424..433
+                VariableRef@424..433
+                  Ident@424..428 "left"
+                  Whitespace@428..433 "\n    "
+              ThenKw@433..437 "then"
+              Whitespace@437..438 " "
+              ThenExpr@438..448
+                VariableRef@438..448
+                  Ident@438..443 "right"
+                  Whitespace@443..448 "\n    "
+              ElseKw@448..452 "else"
+              Whitespace@452..453 " "
+              ElseExpr@453..464
+                FunctionCall@453..464
+                  FunctionCallTarget@453..456
+                    VariableRef@453..456
+                      Ident@453..456 "not"
+                  FunctionCallArgList@456..464
+                    LParen@456..457 "("
+                    FunctionCallArg@457..462
+                      VariableRef@457..462
+                        Ident@457..462 "right"
+                    RParen@462..463 ")"
+                    Whitespace@463..464 "\n"
+      EndKw@464..467 "end"
+      Whitespace@467..470 "\n\n\n"
+    BehaviorDef@470..722
+      BehaviorKw@470..478 "behavior"
+      Whitespace@478..479 " "
+      TypeIdentifier@479..483
+        Ident@479..482 "Ord"
+        Whitespace@482..483 " "
+      ForKw@483..486 "for"
+      Whitespace@486..487 " "
+      TypeIdentifier@487..492
+        Ident@487..491 "Bool"
+        Whitespace@491..492 " "
+      WhereKw@492..497 "where"
+      Whitespace@497..500 "\n  "
+      VariableDef@500..716
+        LetKw@500..503 "let"
+        Whitespace@503..504 " "
+        Ident@504..511 "compare"
+        Whitespace@511..512 " "
+        Equals@512..513 "="
+        Whitespace@513..514 " "
+        LambdaExprDef@514..716
+          LambdaExprArgList@514..528
+            Pipe@514..515 "|"
+            LambdaExprArg@515..519
+              VariableRef@515..519
+                Ident@515..519 "left"
+            Comma@519..520 ","
+            Whitespace@520..521 " "
+            LambdaExprArg@521..526
+              VariableRef@521..526
+                Ident@521..526 "right"
+            Pipe@526..527 "|"
+            Whitespace@527..528 " "
+          RightArrow@528..530 "->"
+          Whitespace@530..535 "\n    "
+          LambdaExprBody@535..716
+            MatchExpr@535..716
+              MatchKw@535..540 "match"
+              Whitespace@540..541 " "
+              MatchExprArg@541..555
+                TupleExpr@541..555
+                  LParen@541..542 "("
+                  VariableRef@542..546
+                    Ident@542..546 "left"
+                  Comma@546..547 ","
+                  Whitespace@547..548 " "
+                  VariableRef@548..553
+                    Ident@548..553 "right"
+                  RParen@553..554 ")"
+                  Whitespace@554..555 " "
+              WhenKw@555..559 "when"
+              Whitespace@559..566 "\n      "
+              MatchTarget@566..605
+                Pipe@566..567 "|"
+                Whitespace@567..568 " "
+                MatchTargetCondition@568..583
+                  TupleExpr@568..583
+                    LParen@568..569 "("
+                    TupleExprArg@569..573
+                      VariableRef@569..573
+                        Ident@569..573 "True"
+                    Comma@573..574 ","
+                    Whitespace@574..575 " "
+                    TupleExprArg@575..579
+                      VariableRef@575..579
+                        Ident@575..579 "True"
+                    RParen@579..580 ")"
+                    Whitespace@580..583 "   "
+                RightArrow@583..585 "->"
+                Whitespace@585..586 " "
+                MatchTargetValue@586..605
+                  VariableRef@586..605
+                    Ident@586..594 "Ordering"
+                    DoubleColon@594..596 "::"
+                    Ident@596..598 "EQ"
+                    Whitespace@598..605 "\n      "
+              MatchTarget@605..644
+                Pipe@605..606 "|"
+                Whitespace@606..607 " "
+                MatchTargetCondition@607..622
+                  TupleExpr@607..622
+                    LParen@607..608 "("
+                    TupleExprArg@608..613
+                      VariableRef@608..613
+                        Ident@608..613 "False"
+                    Comma@613..614 ","
+                    Whitespace@614..615 " "
+                    TupleExprArg@615..620
+                      VariableRef@615..620
+                        Ident@615..620 "False"
+                    RParen@620..621 ")"
+                    Whitespace@621..622 " "
+                RightArrow@622..624 "->"
+                Whitespace@624..625 " "
+                MatchTargetValue@625..644
+                  VariableRef@625..644
+                    Ident@625..633 "Ordering"
+                    DoubleColon@633..635 "::"
+                    Ident@635..637 "EQ"
+                    Whitespace@637..644 "\n      "
+              MatchTarget@644..683
+                Pipe@644..645 "|"
+                Whitespace@645..646 " "
+                MatchTargetCondition@646..661
+                  TupleExpr@646..661
+                    LParen@646..647 "("
+                    TupleExprArg@647..651
+                      VariableRef@647..651
+                        Ident@647..651 "True"
+                    Comma@651..652 ","
+                    Whitespace@652..653 " "
+                    TupleExprArg@653..658
+                      VariableRef@653..658
+                        Ident@653..658 "False"
+                    RParen@658..659 ")"
+                    Whitespace@659..661 "  "
+                RightArrow@661..663 "->"
+                Whitespace@663..664 " "
+                MatchTargetValue@664..683
+                  VariableRef@664..683
+                    Ident@664..672 "Ordering"
+                    DoubleColon@672..674 "::"
+                    Ident@674..676 "GT"
+                    Whitespace@676..683 "\n      "
+              MatchTarget@683..716
+                Pipe@683..684 "|"
+                Whitespace@684..685 " "
+                MatchTargetCondition@685..700
+                  TupleExpr@685..700
+                    LParen@685..686 "("
+                    TupleExprArg@686..691
+                      VariableRef@686..691
+                        Ident@686..691 "False"
+                    Comma@691..692 ","
+                    Whitespace@692..693 " "
+                    TupleExprArg@693..697
+                      VariableRef@693..697
+                        Ident@693..697 "True"
+                    RParen@697..698 ")"
+                    Whitespace@698..700 "  "
+                RightArrow@700..702 "->"
+                Whitespace@702..703 " "
+                MatchTargetValue@703..716
+                  VariableRef@703..716
+                    Ident@703..711 "Ordering"
+                    DoubleColon@711..713 "::"
+                    Ident@713..715 "LT"
+                    Whitespace@715..716 "\n"
+      EndKw@716..719 "end"
+      Whitespace@719..722 "\n\n\n"
+    BehaviorDef@722..819
+      BehaviorKw@722..730 "behavior"
+      Whitespace@730..731 " "
+      TypeIdentifier@731..737
+        Ident@731..736 "Debug"
+        Whitespace@736..737 " "
+      ForKw@737..740 "for"
+      Whitespace@740..741 " "
+      TypeIdentifier@741..746
+        Ident@741..745 "Bool"
+        Whitespace@745..746 " "
+      WhereKw@746..751 "where"
+      Whitespace@751..754 "\n  "
+      VariableDef@754..815
+        LetKw@754..757 "let"
+        Whitespace@757..758 " "
+        Ident@758..763 "debug"
+        Whitespace@763..764 " "
+        Equals@764..765 "="
+        Whitespace@765..766 " "
+        LambdaExprDef@766..815
+          LambdaExprArgList@766..770
+            Pipe@766..767 "|"
+            LambdaExprArg@767..768
+              VariableRef@767..768
+                Ident@767..768 "x"
+            Pipe@768..769 "|"
+            Whitespace@769..770 " "
+          RightArrow@770..772 "->"
+          Whitespace@772..777 "\n    "
+          LambdaExprBody@777..815
+            IfThenElseExpr@777..815
+              IfKw@777..779 "if"
+              Whitespace@779..780 " "
+              IfExpr@780..786
+                VariableRef@780..786
+                  Ident@780..781 "x"
+                  Whitespace@781..786 "\n    "
+              ThenKw@786..790 "then"
+              Whitespace@790..791 " "
+              ThenExpr@791..802
+                StringLiteral@791..802
+                  String@791..797 "\"True\""
+                  Whitespace@797..802 "\n    "
+              ElseKw@802..806 "else"
+              Whitespace@806..807 " "
+              ElseExpr@807..815
+                StringLiteral@807..815
+                  String@807..814 "\"False\""
+                  Whitespace@814..815 "\n"
+      EndKw@815..818 "end"
+      Whitespace@818..819 "\n"

@@ -6,14 +6,16 @@ SourceFile@0..58
   BehaviorDef@0..58
     BehaviorKw@0..8 "behavior"
     Whitespace@8..9 " "
-    TypeIdentifier@9..20
-      Ident@9..19 "TestTrait1"
-      Whitespace@19..20 " "
+    BehaviorTraitName@9..20
+      TypeIdentifier@9..20
+        Ident@9..19 "TestTrait1"
+        Whitespace@19..20 " "
     ForKw@20..23 "for"
     Whitespace@23..24 " "
-    TypeIdentifier@24..34
-      Ident@24..29 "Type1"
-      Whitespace@29..34 "\n    "
+    BehaviorTypeName@24..34
+      TypeIdentifier@24..34
+        Ident@24..29 "Type1"
+        Whitespace@29..34 "\n    "
     TypeAnnotation@34..55
       TypeOfKw@34..40 "typeof"
       Whitespace@40..41 " "

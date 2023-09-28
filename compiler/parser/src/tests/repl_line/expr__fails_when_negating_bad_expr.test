@@ -3,4 +3,4 @@
 SourceFile@0..1
   PrefixExpr@0..1
     Minus@0..1 "-"
-error at position 1 while parsing an expression after a prefix operator. Missing expected integer, fractional, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error at position 1 while parsing an expression after a prefix operator. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’

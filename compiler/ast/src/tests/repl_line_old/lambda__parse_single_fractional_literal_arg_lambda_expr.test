@@ -1,0 +1,31 @@
+|0.4| -> 2
+===
+[
+    Expression(
+        LambdaExpr(
+            LambdaExpr {
+                args: [
+                    FractionLiteral(
+                        FractionLiteral {
+                            value: Some(
+                                NotNan(
+                                    0.4,
+                                ),
+                            ),
+                        },
+                    ),
+                ],
+                body: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                2,
+                            ),
+                        },
+                    ),
+                ),
+            },
+        ),
+    ),
+]
+[]

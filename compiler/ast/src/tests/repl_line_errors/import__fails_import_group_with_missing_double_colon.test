@@ -1,0 +1,5 @@
+import std::functor Functor
+import std::functor::map
+===
+[]
+[]

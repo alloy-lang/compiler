@@ -1,0 +1,25 @@
+|Option::Some(x)| -> x
+===
+[
+    Expression(
+        LambdaExpr(
+            LambdaExpr {
+                args: [],
+                body: Some(
+                    VariableRef(
+                        VariableRef {
+                            name: Some(
+                                Path {
+                                    segments: [
+                                        "x",
+                                    ],
+                                },
+                            ),
+                        },
+                    ),
+                ),
+            },
+        ),
+    ),
+]
+[]

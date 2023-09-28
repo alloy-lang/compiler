@@ -1,0 +1,82 @@
+typeof apply : Test[t1] -> Test[t2] where
+===
+[
+    TypeAnnotation(
+        TypeAnnotation {
+            name: Some(
+                "apply",
+            ),
+            type: Some(
+                Lambda(
+                    LambdaType {
+                        arg_type: Some(
+                            Bounded(
+                                BoundedType {
+                                    base: Some(
+                                        Identifier(
+                                            TypeIdentifier {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "Test",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                    args: [
+                                        Identifier(
+                                            TypeIdentifier {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "t1",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ],
+                                },
+                            ),
+                        ),
+                        return_type: Some(
+                            Bounded(
+                                BoundedType {
+                                    base: Some(
+                                        Identifier(
+                                            TypeIdentifier {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "Test",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                    args: [
+                                        Identifier(
+                                            TypeIdentifier {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "t2",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ],
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            ),
+        },
+    ),
+]
+[]

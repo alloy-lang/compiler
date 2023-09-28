@@ -1,0 +1,14 @@
+   9876
+===
+[
+    Expression(
+        IntLiteral(
+            IntLiteral {
+                value: Some(
+                    9876,
+                ),
+            },
+        ),
+    ),
+]
+[]

@@ -1,0 +1,31 @@
+trait TestTrait1 where
+    typevar t1 = #Type[_] + Functor
+end
+===
+[
+    Trait(
+        Trait {
+            name: Some(
+                "TestTrait1",
+            ),
+            members: [
+                TypeVariable(
+                    TypeVariable {
+                        name: Some(
+                            "t1",
+                        ),
+                        constraints: [
+                            Kind(
+                                TypeVariableKindConstraint,
+                            ),
+                            Trait(
+                                TypeVariableTraitConstraint,
+                            ),
+                        ],
+                    },
+                ),
+            ],
+        },
+    ),
+]
+[]

@@ -1,0 +1,84 @@
+typeof apply : Test[t1] -> Test t2] where
+    typevar t1
+    typevar t2
+===
+[
+    TypeAnnotation(
+        TypeAnnotation {
+            name: Some(
+                "apply",
+            ),
+            type: Some(
+                Lambda(
+                    LambdaType {
+                        arg_type: Some(
+                            Bounded(
+                                BoundedType {
+                                    base: Some(
+                                        Identifier(
+                                            TypeIdentifier {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "Test",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                    args: [
+                                        Identifier(
+                                            TypeIdentifier {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "t1",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ],
+                                },
+                            ),
+                        ),
+                        return_type: Some(
+                            Bounded(
+                                BoundedType {
+                                    base: Some(
+                                        Identifier(
+                                            TypeIdentifier {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "Test",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ),
+                                    args: [
+                                        Identifier(
+                                            TypeIdentifier {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "t2",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ],
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            ),
+        },
+    ),
+]
+[]

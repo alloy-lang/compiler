@@ -44,8 +44,14 @@ impl<'t, 'input> Parser<'t, 'input> {
     }
 
     #[must_use]
-    pub(crate) fn parse(mut self) -> Vec<Event> {
+    pub(crate) fn parse_source_file(mut self) -> Vec<Event> {
         grammar::source_file(&mut self);
+        self.events
+    }
+
+    #[must_use]
+    pub(crate) fn parse_repl_line(mut self) -> Vec<Event> {
+        grammar::repl_line(&mut self);
         self.events
     }
 

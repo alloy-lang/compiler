@@ -1,0 +1,14 @@
+999
+===
+[
+    Expression(
+        IntLiteral(
+            IntLiteral {
+                value: Some(
+                    999,
+                ),
+            },
+        ),
+    ),
+]
+[]
