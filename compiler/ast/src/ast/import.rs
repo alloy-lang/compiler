@@ -69,13 +69,14 @@ pub enum ImportChild {
 impl ImportChild {
     #[must_use]
     pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::ImportStatementSegment {
-            Some(Self::Segment(ImportChildSegment(node)))
-        } else if node.kind() == SyntaxKind::ImportStatementGroup {
-            Some(Self::Group(ImportChildGroup(node)))
-        } else {
-            None
-        }
+        let result = match node.kind() {
+            SyntaxKind::ImportStatementSegment => Self::Segment(ImportChildSegment::cast(node)?),
+            SyntaxKind::ImportStatementGroup => Self::Group(ImportChildGroup::cast(node)?),
+
+            _ => return None,
+        };
+
+        Some(result)
     }
 }
 
@@ -85,7 +86,7 @@ impl ImportChildSegment {
     #[must_use]
     pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
         if node.kind() == SyntaxKind::ImportStatementSegment {
-            Some(ImportChildSegment(node))
+            Some(Self(node))
         } else {
             None
         }
@@ -95,7 +96,7 @@ impl ImportChildSegment {
         self.0
             .children_with_tokens()
             .filter_map(SyntaxElement::into_token)
-            .find(|ct| ct.kind() == SyntaxKind::Ident)
+            .find(|token| token.kind() == SyntaxKind::Ident)
             .map(|token| token.text().into())
     }
 }
@@ -111,6 +112,15 @@ impl fmt::Debug for ImportChildSegment {
 pub struct ImportChildGroup(SyntaxNode);
 
 impl ImportChildGroup {
+    #[must_use]
+    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::ImportStatementGroup {
+            Some(Self(node))
+        } else {
+            None
+        }
+    }
+
     fn names(&self) -> Vec<String> {
         self.0
             .children()
