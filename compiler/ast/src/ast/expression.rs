@@ -16,6 +16,7 @@ pub enum Expression {
     UnaryExpr(UnaryExpr),
     LambdaExpr(LambdaExpr),
     FunctionCall(FunctionCall),
+    MatchExpr(MatchExpr),
 }
 
 impl Expression {
@@ -35,6 +36,7 @@ impl Expression {
             SyntaxKind::PrefixExpr => Self::UnaryExpr(UnaryExpr::cast(node)?),
             SyntaxKind::LambdaExprDef => Self::LambdaExpr(LambdaExpr::cast(node)?),
             SyntaxKind::FunctionCall => Self::FunctionCall(FunctionCall::cast(node)?),
+            SyntaxKind::MatchExpr => Self::MatchExpr(MatchExpr::cast(node)?),
             _ => return None,
         };
 
@@ -417,6 +419,84 @@ impl fmt::Debug for FunctionCallArg {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("FunctionCallArg")
             .field("expression", &self.expression())
+            .finish()
+    }
+}
+
+pub struct MatchExpr(SyntaxNode);
+
+impl MatchExpr {
+    #[must_use]
+    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::MatchExpr {
+            Some(Self(node))
+        } else {
+            None
+        }
+    }
+
+    pub fn expression(&self) -> Option<Expression> {
+        self.0.children().find_map(|token| {
+            if token.kind() == SyntaxKind::MatchExprArg {
+                token.children().find_map(Expression::cast)
+            } else {
+                None
+            }
+        })
+    }
+
+    pub fn targets(&self) -> impl Iterator<Item = MatchTarget> {
+        self.0.children().filter_map(MatchTarget::cast)
+    }
+}
+
+impl fmt::Debug for MatchExpr {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("MatchExpr")
+            .field("expression", &self.expression())
+            .field("targets", &self.targets().collect::<Vec<_>>())
+            .finish()
+    }
+}
+
+pub struct MatchTarget(SyntaxNode);
+
+impl MatchTarget {
+    #[must_use]
+    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::MatchTarget {
+            Some(Self(node))
+        } else {
+            None
+        }
+    }
+
+    pub fn condition(&self) -> Option<Pattern> {
+        self.0.children().find_map(|token| {
+            if token.kind() == SyntaxKind::MatchTargetCondition {
+                token.children().find_map(Pattern::cast)
+            } else {
+                None
+            }
+        })
+    }
+
+    pub fn value(&self) -> Option<Expression> {
+        self.0.children().find_map(|token| {
+            if token.kind() == SyntaxKind::MatchTargetValue {
+                token.children().find_map(Expression::cast)
+            } else {
+                None
+            }
+        })
+    }
+}
+
+impl fmt::Debug for MatchTarget {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("MatchTarget")
+            .field("condition", &self.condition())
+            .field("value", &self.value())
             .finish()
     }
 }

@@ -66,13 +66,12 @@ SourceFile@0..120
               Ident@73..79 "Either"
               DoubleColon@79..81 "::"
               Ident@81..85 "Left"
-          DestructorArgList@85..90
-            LParen@85..86 "("
-            DestructorArg@86..87
-              VariableRef@86..87
-                Ident@86..87 "l"
-            RParen@87..88 ")"
-            Whitespace@88..90 "  "
+          LParen@85..86 "("
+          DestructorArg@86..87
+            VariableRef@86..87
+              Ident@86..87 "l"
+          RParen@87..88 ")"
+          Whitespace@88..90 "  "
       RightArrow@90..92 "->"
       Whitespace@92..93 " "
       MatchTargetValue@93..97
@@ -89,13 +88,12 @@ SourceFile@0..120
               Ident@99..105 "Either"
               DoubleColon@105..107 "::"
               Ident@107..112 "Right"
-          DestructorArgList@112..116
-            LParen@112..113 "("
-            DestructorArg@113..114
-              VariableRef@113..114
-                Ident@113..114 "r"
-            RParen@114..115 ")"
-            Whitespace@115..116 " "
+          LParen@112..113 "("
+          DestructorArg@113..114
+            VariableRef@113..114
+              Ident@113..114 "r"
+          RParen@114..115 ")"
+          Whitespace@115..116 " "
       RightArrow@116..118 "->"
       Whitespace@118..119 " "
       MatchTargetValue@119..120

@@ -2,5 +2,63 @@ match test when
   | True -> 0
   | _ -> 1
 ===
-[]
+[
+    Expression(
+        MatchExpr(
+            MatchExpr {
+                expression: Some(
+                    VariableRef(
+                        VariableRef {
+                            name: Some(
+                                Path {
+                                    segments: [
+                                        "test",
+                                    ],
+                                },
+                            ),
+                        },
+                    ),
+                ),
+                targets: [
+                    MatchTarget {
+                        condition: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "True",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                        value: Some(
+                            IntLiteral(
+                                IntLiteral {
+                                    value: Some(
+                                        0,
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                    MatchTarget {
+                        condition: None,
+                        value: Some(
+                            IntLiteral(
+                                IntLiteral {
+                                    value: Some(
+                                        1,
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ],
+            },
+        ),
+    ),
+]
 []

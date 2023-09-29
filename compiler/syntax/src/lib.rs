@@ -94,7 +94,6 @@ pub enum SyntaxKind {
     FunctionCallArg,
     Destructor,
     DestructorTarget,
-    DestructorArgList,
     DestructorArg,
     TraitDef,
     BehaviorDef,

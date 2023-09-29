@@ -74,8 +74,7 @@ fn maybe_parse_typedef_destructuring(p: &mut Parser, lhs: CompletedMarker) -> Co
     cm.precede(p).complete(p, SyntaxKind::Destructor)
 }
 
-fn parse_typedef_destructuring(p: &mut Parser) -> CompletedMarker {
-    let paren_m = p.start();
+fn parse_typedef_destructuring(p: &mut Parser) {
     p.bump(TokenKind::LParen);
 
     loop {
@@ -103,7 +102,7 @@ fn parse_typedef_destructuring(p: &mut Parser) -> CompletedMarker {
 
     p.expect(TokenKind::RParen, ParseErrorContext::DestructorRightParen);
 
-    return paren_m.complete(p, SyntaxKind::DestructorArgList);
+    return;
 
     fn should_stop(p: &mut Parser) -> bool {
         p.maybe_at(TokenKind::RParen) || p.at_top_level_token() || p.at_eof()

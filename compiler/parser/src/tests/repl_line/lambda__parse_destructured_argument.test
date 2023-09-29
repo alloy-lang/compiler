@@ -11,12 +11,11 @@ SourceFile@0..22
               Ident@1..7 "Option"
               DoubleColon@7..9 "::"
               Ident@9..13 "Some"
-          DestructorArgList@13..16
-            LParen@13..14 "("
-            DestructorArg@14..15
-              VariableRef@14..15
-                Ident@14..15 "x"
-            RParen@15..16 ")"
+          LParen@13..14 "("
+          DestructorArg@14..15
+            VariableRef@14..15
+              Ident@14..15 "x"
+          RParen@15..16 ")"
       Pipe@16..17 "|"
       Whitespace@17..18 " "
     RightArrow@18..20 "->"
