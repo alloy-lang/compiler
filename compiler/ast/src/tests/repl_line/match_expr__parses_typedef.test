@@ -66,5 +66,110 @@ match test when
             ],
         },
     ),
+    Expression(
+        MatchExpr(
+            MatchExpr {
+                expression: Some(
+                    VariableRef(
+                        VariableRef {
+                            name: Some(
+                                Path {
+                                    segments: [
+                                        "test",
+                                    ],
+                                },
+                            ),
+                        },
+                    ),
+                ),
+                targets: [
+                    MatchTarget {
+                        condition: Some(
+                            Destructor(
+                                Destructor {
+                                    target: Some(
+                                        Path {
+                                            segments: [
+                                                "Either",
+                                                "Left",
+                                            ],
+                                        },
+                                    ),
+                                    args: [
+                                        VariableRef(
+                                            VariableRef {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "l",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ],
+                                },
+                            ),
+                        ),
+                        value: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "l",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                    MatchTarget {
+                        condition: Some(
+                            Destructor(
+                                Destructor {
+                                    target: Some(
+                                        Path {
+                                            segments: [
+                                                "Either",
+                                                "Right",
+                                            ],
+                                        },
+                                    ),
+                                    args: [
+                                        VariableRef(
+                                            VariableRef {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "r",
+                                                        ],
+                                                    },
+                                                ),
+                                            },
+                                        ),
+                                    ],
+                                },
+                            ),
+                        ),
+                        value: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "r",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ],
+            },
+        ),
+    ),
 ]
 []

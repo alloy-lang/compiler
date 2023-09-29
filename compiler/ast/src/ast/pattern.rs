@@ -10,6 +10,7 @@ pub enum Pattern {
     StringLiteral(StringLiteral),
     CharLiteral(CharLiteral),
     VariableRef(VariableRef),
+    Destructor(Destructor),
 }
 
 impl Pattern {
@@ -21,6 +22,7 @@ impl Pattern {
             SyntaxKind::StringLiteral => Self::StringLiteral(StringLiteral::cast(node)?),
             SyntaxKind::CharLiteral => Self::CharLiteral(CharLiteral::cast(node)?),
             SyntaxKind::VariableRef => Self::VariableRef(VariableRef::cast(node)?),
+            SyntaxKind::Destructor => Self::Destructor(Destructor::cast(node)?),
             _ => return None,
         };
 
@@ -185,6 +187,49 @@ impl fmt::Debug for VariableRef {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("VariableRef")
             .field("name", &self.name())
+            .finish()
+    }
+}
+
+pub struct Destructor(SyntaxNode);
+
+impl Destructor {
+    #[must_use]
+    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
+        if node.kind() == SyntaxKind::Destructor {
+            Some(Self(node))
+        } else {
+            None
+        }
+    }
+
+    #[must_use]
+    pub fn target(&self) -> Option<Path> {
+        self.0.children().find_map(|token| {
+            if token.kind() == SyntaxKind::DestructorTarget {
+                token.children().find_map(Path::cast)
+            } else {
+                None
+            }
+        })
+    }
+
+    pub fn args(&self) -> impl Iterator<Item = Pattern> {
+        self.0.children().filter_map(|token| {
+            if token.kind() == SyntaxKind::DestructorArg {
+                token.children().find_map(Pattern::cast)
+            } else {
+                None
+            }
+        })
+    }
+}
+
+impl fmt::Debug for Destructor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Destructor")
+            .field("target", &self.target())
+            .field("args", &self.args().collect::<Vec<_>>())
             .finish()
     }
 }

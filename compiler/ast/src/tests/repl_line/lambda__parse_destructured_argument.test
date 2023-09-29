@@ -4,7 +4,33 @@
     Expression(
         LambdaExpr(
             LambdaExpr {
-                args: [],
+                args: [
+                    Destructor(
+                        Destructor {
+                            target: Some(
+                                Path {
+                                    segments: [
+                                        "Option",
+                                        "Some",
+                                    ],
+                                },
+                            ),
+                            args: [
+                                VariableRef(
+                                    VariableRef {
+                                        name: Some(
+                                            Path {
+                                                segments: [
+                                                    "x",
+                                                ],
+                                            },
+                                        ),
+                                    },
+                                ),
+                            ],
+                        },
+                    ),
+                ],
                 body: Some(
                     VariableRef(
                         VariableRef {
