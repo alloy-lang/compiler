@@ -3,10 +3,10 @@ module TestModule1 where
     import really::real::other::Thing2
 ===
 Some(
-    Module {
+    ModuleDef {
         definitions: [
-            Import(
-                Import {
+            ImportDef(
+                ImportDef {
                     path: [
                         "really",
                         "really",
@@ -17,8 +17,8 @@ Some(
                     ],
                 },
             ),
-            Import(
-                Import {
+            ImportDef(
+                ImportDef {
                     path: [
                         "really",
                         "real",

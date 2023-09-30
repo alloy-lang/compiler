@@ -8,11 +8,15 @@
                     Destructor(
                         Destructor {
                             target: Some(
-                                Path {
-                                    segments: [
-                                        "Option",
-                                        "Some",
-                                    ],
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "Option",
+                                                "Some",
+                                            ],
+                                        },
+                                    ),
                                 },
                             ),
                             args: [

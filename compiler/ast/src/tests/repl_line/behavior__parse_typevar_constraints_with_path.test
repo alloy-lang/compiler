@@ -3,7 +3,7 @@ behavior TestTrait1 for Type1 where
 end
 ===
 [
-    Behavior(
+    BehaviorDef(
         BehaviorDef {
             trait_: Some(
                 Identifier(
@@ -32,28 +32,26 @@ end
                 ),
             ),
             members: [
-                TypeVariable(
-                    Named(
-                        NamedTypeVariable {
-                            name: Some(
-                                "t1",
+                NamedTypeVariable(
+                    NamedTypeVariable {
+                        name: Some(
+                            "t1",
+                        ),
+                        constraints: [
+                            TypeVariableTraitConstraint(
+                                TypeVariableTraitConstraint {
+                                    trait_: Some(
+                                        Path {
+                                            segments: [
+                                                "functor",
+                                                "Functor",
+                                            ],
+                                        },
+                                    ),
+                                },
                             ),
-                            constraints: [
-                                Trait(
-                                    TypeVariableTraitConstraint {
-                                        trait_: Some(
-                                            Path {
-                                                segments: [
-                                                    "functor",
-                                                    "Functor",
-                                                ],
-                                            },
-                                        ),
-                                    },
-                                ),
-                            ],
-                        },
-                    ),
+                        ],
+                    },
                 ),
             ],
         },

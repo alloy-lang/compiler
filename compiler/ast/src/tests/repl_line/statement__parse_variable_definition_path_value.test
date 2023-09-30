@@ -1,8 +1,8 @@
 let foo = ResultThing::More::Stuff::here
 ===
 [
-    Value(
-        ValueDefinition {
+    ValueDef(
+        ValueDef {
             name: Some(
                 "foo",
             ),

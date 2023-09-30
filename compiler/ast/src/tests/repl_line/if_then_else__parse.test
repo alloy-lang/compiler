@@ -4,7 +4,7 @@ if test then 2 else 3
     Expression(
         IfThenElseExpr(
             IfThenElseExpr {
-                cond: Some(
+                condition: Some(
                     VariableRef(
                         VariableRef {
                             name: Some(

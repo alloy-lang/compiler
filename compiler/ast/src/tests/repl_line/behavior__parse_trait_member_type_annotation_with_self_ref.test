@@ -3,7 +3,7 @@ behavior TestTrait1 for Type1 where
 end
 ===
 [
-    Behavior(
+    BehaviorDef(
         BehaviorDef {
             trait_: Some(
                 Identifier(
@@ -37,7 +37,7 @@ end
                         name: Some(
                             "test",
                         ),
-                        type: Some(
+                        type_: Some(
                             Lambda(
                                 LambdaType {
                                     arg_type: Some(

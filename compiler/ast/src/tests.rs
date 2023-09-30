@@ -4,6 +4,7 @@ use std::ffi::OsStr;
 use std::path::PathBuf;
 use std::{env, fmt, fs};
 
+use crate::ast::AstNode;
 use crate::ast::SourceFile;
 
 #[test]

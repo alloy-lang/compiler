@@ -1,31 +1,22 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-pub struct Import(SyntaxNode);
+ast_node!(ImportDef, fields: [path, targets]);
 
-impl Import {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::ImportStatement {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
+impl ImportDef {
     #[must_use]
     pub fn path(&self) -> Vec<String> {
         let (_last, rest) = Self::full_path(self);
 
         rest.into_iter()
             .filter_map(|child| {
-                if let ImportChild::Segment(segment) = child {
+                if let ImportDefChild::ImportDefSegment(segment) = child {
                     segment.name()
                 } else {
                     None
                 }
             })
-            .collect::<Vec<_>>()
+            .collect()
     }
 
     #[must_use]
@@ -33,17 +24,13 @@ impl Import {
         let (last, _) = Self::full_path(self);
 
         match last {
-            ImportChild::Segment(segment) => vec![segment.name().unwrap()],
-            ImportChild::Group(group) => group.names(),
+            ImportDefChild::ImportDefSegment(segment) => vec![segment.name().unwrap()],
+            ImportDefChild::ImportDefGroup(group) => group.names(),
         }
     }
 
-    fn full_path(&self) -> (ImportChild, Vec<ImportChild>) {
-        let mut full_path = self
-            .0
-            .children()
-            .filter_map(ImportChild::cast)
-            .collect::<Vec<_>>();
+    fn full_path(&self) -> (ImportDefChild, Vec<ImportDefChild>) {
+        let mut full_path = children(self);
 
         let last = full_path.pop().unwrap();
 
@@ -51,89 +38,23 @@ impl Import {
     }
 }
 
-impl fmt::Debug for Import {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Import")
-            .field("path", &self.path())
-            .field("targets", &self.targets())
-            .finish()
-    }
-}
+ast_union_node!(ImportDefChild, kinds: [ImportDefSegment, ImportDefGroup]);
 
-#[derive(Debug)]
-pub enum ImportChild {
-    Segment(ImportChildSegment),
-    Group(ImportChildGroup),
-}
+ast_node!(ImportDefSegment, fields: [name]);
 
-impl ImportChild {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        let result = match node.kind() {
-            SyntaxKind::ImportStatementSegment => Self::Segment(ImportChildSegment::cast(node)?),
-            SyntaxKind::ImportStatementGroup => Self::Group(ImportChildGroup::cast(node)?),
-
-            _ => return None,
-        };
-
-        Some(result)
-    }
-}
-
-pub struct ImportChildSegment(SyntaxNode);
-
-impl ImportChildSegment {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::ImportStatementSegment {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
+impl ImportDefSegment {
     fn name(&self) -> Option<String> {
-        self.0
-            .children_with_tokens()
-            .filter_map(SyntaxElement::into_token)
-            .find(|token| token.kind() == SyntaxKind::Ident)
-            .map(|token| token.text().into())
+        first_ident(self)
     }
 }
 
-impl fmt::Debug for ImportChildSegment {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("ImportChildSegment")
-            .field("name", &self.name())
-            .finish()
-    }
-}
+ast_node!(ImportDefGroup, fields: [names]);
 
-pub struct ImportChildGroup(SyntaxNode);
-
-impl ImportChildGroup {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::ImportStatementGroup {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
+impl ImportDefGroup {
     fn names(&self) -> Vec<String> {
-        self.0
-            .children()
-            .filter_map(ImportChildSegment::cast)
-            .filter_map(|token| token.name())
+        children::<ImportDefGroup, ImportDefSegment>(self)
+            .into_iter()
+            .filter_map(|token| ImportDefSegment::name(&token))
             .collect()
-    }
-}
-
-impl fmt::Debug for ImportChildGroup {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("ImportChildGroup")
-            .field("names", &self.names())
-            .finish()
     }
 }

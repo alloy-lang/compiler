@@ -2,11 +2,8 @@
 ===
 [
     Expression(
-        UnaryExpr(
-            UnaryExpr {
-                op: Some(
-                    Minus@0..1 "-",
-                ),
+        PrefixExpr(
+            PrefixExpr {
                 expr: Some(
                     IntLiteral(
                         IntLiteral {
@@ -15,6 +12,9 @@
                             ),
                         },
                     ),
+                ),
+                op: Some(
+                    Minus@0..1 "-",
                 ),
             },
         ),

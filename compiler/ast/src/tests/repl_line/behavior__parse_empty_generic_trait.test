@@ -3,7 +3,7 @@ behavior Trait1[t1, t2] for Type1 where
 end
 ===
 [
-    Behavior(
+    BehaviorDef(
         BehaviorDef {
             trait_: Some(
                 Bounded(

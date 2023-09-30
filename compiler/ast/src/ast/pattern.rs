@@ -3,45 +3,19 @@ use super::*;
 
 use ordered_float::NotNan;
 
-#[derive(Debug)]
-pub enum Pattern {
-    IntLiteral(IntLiteral),
-    FractionLiteral(FractionLiteral),
-    StringLiteral(StringLiteral),
-    CharLiteral(CharLiteral),
-    VariableRef(VariableRef),
-    Destructor(Destructor),
-}
+ast_union_node!(Pattern, kinds: [
+    IntLiteral,
+    FractionLiteral,
+    StringLiteral,
+    CharLiteral,
+    VariableRef,
+    NilIdentifier,
+    Destructor
+]);
 
-impl Pattern {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        let result = match node.kind() {
-            SyntaxKind::IntLiteral => Self::IntLiteral(IntLiteral::cast(node)?),
-            SyntaxKind::FractionLiteral => Self::FractionLiteral(FractionLiteral::cast(node)?),
-            SyntaxKind::StringLiteral => Self::StringLiteral(StringLiteral::cast(node)?),
-            SyntaxKind::CharLiteral => Self::CharLiteral(CharLiteral::cast(node)?),
-            SyntaxKind::VariableRef => Self::VariableRef(VariableRef::cast(node)?),
-            SyntaxKind::Destructor => Self::Destructor(Destructor::cast(node)?),
-            _ => return None,
-        };
-
-        Some(result)
-    }
-}
-
-pub struct IntLiteral(SyntaxNode);
+ast_node!(IntLiteral, fields: [value]);
 
 impl IntLiteral {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::IntLiteral {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
     #[must_use]
     pub fn value(&self) -> Option<u64> {
         self.0
@@ -51,33 +25,11 @@ impl IntLiteral {
             .parse()
             .ok()
     }
-
-    #[must_use]
-    pub fn span(&self) -> TextRange {
-        self.0.text_range()
-    }
 }
 
-impl fmt::Debug for IntLiteral {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("IntLiteral")
-            .field("value", &self.value())
-            .finish()
-    }
-}
-
-pub struct FractionLiteral(SyntaxNode);
+ast_node!(FractionLiteral, fields: [value]);
 
 impl FractionLiteral {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::FractionLiteral {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
     #[must_use]
     pub fn value(&self) -> Option<NotNan<f64>> {
         self.0
@@ -89,26 +41,9 @@ impl FractionLiteral {
     }
 }
 
-impl fmt::Debug for FractionLiteral {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("FractionLiteral")
-            .field("value", &self.value())
-            .finish()
-    }
-}
-
-pub struct StringLiteral(SyntaxNode);
+ast_node!(StringLiteral, fields: [value]);
 
 impl StringLiteral {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::StringLiteral {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
     #[must_use]
     pub fn value(&self) -> String {
         let string = self
@@ -122,26 +57,9 @@ impl StringLiteral {
     }
 }
 
-impl fmt::Debug for StringLiteral {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("StringLiteral")
-            .field("value", &self.value())
-            .finish()
-    }
-}
-
-pub struct CharLiteral(SyntaxNode);
+ast_node!(CharLiteral, fields: [value]);
 
 impl CharLiteral {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::CharLiteral {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
     #[must_use]
     pub fn value(&self) -> Option<char> {
         self.0
@@ -150,52 +68,22 @@ impl CharLiteral {
             .filter(|token| token.text().len() == 3)
             .find_map(|token| token.text().chars().nth(1))
     }
-
-    #[must_use]
-    pub fn span(&self) -> TextRange {
-        self.0.text_range()
-    }
 }
 
-impl fmt::Debug for CharLiteral {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("CharLiteral")
-            .field("value", &self.value())
-            .finish()
-    }
-}
-
-pub struct VariableRef(SyntaxNode);
+ast_node!(VariableRef, fields: [name]);
 
 impl VariableRef {
     #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::VariableRef {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
-    #[must_use]
     pub fn name(&self) -> Option<Path> {
-        Path::cast(self.0.clone())
+        first_child(self)
     }
 }
 
-impl fmt::Debug for VariableRef {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("VariableRef")
-            .field("name", &self.name())
-            .finish()
-    }
-}
+ast_node!(NilIdentifier, fields: []);
 
 pub struct Destructor(SyntaxNode);
-
-impl Destructor {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
+impl AstNode for Destructor {
+    fn cast(node: SyntaxNode) -> Option<Self> {
         if node.kind() == SyntaxKind::Destructor {
             Some(Self(node))
         } else {
@@ -203,33 +91,30 @@ impl Destructor {
         }
     }
 
-    #[must_use]
-    pub fn target(&self) -> Option<Path> {
-        self.0.children().find_map(|token| {
-            if token.kind() == SyntaxKind::DestructorTarget {
-                token.children().find_map(Path::cast)
-            } else {
-                None
-            }
-        })
+    fn syntax(&self) -> SyntaxNode {
+        self.0.clone()
     }
-
-    pub fn args(&self) -> impl Iterator<Item = Pattern> {
-        self.0.children().filter_map(|token| {
-            if token.kind() == SyntaxKind::DestructorArg {
-                token.children().find_map(Pattern::cast)
-            } else {
-                None
-            }
-        })
+}
+impl fmt::Debug for Destructor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct(stringify!(Destructor))
+            .field(stringify!(target), &self.target())
+            .field(stringify!(args), &self.args())
+            .finish()
     }
 }
 
-impl fmt::Debug for Destructor {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Destructor")
-            .field("target", &self.target())
-            .field("args", &self.args().collect::<Vec<_>>())
-            .finish()
+impl Destructor {
+    #[must_use]
+    pub fn target(&self) -> Option<VariableRef> {
+        match_node(self, SyntaxKind::DestructorTarget)?
+            .children()
+            .find_map(VariableRef::cast)
+    }
+
+    pub fn args(&self) -> Vec<Pattern> {
+        match_nodes(self, SyntaxKind::DestructorArg)
+            .filter_map(|n| n.children().find_map(Pattern::cast))
+            .collect()
     }
 }

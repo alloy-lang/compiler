@@ -1,29 +1,19 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-pub struct Module(SyntaxNode);
+ast_node!(ModuleDef, fields: [definitions]);
 
-impl Module {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::ModuleDef {
-            Some(Self(node))
-        } else {
-            None
-        }
+impl ModuleDef {
+    pub fn definitions(&self) -> Vec<ModuleDefinition> {
+        children(self)
     }
 }
 
-impl fmt::Debug for Module {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Module")
-            .field("definitions", &self.definitions().collect::<Vec<_>>())
-            .finish()
-    }
-}
-
-impl Module {
-    pub fn definitions(&self) -> impl Iterator<Item = ModuleDefinition> {
-        self.0.children().filter_map(ModuleDefinition::cast)
-    }
-}
+ast_union_node!(ModuleDefinition, kinds: [
+    ImportDef,
+    TraitDef,
+    BehaviorDef,
+    TypeDefinition,
+    TypeAnnotation,
+    ValueDef
+]);

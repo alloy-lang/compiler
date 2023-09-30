@@ -15,61 +15,37 @@ pub enum Type {
 impl Type {
     #[must_use]
     pub(crate) fn cast(node: SyntaxElement) -> Option<Self> {
-        match node.kind() {
-            SyntaxKind::SelfType => Some(Self::SelfRef),
-            SyntaxKind::NilIdentifier => Some(Self::NilRef),
+        let result = match node.kind() {
+            SyntaxKind::SelfType => Self::SelfRef,
+            SyntaxKind::NilIdentifier => Self::NilRef,
             SyntaxKind::TypeIdentifier => {
-                Some(Self::Identifier(TypeIdentifier::cast(node.into_node()?)?))
+                Self::Identifier(TypeIdentifier::cast(node.into_node()?)?)
             }
-            SyntaxKind::LambdaType => Some(Self::Lambda(LambdaType::cast(node.into_node()?)?)),
-            SyntaxKind::TupleType => Some(Self::Tuple(TupleType::cast(node.into_node()?)?)),
-            SyntaxKind::BoundedType => Some(Self::Bounded(BoundedType::cast(node.into_node()?)?)),
-            SyntaxKind::ParenthesizedType => Some(Self::Parenthesized(ParenthesizedType::cast(
-                node.into_node()?,
-            )?)),
-            _ => None,
-        }
+            SyntaxKind::LambdaType => Self::Lambda(LambdaType::cast(node.into_node()?)?),
+            SyntaxKind::TupleType => Self::Tuple(TupleType::cast(node.into_node()?)?),
+            SyntaxKind::BoundedType => Self::Bounded(BoundedType::cast(node.into_node()?)?),
+            SyntaxKind::ParenthesizedType => {
+                Self::Parenthesized(ParenthesizedType::cast(node.into_node()?)?)
+            }
+            _ => return None,
+        };
+
+        Some(result)
     }
 }
 
-pub struct TypeIdentifier(SyntaxNode);
+ast_node!(TypeIdentifier, fields: [name]);
 
 impl TypeIdentifier {
     #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::TypeIdentifier {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
-    #[must_use]
     pub fn name(&self) -> Option<Path> {
-        Path::cast(self.0.clone())
+        first_child(self)
     }
 }
 
-impl fmt::Debug for TypeIdentifier {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("TypeIdentifier")
-            .field("name", &self.name())
-            .finish()
-    }
-}
-
-pub struct LambdaType(SyntaxNode);
+ast_node!(LambdaType, fields: [arg_type, return_type]);
 
 impl LambdaType {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::LambdaType {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
     #[must_use]
     pub fn arg_type(&self) -> Option<Type> {
         self.0.children_with_tokens().filter_map(Type::cast).nth(0)
@@ -81,101 +57,38 @@ impl LambdaType {
     }
 }
 
-impl fmt::Debug for LambdaType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("LambdaType")
-            .field("arg_type", &self.arg_type())
-            .field("return_type", &self.return_type())
-            .finish()
-    }
-}
-
-pub struct TupleType(SyntaxNode);
+ast_node!(TupleType, fields: [members]);
 
 impl TupleType {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::TupleType {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
-    pub fn members(&self) -> impl Iterator<Item = Type> {
-        self.0.children_with_tokens().filter_map(Type::cast)
+    pub fn members(&self) -> Vec<Type> {
+        self.0
+            .children_with_tokens()
+            .filter_map(Type::cast)
+            .collect()
     }
 }
 
-impl fmt::Debug for TupleType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("TupleType")
-            .field("members", &self.members().collect::<Vec<_>>())
-            .finish()
-    }
-}
-
-pub struct BoundedType(SyntaxNode);
+ast_node!(BoundedType, fields: [base, args]);
 
 impl BoundedType {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::BoundedType {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
-    #[must_use]
     pub fn base(&self) -> Option<Type> {
-        self.0
-            .children()
-            .find(|node| node.kind() == SyntaxKind::BoundedTypeBase)
-            .and_then(|node| node.children_with_tokens().next())
-            .and_then(Type::cast)
+        match_node(self, SyntaxKind::BoundedTypeBase)?
+            .children_with_tokens()
+            .find_map(Type::cast)
     }
 
-    pub fn args(&self) -> impl Iterator<Item = Type> {
-        self.0
-            .children()
-            .filter(|node| node.kind() == SyntaxKind::BoundedTypeArg)
-            .flat_map(|node| node.children_with_tokens())
-            .filter_map(Type::cast)
+    pub fn args(&self) -> Vec<Type> {
+        match_nodes(self, SyntaxKind::BoundedTypeArg)
+            .flat_map(|node| node.children_with_tokens().filter_map(Type::cast))
+            .collect()
     }
 }
 
-impl fmt::Debug for BoundedType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("BoundedType")
-            .field("base", &self.base())
-            .field("args", &self.args().collect::<Vec<_>>())
-            .finish()
-    }
-}
-
-pub struct ParenthesizedType(SyntaxNode);
+ast_node!(ParenthesizedType, fields: [inner]);
 
 impl ParenthesizedType {
     #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::ParenthesizedType {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
-    #[must_use]
     pub fn inner(&self) -> Option<Type> {
         self.0.children_with_tokens().find_map(Type::cast)
-    }
-}
-
-impl fmt::Debug for ParenthesizedType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("ParenthesizedType")
-            .field("inner", &self.inner())
-            .finish()
     }
 }

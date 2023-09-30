@@ -5,14 +5,14 @@ module TestModule1 where
     let testThing = |funky, x, y| -> TestType::new <| (funky(x), funky(y))
 ===
 Some(
-    Module {
+    ModuleDef {
         definitions: [
             TypeAnnotation(
                 TypeAnnotation {
                     name: Some(
                         "testThing",
                     ),
-                    type: Some(
+                    type_: Some(
                         Lambda(
                             LambdaType {
                                 arg_type: Some(
@@ -109,8 +109,8 @@ Some(
                     ),
                 },
             ),
-            Value(
-                ValueDefinition {
+            ValueDef(
+                ValueDef {
                     name: Some(
                         "testThing",
                     ),
@@ -153,8 +153,8 @@ Some(
                                     ),
                                 ],
                                 body: Some(
-                                    BinaryExpr(
-                                        BinaryExpr {
+                                    InfixExpr(
+                                        InfixExpr {
                                             lhs: Some(
                                                 VariableRef(
                                                     VariableRef {

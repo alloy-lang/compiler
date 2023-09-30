@@ -4,7 +4,7 @@ behavior Trait1 for Type1[t1, _] where
 end
 ===
 [
-    Behavior(
+    BehaviorDef(
         BehaviorDef {
             trait_: Some(
                 Identifier(
@@ -53,15 +53,13 @@ end
                 ),
             ),
             members: [
-                TypeVariable(
-                    Named(
-                        NamedTypeVariable {
-                            name: Some(
-                                "t1",
-                            ),
-                            constraints: [],
-                        },
-                    ),
+                NamedTypeVariable(
+                    NamedTypeVariable {
+                        name: Some(
+                            "t1",
+                        ),
+                        constraints: [],
+                    },
                 ),
             ],
         },

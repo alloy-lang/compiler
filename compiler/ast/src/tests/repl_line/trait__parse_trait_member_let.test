@@ -5,8 +5,8 @@ trait TestTrait1 where
 end
 ===
 [
-    Trait(
-        Trait {
+    TraitDef(
+        TraitDef {
             name: Some(
                 "TestTrait1",
             ),
@@ -16,7 +16,7 @@ end
                         name: Some(
                             "test",
                         ),
-                        type: Some(
+                        type_: Some(
                             Identifier(
                                 TypeIdentifier {
                                     name: Some(
@@ -31,8 +31,8 @@ end
                         ),
                     },
                 ),
-                Value(
-                    ValueDefinition {
+                ValueDef(
+                    ValueDef {
                         name: Some(
                             "thing",
                         ),

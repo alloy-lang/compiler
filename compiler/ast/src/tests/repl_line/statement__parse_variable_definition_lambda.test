@@ -1,8 +1,8 @@
 let add = |a, b| -> a + b
 ===
 [
-    Value(
-        ValueDefinition {
+    ValueDef(
+        ValueDef {
             name: Some(
                 "add",
             ),
@@ -34,8 +34,8 @@ let add = |a, b| -> a + b
                             ),
                         ],
                         body: Some(
-                            BinaryExpr(
-                                BinaryExpr {
+                            InfixExpr(
+                                InfixExpr {
                                     lhs: Some(
                                         VariableRef(
                                             VariableRef {

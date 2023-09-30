@@ -3,36 +3,34 @@ trait TestTrait1 where
 end
 ===
 [
-    Trait(
-        Trait {
+    TraitDef(
+        TraitDef {
             name: Some(
                 "TestTrait1",
             ),
             members: [
-                TypeVariable(
-                    Self_(
-                        SelfTypeVariable {
-                            constraints: [
-                                Kind(
-                                    TypeVariableKindConstraint {
-                                        arity: 1,
-                                    },
-                                ),
-                                Trait(
-                                    TypeVariableTraitConstraint {
-                                        trait_: Some(
-                                            Path {
-                                                segments: [
-                                                    "functor",
-                                                    "Functor",
-                                                ],
-                                            },
-                                        ),
-                                    },
-                                ),
-                            ],
-                        },
-                    ),
+                SelfTypeVariable(
+                    SelfTypeVariable {
+                        constraints: [
+                            TypeVariableKindConstraint(
+                                TypeVariableKindConstraint {
+                                    arity: 1,
+                                },
+                            ),
+                            TypeVariableTraitConstraint(
+                                TypeVariableTraitConstraint {
+                                    trait_: Some(
+                                        Path {
+                                            segments: [
+                                                "functor",
+                                                "Functor",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ],
+                    },
                 ),
             ],
         },

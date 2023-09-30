@@ -7,7 +7,7 @@ let (|>) = |x, f| -> fakeStuff
     TypeAnnotation(
         TypeAnnotation {
             name: None,
-            type: Some(
+            type_: Some(
                 Lambda(
                     LambdaType {
                         arg_type: Some(
@@ -85,8 +85,8 @@ let (|>) = |x, f| -> fakeStuff
             ),
         },
     ),
-    Value(
-        ValueDefinition {
+    ValueDef(
+        ValueDef {
             name: None,
             value: Some(
                 LambdaExpr(

@@ -3,24 +3,22 @@ trait TestTrait1 where
 end
 ===
 [
-    Trait(
-        Trait {
+    TraitDef(
+        TraitDef {
             name: Some(
                 "TestTrait1",
             ),
             members: [
-                TypeVariable(
-                    Self_(
-                        SelfTypeVariable {
-                            constraints: [
-                                Kind(
-                                    TypeVariableKindConstraint {
-                                        arity: 6,
-                                    },
-                                ),
-                            ],
-                        },
-                    ),
+                SelfTypeVariable(
+                    SelfTypeVariable {
+                        constraints: [
+                            TypeVariableKindConstraint(
+                                TypeVariableKindConstraint {
+                                    arity: 6,
+                                },
+                            ),
+                        ],
+                    },
                 ),
             ],
         },

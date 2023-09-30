@@ -69,7 +69,7 @@ match test when
     Expression(
         MatchExpr(
             MatchExpr {
-                expression: Some(
+                condition: Some(
                     VariableRef(
                         VariableRef {
                             name: Some(
@@ -88,11 +88,15 @@ match test when
                             Destructor(
                                 Destructor {
                                     target: Some(
-                                        Path {
-                                            segments: [
-                                                "Either",
-                                                "Left",
-                                            ],
+                                        VariableRef {
+                                            name: Some(
+                                                Path {
+                                                    segments: [
+                                                        "Either",
+                                                        "Left",
+                                                    ],
+                                                },
+                                            ),
                                         },
                                     ),
                                     args: [
@@ -130,11 +134,15 @@ match test when
                             Destructor(
                                 Destructor {
                                     target: Some(
-                                        Path {
-                                            segments: [
-                                                "Either",
-                                                "Right",
-                                            ],
+                                        VariableRef {
+                                            name: Some(
+                                                Path {
+                                                    segments: [
+                                                        "Either",
+                                                        "Right",
+                                                    ],
+                                                },
+                                            ),
                                         },
                                     ),
                                     args: [
