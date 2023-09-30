@@ -6,7 +6,7 @@ end
 ===
 [
     Behavior(
-        Behavior {
+        BehaviorDef {
             trait_: Some(
                 Identifier(
                     TypeIdentifier {

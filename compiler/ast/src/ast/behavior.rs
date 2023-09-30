@@ -1,18 +1,9 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-pub struct Behavior(SyntaxNode);
+ast_node!(BehaviorDef, fields: [trait_, type_, members]);
 
-impl Behavior {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::BehaviorDef {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
+impl BehaviorDef {
     #[must_use]
     pub fn trait_(&self) -> Option<Type> {
         self.0.children().find_map(|token| {
@@ -35,18 +26,8 @@ impl Behavior {
         })
     }
 
-    pub fn members(&self) -> impl Iterator<Item = BehaviorMember> {
-        self.0.children().filter_map(BehaviorMember::cast)
-    }
-}
-
-impl fmt::Debug for Behavior {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Behavior")
-            .field("trait_", &self.trait_())
-            .field("type_", &self.type_())
-            .field("members", &self.members().collect::<Vec<_>>())
-            .finish()
+    pub fn members(&self) -> Vec<BehaviorMember> {
+        self.0.children().filter_map(BehaviorMember::cast).collect()
     }
 }
 
