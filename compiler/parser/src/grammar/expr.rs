@@ -175,22 +175,12 @@ pub(crate) fn parse_char_literal(p: &mut Parser) -> CompletedMarker {
 }
 
 pub(crate) fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
-    let cm = if p.at(TokenKind::OpIdent) {
-        let m = p.start();
-        p.expect_with_recovery(
-            TokenKind::OpIdent,
-            ParseErrorContext::VariableRef,
-            EXPR_FIRSTS,
-        );
-        m.complete(p, SyntaxKind::VariableRef)
-    } else {
-        path::parse_path(
-            p,
-            ParseErrorContext::VariableRef,
-            ts![],
-            SyntaxKind::VariableRef,
-        )
-    };
+    let cm = path::parse_path(
+        p,
+        ParseErrorContext::VariableRef,
+        ts![],
+        SyntaxKind::VariableRef,
+    );
 
     maybe_parse_function_call(p, cm)
 }

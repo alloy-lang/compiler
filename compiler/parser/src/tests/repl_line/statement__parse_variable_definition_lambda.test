@@ -1,24 +1,26 @@
 let add = |a, b| -> a + b
 ===
 SourceFile@0..25
-  VariableDef@0..25
+  ValueDef@0..25
     LetKw@0..3 "let"
     Whitespace@3..4 " "
     Ident@4..7 "add"
     Whitespace@7..8 " "
     Equals@8..9 "="
     Whitespace@9..10 " "
-    LambdaExprDef@10..25
+    LambdaExpr@10..25
       LambdaExprArgList@10..17
         Pipe@10..11 "|"
         LambdaExprArg@11..12
           VariableRef@11..12
-            Ident@11..12 "a"
+            Path@11..12
+              Ident@11..12 "a"
         Comma@12..13 ","
         Whitespace@13..14 " "
         LambdaExprArg@14..15
           VariableRef@14..15
-            Ident@14..15 "b"
+            Path@14..15
+              Ident@14..15 "b"
         Pipe@15..16 "|"
         Whitespace@16..17 " "
       RightArrow@17..19 "->"
@@ -26,9 +28,11 @@ SourceFile@0..25
       LambdaExprBody@20..25
         InfixExpr@20..25
           VariableRef@20..22
-            Ident@20..21 "a"
-            Whitespace@21..22 " "
+            Path@20..22
+              Ident@20..21 "a"
+              Whitespace@21..22 " "
           Plus@22..23 "+"
           Whitespace@23..24 " "
           VariableRef@24..25
-            Ident@24..25 "b"
+            Path@24..25
+              Ident@24..25 "b"

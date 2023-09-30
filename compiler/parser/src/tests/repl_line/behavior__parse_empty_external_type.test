@@ -8,16 +8,18 @@ SourceFile@0..77
     Whitespace@8..9 " "
     BehaviorTraitName@9..16
       TypeIdentifier@9..16
-        Ident@9..15 "Trait1"
-        Whitespace@15..16 " "
+        Path@9..16
+          Ident@9..15 "Trait1"
+          Whitespace@15..16 " "
     ForKw@16..19 "for"
     Whitespace@19..20 " "
     BehaviorTypeName@20..33
       TypeIdentifier@20..33
-        Ident@20..25 "other"
-        DoubleColon@25..27 "::"
-        Ident@27..32 "Type1"
-        Whitespace@32..33 " "
+        Path@20..33
+          Ident@20..25 "other"
+          DoubleColon@25..27 "::"
+          Ident@27..32 "Type1"
+          Whitespace@32..33 " "
     WhereKw@33..38 "where"
     Whitespace@38..43 "\n    "
     Comment@43..73 "-- imagine all the th ..."

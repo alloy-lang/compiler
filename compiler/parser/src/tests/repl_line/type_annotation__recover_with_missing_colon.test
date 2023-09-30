@@ -8,8 +8,9 @@ SourceFile@0..58
     Ident@7..12 "test1"
     Whitespace@12..15 "   "
     TypeIdentifier@15..22
-      Ident@15..21 "String"
-      Whitespace@21..22 "\n"
+      Path@15..22
+        Ident@15..21 "String"
+        Whitespace@21..22 "\n"
   TypeAnnotation@22..58
     TypeOfKw@22..28 "typeof"
     Whitespace@28..29 " "
@@ -19,16 +20,19 @@ SourceFile@0..58
     Whitespace@36..37 " "
     LambdaType@37..58
       TypeIdentifier@37..42
-        Ident@37..41 "Test"
-        Whitespace@41..42 " "
+        Path@37..42
+          Ident@37..41 "Test"
+          Whitespace@41..42 " "
       RightArrow@42..44 "->"
       Whitespace@44..45 " "
       LambdaType@45..58
         TypeIdentifier@45..52
-          Ident@45..51 "String"
-          Whitespace@51..52 " "
+          Path@45..52
+            Ident@45..51 "String"
+            Whitespace@51..52 " "
         RightArrow@52..54 "->"
         Whitespace@54..55 " "
         TypeIdentifier@55..58
-          Ident@55..58 "Int"
+          Path@55..58
+            Ident@55..58 "Int"
 error at position 15 while parsing the colon after the name of a type. Missing expected ‘:’

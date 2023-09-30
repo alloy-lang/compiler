@@ -9,19 +9,22 @@ SourceFile@0..92
     Whitespace@8..9 " "
     BehaviorTraitName@9..16
       TypeIdentifier@9..16
-        Ident@9..15 "Trait1"
-        Whitespace@15..16 " "
+        Path@9..16
+          Ident@9..15 "Trait1"
+          Whitespace@15..16 " "
     ForKw@16..19 "for"
     Whitespace@19..20 " "
     BehaviorTypeName@20..33
       BoundedType@20..33
         BoundedTypeBase@20..25
           TypeIdentifier@20..25
-            Ident@20..25 "Type1"
+            Path@20..25
+              Ident@20..25 "Type1"
         LBracket@25..26 "["
         BoundedTypeArg@26..28
           TypeIdentifier@26..28
-            Ident@26..28 "t1"
+            Path@26..28
+              Ident@26..28 "t1"
         Comma@28..29 ","
         Whitespace@29..30 " "
         BoundedTypeArg@30..31
@@ -30,7 +33,7 @@ SourceFile@0..92
         Whitespace@32..33 " "
     WhereKw@33..38 "where"
     Whitespace@38..43 "\n    "
-    TypeVariable@43..89
+    NamedTypeVariable@43..89
       TypevarKw@43..50 "typevar"
       Whitespace@50..51 " "
       Ident@51..53 "t1"

@@ -2,7 +2,7 @@ let a (1 + 2)
 let b = a
 ===
 SourceFile@0..23
-  VariableDef@0..14
+  ValueDef@0..14
     LetKw@0..3 "let"
     Whitespace@3..4 " "
     Ident@4..5 "a"
@@ -19,7 +19,7 @@ SourceFile@0..23
           Integer@11..12 "2"
       RParen@12..13 ")"
       Whitespace@13..14 "\n"
-  VariableDef@14..23
+  ValueDef@14..23
     LetKw@14..17 "let"
     Whitespace@17..18 " "
     Ident@18..19 "b"
@@ -27,5 +27,6 @@ SourceFile@0..23
     Equals@20..21 "="
     Whitespace@21..22 " "
     VariableRef@22..23
-      Ident@22..23 "a"
-error at position 6 while parsing a variable definition. Missing expected ‘=’
+      Path@22..23
+        Ident@22..23 "a"
+error at position 6 while parsing the ‘=’ in a value definition. Missing expected ‘=’

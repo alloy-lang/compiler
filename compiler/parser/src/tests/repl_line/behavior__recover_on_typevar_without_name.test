@@ -9,20 +9,22 @@ SourceFile@0..66
     Whitespace@8..9 " "
     BehaviorTraitName@9..20
       TypeIdentifier@9..20
-        Ident@9..19 "TestTrait1"
-        Whitespace@19..20 " "
+        Path@9..20
+          Ident@9..19 "TestTrait1"
+          Whitespace@19..20 " "
     ForKw@20..23 "for"
     Whitespace@23..24 " "
     BehaviorTypeName@24..30
       TypeIdentifier@24..30
-        Ident@24..29 "Type1"
-        Whitespace@29..30 " "
+        Path@24..30
+          Ident@24..29 "Type1"
+          Whitespace@29..30 " "
     WhereKw@30..35 "where"
     Whitespace@35..40 "\n    "
-    TypeVariable@40..52
+    NamedTypeVariable@40..52
       TypevarKw@40..47 "typevar"
       Whitespace@47..52 "\n    "
-    TypeVariable@52..63
+    NamedTypeVariable@52..63
       TypevarKw@52..59 "typevar"
       Whitespace@59..60 " "
       Ident@60..62 "t2"

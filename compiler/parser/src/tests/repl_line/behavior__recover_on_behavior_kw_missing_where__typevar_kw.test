@@ -8,15 +8,17 @@ SourceFile@0..48
     Whitespace@8..9 " "
     BehaviorTraitName@9..20
       TypeIdentifier@9..20
-        Ident@9..19 "TestTrait1"
-        Whitespace@19..20 " "
+        Path@9..20
+          Ident@9..19 "TestTrait1"
+          Whitespace@19..20 " "
     ForKw@20..23 "for"
     Whitespace@23..24 " "
     BehaviorTypeName@24..34
       TypeIdentifier@24..34
-        Ident@24..29 "Type1"
-        Whitespace@29..34 "\n    "
-    TypeVariable@34..45
+        Path@24..34
+          Ident@24..29 "Type1"
+          Whitespace@29..34 "\n    "
+    NamedTypeVariable@34..45
       TypevarKw@34..41 "typevar"
       Whitespace@41..42 " "
       Ident@42..44 "t1"

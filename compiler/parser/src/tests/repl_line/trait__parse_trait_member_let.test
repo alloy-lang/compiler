@@ -20,9 +20,10 @@ SourceFile@0..70
       Colon@39..40 ":"
       Whitespace@40..41 " "
       TypeIdentifier@41..50
-        Ident@41..44 "Int"
-        Whitespace@44..50 "\n\n    "
-    VariableDef@50..67
+        Path@41..50
+          Ident@41..44 "Int"
+          Whitespace@44..50 "\n\n    "
+    ValueDef@50..67
       LetKw@50..53 "let"
       Whitespace@53..54 " "
       Ident@54..59 "thing"
@@ -30,6 +31,7 @@ SourceFile@0..70
       Equals@60..61 "="
       Whitespace@61..62 " "
       VariableRef@62..67
-        Ident@62..66 "test"
-        Whitespace@66..67 "\n"
+        Path@62..67
+          Ident@62..66 "test"
+          Whitespace@66..67 "\n"
     EndKw@67..70 "end"

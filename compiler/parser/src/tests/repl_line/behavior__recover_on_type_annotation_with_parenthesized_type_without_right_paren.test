@@ -10,14 +10,16 @@ SourceFile@0..100
     Whitespace@8..9 " "
     BehaviorTraitName@9..20
       TypeIdentifier@9..20
-        Ident@9..19 "TestTrait1"
-        Whitespace@19..20 " "
+        Path@9..20
+          Ident@9..19 "TestTrait1"
+          Whitespace@19..20 " "
     ForKw@20..23 "for"
     Whitespace@23..24 " "
     BehaviorTypeName@24..30
       TypeIdentifier@24..30
-        Ident@24..29 "Type1"
-        Whitespace@29..30 " "
+        Path@24..30
+          Ident@24..29 "Type1"
+          Whitespace@29..30 " "
     WhereKw@30..35 "where"
     Whitespace@35..40 "\n    "
     TypeAnnotation@40..86
@@ -35,16 +37,18 @@ SourceFile@0..100
         Whitespace@62..63 " "
         LambdaType@63..86
           TypeIdentifier@63..70
-            Ident@63..69 "String"
-            Whitespace@69..70 " "
+            Path@63..70
+              Ident@63..69 "String"
+              Whitespace@69..70 " "
           RightArrow@70..72 "->"
           Whitespace@72..73 " "
           ParenthesizedType@73..86
             LParen@73..74 "("
             TypeIdentifier@74..86
-              Ident@74..80 "String"
-              Whitespace@80..86 "\n\n    "
-    TypeVariable@86..97
+              Path@74..86
+                Ident@74..80 "String"
+                Whitespace@80..86 "\n\n    "
+    NamedTypeVariable@86..97
       TypevarKw@86..93 "typevar"
       Whitespace@93..94 " "
       Ident@94..96 "t1"

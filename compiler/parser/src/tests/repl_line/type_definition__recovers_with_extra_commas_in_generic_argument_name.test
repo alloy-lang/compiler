@@ -2,7 +2,7 @@ typedef Test1[t1, , t3] = Empty
 typedef Test2           = Empty
 ===
 SourceFile@0..63
-  TypeDef@0..32
+  TypeDefinition@0..32
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
     Ident@8..13 "Test1"
@@ -20,16 +20,16 @@ SourceFile@0..63
     Whitespace@23..24 " "
     Equals@24..25 "="
     Whitespace@25..26 " "
-    TypeDefMember@26..32
+    TypeDefinitionMember@26..32
       Ident@26..31 "Empty"
       Whitespace@31..32 "\n"
-  TypeDef@32..63
+  TypeDefinition@32..63
     TypedefKw@32..39 "typedef"
     Whitespace@39..40 " "
     Ident@40..45 "Test2"
     Whitespace@45..56 "           "
     Equals@56..57 "="
     Whitespace@57..58 " "
-    TypeDefMember@58..63
+    TypeDefinitionMember@58..63
       Ident@58..63 "Empty"
 error at position 18 while parsing the name of a bounded type argument. Missing expected identifier

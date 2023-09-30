@@ -14,8 +14,9 @@ SourceFile@0..39
       Whitespace@14..15 " "
       MatchTargetCondition@15..20
         VariableRef@15..20
-          Ident@15..19 "True"
-          Whitespace@19..20 " "
+          Path@15..20
+            Ident@15..19 "True"
+            Whitespace@19..20 " "
       RightArrow@20..22 "->"
       Whitespace@22..23 " "
       MatchTargetValue@23..27
@@ -27,8 +28,9 @@ SourceFile@0..39
       Whitespace@28..29 " "
       MatchTargetCondition@29..35
         VariableRef@29..35
-          Ident@29..34 "False"
-          Whitespace@34..35 " "
+          Path@29..35
+            Ident@29..34 "False"
+            Whitespace@34..35 " "
       RightArrow@35..37 "->"
       Whitespace@37..38 " "
       MatchTargetValue@38..39

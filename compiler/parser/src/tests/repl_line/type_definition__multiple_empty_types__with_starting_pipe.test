@@ -3,7 +3,7 @@ typedef Test =
   | Empty2
 ===
 SourceFile@0..36
-  TypeDef@0..36
+  TypeDefinition@0..36
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
     Ident@8..12 "Test"
@@ -12,10 +12,10 @@ SourceFile@0..36
     Whitespace@14..17 "\n  "
     Pipe@17..18 "|"
     Whitespace@18..19 " "
-    TypeDefMember@19..28
+    TypeDefinitionMember@19..28
       Ident@19..25 "Empty1"
       Whitespace@25..28 "\n  "
     Pipe@28..29 "|"
     Whitespace@29..30 " "
-    TypeDefMember@30..36
+    TypeDefinitionMember@30..36
       Ident@30..36 "Empty2"

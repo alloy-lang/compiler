@@ -25,11 +25,13 @@ SourceFile@0..66
         Whitespace@48..49 " "
         LambdaType@49..63
           TypeIdentifier@49..56
-            Ident@49..55 "String"
-            Whitespace@55..56 " "
+            Path@49..56
+              Ident@49..55 "String"
+              Whitespace@55..56 " "
           RightArrow@56..58 "->"
           Whitespace@58..59 " "
           TypeIdentifier@59..63
-            Ident@59..62 "Int"
-            Whitespace@62..63 "\n"
+            Path@59..63
+              Ident@59..62 "Int"
+              Whitespace@62..63 "\n"
     EndKw@63..66 "end"

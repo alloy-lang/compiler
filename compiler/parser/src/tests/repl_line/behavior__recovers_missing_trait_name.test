@@ -15,8 +15,9 @@ SourceFile@0..122
     Whitespace@12..13 " "
     BehaviorTypeName@13..19
       TypeIdentifier@13..19
-        Ident@13..18 "Type1"
-        Whitespace@18..19 " "
+        Path@13..19
+          Ident@13..18 "Type1"
+          Whitespace@18..19 " "
     WhereKw@19..24 "where"
     Whitespace@24..29 "\n    "
     Comment@29..59 "-- imagine all the th ..."

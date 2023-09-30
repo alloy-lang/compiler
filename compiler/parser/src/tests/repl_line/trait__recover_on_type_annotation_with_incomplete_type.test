@@ -31,13 +31,15 @@ SourceFile@0..84
         Whitespace@66..67 " "
         LambdaType@67..81
           TypeIdentifier@67..74
-            Ident@67..73 "String"
-            Whitespace@73..74 " "
+            Path@67..74
+              Ident@67..73 "String"
+              Whitespace@73..74 " "
           RightArrow@74..76 "->"
           Whitespace@76..77 " "
           TypeIdentifier@77..81
-            Ident@77..80 "Int"
-            Whitespace@80..81 "\n"
+            Path@77..81
+              Ident@77..80 "Int"
+              Whitespace@80..81 "\n"
     EndKw@81..84 "end"
 error at position 44 while parsing the colon after the name of a type. Missing expected ‘:’
 error at position 44 while parsing a type in a type annotation. Missing expected identifier, ‘self‘ or ‘(’

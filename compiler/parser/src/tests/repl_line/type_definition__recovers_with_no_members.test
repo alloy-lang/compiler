@@ -2,21 +2,21 @@ typedef Test1 =
 typedef Test2 = Empty
 ===
 SourceFile@0..37
-  TypeDef@0..16
+  TypeDefinition@0..16
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
     Ident@8..13 "Test1"
     Whitespace@13..14 " "
     Equals@14..15 "="
     Whitespace@15..16 "\n"
-    TypeDefMember@16..16
-  TypeDef@16..37
+    TypeDefinitionMember@16..16
+  TypeDefinition@16..37
     TypedefKw@16..23 "typedef"
     Whitespace@23..24 " "
     Ident@24..29 "Test2"
     Whitespace@29..30 " "
     Equals@30..31 "="
     Whitespace@31..32 " "
-    TypeDefMember@32..37
+    TypeDefinitionMember@32..37
       Ident@32..37 "Empty"
 error at position 16 while parsing the name of a type definition member. Missing expected identifier

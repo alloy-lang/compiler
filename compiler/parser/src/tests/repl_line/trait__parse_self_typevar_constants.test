@@ -10,7 +10,7 @@ SourceFile@0..56
     Whitespace@16..17 " "
     WhereKw@17..22 "where"
     Whitespace@22..27 "\n    "
-    TypeVariable@27..53
+    SelfTypeVariable@27..53
       SelfKw@27..31 "self"
       Whitespace@31..32 " "
       Equals@32..33 "="
@@ -25,6 +25,7 @@ SourceFile@0..56
       Plus@43..44 "+"
       Whitespace@44..45 " "
       TypeVariableTraitConstraint@45..53
-        Ident@45..52 "Functor"
-        Whitespace@52..53 "\n"
+        Path@45..53
+          Ident@45..52 "Functor"
+          Whitespace@52..53 "\n"
     EndKw@53..56 "end"

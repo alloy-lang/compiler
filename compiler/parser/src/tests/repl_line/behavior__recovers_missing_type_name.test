@@ -12,8 +12,9 @@ SourceFile@0..123
     Whitespace@8..9 " "
     BehaviorTraitName@9..16
       TypeIdentifier@9..16
-        Ident@9..15 "Trait1"
-        Whitespace@15..16 " "
+        Path@9..16
+          Ident@9..15 "Trait1"
+          Whitespace@15..16 " "
     ForKw@16..19 "for"
     Whitespace@19..20 " "
     BehaviorTypeName@20..20

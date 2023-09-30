@@ -22,7 +22,7 @@ mod r#type;
 mod type_annotation;
 mod type_definition;
 mod type_variable;
-mod variable_def;
+mod value;
 
 pub(crate) fn source_file(p: &mut Parser) -> CompletedMarker {
     let m = p.start();

@@ -7,7 +7,7 @@ pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
     p.bump(TokenKind::ImportKw);
 
-    parse_first_import_segment(p, ParseErrorContext::ImportStatementFirstSegment);
+    parse_first_import_segment(p, ParseErrorContext::ImportDefFirstSegment);
 
     loop {
         if should_stop(p) {
@@ -16,7 +16,7 @@ pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
 
         p.expect_with_recovery(
             TokenKind::DoubleColon,
-            ParseErrorContext::ImportStatementSeparator,
+            ParseErrorContext::ImportDefSeparator,
             IMPORT_RECOVERY_SET,
         );
 
@@ -26,10 +26,10 @@ pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
             break;
         }
 
-        parse_import_segment(p, ParseErrorContext::ImportStatementSegment);
+        parse_import_segment(p, ParseErrorContext::ImportDefSegment);
     }
 
-    return m.complete(p, SyntaxKind::ImportStatement);
+    return m.complete(p, SyntaxKind::ImportDef);
 
     fn should_stop(p: &mut Parser) -> bool {
         !p.at_set(IMPORT_RECOVERY_SET.plus(TokenKind::DoubleColon)) || p.at_eof()
@@ -40,7 +40,7 @@ fn parse_import_group(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
     p.bump(TokenKind::LBrace);
 
-    parse_import_segment(p, ParseErrorContext::ImportStatementSegment);
+    parse_import_segment(p, ParseErrorContext::ImportDefSegment);
 
     loop {
         if should_stop(p) {
@@ -49,20 +49,20 @@ fn parse_import_group(p: &mut Parser) -> CompletedMarker {
 
         p.expect_with_recovery(
             TokenKind::Comma,
-            ParseErrorContext::ImportStatementGroupSeparator,
+            ParseErrorContext::ImportDefGroupSeparator,
             ts![TokenKind::Ident],
         );
 
-        parse_import_segment(p, ParseErrorContext::ImportStatementSegment);
+        parse_import_segment(p, ParseErrorContext::ImportDefSegment);
     }
 
     p.expect_with_recovery(
         TokenKind::RBrace,
-        ParseErrorContext::ImportStatementGroupEnd,
+        ParseErrorContext::ImportDefGroupEnd,
         ts![],
     );
 
-    return m.complete(p, SyntaxKind::ImportStatementGroup);
+    return m.complete(p, SyntaxKind::ImportDefGroup);
 
     fn should_stop(p: &mut Parser) -> bool {
         !p.at_set(ts![TokenKind::Comma, TokenKind::Ident]) || p.at_eof()
@@ -76,7 +76,7 @@ fn parse_first_import_segment(p: &mut Parser, context: ParseErrorContext) -> Com
 
     p.expect_with_recovery(TokenKind::Ident, context, IMPORT_SEGMENT_RECOVERY_SET);
 
-    segment_m.complete(p, SyntaxKind::ImportStatementSegment)
+    segment_m.complete(p, SyntaxKind::ImportDefSegment)
 }
 
 fn parse_import_segment(p: &mut Parser, context: ParseErrorContext) -> CompletedMarker {
@@ -88,5 +88,5 @@ fn parse_import_segment(p: &mut Parser, context: ParseErrorContext) -> Completed
         p.expect_with_recovery(TokenKind::Ident, context, IMPORT_SEGMENT_RECOVERY_SET);
     }
 
-    segment_m.complete(p, SyntaxKind::ImportStatementSegment)
+    segment_m.complete(p, SyntaxKind::ImportDefSegment)
 }

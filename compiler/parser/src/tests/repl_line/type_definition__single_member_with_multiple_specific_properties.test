@@ -1,20 +1,22 @@
 typedef Test = Thing Int String
 ===
 SourceFile@0..31
-  TypeDef@0..31
+  TypeDefinition@0..31
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
     Ident@8..12 "Test"
     Whitespace@12..13 " "
     Equals@13..14 "="
     Whitespace@14..15 " "
-    TypeDefMember@15..31
+    TypeDefinitionMember@15..31
       Ident@15..20 "Thing"
       Whitespace@20..21 " "
-      TypeDefMemberProperty@21..25
+      TypeDefinitionMemberProperty@21..25
         TypeIdentifier@21..25
-          Ident@21..24 "Int"
-          Whitespace@24..25 " "
-      TypeDefMemberProperty@25..31
+          Path@21..25
+            Ident@21..24 "Int"
+            Whitespace@24..25 " "
+      TypeDefinitionMemberProperty@25..31
         TypeIdentifier@25..31
-          Ident@25..31 "String"
+          Path@25..31
+            Ident@25..31 "String"

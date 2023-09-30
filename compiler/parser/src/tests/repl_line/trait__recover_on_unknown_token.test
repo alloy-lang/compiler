@@ -15,7 +15,7 @@ SourceFile@0..54
     Error@27..40
       Ident@27..34 "unknown"
       Whitespace@34..40 "\n\n    "
-    TypeVariable@40..51
+    NamedTypeVariable@40..51
       TypevarKw@40..47 "typevar"
       Whitespace@47..48 " "
       Ident@48..50 "t1"

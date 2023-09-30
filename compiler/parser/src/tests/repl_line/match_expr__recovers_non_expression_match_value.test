@@ -8,8 +8,9 @@ SourceFile@0..44
     Whitespace@5..6 " "
     MatchExprArg@6..11
       VariableRef@6..11
-        Ident@6..10 "test"
-        Whitespace@10..11 " "
+        Path@6..11
+          Ident@6..10 "test"
+          Whitespace@10..11 " "
     WhenKw@11..15 "when"
     Whitespace@15..18 "\n  "
     MatchTarget@18..32
@@ -17,8 +18,9 @@ SourceFile@0..44
       Whitespace@19..20 " "
       MatchTargetCondition@20..25
         VariableRef@20..25
-          Ident@20..24 "True"
-          Whitespace@24..25 " "
+          Path@20..25
+            Ident@20..24 "True"
+            Whitespace@24..25 " "
       RightArrow@25..27 "->"
       Whitespace@27..28 " "
       MatchTargetValue@28..32
@@ -30,8 +32,9 @@ SourceFile@0..44
       Whitespace@33..34 " "
       MatchTargetCondition@34..40
         VariableRef@34..40
-          Ident@34..39 "False"
-          Whitespace@39..40 " "
+          Path@34..40
+            Ident@34..39 "False"
+            Whitespace@39..40 " "
       RightArrow@40..42 "->"
       Whitespace@42..43 " "
       MatchTargetValue@43..44

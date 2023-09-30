@@ -10,14 +10,16 @@ SourceFile@0..83
     Whitespace@8..9 " "
     BehaviorTraitName@9..20
       TypeIdentifier@9..20
-        Ident@9..19 "TestTrait1"
-        Whitespace@19..20 " "
+        Path@9..20
+          Ident@9..19 "TestTrait1"
+          Whitespace@19..20 " "
     ForKw@20..23 "for"
     Whitespace@23..24 " "
     BehaviorTypeName@24..30
       TypeIdentifier@24..30
-        Ident@24..29 "Type1"
-        Whitespace@29..30 " "
+        Path@24..30
+          Ident@24..29 "Type1"
+          Whitespace@29..30 " "
     WhereKw@30..35 "where"
     Whitespace@35..40 "\n    "
     TypeAnnotation@40..63
@@ -28,9 +30,10 @@ SourceFile@0..83
       Colon@52..53 ":"
       Whitespace@53..54 " "
       TypeIdentifier@54..63
-        Ident@54..57 "Int"
-        Whitespace@57..63 "\n\n    "
-    VariableDef@63..80
+        Path@54..63
+          Ident@54..57 "Int"
+          Whitespace@57..63 "\n\n    "
+    ValueDef@63..80
       LetKw@63..66 "let"
       Whitespace@66..67 " "
       Ident@67..72 "thing"
@@ -38,6 +41,7 @@ SourceFile@0..83
       Equals@73..74 "="
       Whitespace@74..75 " "
       VariableRef@75..80
-        Ident@75..79 "test"
-        Whitespace@79..80 "\n"
+        Path@75..80
+          Ident@75..79 "test"
+          Whitespace@79..80 "\n"
     EndKw@80..83 "end"

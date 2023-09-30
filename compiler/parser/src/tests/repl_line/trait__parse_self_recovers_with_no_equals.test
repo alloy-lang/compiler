@@ -10,13 +10,14 @@ SourceFile@0..52
     Whitespace@16..17 " "
     WhereKw@17..22 "where"
     Whitespace@22..27 "\n    "
-    TypeVariable@27..49
+    SelfTypeVariable@27..49
       SelfKw@27..31 "self"
       Whitespace@31..32 " "
       TypeVariableTraitConstraint@32..49
-        Ident@32..39 "functor"
-        DoubleColon@39..41 "::"
-        Ident@41..48 "Functor"
-        Whitespace@48..49 "\n"
+        Path@32..49
+          Ident@32..39 "functor"
+          DoubleColon@39..41 "::"
+          Ident@41..48 "Functor"
+          Whitespace@48..49 "\n"
     EndKw@49..52 "end"
 error at position 32 while parsing the `=` sign in a trait `self` constraint. Missing expected ‘=’

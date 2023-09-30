@@ -21,12 +21,14 @@ SourceFile@0..91
             LParen@20..21 "("
             LambdaType@21..29
               TypeIdentifier@21..24
-                Ident@21..23 "t1"
-                Whitespace@23..24 " "
+                Path@21..24
+                  Ident@21..23 "t1"
+                  Whitespace@23..24 " "
               RightArrow@24..26 "->"
               Whitespace@26..27 " "
               TypeIdentifier@27..29
-                Ident@27..29 "t2"
+                Path@27..29
+                  Ident@27..29 "t2"
             RParen@29..30 ")"
         RBracket@30..31 "]"
         Whitespace@31..32 " "
@@ -40,7 +42,8 @@ SourceFile@0..91
           LBracket@39..40 "["
           BoundedTypeArg@40..42
             TypeIdentifier@40..42
-              Ident@40..42 "t1"
+              Path@40..42
+                Ident@40..42 "t1"
           RBracket@42..43 "]"
           Whitespace@43..44 " "
         RightArrow@44..46 "->"
@@ -52,17 +55,18 @@ SourceFile@0..91
           LBracket@51..52 "["
           BoundedTypeArg@52..54
             TypeIdentifier@52..54
-              Ident@52..54 "t2"
+              Path@52..54
+                Ident@52..54 "t2"
           RBracket@54..55 "]"
           Whitespace@55..56 " "
     WhereKw@56..61 "where"
     Whitespace@61..66 "\n    "
-    TypeVariable@66..81
+    NamedTypeVariable@66..81
       TypevarKw@66..73 "typevar"
       Whitespace@73..74 " "
       Ident@74..76 "t1"
       Whitespace@76..81 "\n    "
-    TypeVariable@81..91
+    NamedTypeVariable@81..91
       TypevarKw@81..88 "typevar"
       Whitespace@88..89 " "
       Ident@89..91 "t2"

@@ -9,14 +9,16 @@ SourceFile@0..121
     Whitespace@8..9 " "
     BehaviorTraitName@9..20
       TypeIdentifier@9..20
-        Ident@9..19 "TestTrait1"
-        Whitespace@19..20 " "
+        Path@9..20
+          Ident@9..19 "TestTrait1"
+          Whitespace@19..20 " "
     ForKw@20..23 "for"
     Whitespace@23..24 " "
     BehaviorTypeName@24..30
       TypeIdentifier@24..30
-        Ident@24..29 "Type1"
-        Whitespace@29..30 " "
+        Path@24..30
+          Ident@24..29 "Type1"
+          Whitespace@29..30 " "
     WhereKw@30..35 "where"
     Whitespace@35..40 "\n    "
     TypeAnnotation@40..81
@@ -32,13 +34,15 @@ SourceFile@0..121
         Whitespace@62..63 " "
         LambdaType@63..81
           TypeIdentifier@63..70
-            Ident@63..69 "String"
-            Whitespace@69..70 " "
+            Path@63..70
+              Ident@63..69 "String"
+              Whitespace@69..70 " "
           RightArrow@70..72 "->"
           Whitespace@72..73 " "
           TypeIdentifier@73..81
-            Ident@73..76 "Int"
-            Whitespace@76..81 "\n    "
+            Path@73..81
+              Ident@73..76 "Int"
+              Whitespace@76..81 "\n    "
     TypeAnnotation@81..118
       TypeOfKw@81..87 "typeof"
       Whitespace@87..88 " "
@@ -54,12 +58,14 @@ SourceFile@0..121
         Whitespace@103..104 " "
         LambdaType@104..118
           TypeIdentifier@104..111
-            Ident@104..110 "String"
-            Whitespace@110..111 " "
+            Path@104..111
+              Ident@104..110 "String"
+              Whitespace@110..111 " "
           RightArrow@111..113 "->"
           Whitespace@113..114 " "
           TypeIdentifier@114..118
-            Ident@114..117 "Int"
-            Whitespace@117..118 "\n"
+            Path@114..118
+              Ident@114..117 "Int"
+              Whitespace@117..118 "\n"
     EndKw@118..121 "end"
 error at position 55 while parsing the colon after the name of a type. Missing expected ‘:’

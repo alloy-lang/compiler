@@ -16,8 +16,9 @@ SourceFile@0..34
       Whitespace@21..22 " "
       LambdaType@22..34
         TypeIdentifier@22..29
-          Ident@22..28 "String"
-          Whitespace@28..29 " "
+          Path@22..29
+            Ident@22..28 "String"
+            Whitespace@28..29 " "
         RightArrow@29..31 "->"
         Whitespace@31..32 " "
         UnitType@32..34

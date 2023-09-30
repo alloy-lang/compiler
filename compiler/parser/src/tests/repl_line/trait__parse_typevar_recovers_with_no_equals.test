@@ -10,15 +10,16 @@ SourceFile@0..58
     Whitespace@16..17 " "
     WhereKw@17..22 "where"
     Whitespace@22..27 "\n    "
-    TypeVariable@27..55
+    NamedTypeVariable@27..55
       TypevarKw@27..34 "typevar"
       Whitespace@34..35 " "
       Ident@35..37 "t1"
       Whitespace@37..38 " "
       TypeVariableTraitConstraint@38..55
-        Ident@38..45 "functor"
-        DoubleColon@45..47 "::"
-        Ident@47..54 "Functor"
-        Whitespace@54..55 "\n"
+        Path@38..55
+          Ident@38..45 "functor"
+          DoubleColon@45..47 "::"
+          Ident@47..54 "Functor"
+          Whitespace@54..55 "\n"
     EndKw@55..58 "end"
 error at position 38 while parsing the constraints for a type variable. Missing expected ‘=’

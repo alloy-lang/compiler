@@ -1,8 +1,8 @@
 import std
 ===
 SourceFile@0..10
-  ImportStatement@0..10
+  ImportDef@0..10
     ImportKw@0..6 "import"
     Whitespace@6..7 " "
-    ImportStatementSegment@7..10
+    ImportDefSegment@7..10
       Ident@7..10 "std"

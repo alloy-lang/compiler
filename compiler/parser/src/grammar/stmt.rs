@@ -3,7 +3,7 @@ use super::*;
 
 pub(super) fn stmt(p: &mut Parser) -> Option<CompletedMarker> {
     if p.at(TokenKind::LetKw) {
-        Some(variable_def::parse_variable_def(p))
+        Some(value::parse_value(p))
     } else if p.at(TokenKind::ImportKw) {
         Some(import::parse_import(p))
     } else if p.at(TokenKind::TraitKw) {

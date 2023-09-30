@@ -10,7 +10,7 @@ SourceFile@0..64
     Whitespace@16..17 " "
     WhereKw@17..22 "where"
     Whitespace@22..27 "\n    "
-    TypeVariable@27..61
+    SelfTypeVariable@27..61
       SelfKw@27..31 "self"
       Whitespace@31..32 " "
       Equals@32..33 "="

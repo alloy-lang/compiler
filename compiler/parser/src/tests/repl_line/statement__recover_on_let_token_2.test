@@ -2,13 +2,13 @@ let 1
 let b = a
 ===
 SourceFile@0..15
-  VariableDef@0..6
+  ValueDef@0..6
     LetKw@0..3 "let"
     Whitespace@3..4 " "
     Error@4..6
       Integer@4..5 "1"
       Whitespace@5..6 "\n"
-  VariableDef@6..15
+  ValueDef@6..15
     LetKw@6..9 "let"
     Whitespace@9..10 " "
     Ident@10..11 "b"
@@ -16,7 +16,8 @@ SourceFile@0..15
     Equals@12..13 "="
     Whitespace@13..14 " "
     VariableRef@14..15
-      Ident@14..15 "a"
-error in range 4..5 while parsing a variable definition. Found integer, but expected operator identifier or identifier
-error at position 6 while parsing a variable definition. Missing expected ‘=’
-error at position 6 while parsing a variable definition. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+      Path@14..15
+        Ident@14..15 "a"
+error in range 4..5 while parsing the name in a value definition. Found integer, but expected operator identifier or identifier
+error at position 6 while parsing the ‘=’ in a value definition. Missing expected ‘=’
+error at position 6 while parsing the expression in a value definition. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’

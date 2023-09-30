@@ -13,25 +13,28 @@ SourceFile@0..62
     BoundedType@15..27
       BoundedTypeBase@15..19
         TypeIdentifier@15..19
-          Ident@15..19 "Test"
+          Path@15..19
+            Ident@15..19 "Test"
       LBracket@19..20 "["
       BoundedTypeArg@20..22
         TypeIdentifier@20..22
-          Ident@20..22 "t1"
+          Path@20..22
+            Ident@20..22 "t1"
       Comma@22..23 ","
       Whitespace@23..24 " "
       BoundedTypeArg@24..27
         TypeIdentifier@24..27
-          Ident@24..26 "t2"
-          Whitespace@26..27 " "
+          Path@24..27
+            Ident@24..26 "t2"
+            Whitespace@26..27 " "
     WhereKw@27..32 "where"
     Whitespace@32..37 "\n    "
-    TypeVariable@37..52
+    NamedTypeVariable@37..52
       TypevarKw@37..44 "typevar"
       Whitespace@44..45 " "
       Ident@45..47 "t1"
       Whitespace@47..52 "\n    "
-    TypeVariable@52..62
+    NamedTypeVariable@52..62
       TypevarKw@52..59 "typevar"
       Whitespace@59..60 " "
       Ident@60..62 "t2"

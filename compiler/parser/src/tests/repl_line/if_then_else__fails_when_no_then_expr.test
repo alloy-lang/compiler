@@ -6,8 +6,9 @@ SourceFile@0..19
     Whitespace@2..3 " "
     IfExpr@3..8
       VariableRef@3..8
-        Ident@3..7 "test"
-        Whitespace@7..8 " "
+        Path@3..8
+          Ident@3..7 "test"
+          Whitespace@7..8 " "
     ThenKw@8..12 "then"
     Whitespace@12..13 " "
     ThenExpr@13..13

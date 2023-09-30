@@ -1,7 +1,7 @@
 import
 ===
 SourceFile@0..6
-  ImportStatement@0..6
+  ImportDef@0..6
     ImportKw@0..6 "import"
-    ImportStatementSegment@6..6
+    ImportDefSegment@6..6
 error at position 6 while parsing the first import segment. Missing expected identifier

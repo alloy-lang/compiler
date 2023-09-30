@@ -27,7 +27,7 @@ pub(crate) fn parse_type_definition(p: &mut Parser) -> CompletedMarker {
         p.bump(TokenKind::EndKw);
     }
 
-    m.complete(p, SyntaxKind::TypeDef)
+    m.complete(p, SyntaxKind::TypeDefinition)
 }
 
 fn parse_type_definition_bounds(p: &mut Parser) {
@@ -103,10 +103,10 @@ fn parse_type_definition_member(p: &mut Parser) -> CompletedMarker {
             r#type::SINGLE_TYPE_RECOVERY_SET,
             ts![],
         );
-        m.complete(p, SyntaxKind::TypeDefMemberProperty);
+        m.complete(p, SyntaxKind::TypeDefinitionMemberProperty);
     }
 
-    return m.complete(p, SyntaxKind::TypeDefMember);
+    return m.complete(p, SyntaxKind::TypeDefinitionMember);
 
     fn should_stop(p: &mut Parser) -> bool {
         p.at_set(ts![TokenKind::EndKw, TokenKind::Pipe]) || p.at_top_level_token() || p.at_eof()

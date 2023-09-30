@@ -19,7 +19,7 @@ SourceFile@0..152
     Whitespace@22..27 "\n    "
     Comment@27..57 "-- imagine all the th ..."
     Whitespace@57..63 "\n\n    "
-    TypeVariable@63..75
+    NamedTypeVariable@63..75
       TypevarKw@63..70 "typevar"
       Whitespace@70..71 " "
       Ident@71..73 "t1"
@@ -33,7 +33,7 @@ SourceFile@0..152
     Whitespace@97..102 "\n    "
     Comment@102..132 "-- imagine all the th ..."
     Whitespace@132..138 "\n\n    "
-    TypeVariable@138..149
+    NamedTypeVariable@138..149
       TypevarKw@138..145 "typevar"
       Whitespace@145..146 " "
       Ident@146..148 "t1"

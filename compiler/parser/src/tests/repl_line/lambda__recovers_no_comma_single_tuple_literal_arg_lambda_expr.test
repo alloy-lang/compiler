@@ -1,7 +1,7 @@
 |(a b)| -> 5
 ===
 SourceFile@0..12
-  LambdaExprDef@0..12
+  LambdaExpr@0..12
     LambdaExprArgList@0..8
       Pipe@0..1 "|"
       LambdaExprArg@1..6
@@ -9,11 +9,13 @@ SourceFile@0..12
           LParen@1..2 "("
           TupleExprArg@2..4
             VariableRef@2..4
-              Ident@2..3 "a"
-              Whitespace@3..4 " "
+              Path@2..4
+                Ident@2..3 "a"
+                Whitespace@3..4 " "
           TupleExprArg@4..5
             VariableRef@4..5
-              Ident@4..5 "b"
+              Path@4..5
+                Ident@4..5 "b"
           RParen@5..6 ")"
       Pipe@6..7 "|"
       Whitespace@7..8 " "

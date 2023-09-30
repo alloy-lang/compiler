@@ -28,7 +28,7 @@ pub(crate) fn parse_lambda_expr(p: &mut Parser) -> CompletedMarker {
     parse_expr(p, ParseErrorContext::LambdaExprExpr);
     body_m.complete(p, SyntaxKind::LambdaExprBody);
 
-    lambda_m.complete(p, SyntaxKind::LambdaExprDef)
+    lambda_m.complete(p, SyntaxKind::LambdaExpr)
 }
 
 fn parse_arg_list(p: &mut Parser) -> CompletedMarker {

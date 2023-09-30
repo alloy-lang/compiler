@@ -16,7 +16,8 @@ SourceFile@0..45
       Colon@33..34 ":"
       Whitespace@34..35 " "
       TypeIdentifier@35..42
-        Ident@35..41 "String"
-        Whitespace@41..42 "\n"
+        Path@35..42
+          Ident@35..41 "String"
+          Whitespace@41..42 "\n"
     EndKw@42..45 "end"
 error at position 21 while parsing the `where` keyword at the start of a trait definition. Missing expected ‘where‘

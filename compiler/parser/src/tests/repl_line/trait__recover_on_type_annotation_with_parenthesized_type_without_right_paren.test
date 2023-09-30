@@ -27,16 +27,18 @@ SourceFile@0..87
         Whitespace@49..50 " "
         LambdaType@50..73
           TypeIdentifier@50..57
-            Ident@50..56 "String"
-            Whitespace@56..57 " "
+            Path@50..57
+              Ident@50..56 "String"
+              Whitespace@56..57 " "
           RightArrow@57..59 "->"
           Whitespace@59..60 " "
           ParenthesizedType@60..73
             LParen@60..61 "("
             TypeIdentifier@61..73
-              Ident@61..67 "String"
-              Whitespace@67..73 "\n\n    "
-    TypeVariable@73..84
+              Path@61..73
+                Ident@61..67 "String"
+                Whitespace@67..73 "\n\n    "
+    NamedTypeVariable@73..84
       TypevarKw@73..80 "typevar"
       Whitespace@80..81 " "
       Ident@81..83 "t1"

@@ -11,21 +11,24 @@ SourceFile@0..70
     Whitespace@14..15 " "
     LambdaType@15..41
       TypeIdentifier@15..20
-        Ident@15..19 "Test"
-        Whitespace@19..20 " "
+        Path@15..20
+          Ident@15..19 "Test"
+          Whitespace@19..20 " "
       RightArrow@20..22 "->"
       Whitespace@22..23 " "
       LambdaType@23..41
         TypeIdentifier@23..30
-          Ident@23..29 "String"
-          Whitespace@29..30 " "
+          Path@23..30
+            Ident@23..29 "String"
+            Whitespace@29..30 " "
         RightArrow@30..32 "->"
         Whitespace@32..33 " "
         ParenthesizedType@33..41
           LParen@33..34 "("
           TypeIdentifier@34..41
-            Ident@34..40 "String"
-            Whitespace@40..41 "\n"
+            Path@34..41
+              Ident@34..40 "String"
+              Whitespace@40..41 "\n"
   TypeAnnotation@41..70
     TypeOfKw@41..47 "typeof"
     Whitespace@47..48 " "
@@ -35,10 +38,12 @@ SourceFile@0..70
     Whitespace@55..56 " "
     LambdaType@56..70
       TypeIdentifier@56..61
-        Ident@56..60 "Test"
-        Whitespace@60..61 " "
+        Path@56..61
+          Ident@56..60 "Test"
+          Whitespace@60..61 " "
       RightArrow@61..63 "->"
       Whitespace@63..64 " "
       TypeIdentifier@64..70
-        Ident@64..70 "String"
+        Path@64..70
+          Ident@64..70 "String"
 error at position 41 while parsing the right parenthesis of a parenthesized type. Missing expected ‘,’ or ‘)’

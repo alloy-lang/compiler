@@ -11,25 +11,29 @@ SourceFile@0..78
     Whitespace@14..15 " "
     LambdaType@15..49
       TypeIdentifier@15..20
-        Ident@15..19 "Test"
-        Whitespace@19..20 " "
+        Path@15..20
+          Ident@15..19 "Test"
+          Whitespace@19..20 " "
       RightArrow@20..22 "->"
       Whitespace@22..23 " "
       LambdaType@23..49
         TypeIdentifier@23..30
-          Ident@23..29 "String"
-          Whitespace@29..30 " "
+          Path@23..30
+            Ident@23..29 "String"
+            Whitespace@29..30 " "
         RightArrow@30..32 "->"
         Whitespace@32..33 " "
         TupleType@33..49
           LParen@33..34 "("
           TypeIdentifier@34..40
-            Ident@34..40 "String"
+            Path@34..40
+              Ident@34..40 "String"
           Comma@40..41 ","
           Whitespace@41..42 " "
           TypeIdentifier@42..49
-            Ident@42..48 "String"
-            Whitespace@48..49 "\n"
+            Path@42..49
+              Ident@42..48 "String"
+              Whitespace@48..49 "\n"
   TypeAnnotation@49..78
     TypeOfKw@49..55 "typeof"
     Whitespace@55..56 " "
@@ -39,10 +43,12 @@ SourceFile@0..78
     Whitespace@63..64 " "
     LambdaType@64..78
       TypeIdentifier@64..69
-        Ident@64..68 "Test"
-        Whitespace@68..69 " "
+        Path@64..69
+          Ident@64..68 "Test"
+          Whitespace@68..69 " "
       RightArrow@69..71 "->"
       Whitespace@71..72 " "
       TypeIdentifier@72..78
-        Ident@72..78 "String"
+        Path@72..78
+          Ident@72..78 "String"
 error at position 49 while parsing the right parenthesis of a tuple type. Missing expected ‘)’

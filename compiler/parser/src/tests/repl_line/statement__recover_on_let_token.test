@@ -2,14 +2,14 @@ let a =
 let b = a
 ===
 SourceFile@0..17
-  VariableDef@0..8
+  ValueDef@0..8
     LetKw@0..3 "let"
     Whitespace@3..4 " "
     Ident@4..5 "a"
     Whitespace@5..6 " "
     Equals@6..7 "="
     Whitespace@7..8 "\n"
-  VariableDef@8..17
+  ValueDef@8..17
     LetKw@8..11 "let"
     Whitespace@11..12 " "
     Ident@12..13 "b"
@@ -17,5 +17,6 @@ SourceFile@0..17
     Equals@14..15 "="
     Whitespace@15..16 " "
     VariableRef@16..17
-      Ident@16..17 "a"
-error at position 8 while parsing a variable definition. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+      Path@16..17
+        Ident@16..17 "a"
+error at position 8 while parsing the expression in a value definition. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’

@@ -65,5 +65,5 @@ fn parse_generic_type_variable(p: &mut Parser, parent_recovery_set: TokenSet) ->
         type_variable::parse_typevar_constraints(p);
     }
 
-    m.complete(p, SyntaxKind::TypeVariable)
+    m.complete(p, SyntaxKind::NamedTypeVariable)
 }

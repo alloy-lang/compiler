@@ -2,26 +2,26 @@ import std::functor::
 import std::functor::map
 ===
 SourceFile@0..46
-  ImportStatement@0..22
+  ImportDef@0..22
     ImportKw@0..6 "import"
     Whitespace@6..7 " "
-    ImportStatementSegment@7..10
+    ImportDefSegment@7..10
       Ident@7..10 "std"
     DoubleColon@10..12 "::"
-    ImportStatementSegment@12..19
+    ImportDefSegment@12..19
       Ident@12..19 "functor"
     DoubleColon@19..21 "::"
     Whitespace@21..22 "\n"
-    ImportStatementSegment@22..22
-  ImportStatement@22..46
+    ImportDefSegment@22..22
+  ImportDef@22..46
     ImportKw@22..28 "import"
     Whitespace@28..29 " "
-    ImportStatementSegment@29..32
+    ImportDefSegment@29..32
       Ident@29..32 "std"
     DoubleColon@32..34 "::"
-    ImportStatementSegment@34..41
+    ImportDefSegment@34..41
       Ident@34..41 "functor"
     DoubleColon@41..43 "::"
-    ImportStatementSegment@43..46
+    ImportDefSegment@43..46
       Ident@43..46 "map"
 error at position 22 while parsing an import statement. Missing expected ‘{’, operator identifier or identifier

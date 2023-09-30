@@ -5,7 +5,8 @@ SourceFile@0..21
   FunctionCall@0..12
     FunctionCallTarget@0..5
       VariableRef@0..5
-        Ident@0..5 "funky"
+        Path@0..5
+          Ident@0..5 "funky"
     FunctionCallArgList@5..12
       LParen@5..6 "("
       FunctionCallArg@6..10
@@ -17,7 +18,7 @@ SourceFile@0..21
           Whitespace@9..10 " "
       RParen@10..11 ")"
       Whitespace@11..12 "\n"
-  VariableDef@12..21
+  ValueDef@12..21
     LetKw@12..15 "let"
     Whitespace@15..16 " "
     Ident@16..17 "a"

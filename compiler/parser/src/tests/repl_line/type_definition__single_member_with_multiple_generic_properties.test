@@ -1,7 +1,7 @@
 typedef Test[t1, t2] = Thing t1 t2
 ===
 SourceFile@0..34
-  TypeDef@0..34
+  TypeDefinition@0..34
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
     Ident@8..12 "Test"
@@ -16,13 +16,15 @@ SourceFile@0..34
     Whitespace@20..21 " "
     Equals@21..22 "="
     Whitespace@22..23 " "
-    TypeDefMember@23..34
+    TypeDefinitionMember@23..34
       Ident@23..28 "Thing"
       Whitespace@28..29 " "
-      TypeDefMemberProperty@29..32
+      TypeDefinitionMemberProperty@29..32
         TypeIdentifier@29..32
-          Ident@29..31 "t1"
-          Whitespace@31..32 " "
-      TypeDefMemberProperty@32..34
+          Path@29..32
+            Ident@29..31 "t1"
+            Whitespace@31..32 " "
+      TypeDefinitionMemberProperty@32..34
         TypeIdentifier@32..34
-          Ident@32..34 "t2"
+          Path@32..34
+            Ident@32..34 "t2"

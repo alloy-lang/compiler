@@ -12,16 +12,18 @@ SourceFile@0..123
     Whitespace@8..9 " "
     BehaviorTraitName@9..16
       TypeIdentifier@9..16
-        Ident@9..15 "Trait1"
-        Whitespace@15..16 " "
+        Path@9..16
+          Ident@9..15 "Trait1"
+          Whitespace@15..16 " "
     ForKw@16..19 "for"
     Whitespace@19..20 " "
     BehaviorTypeName@20..61
       TypeIdentifier@20..61
-        Ident@20..25 "Type1"
-        Whitespace@25..30 "\n    "
-        Comment@30..60 "-- imagine all the th ..."
-        Whitespace@60..61 "\n"
+        Path@20..61
+          Ident@20..25 "Type1"
+          Whitespace@25..30 "\n    "
+          Comment@30..60 "-- imagine all the th ..."
+          Whitespace@60..61 "\n"
     EndKw@61..64 "end"
     Whitespace@64..66 "\n\n"
   TraitDef@66..123

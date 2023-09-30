@@ -17,6 +17,7 @@ SourceFile@0..30
       ParenthesizedType@22..30
         LParen@22..23 "("
         TypeIdentifier@23..29
-          Ident@23..29 "String"
+          Path@23..29
+            Ident@23..29 "String"
         RParen@29..30 ")"
 error at position 14 while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context. Missing expected identifier

@@ -8,7 +8,7 @@ match test when
   | Either::Right(r) -> r
 ===
 SourceFile@0..120
-  TypeDef@0..53
+  TypeDefinition@0..53
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
     Ident@8..14 "Either"
@@ -25,24 +25,26 @@ SourceFile@0..120
     Whitespace@22..25 "\n  "
     Pipe@25..26 "|"
     Whitespace@26..27 " "
-    TypeDefMember@27..37
+    TypeDefinitionMember@27..37
       Ident@27..31 "Left"
-      TypeDefMemberProperty@31..37
+      TypeDefinitionMemberProperty@31..37
         ParenthesizedType@31..37
           LParen@31..32 "("
           TypeIdentifier@32..33
-            Ident@32..33 "l"
+            Path@32..33
+              Ident@32..33 "l"
           RParen@33..34 ")"
           Whitespace@34..37 "\n  "
     Pipe@37..38 "|"
     Whitespace@38..39 " "
-    TypeDefMember@39..48
+    TypeDefinitionMember@39..48
       Ident@39..44 "Right"
-      TypeDefMemberProperty@44..48
+      TypeDefinitionMemberProperty@44..48
         ParenthesizedType@44..48
           LParen@44..45 "("
           TypeIdentifier@45..46
-            Ident@45..46 "r"
+            Path@45..46
+              Ident@45..46 "r"
           RParen@46..47 ")"
           Whitespace@47..48 "\n"
     EndKw@48..51 "end"
@@ -52,8 +54,9 @@ SourceFile@0..120
     Whitespace@58..59 " "
     MatchExprArg@59..64
       VariableRef@59..64
-        Ident@59..63 "test"
-        Whitespace@63..64 " "
+        Path@59..64
+          Ident@59..63 "test"
+          Whitespace@63..64 " "
     WhenKw@64..68 "when"
     Whitespace@68..71 "\n  "
     MatchTarget@71..97
@@ -63,21 +66,24 @@ SourceFile@0..120
         Destructor@73..90
           DestructorTarget@73..85
             VariableRef@73..85
-              Ident@73..79 "Either"
-              DoubleColon@79..81 "::"
-              Ident@81..85 "Left"
+              Path@73..85
+                Ident@73..79 "Either"
+                DoubleColon@79..81 "::"
+                Ident@81..85 "Left"
           LParen@85..86 "("
           DestructorArg@86..87
             VariableRef@86..87
-              Ident@86..87 "l"
+              Path@86..87
+                Ident@86..87 "l"
           RParen@87..88 ")"
           Whitespace@88..90 "  "
       RightArrow@90..92 "->"
       Whitespace@92..93 " "
       MatchTargetValue@93..97
         VariableRef@93..97
-          Ident@93..94 "l"
-          Whitespace@94..97 "\n  "
+          Path@93..97
+            Ident@93..94 "l"
+            Whitespace@94..97 "\n  "
     MatchTarget@97..120
       Pipe@97..98 "|"
       Whitespace@98..99 " "
@@ -85,17 +91,20 @@ SourceFile@0..120
         Destructor@99..116
           DestructorTarget@99..112
             VariableRef@99..112
-              Ident@99..105 "Either"
-              DoubleColon@105..107 "::"
-              Ident@107..112 "Right"
+              Path@99..112
+                Ident@99..105 "Either"
+                DoubleColon@105..107 "::"
+                Ident@107..112 "Right"
           LParen@112..113 "("
           DestructorArg@113..114
             VariableRef@113..114
-              Ident@113..114 "r"
+              Path@113..114
+                Ident@113..114 "r"
           RParen@114..115 ")"
           Whitespace@115..116 " "
       RightArrow@116..118 "->"
       Whitespace@118..119 " "
       MatchTargetValue@119..120
         VariableRef@119..120
-          Ident@119..120 "r"
+          Path@119..120
+            Ident@119..120 "r"

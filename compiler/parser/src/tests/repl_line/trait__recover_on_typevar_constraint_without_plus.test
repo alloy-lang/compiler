@@ -11,7 +11,7 @@ SourceFile@0..69
     Whitespace@16..17 " "
     WhereKw@17..22 "where"
     Whitespace@22..27 "\n    "
-    TypeVariable@27..55
+    SelfTypeVariable@27..55
       SelfKw@27..31 "self"
       Whitespace@31..32 " "
       Equals@32..33 "="
@@ -24,9 +24,10 @@ SourceFile@0..69
         RBracket@41..42 "]"
         Whitespace@42..43 " "
       TypeVariableTraitConstraint@43..55
-        Ident@43..50 "Functor"
-        Whitespace@50..55 "\n    "
-    TypeVariable@55..66
+        Path@43..55
+          Ident@43..50 "Functor"
+          Whitespace@50..55 "\n    "
+    NamedTypeVariable@55..66
       TypevarKw@55..62 "typevar"
       Whitespace@62..63 " "
       Ident@63..65 "t1"

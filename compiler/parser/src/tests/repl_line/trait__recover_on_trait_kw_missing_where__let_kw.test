@@ -8,7 +8,7 @@ SourceFile@0..34
     Whitespace@5..6 " "
     Ident@6..16 "TestTrait1"
     Whitespace@16..21 "\n    "
-    VariableDef@21..31
+    ValueDef@21..31
       LetKw@21..24 "let"
       Whitespace@24..25 " "
       Ident@25..26 "a"

@@ -1,14 +1,14 @@
 import std::function::(<|)
 ===
 SourceFile@0..26
-  ImportStatement@0..26
+  ImportDef@0..26
     ImportKw@0..6 "import"
     Whitespace@6..7 " "
-    ImportStatementSegment@7..10
+    ImportDefSegment@7..10
       Ident@7..10 "std"
     DoubleColon@10..12 "::"
-    ImportStatementSegment@12..20
+    ImportDefSegment@12..20
       Ident@12..20 "function"
     DoubleColon@20..22 "::"
-    ImportStatementSegment@22..26
+    ImportDefSegment@22..26
       OpIdent@22..26 "(<|)"

@@ -63,7 +63,7 @@ fn parse_trait_member(p: &mut Parser) -> TraitMemberParseResult {
         );
         TraitMemberParseResult::TraitMember(cm)
     } else if p.at(TokenKind::LetKw) {
-        let cm = variable_def::parse_variable_def(p);
+        let cm = value::parse_value(p);
         TraitMemberParseResult::TraitMember(cm)
     } else if p.at(TokenKind::TypevarKw) {
         let cm = parse_trait_type_variable(p);
@@ -94,7 +94,7 @@ fn parse_trait_self(p: &mut Parser) -> CompletedMarker {
 
     type_variable::parse_typevar_constraints_with_kind(p);
 
-    m.complete(p, SyntaxKind::TypeVariable)
+    m.complete(p, SyntaxKind::SelfTypeVariable)
 }
 
 fn parse_trait_type_variable(p: &mut Parser) -> CompletedMarker {
@@ -122,5 +122,5 @@ fn parse_trait_type_variable(p: &mut Parser) -> CompletedMarker {
         type_variable::parse_typevar_constraints_with_kind(p);
     }
 
-    m.complete(p, SyntaxKind::TypeVariable)
+    m.complete(p, SyntaxKind::NamedTypeVariable)
 }

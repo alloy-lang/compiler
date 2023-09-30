@@ -16,8 +16,9 @@ SourceFile@0..59
       RightArrow@20..22 "->"
       Whitespace@22..23 " "
       TypeIdentifier@23..30
-        Ident@23..29 "String"
-        Whitespace@29..30 "\n"
+        Path@23..30
+          Ident@23..29 "String"
+          Whitespace@29..30 "\n"
   TypeAnnotation@30..59
     TypeOfKw@30..36 "typeof"
     Whitespace@36..37 " "
@@ -27,10 +28,12 @@ SourceFile@0..59
     Whitespace@44..45 " "
     LambdaType@45..59
       TypeIdentifier@45..50
-        Ident@45..49 "Test"
-        Whitespace@49..50 " "
+        Path@45..50
+          Ident@45..49 "Test"
+          Whitespace@49..50 " "
       RightArrow@50..52 "->"
       Whitespace@52..53 " "
       TypeIdentifier@53..59
-        Ident@53..59 "String"
+        Path@53..59
+          Ident@53..59 "String"
 error at position 15 while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context. Missing expected identifier

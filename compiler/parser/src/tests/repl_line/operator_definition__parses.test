@@ -13,8 +13,9 @@ SourceFile@0..103
     Whitespace@13..14 " "
     LambdaType@14..37
       TypeIdentifier@14..17
-        Ident@14..16 "t1"
-        Whitespace@16..17 " "
+        Path@14..17
+          Ident@14..16 "t1"
+          Whitespace@16..17 " "
       RightArrow@17..19 "->"
       Whitespace@19..20 " "
       LambdaType@20..37
@@ -22,53 +23,59 @@ SourceFile@0..103
           LParen@20..21 "("
           LambdaType@21..29
             TypeIdentifier@21..24
-              Ident@21..23 "t1"
-              Whitespace@23..24 " "
+              Path@21..24
+                Ident@21..23 "t1"
+                Whitespace@23..24 " "
             RightArrow@24..26 "->"
             Whitespace@26..27 " "
             TypeIdentifier@27..29
-              Ident@27..29 "t2"
+              Path@27..29
+                Ident@27..29 "t2"
           RParen@29..30 ")"
           Whitespace@30..31 " "
         RightArrow@31..33 "->"
         Whitespace@33..34 " "
         TypeIdentifier@34..37
-          Ident@34..36 "t2"
-          Whitespace@36..37 " "
+          Path@34..37
+            Ident@34..36 "t2"
+            Whitespace@36..37 " "
     WhereKw@37..42 "where"
     Whitespace@42..47 "\n    "
-    TypeVariable@47..62
+    NamedTypeVariable@47..62
       TypevarKw@47..54 "typevar"
       Whitespace@54..55 " "
       Ident@55..57 "t1"
       Whitespace@57..62 "\n    "
-    TypeVariable@62..73
+    NamedTypeVariable@62..73
       TypevarKw@62..69 "typevar"
       Whitespace@69..70 " "
       Ident@70..72 "t2"
       Whitespace@72..73 "\n"
-  VariableDef@73..103
+  ValueDef@73..103
     LetKw@73..76 "let"
     Whitespace@76..77 " "
     OpIdent@77..81 "(|>)"
     Whitespace@81..82 " "
     Equals@82..83 "="
     Whitespace@83..84 " "
-    LambdaExprDef@84..103
+    LambdaExpr@84..103
       LambdaExprArgList@84..91
         Pipe@84..85 "|"
         LambdaExprArg@85..86
           VariableRef@85..86
-            Ident@85..86 "x"
+            Path@85..86
+              Ident@85..86 "x"
         Comma@86..87 ","
         Whitespace@87..88 " "
         LambdaExprArg@88..89
           VariableRef@88..89
-            Ident@88..89 "f"
+            Path@88..89
+              Ident@88..89 "f"
         Pipe@89..90 "|"
         Whitespace@90..91 " "
       RightArrow@91..93 "->"
       Whitespace@93..94 " "
       LambdaExprBody@94..103
         VariableRef@94..103
-          Ident@94..103 "fakeStuff"
+          Path@94..103
+            Ident@94..103 "fakeStuff"

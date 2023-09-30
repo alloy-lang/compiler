@@ -8,7 +8,7 @@ SourceFile@0..35
     Whitespace@5..6 " "
     Ident@6..16 "TestTrait1"
     Whitespace@16..21 "\n    "
-    TypeVariable@21..32
+    NamedTypeVariable@21..32
       TypevarKw@21..28 "typevar"
       Whitespace@28..29 " "
       Ident@29..31 "t1"

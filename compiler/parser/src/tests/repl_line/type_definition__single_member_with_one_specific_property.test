@@ -1,16 +1,17 @@
 typedef Test = Thing Int
 ===
 SourceFile@0..24
-  TypeDef@0..24
+  TypeDefinition@0..24
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
     Ident@8..12 "Test"
     Whitespace@12..13 " "
     Equals@13..14 "="
     Whitespace@14..15 " "
-    TypeDefMember@15..24
+    TypeDefinitionMember@15..24
       Ident@15..20 "Thing"
       Whitespace@20..21 " "
-      TypeDefMemberProperty@21..24
+      TypeDefinitionMemberProperty@21..24
         TypeIdentifier@21..24
-          Ident@21..24 "Int"
+          Path@21..24
+            Ident@21..24 "Int"

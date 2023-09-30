@@ -10,7 +10,7 @@ SourceFile@0..43
     Whitespace@16..17 " "
     WhereKw@17..22 "where"
     Whitespace@22..27 "\n    "
-    TypeVariable@27..40
+    NamedTypeVariable@27..40
       TypevarKw@27..34 "typevar"
       Whitespace@34..35 " "
       Ident@35..37 "t1"

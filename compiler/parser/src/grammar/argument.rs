@@ -44,21 +44,12 @@ pub(crate) fn parse_argument(
 }
 
 fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
-    let m = p.start();
-    p.bump(TokenKind::Ident);
-
-    let cm = if !(p.maybe_at(TokenKind::DoubleColon)) {
-        m.complete(p, SyntaxKind::VariableRef)
-    } else {
-        m.cancel(p);
-
-        path::parse_path(
-            p,
-            ParseErrorContext::VariableRef,
-            ts![],
-            SyntaxKind::VariableRef,
-        )
-    };
+    let cm = path::parse_path(
+        p,
+        ParseErrorContext::VariableRef,
+        ts![],
+        SyntaxKind::VariableRef,
+    );
 
     maybe_parse_typedef_destructuring(p, cm)
 }

@@ -11,7 +11,7 @@ SourceFile@0..57
     Whitespace@16..17 " "
     WhereKw@17..22 "where"
     Whitespace@22..27 "\n    "
-    TypeVariable@27..43
+    SelfTypeVariable@27..43
       SelfKw@27..31 "self"
       Whitespace@31..32 " "
       Equals@32..33 "="
@@ -22,7 +22,7 @@ SourceFile@0..57
         NilIdentifier@36..37 "_"
         RBracket@37..38 "]"
         Whitespace@38..43 "\n    "
-    TypeVariable@43..54
+    NamedTypeVariable@43..54
       TypevarKw@43..50 "typevar"
       Whitespace@50..51 " "
       Ident@51..53 "t1"

@@ -4,7 +4,7 @@ typedef Test1 =
   | Thing3 String Int
 ===
 SourceFile@0..70
-  TypeDef@0..70
+  TypeDefinition@0..70
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
     Ident@8..13 "Test1"
@@ -13,37 +13,40 @@ SourceFile@0..70
     Whitespace@15..18 "\n  "
     Pipe@18..19 "|"
     Whitespace@19..20 " "
-    TypeDefMember@20..35
+    TypeDefinitionMember@20..35
       Ident@20..26 "Thing1"
       Whitespace@26..27 " "
-      TypeDefMemberProperty@27..29
+      TypeDefinitionMemberProperty@27..29
         Error@27..29
           Integer@27..28 "0"
           Whitespace@28..29 " "
-      TypeDefMemberProperty@29..35
+      TypeDefinitionMemberProperty@29..35
         TypeIdentifier@29..35
-          Ident@29..32 "Int"
-          Whitespace@32..35 "\n  "
+          Path@29..35
+            Ident@29..32 "Int"
+            Whitespace@32..35 "\n  "
     Pipe@35..36 "|"
     Whitespace@36..37 " "
-    TypeDefMember@37..51
+    TypeDefinitionMember@37..51
       Ident@37..43 "Thing2"
       Whitespace@43..44 " "
-      TypeDefMemberProperty@44..51
+      TypeDefinitionMemberProperty@44..51
         Error@44..51
           String@44..48 "\"hi\""
           Whitespace@48..51 "\n  "
     Pipe@51..52 "|"
     Whitespace@52..53 " "
-    TypeDefMember@53..70
+    TypeDefinitionMember@53..70
       Ident@53..59 "Thing3"
       Whitespace@59..60 " "
-      TypeDefMemberProperty@60..67
+      TypeDefinitionMemberProperty@60..67
         TypeIdentifier@60..67
-          Ident@60..66 "String"
-          Whitespace@66..67 " "
-      TypeDefMemberProperty@67..70
+          Path@60..67
+            Ident@60..66 "String"
+            Whitespace@66..67 " "
+      TypeDefinitionMemberProperty@67..70
         TypeIdentifier@67..70
-          Ident@67..70 "Int"
+          Path@67..70
+            Ident@67..70 "Int"
 error in range 27..28 while parsing the type of a type definition member. Found integer, but expected identifier or ‘(’
 error in range 44..48 while parsing the type of a type definition member. Found string, but expected identifier or ‘(’

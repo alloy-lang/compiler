@@ -87,7 +87,7 @@ fn parse_behavior_member(p: &mut Parser) -> BehaviorMemberParseResult {
         );
         BehaviorMemberParseResult::BehaviorMember(cm)
     } else if p.at(TokenKind::LetKw) {
-        let cm = variable_def::parse_variable_def(p);
+        let cm = value::parse_value(p);
         BehaviorMemberParseResult::BehaviorMember(cm)
     } else if p.at(TokenKind::TypevarKw) {
         let cm = parse_behavior_type_variable(p);
@@ -124,5 +124,5 @@ fn parse_behavior_type_variable(p: &mut Parser) -> CompletedMarker {
         type_variable::parse_typevar_constraints_with_kind(p);
     }
 
-    m.complete(p, SyntaxKind::TypeVariable)
+    m.complete(p, SyntaxKind::NamedTypeVariable)
 }

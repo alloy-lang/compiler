@@ -1,12 +1,12 @@
 typedef Test = Empty
 ===
 SourceFile@0..20
-  TypeDef@0..20
+  TypeDefinition@0..20
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
     Ident@8..12 "Test"
     Whitespace@12..13 " "
     Equals@13..14 "="
     Whitespace@14..15 " "
-    TypeDefMember@15..20
+    TypeDefinitionMember@15..20
       Ident@15..20 "Empty"

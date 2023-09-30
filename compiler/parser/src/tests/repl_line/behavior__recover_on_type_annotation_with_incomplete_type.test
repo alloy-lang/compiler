@@ -9,14 +9,16 @@ SourceFile@0..97
     Whitespace@8..9 " "
     BehaviorTraitName@9..20
       TypeIdentifier@9..20
-        Ident@9..19 "TestTrait1"
-        Whitespace@19..20 " "
+        Path@9..20
+          Ident@9..19 "TestTrait1"
+          Whitespace@19..20 " "
     ForKw@20..23 "for"
     Whitespace@23..24 " "
     BehaviorTypeName@24..30
       TypeIdentifier@24..30
-        Ident@24..29 "Type1"
-        Whitespace@29..30 " "
+        Path@24..30
+          Ident@24..29 "Type1"
+          Whitespace@29..30 " "
     WhereKw@30..35 "where"
     Whitespace@35..40 "\n    "
     TypeAnnotation@40..57
@@ -39,13 +41,15 @@ SourceFile@0..97
         Whitespace@79..80 " "
         LambdaType@80..94
           TypeIdentifier@80..87
-            Ident@80..86 "String"
-            Whitespace@86..87 " "
+            Path@80..87
+              Ident@80..86 "String"
+              Whitespace@86..87 " "
           RightArrow@87..89 "->"
           Whitespace@89..90 " "
           TypeIdentifier@90..94
-            Ident@90..93 "Int"
-            Whitespace@93..94 "\n"
+            Path@90..94
+              Ident@90..93 "Int"
+              Whitespace@93..94 "\n"
     EndKw@94..97 "end"
 error at position 57 while parsing the colon after the name of a type. Missing expected ‘:’
 error at position 57 while parsing a type in a type annotation. Missing expected identifier, ‘self‘ or ‘(’
