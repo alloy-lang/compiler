@@ -1,8 +1,0 @@
-typedef Test = Thing Int
-===
-[
-    TypeDefinition(
-        TypeDefinition,
-    ),
-]
-[]
