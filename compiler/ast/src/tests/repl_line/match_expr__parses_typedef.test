@@ -20,10 +20,10 @@ match test when
                         "Left",
                     ),
                     properties: [
-                        Parenthesized(
+                        ParenthesizedType(
                             ParenthesizedType {
                                 inner: Some(
-                                    Identifier(
+                                    TypeIdentifier(
                                         TypeIdentifier {
                                             name: Some(
                                                 Path {
@@ -44,10 +44,10 @@ match test when
                         "Right",
                     ),
                     properties: [
-                        Parenthesized(
+                        ParenthesizedType(
                             ParenthesizedType {
                                 inner: Some(
-                                    Identifier(
+                                    TypeIdentifier(
                                         TypeIdentifier {
                                             name: Some(
                                                 Path {

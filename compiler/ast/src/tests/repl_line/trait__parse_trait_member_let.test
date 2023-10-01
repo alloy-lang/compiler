@@ -17,7 +17,7 @@ end
                             "test",
                         ),
                         type_: Some(
-                            Identifier(
+                            TypeIdentifier(
                                 TypeIdentifier {
                                     name: Some(
                                         Path {

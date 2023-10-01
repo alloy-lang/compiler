@@ -10,10 +10,10 @@ let (|>) = |x, f| -> fakeStuff
                 "(|>)",
             ),
             type_: Some(
-                Lambda(
+                LambdaType(
                     LambdaType {
                         arg_type: Some(
-                            Identifier(
+                            TypeIdentifier(
                                 TypeIdentifier {
                                     name: Some(
                                         Path {
@@ -26,16 +26,16 @@ let (|>) = |x, f| -> fakeStuff
                             ),
                         ),
                         return_type: Some(
-                            Lambda(
+                            LambdaType(
                                 LambdaType {
                                     arg_type: Some(
-                                        Parenthesized(
+                                        ParenthesizedType(
                                             ParenthesizedType {
                                                 inner: Some(
-                                                    Lambda(
+                                                    LambdaType(
                                                         LambdaType {
                                                             arg_type: Some(
-                                                                Identifier(
+                                                                TypeIdentifier(
                                                                     TypeIdentifier {
                                                                         name: Some(
                                                                             Path {
@@ -48,7 +48,7 @@ let (|>) = |x, f| -> fakeStuff
                                                                 ),
                                                             ),
                                                             return_type: Some(
-                                                                Identifier(
+                                                                TypeIdentifier(
                                                                     TypeIdentifier {
                                                                         name: Some(
                                                                             Path {
@@ -67,7 +67,7 @@ let (|>) = |x, f| -> fakeStuff
                                         ),
                                     ),
                                     return_type: Some(
-                                        Identifier(
+                                        TypeIdentifier(
                                             TypeIdentifier {
                                                 name: Some(
                                                     Path {

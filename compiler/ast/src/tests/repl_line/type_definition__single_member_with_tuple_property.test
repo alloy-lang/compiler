@@ -10,10 +10,10 @@ typedef Test = Thing (Int, String)
                         "Thing",
                     ),
                     properties: [
-                        Tuple(
+                        TupleType(
                             TupleType {
                                 members: [
-                                    Identifier(
+                                    TypeIdentifier(
                                         TypeIdentifier {
                                             name: Some(
                                                 Path {
@@ -24,7 +24,7 @@ typedef Test = Thing (Int, String)
                                             ),
                                         },
                                     ),
-                                    Identifier(
+                                    TypeIdentifier(
                                         TypeIdentifier {
                                             name: Some(
                                                 Path {

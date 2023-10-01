@@ -13,16 +13,16 @@ Some(
                         "testThing",
                     ),
                     type_: Some(
-                        Lambda(
+                        LambdaType(
                             LambdaType {
                                 arg_type: Some(
-                                    Parenthesized(
+                                    ParenthesizedType(
                                         ParenthesizedType {
                                             inner: Some(
-                                                Lambda(
+                                                LambdaType(
                                                     LambdaType {
                                                         arg_type: Some(
-                                                            Identifier(
+                                                            TypeIdentifier(
                                                                 TypeIdentifier {
                                                                     name: Some(
                                                                         Path {
@@ -35,7 +35,7 @@ Some(
                                                             ),
                                                         ),
                                                         return_type: Some(
-                                                            Identifier(
+                                                            TypeIdentifier(
                                                                 TypeIdentifier {
                                                                     name: Some(
                                                                         Path {
@@ -54,10 +54,10 @@ Some(
                                     ),
                                 ),
                                 return_type: Some(
-                                    Lambda(
+                                    LambdaType(
                                         LambdaType {
                                             arg_type: Some(
-                                                Identifier(
+                                                TypeIdentifier(
                                                     TypeIdentifier {
                                                         name: Some(
                                                             Path {
@@ -70,10 +70,10 @@ Some(
                                                 ),
                                             ),
                                             return_type: Some(
-                                                Lambda(
+                                                LambdaType(
                                                     LambdaType {
                                                         arg_type: Some(
-                                                            Identifier(
+                                                            TypeIdentifier(
                                                                 TypeIdentifier {
                                                                     name: Some(
                                                                         Path {
@@ -86,7 +86,7 @@ Some(
                                                             ),
                                                         ),
                                                         return_type: Some(
-                                                            Identifier(
+                                                            TypeIdentifier(
                                                                 TypeIdentifier {
                                                                     name: Some(
                                                                         Path {

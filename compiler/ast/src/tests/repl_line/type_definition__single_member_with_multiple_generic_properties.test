@@ -13,7 +13,7 @@ typedef Test[t1, t2] = Thing t1 t2
                         "Thing",
                     ),
                     properties: [
-                        Identifier(
+                        TypeIdentifier(
                             TypeIdentifier {
                                 name: Some(
                                     Path {
@@ -24,7 +24,7 @@ typedef Test[t1, t2] = Thing t1 t2
                                 ),
                             },
                         ),
-                        Identifier(
+                        TypeIdentifier(
                             TypeIdentifier {
                                 name: Some(
                                     Path {

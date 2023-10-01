@@ -1,39 +1,18 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-#[derive(Debug)]
-pub enum Type {
-    SelfRef,
-    NilRef,
-    Identifier(TypeIdentifier),
-    Lambda(LambdaType),
-    Tuple(TupleType),
-    Bounded(BoundedType),
-    Parenthesized(ParenthesizedType),
-}
+ast_union_node!(Type, kinds: [
+    SelfType,
+    NilIdentifier,
+    TypeIdentifier,
+    LambdaType,
+    TupleType,
+    BoundedType,
+    ParenthesizedType
+]);
 
-impl Type {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxElement) -> Option<Self> {
-        let result = match node.kind() {
-            SyntaxKind::SelfType => Self::SelfRef,
-            SyntaxKind::NilIdentifier => Self::NilRef,
-            SyntaxKind::TypeIdentifier => {
-                Self::Identifier(TypeIdentifier::cast(node.into_node()?)?)
-            }
-            SyntaxKind::LambdaType => Self::Lambda(LambdaType::cast(node.into_node()?)?),
-            SyntaxKind::TupleType => Self::Tuple(TupleType::cast(node.into_node()?)?),
-            SyntaxKind::BoundedType => Self::Bounded(BoundedType::cast(node.into_node()?)?),
-            SyntaxKind::ParenthesizedType => {
-                Self::Parenthesized(ParenthesizedType::cast(node.into_node()?)?)
-            }
-            _ => return None,
-        };
-
-        Some(result)
-    }
-}
-
+ast_node!(SelfType, fields: []);
+ast_token!(NilIdentifier, fields: []);
 ast_node!(TypeIdentifier, fields: [name]);
 
 impl TypeIdentifier {

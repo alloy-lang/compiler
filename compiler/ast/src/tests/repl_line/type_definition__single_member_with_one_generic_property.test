@@ -12,7 +12,7 @@ typedef Test[t] = Thing t
                         "Thing",
                     ),
                     properties: [
-                        Identifier(
+                        TypeIdentifier(
                             TypeIdentifier {
                                 name: Some(
                                     Path {

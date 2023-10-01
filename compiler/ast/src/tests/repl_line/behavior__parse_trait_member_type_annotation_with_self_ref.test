@@ -6,7 +6,7 @@ end
     BehaviorDef(
         BehaviorDef {
             trait_: Some(
-                Identifier(
+                TypeIdentifier(
                     TypeIdentifier {
                         name: Some(
                             Path {
@@ -19,7 +19,7 @@ end
                 ),
             ),
             type_: Some(
-                Identifier(
+                TypeIdentifier(
                     TypeIdentifier {
                         name: Some(
                             Path {
@@ -38,16 +38,18 @@ end
                             "test",
                         ),
                         type_: Some(
-                            Lambda(
+                            LambdaType(
                                 LambdaType {
                                     arg_type: Some(
-                                        SelfRef,
+                                        SelfType(
+                                            SelfType,
+                                        ),
                                     ),
                                     return_type: Some(
-                                        Lambda(
+                                        LambdaType(
                                             LambdaType {
                                                 arg_type: Some(
-                                                    Identifier(
+                                                    TypeIdentifier(
                                                         TypeIdentifier {
                                                             name: Some(
                                                                 Path {
@@ -60,7 +62,7 @@ end
                                                     ),
                                                 ),
                                                 return_type: Some(
-                                                    Identifier(
+                                                    TypeIdentifier(
                                                         TypeIdentifier {
                                                             name: Some(
                                                                 Path {
