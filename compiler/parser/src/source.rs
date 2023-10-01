@@ -21,13 +21,6 @@ impl<'t, 'input> Source<'t, 'input> {
         Some(token)
     }
 
-    pub(crate) fn undo_token(&mut self) -> Option<&'t Token<'input>> {
-        let token = self.tokens.get(self.cursor - 1)?;
-        self.cursor -= 1;
-
-        Some(token)
-    }
-
     pub(crate) fn peek_nth_kind(&mut self, skip: usize) -> Option<TokenKind> {
         self.peek_kind_raw(skip)
     }
