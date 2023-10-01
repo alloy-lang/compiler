@@ -78,7 +78,7 @@ pub enum SyntaxKind {
     ParenExpr,
     TupleExpr,
     TupleExprArg,
-    PrefixExpr,
+    UnaryExpr,
     ValueDef,
     VariableRef,
     LambdaExpr,

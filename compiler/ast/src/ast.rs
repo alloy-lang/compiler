@@ -2,6 +2,34 @@ use alloy_syntax::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken};
 use std::fmt;
 use text_size::TextRange;
 
+macro_rules! ast_token {
+    ($kind:ident, fields: [$($field:ident),*]) => {
+        pub struct $kind(SyntaxToken);
+
+        impl AstToken for $kind {
+            fn cast(node: SyntaxToken) -> Option<Self> {
+                if node.kind() == SyntaxKind::$kind {
+                    Some(Self(node))
+                } else {
+                    None
+                }
+            }
+
+            fn syntax(&self) -> SyntaxToken {
+                self.0.clone()
+            }
+        }
+
+        impl fmt::Debug for $kind {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                f.debug_struct(stringify!($kind))
+                    $( .field(stringify!($field), &self.$field()) )*
+                    .finish()
+            }
+        }
+    };
+}
+
 macro_rules! ast_node {
     ($kind:ident, fields: [$($field:ident),*]) => {
         pub struct $kind(SyntaxNode);
@@ -131,12 +159,25 @@ pub(crate) trait AstNode: Sized {
     }
 }
 
+pub(crate) trait AstToken: Sized {
+    fn cast(node: SyntaxToken) -> Option<Self>;
+
+    fn syntax(&self) -> SyntaxToken;
+
+    fn text(&self) -> String {
+        self.syntax().text().to_string()
+    }
+
+    fn span(&self) -> TextRange {
+        self.syntax().text_range()
+    }
+}
+
 fn first_ident(node: &impl AstNode) -> Option<String> {
     node.syntax()
         .children_with_tokens()
         .filter_map(SyntaxElement::into_token)
-        // .find(|token| token.kind() == SyntaxKind::Ident)
-        .find(|node| matches!(node.kind(), SyntaxKind::Ident | SyntaxKind::OpIdent))
+        .find(|token| matches!(token.kind(), SyntaxKind::Ident | SyntaxKind::OpIdent))
         .map(|token| token.text().into())
 }
 

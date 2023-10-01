@@ -335,7 +335,7 @@ fn parse_prefix_expr(p: &mut Parser) -> CompletedMarker {
         ParseErrorContext::PrefixExprExpr,
     );
 
-    m.complete(p, SyntaxKind::PrefixExpr)
+    m.complete(p, SyntaxKind::UnaryExpr)
 }
 
 fn parse_paren_expr(p: &mut Parser) -> CompletedMarker {

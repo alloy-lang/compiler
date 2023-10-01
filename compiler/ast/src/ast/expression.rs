@@ -12,7 +12,7 @@ ast_union_node!(Expression, kinds: [
     IfThenElseExpr,
     ParenExpr,
     TupleExpr,
-    PrefixExpr,
+    UnaryExpr,
     LambdaExpr,
     FunctionCall,
     MatchExpr
@@ -116,9 +116,9 @@ impl TupleExpr {
     }
 }
 
-ast_node!(PrefixExpr, fields: [expr, op]);
+ast_node!(UnaryExpr, fields: [expr, op]);
 
-impl PrefixExpr {
+impl UnaryExpr {
     #[must_use]
     pub fn expr(&self) -> Option<Expression> {
         first_child(self)

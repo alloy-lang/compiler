@@ -2,8 +2,8 @@
 ===
 [
     Expression(
-        PrefixExpr(
-            PrefixExpr {
+        UnaryExpr(
+            UnaryExpr {
                 expr: Some(
                     IntLiteral(
                         IntLiteral {
