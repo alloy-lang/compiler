@@ -7,7 +7,9 @@
                 args: [
                     StringLiteral(
                         StringLiteral {
-                            value: "hello",
+                            value: Some(
+                                "hello",
+                            ),
                         },
                     ),
                 ],

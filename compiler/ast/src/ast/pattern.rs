@@ -70,15 +70,10 @@ ast_node!(StringLiteral, fields: [value]);
 
 impl StringLiteral {
     #[must_use]
-    pub fn value(&self) -> String {
-        let string = self
-            .0
-            .first_token()
-            .expect("first_token will always exist")
-            .text()
-            .to_string();
+    pub fn value(&self) -> Option<String> {
+        let string = self.0.first_token()?.text().to_string();
 
-        string[1..string.len() - 1].to_string()
+        Some(string[1..string.len() - 1].to_string())
     }
 }
 
