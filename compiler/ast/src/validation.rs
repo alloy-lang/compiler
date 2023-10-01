@@ -4,7 +4,7 @@ use text_size::TextRange;
 
 use alloy_syntax::SyntaxNode;
 
-use crate::ast::{AstNode, CharLiteral, IntLiteral};
+use crate::ast::{AstElement, CharLiteral, IntLiteral};
 
 #[derive(Debug, PartialEq)]
 pub struct ValidationError {

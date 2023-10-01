@@ -4,6 +4,7 @@ use super::*;
 ast_node!(ModuleDef, fields: [definitions]);
 
 impl ModuleDef {
+    #[must_use]
     pub fn definitions(&self) -> Vec<ModuleDefinition> {
         children(self)
     }

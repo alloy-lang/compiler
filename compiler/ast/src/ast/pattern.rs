@@ -3,52 +3,22 @@ use super::*;
 
 use ordered_float::NotNan;
 
-#[derive(Debug)]
-pub enum Pattern {
-    IntLiteral(IntLiteral),
-    FractionLiteral(FractionLiteral),
-    StringLiteral(StringLiteral),
-    CharLiteral(CharLiteral),
-    VariableRef(VariableRef),
-    NilIdentifier(NilIdentifier),
-    Destructor(Destructor),
-}
-
-impl Pattern {
-    #[must_use]
-    pub(crate) fn cast(node: SyntaxElement) -> Option<Self> {
-        let result = match node.kind() {
-            SyntaxKind::IntLiteral => Self::IntLiteral(IntLiteral::cast(node.into_node()?)?),
-            SyntaxKind::FractionLiteral => {
-                Self::FractionLiteral(FractionLiteral::cast(node.into_node()?)?)
-            }
-            SyntaxKind::StringLiteral => {
-                Self::StringLiteral(StringLiteral::cast(node.into_node()?)?)
-            }
-            SyntaxKind::CharLiteral => Self::CharLiteral(CharLiteral::cast(node.into_node()?)?),
-            SyntaxKind::VariableRef => Self::VariableRef(VariableRef::cast(node.into_node()?)?),
-            SyntaxKind::NilIdentifier => {
-                Self::NilIdentifier(NilIdentifier::cast(node.into_token()?)?)
-            }
-            SyntaxKind::Destructor => Self::Destructor(Destructor::cast(node.into_node()?)?),
-            _ => return None,
-        };
-
-        Some(result)
-    }
-}
+ast_union_node!(Pattern, kinds: [
+    IntLiteral,
+    FractionLiteral,
+    StringLiteral,
+    CharLiteral,
+    VariableRef,
+    NilIdentifier,
+    Destructor
+]);
 
 ast_node!(IntLiteral, fields: [value]);
 
 impl IntLiteral {
     #[must_use]
     pub fn value(&self) -> Option<u64> {
-        self.0
-            .first_token()
-            .expect("first_token will always exist")
-            .text()
-            .parse()
-            .ok()
+        self.0.first_token()?.text().parse().ok()
     }
 }
 
@@ -57,12 +27,7 @@ ast_node!(FractionLiteral, fields: [value]);
 impl FractionLiteral {
     #[must_use]
     pub fn value(&self) -> Option<NotNan<f64>> {
-        self.0
-            .first_token()
-            .expect("first_token will always exist")
-            .text()
-            .parse()
-            .ok()
+        self.0.first_token()?.text().parse().ok()
     }
 }
 
@@ -106,14 +71,11 @@ ast_node!(Destructor, fields: [target, args]);
 impl Destructor {
     #[must_use]
     pub fn target(&self) -> Option<VariableRef> {
-        match_node(self, SyntaxKind::DestructorTarget)?
-            .children()
-            .find_map(VariableRef::cast)
+        first_matching_child(self, SyntaxKind::DestructorTarget)
     }
 
+    #[must_use]
     pub fn args(&self) -> Vec<Pattern> {
-        match_nodes(self, SyntaxKind::DestructorArg)
-            .filter_map(|n| n.children_with_tokens().find_map(Pattern::cast))
-            .collect()
+        all_matching_children(self, SyntaxKind::DestructorArg).collect()
     }
 }

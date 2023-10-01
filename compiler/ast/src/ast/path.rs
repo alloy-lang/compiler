@@ -4,6 +4,7 @@ use super::*;
 ast_node!(Path, fields: [segments]);
 
 impl Path {
+    #[must_use]
     pub fn segments(&self) -> Vec<String> {
         self.0
             .children_with_tokens()

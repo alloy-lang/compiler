@@ -6,17 +6,18 @@ macro_rules! ast_token {
     ($kind:ident, fields: [$($field:ident),*]) => {
         pub struct $kind(SyntaxToken);
 
-        impl AstToken for $kind {
-            fn cast(node: SyntaxToken) -> Option<Self> {
-                if node.kind() == SyntaxKind::$kind {
-                    Some(Self(node))
+        impl AstElement for $kind {
+            fn cast<E: Into<SyntaxElement>>(element: E) -> Option<Self> {
+                let element = element.into();
+                if element.kind() == SyntaxKind::$kind {
+                    Some(Self(element.into_token()?))
                 } else {
                     None
                 }
             }
 
-            fn syntax(&self) -> SyntaxToken {
-                self.0.clone()
+            fn syntax(&self) -> SyntaxElement {
+                self.0.clone().into()
             }
         }
 
@@ -34,17 +35,18 @@ macro_rules! ast_node {
     ($kind:ident, fields: [$($field:ident),*]) => {
         pub struct $kind(SyntaxNode);
 
-        impl AstNode for $kind {
-            fn cast(node: SyntaxNode) -> Option<Self> {
-                if node.kind() == SyntaxKind::$kind {
-                    Some(Self(node))
+        impl AstElement for $kind {
+            fn cast<E: Into<SyntaxElement>>(element: E) -> Option<Self> {
+                let element = element.into();
+                if element.kind() == SyntaxKind::$kind {
+                    Some(Self(element.into_node()?))
                 } else {
                     None
                 }
             }
 
-            fn syntax(&self) -> SyntaxNode {
-                self.0.clone()
+            fn syntax(&self) -> SyntaxElement {
+                self.0.clone().into()
             }
         }
 
@@ -65,15 +67,16 @@ macro_rules! ast_union_node {
 			$( $kind($kind), )+
 		}
 
-		impl AstNode for $name {
-			fn cast(node: SyntaxNode) -> Option<Self> {
-				match node.kind() {
-					$( SyntaxKind::$kind => Some(Self::$kind($kind::cast(node)?)), )+
+		impl AstElement for $name {
+			fn cast<E: Into<SyntaxElement>>(element: E) -> Option<Self> {
+                let element = element.into();
+				match element.kind() {
+					$( SyntaxKind::$kind => Some(Self::$kind($kind::cast(element)?)), )+
 					_ => None
 				}
 			}
 
-			fn syntax(&self) -> SyntaxNode {
+			fn syntax(&self) -> SyntaxElement {
 				match self {
 					$( Self::$kind(s) => s.syntax(), )+
 				}
@@ -88,15 +91,16 @@ macro_rules! ast_union_node {
 			$( $kind($kind), )+
 		}
 
-		impl AstNode for $name {
-			fn cast(node: SyntaxNode) -> Option<Self> {
-				match node.kind() {
-					$( SyntaxKind::$kind => Some(Self::$kind($kind::cast(node)?)), )+
-					_ => Some(Self::$else($else::cast(node)?)),
+		impl AstElement for $name {
+			fn cast<E: Into<SyntaxElement>>(element: E) -> Option<Self> {
+                let element = element.into();
+				match element.kind() {
+					$( SyntaxKind::$kind => Some(Self::$kind($kind::cast(element)?)), )+
+					_ => Some(Self::$else($else::cast(element)?)),
 				}
 			}
 
-			fn syntax(&self) -> SyntaxNode {
+			fn syntax(&self) -> SyntaxElement {
 				match self {
 					   Self::$else(s) => s.syntax(),
 					$( Self::$kind(s) => s.syntax(), )+
@@ -145,13 +149,16 @@ mod type_variable;
 pub use path::*;
 mod path;
 
-pub(crate) trait AstNode: Sized {
-    fn cast(node: SyntaxNode) -> Option<Self>;
+pub(crate) trait AstElement: Sized {
+    fn cast<E: Into<SyntaxElement>>(element: E) -> Option<Self>;
 
-    fn syntax(&self) -> SyntaxNode;
+    fn syntax(&self) -> SyntaxElement;
 
     fn text(&self) -> String {
-        self.syntax().text().to_string()
+        match self.syntax() {
+            SyntaxElement::Node(n) => n.text().to_string(),
+            SyntaxElement::Token(t) => t.text().to_string(),
+        }
     }
 
     fn span(&self) -> TextRange {
@@ -159,46 +166,59 @@ pub(crate) trait AstNode: Sized {
     }
 }
 
-pub(crate) trait AstToken: Sized {
-    fn cast(node: SyntaxToken) -> Option<Self>;
-
-    fn syntax(&self) -> SyntaxToken;
-
-    fn text(&self) -> String {
-        self.syntax().text().to_string()
-    }
-
-    fn span(&self) -> TextRange {
-        self.syntax().text_range()
-    }
-}
-
-fn first_ident(node: &impl AstNode) -> Option<String> {
+fn first_ident(node: &impl AstElement) -> Option<String> {
     node.syntax()
+        .into_node()?
         .children_with_tokens()
         .filter_map(SyntaxElement::into_token)
         .find(|token| matches!(token.kind(), SyntaxKind::Ident | SyntaxKind::OpIdent))
         .map(|token| token.text().into())
 }
 
-fn first_child<Parent: AstNode, Child: AstNode>(parent: &Parent) -> Option<Child> {
-    parent.syntax().children().find_map(Child::cast)
-}
-
-fn children<Parent: AstNode, Child: AstNode>(parent: &Parent) -> Vec<Child> {
-    parent.syntax().children().filter_map(Child::cast).collect()
-}
-
-fn match_node<Parent: AstNode>(parent: &Parent, st: SyntaxKind) -> Option<SyntaxNode> {
-    parent.syntax().children().find(|node| node.kind() == st)
-}
-
-fn match_nodes<Parent: AstNode>(
-    parent: &Parent,
-    st: SyntaxKind,
-) -> impl Iterator<Item = SyntaxNode> {
+fn first_child<Parent: AstElement, Child: AstElement>(parent: &Parent) -> Option<Child> {
     parent
         .syntax()
+        .into_node()?
+        .children_with_tokens()
+        .find_map(Child::cast)
+}
+
+fn first_matching_child<Parent: AstElement, Child: AstElement>(
+    parent: &Parent,
+    st: SyntaxKind,
+) -> Option<Child> {
+    parent
+        .syntax()
+        .into_node()?
         .children()
+        .find(|node| node.kind() == st)?
+        .children_with_tokens()
+        .find_map(Child::cast)
+}
+
+fn children<Parent: AstElement, Child: AstElement>(parent: &Parent) -> Vec<Child> {
+    let node = parent.syntax().into_node();
+
+    let Some(node) = node else { return Vec::new() };
+
+    node.children_with_tokens()
+        .filter_map(Child::cast)
+        .collect()
+}
+
+fn all_matching_children<Parent: AstElement, Child: AstElement>(
+    parent: &Parent,
+    st: SyntaxKind,
+) -> impl Iterator<Item = Child> {
+    let node = parent.syntax().into_node();
+
+    let Some(node) = node else {
+        return Vec::new().into_iter();
+    };
+
+    node.children()
         .filter(move |node| node.kind() == st)
+        .flat_map(|node| node.children_with_tokens().filter_map(Child::cast))
+        .collect::<Vec<_>>()
+        .into_iter()
 }

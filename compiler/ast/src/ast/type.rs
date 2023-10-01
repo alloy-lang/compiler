@@ -39,27 +39,23 @@ impl LambdaType {
 ast_node!(TupleType, fields: [members]);
 
 impl TupleType {
+    #[must_use]
     pub fn members(&self) -> Vec<Type> {
-        self.0
-            .children_with_tokens()
-            .filter_map(Type::cast)
-            .collect()
+        children(self)
     }
 }
 
 ast_node!(BoundedType, fields: [base, args]);
 
 impl BoundedType {
+    #[must_use]
     pub fn base(&self) -> Option<Type> {
-        match_node(self, SyntaxKind::BoundedTypeBase)?
-            .children_with_tokens()
-            .find_map(Type::cast)
+        first_matching_child(self, SyntaxKind::BoundedTypeBase)
     }
 
+    #[must_use]
     pub fn args(&self) -> Vec<Type> {
-        match_nodes(self, SyntaxKind::BoundedTypeArg)
-            .flat_map(|node| node.children_with_tokens().filter_map(Type::cast))
-            .collect()
+        all_matching_children(self, SyntaxKind::BoundedTypeArg).collect()
     }
 }
 

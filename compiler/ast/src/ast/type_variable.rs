@@ -4,6 +4,7 @@ use super::*;
 ast_node!(NamedTypeVariable, fields: [name, constraints]);
 
 impl NamedTypeVariable {
+    #[must_use]
     pub fn name(&self) -> Option<String> {
         first_ident(self)
     }
@@ -28,6 +29,7 @@ ast_union_node!(TypeVariableConstraint, kinds: [TypeVariableKindConstraint, Type
 ast_node!(TypeVariableKindConstraint, fields: [arity]);
 
 impl TypeVariableKindConstraint {
+    #[must_use]
     pub fn arity(&self) -> usize {
         self.0
             .children_with_tokens()
@@ -39,6 +41,7 @@ impl TypeVariableKindConstraint {
 ast_node!(TypeVariableTraitConstraint, fields: [trait_]);
 
 impl TypeVariableTraitConstraint {
+    #[must_use]
     pub fn trait_(&self) -> Option<Path> {
         first_child(self)
     }

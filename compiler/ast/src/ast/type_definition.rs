@@ -3,16 +3,17 @@ use super::*;
 
 ast_node!(TypeDefinition, fields: [type_args, types]);
 
+ast_token!(Ident, fields: [text]);
+
 impl TypeDefinition {
+    #[must_use]
     pub fn type_args(&self) -> Vec<String> {
-        match_nodes(self, SyntaxKind::BoundedTypeArg)
-            .flat_map(|node| node.children_with_tokens())
-            .filter_map(SyntaxElement::into_token)
-            .filter(|node| node.kind() == SyntaxKind::Ident)
-            .map(|token| token.text().into())
+        all_matching_children(self, SyntaxKind::BoundedTypeArg)
+            .map(|token: Ident| token.text())
             .collect()
     }
 
+    #[must_use]
     pub fn types(&self) -> Vec<TypeDefinitionMember> {
         children(self)
     }
@@ -21,14 +22,13 @@ impl TypeDefinition {
 ast_node!(TypeDefinitionMember, fields: [name, properties]);
 
 impl TypeDefinitionMember {
+    #[must_use]
     pub fn name(&self) -> Option<String> {
         first_ident(self)
     }
 
+    #[must_use]
     pub fn properties(&self) -> Vec<Type> {
-        match_nodes(self, SyntaxKind::TypeDefinitionMemberProperty)
-            .flat_map(|node| node.children_with_tokens())
-            .filter_map(Type::cast)
-            .collect()
+        all_matching_children(self, SyntaxKind::TypeDefinitionMemberProperty).collect()
     }
 }

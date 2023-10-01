@@ -9,6 +9,7 @@ impl ValueDef {
         first_ident(self)
     }
 
+    #[must_use]
     pub fn value(&self) -> Option<Expression> {
         first_child(self)
     }

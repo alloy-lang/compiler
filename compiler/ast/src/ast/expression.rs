@@ -59,6 +59,7 @@ impl BinaryOp {
         }
     }
 
+    #[must_use]
     pub fn name(&self) -> String {
         self.0.text().to_string()
     }
@@ -77,23 +78,17 @@ ast_node!(IfThenElseExpr, fields: [condition, then, else_]);
 impl IfThenElseExpr {
     #[must_use]
     pub fn condition(&self) -> Option<Expression> {
-        match_node(self, SyntaxKind::IfExpr)?
-            .children()
-            .find_map(Expression::cast)
+        first_matching_child(self, SyntaxKind::IfExpr)
     }
 
     #[must_use]
     pub fn then(&self) -> Option<Expression> {
-        match_node(self, SyntaxKind::ThenExpr)?
-            .children()
-            .find_map(Expression::cast)
+        first_matching_child(self, SyntaxKind::ThenExpr)
     }
 
     #[must_use]
     pub fn else_(&self) -> Option<Expression> {
-        match_node(self, SyntaxKind::ElseExpr)?
-            .children()
-            .find_map(Expression::cast)
+        first_matching_child(self, SyntaxKind::ElseExpr)
     }
 }
 
@@ -128,8 +123,7 @@ impl UnaryExpr {
     pub fn op(&self) -> Option<SyntaxToken> {
         self.0
             .children_with_tokens()
-            .filter_map(SyntaxElement::into_token)
-            .next()
+            .find_map(SyntaxElement::into_token)
     }
 }
 
@@ -138,51 +132,45 @@ ast_node!(LambdaExpr, fields: [args, body]);
 impl LambdaExpr {
     #[must_use]
     pub fn args(&self) -> Vec<Pattern> {
-        match_node(self, SyntaxKind::LambdaExprArgList)
-            .map(|parent| {
-                parent
-                    .children()
-                    .filter_map(LambdaExprArg::cast)
-                    .filter_map(|c| c.pattern())
-                    .collect()
-            })
-            .unwrap_or_default()
+        all_matching_children(self, SyntaxKind::LambdaExprArgList)
+            .filter_map(|arg: LambdaExprArg| arg.pattern())
+            .collect()
     }
 
     #[must_use]
     pub fn body(&self) -> Option<Expression> {
-        match_node(self, SyntaxKind::LambdaExprBody)?
-            .children()
-            .find_map(Expression::cast)
+        first_matching_child(self, SyntaxKind::LambdaExprBody)
     }
 }
 
 ast_node!(LambdaExprArg, fields: [pattern]);
 
 impl LambdaExprArg {
-    fn pattern(&self) -> Option<Pattern> {
-        self.0.children_with_tokens().find_map(Pattern::cast)
+    #[must_use]
+    pub fn pattern(&self) -> Option<Pattern> {
+        first_child(self)
     }
 }
 
 ast_node!(FunctionCall, fields: [target, args]);
 
 impl FunctionCall {
-    fn target(&self) -> Option<FunctionCallTarget> {
+    #[must_use]
+    pub fn target(&self) -> Option<FunctionCallTarget> {
         first_child(self)
     }
 
-    fn args(&self) -> Vec<FunctionCallArg> {
-        match_nodes(self, SyntaxKind::FunctionCallArgList)
-            .flat_map(|parent| parent.children().filter_map(FunctionCallArg::cast))
-            .collect()
+    #[must_use]
+    pub fn args(&self) -> Vec<FunctionCallArg> {
+        all_matching_children(self, SyntaxKind::FunctionCallArgList).collect()
     }
 }
 
 ast_node!(FunctionCallTarget, fields: [target]);
 
 impl FunctionCallTarget {
-    fn target(&self) -> Option<VariableRef> {
+    #[must_use]
+    pub fn target(&self) -> Option<VariableRef> {
         first_child(self)
     }
 }
@@ -190,7 +178,8 @@ impl FunctionCallTarget {
 ast_node!(FunctionCallArg, fields: [expression]);
 
 impl FunctionCallArg {
-    fn expression(&self) -> Option<Expression> {
+    #[must_use]
+    pub fn expression(&self) -> Option<Expression> {
         first_child(self)
     }
 }
@@ -198,12 +187,12 @@ impl FunctionCallArg {
 ast_node!(MatchExpr, fields: [condition, targets]);
 
 impl MatchExpr {
+    #[must_use]
     pub fn condition(&self) -> Option<Expression> {
-        match_node(self, SyntaxKind::MatchExprArg)?
-            .children()
-            .find_map(Expression::cast)
+        first_matching_child(self, SyntaxKind::MatchExprArg)
     }
 
+    #[must_use]
     pub fn targets(&self) -> Vec<MatchTarget> {
         children(self)
     }
@@ -212,15 +201,13 @@ impl MatchExpr {
 ast_node!(MatchTarget, fields: [condition, value]);
 
 impl MatchTarget {
+    #[must_use]
     pub fn condition(&self) -> Option<Pattern> {
-        match_node(self, SyntaxKind::MatchTargetCondition)?
-            .children_with_tokens()
-            .find_map(Pattern::cast)
+        first_matching_child(self, SyntaxKind::MatchTargetCondition)
     }
 
+    #[must_use]
     pub fn value(&self) -> Option<Expression> {
-        match_node(self, SyntaxKind::MatchTargetValue)?
-            .children()
-            .find_map(Expression::cast)
+        first_matching_child(self, SyntaxKind::MatchTargetValue)
     }
 }
