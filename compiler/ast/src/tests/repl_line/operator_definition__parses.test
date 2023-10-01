@@ -6,7 +6,9 @@ let (|>) = |x, f| -> fakeStuff
 [
     TypeAnnotation(
         TypeAnnotation {
-            name: None,
+            name: Some(
+                "(|>)",
+            ),
             type_: Some(
                 Lambda(
                     LambdaType {
@@ -87,7 +89,9 @@ let (|>) = |x, f| -> fakeStuff
     ),
     ValueDef(
         ValueDef {
-            name: None,
+            name: Some(
+                "(|>)",
+            ),
             value: Some(
                 LambdaExpr(
                     LambdaExpr {

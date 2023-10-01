@@ -3,15 +3,40 @@ use super::*;
 
 use ordered_float::NotNan;
 
-ast_union_node!(Pattern, kinds: [
-    IntLiteral,
-    FractionLiteral,
-    StringLiteral,
-    CharLiteral,
-    VariableRef,
-    NilIdentifier,
-    Destructor
-]);
+#[derive(Debug)]
+pub enum Pattern {
+    IntLiteral(IntLiteral),
+    FractionLiteral(FractionLiteral),
+    StringLiteral(StringLiteral),
+    CharLiteral(CharLiteral),
+    VariableRef(VariableRef),
+    NilIdentifier(NilIdentifier),
+    Destructor(Destructor),
+}
+
+impl Pattern {
+    #[must_use]
+    pub(crate) fn cast(node: SyntaxElement) -> Option<Self> {
+        let result = match node.kind() {
+            SyntaxKind::IntLiteral => Self::IntLiteral(IntLiteral::cast(node.into_node()?)?),
+            SyntaxKind::FractionLiteral => {
+                Self::FractionLiteral(FractionLiteral::cast(node.into_node()?)?)
+            }
+            SyntaxKind::StringLiteral => {
+                Self::StringLiteral(StringLiteral::cast(node.into_node()?)?)
+            }
+            SyntaxKind::CharLiteral => Self::CharLiteral(CharLiteral::cast(node.into_node()?)?),
+            SyntaxKind::VariableRef => Self::VariableRef(VariableRef::cast(node.into_node()?)?),
+            SyntaxKind::NilIdentifier => {
+                Self::NilIdentifier(NilIdentifier::cast(node.into_token()?)?)
+            }
+            SyntaxKind::Destructor => Self::Destructor(Destructor::cast(node.into_node()?)?),
+            _ => return None,
+        };
+
+        Some(result)
+    }
+}
 
 ast_node!(IntLiteral, fields: [value]);
 
@@ -79,30 +104,9 @@ impl VariableRef {
     }
 }
 
-ast_node!(NilIdentifier, fields: []);
+ast_token!(NilIdentifier, fields: []);
 
-pub struct Destructor(SyntaxNode);
-impl AstNode for Destructor {
-    fn cast(node: SyntaxNode) -> Option<Self> {
-        if node.kind() == SyntaxKind::Destructor {
-            Some(Self(node))
-        } else {
-            None
-        }
-    }
-
-    fn syntax(&self) -> SyntaxNode {
-        self.0.clone()
-    }
-}
-impl fmt::Debug for Destructor {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct(stringify!(Destructor))
-            .field(stringify!(target), &self.target())
-            .field(stringify!(args), &self.args())
-            .finish()
-    }
-}
+ast_node!(Destructor, fields: [target, args]);
 
 impl Destructor {
     #[must_use]
@@ -114,7 +118,7 @@ impl Destructor {
 
     pub fn args(&self) -> Vec<Pattern> {
         match_nodes(self, SyntaxKind::DestructorArg)
-            .filter_map(|n| n.children().find_map(Pattern::cast))
+            .filter_map(|n| n.children_with_tokens().find_map(Pattern::cast))
             .collect()
     }
 }

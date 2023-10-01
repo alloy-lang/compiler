@@ -161,7 +161,7 @@ ast_node!(LambdaExprArg, fields: [pattern]);
 
 impl LambdaExprArg {
     fn pattern(&self) -> Option<Pattern> {
-        first_child(self)
+        self.0.children_with_tokens().find_map(Pattern::cast)
     }
 }
 
@@ -214,7 +214,7 @@ ast_node!(MatchTarget, fields: [condition, value]);
 impl MatchTarget {
     pub fn condition(&self) -> Option<Pattern> {
         match_node(self, SyntaxKind::MatchTargetCondition)?
-            .children()
+            .children_with_tokens()
             .find_map(Pattern::cast)
     }
 

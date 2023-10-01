@@ -45,7 +45,11 @@ match test when
                         ),
                     },
                     MatchTarget {
-                        condition: None,
+                        condition: Some(
+                            NilIdentifier(
+                                NilIdentifier,
+                            ),
+                        ),
                         value: Some(
                             IntLiteral(
                                 IntLiteral {
