@@ -209,16 +209,15 @@ fn children<Parent: AstElement, Child: AstElement>(parent: &Parent) -> Vec<Child
 fn all_matching_children<Parent: AstElement, Child: AstElement>(
     parent: &Parent,
     st: SyntaxKind,
-) -> impl Iterator<Item = Child> {
+) -> Vec<Child> {
     let node = parent.syntax().into_node();
 
     let Some(node) = node else {
-        return Vec::new().into_iter();
+        return Vec::new();
     };
 
     node.children()
         .filter(move |node| node.kind() == st)
         .flat_map(|node| node.children_with_tokens().filter_map(Child::cast))
         .collect::<Vec<_>>()
-        .into_iter()
 }

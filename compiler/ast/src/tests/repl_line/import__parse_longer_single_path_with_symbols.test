@@ -1,4 +1,32 @@
 import std::function::(<|)
 ===
-[]
+[
+    ImportDef(
+        ImportDef {
+            children: [
+                ImportDefSegment(
+                    ImportDefSegment {
+                        name: Some(
+                            "std",
+                        ),
+                    },
+                ),
+                ImportDefSegment(
+                    ImportDefSegment {
+                        name: Some(
+                            "function",
+                        ),
+                    },
+                ),
+                ImportDefSegment(
+                    ImportDefSegment {
+                        name: Some(
+                            "(<|)",
+                        ),
+                    },
+                ),
+            ],
+        },
+    ),
+]
 []

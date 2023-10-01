@@ -118,39 +118,51 @@ Some(
                         LambdaExpr(
                             LambdaExpr {
                                 args: [
-                                    VariableRef(
-                                        VariableRef {
-                                            name: Some(
-                                                Path {
-                                                    segments: [
-                                                        "funky",
-                                                    ],
+                                    LambdaExprArg {
+                                        pattern: Some(
+                                            VariableRef(
+                                                VariableRef {
+                                                    name: Some(
+                                                        Path {
+                                                            segments: [
+                                                                "funky",
+                                                            ],
+                                                        },
+                                                    ),
                                                 },
                                             ),
-                                        },
-                                    ),
-                                    VariableRef(
-                                        VariableRef {
-                                            name: Some(
-                                                Path {
-                                                    segments: [
-                                                        "x",
-                                                    ],
+                                        ),
+                                    },
+                                    LambdaExprArg {
+                                        pattern: Some(
+                                            VariableRef(
+                                                VariableRef {
+                                                    name: Some(
+                                                        Path {
+                                                            segments: [
+                                                                "x",
+                                                            ],
+                                                        },
+                                                    ),
                                                 },
                                             ),
-                                        },
-                                    ),
-                                    VariableRef(
-                                        VariableRef {
-                                            name: Some(
-                                                Path {
-                                                    segments: [
-                                                        "y",
-                                                    ],
+                                        ),
+                                    },
+                                    LambdaExprArg {
+                                        pattern: Some(
+                                            VariableRef(
+                                                VariableRef {
+                                                    name: Some(
+                                                        Path {
+                                                            segments: [
+                                                                "y",
+                                                            ],
+                                                        },
+                                                    ),
                                                 },
                                             ),
-                                        },
-                                    ),
+                                        ),
+                                    },
                                 ],
                                 body: Some(
                                     InfixExpr(

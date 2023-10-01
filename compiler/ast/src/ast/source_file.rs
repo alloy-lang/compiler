@@ -15,4 +15,16 @@ impl SourceFile {
     }
 }
 
-ast_union_node!(Statement, kinds: [ModuleDef, TraitDef, BehaviorDef, TypeDefinition, TypeAnnotation, ValueDef], Expression);
+ast_union_node!(
+    Statement,
+    kinds: [
+        ModuleDef,
+        ImportDef,
+        TraitDef,
+        BehaviorDef,
+        TypeDefinition,
+        TypeAnnotation,
+        ValueDef
+    ],
+    Expression
+);
