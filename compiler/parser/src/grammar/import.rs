@@ -22,11 +22,9 @@ pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
 
         if p.at(TokenKind::LBrace) {
             parse_import_group(p);
-
-            break;
+        } else {
+            parse_import_segment(p, ParseErrorContext::ImportDefSegment);
         }
-
-        parse_import_segment(p, ParseErrorContext::ImportDefSegment);
     }
 
     return m.complete(p, SyntaxKind::ImportDef);

@@ -2,7 +2,7 @@ import std::{functor, option}::map
 import std::functor::Functor
 ===
 SourceFile@0..63
-  ImportDef@0..29
+  ImportDef@0..35
     ImportKw@0..6 "import"
     Whitespace@6..7 " "
     ImportDefSegment@7..10
@@ -17,10 +17,8 @@ SourceFile@0..63
       ImportDefSegment@22..28
         Ident@22..28 "option"
       RBrace@28..29 "}"
-  Error@29..31
     DoubleColon@29..31 "::"
-  VariableRef@31..35
-    Path@31..35
+    ImportDefSegment@31..35
       Ident@31..34 "map"
       Whitespace@34..35 "\n"
   ImportDef@35..63
@@ -34,4 +32,3 @@ SourceFile@0..63
     DoubleColon@54..56 "::"
     ImportDefSegment@56..63
       Ident@56..63 "Functor"
-error in range 29..31 while parsing a top level expression. Found ‘::’, but expected ‘module‘, ‘let’, ‘import‘, ‘trait‘, ‘behavior‘, ‘typedef‘, ‘typeof‘, integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
