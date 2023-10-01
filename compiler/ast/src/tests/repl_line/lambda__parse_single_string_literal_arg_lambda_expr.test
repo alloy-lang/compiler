@@ -5,13 +5,17 @@
         LambdaExpr(
             LambdaExpr {
                 args: [
-                    StringLiteral(
-                        StringLiteral {
-                            value: Some(
-                                "hello",
+                    LambdaExprArg {
+                        pattern: Some(
+                            StringLiteral(
+                                StringLiteral {
+                                    value: Some(
+                                        "hello",
+                                    ),
+                                },
                             ),
-                        },
-                    ),
+                        ),
+                    },
                 ],
                 body: Some(
                     IntLiteral(

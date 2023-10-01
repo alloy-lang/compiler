@@ -9,6 +9,7 @@ impl TypeDefinition {
     #[must_use]
     pub fn type_args(&self) -> Vec<String> {
         all_matching_children(self, SyntaxKind::BoundedTypeArg)
+            .into_iter()
             .map(|token: Ident| token.text())
             .collect()
     }
@@ -29,6 +30,6 @@ impl TypeDefinitionMember {
 
     #[must_use]
     pub fn properties(&self) -> Vec<Type> {
-        all_matching_children(self, SyntaxKind::TypeDefinitionMemberProperty).collect()
+        all_matching_children(self, SyntaxKind::TypeDefinitionMemberProperty)
     }
 }

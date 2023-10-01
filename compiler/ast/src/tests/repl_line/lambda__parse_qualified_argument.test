@@ -5,18 +5,22 @@
         LambdaExpr(
             LambdaExpr {
                 args: [
-                    VariableRef(
-                        VariableRef {
-                            name: Some(
-                                Path {
-                                    segments: [
-                                        "Option",
-                                        "None",
-                                    ],
+                    LambdaExprArg {
+                        pattern: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "Option",
+                                                "None",
+                                            ],
+                                        },
+                                    ),
                                 },
                             ),
-                        },
-                    ),
+                        ),
+                    },
                 ],
                 body: Some(
                     VariableRef(

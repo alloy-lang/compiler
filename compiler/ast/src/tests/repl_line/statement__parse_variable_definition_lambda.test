@@ -10,28 +10,36 @@ let add = |a, b| -> a + b
                 LambdaExpr(
                     LambdaExpr {
                         args: [
-                            VariableRef(
-                                VariableRef {
-                                    name: Some(
-                                        Path {
-                                            segments: [
-                                                "a",
-                                            ],
+                            LambdaExprArg {
+                                pattern: Some(
+                                    VariableRef(
+                                        VariableRef {
+                                            name: Some(
+                                                Path {
+                                                    segments: [
+                                                        "a",
+                                                    ],
+                                                },
+                                            ),
                                         },
                                     ),
-                                },
-                            ),
-                            VariableRef(
-                                VariableRef {
-                                    name: Some(
-                                        Path {
-                                            segments: [
-                                                "b",
-                                            ],
+                                ),
+                            },
+                            LambdaExprArg {
+                                pattern: Some(
+                                    VariableRef(
+                                        VariableRef {
+                                            name: Some(
+                                                Path {
+                                                    segments: [
+                                                        "b",
+                                                    ],
+                                                },
+                                            ),
                                         },
                                     ),
-                                },
-                            ),
+                                ),
+                            },
                         ],
                         body: Some(
                             InfixExpr(

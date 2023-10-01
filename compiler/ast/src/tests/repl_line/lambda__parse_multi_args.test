@@ -5,39 +5,51 @@
         LambdaExpr(
             LambdaExpr {
                 args: [
-                    VariableRef(
-                        VariableRef {
-                            name: Some(
-                                Path {
-                                    segments: [
-                                        "arg1",
-                                    ],
+                    LambdaExprArg {
+                        pattern: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "arg1",
+                                            ],
+                                        },
+                                    ),
                                 },
                             ),
-                        },
-                    ),
-                    VariableRef(
-                        VariableRef {
-                            name: Some(
-                                Path {
-                                    segments: [
-                                        "arg2",
-                                    ],
+                        ),
+                    },
+                    LambdaExprArg {
+                        pattern: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "arg2",
+                                            ],
+                                        },
+                                    ),
                                 },
                             ),
-                        },
-                    ),
-                    VariableRef(
-                        VariableRef {
-                            name: Some(
-                                Path {
-                                    segments: [
-                                        "arg3",
-                                    ],
+                        ),
+                    },
+                    LambdaExprArg {
+                        pattern: Some(
+                            VariableRef(
+                                VariableRef {
+                                    name: Some(
+                                        Path {
+                                            segments: [
+                                                "arg3",
+                                            ],
+                                        },
+                                    ),
                                 },
                             ),
-                        },
-                    ),
+                        ),
+                    },
                 ],
                 body: Some(
                     IntLiteral(

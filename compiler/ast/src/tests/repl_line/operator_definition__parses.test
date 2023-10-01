@@ -96,28 +96,36 @@ let (|>) = |x, f| -> fakeStuff
                 LambdaExpr(
                     LambdaExpr {
                         args: [
-                            VariableRef(
-                                VariableRef {
-                                    name: Some(
-                                        Path {
-                                            segments: [
-                                                "x",
-                                            ],
+                            LambdaExprArg {
+                                pattern: Some(
+                                    VariableRef(
+                                        VariableRef {
+                                            name: Some(
+                                                Path {
+                                                    segments: [
+                                                        "x",
+                                                    ],
+                                                },
+                                            ),
                                         },
                                     ),
-                                },
-                            ),
-                            VariableRef(
-                                VariableRef {
-                                    name: Some(
-                                        Path {
-                                            segments: [
-                                                "f",
-                                            ],
+                                ),
+                            },
+                            LambdaExprArg {
+                                pattern: Some(
+                                    VariableRef(
+                                        VariableRef {
+                                            name: Some(
+                                                Path {
+                                                    segments: [
+                                                        "f",
+                                                    ],
+                                                },
+                                            ),
                                         },
                                     ),
-                                },
-                            ),
+                                ),
+                            },
                         ],
                         body: Some(
                             VariableRef(

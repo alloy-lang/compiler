@@ -55,7 +55,7 @@ impl BoundedType {
 
     #[must_use]
     pub fn args(&self) -> Vec<Type> {
-        all_matching_children(self, SyntaxKind::BoundedTypeArg).collect()
+        all_matching_children(self, SyntaxKind::BoundedTypeArg)
     }
 }
 

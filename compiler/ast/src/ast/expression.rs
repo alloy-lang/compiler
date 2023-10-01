@@ -131,10 +131,8 @@ ast_node!(LambdaExpr, fields: [args, body]);
 
 impl LambdaExpr {
     #[must_use]
-    pub fn args(&self) -> Vec<Pattern> {
+    pub fn args(&self) -> Vec<LambdaExprArg> {
         all_matching_children(self, SyntaxKind::LambdaExprArgList)
-            .filter_map(|arg: LambdaExprArg| arg.pattern())
-            .collect()
     }
 
     #[must_use]
@@ -162,7 +160,7 @@ impl FunctionCall {
 
     #[must_use]
     pub fn args(&self) -> Vec<FunctionCallArg> {
-        all_matching_children(self, SyntaxKind::FunctionCallArgList).collect()
+        all_matching_children(self, SyntaxKind::FunctionCallArgList)
     }
 }
 

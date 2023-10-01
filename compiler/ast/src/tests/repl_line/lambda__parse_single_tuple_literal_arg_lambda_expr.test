@@ -4,7 +4,11 @@
     Expression(
         LambdaExpr(
             LambdaExpr {
-                args: [],
+                args: [
+                    LambdaExprArg {
+                        pattern: None,
+                    },
+                ],
                 body: Some(
                     IntLiteral(
                         IntLiteral {

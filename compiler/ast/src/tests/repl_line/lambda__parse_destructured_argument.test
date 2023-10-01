@@ -5,35 +5,39 @@
         LambdaExpr(
             LambdaExpr {
                 args: [
-                    Destructor(
-                        Destructor {
-                            target: Some(
-                                VariableRef {
-                                    name: Some(
-                                        Path {
-                                            segments: [
-                                                "Option",
-                                                "Some",
-                                            ],
+                    LambdaExprArg {
+                        pattern: Some(
+                            Destructor(
+                                Destructor {
+                                    target: Some(
+                                        VariableRef {
+                                            name: Some(
+                                                Path {
+                                                    segments: [
+                                                        "Option",
+                                                        "Some",
+                                                    ],
+                                                },
+                                            ),
                                         },
                                     ),
-                                },
-                            ),
-                            args: [
-                                VariableRef(
-                                    VariableRef {
-                                        name: Some(
-                                            Path {
-                                                segments: [
-                                                    "x",
-                                                ],
+                                    args: [
+                                        VariableRef(
+                                            VariableRef {
+                                                name: Some(
+                                                    Path {
+                                                        segments: [
+                                                            "x",
+                                                        ],
+                                                    },
+                                                ),
                                             },
                                         ),
-                                    },
-                                ),
-                            ],
-                        },
-                    ),
+                                    ],
+                                },
+                            ),
+                        ),
+                    },
                 ],
                 body: Some(
                     VariableRef(

@@ -76,6 +76,6 @@ impl Destructor {
 
     #[must_use]
     pub fn args(&self) -> Vec<Pattern> {
-        all_matching_children(self, SyntaxKind::DestructorArg).collect()
+        all_matching_children(self, SyntaxKind::DestructorArg)
     }
 }
