@@ -27,7 +27,9 @@ mod value;
 pub(crate) fn source_file(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
 
-    module::parse_module(p);
+    if p.at(TokenKind::ModuleKw) {
+        module::parse_module(p);
+    }
     assert!(p.at_eof());
 
     m.complete(p, SyntaxKind::SourceFile)
