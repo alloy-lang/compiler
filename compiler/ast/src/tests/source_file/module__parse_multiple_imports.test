@@ -4,76 +4,77 @@ module TestModule1 where
 ===
 Some(
     ModuleDef {
-        definitions: [
-            ImportDef(
-                ImportDef {
-                    children: [
-                        ImportDefSegment(
-                            ImportDefSegment {
-                                name: Some(
-                                    "really",
-                                ),
-                            },
-                        ),
-                        ImportDefSegment(
-                            ImportDefSegment {
-                                name: Some(
-                                    "really",
-                                ),
-                            },
-                        ),
-                        ImportDefSegment(
-                            ImportDefSegment {
-                                name: Some(
-                                    "real",
-                                ),
-                            },
-                        ),
-                        ImportDefSegment(
-                            ImportDefSegment {
-                                name: Some(
-                                    "Thing1",
-                                ),
-                            },
-                        ),
-                    ],
-                },
-            ),
-            ImportDef(
-                ImportDef {
-                    children: [
-                        ImportDefSegment(
-                            ImportDefSegment {
-                                name: Some(
-                                    "really",
-                                ),
-                            },
-                        ),
-                        ImportDefSegment(
-                            ImportDefSegment {
-                                name: Some(
-                                    "real",
-                                ),
-                            },
-                        ),
-                        ImportDefSegment(
-                            ImportDefSegment {
-                                name: Some(
-                                    "other",
-                                ),
-                            },
-                        ),
-                        ImportDefSegment(
-                            ImportDefSegment {
-                                name: Some(
-                                    "Thing2",
-                                ),
-                            },
-                        ),
-                    ],
-                },
-            ),
+        imports: [
+            ImportDef {
+                children: [
+                    ImportDefSegment(
+                        ImportDefSegment {
+                            name: Some(
+                                "really",
+                            ),
+                        },
+                    ),
+                    ImportDefSegment(
+                        ImportDefSegment {
+                            name: Some(
+                                "really",
+                            ),
+                        },
+                    ),
+                    ImportDefSegment(
+                        ImportDefSegment {
+                            name: Some(
+                                "real",
+                            ),
+                        },
+                    ),
+                    ImportDefSegment(
+                        ImportDefSegment {
+                            name: Some(
+                                "Thing1",
+                            ),
+                        },
+                    ),
+                ],
+            },
+            ImportDef {
+                children: [
+                    ImportDefSegment(
+                        ImportDefSegment {
+                            name: Some(
+                                "really",
+                            ),
+                        },
+                    ),
+                    ImportDefSegment(
+                        ImportDefSegment {
+                            name: Some(
+                                "real",
+                            ),
+                        },
+                    ),
+                    ImportDefSegment(
+                        ImportDefSegment {
+                            name: Some(
+                                "other",
+                            ),
+                        },
+                    ),
+                    ImportDefSegment(
+                        ImportDefSegment {
+                            name: Some(
+                                "Thing2",
+                            ),
+                        },
+                    ),
+                ],
+            },
         ],
+        traits: [],
+        behaviors: [],
+        type_definitions: [],
+        type_annotations: [],
+        values: [],
     },
 )
 []
