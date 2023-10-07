@@ -3,10 +3,9 @@ let a = 1
 ===
 SourceFile@0..22
   FunctionCall@0..13
-    FunctionCallTarget@0..5
-      VariableRef@0..5
-        Path@0..5
-          Ident@0..5 "funky"
+    VariableRef@0..5
+      Path@0..5
+        Ident@0..5 "funky"
     FunctionCallArgList@5..13
       LParen@5..6 "("
       FunctionCallArg@6..10

@@ -5,16 +5,12 @@ funky(x, y, z)
         FunctionCall(
             FunctionCall {
                 target: Some(
-                    FunctionCallTarget {
-                        target: Some(
-                            VariableRef {
-                                name: Some(
-                                    Path {
-                                        segments: [
-                                            "funky",
-                                        ],
-                                    },
-                                ),
+                    VariableRef {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    "funky",
+                                ],
                             },
                         ),
                     },

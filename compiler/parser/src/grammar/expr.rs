@@ -190,10 +190,9 @@ fn maybe_parse_function_call(p: &mut Parser, lhs: CompletedMarker) -> CompletedM
         return lhs;
     }
 
-    let cm = lhs.precede(p).complete(p, SyntaxKind::FunctionCallTarget);
     parse_function_call(p);
 
-    cm.precede(p).complete(p, SyntaxKind::FunctionCall)
+    lhs.precede(p).complete(p, SyntaxKind::FunctionCall)
 }
 
 fn parse_function_call(p: &mut Parser) -> CompletedMarker {

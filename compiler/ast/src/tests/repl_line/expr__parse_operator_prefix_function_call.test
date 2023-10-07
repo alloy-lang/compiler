@@ -5,16 +5,12 @@
         FunctionCall(
             FunctionCall {
                 target: Some(
-                    FunctionCallTarget {
-                        target: Some(
-                            VariableRef {
-                                name: Some(
-                                    Path {
-                                        segments: [
-                                            ">>",
-                                        ],
-                                    },
-                                ),
+                    VariableRef {
+                        name: Some(
+                            Path {
+                                segments: [
+                                    ">>",
+                                ],
                             },
                         ),
                     },

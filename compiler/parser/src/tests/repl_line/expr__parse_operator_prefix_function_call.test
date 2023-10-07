@@ -2,10 +2,9 @@
 ===
 SourceFile@0..16
   FunctionCall@0..16
-    FunctionCallTarget@0..2
-      VariableRef@0..2
-        Path@0..2
-          OpIdent@0..2 ">>"
+    VariableRef@0..2
+      Path@0..2
+        OpIdent@0..2 ">>"
     FunctionCallArgList@2..16
       LParen@2..3 "("
       FunctionCallArg@3..8

@@ -89,7 +89,6 @@ pub enum SyntaxKind {
     ImportDefSegment,
     ImportDefGroup,
     FunctionCall,
-    FunctionCallTarget,
     FunctionCallArgList,
     FunctionCallArg,
     Destructor,

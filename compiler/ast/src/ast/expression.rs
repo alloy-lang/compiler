@@ -154,22 +154,13 @@ ast_node!(FunctionCall, fields: [target, args]);
 
 impl FunctionCall {
     #[must_use]
-    pub fn target(&self) -> Option<FunctionCallTarget> {
+    pub fn target(&self) -> Option<VariableRef> {
         first_child(self)
     }
 
     #[must_use]
     pub fn args(&self) -> Vec<FunctionCallArg> {
         all_matching_children(self, SyntaxKind::FunctionCallArgList)
-    }
-}
-
-ast_node!(FunctionCallTarget, fields: [target]);
-
-impl FunctionCallTarget {
-    #[must_use]
-    pub fn target(&self) -> Option<VariableRef> {
-        first_child(self)
     }
 }
 
