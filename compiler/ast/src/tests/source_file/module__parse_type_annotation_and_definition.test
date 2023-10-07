@@ -191,72 +191,56 @@ Some(
                                                         FunctionCall(
                                                             FunctionCall {
                                                                 target: Some(
-                                                                    FunctionCallTarget {
-                                                                        target: Some(
-                                                                            VariableRef {
-                                                                                name: Some(
-                                                                                    Path {
-                                                                                        segments: [
-                                                                                            "funky",
-                                                                                        ],
-                                                                                    },
-                                                                                ),
+                                                                    VariableRef {
+                                                                        name: Some(
+                                                                            Path {
+                                                                                segments: [
+                                                                                    "funky",
+                                                                                ],
                                                                             },
                                                                         ),
                                                                     },
                                                                 ),
                                                                 args: [
-                                                                    FunctionCallArg {
-                                                                        expression: Some(
-                                                                            VariableRef(
-                                                                                VariableRef {
-                                                                                    name: Some(
-                                                                                        Path {
-                                                                                            segments: [
-                                                                                                "x",
-                                                                                            ],
-                                                                                        },
-                                                                                    ),
+                                                                    VariableRef(
+                                                                        VariableRef {
+                                                                            name: Some(
+                                                                                Path {
+                                                                                    segments: [
+                                                                                        "x",
+                                                                                    ],
                                                                                 },
                                                                             ),
-                                                                        ),
-                                                                    },
+                                                                        },
+                                                                    ),
                                                                 ],
                                                             },
                                                         ),
                                                         FunctionCall(
                                                             FunctionCall {
                                                                 target: Some(
-                                                                    FunctionCallTarget {
-                                                                        target: Some(
-                                                                            VariableRef {
-                                                                                name: Some(
-                                                                                    Path {
-                                                                                        segments: [
-                                                                                            "funky",
-                                                                                        ],
-                                                                                    },
-                                                                                ),
+                                                                    VariableRef {
+                                                                        name: Some(
+                                                                            Path {
+                                                                                segments: [
+                                                                                    "funky",
+                                                                                ],
                                                                             },
                                                                         ),
                                                                     },
                                                                 ),
                                                                 args: [
-                                                                    FunctionCallArg {
-                                                                        expression: Some(
-                                                                            VariableRef(
-                                                                                VariableRef {
-                                                                                    name: Some(
-                                                                                        Path {
-                                                                                            segments: [
-                                                                                                "y",
-                                                                                            ],
-                                                                                        },
-                                                                                    ),
+                                                                    VariableRef(
+                                                                        VariableRef {
+                                                                            name: Some(
+                                                                                Path {
+                                                                                    segments: [
+                                                                                        "y",
+                                                                                    ],
                                                                                 },
                                                                             ),
-                                                                        ),
-                                                                    },
+                                                                        },
+                                                                    ),
                                                                 ],
                                                             },
                                                         ),

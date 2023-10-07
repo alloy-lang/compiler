@@ -7,8 +7,7 @@ SourceFile@0..8
         Ident@0..5 "funky"
     FunctionCallArgList@5..8
       LParen@5..6 "("
-      FunctionCallArg@6..7
-        VariableRef@6..7
-          Path@6..7
-            Ident@6..7 "x"
+      VariableRef@6..7
+        Path@6..7
+          Ident@6..7 "x"
       RParen@7..8 ")"

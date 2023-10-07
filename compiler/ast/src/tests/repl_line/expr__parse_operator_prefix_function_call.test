@@ -16,36 +16,28 @@
                     },
                 ),
                 args: [
-                    FunctionCallArg {
-                        expression: Some(
-                            VariableRef(
-                                VariableRef {
-                                    name: Some(
-                                        Path {
-                                            segments: [
-                                                "func1",
-                                            ],
-                                        },
-                                    ),
+                    VariableRef(
+                        VariableRef {
+                            name: Some(
+                                Path {
+                                    segments: [
+                                        "func1",
+                                    ],
                                 },
                             ),
-                        ),
-                    },
-                    FunctionCallArg {
-                        expression: Some(
-                            VariableRef(
-                                VariableRef {
-                                    name: Some(
-                                        Path {
-                                            segments: [
-                                                "func2",
-                                            ],
-                                        },
-                                    ),
+                        },
+                    ),
+                    VariableRef(
+                        VariableRef {
+                            name: Some(
+                                Path {
+                                    segments: [
+                                        "func2",
+                                    ],
                                 },
                             ),
-                        ),
-                    },
+                        },
+                    ),
                 ],
             },
         ),

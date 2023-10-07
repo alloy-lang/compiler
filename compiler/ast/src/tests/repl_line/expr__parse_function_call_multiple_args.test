@@ -16,51 +16,39 @@ funky(x, y, z)
                     },
                 ),
                 args: [
-                    FunctionCallArg {
-                        expression: Some(
-                            VariableRef(
-                                VariableRef {
-                                    name: Some(
-                                        Path {
-                                            segments: [
-                                                "x",
-                                            ],
-                                        },
-                                    ),
+                    VariableRef(
+                        VariableRef {
+                            name: Some(
+                                Path {
+                                    segments: [
+                                        "x",
+                                    ],
                                 },
                             ),
-                        ),
-                    },
-                    FunctionCallArg {
-                        expression: Some(
-                            VariableRef(
-                                VariableRef {
-                                    name: Some(
-                                        Path {
-                                            segments: [
-                                                "y",
-                                            ],
-                                        },
-                                    ),
+                        },
+                    ),
+                    VariableRef(
+                        VariableRef {
+                            name: Some(
+                                Path {
+                                    segments: [
+                                        "y",
+                                    ],
                                 },
                             ),
-                        ),
-                    },
-                    FunctionCallArg {
-                        expression: Some(
-                            VariableRef(
-                                VariableRef {
-                                    name: Some(
-                                        Path {
-                                            segments: [
-                                                "z",
-                                            ],
-                                        },
-                                    ),
+                        },
+                    ),
+                    VariableRef(
+                        VariableRef {
+                            name: Some(
+                                Path {
+                                    segments: [
+                                        "z",
+                                    ],
                                 },
                             ),
-                        ),
-                    },
+                        },
+                    ),
                 ],
             },
         ),

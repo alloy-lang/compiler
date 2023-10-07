@@ -159,17 +159,8 @@ impl FunctionCall {
     }
 
     #[must_use]
-    pub fn args(&self) -> Vec<FunctionCallArg> {
+    pub fn args(&self) -> Vec<Expression> {
         all_matching_children(self, SyntaxKind::FunctionCallArgList)
-    }
-}
-
-ast_node!(FunctionCallArg, fields: [expression]);
-
-impl FunctionCallArg {
-    #[must_use]
-    pub fn expression(&self) -> Option<Expression> {
-        first_child(self)
     }
 }
 
