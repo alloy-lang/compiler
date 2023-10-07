@@ -1,0 +1,34 @@
+if test then 2 else
+===
+[
+    Expression(
+        IfThenElseExpr(
+            IfThenElseExpr {
+                condition: Some(
+                    VariableRef(
+                        VariableRef {
+                            name: Some(
+                                Path {
+                                    segments: [
+                                        "test",
+                                    ],
+                                },
+                            ),
+                        },
+                    ),
+                ),
+                then: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                2,
+                            ),
+                        },
+                    ),
+                ),
+                else_: None,
+            },
+        ),
+    ),
+]
+[]

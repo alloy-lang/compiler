@@ -25,15 +25,6 @@ fn repl_line() {
     );
 }
 
-// #[test]
-// fn repl_line_old() {
-//     run_parser_tests(
-//         "repl_line_old",
-//         alloy_parser::parse_repl_line,
-//         SourceFile::statements,
-//     );
-// }
-
 fn run_parser_test<T: fmt::Debug>(
     path: PathBuf,
     parsing_fn: fn(&str) -> Parse,

@@ -1,0 +1,15 @@
+-
+===
+[
+    Expression(
+        UnaryExpr(
+            UnaryExpr {
+                expr: None,
+                op: Some(
+                    Minus@0..1 "-",
+                ),
+            },
+        ),
+    ),
+]
+[]

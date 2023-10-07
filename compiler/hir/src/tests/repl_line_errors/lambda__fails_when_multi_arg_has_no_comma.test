@@ -1,0 +1,68 @@
+|arg1 1001 'c'| -> 8
+===
+HirModule {
+    values: Arena {
+        len: 0,
+        data: [],
+    },
+    expressions: Arena {
+        len: 2,
+        data: [
+            IntLiteral(
+                8,
+            ),
+            Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                    Idx::<Pattern>(2),
+                ],
+                body: Idx::<Expression>(0),
+            },
+        ],
+    },
+    expression_ranges: ArenaMap {
+        v: [
+            Some(
+                19..20,
+            ),
+            Some(
+                0..20,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 3,
+        data: [
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "arg1",
+                    ),
+                ),
+            },
+            IntLiteral(
+                1001,
+            ),
+            CharLiteral(
+                'c',
+            ),
+        ],
+    },
+    pattern_ranges: ArenaMap {
+        v: [
+            Some(
+                1..6,
+            ),
+            Some(
+                6..11,
+            ),
+            Some(
+                11..14,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+}
+[]

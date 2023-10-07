@@ -1,0 +1,27 @@
+behavior TestTrait1 for Type1
+    let a = 1
+end
+===
+HirModule {
+    values: Arena {
+        len: 0,
+        data: [],
+    },
+    expressions: Arena {
+        len: 0,
+        data: [],
+    },
+    expression_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 0,
+        data: [],
+    },
+    pattern_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+}
+[]

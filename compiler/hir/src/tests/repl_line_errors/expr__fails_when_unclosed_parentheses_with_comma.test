@@ -1,0 +1,24 @@
+(foo,
+===
+[
+    Expression(
+        ParenExpr(
+            ParenExpr {
+                expr: Some(
+                    VariableRef(
+                        VariableRef {
+                            name: Some(
+                                Path {
+                                    segments: [
+                                        "foo",
+                                    ],
+                                },
+                            ),
+                        },
+                    ),
+                ),
+            },
+        ),
+    ),
+]
+[]

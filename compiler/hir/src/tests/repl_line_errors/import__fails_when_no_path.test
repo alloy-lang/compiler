@@ -1,0 +1,16 @@
+import
+===
+[
+    ImportDef(
+        ImportDef {
+            children: [
+                ImportDefSegment(
+                    ImportDefSegment {
+                        name: None,
+                    },
+                ),
+            ],
+        },
+    ),
+]
+[]

@@ -1,6 +1,0 @@
-match test when
-  | -> 0
-  | False -> 1
-===
-[]
-[]

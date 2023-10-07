@@ -1,0 +1,78 @@
+match test when
+  | True -> _
+  | False -> 1
+===
+HirModule {
+    values: Arena {
+        len: 0,
+        data: [],
+    },
+    expressions: Arena {
+        len: 4,
+        data: [
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "test",
+                    ),
+                ),
+            },
+            Missing,
+            IntLiteral(
+                1,
+            ),
+            Match {
+                condition: Idx::<Expression>(0),
+                targets: [],
+            },
+        ],
+    },
+    expression_ranges: ArenaMap {
+        v: [
+            Some(
+                6..11,
+            ),
+            Some(
+                18..32,
+            ),
+            Some(
+                43..44,
+            ),
+            Some(
+                0..44,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 2,
+        data: [
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "True",
+                    ),
+                ),
+            },
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "False",
+                    ),
+                ),
+            },
+        ],
+    },
+    pattern_ranges: ArenaMap {
+        v: [
+            Some(
+                20..25,
+            ),
+            Some(
+                34..40,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+}
+[]

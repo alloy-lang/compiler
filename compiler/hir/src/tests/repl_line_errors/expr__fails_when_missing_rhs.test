@@ -1,0 +1,32 @@
+(1+
+===
+[
+    Expression(
+        ParenExpr(
+            ParenExpr {
+                expr: Some(
+                    InfixExpr(
+                        InfixExpr {
+                            lhs: Some(
+                                IntLiteral(
+                                    IntLiteral {
+                                        value: Some(
+                                            1,
+                                        ),
+                                    },
+                                ),
+                            ),
+                            rhs: None,
+                            op: Some(
+                                BinaryOp {
+                                    name: "+",
+                                },
+                            ),
+                        },
+                    ),
+                ),
+            },
+        ),
+    ),
+]
+[]

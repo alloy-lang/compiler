@@ -1,0 +1,31 @@
+behavior Trait1 Type1 where
+    -- imagine all the things here
+end
+
+trait Trait1 where
+    -- imagine all the things here
+end
+===
+HirModule {
+    values: Arena {
+        len: 0,
+        data: [],
+    },
+    expressions: Arena {
+        len: 0,
+        data: [],
+    },
+    expression_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 0,
+        data: [],
+    },
+    pattern_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+}
+[]

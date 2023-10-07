@@ -1,0 +1,58 @@
+import std::functor::
+import std::functor::map
+===
+[
+    ImportDef(
+        ImportDef {
+            children: [
+                ImportDefSegment(
+                    ImportDefSegment {
+                        name: Some(
+                            "std",
+                        ),
+                    },
+                ),
+                ImportDefSegment(
+                    ImportDefSegment {
+                        name: Some(
+                            "functor",
+                        ),
+                    },
+                ),
+                ImportDefSegment(
+                    ImportDefSegment {
+                        name: None,
+                    },
+                ),
+            ],
+        },
+    ),
+    ImportDef(
+        ImportDef {
+            children: [
+                ImportDefSegment(
+                    ImportDefSegment {
+                        name: Some(
+                            "std",
+                        ),
+                    },
+                ),
+                ImportDefSegment(
+                    ImportDefSegment {
+                        name: Some(
+                            "functor",
+                        ),
+                    },
+                ),
+                ImportDefSegment(
+                    ImportDefSegment {
+                        name: Some(
+                            "map",
+                        ),
+                    },
+                ),
+            ],
+        },
+    ),
+]
+[]
