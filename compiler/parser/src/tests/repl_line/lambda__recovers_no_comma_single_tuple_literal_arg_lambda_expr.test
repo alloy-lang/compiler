@@ -5,14 +5,14 @@ SourceFile@0..12
     LambdaExprArgList@0..8
       Pipe@0..1 "|"
       LambdaExprArg@1..6
-        TupleExpr@1..6
+        TuplePattern@1..6
           LParen@1..2 "("
-          TupleExprArg@2..4
+          TuplePatternArg@2..4
             VariableRef@2..4
               Path@2..4
                 Ident@2..3 "a"
                 Whitespace@3..4 " "
-          TupleExprArg@4..5
+          TuplePatternArg@4..5
             VariableRef@4..5
               Path@4..5
                 Ident@4..5 "b"

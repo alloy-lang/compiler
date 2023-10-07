@@ -1,0 +1,17 @@
+|()| -> 5
+===
+SourceFile@0..9
+  LambdaExpr@0..9
+    LambdaExprArgList@0..5
+      Pipe@0..1 "|"
+      LambdaExprArg@1..3
+        Unit@1..3
+          LParen@1..2 "("
+          RParen@2..3 ")"
+      Pipe@3..4 "|"
+      Whitespace@4..5 " "
+    RightArrow@5..7 "->"
+    Whitespace@7..8 " "
+    LambdaExprBody@8..9
+      IntLiteral@8..9
+        Integer@8..9 "5"

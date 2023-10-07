@@ -1,0 +1,29 @@
+|()| -> 5
+===
+[
+    Expression(
+        LambdaExpr(
+            LambdaExpr {
+                args: [
+                    LambdaExprArg {
+                        pattern: Some(
+                            Unit(
+                                Unit,
+                            ),
+                        ),
+                    },
+                ],
+                body: Some(
+                    IntLiteral(
+                        IntLiteral {
+                            value: Some(
+                                5,
+                            ),
+                        },
+                    ),
+                ),
+            },
+        ),
+    ),
+]
+[]

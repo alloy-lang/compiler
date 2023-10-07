@@ -1,4 +1,4 @@
-|(a, b)| -> 5
+|(a)| -> 5
 ===
 [
     Expression(
@@ -7,9 +7,9 @@
                 args: [
                     LambdaExprArg {
                         pattern: Some(
-                            TuplePattern(
-                                TuplePattern {
-                                    patterns: [
+                            ParenPattern(
+                                ParenPattern {
+                                    pattern: Some(
                                         TuplePatternArg {
                                             patterns: [
                                                 VariableRef(
@@ -25,22 +25,7 @@
                                                 ),
                                             ],
                                         },
-                                        TuplePatternArg {
-                                            patterns: [
-                                                VariableRef(
-                                                    VariableRef {
-                                                        name: Some(
-                                                            Path {
-                                                                segments: [
-                                                                    "b",
-                                                                ],
-                                                            },
-                                                        ),
-                                                    },
-                                                ),
-                                            ],
-                                        },
-                                    ],
+                                    ),
                                 },
                             ),
                         ),

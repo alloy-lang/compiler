@@ -112,7 +112,7 @@ fn parse_tuple_arg(p: &mut Parser) -> CompletedMarker {
 
         parse_argument(
             p,
-            SyntaxKind::TupleExprArg,
+            SyntaxKind::TuplePatternArg,
             ParseErrorContext::ParenExprExpr,
             ts![TokenKind::RightArrow],
         );
@@ -132,9 +132,9 @@ fn parse_tuple_arg(p: &mut Parser) -> CompletedMarker {
     p.expect(TokenKind::RParen, ParseErrorContext::ParenExprRightParen);
 
     let kind = match arg_len {
-        0 => SyntaxKind::UnitExpr,
-        1 => SyntaxKind::ParenExpr,
-        _ => SyntaxKind::TupleExpr,
+        0 => SyntaxKind::Unit,
+        1 => SyntaxKind::ParenPattern,
+        _ => SyntaxKind::TuplePattern,
     };
     return paren_m.complete(p, kind);
 

@@ -10,7 +10,10 @@ ast_union_node!(Pattern, kinds: [
     CharLiteral,
     VariableRef,
     NilIdentifier,
-    Destructor
+    Destructor,
+    Unit,
+    ParenPattern,
+    TuplePattern
 ]);
 
 ast_node!(IntLiteral, fields: [value]);
@@ -77,5 +80,34 @@ impl Destructor {
     #[must_use]
     pub fn args(&self) -> Vec<Pattern> {
         all_matching_children(self, SyntaxKind::DestructorArg)
+    }
+}
+
+ast_node!(Unit, fields: []);
+
+ast_node!(ParenPattern, fields: [pattern]);
+
+impl ParenPattern {
+    #[must_use]
+    pub fn pattern(&self) -> Option<TuplePatternArg> {
+        first_child(self)
+    }
+}
+
+ast_node!(TuplePattern, fields: [patterns]);
+
+impl TuplePattern {
+    #[must_use]
+    pub fn patterns(&self) -> Vec<TuplePatternArg> {
+        children(self)
+    }
+}
+
+ast_node!(TuplePatternArg, fields: [patterns]);
+
+impl TuplePatternArg {
+    #[must_use]
+    pub fn patterns(&self) -> Vec<Pattern> {
+        children(self)
     }
 }

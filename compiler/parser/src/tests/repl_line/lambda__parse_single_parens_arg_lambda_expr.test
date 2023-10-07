@@ -1,0 +1,21 @@
+|(a)| -> 5
+===
+SourceFile@0..10
+  LambdaExpr@0..10
+    LambdaExprArgList@0..6
+      Pipe@0..1 "|"
+      LambdaExprArg@1..4
+        ParenPattern@1..4
+          LParen@1..2 "("
+          TuplePatternArg@2..3
+            VariableRef@2..3
+              Path@2..3
+                Ident@2..3 "a"
+          RParen@3..4 ")"
+      Pipe@4..5 "|"
+      Whitespace@5..6 " "
+    RightArrow@6..8 "->"
+    Whitespace@8..9 " "
+    LambdaExprBody@9..10
+      IntLiteral@9..10
+        Integer@9..10 "5"

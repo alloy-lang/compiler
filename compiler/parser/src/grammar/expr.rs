@@ -362,7 +362,7 @@ fn parse_paren_expr(p: &mut Parser) -> CompletedMarker {
     p.expect(TokenKind::RParen, ParseErrorContext::ParenExprRightParen);
 
     let kind = match arg_len {
-        0 => SyntaxKind::UnitExpr,
+        0 => SyntaxKind::Unit,
         1 => SyntaxKind::ParenExpr,
         _ => SyntaxKind::TupleExpr,
     };

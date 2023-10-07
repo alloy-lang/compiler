@@ -8,7 +8,7 @@ ast_union_node!(Expression, kinds: [
     CharLiteral,
     VariableRef,
     InfixExpr,
-    UnitExpr,
+    Unit,
     IfThenElseExpr,
     ParenExpr,
     TupleExpr,
@@ -92,7 +92,6 @@ impl IfThenElseExpr {
     }
 }
 
-ast_node!(UnitExpr, fields: []);
 ast_node!(ParenExpr, fields: [expr]);
 
 impl ParenExpr {
