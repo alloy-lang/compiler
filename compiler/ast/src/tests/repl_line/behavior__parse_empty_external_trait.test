@@ -32,7 +32,9 @@ end
                     },
                 ),
             ),
-            members: [],
+            named_type_variables: [],
+            type_annotations: [],
+            values: [],
         },
     ),
 ]

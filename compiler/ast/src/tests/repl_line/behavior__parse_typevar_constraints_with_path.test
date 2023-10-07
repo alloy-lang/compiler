@@ -31,29 +31,29 @@ end
                     },
                 ),
             ),
-            members: [
-                NamedTypeVariable(
-                    NamedTypeVariable {
-                        name: Some(
-                            "t1",
+            named_type_variables: [
+                NamedTypeVariable {
+                    name: Some(
+                        "t1",
+                    ),
+                    constraints: [
+                        TypeVariableTraitConstraint(
+                            TypeVariableTraitConstraint {
+                                trait_: Some(
+                                    Path {
+                                        segments: [
+                                            "functor",
+                                            "Functor",
+                                        ],
+                                    },
+                                ),
+                            },
                         ),
-                        constraints: [
-                            TypeVariableTraitConstraint(
-                                TypeVariableTraitConstraint {
-                                    trait_: Some(
-                                        Path {
-                                            segments: [
-                                                "functor",
-                                                "Functor",
-                                            ],
-                                        },
-                                    ),
-                                },
-                            ),
-                        ],
-                    },
-                ),
+                    ],
+                },
             ],
+            type_annotations: [],
+            values: [],
         },
     ),
 ]

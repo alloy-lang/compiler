@@ -54,16 +54,16 @@ end
                     },
                 ),
             ),
-            members: [
-                NamedTypeVariable(
-                    NamedTypeVariable {
-                        name: Some(
-                            "t1",
-                        ),
-                        constraints: [],
-                    },
-                ),
+            named_type_variables: [
+                NamedTypeVariable {
+                    name: Some(
+                        "t1",
+                    ),
+                    constraints: [],
+                },
             ],
+            type_annotations: [],
+            values: [],
         },
     ),
 ]

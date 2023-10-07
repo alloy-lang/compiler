@@ -10,47 +10,47 @@ end
             name: Some(
                 "TestTrait1",
             ),
-            members: [
-                TypeAnnotation(
-                    TypeAnnotation {
-                        name: Some(
-                            "test",
+            self_type_variables: [],
+            named_type_variables: [],
+            type_annotations: [
+                TypeAnnotation {
+                    name: Some(
+                        "test",
+                    ),
+                    type_: Some(
+                        TypeIdentifier(
+                            TypeIdentifier {
+                                name: Some(
+                                    Path {
+                                        segments: [
+                                            "Int",
+                                        ],
+                                    },
+                                ),
+                            },
                         ),
-                        type_: Some(
-                            TypeIdentifier(
-                                TypeIdentifier {
-                                    name: Some(
-                                        Path {
-                                            segments: [
-                                                "Int",
-                                            ],
-                                        },
-                                    ),
-                                },
-                            ),
+                    ),
+                },
+            ],
+            values: [
+                ValueDef {
+                    name: Some(
+                        "thing",
+                    ),
+                    value: Some(
+                        VariableRef(
+                            VariableRef {
+                                name: Some(
+                                    Path {
+                                        segments: [
+                                            "test",
+                                        ],
+                                    },
+                                ),
+                            },
                         ),
-                    },
-                ),
-                ValueDef(
-                    ValueDef {
-                        name: Some(
-                            "thing",
-                        ),
-                        value: Some(
-                            VariableRef(
-                                VariableRef {
-                                    name: Some(
-                                        Path {
-                                            segments: [
-                                                "test",
-                                            ],
-                                        },
-                                    ),
-                                },
-                            ),
-                        ),
-                    },
-                ),
+                    ),
+                },
             ],
         },
     ),

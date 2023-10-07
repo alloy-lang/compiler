@@ -8,19 +8,20 @@ end
             name: Some(
                 "TestTrait1",
             ),
-            members: [
-                SelfTypeVariable(
-                    SelfTypeVariable {
-                        constraints: [
-                            TypeVariableKindConstraint(
-                                TypeVariableKindConstraint {
-                                    arity: 6,
-                                },
-                            ),
-                        ],
-                    },
-                ),
+            self_type_variables: [
+                SelfTypeVariable {
+                    constraints: [
+                        TypeVariableKindConstraint(
+                            TypeVariableKindConstraint {
+                                arity: 6,
+                            },
+                        ),
+                    ],
+                },
             ],
+            named_type_variables: [],
+            type_annotations: [],
+            values: [],
         },
     ),
 ]

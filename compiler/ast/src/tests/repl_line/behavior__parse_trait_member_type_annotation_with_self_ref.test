@@ -31,58 +31,58 @@ end
                     },
                 ),
             ),
-            members: [
-                TypeAnnotation(
-                    TypeAnnotation {
-                        name: Some(
-                            "test",
-                        ),
-                        type_: Some(
-                            LambdaType(
-                                LambdaType {
-                                    arg_type: Some(
-                                        SelfType(
-                                            SelfType,
-                                        ),
+            named_type_variables: [],
+            type_annotations: [
+                TypeAnnotation {
+                    name: Some(
+                        "test",
+                    ),
+                    type_: Some(
+                        LambdaType(
+                            LambdaType {
+                                arg_type: Some(
+                                    SelfType(
+                                        SelfType,
                                     ),
-                                    return_type: Some(
-                                        LambdaType(
-                                            LambdaType {
-                                                arg_type: Some(
-                                                    TypeIdentifier(
-                                                        TypeIdentifier {
-                                                            name: Some(
-                                                                Path {
-                                                                    segments: [
-                                                                        "String",
-                                                                    ],
-                                                                },
-                                                            ),
-                                                        },
-                                                    ),
+                                ),
+                                return_type: Some(
+                                    LambdaType(
+                                        LambdaType {
+                                            arg_type: Some(
+                                                TypeIdentifier(
+                                                    TypeIdentifier {
+                                                        name: Some(
+                                                            Path {
+                                                                segments: [
+                                                                    "String",
+                                                                ],
+                                                            },
+                                                        ),
+                                                    },
                                                 ),
-                                                return_type: Some(
-                                                    TypeIdentifier(
-                                                        TypeIdentifier {
-                                                            name: Some(
-                                                                Path {
-                                                                    segments: [
-                                                                        "Int",
-                                                                    ],
-                                                                },
-                                                            ),
-                                                        },
-                                                    ),
+                                            ),
+                                            return_type: Some(
+                                                TypeIdentifier(
+                                                    TypeIdentifier {
+                                                        name: Some(
+                                                            Path {
+                                                                segments: [
+                                                                    "Int",
+                                                                ],
+                                                            },
+                                                        ),
+                                                    },
                                                 ),
-                                            },
-                                        ),
+                                            ),
+                                        },
                                     ),
-                                },
-                            ),
+                                ),
+                            },
                         ),
-                    },
-                ),
+                    ),
+                },
             ],
+            values: [],
         },
     ),
 ]

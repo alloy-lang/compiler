@@ -8,31 +8,32 @@ end
             name: Some(
                 "TestTrait1",
             ),
-            members: [
-                SelfTypeVariable(
-                    SelfTypeVariable {
-                        constraints: [
-                            TypeVariableKindConstraint(
-                                TypeVariableKindConstraint {
-                                    arity: 1,
-                                },
-                            ),
-                            TypeVariableTraitConstraint(
-                                TypeVariableTraitConstraint {
-                                    trait_: Some(
-                                        Path {
-                                            segments: [
-                                                "functor",
-                                                "Functor",
-                                            ],
-                                        },
-                                    ),
-                                },
-                            ),
-                        ],
-                    },
-                ),
+            self_type_variables: [
+                SelfTypeVariable {
+                    constraints: [
+                        TypeVariableKindConstraint(
+                            TypeVariableKindConstraint {
+                                arity: 1,
+                            },
+                        ),
+                        TypeVariableTraitConstraint(
+                            TypeVariableTraitConstraint {
+                                trait_: Some(
+                                    Path {
+                                        segments: [
+                                            "functor",
+                                            "Functor",
+                                        ],
+                                    },
+                                ),
+                            },
+                        ),
+                    ],
+                },
             ],
+            named_type_variables: [],
+            type_annotations: [],
+            values: [],
         },
     ),
 ]
