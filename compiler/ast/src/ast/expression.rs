@@ -92,29 +92,29 @@ impl IfThenElseExpr {
     }
 }
 
-ast_node!(ParenExpr, fields: [expr]);
+ast_node!(ParenExpr, fields: [expression]);
 
 impl ParenExpr {
     #[must_use]
-    pub fn expr(&self) -> Option<Expression> {
+    pub fn expression(&self) -> Option<Expression> {
         first_child(self)
     }
 }
 
-ast_node!(TupleExpr, fields: [exprs]);
+ast_node!(TupleExpr, fields: [expressions]);
 
 impl TupleExpr {
     #[must_use]
-    pub fn exprs(&self) -> Vec<Expression> {
+    pub fn expressions(&self) -> Vec<Expression> {
         children(self)
     }
 }
 
-ast_node!(UnaryExpr, fields: [expr, op]);
+ast_node!(UnaryExpr, fields: [expression, op]);
 
 impl UnaryExpr {
     #[must_use]
-    pub fn expr(&self) -> Option<Expression> {
+    pub fn expression(&self) -> Option<Expression> {
         first_child(self)
     }
 

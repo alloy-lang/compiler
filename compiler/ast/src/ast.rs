@@ -149,7 +149,7 @@ mod type_variable;
 pub use path::*;
 mod path;
 
-pub(crate) trait AstElement: Sized {
+pub trait AstElement: Sized {
     fn cast<E: Into<SyntaxElement>>(element: E) -> Option<Self>;
 
     fn syntax(&self) -> SyntaxElement;

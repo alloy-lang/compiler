@@ -103,11 +103,11 @@ impl TuplePattern {
     }
 }
 
-ast_node!(TuplePatternArg, fields: [patterns]);
+ast_node!(TuplePatternArg, fields: [arg]);
 
 impl TuplePatternArg {
     #[must_use]
-    pub fn patterns(&self) -> Vec<Pattern> {
-        children(self)
+    pub fn arg(&self) -> Option<Pattern> {
+        first_child(self)
     }
 }

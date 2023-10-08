@@ -187,7 +187,7 @@ Some(
                                         rhs: Some(
                                             TupleExpr(
                                                 TupleExpr {
-                                                    exprs: [
+                                                    expressions: [
                                                         FunctionCall(
                                                             FunctionCall {
                                                                 target: Some(

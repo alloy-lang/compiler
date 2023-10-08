@@ -3,15 +3,17 @@ use super::*;
 
 ast_union_node!(Type, kinds: [
     SelfType,
+    UnitType,
     NilIdentifier,
     TypeIdentifier,
     LambdaType,
     TupleType,
-    BoundedType,
-    ParenthesizedType
+    ParenthesizedType,
+    BoundedType
 ]);
 
 ast_node!(SelfType, fields: []);
+ast_node!(UnitType, fields: []);
 ast_token!(NilIdentifier, fields: []);
 ast_node!(TypeIdentifier, fields: [name]);
 
@@ -45,6 +47,15 @@ impl TupleType {
     }
 }
 
+ast_node!(ParenthesizedType, fields: [inner]);
+
+impl ParenthesizedType {
+    #[must_use]
+    pub fn inner(&self) -> Option<Type> {
+        first_child(self)
+    }
+}
+
 ast_node!(BoundedType, fields: [base, args]);
 
 impl BoundedType {
@@ -56,14 +67,5 @@ impl BoundedType {
     #[must_use]
     pub fn args(&self) -> Vec<Type> {
         all_matching_children(self, SyntaxKind::BoundedTypeArg)
-    }
-}
-
-ast_node!(ParenthesizedType, fields: [inner]);
-
-impl ParenthesizedType {
-    #[must_use]
-    pub fn inner(&self) -> Option<Type> {
-        self.0.children_with_tokens().find_map(Type::cast)
     }
 }

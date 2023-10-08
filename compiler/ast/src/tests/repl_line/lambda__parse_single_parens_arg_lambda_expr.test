@@ -11,7 +11,7 @@
                                 ParenPattern {
                                     pattern: Some(
                                         TuplePatternArg {
-                                            patterns: [
+                                            arg: Some(
                                                 VariableRef(
                                                     VariableRef {
                                                         name: Some(
@@ -23,7 +23,7 @@
                                                         ),
                                                     },
                                                 ),
-                                            ],
+                                            ),
                                         },
                                     ),
                                 },
