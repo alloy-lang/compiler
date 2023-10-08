@@ -1,0 +1,39 @@
+()
+===
+HirModule {
+    values: Arena {
+        len: 0,
+        data: [],
+    },
+    expressions: Arena {
+        len: 1,
+        data: [
+            Unit,
+        ],
+    },
+    expression_ranges: ArenaMap {
+        v: [
+            Some(
+                0..2,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 0,
+        data: [],
+    },
+    pattern_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+    types: Arena {
+        len: 0,
+        data: [],
+    },
+    type_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+}
+[]

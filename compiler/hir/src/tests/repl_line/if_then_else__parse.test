@@ -1,0 +1,65 @@
+if test then 2 else 3
+===
+HirModule {
+    values: Arena {
+        len: 0,
+        data: [],
+    },
+    expressions: Arena {
+        len: 4,
+        data: [
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "test",
+                    ),
+                ),
+            },
+            IntLiteral(
+                2,
+            ),
+            IntLiteral(
+                3,
+            ),
+            IfThenElse {
+                condition: Idx::<Expression>(0),
+                then: Idx::<Expression>(1),
+                else_: Idx::<Expression>(2),
+            },
+        ],
+    },
+    expression_ranges: ArenaMap {
+        v: [
+            Some(
+                3..8,
+            ),
+            Some(
+                13..15,
+            ),
+            Some(
+                20..21,
+            ),
+            Some(
+                0..21,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 0,
+        data: [],
+    },
+    pattern_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+    types: Arena {
+        len: 0,
+        data: [],
+    },
+    type_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+}
+[]

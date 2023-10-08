@@ -1,0 +1,56 @@
+|()| -> 5
+===
+HirModule {
+    values: Arena {
+        len: 0,
+        data: [],
+    },
+    expressions: Arena {
+        len: 2,
+        data: [
+            IntLiteral(
+                5,
+            ),
+            Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                ],
+                body: Idx::<Expression>(0),
+            },
+        ],
+    },
+    expression_ranges: ArenaMap {
+        v: [
+            Some(
+                8..9,
+            ),
+            Some(
+                0..9,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 1,
+        data: [
+            Unit,
+        ],
+    },
+    pattern_ranges: ArenaMap {
+        v: [
+            Some(
+                1..3,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+    types: Arena {
+        len: 0,
+        data: [],
+    },
+    type_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+}
+[]

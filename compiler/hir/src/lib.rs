@@ -1,128 +1,38 @@
-use la_arena::Idx;
 use non_empty_vec::NonEmpty;
-use ordered_float::NotNan;
 
-use alloy_ast as ast;
+mod hir;
+#[cfg(test)]
+mod tests;
 
-pub use self::database::Database;
+pub use hir::lower_repl_line;
+pub use hir::lower_source_file;
 
-mod database;
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Name(String);
 
-#[must_use]
-pub fn lower(ast: &ast::SourceFile) -> (Database, Vec<Stmt>) {
-    let mut db = Database::default();
-    let stmts = ast.stmts().filter_map(|stmt| db.lower_stmt(stmt)).collect();
-
-    (db, stmts)
+impl Name {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self(name.into())
+    }
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Stmt {
-    VariableDef { name: String, value: Expr },
-    Expr(Expr),
-    Import(Import),
-    Trait(Trait),
+pub struct Fqn {
+    pub module: NonEmpty<Name>,
+    pub name: Name,
 }
 
-type PatternIdx = Idx<Pattern>;
-
-#[derive(Debug, PartialEq)]
-pub enum Pattern {
-    Missing,
-    IntLiteral(Option<u64>),
-    FractionLiteral(Option<NotNan<f64>>),
-    StringLiteral(String),
-    CharLiteral(Option<char>),
-    VariableRef { var: String },
-    NilIdentifier,
-}
-
-type ExprIdx = Idx<Expr>;
-
-#[derive(Debug, PartialEq)]
-pub enum Expr {
-    Missing,
-    Unit,
-    Binary {
-        op: BinaryOp,
-        lhs: ExprIdx,
-        rhs: ExprIdx,
-    },
-    IntLiteral {
-        /// is `None` if the number is too big to fit in a u64
-        n: Option<u64>,
-    },
-    FractionLiteral {
-        /// is `None` if the number is too big to fit in a f64
-        n: Option<NotNan<f64>>,
-    },
-    StringLiteral(String),
-    CharLiteral(Option<char>),
-    IfThenElse {
-        cond: ExprIdx,
-        then: ExprIdx,
-        else_: ExprIdx,
-    },
-    Match {
-        cond: ExprIdx,
-        cases: Vec<(PatternIdx, ExprIdx)>,
-    },
-    Unary {
-        op: UnaryOp,
-        expr: ExprIdx,
-    },
-    VariableRef {
-        var: String,
-    },
-    Lambda {
-        args: Vec<PatternIdx>,
-        body: ExprIdx,
-    },
-    Tuple(NonEmpty<ExprIdx>),
-}
-
-#[derive(Debug, PartialEq)]
-pub enum BinaryOp {
-    Add,
-    Sub,
-    Mul,
-    Div,
-}
-
-#[derive(Debug, PartialEq)]
-pub enum UnaryOp {
-    Neg,
-}
-
-#[derive(Debug, PartialEq)]
-pub struct Import {
-    path: Vec<String>,
-    targets: Vec<String>,
-}
-
-#[derive(Debug, PartialEq)]
-pub struct Trait {
-    name: String,
-    members: Vec<TraitMember>,
-}
-
-#[derive(Debug, PartialEq)]
-pub enum TraitMember {
-    TypeAnnotation(TypeAnnotation),
-}
-
-#[derive(Debug, PartialEq)]
-pub struct TypeAnnotation {
-    name: String,
-    t: Type,
-}
-
-#[derive(Debug, PartialEq)]
-pub enum Type {
-    Identifier(String),
-    SelfRef,
-    Lambda {
-        arg_type: Box<Type>,
-        return_type: Box<Type>,
-    },
+impl Fqn {
+    #[inline]
+    pub fn new(
+        module: impl IntoIterator<Item = impl Into<String>>,
+        name: impl Into<String>,
+    ) -> Self {
+        unsafe {
+            Self {
+                module: NonEmpty::new_unchecked(module.into_iter().map(Name::new).collect()),
+                name: Name::new(name.into()),
+            }
+        }
+    }
 }

@@ -1,0 +1,80 @@
+funky(x, y, z)
+===
+HirModule {
+    values: Arena {
+        len: 0,
+        data: [],
+    },
+    expressions: Arena {
+        len: 4,
+        data: [
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "x",
+                    ),
+                ),
+            },
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "y",
+                    ),
+                ),
+            },
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "z",
+                    ),
+                ),
+            },
+            FunctionCall {
+                target: ThisModule(
+                    Name(
+                        "funky",
+                    ),
+                ),
+                args: [
+                    Idx::<Expression>(0),
+                    Idx::<Expression>(1),
+                    Idx::<Expression>(2),
+                ],
+            },
+        ],
+    },
+    expression_ranges: ArenaMap {
+        v: [
+            Some(
+                6..7,
+            ),
+            Some(
+                9..10,
+            ),
+            Some(
+                12..13,
+            ),
+            Some(
+                0..14,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 0,
+        data: [],
+    },
+    pattern_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+    types: Arena {
+        len: 0,
+        data: [],
+    },
+    type_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+}
+[]

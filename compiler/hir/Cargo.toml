@@ -8,9 +8,12 @@ edition = "2018"
 [dependencies]
 alloy_ast = { path = "../ast" }
 alloy_syntax = { path = "../syntax" }
-la-arena = "0.2"
+la-arena = "0.3"
 non-empty-vec = "0.2"
 ordered-float = "3.0"
+text-size = "1.1"
 
 [dev-dependencies]
 alloy_parser = {path = "../parser"}
+expect-test = "1.3"
+pretty_assertions = "1.2.1"

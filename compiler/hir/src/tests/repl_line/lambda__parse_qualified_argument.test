@@ -1,0 +1,75 @@
+|Option::None| -> x
+===
+HirModule {
+    values: Arena {
+        len: 0,
+        data: [],
+    },
+    expressions: Arena {
+        len: 2,
+        data: [
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "x",
+                    ),
+                ),
+            },
+            Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                ],
+                body: Idx::<Expression>(0),
+            },
+        ],
+    },
+    expression_ranges: ArenaMap {
+        v: [
+            Some(
+                18..19,
+            ),
+            Some(
+                0..19,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 1,
+        data: [
+            VariableRef {
+                name: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                Name(
+                                    "Option",
+                                ),
+                            ],
+                        ),
+                        name: Name(
+                            "None",
+                        ),
+                    },
+                ),
+            },
+        ],
+    },
+    pattern_ranges: ArenaMap {
+        v: [
+            Some(
+                1..13,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+    types: Arena {
+        len: 0,
+        data: [],
+    },
+    type_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+}
+[]
