@@ -109,6 +109,23 @@ impl LoweringCtx {
         };
         (hir, self.errors)
     }
+
+    pub(crate) fn expression(
+        &mut self,
+        expression: Expression,
+        element: &SyntaxElement,
+    ) -> ExpressionIdx {
+        let idx = self.expressions.alloc(expression);
+        self.expression_ranges.insert(idx, element.text_range());
+
+        idx
+    }
+    pub(crate) fn pattern(&mut self, pattern: Pattern, element: &SyntaxElement) -> PatternIdx {
+        let idx = self.patterns.alloc(pattern);
+        self.pattern_ranges.insert(idx, element.text_range());
+
+        idx
+    }
 }
 
 #[must_use]

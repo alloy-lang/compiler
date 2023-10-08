@@ -61,7 +61,7 @@ pub enum UnaryOp {
 
 pub(super) fn lower_expression(ctx: &mut LoweringCtx, ast: &ast::Expression) -> ExpressionIdx {
     let expression = lower_expression_inner(ctx, ast);
-    ctx.expression(expression, ast.syntax())
+    ctx.expression(expression, &ast.syntax())
 }
 
 fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expression) -> Expression {
@@ -228,7 +228,7 @@ fn lower_lambda_expression(ctx: &mut LoweringCtx, e: &ast::LambdaExpr) -> Expres
             Some(arg) => lower_pattern(ctx, &arg),
             None => {
                 todo!("validation");
-                return ctx.pattern(Pattern::Missing, arg.syntax());
+                return ctx.pattern(Pattern::Missing, &arg.syntax());
             }
         })
         .collect::<Vec<_>>();
@@ -276,11 +276,11 @@ fn lower_match_expression(ctx: &mut LoweringCtx, e: &ast::MatchExpr) -> Expressi
             let condition = a
                 .condition()
                 .map(|c| lower_pattern(ctx, &c))
-                .unwrap_or_else(|| ctx.pattern(Pattern::Missing, a.syntax()));
+                .unwrap_or_else(|| ctx.pattern(Pattern::Missing, &a.syntax()));
             let value = a
                 .value()
                 .map(|v| lower_expression(ctx, &v))
-                .unwrap_or_else(|| ctx.expression(Expression::Missing, a.syntax()));
+                .unwrap_or_else(|| ctx.expression(Expression::Missing, &a.syntax()));
 
             (condition, value)
         })
