@@ -1,32 +1,31 @@
-- 10
+import std::functor::Functor
 ===
 HirModule {
-    imports: {},
+    imports: {
+        Import {
+            segments: [
+                Name(
+                    "std",
+                ),
+                Name(
+                    "functor",
+                ),
+            ],
+            last: Name(
+                "Functor",
+            ),
+        },
+    },
     values: Arena {
         len: 0,
         data: [],
     },
     expressions: Arena {
-        len: 2,
-        data: [
-            IntLiteral(
-                10,
-            ),
-            Unary {
-                op: Neg,
-                expression: Idx::<Expression>(0),
-            },
-        ],
+        len: 0,
+        data: [],
     },
     expression_ranges: ArenaMap {
-        v: [
-            Some(
-                2..4,
-            ),
-            Some(
-                0..4,
-            ),
-        ],
+        v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
     },
     patterns: Arena {
@@ -37,6 +36,7 @@ HirModule {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
     },
+    type_annotations: {},
     types: Arena {
         len: 0,
         data: [],

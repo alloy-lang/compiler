@@ -6,6 +6,7 @@ use la_arena::Idx;
 use la_arena::{Arena, ArenaMap};
 use non_empty_vec::NonEmpty;
 use ordered_float::NotNan;
+use rustc_hash::{FxHashMap, FxHashSet};
 use std::convert::TryFrom;
 use text_size::TextRange;
 
@@ -40,6 +41,7 @@ pub use value::*;
 
 #[derive(Debug)]
 pub struct HirModule {
+    imports: FxHashSet<Import>,
     values: Arena<Value>,
     expressions: Arena<Expression>,
     expression_ranges: ArenaMap<ExpressionIdx, TextRange>,
@@ -54,6 +56,7 @@ pub struct LoweringError(String);
 
 #[derive(Debug)]
 struct LoweringCtx {
+    imports: FxHashSet<Import>,
     values: Arena<Value>,
     expressions: Arena<Expression>,
     expression_ranges: ArenaMap<ExpressionIdx, TextRange>,
@@ -86,6 +89,7 @@ impl LoweringCtx {
 impl LoweringCtx {
     fn new() -> Self {
         Self {
+            imports: FxHashSet::default(),
             values: Arena::default(),
             expressions: Arena::default(),
             expression_ranges: ArenaMap::default(),
@@ -99,6 +103,7 @@ impl LoweringCtx {
 
     fn finish(self) -> (HirModule, Vec<LoweringError>) {
         let hir = HirModule {
+            imports: self.imports,
             values: self.values,
             expressions: self.expressions,
             expression_ranges: self.expression_ranges,
@@ -125,6 +130,12 @@ impl LoweringCtx {
         self.pattern_ranges.insert(idx, element.text_range());
 
         idx
+    }
+
+    pub(crate) fn import(&mut self, path: NonEmpty<Name>) {
+        if !self.imports.insert(Import::new(path)) {
+            todo!("validation")
+        }
     }
 }
 

@@ -1,0 +1,70 @@
+module TestModule1 where
+    import really::really::real::Thing1
+    import really::real::other::Thing2
+===
+HirModule {
+    imports: {
+        Import {
+            segments: [
+                Name(
+                    "really",
+                ),
+                Name(
+                    "really",
+                ),
+                Name(
+                    "real",
+                ),
+            ],
+            last: Name(
+                "Thing1",
+            ),
+        },
+        Import {
+            segments: [
+                Name(
+                    "really",
+                ),
+                Name(
+                    "real",
+                ),
+                Name(
+                    "other",
+                ),
+            ],
+            last: Name(
+                "Thing2",
+            ),
+        },
+    },
+    values: Arena {
+        len: 0,
+        data: [],
+    },
+    expressions: Arena {
+        len: 0,
+        data: [],
+    },
+    expression_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 0,
+        data: [],
+    },
+    pattern_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+    type_annotations: {},
+    types: Arena {
+        len: 0,
+        data: [],
+    },
+    type_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+}
+[]

@@ -1,6 +1,7 @@
 |arg1, arg2, arg3| -> 17
 ===
 HirModule {
+    imports: {},
     values: Arena {
         len: 0,
         data: [],

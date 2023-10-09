@@ -11,6 +11,7 @@ alloy_syntax = { path = "../syntax" }
 la-arena = "0.3"
 non-empty-vec = "0.2"
 ordered-float = "3.0"
+rustc-hash = "1.1"
 text-size = "1.1"
 
 [dev-dependencies]

@@ -1,53 +1,90 @@
+use std::fmt;
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub struct Import {
+    segments: Vec<Name>,
+    last: Name,
+}
+
+impl Import {
+    pub(crate) fn new(segments: NonEmpty<Name>) -> Self {
+        let (last, path) = segments.split_last();
+        Self {
+            segments: path.to_vec(),
+            last: last.clone(),
+        }
+    }
+
+    pub fn last(&self) -> &Name {
+        &self.last
+    }
+
+    pub fn path(&self) -> &[Name] {
+        &self.segments
+    }
+}
+
 pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
-    // let num_segments = import.children().len() - 1;
-    //
-    // let mut path = vec![];
-    // for (segment_num, child) in import.children().iter().enumerate() {
-    //     match child {
-    //         ImportDefChild::ImportDefSegment(segment) => {
-    //             let segment = segment.name() else {
-    //                 continue;
-    //             };
-    //             path.push("");
-    //
-    //             match segment_num {
-    //                 0 => todo!("lower_import"),
-    //                 s if s == num_segments => todo!("lower_import"),
-    //                 _ => todo!("lower_import"),
-    //             };
-    //         }
-    //         ImportDefChild::ImportDefGroup(group) => {
-    //
-    //         }
-    //     }
-    // }
+    let children = import
+        .children()
+        .into_iter()
+        .enumerate()
+        .collect::<Vec<_>>();
+    let num_segments = children.len();
+    let Some(((_, first), rest)) = children.split_first() else {
+        todo!("validation");
+        return;
+    };
+    let mut segments = match first {
+        ast::ImportDefChild::ImportDefSegment(segment) => {
+            let Some(segment) = lower_import_def_segment(segment) else {
+                return;
+            };
 
-    let mut paths = vec![];
+            NonEmpty::new(segment)
+        }
+        ast::ImportDefChild::ImportDefGroup(_) => {
+            todo!("validation");
+            return;
+        }
+    };
 
-    let mut segments = vec![];
-    for (_segment_num, child) in import.children().iter().enumerate() {
+    for (segment_num, child) in rest {
         match child {
             ast::ImportDefChild::ImportDefSegment(segment) => {
-                segments.push(segment.name().unwrap());
+                let Some(segment) = lower_import_def_segment(segment) else {
+                    return;
+                };
+
+                segments.push(segment);
+            }
+            ast::ImportDefChild::ImportDefGroup(group) if segment_num + 1 == num_segments => {
+                for segment in group.children() {
+                    let Some(segment) = lower_import_def_segment(&segment) else {
+                        return;
+                    };
+
+                    segments.push(segment);
+                }
             }
             ast::ImportDefChild::ImportDefGroup(_) => {
-                todo!()
+                todo!("validation");
+                return;
             }
         }
     }
 
-    match &segments[..] {
-        [] => {}
-        [segment] => {
-            let path = Path::ThisModule(Name::new(segment.clone()));
-            paths.push(path);
+    ctx.import(segments);
+}
+
+fn lower_import_def_segment(ast: &ast::ImportDefSegment) -> Option<Name> {
+    match ast.name() {
+        None => {
+            todo!("validation");
+            return None;
         }
-        [head @ .., tail] => unsafe {
-            let path = Path::OtherModule(Fqn::new(head, tail));
-            paths.push(path);
-        },
+        Some(segment) => Some(Name::new(segment)),
     }
 }

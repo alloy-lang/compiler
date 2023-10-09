@@ -1,6 +1,7 @@
 funky(x, y, z)
 ===
 HirModule {
+    imports: {},
     values: Arena {
         len: 0,
         data: [],

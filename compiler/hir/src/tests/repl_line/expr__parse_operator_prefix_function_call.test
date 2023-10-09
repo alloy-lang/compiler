@@ -1,6 +1,7 @@
 >>(func1, func2)
 ===
 HirModule {
+    imports: {},
     values: Arena {
         len: 0,
         data: [],

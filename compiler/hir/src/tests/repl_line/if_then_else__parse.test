@@ -1,6 +1,7 @@
 if test then 2 else 3
 ===
 HirModule {
+    imports: {},
     values: Arena {
         len: 0,
         data: [],

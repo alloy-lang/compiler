@@ -1,6 +1,7 @@
 |(a, b)| -> 5
 ===
 HirModule {
+    imports: {},
     values: Arena {
         len: 0,
         data: [],
