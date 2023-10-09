@@ -1,4 +1,6 @@
-|arg1, arg2, arg3| -> 17
+match test when
+  | True -> 0
+  | _    -> 1
 ===
 HirModule {
     imports: {},
@@ -7,68 +9,64 @@ HirModule {
         data: [],
     },
     expressions: Arena {
-        len: 2,
+        len: 4,
         data: [
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "test",
+                    ),
+                ),
+            },
             IntLiteral(
-                17,
+                0,
             ),
-            Lambda {
-                args: [
-                    Idx::<Pattern>(0),
-                    Idx::<Pattern>(1),
-                    Idx::<Pattern>(2),
-                ],
-                body: Idx::<Expression>(0),
+            IntLiteral(
+                1,
+            ),
+            Match {
+                condition: Idx::<Expression>(0),
+                targets: [],
             },
         ],
     },
     expression_ranges: ArenaMap {
         v: [
             Some(
-                22..24,
+                6..11,
             ),
             Some(
-                0..24,
+                28..32,
+            ),
+            Some(
+                42..43,
+            ),
+            Some(
+                0..43,
             ),
         ],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
     },
     patterns: Arena {
-        len: 3,
+        len: 2,
         data: [
             VariableRef {
                 name: ThisModule(
                     Name(
-                        "arg1",
+                        "True",
                     ),
                 ),
             },
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "arg2",
-                    ),
-                ),
-            },
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "arg3",
-                    ),
-                ),
-            },
+            NilIdentifier,
         ],
     },
     pattern_ranges: ArenaMap {
         v: [
             Some(
-                1..5,
+                20..25,
             ),
             Some(
-                7..11,
-            ),
-            Some(
-                13..17,
+                34..35,
             ),
         ],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,

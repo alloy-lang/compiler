@@ -47,6 +47,7 @@ pub struct HirModule {
     expression_ranges: ArenaMap<ExpressionIdx, TextRange>,
     patterns: Arena<Pattern>,
     pattern_ranges: ArenaMap<PatternIdx, TextRange>,
+    type_annotations: FxHashMap<Name, TypeIdx>,
     types: Arena<Type>,
     type_ranges: ArenaMap<TypeIdx, TextRange>,
 }
@@ -62,28 +63,10 @@ struct LoweringCtx {
     expression_ranges: ArenaMap<ExpressionIdx, TextRange>,
     patterns: Arena<Pattern>,
     pattern_ranges: ArenaMap<PatternIdx, TextRange>,
+    type_annotations: FxHashMap<Name, TypeIdx>,
     types: Arena<Type>,
     type_ranges: ArenaMap<TypeIdx, TextRange>,
     errors: Vec<LoweringError>,
-}
-
-impl LoweringCtx {
-    pub(crate) fn expression(
-        &mut self,
-        expression: Expression,
-        element: SyntaxElement,
-    ) -> ExpressionIdx {
-        let idx = self.expressions.alloc(expression);
-        self.expression_ranges.insert(idx, element.text_range());
-
-        idx
-    }
-    pub(crate) fn pattern(&mut self, pattern: Pattern, element: SyntaxElement) -> PatternIdx {
-        let idx = self.patterns.alloc(pattern);
-        self.pattern_ranges.insert(idx, element.text_range());
-
-        idx
-    }
 }
 
 impl LoweringCtx {
@@ -95,6 +78,7 @@ impl LoweringCtx {
             expression_ranges: ArenaMap::default(),
             patterns: Arena::default(),
             pattern_ranges: ArenaMap::default(),
+            type_annotations: FxHashMap::default(),
             types: Arena::default(),
             type_ranges: ArenaMap::default(),
             errors: vec![],
@@ -109,6 +93,7 @@ impl LoweringCtx {
             expression_ranges: self.expression_ranges,
             patterns: self.patterns,
             pattern_ranges: self.pattern_ranges,
+            type_annotations: self.type_annotations,
             types: self.types,
             type_ranges: self.type_ranges,
         };
@@ -130,6 +115,17 @@ impl LoweringCtx {
         self.pattern_ranges.insert(idx, element.text_range());
 
         idx
+    }
+
+    pub(crate) fn type_(&mut self, type_: Type, element: &SyntaxElement) -> TypeIdx {
+        let idx = self.types.alloc(type_);
+        self.type_ranges.insert(idx, element.text_range());
+
+        idx
+    }
+
+    pub(crate) fn type_annotation(&mut self, name: Name, type_id: TypeIdx) {
+        self.type_annotations.insert(name, type_id);
     }
 
     pub(crate) fn import(&mut self, path: NonEmpty<Name>) {

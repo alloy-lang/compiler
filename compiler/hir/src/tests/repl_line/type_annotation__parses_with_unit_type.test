@@ -1,0 +1,79 @@
+typeof test : Int -> String -> ()
+===
+HirModule {
+    imports: {},
+    values: Arena {
+        len: 0,
+        data: [],
+    },
+    expressions: Arena {
+        len: 0,
+        data: [],
+    },
+    expression_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 0,
+        data: [],
+    },
+    pattern_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+    type_annotations: {
+        Name(
+            "test",
+        ): Idx::<Type>(4),
+    },
+    types: Arena {
+        len: 5,
+        data: [
+            Named(
+                ThisModule(
+                    Name(
+                        "Int",
+                    ),
+                ),
+            ),
+            Named(
+                ThisModule(
+                    Name(
+                        "String",
+                    ),
+                ),
+            ),
+            Unit,
+            Lambda {
+                arg_type: Idx::<Type>(1),
+                return_type: Idx::<Type>(2),
+            },
+            Lambda {
+                arg_type: Idx::<Type>(0),
+                return_type: Idx::<Type>(3),
+            },
+        ],
+    },
+    type_ranges: ArenaMap {
+        v: [
+            Some(
+                14..18,
+            ),
+            Some(
+                21..28,
+            ),
+            Some(
+                31..33,
+            ),
+            Some(
+                21..33,
+            ),
+            Some(
+                14..33,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+}
+[]

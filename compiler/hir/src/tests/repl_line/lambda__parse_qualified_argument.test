@@ -64,6 +64,7 @@ HirModule {
         ],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
     },
+    type_annotations: {},
     types: Arena {
         len: 0,
         data: [],
