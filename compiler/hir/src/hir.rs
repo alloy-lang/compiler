@@ -128,6 +128,10 @@ impl LoweringCtx {
         self.type_annotations.insert(name, type_id);
     }
 
+    pub(crate) fn value(&mut self, value: Value) {
+        self.values.alloc(value);
+    }
+
     pub(crate) fn import(&mut self, path: NonEmpty<Name>) {
         if !self.imports.insert(Import::new(path)) {
             todo!("validation")

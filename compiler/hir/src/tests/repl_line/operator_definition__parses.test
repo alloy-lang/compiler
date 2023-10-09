@@ -1,0 +1,162 @@
+typeof (|>) : t1 -> (t1 -> t2) -> t2 where
+    typevar t1
+    typevar t2
+let (|>) = |x, f| -> fakeStuff
+===
+HirModule {
+    imports: {},
+    values: Arena {
+        len: 1,
+        data: [
+            Value {
+                name: Name(
+                    "(|>)",
+                ),
+                value: Idx::<Expression>(1),
+            },
+        ],
+    },
+    expressions: Arena {
+        len: 2,
+        data: [
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "fakeStuff",
+                    ),
+                ),
+            },
+            Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                ],
+                body: Idx::<Expression>(0),
+            },
+        ],
+    },
+    expression_ranges: ArenaMap {
+        v: [
+            Some(
+                94..103,
+            ),
+            Some(
+                84..103,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 2,
+        data: [
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "x",
+                    ),
+                ),
+            },
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "f",
+                    ),
+                ),
+            },
+        ],
+    },
+    pattern_ranges: ArenaMap {
+        v: [
+            Some(
+                85..86,
+            ),
+            Some(
+                88..89,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+    type_annotations: {
+        Name(
+            "(|>)",
+        ): Idx::<Type>(7),
+    },
+    types: Arena {
+        len: 8,
+        data: [
+            Named(
+                ThisModule(
+                    Name(
+                        "t1",
+                    ),
+                ),
+            ),
+            Named(
+                ThisModule(
+                    Name(
+                        "t1",
+                    ),
+                ),
+            ),
+            Named(
+                ThisModule(
+                    Name(
+                        "t2",
+                    ),
+                ),
+            ),
+            Lambda {
+                arg_type: Idx::<Type>(1),
+                return_type: Idx::<Type>(2),
+            },
+            ParenthesizedType(
+                Idx::<Type>(3),
+            ),
+            Named(
+                ThisModule(
+                    Name(
+                        "t2",
+                    ),
+                ),
+            ),
+            Lambda {
+                arg_type: Idx::<Type>(4),
+                return_type: Idx::<Type>(5),
+            },
+            Lambda {
+                arg_type: Idx::<Type>(0),
+                return_type: Idx::<Type>(6),
+            },
+        ],
+    },
+    type_ranges: ArenaMap {
+        v: [
+            Some(
+                14..17,
+            ),
+            Some(
+                21..24,
+            ),
+            Some(
+                27..29,
+            ),
+            Some(
+                21..29,
+            ),
+            Some(
+                20..31,
+            ),
+            Some(
+                34..37,
+            ),
+            Some(
+                20..37,
+            ),
+            Some(
+                14..37,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+}
+[]

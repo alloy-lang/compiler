@@ -33,6 +33,7 @@ macro_rules! ast_token {
 
 macro_rules! ast_node {
     ($kind:ident, fields: [$($field:ident),*]) => {
+        #[derive(Clone)]
         pub struct $kind(SyntaxNode);
 
         impl AstElement for $kind {

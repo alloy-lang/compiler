@@ -1,0 +1,271 @@
+module TestModule1 where
+    typeof testThing : (t2 -> t1) -> t2 -> t2 -> ResultThing where
+      typevar t1 = Thing
+      typevar t2
+    let testThing = |funky, x, y| -> TestType::new <| (funky(x), funky(y))
+===
+HirModule {
+    imports: {},
+    values: Arena {
+        len: 1,
+        data: [
+            Value {
+                name: Name(
+                    "testThing",
+                ),
+                value: Idx::<Expression>(7),
+            },
+        ],
+    },
+    expressions: Arena {
+        len: 8,
+        data: [
+            VariableRef {
+                name: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                Name(
+                                    "TestType",
+                                ),
+                            ],
+                        ),
+                        name: Name(
+                            "new",
+                        ),
+                    },
+                ),
+            },
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "x",
+                    ),
+                ),
+            },
+            FunctionCall {
+                target: ThisModule(
+                    Name(
+                        "funky",
+                    ),
+                ),
+                args: [
+                    Idx::<Expression>(1),
+                ],
+            },
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "y",
+                    ),
+                ),
+            },
+            FunctionCall {
+                target: ThisModule(
+                    Name(
+                        "funky",
+                    ),
+                ),
+                args: [
+                    Idx::<Expression>(3),
+                ],
+            },
+            Tuple(
+                NonEmpty(
+                    [
+                        Idx::<Expression>(2),
+                        Idx::<Expression>(4),
+                    ],
+                ),
+            ),
+            Binary {
+                op: Custom(
+                    ThisModule(
+                        Name(
+                            "<|",
+                        ),
+                    ),
+                ),
+                lhs: Idx::<Expression>(0),
+                rhs: Idx::<Expression>(5),
+            },
+            Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                    Idx::<Pattern>(2),
+                ],
+                body: Idx::<Expression>(6),
+            },
+        ],
+    },
+    expression_ranges: ArenaMap {
+        v: [
+            Some(
+                171..185,
+            ),
+            Some(
+                195..196,
+            ),
+            Some(
+                189..197,
+            ),
+            Some(
+                205..206,
+            ),
+            Some(
+                199..207,
+            ),
+            Some(
+                188..208,
+            ),
+            Some(
+                171..208,
+            ),
+            Some(
+                154..208,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 3,
+        data: [
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "funky",
+                    ),
+                ),
+            },
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "x",
+                    ),
+                ),
+            },
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "y",
+                    ),
+                ),
+            },
+        ],
+    },
+    pattern_ranges: ArenaMap {
+        v: [
+            Some(
+                155..160,
+            ),
+            Some(
+                162..163,
+            ),
+            Some(
+                165..166,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+    type_annotations: {
+        Name(
+            "testThing",
+        ): Idx::<Type>(9),
+    },
+    types: Arena {
+        len: 10,
+        data: [
+            Named(
+                ThisModule(
+                    Name(
+                        "t2",
+                    ),
+                ),
+            ),
+            Named(
+                ThisModule(
+                    Name(
+                        "t1",
+                    ),
+                ),
+            ),
+            Lambda {
+                arg_type: Idx::<Type>(0),
+                return_type: Idx::<Type>(1),
+            },
+            ParenthesizedType(
+                Idx::<Type>(2),
+            ),
+            Named(
+                ThisModule(
+                    Name(
+                        "t2",
+                    ),
+                ),
+            ),
+            Named(
+                ThisModule(
+                    Name(
+                        "t2",
+                    ),
+                ),
+            ),
+            Named(
+                ThisModule(
+                    Name(
+                        "ResultThing",
+                    ),
+                ),
+            ),
+            Lambda {
+                arg_type: Idx::<Type>(5),
+                return_type: Idx::<Type>(6),
+            },
+            Lambda {
+                arg_type: Idx::<Type>(4),
+                return_type: Idx::<Type>(7),
+            },
+            Lambda {
+                arg_type: Idx::<Type>(3),
+                return_type: Idx::<Type>(8),
+            },
+        ],
+    },
+    type_ranges: ArenaMap {
+        v: [
+            Some(
+                49..52,
+            ),
+            Some(
+                55..57,
+            ),
+            Some(
+                49..57,
+            ),
+            Some(
+                48..59,
+            ),
+            Some(
+                62..65,
+            ),
+            Some(
+                68..71,
+            ),
+            Some(
+                74..86,
+            ),
+            Some(
+                68..86,
+            ),
+            Some(
+                62..86,
+            ),
+            Some(
+                48..86,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+}
+[]

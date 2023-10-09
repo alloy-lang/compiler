@@ -1,0 +1,104 @@
+let add = |a, b| -> a + b
+===
+HirModule {
+    imports: {},
+    values: Arena {
+        len: 1,
+        data: [
+            Value {
+                name: Name(
+                    "add",
+                ),
+                value: Idx::<Expression>(3),
+            },
+        ],
+    },
+    expressions: Arena {
+        len: 4,
+        data: [
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "a",
+                    ),
+                ),
+            },
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "b",
+                    ),
+                ),
+            },
+            Binary {
+                op: Add,
+                lhs: Idx::<Expression>(0),
+                rhs: Idx::<Expression>(1),
+            },
+            Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                ],
+                body: Idx::<Expression>(2),
+            },
+        ],
+    },
+    expression_ranges: ArenaMap {
+        v: [
+            Some(
+                20..22,
+            ),
+            Some(
+                24..25,
+            ),
+            Some(
+                20..25,
+            ),
+            Some(
+                10..25,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 2,
+        data: [
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "a",
+                    ),
+                ),
+            },
+            VariableRef {
+                name: ThisModule(
+                    Name(
+                        "b",
+                    ),
+                ),
+            },
+        ],
+    },
+    pattern_ranges: ArenaMap {
+        v: [
+            Some(
+                11..12,
+            ),
+            Some(
+                14..15,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+    type_annotations: {},
+    types: Arena {
+        len: 0,
+        data: [],
+    },
+    type_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+}
+[]

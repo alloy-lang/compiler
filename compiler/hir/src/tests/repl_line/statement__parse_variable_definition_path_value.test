@@ -1,0 +1,69 @@
+let foo = ResultThing::More::Stuff::here
+===
+HirModule {
+    imports: {},
+    values: Arena {
+        len: 1,
+        data: [
+            Value {
+                name: Name(
+                    "foo",
+                ),
+                value: Idx::<Expression>(0),
+            },
+        ],
+    },
+    expressions: Arena {
+        len: 1,
+        data: [
+            VariableRef {
+                name: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                Name(
+                                    "ResultThing",
+                                ),
+                                Name(
+                                    "More",
+                                ),
+                                Name(
+                                    "Stuff",
+                                ),
+                            ],
+                        ),
+                        name: Name(
+                            "here",
+                        ),
+                    },
+                ),
+            },
+        ],
+    },
+    expression_ranges: ArenaMap {
+        v: [
+            Some(
+                10..40,
+            ),
+        ],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+    },
+    patterns: Arena {
+        len: 0,
+        data: [],
+    },
+    pattern_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    },
+    type_annotations: {},
+    types: Arena {
+        len: 0,
+        data: [],
+    },
+    type_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+}
+[]
