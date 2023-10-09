@@ -288,6 +288,6 @@ fn lower_match_expression(ctx: &mut LoweringCtx, e: &ast::MatchExpr) -> Expressi
 
     Expression::Match {
         condition,
-        targets: vec![],
+        targets,
     }
 }

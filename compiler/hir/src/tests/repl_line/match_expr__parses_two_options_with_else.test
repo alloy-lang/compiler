@@ -26,7 +26,16 @@ HirModule {
             ),
             Match {
                 condition: Idx::<Expression>(0),
-                targets: [],
+                targets: [
+                    (
+                        Idx::<Pattern>(0),
+                        Idx::<Expression>(1),
+                    ),
+                    (
+                        Idx::<Pattern>(1),
+                        Idx::<Expression>(2),
+                    ),
+                ],
             },
         ],
     },
