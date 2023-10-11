@@ -85,8 +85,8 @@ match test when
                 targets: [
                     MatchTarget {
                         condition: Some(
-                            Destructor(
-                                Destructor {
+                            Destructure(
+                                Destructure {
                                     target: Some(
                                         VariableRef {
                                             name: Some(
@@ -131,8 +131,8 @@ match test when
                     },
                     MatchTarget {
                         condition: Some(
-                            Destructor(
-                                Destructor {
+                            Destructure(
+                                Destructure {
                                     target: Some(
                                         VariableRef {
                                             name: Some(

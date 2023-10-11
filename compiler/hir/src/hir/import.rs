@@ -1,4 +1,3 @@
-use std::fmt;
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
@@ -34,7 +33,7 @@ pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
         .collect::<Vec<_>>();
     let num_segments = children.len();
     let Some(((_, first), rest)) = children.split_first() else {
-        todo!("validation");
+        // todo!("validation");
         return;
     };
     let mut segments = match first {
@@ -46,7 +45,7 @@ pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
             NonEmpty::new(segment)
         }
         ast::ImportDefChild::ImportDefGroup(_) => {
-            todo!("validation");
+            // todo!("validation");
             return;
         }
     };
@@ -70,19 +69,19 @@ pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
                 }
             }
             ast::ImportDefChild::ImportDefGroup(_) => {
-                todo!("validation");
+                // todo!("validation");
                 return;
             }
         }
     }
 
-    ctx.import(segments);
+    ctx.add_import(segments);
 }
 
 fn lower_import_def_segment(ast: &ast::ImportDefSegment) -> Option<Name> {
     match ast.name() {
         None => {
-            todo!("validation");
+            // todo!("validation");
             return None;
         }
         Some(segment) => Some(Name::new(segment)),

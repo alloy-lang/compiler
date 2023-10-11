@@ -59,10 +59,10 @@ fn maybe_parse_typedef_destructuring(p: &mut Parser, lhs: CompletedMarker) -> Co
         return lhs;
     }
 
-    let cm = lhs.precede(p).complete(p, SyntaxKind::DestructorTarget);
+    let cm = lhs.precede(p).complete(p, SyntaxKind::DestructureTarget);
     parse_typedef_destructuring(p);
 
-    cm.precede(p).complete(p, SyntaxKind::Destructor)
+    cm.precede(p).complete(p, SyntaxKind::Destructure)
 }
 
 fn parse_typedef_destructuring(p: &mut Parser) {
@@ -75,8 +75,8 @@ fn parse_typedef_destructuring(p: &mut Parser) {
 
         parse_argument(
             p,
-            SyntaxKind::DestructorArg,
-            ParseErrorContext::DestructorArgPattern,
+            SyntaxKind::DestructureArg,
+            ParseErrorContext::DestructureArgPattern,
             ts![TokenKind::RParen, TokenKind::Comma],
         );
 
@@ -86,12 +86,12 @@ fn parse_typedef_destructuring(p: &mut Parser) {
 
         p.expect_with_recovery(
             TokenKind::Comma,
-            ParseErrorContext::DestructorArgComma,
+            ParseErrorContext::DestructureArgComma,
             ARGUMENT_RECOVERY_SET,
         );
     }
 
-    p.expect(TokenKind::RParen, ParseErrorContext::DestructorRightParen);
+    p.expect(TokenKind::RParen, ParseErrorContext::DestructureRightParen);
 
     return;
 

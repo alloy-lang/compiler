@@ -10,7 +10,7 @@ ast_union_node!(Pattern, kinds: [
     CharLiteral,
     VariableRef,
     NilIdentifier,
-    Destructor,
+    Destructure,
     Unit,
     ParenPattern,
     TuplePattern
@@ -69,17 +69,17 @@ impl VariableRef {
 
 ast_token!(NilIdentifier, fields: []);
 
-ast_node!(Destructor, fields: [target, args]);
+ast_node!(Destructure, fields: [target, args]);
 
-impl Destructor {
+impl Destructure {
     #[must_use]
     pub fn target(&self) -> Option<VariableRef> {
-        first_matching_child(self, SyntaxKind::DestructorTarget)
+        first_matching_child(self, SyntaxKind::DestructureTarget)
     }
 
     #[must_use]
     pub fn args(&self) -> Vec<Pattern> {
-        all_matching_children(self, SyntaxKind::DestructorArg)
+        all_matching_children(self, SyntaxKind::DestructureArg)
     }
 }
 

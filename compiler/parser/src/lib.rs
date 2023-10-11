@@ -4,7 +4,8 @@ use std::fmt::Write as _;
 use alloy_lexer::Lexer;
 use alloy_syntax::SyntaxNode;
 
-use crate::parser::{ParseError, Parser};
+use crate::parser::Parser;
+pub use crate::parser::ParseError;
 use crate::sink::Sink;
 use crate::source::Source;
 
@@ -68,7 +69,7 @@ impl Parse {
     }
 
     #[must_use]
-    pub fn errors(&self) -> &Vec<ParseError> {
+    pub fn errors(&self) -> &[ParseError] {
         &self.errors
     }
 }

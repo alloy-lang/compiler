@@ -11,101 +11,89 @@ pub enum Pattern {
     StringLiteral(String),
     CharLiteral(char),
     VariableRef { name: Path },
-    NilIdentifier,
-    Destructor { target: Path, args: Vec<PatternIdx> },
+    Nil,
+    Destructure { target: Path, args: Vec<PatternIdx> },
     Unit,
-    Paren(PatternIdx),
     Tuple(NonEmpty<PatternIdx>),
 }
 
 pub(super) fn lower_pattern(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> PatternIdx {
     let pattern = lower_pattern_inner(ctx, ast);
-    ctx.pattern(pattern, &ast.syntax())
+    ctx.add_pattern(pattern, &ast.syntax())
 }
 
 fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
     match ast {
         ast::Pattern::IntLiteral(lit) => {
             let Some(value) = lit.value() else {
-                todo!("validation");
+                // todo!("validation");
                 return Pattern::Missing;
             };
             Pattern::IntLiteral(value)
         }
         ast::Pattern::FractionLiteral(lit) => {
             let Some(value) = lit.value() else {
-                todo!("validation");
+                // todo!("validation");
                 return Pattern::Missing;
             };
             Pattern::FractionLiteral(value)
         }
         ast::Pattern::StringLiteral(lit) => {
             let Some(value) = lit.value() else {
-                todo!("validation");
+                // todo!("validation");
                 return Pattern::Missing;
             };
             Pattern::StringLiteral(value)
         }
         ast::Pattern::CharLiteral(lit) => {
             let Some(value) = lit.value() else {
-                todo!("validation");
+                // todo!("validation");
                 return Pattern::Missing;
             };
             Pattern::CharLiteral(value)
         }
         ast::Pattern::VariableRef(var) => {
-            let name = match lower_variable_ref(var) {
-                Ok(value) => value,
-                Err(value) => return value,
+            let Some(name) = lower_variable_ref(var) else {
+                // todo!("validation");
+                return Pattern::Missing;
             };
 
             Pattern::VariableRef { name }
         }
-        ast::Pattern::NilIdentifier(_) => Pattern::NilIdentifier,
-        ast::Pattern::Destructor(destructor) => {
-            let Some(target) = destructor.target() else {
-                todo!("validation");
+        ast::Pattern::NilIdentifier(_) => Pattern::Nil,
+        ast::Pattern::Destructure(destructure) => {
+            let Some(target) = destructure
+                .target()
+                .and_then(|target| lower_variable_ref(&target))
+            else {
+                // todo!("validation");
                 return Pattern::Missing;
             };
-            let Ok(target) = lower_variable_ref(&target) else {
-                todo!("validation");
-                return Pattern::Missing;
-            };
-            let args = destructor
+
+            let args = destructure
                 .args()
                 .iter()
                 .map(|arg| lower_pattern(ctx, &arg))
                 .collect::<Vec<_>>();
-            Pattern::Destructor { target, args }
+            Pattern::Destructure { target, args }
         }
         ast::Pattern::Unit(_) => Pattern::Unit,
-        ast::Pattern::ParenPattern(paren) => {
-            let Some(inner) = paren.pattern() else {
-                todo!("validation");
-                return Pattern::Missing;
-            };
-            let Some(inner) = inner.arg() else {
-                todo!("validation");
-                return Pattern::Missing;
-            };
-
-            lower_pattern_inner(ctx, &inner)
-        }
+        ast::Pattern::ParenPattern(paren) => paren
+            .pattern()
+            .and_then(|inner| inner.arg())
+            .map_or(Pattern::Missing, |inner| lower_pattern_inner(ctx, &inner)),
         ast::Pattern::TuplePattern(tuple) => {
             let args = tuple
                 .patterns()
                 .iter()
-                .map(|arg| {
-                    let Some(arg) = arg.arg() else {
-                        todo!("validation");
-                        return ctx.pattern(Pattern::Missing, &arg.syntax());
-                    };
-                    lower_pattern(ctx, &arg)
+                .map(|arg| match arg.arg() {
+                    Some(arg) => lower_pattern(ctx, &arg),
+                    None => ctx.add_missing_pattern(&arg.syntax()),
                 })
                 .collect::<Vec<_>>();
 
             let Ok(args) = NonEmpty::try_from(args) else {
-                todo!("validation");
+                // todo!("validation");
                 return Pattern::Missing;
             };
 
@@ -114,15 +102,15 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
     }
 }
 
-pub(super) fn lower_variable_ref(var: &ast::VariableRef) -> Result<Path, Pattern> {
+pub(super) fn lower_variable_ref(var: &ast::VariableRef) -> Option<Path> {
     let Some(path) = var.name() else {
-        todo!("validation");
-        return Err(Pattern::Missing);
+        // todo!("validation");
+        return None;
     };
 
     let Ok(name) = Path::try_from(path.segments()) else {
-        todo!("validation");
-        return Err(Pattern::Missing);
+        // todo!("validation");
+        return None;
     };
-    Ok(name)
+    Some(name)
 }

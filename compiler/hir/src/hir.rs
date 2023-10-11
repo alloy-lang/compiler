@@ -100,7 +100,7 @@ impl LoweringCtx {
         (hir, self.errors)
     }
 
-    pub(crate) fn expression(
+    pub(crate) fn add_expression(
         &mut self,
         expression: Expression,
         element: &SyntaxElement,
@@ -110,31 +110,46 @@ impl LoweringCtx {
 
         idx
     }
-    pub(crate) fn pattern(&mut self, pattern: Pattern, element: &SyntaxElement) -> PatternIdx {
+
+    pub(crate) fn add_missing_expression(&mut self, element: &SyntaxElement) -> ExpressionIdx {
+        let idx = self.expressions.alloc(Expression::Missing);
+        self.expression_ranges.insert(idx, element.text_range());
+
+        idx
+    }
+
+    pub(crate) fn add_pattern(&mut self, pattern: Pattern, element: &SyntaxElement) -> PatternIdx {
         let idx = self.patterns.alloc(pattern);
         self.pattern_ranges.insert(idx, element.text_range());
 
         idx
     }
 
-    pub(crate) fn type_(&mut self, type_: Type, element: &SyntaxElement) -> TypeIdx {
+    pub(crate) fn add_missing_pattern(&mut self, element: &SyntaxElement) -> PatternIdx {
+        let idx = self.patterns.alloc(Pattern::Missing);
+        self.pattern_ranges.insert(idx, element.text_range());
+
+        idx
+    }
+
+    pub(crate) fn add_type_(&mut self, type_: Type, element: &SyntaxElement) -> TypeIdx {
         let idx = self.types.alloc(type_);
         self.type_ranges.insert(idx, element.text_range());
 
         idx
     }
 
-    pub(crate) fn type_annotation(&mut self, name: Name, type_id: TypeIdx) {
+    pub(crate) fn add_type_annotation(&mut self, name: Name, type_id: TypeIdx) {
         self.type_annotations.insert(name, type_id);
     }
 
-    pub(crate) fn value(&mut self, value: Value) {
+    pub(crate) fn add_value(&mut self, value: Value) {
         self.values.alloc(value);
     }
 
-    pub(crate) fn import(&mut self, path: NonEmpty<Name>) {
+    pub(crate) fn add_import(&mut self, path: NonEmpty<Name>) {
         if !self.imports.insert(Import::new(path)) {
-            todo!("validation")
+            // todo!("validation")
         }
     }
 }

@@ -8,20 +8,16 @@ pub struct Value {
 }
 
 pub(super) fn lower_value(ctx: &mut LoweringCtx, ast: &ast::ValueDef) {
+    let value = match ast.value() {
+        Some(value) => lower_expression(ctx, &value),
+        None => ctx.add_missing_expression(&ast.syntax()),
+    };
+
     let Some(name) = ast.name() else {
-        todo!("validation");
+        // todo!("validation");
         return;
     };
     let name = Name::new(name);
 
-    let Some(value) = ast.value() else {
-        todo!("validation");
-        return;
-    };
-    let value = lower_expression(ctx, &value);
-
-    ctx.value(Value {
-        name,
-        value,
-    });
+    ctx.add_value(Value { name, value });
 }

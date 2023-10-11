@@ -5,15 +5,15 @@ SourceFile@0..22
     LambdaExprArgList@0..18
       Pipe@0..1 "|"
       LambdaExprArg@1..16
-        Destructor@1..16
-          DestructorTarget@1..13
+        Destructure@1..16
+          DestructureTarget@1..13
             VariableRef@1..13
               Path@1..13
                 Ident@1..7 "Option"
                 DoubleColon@7..9 "::"
                 Ident@9..13 "Some"
           LParen@13..14 "("
-          DestructorArg@14..15
+          DestructureArg@14..15
             VariableRef@14..15
               Path@14..15
                 Ident@14..15 "x"

@@ -66,7 +66,7 @@ HirModule {
                     ),
                 ),
             },
-            NilIdentifier,
+            Nil,
         ],
     },
     pattern_ranges: ArenaMap {
@@ -90,4 +90,5 @@ HirModule {
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
 }
+[]
 []

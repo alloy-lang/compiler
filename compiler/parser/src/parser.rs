@@ -9,7 +9,7 @@ use crate::parser::parse_error::ParseErrorKind;
 use crate::source::Source;
 use crate::token_set::TokenSet;
 use crate::{grammar, ts};
-pub(crate) use parse_error::ParseError;
+pub use parse_error::ParseError;
 pub(crate) use parse_error::ParseErrorContext;
 
 use self::marker::Marker;

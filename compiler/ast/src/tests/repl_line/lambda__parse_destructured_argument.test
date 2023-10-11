@@ -7,8 +7,8 @@
                 args: [
                     LambdaExprArg {
                         pattern: Some(
-                            Destructor(
-                                Destructor {
+                            Destructure(
+                                Destructure {
                                     target: Some(
                                         VariableRef {
                                             name: Some(

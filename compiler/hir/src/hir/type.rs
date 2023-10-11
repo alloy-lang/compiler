@@ -28,7 +28,7 @@ pub enum Type {
 
 pub(super) fn lower_type(ctx: &mut LoweringCtx, ast: &ast::Type) -> TypeIdx {
     let type_ = lower_type_inner(ctx, ast);
-    ctx.type_(type_, &ast.syntax())
+    ctx.add_type_(type_, &ast.syntax())
 }
 
 fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> Type {
@@ -38,12 +38,12 @@ fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> Type {
         ast::Type::NilIdentifier(_) => Type::Unknown,
         ast::Type::TypeIdentifier(t) => {
             let Some(path) = t.name() else {
-                todo!("validation");
+                // todo!("validation");
                 return Type::Missing;
             };
 
             let Ok(name) = Path::try_from(path.segments()) else {
-                todo!("validation");
+                // todo!("validation");
                 return Type::Missing;
             };
 
@@ -51,13 +51,13 @@ fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> Type {
         }
         ast::Type::LambdaType(t) => {
             let Some(arg_type) = t.arg_type() else {
-                todo!("validation");
+                // todo!("validation");
                 return Type::Missing;
             };
             let arg_type = lower_type(ctx, &arg_type);
 
             let Some(return_type) = t.return_type() else {
-                todo!("validation");
+                // todo!("validation");
                 return Type::Missing;
             };
             let return_type = lower_type(ctx, &return_type);
@@ -68,7 +68,8 @@ fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> Type {
             }
         }
         ast::Type::TupleType(t) => {
-            let types = t.members()
+            let types = t
+                .members()
                 .iter()
                 .map(|member| lower_type(ctx, &member))
                 .collect::<Vec<_>>();
@@ -76,7 +77,7 @@ fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> Type {
         }
         ast::Type::ParenthesizedType(t) => {
             let Some(inner) = t.inner() else {
-                todo!("validation");
+                // todo!("validation");
                 return Type::Missing;
             };
 
@@ -85,20 +86,18 @@ fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> Type {
         }
         ast::Type::BoundedType(t) => {
             let Some(base) = t.base() else {
-                todo!("validation");
+                // todo!("validation");
                 return Type::Missing;
             };
             let base = lower_type(ctx, &base);
 
-            let args = t.args()
+            let args = t
+                .args()
                 .iter()
                 .map(|member| lower_type(ctx, &member))
                 .collect::<Vec<_>>();
 
-            Type::Bounded {
-                base,
-                args,
-            }
+            Type::Bounded { base, args }
         }
     }
 }

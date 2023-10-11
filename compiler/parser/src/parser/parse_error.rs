@@ -3,14 +3,14 @@ use itertools::Itertools;
 use std::fmt;
 use text_size::{TextRange, TextSize};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ParseError {
     pub(super) expected: Vec<TokenKind>,
     pub(super) kind: ParseErrorKind,
     pub(super) context: ParseErrorContext,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub(crate) enum ParseErrorKind {
     Missing { offset: TextSize },
     Unexpected { found: TokenKind, range: TextRange },
@@ -28,9 +28,9 @@ pub(crate) enum ParseErrorContext {
     FunctionCallArgExpr,
     FunctionCallArgComma,
     FunctionCallRightParen,
-    DestructorArgPattern,
-    DestructorArgComma,
-    DestructorRightParen,
+    DestructureArgPattern,
+    DestructureArgComma,
+    DestructureRightParen,
     PrefixExprExpr,
     ParenExprExpr,
     ParenExprComma,
@@ -110,9 +110,9 @@ impl ParseErrorContext {
             ParseErrorContext::FunctionCallArgExpr => "a function call argument",
             ParseErrorContext::FunctionCallArgComma => "a comma between arguments in a function call",
             ParseErrorContext::FunctionCallRightParen => "a close parenthesis after a function call",
-            ParseErrorContext::DestructorArgPattern => "a destructor argument",
-            ParseErrorContext::DestructorArgComma => "a comma between arguments in a destructor",
-            ParseErrorContext::DestructorRightParen => "a close parenthesis at the end of a destructor",
+            ParseErrorContext::DestructureArgPattern => "a destructure argument",
+            ParseErrorContext::DestructureArgComma => "a comma between arguments in a destructure",
+            ParseErrorContext::DestructureRightParen => "a close parenthesis at the end of a destructure",
             ParseErrorContext::PrefixExprExpr => "an expression after a prefix operator",
             ParseErrorContext::ParenExprExpr => "an expression inside parentheses",
             ParseErrorContext::ParenExprComma => "a comma between expressions inside parentheses",

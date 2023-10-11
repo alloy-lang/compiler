@@ -45,7 +45,7 @@ HirModule {
                     ),
                 ),
             },
-            Destructor {
+            Destructure {
                 target: OtherModule(
                     Fqn {
                         module: NonEmpty(
@@ -87,4 +87,5 @@ HirModule {
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
 }
+[]
 []

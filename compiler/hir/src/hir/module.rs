@@ -1,19 +1,6 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-// pub type ModuleIdx = Idx<Module>;
-
-// #[derive(Debug)]
-// pub struct Module {
-//     name: String,
-//     imports: Vec<Import>,
-//     traits: Vec<Trait>,
-//     behaviors: Vec<Behavior>,
-//     type_definitions: Vec<TypeDefinition>,
-//     type_annotations: Vec<TypeAnnotation>,
-//     value_definitions: Vec<ValueDefinition>,
-// }
-
 pub(super) fn lower_module(ctx: &mut LoweringCtx, module: &ast::ModuleDef) {
     for import in module.imports() {
         lower_import(ctx, &import);
