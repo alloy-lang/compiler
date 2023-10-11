@@ -162,7 +162,7 @@ pub trait AstElement: Sized {
         }
     }
 
-    fn span(&self) -> TextRange {
+    fn range(&self) -> TextRange {
         self.syntax().text_range()
     }
 }

@@ -4,8 +4,8 @@ use std::fmt::Write as _;
 use alloy_lexer::Lexer;
 use alloy_syntax::SyntaxNode;
 
-use crate::parser::Parser;
 pub use crate::parser::ParseError;
+use crate::parser::Parser;
 use crate::sink::Sink;
 use crate::source::Source;
 

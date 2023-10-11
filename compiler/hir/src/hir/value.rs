@@ -5,6 +5,7 @@ use super::*;
 pub struct Value {
     name: Name,
     value: ExpressionIdx,
+    range: TextRange,
 }
 
 pub(super) fn lower_value(ctx: &mut LoweringCtx, ast: &ast::ValueDef) {
@@ -19,5 +20,5 @@ pub(super) fn lower_value(ctx: &mut LoweringCtx, ast: &ast::ValueDef) {
     };
     let name = Name::new(name);
 
-    ctx.add_value(Value { name, value });
+    ctx.add_value(Value { name, value, range: ast.range() });
 }
