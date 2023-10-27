@@ -65,7 +65,7 @@ pub(super) fn lower_expression(ctx: &mut LoweringCtx, ast: &ast::Expression) -> 
     ctx.add_expression(expression, &ast.syntax())
 }
 
-fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expression) -> Expression {
+pub(super) fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expression) -> Expression {
     match ast {
         ast::Expression::IntLiteral(lit) => {
             let Some(value) = lit.value() else {

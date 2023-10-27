@@ -1,7 +1,7 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Import {
     segments: Vec<Name>,
     last: Name,
@@ -20,7 +20,7 @@ impl Import {
         &self.last
     }
 
-    pub fn path(&self) -> &[Name] {
+    pub fn segments(&self) -> &[Name] {
         &self.segments
     }
 }
@@ -75,7 +75,7 @@ pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
         }
     }
 
-    ctx.add_import(segments);
+    ctx.add_import(segments, import.syntax());
 }
 
 fn lower_import_def_segment(ast: &ast::ImportDefSegment) -> Option<Name> {

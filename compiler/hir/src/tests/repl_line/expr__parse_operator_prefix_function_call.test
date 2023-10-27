@@ -1,62 +1,74 @@
 >>(func1, func2)
 ===
 HirModule {
-    imports: {},
-    values: Arena {
-        len: 0,
-        data: [],
+    imports: Index {
+        items: Arena {
+            len: 0,
+            data: [],
+        },
+        item_ranges: ArenaMap {
+            v: [],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
+        },
+        item_names: {},
     },
-    expressions: Arena {
-        len: 3,
-        data: [
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "func1",
+    expressions: Index {
+        items: Arena {
+            len: 3,
+            data: [
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "func1",
+                        ),
                     ),
-                ),
-            },
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "func2",
+                },
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "func2",
+                        ),
                     ),
-                ),
-            },
-            FunctionCall {
-                target: ThisModule(
-                    Name(
-                        ">>",
+                },
+                FunctionCall {
+                    target: ThisModule(
+                        Name(
+                            ">>",
+                        ),
                     ),
+                    args: [
+                        Idx::<Expression>(0),
+                        Idx::<Expression>(1),
+                    ],
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    3..8,
                 ),
-                args: [
-                    Idx::<Expression>(0),
-                    Idx::<Expression>(1),
-                ],
-            },
-        ],
+                Some(
+                    10..15,
+                ),
+                Some(
+                    0..16,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+        },
+        item_names: {},
     },
-    expression_ranges: ArenaMap {
-        v: [
-            Some(
-                3..8,
-            ),
-            Some(
-                10..15,
-            ),
-            Some(
-                0..16,
-            ),
-        ],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-    },
-    patterns: Arena {
-        len: 0,
-        data: [],
-    },
-    pattern_ranges: ArenaMap {
-        v: [],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    patterns: Index {
+        items: Arena {
+            len: 0,
+            data: [],
+        },
+        item_ranges: ArenaMap {
+            v: [],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+        },
+        item_names: {},
     },
     type_annotations: {},
     types: Arena {
@@ -67,6 +79,8 @@ HirModule {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
+    warnings: [],
+    errors: [],
 }
 []
 []

@@ -5,168 +5,177 @@ module TestModule1 where
     let testThing = |funky, x, y| -> TestType::new <| (funky(x), funky(y))
 ===
 HirModule {
-    imports: {},
-    values: Arena {
-        len: 1,
-        data: [
-            Value {
-                name: Name(
-                    "testThing",
-                ),
-                value: Idx::<Expression>(7),
-            },
-        ],
+    imports: Index {
+        items: Arena {
+            len: 0,
+            data: [],
+        },
+        item_ranges: ArenaMap {
+            v: [],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
+        },
+        item_names: {},
     },
-    expressions: Arena {
-        len: 8,
-        data: [
-            VariableRef {
-                name: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                Name(
-                                    "TestType",
-                                ),
-                            ],
-                        ),
-                        name: Name(
-                            "new",
-                        ),
-                    },
-                ),
-            },
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "x",
+    expressions: Index {
+        items: Arena {
+            len: 8,
+            data: [
+                VariableRef {
+                    name: OtherModule(
+                        Fqn {
+                            module: NonEmpty(
+                                [
+                                    Name(
+                                        "TestType",
+                                    ),
+                                ],
+                            ),
+                            name: Name(
+                                "new",
+                            ),
+                        },
                     ),
-                ),
-            },
-            FunctionCall {
-                target: ThisModule(
-                    Name(
-                        "funky",
-                    ),
-                ),
-                args: [
-                    Idx::<Expression>(1),
-                ],
-            },
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "y",
-                    ),
-                ),
-            },
-            FunctionCall {
-                target: ThisModule(
-                    Name(
-                        "funky",
-                    ),
-                ),
-                args: [
-                    Idx::<Expression>(3),
-                ],
-            },
-            Tuple(
-                NonEmpty(
-                    [
-                        Idx::<Expression>(2),
-                        Idx::<Expression>(4),
-                    ],
-                ),
-            ),
-            Binary {
-                op: Custom(
-                    ThisModule(
+                },
+                VariableRef {
+                    name: ThisModule(
                         Name(
-                            "<|",
+                            "x",
                         ),
                     ),
-                ),
-                lhs: Idx::<Expression>(0),
-                rhs: Idx::<Expression>(5),
-            },
-            Lambda {
-                args: [
-                    Idx::<Pattern>(0),
-                    Idx::<Pattern>(1),
-                    Idx::<Pattern>(2),
-                ],
-                body: Idx::<Expression>(6),
-            },
-        ],
-    },
-    expression_ranges: ArenaMap {
-        v: [
-            Some(
-                171..185,
-            ),
-            Some(
-                195..196,
-            ),
-            Some(
-                189..197,
-            ),
-            Some(
-                205..206,
-            ),
-            Some(
-                199..207,
-            ),
-            Some(
-                188..208,
-            ),
-            Some(
-                171..208,
-            ),
-            Some(
-                154..208,
-            ),
-        ],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-    },
-    patterns: Arena {
-        len: 3,
-        data: [
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "funky",
+                },
+                FunctionCall {
+                    target: ThisModule(
+                        Name(
+                            "funky",
+                        ),
+                    ),
+                    args: [
+                        Idx::<Expression>(1),
+                    ],
+                },
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "y",
+                        ),
+                    ),
+                },
+                FunctionCall {
+                    target: ThisModule(
+                        Name(
+                            "funky",
+                        ),
+                    ),
+                    args: [
+                        Idx::<Expression>(3),
+                    ],
+                },
+                Tuple(
+                    NonEmpty(
+                        [
+                            Idx::<Expression>(2),
+                            Idx::<Expression>(4),
+                        ],
                     ),
                 ),
-            },
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "x",
+                Binary {
+                    op: Custom(
+                        ThisModule(
+                            Name(
+                                "<|",
+                            ),
+                        ),
                     ),
+                    lhs: Idx::<Expression>(0),
+                    rhs: Idx::<Expression>(5),
+                },
+                Lambda {
+                    args: [
+                        Idx::<Pattern>(0),
+                        Idx::<Pattern>(1),
+                        Idx::<Pattern>(2),
+                    ],
+                    body: Idx::<Expression>(6),
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    171..185,
                 ),
-            },
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "y",
-                    ),
+                Some(
+                    195..196,
                 ),
-            },
-        ],
+                Some(
+                    189..197,
+                ),
+                Some(
+                    205..206,
+                ),
+                Some(
+                    199..207,
+                ),
+                Some(
+                    188..208,
+                ),
+                Some(
+                    171..208,
+                ),
+                Some(
+                    138..208,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+        },
+        item_names: {
+            Name(
+                "testThing",
+            ): Idx::<Expression>(7),
+        },
     },
-    pattern_ranges: ArenaMap {
-        v: [
-            Some(
-                155..160,
-            ),
-            Some(
-                162..163,
-            ),
-            Some(
-                165..166,
-            ),
-        ],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    patterns: Index {
+        items: Arena {
+            len: 3,
+            data: [
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "funky",
+                        ),
+                    ),
+                },
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "x",
+                        ),
+                    ),
+                },
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "y",
+                        ),
+                    ),
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    155..160,
+                ),
+                Some(
+                    162..163,
+                ),
+                Some(
+                    165..166,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+        },
+        item_names: {},
     },
     type_annotations: {
         Name(
@@ -267,6 +276,8 @@ HirModule {
         ],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
+    warnings: [],
+    errors: [],
 }
 []
 []

@@ -3,82 +3,94 @@ match test when
   | _    -> 1
 ===
 HirModule {
-    imports: {},
-    values: Arena {
-        len: 0,
-        data: [],
+    imports: Index {
+        items: Arena {
+            len: 0,
+            data: [],
+        },
+        item_ranges: ArenaMap {
+            v: [],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
+        },
+        item_names: {},
     },
-    expressions: Arena {
-        len: 4,
-        data: [
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "test",
+    expressions: Index {
+        items: Arena {
+            len: 4,
+            data: [
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "test",
+                        ),
                     ),
+                },
+                IntLiteral(
+                    0,
                 ),
-            },
-            IntLiteral(
-                0,
-            ),
-            IntLiteral(
-                1,
-            ),
-            Match {
-                condition: Idx::<Expression>(0),
-                targets: [
-                    (
-                        Idx::<Pattern>(0),
-                        Idx::<Expression>(1),
-                    ),
-                    (
-                        Idx::<Pattern>(1),
-                        Idx::<Expression>(2),
-                    ),
-                ],
-            },
-        ],
-    },
-    expression_ranges: ArenaMap {
-        v: [
-            Some(
-                6..11,
-            ),
-            Some(
-                28..32,
-            ),
-            Some(
-                42..43,
-            ),
-            Some(
-                0..43,
-            ),
-        ],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-    },
-    patterns: Arena {
-        len: 2,
-        data: [
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "True",
-                    ),
+                IntLiteral(
+                    1,
                 ),
-            },
-            Nil,
-        ],
+                Match {
+                    condition: Idx::<Expression>(0),
+                    targets: [
+                        (
+                            Idx::<Pattern>(0),
+                            Idx::<Expression>(1),
+                        ),
+                        (
+                            Idx::<Pattern>(1),
+                            Idx::<Expression>(2),
+                        ),
+                    ],
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    6..11,
+                ),
+                Some(
+                    28..32,
+                ),
+                Some(
+                    42..43,
+                ),
+                Some(
+                    0..43,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+        },
+        item_names: {},
     },
-    pattern_ranges: ArenaMap {
-        v: [
-            Some(
-                20..25,
-            ),
-            Some(
-                34..35,
-            ),
-        ],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    patterns: Index {
+        items: Arena {
+            len: 2,
+            data: [
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "True",
+                        ),
+                    ),
+                },
+                Nil,
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    20..25,
+                ),
+                Some(
+                    34..35,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+        },
+        item_names: {},
     },
     type_annotations: {},
     types: Arena {
@@ -89,6 +101,8 @@ HirModule {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
+    warnings: [],
+    errors: [],
 }
 []
 []

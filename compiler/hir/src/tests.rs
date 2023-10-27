@@ -22,38 +22,34 @@ fn repl_line_errors() {
 }
 
 #[track_caller]
-fn lower_source_file(
-    input: &str,
-) -> (HirModule, Vec<alloy_parser::ParseError>, Vec<LoweringError>) {
+fn lower_source_file(input: &str) -> (HirModule, Vec<alloy_parser::ParseError>) {
     let parse = alloy_parser::parse_source_file(input);
     let parse_errors = parse.errors().to_vec();
     let root = parse.syntax();
     let source_file = ast::source_file(root).unwrap();
 
-    let (hir, lowering_errors) = crate::lower_source_file(&source_file);
-    (hir, parse_errors, lowering_errors)
+    let hir = crate::lower_source_file(&source_file);
+    (hir, parse_errors)
 }
 
 #[track_caller]
-fn lower_repl_line(input: &str) -> (HirModule, Vec<alloy_parser::ParseError>, Vec<LoweringError>) {
+fn lower_repl_line(input: &str) -> (HirModule, Vec<alloy_parser::ParseError>) {
     let parse = alloy_parser::parse_repl_line(input);
     let parse_errors = parse.errors().to_vec();
     let root = parse.syntax();
     let source_file = ast::source_file(root).unwrap();
 
-    let (hir, lowering_errors) = crate::lower_repl_line(&source_file);
-    (hir, parse_errors, lowering_errors)
+    let hir = crate::lower_repl_line(&source_file);
+    (hir, parse_errors)
 }
 
 #[track_caller]
-fn run_parser_test(
-    path: PathBuf,
-    func: fn(&str) -> (HirModule, Vec<alloy_parser::ParseError>, Vec<LoweringError>),
-) {
+fn run_parser_test(path: PathBuf, func: fn(&str) -> (HirModule, Vec<alloy_parser::ParseError>)) {
     let test_content = fs::read_to_string(&path).unwrap();
     let (input, _expected_parse) = test_content.split_once("\n===\n").unwrap();
 
-    let (module, parse_errors, lowering_errors) = func(input);
+    let (module, parse_errors) = func(input);
+    let lowering_errors = module.errors();
 
     let expected_test_content = format!(
         "{}\n===\n{:#?}\n{:#?}\n{:#?}\n",
@@ -64,10 +60,7 @@ fn run_parser_test(
 }
 
 #[track_caller]
-fn run_parser_tests(
-    tests_dir: &str,
-    func: fn(&str) -> (HirModule, Vec<alloy_parser::ParseError>, Vec<LoweringError>),
-) {
+fn run_parser_tests(tests_dir: &str, func: fn(&str) -> (HirModule, Vec<alloy_parser::ParseError>)) {
     let tests_dir = {
         let current_dir = env::current_dir().unwrap();
         current_dir.join(format!("src/tests/{}", tests_dir))
@@ -115,7 +108,8 @@ fn test_std_lib() {
         let source = fs::read_to_string(file_name)
             .unwrap_or_else(|_| panic!("Something went wrong reading the file '{:?}'", file_name));
 
-        let (module, parse_errors, lowering_errors) = lower_source_file(&source);
+        let (module, parse_errors) = lower_source_file(&source);
+        let lowering_errors = module.errors();
 
         assert!(
             parse_errors.is_empty(),

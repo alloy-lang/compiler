@@ -1,4 +1,7 @@
-import std::function::(<|)
+import std::functor::map
+import std::functor::map
+
+let thing = map
 ===
 HirModule {
     imports: Index {
@@ -11,11 +14,11 @@ HirModule {
                             "std",
                         ),
                         Name(
-                            "function",
+                            "functor",
                         ),
                     ],
                     last: Name(
-                        "(<|)",
+                        "map",
                     ),
                 },
             ],
@@ -23,27 +26,43 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    0..26,
+                    0..25,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
         },
         item_names: {
             Name(
-                "(<|)",
+                "map",
             ): Idx::<Import>(0),
         },
     },
     expressions: Index {
         items: Arena {
-            len: 0,
-            data: [],
+            len: 1,
+            data: [
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "map",
+                        ),
+                    ),
+                },
+            ],
         },
         item_ranges: ArenaMap {
-            v: [],
+            v: [
+                Some(
+                    51..66,
+                ),
+            ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
         },
-        item_names: {},
+        item_names: {
+            Name(
+                "thing",
+            ): Idx::<Expression>(0),
+        },
     },
     patterns: Index {
         items: Arena {
@@ -65,7 +84,18 @@ HirModule {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
-    warnings: [],
+    warnings: [
+        LoweringWarning {
+            kind: DuplicateImport {
+                name: Name(
+                    "map",
+                ),
+                first: 0..25,
+                second: 25..51,
+            },
+            range: 25..51,
+        },
+    ],
     errors: [],
 }
 []

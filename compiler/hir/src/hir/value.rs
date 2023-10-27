@@ -1,24 +1,17 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-#[derive(Debug)]
-pub struct Value {
-    name: Name,
-    value: ExpressionIdx,
-    range: TextRange,
-}
-
 pub(super) fn lower_value(ctx: &mut LoweringCtx, ast: &ast::ValueDef) {
-    let value = match ast.value() {
-        Some(value) => lower_expression(ctx, &value),
-        None => ctx.add_missing_expression(&ast.syntax()),
-    };
-
     let Some(name) = ast.name() else {
         // todo!("validation");
         return;
     };
     let name = Name::new(name);
 
-    ctx.add_value(Value { name, value, range: ast.range() });
+    let value = match ast.value() {
+        Some(value) => lower_expression_inner(ctx, &value),
+        None => Expression::Missing,
+    };
+
+    ctx.add_value(name, value, &ast.syntax());
 }

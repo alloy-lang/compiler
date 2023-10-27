@@ -1,73 +1,85 @@
 funky(x, y, z)
 ===
 HirModule {
-    imports: {},
-    values: Arena {
-        len: 0,
-        data: [],
+    imports: Index {
+        items: Arena {
+            len: 0,
+            data: [],
+        },
+        item_ranges: ArenaMap {
+            v: [],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
+        },
+        item_names: {},
     },
-    expressions: Arena {
-        len: 4,
-        data: [
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "x",
+    expressions: Index {
+        items: Arena {
+            len: 4,
+            data: [
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "x",
+                        ),
                     ),
-                ),
-            },
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "y",
+                },
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "y",
+                        ),
                     ),
-                ),
-            },
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "z",
+                },
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "z",
+                        ),
                     ),
-                ),
-            },
-            FunctionCall {
-                target: ThisModule(
-                    Name(
-                        "funky",
+                },
+                FunctionCall {
+                    target: ThisModule(
+                        Name(
+                            "funky",
+                        ),
                     ),
+                    args: [
+                        Idx::<Expression>(0),
+                        Idx::<Expression>(1),
+                        Idx::<Expression>(2),
+                    ],
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    6..7,
                 ),
-                args: [
-                    Idx::<Expression>(0),
-                    Idx::<Expression>(1),
-                    Idx::<Expression>(2),
-                ],
-            },
-        ],
+                Some(
+                    9..10,
+                ),
+                Some(
+                    12..13,
+                ),
+                Some(
+                    0..14,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+        },
+        item_names: {},
     },
-    expression_ranges: ArenaMap {
-        v: [
-            Some(
-                6..7,
-            ),
-            Some(
-                9..10,
-            ),
-            Some(
-                12..13,
-            ),
-            Some(
-                0..14,
-            ),
-        ],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-    },
-    patterns: Arena {
-        len: 0,
-        data: [],
-    },
-    pattern_ranges: ArenaMap {
-        v: [],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    patterns: Index {
+        items: Arena {
+            len: 0,
+            data: [],
+        },
+        item_ranges: ArenaMap {
+            v: [],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+        },
+        item_names: {},
     },
     type_annotations: {},
     types: Arena {
@@ -78,6 +90,8 @@ HirModule {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
+    warnings: [],
+    errors: [],
 }
 []
 []

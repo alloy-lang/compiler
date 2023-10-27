@@ -1,60 +1,69 @@
 let foo = ResultThing::More::Stuff::here
 ===
 HirModule {
-    imports: {},
-    values: Arena {
-        len: 1,
-        data: [
-            Value {
-                name: Name(
-                    "foo",
+    imports: Index {
+        items: Arena {
+            len: 0,
+            data: [],
+        },
+        item_ranges: ArenaMap {
+            v: [],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
+        },
+        item_names: {},
+    },
+    expressions: Index {
+        items: Arena {
+            len: 1,
+            data: [
+                VariableRef {
+                    name: OtherModule(
+                        Fqn {
+                            module: NonEmpty(
+                                [
+                                    Name(
+                                        "ResultThing",
+                                    ),
+                                    Name(
+                                        "More",
+                                    ),
+                                    Name(
+                                        "Stuff",
+                                    ),
+                                ],
+                            ),
+                            name: Name(
+                                "here",
+                            ),
+                        },
+                    ),
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    0..40,
                 ),
-                value: Idx::<Expression>(0),
-            },
-        ],
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+        },
+        item_names: {
+            Name(
+                "foo",
+            ): Idx::<Expression>(0),
+        },
     },
-    expressions: Arena {
-        len: 1,
-        data: [
-            VariableRef {
-                name: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                Name(
-                                    "ResultThing",
-                                ),
-                                Name(
-                                    "More",
-                                ),
-                                Name(
-                                    "Stuff",
-                                ),
-                            ],
-                        ),
-                        name: Name(
-                            "here",
-                        ),
-                    },
-                ),
-            },
-        ],
-    },
-    expression_ranges: ArenaMap {
-        v: [
-            Some(
-                10..40,
-            ),
-        ],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-    },
-    patterns: Arena {
-        len: 0,
-        data: [],
-    },
-    pattern_ranges: ArenaMap {
-        v: [],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    patterns: Index {
+        items: Arena {
+            len: 0,
+            data: [],
+        },
+        item_ranges: ArenaMap {
+            v: [],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+        },
+        item_names: {},
     },
     type_annotations: {},
     types: Arena {
@@ -65,6 +74,8 @@ HirModule {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
+    warnings: [],
+    errors: [],
 }
 []
 []

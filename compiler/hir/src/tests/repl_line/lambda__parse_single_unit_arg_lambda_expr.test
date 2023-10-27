@@ -1,49 +1,61 @@
 |()| -> 5
 ===
 HirModule {
-    imports: {},
-    values: Arena {
-        len: 0,
-        data: [],
+    imports: Index {
+        items: Arena {
+            len: 0,
+            data: [],
+        },
+        item_ranges: ArenaMap {
+            v: [],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
+        },
+        item_names: {},
     },
-    expressions: Arena {
-        len: 2,
-        data: [
-            IntLiteral(
-                5,
-            ),
-            Lambda {
-                args: [
-                    Idx::<Pattern>(0),
-                ],
-                body: Idx::<Expression>(0),
-            },
-        ],
+    expressions: Index {
+        items: Arena {
+            len: 2,
+            data: [
+                IntLiteral(
+                    5,
+                ),
+                Lambda {
+                    args: [
+                        Idx::<Pattern>(0),
+                    ],
+                    body: Idx::<Expression>(0),
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    8..9,
+                ),
+                Some(
+                    0..9,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+        },
+        item_names: {},
     },
-    expression_ranges: ArenaMap {
-        v: [
-            Some(
-                8..9,
-            ),
-            Some(
-                0..9,
-            ),
-        ],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-    },
-    patterns: Arena {
-        len: 1,
-        data: [
-            Unit,
-        ],
-    },
-    pattern_ranges: ArenaMap {
-        v: [
-            Some(
-                1..3,
-            ),
-        ],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    patterns: Index {
+        items: Arena {
+            len: 1,
+            data: [
+                Unit,
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    1..3,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+        },
+        item_names: {},
     },
     type_annotations: {},
     types: Arena {
@@ -54,6 +66,8 @@ HirModule {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
+    warnings: [],
+    errors: [],
 }
 []
 []

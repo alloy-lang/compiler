@@ -4,77 +4,86 @@ typeof (|>) : t1 -> (t1 -> t2) -> t2 where
 let (|>) = |x, f| -> fakeStuff
 ===
 HirModule {
-    imports: {},
-    values: Arena {
-        len: 1,
-        data: [
-            Value {
-                name: Name(
-                    "(|>)",
-                ),
-                value: Idx::<Expression>(1),
-            },
-        ],
+    imports: Index {
+        items: Arena {
+            len: 0,
+            data: [],
+        },
+        item_ranges: ArenaMap {
+            v: [],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
+        },
+        item_names: {},
     },
-    expressions: Arena {
-        len: 2,
-        data: [
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "fakeStuff",
+    expressions: Index {
+        items: Arena {
+            len: 2,
+            data: [
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "fakeStuff",
+                        ),
                     ),
+                },
+                Lambda {
+                    args: [
+                        Idx::<Pattern>(0),
+                        Idx::<Pattern>(1),
+                    ],
+                    body: Idx::<Expression>(0),
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    94..103,
                 ),
-            },
-            Lambda {
-                args: [
-                    Idx::<Pattern>(0),
-                    Idx::<Pattern>(1),
-                ],
-                body: Idx::<Expression>(0),
-            },
-        ],
+                Some(
+                    73..103,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+        },
+        item_names: {
+            Name(
+                "(|>)",
+            ): Idx::<Expression>(1),
+        },
     },
-    expression_ranges: ArenaMap {
-        v: [
-            Some(
-                94..103,
-            ),
-            Some(
-                84..103,
-            ),
-        ],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-    },
-    patterns: Arena {
-        len: 2,
-        data: [
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "x",
+    patterns: Index {
+        items: Arena {
+            len: 2,
+            data: [
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "x",
+                        ),
                     ),
-                ),
-            },
-            VariableRef {
-                name: ThisModule(
-                    Name(
-                        "f",
+                },
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "f",
+                        ),
                     ),
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    85..86,
                 ),
-            },
-        ],
-    },
-    pattern_ranges: ArenaMap {
-        v: [
-            Some(
-                85..86,
-            ),
-            Some(
-                88..89,
-            ),
-        ],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+                Some(
+                    88..89,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+        },
+        item_names: {},
     },
     type_annotations: {
         Name(
@@ -158,6 +167,8 @@ HirModule {
         ],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
+    warnings: [],
+    errors: [],
 }
 []
 []

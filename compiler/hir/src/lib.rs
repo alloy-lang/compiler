@@ -1,6 +1,7 @@
 use non_empty_vec::NonEmpty;
 
 mod hir;
+mod index;
 #[cfg(test)]
 mod tests;
 
@@ -34,5 +35,9 @@ impl Fqn {
                 name: Name::new(name.into()),
             }
         }
+    }
+
+    fn first_module_segment(&self) -> &Name {
+        self.module.first()
     }
 }

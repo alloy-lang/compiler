@@ -1,4 +1,5 @@
-import std::function::(<|)
+import std::option::map
+import std::functor::map
 ===
 HirModule {
     imports: Index {
@@ -11,11 +12,11 @@ HirModule {
                             "std",
                         ),
                         Name(
-                            "function",
+                            "option",
                         ),
                     ],
                     last: Name(
-                        "(<|)",
+                        "map",
                     ),
                 },
             ],
@@ -23,14 +24,14 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    0..26,
+                    0..24,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
         },
         item_names: {
             Name(
-                "(<|)",
+                "map",
             ): Idx::<Import>(0),
         },
     },
@@ -66,7 +67,29 @@ HirModule {
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
     warnings: [],
-    errors: [],
+    errors: [
+        LoweringError {
+            kind: ConflictingImport {
+                name: Name(
+                    "map",
+                ),
+                first: 0..24,
+                second: 24..48,
+            },
+            range: 24..48,
+        },
+    ],
 }
 []
-[]
+[
+    LoweringError {
+        kind: ConflictingImport {
+            name: Name(
+                "map",
+            ),
+            first: 0..24,
+            second: 24..48,
+        },
+        range: 24..48,
+    },
+]

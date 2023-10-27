@@ -3,59 +3,85 @@ module TestModule1 where
     import really::real::other::Thing2
 ===
 HirModule {
-    imports: {
-        Import {
-            segments: [
-                Name(
-                    "really",
+    imports: Index {
+        items: Arena {
+            len: 2,
+            data: [
+                Import {
+                    segments: [
+                        Name(
+                            "really",
+                        ),
+                        Name(
+                            "really",
+                        ),
+                        Name(
+                            "real",
+                        ),
+                    ],
+                    last: Name(
+                        "Thing1",
+                    ),
+                },
+                Import {
+                    segments: [
+                        Name(
+                            "really",
+                        ),
+                        Name(
+                            "real",
+                        ),
+                        Name(
+                            "other",
+                        ),
+                    ],
+                    last: Name(
+                        "Thing2",
+                    ),
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    29..69,
                 ),
-                Name(
-                    "really",
-                ),
-                Name(
-                    "real",
+                Some(
+                    69..103,
                 ),
             ],
-            last: Name(
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
+        },
+        item_names: {
+            Name(
                 "Thing1",
-            ),
-        },
-        Import {
-            segments: [
-                Name(
-                    "really",
-                ),
-                Name(
-                    "real",
-                ),
-                Name(
-                    "other",
-                ),
-            ],
-            last: Name(
+            ): Idx::<Import>(0),
+            Name(
                 "Thing2",
-            ),
+            ): Idx::<Import>(1),
         },
     },
-    values: Arena {
-        len: 0,
-        data: [],
+    expressions: Index {
+        items: Arena {
+            len: 0,
+            data: [],
+        },
+        item_ranges: ArenaMap {
+            v: [],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+        },
+        item_names: {},
     },
-    expressions: Arena {
-        len: 0,
-        data: [],
-    },
-    expression_ranges: ArenaMap {
-        v: [],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-    },
-    patterns: Arena {
-        len: 0,
-        data: [],
-    },
-    pattern_ranges: ArenaMap {
-        v: [],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+    patterns: Index {
+        items: Arena {
+            len: 0,
+            data: [],
+        },
+        item_ranges: ArenaMap {
+            v: [],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+        },
+        item_names: {},
     },
     type_annotations: {},
     types: Arena {
@@ -66,6 +92,8 @@ HirModule {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
+    warnings: [],
+    errors: [],
 }
 []
 []
