@@ -85,10 +85,10 @@ fn reedline_repl() {
                         println!("{}", error);
                     }
 
-                    let source_file = alloy_ast::SourceFile::cast(syntax).unwrap();
+                    let source_file = alloy_ast::source_file(syntax).unwrap();
 
-                    let ast_statements = source_file.stmts().collect::<Vec<_>>();
-                    let hir_statements = alloy_hir::lower(&source_file);
+                    let ast_statements = source_file.statements();
+                    let hir_statements = alloy_hir::lower_repl_line(&source_file);
 
                     dbg!(ast_statements);
                     dbg!(hir_statements);
