@@ -17,7 +17,7 @@ impl Name {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Fqn {
     pub module: NonEmpty<Name>,
     pub name: Name,

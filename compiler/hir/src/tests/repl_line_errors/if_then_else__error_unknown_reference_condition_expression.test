@@ -1,5 +1,3 @@
-let test = True
-
 if test then 2 else 3
 ===
 HirModule {
@@ -16,15 +14,8 @@ HirModule {
     },
     expressions: Index {
         items: Arena {
-            len: 5,
+            len: 4,
             data: [
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "True",
-                        ),
-                    ),
-                },
                 VariableRef {
                     name: ThisModule(
                         Name(
@@ -39,37 +30,30 @@ HirModule {
                     3,
                 ),
                 IfThenElse {
-                    condition: Idx::<Expression>(1),
-                    then: Idx::<Expression>(2),
-                    else_: Idx::<Expression>(3),
+                    condition: Idx::<Expression>(0),
+                    then: Idx::<Expression>(1),
+                    else_: Idx::<Expression>(2),
                 },
             ],
         },
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    0..17,
+                    3..8,
                 ),
                 Some(
-                    20..25,
+                    13..15,
                 ),
                 Some(
-                    30..32,
+                    20..21,
                 ),
                 Some(
-                    37..38,
-                ),
-                Some(
-                    17..38,
+                    0..21,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
         },
-        item_names: {
-            Name(
-                "test",
-            ): Idx::<Expression>(0),
-        },
+        item_names: {},
     },
     patterns: Index {
         items: Arena {
@@ -97,11 +81,11 @@ HirModule {
             kind: UnknownReference {
                 path: ThisModule(
                     Name(
-                        "True",
+                        "test",
                     ),
                 ),
             },
-            range: 11..17,
+            range: 3..8,
         },
     ],
 }

@@ -3,7 +3,7 @@ use std::ffi::OsStr;
 use std::path::PathBuf;
 use std::{env, fs};
 
-use crate::hir::{HirModule, LoweringError};
+use crate::hir::HirModule;
 use alloy_ast as ast;
 
 #[test]
@@ -49,11 +49,10 @@ fn run_parser_test(path: PathBuf, func: fn(&str) -> (HirModule, Vec<alloy_parser
     let (input, _expected_parse) = test_content.split_once("\n===\n").unwrap();
 
     let (module, parse_errors) = func(input);
-    let lowering_errors = module.errors();
 
     let expected_test_content = format!(
-        "{}\n===\n{:#?}\n{:#?}\n{:#?}\n",
-        input, module, parse_errors, lowering_errors,
+        "{}\n===\n{:#?}\n{:#?}\n",
+        input, module, parse_errors,
     );
 
     expect_file![path].assert_eq(&expected_test_content);

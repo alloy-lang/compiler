@@ -1,3 +1,5 @@
+let counter = 0
+
 counter
 ===
 HirModule {
@@ -14,8 +16,11 @@ HirModule {
     },
     expressions: Index {
         items: Arena {
-            len: 1,
+            len: 2,
             data: [
+                IntLiteral(
+                    0,
+                ),
                 VariableRef {
                     name: ThisModule(
                         Name(
@@ -28,12 +33,19 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    0..7,
+                    0..17,
+                ),
+                Some(
+                    17..24,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
         },
-        item_names: {},
+        item_names: {
+            Name(
+                "counter",
+            ): Idx::<Expression>(0),
+        },
     },
     patterns: Index {
         items: Arena {
@@ -58,5 +70,4 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[]
 []

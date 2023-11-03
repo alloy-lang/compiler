@@ -81,15 +81,3 @@ HirModule {
     ],
 }
 []
-[
-    LoweringError {
-        kind: ConflictingImport {
-            name: Name(
-                "map",
-            ),
-            first: 0..24,
-            second: 24..48,
-        },
-        range: 24..48,
-    },
-]

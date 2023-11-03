@@ -1,4 +1,4 @@
-|Option::None| -> x
+|Option::None| -> 5
 ===
 HirModule {
     imports: Index {
@@ -16,13 +16,9 @@ HirModule {
         items: Arena {
             len: 2,
             data: [
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "x",
-                        ),
-                    ),
-                },
+                IntLiteral(
+                    5,
+                ),
                 Lambda {
                     args: [
                         Idx::<Pattern>(0),
@@ -88,5 +84,4 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[]
 []

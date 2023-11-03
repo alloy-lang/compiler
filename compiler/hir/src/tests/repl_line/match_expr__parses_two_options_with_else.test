@@ -1,3 +1,5 @@
+let test = True
+
 match test when
   | True -> 0
   | _    -> 1
@@ -16,8 +18,15 @@ HirModule {
     },
     expressions: Index {
         items: Arena {
-            len: 4,
+            len: 5,
             data: [
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "True",
+                        ),
+                    ),
+                },
                 VariableRef {
                     name: ThisModule(
                         Name(
@@ -32,15 +41,15 @@ HirModule {
                     1,
                 ),
                 Match {
-                    condition: Idx::<Expression>(0),
+                    condition: Idx::<Expression>(1),
                     targets: [
                         (
                             Idx::<Pattern>(0),
-                            Idx::<Expression>(1),
+                            Idx::<Expression>(2),
                         ),
                         (
                             Idx::<Pattern>(1),
-                            Idx::<Expression>(2),
+                            Idx::<Expression>(3),
                         ),
                     ],
                 },
@@ -49,21 +58,28 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    6..11,
+                    0..17,
                 ),
                 Some(
-                    28..32,
+                    23..28,
                 ),
                 Some(
-                    42..43,
+                    45..49,
                 ),
                 Some(
-                    0..43,
+                    59..60,
+                ),
+                Some(
+                    17..60,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
         },
-        item_names: {},
+        item_names: {
+            Name(
+                "test",
+            ): Idx::<Expression>(0),
+        },
     },
     patterns: Index {
         items: Arena {
@@ -82,10 +98,10 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    20..25,
+                    37..42,
                 ),
                 Some(
-                    34..35,
+                    51..52,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
@@ -102,7 +118,17 @@ HirModule {
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
     warnings: [],
-    errors: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                path: ThisModule(
+                    Name(
+                        "True",
+                    ),
+                ),
+            },
+            range: 11..17,
+        },
+    ],
 }
-[]
 []

@@ -95,7 +95,7 @@ pub(super) fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expressio
             };
             Expression::CharLiteral(value)
         }
-        ast::Expression::VariableRef(var) => lower_variable_ref(var),
+        ast::Expression::VariableRef(var) => lower_variable_ref(ctx, var),
         ast::Expression::InfixExpr(e) => lower_infix_expression(ctx, e),
         ast::Expression::Unit(_) => Expression::Unit,
         ast::Expression::IfThenElseExpr(e) => lower_if_then_else_expression(ctx, e),
@@ -153,7 +153,7 @@ fn lower_unary_expression(ctx: &mut LoweringCtx, e: &ast::UnaryExpr) -> Expressi
     }
 }
 
-fn lower_variable_ref(var: &ast::VariableRef) -> Expression {
+fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Expression {
     let Some(path) = var.name() else {
         // todo!("validation");
         return Expression::Missing;
@@ -163,6 +163,13 @@ fn lower_variable_ref(var: &ast::VariableRef) -> Expression {
         // todo!("validation");
         return Expression::Missing;
     };
+
+    if !ctx.contains_variable_ref(&name) {
+        ctx.error(
+            LoweringErrorKind::UnknownReference { path: name.clone() },
+            &var.range(),
+        );
+    }
 
     Expression::VariableRef { name }
 }

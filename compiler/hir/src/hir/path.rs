@@ -3,7 +3,7 @@ use super::*;
 
 use std::convert::TryFrom;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Path {
     ThisModule(Name),
     OtherModule(Fqn),

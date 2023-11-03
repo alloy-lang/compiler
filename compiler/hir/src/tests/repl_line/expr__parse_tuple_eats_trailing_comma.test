@@ -1,3 +1,5 @@
+let foo = 0
+
 (1, foo,)
 ===
 HirModule {
@@ -14,8 +16,11 @@ HirModule {
     },
     expressions: Index {
         items: Arena {
-            len: 3,
+            len: 4,
             data: [
+                IntLiteral(
+                    0,
+                ),
                 IntLiteral(
                     1,
                 ),
@@ -29,8 +34,8 @@ HirModule {
                 Tuple(
                     NonEmpty(
                         [
-                            Idx::<Expression>(0),
                             Idx::<Expression>(1),
+                            Idx::<Expression>(2),
                         ],
                     ),
                 ),
@@ -39,18 +44,25 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    1..2,
+                    0..13,
                 ),
                 Some(
-                    4..7,
+                    14..15,
                 ),
                 Some(
-                    0..9,
+                    17..20,
+                ),
+                Some(
+                    13..22,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
         },
-        item_names: {},
+        item_names: {
+            Name(
+                "foo",
+            ): Idx::<Expression>(0),
+        },
     },
     patterns: Index {
         items: Arena {
@@ -75,5 +87,4 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[]
 []

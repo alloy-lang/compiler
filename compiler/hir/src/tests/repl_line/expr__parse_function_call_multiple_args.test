@@ -1,3 +1,7 @@
+let x = 0
+let y = 1
+let z = 2
+
 funky(x, y, z)
 ===
 HirModule {
@@ -14,8 +18,17 @@ HirModule {
     },
     expressions: Index {
         items: Arena {
-            len: 4,
+            len: 7,
             data: [
+                IntLiteral(
+                    0,
+                ),
+                IntLiteral(
+                    1,
+                ),
+                IntLiteral(
+                    2,
+                ),
                 VariableRef {
                     name: ThisModule(
                         Name(
@@ -44,9 +57,9 @@ HirModule {
                         ),
                     ),
                     args: [
-                        Idx::<Expression>(0),
-                        Idx::<Expression>(1),
-                        Idx::<Expression>(2),
+                        Idx::<Expression>(3),
+                        Idx::<Expression>(4),
+                        Idx::<Expression>(5),
                     ],
                 },
             ],
@@ -54,21 +67,40 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    6..7,
+                    0..10,
                 ),
                 Some(
-                    9..10,
+                    10..20,
                 ),
                 Some(
-                    12..13,
+                    20..31,
                 ),
                 Some(
-                    0..14,
+                    37..38,
+                ),
+                Some(
+                    40..41,
+                ),
+                Some(
+                    43..44,
+                ),
+                Some(
+                    31..45,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
         },
-        item_names: {},
+        item_names: {
+            Name(
+                "x",
+            ): Idx::<Expression>(0),
+            Name(
+                "z",
+            ): Idx::<Expression>(2),
+            Name(
+                "y",
+            ): Idx::<Expression>(1),
+        },
     },
     patterns: Index {
         items: Arena {
@@ -93,5 +125,4 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[]
 []

@@ -96,7 +96,17 @@ HirModule {
             range: 25..51,
         },
     ],
-    errors: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                path: ThisModule(
+                    Name(
+                        "map",
+                    ),
+                ),
+            },
+            range: 63..66,
+        },
+    ],
 }
-[]
 []

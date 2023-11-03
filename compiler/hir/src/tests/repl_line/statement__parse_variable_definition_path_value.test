@@ -1,16 +1,37 @@
+import fake::ResultThing
+
 let foo = ResultThing::More::Stuff::here
 ===
 HirModule {
     imports: Index {
         items: Arena {
-            len: 0,
-            data: [],
+            len: 1,
+            data: [
+                Import {
+                    segments: [
+                        Name(
+                            "fake",
+                        ),
+                    ],
+                    last: Name(
+                        "ResultThing",
+                    ),
+                },
+            ],
         },
         item_ranges: ArenaMap {
-            v: [],
+            v: [
+                Some(
+                    0..26,
+                ),
+            ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
         },
-        item_names: {},
+        item_names: {
+            Name(
+                "ResultThing",
+            ): Idx::<Import>(0),
+        },
     },
     expressions: Index {
         items: Arena {
@@ -43,7 +64,7 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    0..40,
+                    26..66,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
@@ -77,5 +98,4 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[]
 []

@@ -277,7 +277,46 @@ HirModule {
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
     warnings: [],
-    errors: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                path: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                Name(
+                                    "TestType",
+                                ),
+                            ],
+                        ),
+                        name: Name(
+                            "new",
+                        ),
+                    },
+                ),
+            },
+            range: 171..185,
+        },
+        LoweringError {
+            kind: UnknownReference {
+                path: ThisModule(
+                    Name(
+                        "x",
+                    ),
+                ),
+            },
+            range: 195..196,
+        },
+        LoweringError {
+            kind: UnknownReference {
+                path: ThisModule(
+                    Name(
+                        "y",
+                    ),
+                ),
+            },
+            range: 205..206,
+        },
+    ],
 }
-[]
 []

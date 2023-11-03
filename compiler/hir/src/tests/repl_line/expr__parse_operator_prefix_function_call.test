@@ -1,4 +1,7 @@
->>(func1, func2)
+let func1 = 0
+let func2 = 1
+
+let result = >>(func1, func2)
 ===
 HirModule {
     imports: Index {
@@ -14,8 +17,14 @@ HirModule {
     },
     expressions: Index {
         items: Arena {
-            len: 3,
+            len: 5,
             data: [
+                IntLiteral(
+                    0,
+                ),
+                IntLiteral(
+                    1,
+                ),
                 VariableRef {
                     name: ThisModule(
                         Name(
@@ -37,8 +46,8 @@ HirModule {
                         ),
                     ),
                     args: [
-                        Idx::<Expression>(0),
-                        Idx::<Expression>(1),
+                        Idx::<Expression>(2),
+                        Idx::<Expression>(3),
                     ],
                 },
             ],
@@ -46,18 +55,34 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    3..8,
+                    0..14,
                 ),
                 Some(
-                    10..15,
+                    14..29,
                 ),
                 Some(
-                    0..16,
+                    45..50,
+                ),
+                Some(
+                    52..57,
+                ),
+                Some(
+                    29..58,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
         },
-        item_names: {},
+        item_names: {
+            Name(
+                "func1",
+            ): Idx::<Expression>(0),
+            Name(
+                "result",
+            ): Idx::<Expression>(4),
+            Name(
+                "func2",
+            ): Idx::<Expression>(1),
+        },
     },
     patterns: Index {
         items: Arena {
@@ -82,5 +107,4 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[]
 []

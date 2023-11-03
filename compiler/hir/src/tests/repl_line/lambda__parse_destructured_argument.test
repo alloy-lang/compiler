@@ -99,7 +99,17 @@ HirModule {
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
     warnings: [],
-    errors: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                path: ThisModule(
+                    Name(
+                        "x",
+                    ),
+                ),
+            },
+            range: 21..22,
+        },
+    ],
 }
-[]
 []

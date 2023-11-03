@@ -94,6 +94,9 @@ pub enum LoweringErrorKind {
         first: TextRange,
         second: TextRange,
     },
+    UnknownReference {
+        path: Path,
+    },
 }
 
 #[derive(Debug)]
@@ -148,6 +151,18 @@ impl LoweringCtx {
             type_ranges: self.type_ranges,
             warnings: self.warnings,
             errors: self.errors,
+        }
+    }
+
+    pub(crate) fn contains_variable_ref(&self, path: &Path) -> bool {
+        match path {
+            Path::ThisModule(name) => {
+                self.expressions.get_id(name).is_some() || self.patterns.get_id(name).is_some()
+            },
+            Path::OtherModule(fqn) => self
+                .imports
+                .get_by_name(fqn.first_module_segment())
+                .is_some(),
         }
     }
 
