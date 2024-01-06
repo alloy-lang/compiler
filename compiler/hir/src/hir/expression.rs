@@ -70,28 +70,28 @@ pub(super) fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expressio
     match ast {
         ast::Expression::IntLiteral(lit) => {
             let Some(value) = lit.value() else {
-                // todo!("validation");
+                todo!("validation");
                 return Expression::Missing;
             };
             Expression::IntLiteral(value)
         }
         ast::Expression::FractionLiteral(lit) => {
             let Some(value) = lit.value() else {
-                // todo!("validation");
+                todo!("validation");
                 return Expression::Missing;
             };
             Expression::FractionLiteral(value)
         }
         ast::Expression::StringLiteral(lit) => {
             let Some(value) = lit.value() else {
-                // todo!("validation");
+                todo!("validation");
                 return Expression::Missing;
             };
             Expression::StringLiteral(value)
         }
         ast::Expression::CharLiteral(lit) => {
             let Some(value) = lit.value() else {
-                // todo!("validation");
+                todo!("validation");
                 return Expression::Missing;
             };
             Expression::CharLiteral(value)
@@ -116,7 +116,7 @@ pub(super) fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expressio
                 .collect::<Vec<_>>();
 
             let Ok(args) = NonEmpty::try_from(args) else {
-                // todo!("validation");
+                todo!("validation");
                 return Expression::Missing;
             };
 
@@ -135,14 +135,14 @@ fn lower_unary_expression(ctx: &mut LoweringCtx, e: &ast::UnaryExpr) -> Expressi
         return Expression::Missing;
     };
     let Some(op) = e.op() else {
-        // todo!("validation");
+        todo!("validation");
         return Expression::Missing;
     };
 
     let op = match op.text() {
         "-" => UnaryOp::Neg,
         _ => {
-            // todo!("validation");
+            todo!("validation");
             return Expression::Missing;
         }
     };
@@ -156,12 +156,12 @@ fn lower_unary_expression(ctx: &mut LoweringCtx, e: &ast::UnaryExpr) -> Expressi
 
 fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Expression {
     let Some(path) = var.name() else {
-        // todo!("validation");
+        todo!("validation");
         return Expression::Missing;
     };
 
     let Ok(name) = Path::try_from(path.segments()) else {
-        // todo!("validation");
+        todo!("validation");
         return Expression::Missing;
     };
 
@@ -241,15 +241,15 @@ fn lower_lambda_expression(ctx: &mut LoweringCtx, e: &ast::LambdaExpr) -> Expres
 
 fn lower_function_call(ctx: &mut LoweringCtx, e: &ast::FunctionCall) -> Expression {
     let Some(target) = e.target() else {
-        // todo!("validation");
+        todo!("validation");
         return Expression::Missing;
     };
     let Some(target) = target.name() else {
-        // todo!("validation");
+        todo!("validation");
         return Expression::Missing;
     };
     let Ok(target) = Path::try_from(target.segments()) else {
-        // todo!("validation");
+        todo!("validation");
         return Expression::Missing;
     };
 

@@ -33,7 +33,7 @@ pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
         .collect::<Vec<_>>();
     let num_segments = children.len();
     let Some(((_, first), rest)) = children.split_first() else {
-        // todo!("validation");
+        todo!("validation");
         return;
     };
     let mut segments = match first {
@@ -45,7 +45,7 @@ pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
             NonEmpty::new(segment)
         }
         ast::ImportDefChild::ImportDefGroup(_) => {
-            // todo!("validation");
+            todo!("validation");
             return;
         }
     };
@@ -69,7 +69,7 @@ pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
                 }
             }
             ast::ImportDefChild::ImportDefGroup(_) => {
-                // todo!("validation");
+                todo!("validation");
                 return;
             }
         }
@@ -81,8 +81,8 @@ pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
 fn lower_import_def_segment(ast: &ast::ImportDefSegment) -> Option<Name> {
     match ast.name() {
         None => {
-            // todo!("validation");
-            return None;
+            todo!("validation");
+            None
         }
         Some(segment) => Some(Name::new(segment)),
     }

@@ -27,35 +27,35 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
     match ast {
         ast::Pattern::IntLiteral(lit) => {
             let Some(value) = lit.value() else {
-                // todo!("validation");
+                todo!("validation");
                 return Pattern::Missing;
             };
             Pattern::IntLiteral(value)
         }
         ast::Pattern::FractionLiteral(lit) => {
             let Some(value) = lit.value() else {
-                // todo!("validation");
+                todo!("validation");
                 return Pattern::Missing;
             };
             Pattern::FractionLiteral(value)
         }
         ast::Pattern::StringLiteral(lit) => {
             let Some(value) = lit.value() else {
-                // todo!("validation");
+                todo!("validation");
                 return Pattern::Missing;
             };
             Pattern::StringLiteral(value)
         }
         ast::Pattern::CharLiteral(lit) => {
             let Some(value) = lit.value() else {
-                // todo!("validation");
+                todo!("validation");
                 return Pattern::Missing;
             };
             Pattern::CharLiteral(value)
         }
         ast::Pattern::VariableRef(var) => {
             let Some(name) = lower_variable_ref(var) else {
-                // todo!("validation");
+                todo!("validation");
                 return Pattern::Missing;
             };
 
@@ -67,7 +67,7 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
                 .target()
                 .and_then(|target| lower_variable_ref(&target))
             else {
-                // todo!("validation");
+                todo!("validation");
                 return Pattern::Missing;
             };
 
@@ -94,7 +94,7 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
                 .collect::<Vec<_>>();
 
             let Ok(args) = NonEmpty::try_from(args) else {
-                // todo!("validation");
+                todo!("validation");
                 return Pattern::Missing;
             };
 
@@ -105,12 +105,12 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
 
 pub(super) fn lower_variable_ref(var: &ast::VariableRef) -> Option<Path> {
     let Some(path) = var.name() else {
-        // todo!("validation");
+        todo!("validation");
         return None;
     };
 
     let Ok(name) = Path::try_from(path.segments()) else {
-        // todo!("validation");
+        todo!("validation");
         return None;
     };
     Some(name)
