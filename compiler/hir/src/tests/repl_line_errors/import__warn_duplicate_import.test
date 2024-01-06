@@ -32,8 +32,11 @@ HirModule {
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
         },
         item_names: {
-            Name(
-                "map",
+            (
+                Name(
+                    "map",
+                ),
+                Idx::<Scope>(0),
             ): Idx::<Import>(0),
         },
     },
@@ -59,8 +62,11 @@ HirModule {
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
         },
         item_names: {
-            Name(
-                "thing",
+            (
+                Name(
+                    "thing",
+                ),
+                Idx::<Scope>(0),
             ): Idx::<Expression>(0),
         },
     },
@@ -84,6 +90,17 @@ HirModule {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+            ],
+        },
+    },
     warnings: [
         LoweringWarning {
             kind: DuplicateImport {
@@ -96,17 +113,6 @@ HirModule {
             range: 25..51,
         },
     ],
-    errors: [
-        LoweringError {
-            kind: UnknownReference {
-                path: ThisModule(
-                    Name(
-                        "map",
-                    ),
-                ),
-            },
-            range: 63..66,
-        },
-    ],
+    errors: [],
 }
 []

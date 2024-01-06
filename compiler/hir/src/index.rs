@@ -1,3 +1,4 @@
+use alloy_scope::{ScopeIdx, Scopes};
 use la_arena::{Arena, ArenaMap, Idx};
 use rustc_hash::FxHashMap;
 use text_size::TextRange;
@@ -8,9 +9,10 @@ use crate::Name;
 pub struct Index<T> {
     items: Arena<T>,
     item_ranges: ArenaMap<Idx<T>, TextRange>,
-    item_names: FxHashMap<Name, Idx<T>>,
+    item_names: FxHashMap<(Name, ScopeIdx), Idx<T>>,
 }
 
+#[derive(Debug)]
 pub(crate) struct DuplicateNameError {
     pub(crate) name: Name,
     pub(crate) first: TextRange,
@@ -31,8 +33,11 @@ impl<T> Index<T> {
         name: Name,
         thing: T,
         range: TextRange,
+        scopes: &Scopes,
     ) -> Result<Idx<T>, DuplicateNameError> {
-        if let Some(id) = self.item_names.get(&name).copied() {
+        let current_scope = scopes.current_scope();
+
+        if let Some(id) = self.item_names.get(&(name.clone(), current_scope)).copied() {
             let first = self.item_ranges[id];
             let second = range;
             let err = DuplicateNameError {
@@ -44,7 +49,7 @@ impl<T> Index<T> {
         }
 
         let id = self.insert_not_named(thing, range);
-        self.item_names.insert(name, id);
+        self.item_names.insert((name, current_scope), id);
 
         Ok(id)
     }
@@ -63,11 +68,102 @@ impl<T> Index<T> {
         self.item_ranges[id]
     }
 
-    pub fn get_id(&self, name: &Name) -> Option<Idx<T>> {
-        self.item_names.get(name).copied()
+    pub fn get_id(&self, name: &Name, scopes: &Scopes) -> Option<Idx<T>> {
+        scopes
+            .iter()
+            .find_map(|scope| self.item_names.get(&(name.clone(), scope)))
+            .copied()
     }
 
-    pub fn get_by_name(&self, name: &Name) -> Option<&T> {
-        self.item_names.get(name).copied().map(|id| self.get(id))
+    pub fn get_by_name(&self, name: &Name, scopes: &Scopes) -> Option<&T> {
+        self.get_id(name, scopes).map(|id| self.get(id))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use alloy_scope::Scopes;
+    use text_size::TextSize;
+
+    #[test]
+    fn index_allows_for_retrieval() {
+        let scopes = Scopes::default();
+        let mut index = Index::new();
+
+        let thing = 1;
+        let name = Name::new("hello");
+        let range = TextRange::new(TextSize::from(5), TextSize::from(6));
+
+        let idx = index
+            .insert_named(name.clone(), thing, range, &scopes)
+            .expect("testing");
+
+        assert_eq!(index.get(idx), &thing);
+        assert_eq!(index.get_range(idx), range);
+        assert_eq!(index.get_id(&name, &scopes), Some(idx));
+        assert_eq!(index.get_by_name(&name, &scopes), Some(&thing));
+    }
+
+    #[test]
+    fn retrieval_checks_parent_scopes() {
+        let mut scopes = Scopes::default();
+        let mut index = Index::new();
+
+        let thing = 1;
+        let name = Name::new("hello");
+        let range = TextRange::new(TextSize::from(5), TextSize::from(6));
+
+        let idx = index
+            .insert_named(name.clone(), thing, range, &scopes)
+            .expect("testing");
+
+        scopes.push_scope();
+
+        assert_eq!(index.get_id(&name, &scopes), Some(idx));
+        assert_eq!(index.get_by_name(&name, &scopes), Some(&thing));
+    }
+
+    #[test]
+    fn retrieval_cannot_check_child_scopes() {
+        let mut scopes = Scopes::default();
+        let mut index = Index::new();
+
+        let thing = 1;
+        let name = Name::new("hello");
+        let range = TextRange::new(TextSize::from(5), TextSize::from(6));
+
+        scopes.push_scope();
+
+        index
+            .insert_named(name.clone(), thing, range, &scopes)
+            .expect("testing");
+
+        scopes.pop_scope();
+
+        assert_eq!(index.get_id(&name, &scopes), None);
+        assert_eq!(index.get_by_name(&name, &scopes), None);
+    }
+
+    #[test]
+    fn insertion_is_unique_per_scope() {
+        let mut scopes = Scopes::default();
+        let mut index = Index::new();
+
+        let thing = 1;
+        let name = Name::new("hello");
+        let range = TextRange::new(TextSize::from(5), TextSize::from(6));
+
+        let idx_1 = index
+            .insert_named(name.clone(), thing, range, &scopes)
+            .expect("testing");
+
+        scopes.push_scope();
+
+        let idx_2 = index
+            .insert_named(name.clone(), thing, range, &scopes)
+            .expect("testing");
+
+        assert_ne!(idx_1, idx_2);
     }
 }

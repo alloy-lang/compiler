@@ -34,10 +34,10 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    21..22,
+                    49..50,
                 ),
                 Some(
-                    0..22,
+                    28..50,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
@@ -79,15 +79,22 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    14..15,
+                    42..43,
                 ),
                 Some(
-                    1..16,
+                    29..44,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
         },
-        item_names: {},
+        item_names: {
+            (
+                Name(
+                    "x",
+                ),
+                Idx::<Scope>(1),
+            ): Idx::<Pattern>(0),
+        },
     },
     type_annotations: {},
     types: Arena {
@@ -98,18 +105,21 @@ HirModule {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
-    warnings: [],
-    errors: [
-        LoweringError {
-            kind: UnknownReference {
-                path: ThisModule(
-                    Name(
-                        "x",
-                    ),
-                ),
-            },
-            range: 21..22,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+            ],
         },
-    ],
+    },
+    warnings: [],
+    errors: [],
 }
 []

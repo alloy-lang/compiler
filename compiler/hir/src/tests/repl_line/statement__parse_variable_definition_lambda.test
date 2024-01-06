@@ -62,8 +62,11 @@ HirModule {
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
         },
         item_names: {
-            Name(
-                "add",
+            (
+                Name(
+                    "add",
+                ),
+                Idx::<Scope>(0),
             ): Idx::<Expression>(3),
         },
     },
@@ -98,7 +101,20 @@ HirModule {
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
         },
-        item_names: {},
+        item_names: {
+            (
+                Name(
+                    "a",
+                ),
+                Idx::<Scope>(1),
+            ): Idx::<Pattern>(0),
+            (
+                Name(
+                    "b",
+                ),
+                Idx::<Scope>(1),
+            ): Idx::<Pattern>(1),
+        },
     },
     type_annotations: {},
     types: Arena {
@@ -109,28 +125,21 @@ HirModule {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+            ],
+        },
+    },
     warnings: [],
-    errors: [
-        LoweringError {
-            kind: UnknownReference {
-                path: ThisModule(
-                    Name(
-                        "a",
-                    ),
-                ),
-            },
-            range: 20..22,
-        },
-        LoweringError {
-            kind: UnknownReference {
-                path: ThisModule(
-                    Name(
-                        "b",
-                    ),
-                ),
-            },
-            range: 24..25,
-        },
-    ],
+    errors: [],
 }
 []

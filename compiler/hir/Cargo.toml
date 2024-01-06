@@ -7,6 +7,7 @@ edition = "2018"
 
 [dependencies]
 alloy_ast = { path = "../ast" }
+alloy_scope = { path = "../scope" }
 alloy_syntax = { path = "../syntax" }
 la-arena = "0.3"
 non-empty-vec = "0.2"

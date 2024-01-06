@@ -5,26 +5,41 @@ if test then 2 else 3
 HirModule {
     imports: Index {
         items: Arena {
-            len: 0,
-            data: [],
+            len: 1,
+            data: [
+                Import {
+                    segments: [
+                        Name(
+                            "test_data",
+                        ),
+                    ],
+                    last: Name(
+                        "test",
+                    ),
+                },
+            ],
         },
         item_ranges: ArenaMap {
-            v: [],
+            v: [
+                Some(
+                    0..24,
+                ),
+            ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
         },
-        item_names: {},
+        item_names: {
+            (
+                Name(
+                    "test",
+                ),
+                Idx::<Scope>(0),
+            ): Idx::<Import>(0),
+        },
     },
     expressions: Index {
         items: Arena {
-            len: 5,
+            len: 4,
             data: [
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "True",
-                        ),
-                    ),
-                },
                 VariableRef {
                     name: ThisModule(
                         Name(
@@ -39,37 +54,30 @@ HirModule {
                     3,
                 ),
                 IfThenElse {
-                    condition: Idx::<Expression>(1),
-                    then: Idx::<Expression>(2),
-                    else_: Idx::<Expression>(3),
+                    condition: Idx::<Expression>(0),
+                    then: Idx::<Expression>(1),
+                    else_: Idx::<Expression>(2),
                 },
             ],
         },
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    0..17,
+                    27..32,
                 ),
                 Some(
-                    20..25,
+                    37..39,
                 ),
                 Some(
-                    30..32,
+                    44..45,
                 ),
                 Some(
-                    37..38,
-                ),
-                Some(
-                    17..38,
+                    24..45,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
         },
-        item_names: {
-            Name(
-                "test",
-            ): Idx::<Expression>(0),
-        },
+        item_names: {},
     },
     patterns: Index {
         items: Arena {
@@ -90,6 +98,17 @@ HirModule {
     type_ranges: ArenaMap {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+            ],
+        },
     },
     warnings: [],
     errors: [

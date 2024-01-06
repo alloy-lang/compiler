@@ -28,8 +28,11 @@ HirModule {
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
         },
         item_names: {
-            Name(
-                "ResultThing",
+            (
+                Name(
+                    "ResultThing",
+                ),
+                Idx::<Scope>(0),
             ): Idx::<Import>(0),
         },
     },
@@ -70,8 +73,11 @@ HirModule {
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
         },
         item_names: {
-            Name(
-                "foo",
+            (
+                Name(
+                    "foo",
+                ),
+                Idx::<Scope>(0),
             ): Idx::<Expression>(0),
         },
     },
@@ -94,6 +100,17 @@ HirModule {
     type_ranges: ArenaMap {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+            ],
+        },
     },
     warnings: [],
     errors: [],

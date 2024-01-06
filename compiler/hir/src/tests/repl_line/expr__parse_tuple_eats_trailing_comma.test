@@ -59,8 +59,11 @@ HirModule {
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
         },
         item_names: {
-            Name(
-                "foo",
+            (
+                Name(
+                    "foo",
+                ),
+                Idx::<Scope>(0),
             ): Idx::<Expression>(0),
         },
     },
@@ -83,6 +86,17 @@ HirModule {
     type_ranges: ArenaMap {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+            ],
+        },
     },
     warnings: [],
     errors: [],

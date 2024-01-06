@@ -223,10 +223,7 @@ fn lower_if_then_else_expression(ctx: &mut LoweringCtx, e: &ast::IfThenElseExpr)
 }
 
 fn lower_lambda_expression(ctx: &mut LoweringCtx, e: &ast::LambdaExpr) -> Expression {
-    let body = match e.body() {
-        Some(body) => lower_expression(ctx, &body),
-        None => ctx.add_missing_expression(&e.syntax()),
-    };
+    ctx.scopes.push_scope();
     let args = e
         .args()
         .iter()
@@ -235,6 +232,11 @@ fn lower_lambda_expression(ctx: &mut LoweringCtx, e: &ast::LambdaExpr) -> Expres
             None => ctx.add_missing_pattern(&arg.syntax()),
         })
         .collect::<Vec<_>>();
+    let body = match e.body() {
+        Some(body) => lower_expression(ctx, &body),
+        None => ctx.add_missing_expression(&e.syntax()),
+    };
+    ctx.scopes.pop_scope();
 
     Expression::Lambda { body, args }
 }

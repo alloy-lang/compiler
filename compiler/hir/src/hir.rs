@@ -2,6 +2,7 @@ use super::{Fqn, Name};
 use crate::index::Index;
 
 use alloy_ast as ast;
+use alloy_scope::Scopes;
 use alloy_syntax::SyntaxElement;
 use ast::AstElement;
 use la_arena::Idx;
@@ -63,6 +64,7 @@ pub struct HirModule {
     type_annotations: FxHashMap<Name, TypeIdx>,
     types: Arena<Type>,
     type_ranges: ArenaMap<TypeIdx, TextRange>,
+    scopes: Scopes,
     warnings: Vec<LoweringWarning>,
     errors: Vec<LoweringError>,
 }
@@ -123,13 +125,13 @@ struct LoweringCtx {
     type_annotations: FxHashMap<Name, TypeIdx>,
     types: Arena<Type>,
     type_ranges: ArenaMap<TypeIdx, TextRange>,
+    scopes: Scopes,
     warnings: Vec<LoweringWarning>,
     errors: Vec<LoweringError>,
 }
 
 impl LoweringCtx {
     fn new() -> Self {
-        // TODO: Keep track of Scope for variables
         Self {
             imports: Index::new(),
             expressions: Index::new(),
@@ -137,6 +139,7 @@ impl LoweringCtx {
             type_annotations: FxHashMap::default(),
             types: Arena::default(),
             type_ranges: ArenaMap::default(),
+            scopes: Scopes::default(),
             warnings: vec![],
             errors: vec![],
         }
@@ -150,6 +153,7 @@ impl LoweringCtx {
             type_annotations: self.type_annotations,
             types: self.types,
             type_ranges: self.type_ranges,
+            scopes: self.scopes,
             warnings: self.warnings,
             errors: self.errors,
         }
@@ -158,11 +162,13 @@ impl LoweringCtx {
     pub(crate) fn contains_variable_ref(&self, path: &Path) -> bool {
         match path {
             Path::ThisModule(name) => {
-                self.expressions.get_id(name).is_some() || self.patterns.get_id(name).is_some()
-            },
+                self.expressions.get_id(name, &self.scopes).is_some()
+                    || self.patterns.get_id(name, &self.scopes).is_some()
+                    || self.imports.get_id(name, &self.scopes).is_some()
+            }
             Path::OtherModule(fqn) => self
                 .imports
-                .get_by_name(fqn.first_module_segment())
+                .get_id(fqn.first_module_segment(), &self.scopes)
                 .is_some(),
         }
     }
@@ -186,9 +192,9 @@ impl LoweringCtx {
         expression: Expression,
         element: &SyntaxElement,
     ) {
-        let res = self
-            .expressions
-            .insert_named(name, expression, element.text_range());
+        let res =
+            self.expressions
+                .insert_named(name, expression, element.text_range(), &self.scopes);
 
         if let Err(err) = res {
             let err = LoweringErrorKind::ConflictingValue {
@@ -201,8 +207,33 @@ impl LoweringCtx {
     }
 
     pub(crate) fn add_pattern(&mut self, pattern: Pattern, element: &SyntaxElement) -> PatternIdx {
-        self.patterns
-            .insert_not_named(pattern, element.text_range())
+        match &pattern {
+            Pattern::VariableRef { name } => {
+                let res = self.patterns.insert_named(
+                    name.local_name().clone(),
+                    pattern,
+                    element.text_range(),
+                    &self.scopes,
+                );
+
+                match res {
+                    Err(err) => {
+                        let err = LoweringErrorKind::ConflictingValue {
+                            name: err.name,
+                            first: err.first,
+                            second: err.second,
+                        };
+                        self.error(err, element.text_range());
+
+                        self.add_missing_pattern(element)
+                    }
+                    Ok(pid) => pid,
+                }
+            }
+            _ => self
+                .patterns
+                .insert_not_named(pattern, element.text_range()),
+        }
     }
 
     pub(crate) fn add_missing_pattern(&mut self, element: &SyntaxElement) -> PatternIdx {
@@ -224,7 +255,7 @@ impl LoweringCtx {
         let new_import = Import::new(path);
         let name = path.last();
 
-        if let Some(existing_id) = self.imports.get_id(&name) {
+        if let Some(existing_id) = self.imports.get_id(name, &self.scopes) {
             let existing_import = self.imports.get(existing_id);
             let existing_import_range = self.imports.get_range(existing_id);
 
@@ -240,9 +271,12 @@ impl LoweringCtx {
             }
         }
 
-        let res = self
-            .imports
-            .insert_named(name, new_import.clone(), element.text_range());
+        let res = self.imports.insert_named(
+            name.clone(),
+            new_import.clone(),
+            element.text_range(),
+            &self.scopes,
+        );
 
         if let Err(err) = res {
             let err = LoweringErrorKind::ConflictingImport {

@@ -83,7 +83,26 @@ HirModule {
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
         },
-        item_names: {},
+        item_names: {
+            (
+                Name(
+                    "arg1",
+                ),
+                Idx::<Scope>(1),
+            ): Idx::<Pattern>(0),
+            (
+                Name(
+                    "arg3",
+                ),
+                Idx::<Scope>(1),
+            ): Idx::<Pattern>(2),
+            (
+                Name(
+                    "arg2",
+                ),
+                Idx::<Scope>(1),
+            ): Idx::<Pattern>(1),
+        },
     },
     type_annotations: {},
     types: Arena {
@@ -93,6 +112,20 @@ HirModule {
     type_ranges: ArenaMap {
         v: [],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+            ],
+        },
     },
     warnings: [],
     errors: [],

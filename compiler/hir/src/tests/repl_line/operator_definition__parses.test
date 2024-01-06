@@ -31,8 +31,11 @@ HirModule {
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
         },
         item_names: {
-            Name(
-                "fakeStuff",
+            (
+                Name(
+                    "fakeStuff",
+                ),
+                Idx::<Scope>(0),
             ): Idx::<Import>(0),
         },
     },
@@ -68,8 +71,11 @@ HirModule {
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
         },
         item_names: {
-            Name(
-                "(|>)",
+            (
+                Name(
+                    "(|>)",
+                ),
+                Idx::<Scope>(0),
             ): Idx::<Expression>(1),
         },
     },
@@ -104,7 +110,20 @@ HirModule {
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
         },
-        item_names: {},
+        item_names: {
+            (
+                Name(
+                    "x",
+                ),
+                Idx::<Scope>(1),
+            ): Idx::<Pattern>(0),
+            (
+                Name(
+                    "f",
+                ),
+                Idx::<Scope>(1),
+            ): Idx::<Pattern>(1),
+        },
     },
     type_annotations: {
         Name(
@@ -188,18 +207,21 @@ HirModule {
         ],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
     },
-    warnings: [],
-    errors: [
-        LoweringError {
-            kind: UnknownReference {
-                path: ThisModule(
-                    Name(
-                        "fakeStuff",
-                    ),
-                ),
-            },
-            range: 118..127,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+            ],
         },
-    ],
+    },
+    warnings: [],
+    errors: [],
 }
 []
