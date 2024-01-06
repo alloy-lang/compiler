@@ -9,6 +9,15 @@ pub enum Path {
     OtherModule(Fqn),
 }
 
+impl Path {
+    pub(crate) fn local_name(&self) -> &Name {
+        match self {
+            Self::ThisModule(name) => name,
+            Self::OtherModule(fqn) => fqn.name(),
+        }
+    }
+}
+
 impl From<NonEmpty<String>> for Path {
     fn from(value: NonEmpty<String>) -> Self {
         let (target, rest) = value.split_last();

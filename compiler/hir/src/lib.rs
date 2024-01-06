@@ -40,4 +40,8 @@ impl Fqn {
     fn first_module_segment(&self) -> &Name {
         self.module.first()
     }
+
+    fn name(&self) -> &Name {
+        &self.name
+    }
 }
