@@ -5,6 +5,7 @@ members = [
     "compiler/hir",
     "compiler/lexer",
     "compiler/parser",
+    "compiler/scope",
     "compiler/syntax",
     "smith/repl",
 ]
