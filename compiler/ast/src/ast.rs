@@ -150,6 +150,7 @@ mod type_variable;
 pub use path::*;
 mod path;
 
+#[allow(clippy::module_name_repetitions)]
 pub trait AstElement: Sized {
     fn cast<E: Into<SyntaxElement>>(element: E) -> Option<Self>;
 

@@ -57,7 +57,7 @@ impl Parse {
         s.push_str(&tree[0..tree.len() - 1]);
 
         for error in &self.errors {
-            let _ = write!(s, "\n{}", error);
+            let _ = write!(s, "\n{error}");
         }
 
         s

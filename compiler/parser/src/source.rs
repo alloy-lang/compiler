@@ -84,7 +84,7 @@ mod tests {
         let tokens: Vec<_> = Lexer::new(input).collect();
         let mut source = Source::new(&tokens);
 
-        assert_eq!(source.peek_nth_kind(0), None)
+        assert_eq!(source.peek_nth_kind(0), None);
     }
 
     #[test]
@@ -93,28 +93,24 @@ mod tests {
         let tokens: Vec<_> = Lexer::new(input).collect();
         let mut source = Source::new(&tokens);
 
-        assert_eq!(source.peek_nth_kind(1), None)
+        assert_eq!(source.peek_nth_kind(1), None);
     }
 
     #[test]
     fn peek_nth_kind_0_multiple() {
-        let input = r#"
-        typeof hi : String -> String
-        "#;
+        let input = "typeof hi : String -> String";
         let tokens: Vec<_> = Lexer::new(input).collect();
         let mut source = Source::new(&tokens);
 
-        assert_eq!(source.peek_nth_kind(0), Some(TokenKind::TypeOfKw))
+        assert_eq!(source.peek_nth_kind(0), Some(TokenKind::TypeOfKw));
     }
 
     #[test]
     fn peek_nth_kind_1_multiple() {
-        let input = r#"
-        typeof hi : String -> String
-        "#;
+        let input = "typeof hi : String -> String";
         let tokens: Vec<_> = Lexer::new(input).collect();
         let mut source = Source::new(&tokens);
 
-        assert_eq!(source.peek_nth_kind(1), Some(TokenKind::Ident))
+        assert_eq!(source.peek_nth_kind(1), Some(TokenKind::Ident));
     }
 }

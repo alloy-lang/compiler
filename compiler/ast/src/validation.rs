@@ -6,6 +6,7 @@ use alloy_syntax::SyntaxNode;
 
 use crate::ast::{AstElement, CharLiteral, IntLiteral};
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, PartialEq)]
 pub struct ValidationError {
     kind: ValidationErrorKind,

@@ -82,7 +82,7 @@ fn reedline_repl() {
                     let syntax = parse.syntax();
 
                     for error in alloy_ast::validation::validate(&syntax) {
-                        println!("{}", error);
+                        println!("{error}");
                     }
 
                     let source_file = alloy_ast::source_file(syntax).unwrap();
@@ -101,7 +101,7 @@ fn reedline_repl() {
                 line_editor.run_edit_commands(&[EditCommand::Clear]);
             }
             x => {
-                println!("Event: {:?}", x);
+                println!("Event: {x:?}");
             }
         }
     }

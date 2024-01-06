@@ -54,6 +54,7 @@ pub use type_definition::*;
 mod value;
 pub use value::*;
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug)]
 pub struct HirModule {
     imports: Index<Import>,
@@ -269,17 +270,11 @@ pub fn lower_repl_line(source_file: &ast::SourceFile) -> HirModule {
 }
 
 impl LoweringCtx {
-    fn warning(&mut self, kind: LoweringWarningKind, range: &TextRange) {
-        self.warnings.push(LoweringWarning {
-            kind,
-            range: *range,
-        });
+    fn warning(&mut self, kind: LoweringWarningKind, range: TextRange) {
+        self.warnings.push(LoweringWarning { kind, range });
     }
 
-    fn error(&mut self, kind: LoweringErrorKind, range: &TextRange) {
-        self.errors.push(LoweringError {
-            kind,
-            range: *range,
-        });
+    fn error(&mut self, kind: LoweringErrorKind, range: TextRange) {
+        self.errors.push(LoweringError { kind, range });
     }
 }

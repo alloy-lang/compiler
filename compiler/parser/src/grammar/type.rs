@@ -14,12 +14,9 @@ pub(crate) fn parse_type(
     single_type_recovery_set: TokenSet,
     parent_recovery_set: TokenSet,
 ) -> Option<CompletedMarker> {
-    let single_type_m = match parse_single_type(p, context, mode, parent_recovery_set) {
-        Some(m) => m,
-        None => {
-            p.error_with_recovery(context, single_type_recovery_set);
-            return None;
-        }
+    let Some(single_type_m) = parse_single_type(p, context, mode, parent_recovery_set) else {
+        p.error_with_recovery(context, single_type_recovery_set);
+        return None;
     };
 
     let cm = maybe_parse_bounded_type(

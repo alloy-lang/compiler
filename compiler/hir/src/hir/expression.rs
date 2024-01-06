@@ -1,6 +1,7 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
+#[allow(clippy::module_name_repetitions)]
 pub type ExpressionIdx = Idx<Expression>;
 
 #[derive(Debug, PartialEq)]

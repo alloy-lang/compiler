@@ -50,10 +50,7 @@ fn run_parser_test(path: PathBuf, func: fn(&str) -> (HirModule, Vec<alloy_parser
 
     let (module, parse_errors) = func(input);
 
-    let expected_test_content = format!(
-        "{}\n===\n{:#?}\n{:#?}\n",
-        input, module, parse_errors,
-    );
+    let expected_test_content = format!("{input}\n===\n{module:#?}\n{parse_errors:#?}\n");
 
     expect_file![path].assert_eq(&expected_test_content);
 }
@@ -62,7 +59,7 @@ fn run_parser_test(path: PathBuf, func: fn(&str) -> (HirModule, Vec<alloy_parser
 fn run_parser_tests(tests_dir: &str, func: fn(&str) -> (HirModule, Vec<alloy_parser::ParseError>)) {
     let tests_dir = {
         let current_dir = env::current_dir().unwrap();
-        current_dir.join(format!("src/tests/{}", tests_dir))
+        current_dir.join(format!("src/tests/{tests_dir}"))
     };
 
     let mut failed_tests = vec![];
@@ -82,13 +79,12 @@ fn run_parser_tests(tests_dir: &str, func: fn(&str) -> (HirModule, Vec<alloy_par
         }
     }
 
-    if !failed_tests.is_empty() {
-        panic!(
-            "{} parser test(s) failed: {:?}",
-            failed_tests.len(),
-            failed_tests
-        );
-    }
+    assert!(
+        failed_tests.is_empty(),
+        "{} parser test(s) failed: {:?}",
+        failed_tests.len(),
+        failed_tests,
+    );
 }
 
 #[test]

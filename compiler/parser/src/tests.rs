@@ -40,7 +40,7 @@ fn run_parser_test(path: PathBuf, parsing_fn: fn(&str) -> Parse) {
 fn run_parser_tests(tests_dir: &str, parsing_fn: fn(&str) -> Parse) {
     let tests_dir = {
         let current_dir = env::current_dir().unwrap();
-        current_dir.join(format!("src/tests/{}", tests_dir))
+        current_dir.join(format!("src/tests/{tests_dir}"))
     };
 
     let mut failed_tests = vec![];
@@ -60,13 +60,10 @@ fn run_parser_tests(tests_dir: &str, parsing_fn: fn(&str) -> Parse) {
         }
     }
 
-    if !failed_tests.is_empty() {
-        panic!(
-            "{} parser test(s) failed: {:?}",
-            failed_tests.len(),
-            failed_tests
-        );
-    }
+    assert!(
+        failed_tests.is_empty(),
+        "{} parser test(s) failed: {:?}", failed_tests.len(), failed_tests,
+    );
 }
 
 #[test]

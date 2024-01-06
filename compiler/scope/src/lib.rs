@@ -131,7 +131,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
+    #[should_panic(expected = "")] // empty error message
     fn pop_scope_at_bottom_panics() {
         let mut scopes = Scopes::new();
 

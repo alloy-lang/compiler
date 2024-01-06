@@ -186,8 +186,8 @@ impl fmt::Display for ParseError {
 
         match self.kind {
             ParseErrorKind::Missing { offset } => {
-                write!(f, "error at position {:?}", offset)?;
-                write!(f, " while parsing {}. ", context_name)?;
+                write!(f, "error at position {offset:?}")?;
+                write!(f, " while parsing {context_name}. ")?;
                 f.write_str("Missing expected ")?;
             }
             ParseErrorKind::Unexpected { found, range } => {
@@ -197,8 +197,8 @@ impl fmt::Display for ParseError {
                     u32::from(range.start()),
                     u32::from(range.end()),
                 )?;
-                write!(f, " while parsing {}. ", context_name)?;
-                write!(f, "Found {}, but expected ", found)?;
+                write!(f, " while parsing {context_name}. ")?;
+                write!(f, "Found {found}, but expected ")?;
             }
         }
 
@@ -213,11 +213,11 @@ impl fmt::Display for ParseError {
 
         for (idx, expected_kind) in vec.iter().enumerate() {
             if is_first(idx) {
-                write!(f, "{}", expected_kind)?;
+                write!(f, "{expected_kind}")?;
             } else if is_last(idx) {
-                write!(f, " or {}", expected_kind)?;
+                write!(f, " or {expected_kind}")?;
             } else {
-                write!(f, ", {}", expected_kind)?;
+                write!(f, ", {expected_kind}")?;
             }
         }
 
@@ -237,7 +237,7 @@ mod tests {
             context: ParseErrorContext::ParenExprExpr,
         };
 
-        assert_eq!(format!("{}", error), output);
+        assert_eq!(format!("{error}"), output);
     }
 
     #[test]

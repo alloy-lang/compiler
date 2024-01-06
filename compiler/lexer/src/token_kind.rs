@@ -262,7 +262,7 @@ mod tests {
         };
 
         for (source, expected) in source {
-            check(source, expected)
+            check(source, expected);
         }
     }
 
@@ -286,7 +286,7 @@ mod tests {
         };
 
         for (source, expected) in source {
-            check(source, expected)
+            check(source, expected);
         }
     }
 
@@ -298,7 +298,7 @@ mod tests {
         };
 
         for (source, expected) in source {
-            check_multiple(source, &expected)
+            check_multiple(source, &expected);
         }
     }
 
@@ -319,7 +319,7 @@ mod tests {
         };
 
         for (source, expected) in source {
-            check(source, expected)
+            check(source, expected);
         }
     }
 
@@ -364,7 +364,7 @@ mod tests {
         };
 
         for (source, expected) in source {
-            check_multiple(source, &expected)
+            check_multiple(source, &expected);
         }
     }
 
@@ -388,7 +388,7 @@ mod tests {
         };
 
         for (source, expected) in source {
-            check(source, expected)
+            check(source, expected);
         }
     }
 

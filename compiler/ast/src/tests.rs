@@ -68,7 +68,7 @@ fn run_parser_tests<T: fmt::Debug>(
 ) {
     let tests_dir = {
         let current_dir = env::current_dir().unwrap();
-        current_dir.join(format!("src/tests/{}", tests_dir))
+        current_dir.join(format!("src/tests/{tests_dir}"))
     };
 
     let mut failed_tests = vec![];
@@ -89,13 +89,10 @@ fn run_parser_tests<T: fmt::Debug>(
         }
     }
 
-    if !failed_tests.is_empty() {
-        panic!(
-            "{} parser test(s) failed: {:?}",
-            failed_tests.len(),
-            failed_tests
-        );
-    }
+    assert!(
+        failed_tests.is_empty(),
+        "{} parser test(s) failed: {:?}", failed_tests.len(), failed_tests,
+    );
 }
 
 #[test]

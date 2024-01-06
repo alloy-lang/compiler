@@ -34,7 +34,7 @@ impl<'a> Iterator for Lexer<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         let kind = match self.inner.next()? {
             Ok(kind) => kind,
-            Err(_) => TokenKind::Error,
+            Err(()) => TokenKind::Error,
         };
         let text = self.inner.slice();
 
