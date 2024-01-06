@@ -72,7 +72,7 @@ fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> Type {
             let types = t
                 .members()
                 .iter()
-                .map(|member| lower_type(ctx, &member))
+                .map(|member| lower_type(ctx, member))
                 .collect::<Vec<_>>();
             Type::Tuple(types)
         }
@@ -95,7 +95,7 @@ fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> Type {
             let args = t
                 .args()
                 .iter()
-                .map(|member| lower_type(ctx, &member))
+                .map(|member| lower_type(ctx, member))
                 .collect::<Vec<_>>();
 
             Type::Bounded { base, args }

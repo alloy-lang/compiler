@@ -74,7 +74,7 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
             let args = destructure
                 .args()
                 .iter()
-                .map(|arg| lower_pattern(ctx, &arg))
+                .map(|arg| lower_pattern(ctx, arg))
                 .collect::<Vec<_>>();
             Pattern::Destructure { target, args }
         }

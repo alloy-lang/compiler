@@ -112,7 +112,7 @@ pub(super) fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expressio
             let args = tuple
                 .expressions()
                 .iter()
-                .map(|arg| lower_expression(ctx, &arg))
+                .map(|arg| lower_expression(ctx, arg))
                 .collect::<Vec<_>>();
 
             let Ok(args) = NonEmpty::try_from(args) else {
@@ -168,7 +168,7 @@ fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Expressi
     if !ctx.contains_variable_ref(&name) {
         ctx.error(
             LoweringErrorKind::UnknownReference { path: name.clone() },
-            &var.range(),
+            var.range(),
         );
     }
 
@@ -256,7 +256,7 @@ fn lower_function_call(ctx: &mut LoweringCtx, e: &ast::FunctionCall) -> Expressi
     let args = e
         .args()
         .iter()
-        .map(|arg| lower_expression(ctx, &arg))
+        .map(|arg| lower_expression(ctx, arg))
         .collect::<Vec<_>>();
 
     Expression::FunctionCall { target, args }

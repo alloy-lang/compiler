@@ -8,7 +8,7 @@ pub struct Import {
 }
 
 impl Import {
-    pub(crate) fn new(segments: NonEmpty<Name>) -> Self {
+    pub(crate) fn new(segments: &NonEmpty<Name>) -> Self {
         let (last, path) = segments.split_last();
         Self {
             segments: path.to_vec(),
@@ -75,7 +75,7 @@ pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
         }
     }
 
-    ctx.add_import(segments, import.syntax());
+    ctx.add_import(&segments, &import.syntax());
 }
 
 fn lower_import_def_segment(ast: &ast::ImportDefSegment) -> Option<Name> {

@@ -196,7 +196,7 @@ impl LoweringCtx {
                 first: err.first,
                 second: err.second,
             };
-            self.error(err, &element.text_range());
+            self.error(err, element.text_range());
         }
     }
 
@@ -220,9 +220,9 @@ impl LoweringCtx {
         self.type_annotations.insert(name, type_id);
     }
 
-    pub(crate) fn add_import(&mut self, path: NonEmpty<Name>, element: SyntaxElement) {
-        let name = path.last().clone();
+    pub(crate) fn add_import(&mut self, path: &NonEmpty<Name>, element: &SyntaxElement) {
         let new_import = Import::new(path);
+        let name = path.last();
 
         if let Some(existing_id) = self.imports.get_id(&name) {
             let existing_import = self.imports.get(existing_id);
@@ -230,11 +230,11 @@ impl LoweringCtx {
 
             if &new_import == existing_import {
                 let warn = LoweringWarningKind::DuplicateImport {
-                    name,
+                    name: name.clone(),
                     first: existing_import_range,
                     second: element.text_range(),
                 };
-                self.warning(warn, &element.text_range());
+                self.warning(warn, element.text_range());
 
                 return;
             }
@@ -250,7 +250,7 @@ impl LoweringCtx {
                 first: err.first,
                 second: err.second,
             };
-            self.error(err, &element.text_range());
+            self.error(err, element.text_range());
         }
     }
 }
