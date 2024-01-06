@@ -113,7 +113,7 @@ mod tests {
     fn default_current_scope_is_root() {
         let scopes = Scopes::new();
 
-        assert_eq!(Scopes::ROOT, scopes.current_scope,);
+        assert_eq!(Scopes::ROOT, scopes.current_scope);
     }
 
     #[test]
@@ -122,12 +122,12 @@ mod tests {
 
         let new_scope_id_1 = scopes.push_scope();
 
-        assert_eq!(new_scope_id_1, scopes.current_scope,);
+        assert_eq!(new_scope_id_1, scopes.current_scope);
 
         let _new_scope_id_2 = scopes.push_scope();
         let new_scope_id_3 = scopes.push_scope();
 
-        assert_eq!(new_scope_id_3, scopes.current_scope,);
+        assert_eq!(new_scope_id_3, scopes.current_scope);
     }
 
     #[test]
@@ -147,7 +147,7 @@ mod tests {
         let _ = scopes.push_scope();
         let _ = scopes.pop_scope();
 
-        assert_eq!(Scopes::ROOT, scopes.current_scope,);
+        assert_eq!(Scopes::ROOT, scopes.current_scope);
     }
 
     #[test]
