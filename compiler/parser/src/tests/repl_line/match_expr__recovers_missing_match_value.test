@@ -38,4 +38,4 @@ SourceFile@0..42
           LambdaExprBody@41..42
             IntLiteral@41..42
               Integer@41..42 "1"
-error at position 38 while parsing the `|` at the end of a lambda expression's argument list. Missing expected ‘|’
+error at position 38 while parsing the value in a match expression branch. Expected expression
