@@ -1,43 +1,16 @@
-import std::option::Option
-
 |Option::Some(x)| -> x
 ===
 HirModule {
     imports: Index {
         items: Arena {
-            len: 1,
-            data: [
-                Import {
-                    segments: [
-                        Name(
-                            "std",
-                        ),
-                        Name(
-                            "option",
-                        ),
-                    ],
-                    last: Name(
-                        "Option",
-                    ),
-                },
-            ],
+            len: 0,
+            data: [],
         },
         item_ranges: ArenaMap {
-            v: [
-                Some(
-                    0..28,
-                ),
-            ],
+            v: [],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
         },
-        item_names: {
-            (
-                Name(
-                    "Option",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Import>(0),
-        },
+        item_names: {},
     },
     expressions: Index {
         items: Arena {
@@ -61,10 +34,10 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    49..50,
+                    21..22,
                 ),
                 Some(
-                    28..50,
+                    0..22,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
@@ -106,10 +79,10 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    42..43,
+                    14..15,
                 ),
                 Some(
-                    29..44,
+                    1..16,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
@@ -147,6 +120,26 @@ HirModule {
         },
     },
     warnings: [],
-    errors: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                path: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                Name(
+                                    "Option",
+                                ),
+                            ],
+                        ),
+                        name: Name(
+                            "Some",
+                        ),
+                    },
+                ),
+            },
+            range: 1..16,
+        },
+    ],
 }
 []

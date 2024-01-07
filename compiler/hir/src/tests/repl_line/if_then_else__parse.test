@@ -1,4 +1,4 @@
-let test = True
+import test_data::test
 
 if test then 2 else 3
 ===
@@ -111,17 +111,6 @@ HirModule {
         },
     },
     warnings: [],
-    errors: [
-        LoweringError {
-            kind: UnknownReference {
-                path: ThisModule(
-                    Name(
-                        "True",
-                    ),
-                ),
-            },
-            range: 11..17,
-        },
-    ],
+    errors: [],
 }
 []

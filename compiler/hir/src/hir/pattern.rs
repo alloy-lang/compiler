@@ -62,22 +62,7 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
             Pattern::VariableRef { name }
         }
         ast::Pattern::NilIdentifier(_) => Pattern::Nil,
-        ast::Pattern::Destructure(destructure) => {
-            let Some(target) = destructure
-                .target()
-                .and_then(|target| lower_variable_ref(&target))
-            else {
-                todo!("validation");
-                return Pattern::Missing;
-            };
-
-            let args = destructure
-                .args()
-                .iter()
-                .map(|arg| lower_pattern(ctx, arg))
-                .collect::<Vec<_>>();
-            Pattern::Destructure { target, args }
-        }
+        ast::Pattern::Destructure(destructure) => lower_destructure(ctx, destructure),
         ast::Pattern::Unit(_) => Pattern::Unit,
         ast::Pattern::ParenPattern(paren) => paren
             .pattern()
@@ -101,6 +86,33 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
             Pattern::Tuple(args)
         }
     }
+}
+
+fn lower_destructure(ctx: &mut LoweringCtx, destructure: &ast::Destructure) -> Pattern {
+    let Some(target) = destructure
+        .target()
+        .and_then(|target| lower_variable_ref(ctx, &target))
+    else {
+        todo!("validation");
+        return Pattern::Missing;
+    };
+
+    if !ctx.contains_variable_ref(&target) {
+        ctx.error(
+            LoweringErrorKind::UnknownReference {
+                path: target.clone(),
+            },
+            destructure.range(),
+        );
+    }
+
+    let args = destructure
+        .args()
+        .iter()
+        .map(|arg| lower_pattern(ctx, arg))
+        .collect::<Vec<_>>();
+
+    Pattern::Destructure { target, args }
 }
 
 pub(super) fn lower_variable_ref(var: &ast::VariableRef) -> Option<Path> {
