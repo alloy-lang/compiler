@@ -155,9 +155,7 @@ mod tests {
         let scopes = Scopes::new();
 
         assert_eq!(
-            vec![
-                Idx::from_raw(RawIdx::from_u32(0)),
-            ],
+            vec![Idx::from_raw(RawIdx::from_u32(0)),],
             scopes.iter().collect::<Vec<_>>(),
         );
     }
