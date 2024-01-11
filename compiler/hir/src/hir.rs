@@ -289,6 +289,21 @@ impl LoweringCtx {
     }
 }
 
+impl LoweringCtx {
+    fn inside_scope<F, R>(&mut self, f: F) -> R
+    where
+        F: FnOnce(&mut Self) -> R,
+    {
+        self.scopes.push_scope();
+
+        let res = f(self);
+
+        self.scopes.pop_scope();
+
+        res
+    }
+}
+
 #[must_use]
 pub fn lower_source_file(source_file: &ast::SourceFile) -> HirModule {
     let mut ctx = LoweringCtx::new();

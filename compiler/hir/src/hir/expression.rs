@@ -214,22 +214,22 @@ fn lower_if_then_else_expression(ctx: &mut LoweringCtx, e: &ast::IfThenElseExpr)
 }
 
 fn lower_lambda_expression(ctx: &mut LoweringCtx, e: &ast::LambdaExpr) -> Expression {
-    ctx.scopes.push_scope();
-    let args = e
-        .args()
-        .iter()
-        .map(|arg| match arg.pattern() {
-            Some(arg) => lower_pattern(ctx, &arg),
-            None => ctx.add_missing_pattern(&arg.syntax()),
-        })
-        .collect::<Vec<_>>();
-    let body = match e.body() {
-        Some(body) => lower_expression(ctx, &body),
-        None => ctx.add_missing_expression(&e.syntax()),
-    };
-    ctx.scopes.pop_scope();
+    ctx.inside_scope(|ctx| {
+        let args = e
+            .args()
+            .iter()
+            .map(|arg| match arg.pattern() {
+                Some(arg) => lower_pattern(ctx, &arg),
+                None => ctx.add_missing_pattern(&arg.syntax()),
+            })
+            .collect::<Vec<_>>();
+        let body = match e.body() {
+            Some(body) => lower_expression(ctx, &body),
+            None => ctx.add_missing_expression(&e.syntax()),
+        };
 
-    Expression::Lambda { body, args }
+        Expression::Lambda { body, args }
+    })
 }
 
 fn lower_function_call(ctx: &mut LoweringCtx, e: &ast::FunctionCall) -> Expression {
