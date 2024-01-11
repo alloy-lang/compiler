@@ -33,16 +33,11 @@ pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
         .collect::<Vec<_>>();
     let num_segments = children.len();
     let Some(((_, first), rest)) = children.split_first() else {
-        todo!("validation");
-        return;
+        unreachable!("parsing error")
     };
     let mut segments = match first {
         ast::ImportDefChild::ImportDefSegment(segment) => {
-            let Some(segment) = lower_import_def_segment(segment) else {
-                return;
-            };
-
-            NonEmpty::new(segment)
+            NonEmpty::new(lower_import_def_segment(segment))
         }
         ast::ImportDefChild::ImportDefGroup(_) => {
             todo!("validation");
@@ -53,19 +48,11 @@ pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
     for (segment_num, child) in rest {
         match child {
             ast::ImportDefChild::ImportDefSegment(segment) => {
-                let Some(segment) = lower_import_def_segment(segment) else {
-                    return;
-                };
-
-                segments.push(segment);
+                segments.push(lower_import_def_segment(segment));
             }
             ast::ImportDefChild::ImportDefGroup(group) if segment_num + 1 == num_segments => {
                 for segment in group.children() {
-                    let Some(segment) = lower_import_def_segment(&segment) else {
-                        return;
-                    };
-
-                    segments.push(segment);
+                    segments.push(lower_import_def_segment(&segment));
                 }
             }
             ast::ImportDefChild::ImportDefGroup(_) => {
@@ -78,12 +65,11 @@ pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
     ctx.add_import(&segments, &import.syntax());
 }
 
-fn lower_import_def_segment(ast: &ast::ImportDefSegment) -> Option<Name> {
+fn lower_import_def_segment(ast: &ast::ImportDefSegment) -> Name {
     match ast.name() {
         None => {
-            todo!("validation");
-            None
+            unreachable!("parsing error")
         }
-        Some(segment) => Some(Name::new(segment)),
+        Some(segment) => Name::new(segment),
     }
 }

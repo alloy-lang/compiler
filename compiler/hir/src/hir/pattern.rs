@@ -28,48 +28,34 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
     match ast {
         ast::Pattern::IntLiteral(lit) => {
             let Some(value) = lit.value() else {
-                todo!("validation");
-                return Pattern::Missing;
+                unreachable!("parsing error")
             };
             Pattern::IntLiteral(value)
         }
         ast::Pattern::FractionLiteral(lit) => {
             let Some(value) = lit.value() else {
-                todo!("validation");
-                return Pattern::Missing;
+                unreachable!("parsing error")
             };
             Pattern::FractionLiteral(value)
         }
         ast::Pattern::StringLiteral(lit) => {
             let Some(value) = lit.value() else {
-                todo!("validation");
-                return Pattern::Missing;
+                unreachable!("parsing error")
             };
             Pattern::StringLiteral(value)
         }
         ast::Pattern::CharLiteral(lit) => {
             let Some(value) = lit.value() else {
-                todo!("validation");
-                return Pattern::Missing;
+                unreachable!("parsing error")
             };
             Pattern::CharLiteral(value)
         }
-        ast::Pattern::VariableRef(var) => {
-            let Some(name) = lower_variable_ref(ctx, var) else {
-                todo!("validation");
-                return Pattern::Missing;
-            };
-
-            Pattern::VariableRef { name }
-        }
-        ast::Pattern::VariableDeclaration(var) => {
-            let Some(name) = lower_variable_declaration(ctx, var) else {
-                todo!("validation");
-                return Pattern::Missing;
-            };
-
-            Pattern::VariableDeclaration { name }
-        }
+        ast::Pattern::VariableRef(var) => Pattern::VariableRef {
+            name: lower_variable_ref(ctx, var),
+        },
+        ast::Pattern::VariableDeclaration(var) => Pattern::VariableDeclaration {
+            name: lower_variable_declaration(var),
+        },
         ast::Pattern::NilIdentifier(_) => Pattern::Nil,
         ast::Pattern::Destructure(destructure) => lower_destructure(ctx, destructure),
         ast::Pattern::Unit(_) => Pattern::Unit,
@@ -88,8 +74,7 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
                 .collect::<Vec<_>>();
 
             let Ok(args) = NonEmpty::try_from(args) else {
-                todo!("validation");
-                return Pattern::Missing;
+                unreachable!("parsing error")
             };
 
             Pattern::Tuple(args)
@@ -100,10 +85,9 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
 fn lower_destructure(ctx: &mut LoweringCtx, destructure: &ast::Destructure) -> Pattern {
     let Some(target) = destructure
         .target()
-        .and_then(|target| lower_variable_ref(ctx, &target))
+        .map(|target| lower_variable_ref(ctx, &target))
     else {
-        todo!("validation");
-        return Pattern::Missing;
+        unreachable!("parsing error")
     };
 
     let args = destructure
@@ -115,32 +99,25 @@ fn lower_destructure(ctx: &mut LoweringCtx, destructure: &ast::Destructure) -> P
     Pattern::Destructure { target, args }
 }
 
-pub(super) fn lower_variable_declaration(
-    ctx: &mut LoweringCtx,
-    var: &ast::VariableDeclaration,
-) -> Option<Path> {
+pub(super) fn lower_variable_declaration(var: &ast::VariableDeclaration) -> Path {
     let Some(path) = var.name() else {
-        todo!("validation");
-        return None;
+        unreachable!("parsing error")
     };
 
     let Ok(name) = Path::try_from(path.segments()) else {
-        todo!("validation");
-        return None;
+        unreachable!("parsing error")
     };
 
-    Some(name)
+    name
 }
 
-pub(super) fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Option<Path> {
+pub(super) fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Path {
     let Some(path) = var.name() else {
-        todo!("validation");
-        return None;
+        unreachable!("parsing error")
     };
 
     let Ok(name) = Path::try_from(path.segments()) else {
-        todo!("validation");
-        return None;
+        unreachable!("parsing error")
     };
 
     if !ctx.contains_variable_ref(&name) {
@@ -150,5 +127,5 @@ pub(super) fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) 
         );
     }
 
-    Some(name)
+    name
 }

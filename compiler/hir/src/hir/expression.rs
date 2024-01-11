@@ -70,29 +70,25 @@ pub(super) fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expressio
     match ast {
         ast::Expression::IntLiteral(lit) => {
             let Some(value) = lit.value() else {
-                todo!("validation");
-                return Expression::Missing;
+                unreachable!("parsing error")
             };
             Expression::IntLiteral(value)
         }
         ast::Expression::FractionLiteral(lit) => {
             let Some(value) = lit.value() else {
-                todo!("validation");
-                return Expression::Missing;
+                unreachable!("parsing error")
             };
             Expression::FractionLiteral(value)
         }
         ast::Expression::StringLiteral(lit) => {
             let Some(value) = lit.value() else {
-                todo!("validation");
-                return Expression::Missing;
+                unreachable!("parsing error")
             };
             Expression::StringLiteral(value)
         }
         ast::Expression::CharLiteral(lit) => {
             let Some(value) = lit.value() else {
-                todo!("validation");
-                return Expression::Missing;
+                unreachable!("parsing error")
             };
             Expression::CharLiteral(value)
         }
@@ -116,8 +112,7 @@ pub(super) fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expressio
                 .collect::<Vec<_>>();
 
             let Ok(args) = NonEmpty::try_from(args) else {
-                todo!("validation");
-                return Expression::Missing;
+                unreachable!("parsing error")
             };
 
             Expression::Tuple(args)
@@ -135,15 +130,13 @@ fn lower_unary_expression(ctx: &mut LoweringCtx, e: &ast::UnaryExpr) -> Expressi
         return Expression::Missing;
     };
     let Some(op) = e.op() else {
-        todo!("validation");
-        return Expression::Missing;
+        unreachable!("parsing error")
     };
 
     let op = match op.text() {
         "-" => UnaryOp::Neg,
         _ => {
-            todo!("validation");
-            return Expression::Missing;
+            unreachable!("parsing error")
         }
     };
 
@@ -156,13 +149,11 @@ fn lower_unary_expression(ctx: &mut LoweringCtx, e: &ast::UnaryExpr) -> Expressi
 
 fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Expression {
     let Some(path) = var.name() else {
-        todo!("validation");
-        return Expression::Missing;
+        unreachable!("parsing error")
     };
 
     let Ok(name) = Path::try_from(path.segments()) else {
-        todo!("validation");
-        return Expression::Missing;
+        unreachable!("parsing error")
     };
 
     if !ctx.contains_variable_ref(&name) {
@@ -243,16 +234,13 @@ fn lower_lambda_expression(ctx: &mut LoweringCtx, e: &ast::LambdaExpr) -> Expres
 
 fn lower_function_call(ctx: &mut LoweringCtx, e: &ast::FunctionCall) -> Expression {
     let Some(target) = e.target() else {
-        todo!("validation");
-        return Expression::Missing;
+        unreachable!("parsing error")
     };
     let Some(target) = target.name() else {
-        todo!("validation");
-        return Expression::Missing;
+        unreachable!("parsing error")
     };
     let Ok(target) = Path::try_from(target.segments()) else {
-        todo!("validation");
-        return Expression::Missing;
+        unreachable!("parsing error")
     };
 
     let args = e
