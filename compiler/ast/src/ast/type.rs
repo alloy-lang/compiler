@@ -14,7 +14,6 @@ ast_union_node!(Type, kinds: [
 
 ast_node!(SelfType, fields: []);
 ast_node!(UnitType, fields: []);
-ast_token!(NilIdentifier, fields: []);
 ast_node!(TypeIdentifier, fields: [name]);
 
 impl TypeIdentifier {

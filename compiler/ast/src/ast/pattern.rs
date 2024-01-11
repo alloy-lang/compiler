@@ -77,8 +77,6 @@ impl VariableDeclaration {
     }
 }
 
-ast_token!(NilIdentifier, fields: []);
-
 ast_node!(Destructure, fields: [target, args]);
 
 impl Destructure {

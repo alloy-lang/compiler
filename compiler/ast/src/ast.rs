@@ -111,6 +111,8 @@ macro_rules! ast_union_node {
 	};
 }
 
+ast_token!(NilIdentifier, fields: []);
+
 pub use expression::*;
 mod expression;
 
