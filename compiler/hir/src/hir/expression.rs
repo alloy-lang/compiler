@@ -261,22 +261,24 @@ fn lower_match_expression(ctx: &mut LoweringCtx, e: &ast::MatchExpr) -> Expressi
     let targets = e
         .targets()
         .iter()
-        .map(|a| ctx.inside_scope(|ctx| {
-            // map_or_else can't be used here due to a double borrow
-            #[allow(clippy::map_unwrap_or)]
-            let condition = a
-                .condition()
-                .map(|c| lower_pattern(ctx, &c))
-                .unwrap_or_else(|| ctx.add_missing_pattern(&a.syntax()));
-            // map_or_else can't be used here due to a double borrow
-            #[allow(clippy::map_unwrap_or)]
-            let value = a
-                .value()
-                .map(|v| lower_expression(ctx, &v))
-                .unwrap_or_else(|| ctx.add_missing_expression(&a.syntax()));
+        .map(|a| {
+            ctx.inside_scope(|ctx| {
+                // map_or_else can't be used here due to a double borrow
+                #[allow(clippy::map_unwrap_or)]
+                let condition = a
+                    .condition()
+                    .map(|c| lower_pattern(ctx, &c))
+                    .unwrap_or_else(|| ctx.add_missing_pattern(&a.syntax()));
+                // map_or_else can't be used here due to a double borrow
+                #[allow(clippy::map_unwrap_or)]
+                let value = a
+                    .value()
+                    .map(|v| lower_expression(ctx, &v))
+                    .unwrap_or_else(|| ctx.add_missing_expression(&a.syntax()));
 
-            (condition, value)
-        }))
+                (condition, value)
+            })
+        })
         .collect::<Vec<_>>();
 
     Expression::Match { condition, targets }
