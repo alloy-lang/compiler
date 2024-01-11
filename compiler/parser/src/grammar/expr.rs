@@ -294,6 +294,7 @@ fn parse_match_when_expr(p: &mut Parser) -> CompletedMarker {
             SyntaxKind::MatchTargetCondition,
             ParseErrorContext::MatchTargetCondition,
             ts![TokenKind::RightArrow],
+            false,
         );
 
         p.expect_with_recovery(

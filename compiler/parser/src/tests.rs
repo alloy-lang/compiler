@@ -62,7 +62,9 @@ fn run_parser_tests(tests_dir: &str, parsing_fn: fn(&str) -> Parse) {
 
     assert!(
         failed_tests.is_empty(),
-        "{} parser test(s) failed: {:?}", failed_tests.len(), failed_tests,
+        "{} parser test(s) failed: {:?}",
+        failed_tests.len(),
+        failed_tests,
     );
 }
 

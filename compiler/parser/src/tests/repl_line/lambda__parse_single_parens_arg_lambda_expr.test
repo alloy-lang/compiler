@@ -8,7 +8,7 @@ SourceFile@0..10
         ParenPattern@1..4
           LParen@1..2 "("
           TuplePatternArg@2..3
-            VariableRef@2..3
+            VariableDeclaration@2..3
               Path@2..3
                 Ident@2..3 "a"
           RParen@3..4 ")"

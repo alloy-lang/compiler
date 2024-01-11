@@ -5,7 +5,7 @@ SourceFile@0..20
     LambdaExprArgList@0..16
       Pipe@0..1 "|"
       LambdaExprArg@1..6
-        VariableRef@1..6
+        VariableDeclaration@1..6
           Path@1..6
             Ident@1..5 "arg1"
             Whitespace@5..6 " "

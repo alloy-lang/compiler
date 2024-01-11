@@ -83,6 +83,7 @@ pub enum SyntaxKind {
     UnaryExpr,
     ValueDef,
     VariableRef,
+    VariableDeclaration,
     LambdaExpr,
     LambdaExprArgList,
     LambdaExprArg,

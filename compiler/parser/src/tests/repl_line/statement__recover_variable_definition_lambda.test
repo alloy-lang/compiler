@@ -13,7 +13,7 @@ SourceFile@0..46
       LambdaExprArgList@11..18
         Pipe@11..12 "|"
         LambdaExprArg@12..13
-          VariableRef@12..13
+          VariableDeclaration@12..13
             Path@12..13
               Ident@12..13 "a"
         Comma@13..14 ","
@@ -38,13 +38,13 @@ SourceFile@0..46
       LambdaExprArgList@31..38
         Pipe@31..32 "|"
         LambdaExprArg@32..33
-          VariableRef@32..33
+          VariableDeclaration@32..33
             Path@32..33
               Ident@32..33 "a"
         Comma@33..34 ","
         Whitespace@34..35 " "
         LambdaExprArg@35..36
-          VariableRef@35..36
+          VariableDeclaration@35..36
             Path@35..36
               Ident@35..36 "b"
         Pipe@36..37 "|"

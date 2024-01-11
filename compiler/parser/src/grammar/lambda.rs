@@ -45,6 +45,7 @@ fn parse_arg_list(p: &mut Parser) -> CompletedMarker {
             SyntaxKind::LambdaExprArg,
             ParseErrorContext::LambdaArgExpr,
             ts![],
+            true,
         );
 
         if should_stop(p) {

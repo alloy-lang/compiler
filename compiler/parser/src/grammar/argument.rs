@@ -19,6 +19,7 @@ pub(crate) fn parse_argument(
     kind: SyntaxKind,
     context: ParseErrorContext,
     recovery_set: TokenSet,
+    identify_declarations: bool,
 ) -> CompletedMarker {
     let m = p.start();
 
@@ -30,10 +31,15 @@ pub(crate) fn parse_argument(
         parse_string_literal(p);
     } else if p.at(TokenKind::Char) {
         parse_char_literal(p);
+    } else if identify_declarations
+        && p.at(TokenKind::Ident)
+        && !p.maybe_at_nth(TokenKind::DoubleColon, 1)
+    {
+        parse_variable_declaration(p);
     } else if p.at(TokenKind::Ident) {
         parse_variable_ref(p);
     } else if p.at(TokenKind::LParen) {
-        parse_tuple_arg(p);
+        parse_tuple_arg(p, identify_declarations);
     } else if p.at(TokenKind::NilIdentifier) {
         p.bump(TokenKind::NilIdentifier);
     } else {
@@ -51,21 +57,30 @@ fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
         SyntaxKind::VariableRef,
     );
 
-    maybe_parse_typedef_destructuring(p, cm)
+    maybe_parse_typedef_destructure(p, cm)
 }
 
-fn maybe_parse_typedef_destructuring(p: &mut Parser, lhs: CompletedMarker) -> CompletedMarker {
+fn parse_variable_declaration(p: &mut Parser) -> CompletedMarker {
+    path::parse_path(
+        p,
+        ParseErrorContext::VariableDeclaration,
+        ts![],
+        SyntaxKind::VariableDeclaration,
+    )
+}
+
+fn maybe_parse_typedef_destructure(p: &mut Parser, lhs: CompletedMarker) -> CompletedMarker {
     if !p.maybe_at(TokenKind::LParen) {
         return lhs;
     }
 
     let cm = lhs.precede(p).complete(p, SyntaxKind::DestructureTarget);
-    parse_typedef_destructuring(p);
+    parse_typedef_destructure_args(p);
 
     cm.precede(p).complete(p, SyntaxKind::Destructure)
 }
 
-fn parse_typedef_destructuring(p: &mut Parser) {
+fn parse_typedef_destructure_args(p: &mut Parser) {
     p.bump(TokenKind::LParen);
 
     loop {
@@ -78,6 +93,7 @@ fn parse_typedef_destructuring(p: &mut Parser) {
             SyntaxKind::DestructureArg,
             ParseErrorContext::DestructureArgPattern,
             ts![TokenKind::RParen, TokenKind::Comma],
+            false,
         );
 
         if should_stop(p) {
@@ -100,7 +116,7 @@ fn parse_typedef_destructuring(p: &mut Parser) {
     }
 }
 
-fn parse_tuple_arg(p: &mut Parser) -> CompletedMarker {
+fn parse_tuple_arg(p: &mut Parser, identify_declarations: bool) -> CompletedMarker {
     let paren_m = p.start();
     p.bump(TokenKind::LParen);
 
@@ -115,6 +131,7 @@ fn parse_tuple_arg(p: &mut Parser) -> CompletedMarker {
             SyntaxKind::TuplePatternArg,
             ParseErrorContext::ParenExprExpr,
             ts![TokenKind::RightArrow],
+            identify_declarations,
         );
         arg_len += 1;
 

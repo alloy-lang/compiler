@@ -8,13 +8,13 @@ SourceFile@0..13
         TuplePattern@1..7
           LParen@1..2 "("
           TuplePatternArg@2..3
-            VariableRef@2..3
+            VariableDeclaration@2..3
               Path@2..3
                 Ident@2..3 "a"
           Comma@3..4 ","
           Whitespace@4..5 " "
           TuplePatternArg@5..6
-            VariableRef@5..6
+            VariableDeclaration@5..6
               Path@5..6
                 Ident@5..6 "b"
           RParen@6..7 ")"
