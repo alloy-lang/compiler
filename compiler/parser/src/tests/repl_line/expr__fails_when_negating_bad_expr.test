@@ -1,6 +1,8 @@
--
+-where
 ===
-SourceFile@0..1
-  UnaryExpr@0..1
+SourceFile@0..6
+  UnaryExpr@0..6
     Minus@0..1 "-"
-error at position 1 while parsing an expression after a prefix operator. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+    Error@1..6
+      WhereKw@1..6 "where"
+error in range 1..6 while parsing an expression after a prefix operator. Found ‘where‘, but expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’

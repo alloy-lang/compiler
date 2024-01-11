@@ -8,33 +8,33 @@ SourceFile@0..91
     Whitespace@6..7 " "
     WhereKw@7..12 "where"
     Whitespace@12..17 "\n    "
-    ImportStatement@17..57
+    ImportDef@17..57
       ImportKw@17..23 "import"
       Whitespace@23..24 " "
-      ImportStatementSegment@24..30
+      ImportDefSegment@24..30
         Ident@24..30 "really"
       DoubleColon@30..32 "::"
-      ImportStatementSegment@32..38
+      ImportDefSegment@32..38
         Ident@32..38 "really"
       DoubleColon@38..40 "::"
-      ImportStatementSegment@40..44
+      ImportDefSegment@40..44
         Ident@40..44 "real"
       DoubleColon@44..46 "::"
-      ImportStatementSegment@46..57
+      ImportDefSegment@46..57
         Ident@46..52 "Thing1"
         Whitespace@52..57 "\n    "
-    ImportStatement@57..91
+    ImportDef@57..91
       ImportKw@57..63 "import"
       Whitespace@63..64 " "
-      ImportStatementSegment@64..70
+      ImportDefSegment@64..70
         Ident@64..70 "really"
       DoubleColon@70..72 "::"
-      ImportStatementSegment@72..76
+      ImportDefSegment@72..76
         Ident@72..76 "real"
       DoubleColon@76..78 "::"
-      ImportStatementSegment@78..83
+      ImportDefSegment@78..83
         Ident@78..83 "other"
       DoubleColon@83..85 "::"
-      ImportStatementSegment@85..91
+      ImportDefSegment@85..91
         Ident@85..91 "Thing2"
 error at position 7 while parsing the name of the module in a module definition. Missing expected identifier

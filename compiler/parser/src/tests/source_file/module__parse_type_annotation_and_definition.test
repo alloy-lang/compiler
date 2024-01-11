@@ -24,34 +24,39 @@ SourceFile@0..208
           LParen@48..49 "("
           LambdaType@49..57
             TypeIdentifier@49..52
-              Ident@49..51 "t2"
-              Whitespace@51..52 " "
+              Path@49..52
+                Ident@49..51 "t2"
+                Whitespace@51..52 " "
             RightArrow@52..54 "->"
             Whitespace@54..55 " "
             TypeIdentifier@55..57
-              Ident@55..57 "t1"
+              Path@55..57
+                Ident@55..57 "t1"
           RParen@57..58 ")"
           Whitespace@58..59 " "
         RightArrow@59..61 "->"
         Whitespace@61..62 " "
         LambdaType@62..86
           TypeIdentifier@62..65
-            Ident@62..64 "t2"
-            Whitespace@64..65 " "
+            Path@62..65
+              Ident@62..64 "t2"
+              Whitespace@64..65 " "
           RightArrow@65..67 "->"
           Whitespace@67..68 " "
           LambdaType@68..86
             TypeIdentifier@68..71
-              Ident@68..70 "t2"
-              Whitespace@70..71 " "
+              Path@68..71
+                Ident@68..70 "t2"
+                Whitespace@70..71 " "
             RightArrow@71..73 "->"
             Whitespace@73..74 " "
             TypeIdentifier@74..86
-              Ident@74..85 "ResultThing"
-              Whitespace@85..86 " "
+              Path@74..86
+                Ident@74..85 "ResultThing"
+                Whitespace@85..86 " "
       WhereKw@86..91 "where"
       Whitespace@91..98 "\n      "
-      TypeVariable@98..123
+      NamedTypeVariable@98..123
         TypevarKw@98..105 "typevar"
         Whitespace@105..106 " "
         Ident@106..108 "t1"
@@ -59,36 +64,40 @@ SourceFile@0..208
         Equals@109..110 "="
         Whitespace@110..111 " "
         TypeVariableTraitConstraint@111..123
-          Ident@111..116 "Thing"
-          Whitespace@116..123 "\n      "
-      TypeVariable@123..138
+          Path@111..123
+            Ident@111..116 "Thing"
+            Whitespace@116..123 "\n      "
+      NamedTypeVariable@123..138
         TypevarKw@123..130 "typevar"
         Whitespace@130..131 " "
         Ident@131..133 "t2"
         Whitespace@133..138 "\n    "
-    VariableDef@138..208
+    ValueDef@138..208
       LetKw@138..141 "let"
       Whitespace@141..142 " "
       Ident@142..151 "testThing"
       Whitespace@151..152 " "
       Equals@152..153 "="
       Whitespace@153..154 " "
-      LambdaExprDef@154..208
+      LambdaExpr@154..208
         LambdaExprArgList@154..168
           Pipe@154..155 "|"
           LambdaExprArg@155..160
-            VariableRef@155..160
-              Ident@155..160 "funky"
+            VariableDeclaration@155..160
+              Path@155..160
+                Ident@155..160 "funky"
           Comma@160..161 ","
           Whitespace@161..162 " "
           LambdaExprArg@162..163
-            VariableRef@162..163
-              Ident@162..163 "x"
+            VariableDeclaration@162..163
+              Path@162..163
+                Ident@162..163 "x"
           Comma@163..164 ","
           Whitespace@164..165 " "
           LambdaExprArg@165..166
-            VariableRef@165..166
-              Ident@165..166 "y"
+            VariableDeclaration@165..166
+              Path@165..166
+                Ident@165..166 "y"
           Pipe@166..167 "|"
           Whitespace@167..168 " "
         RightArrow@168..170 "->"
@@ -96,34 +105,35 @@ SourceFile@0..208
         LambdaExprBody@171..208
           InfixExpr@171..208
             VariableRef@171..185
-              Ident@171..179 "TestType"
-              DoubleColon@179..181 "::"
-              Ident@181..184 "new"
-              Whitespace@184..185 " "
+              Path@171..185
+                Ident@171..179 "TestType"
+                DoubleColon@179..181 "::"
+                Ident@181..184 "new"
+                Whitespace@184..185 " "
             OpIdent@185..187 "<|"
             Whitespace@187..188 " "
             TupleExpr@188..208
               LParen@188..189 "("
               FunctionCall@189..197
-                FunctionCallTarget@189..194
-                  VariableRef@189..194
+                VariableRef@189..194
+                  Path@189..194
                     Ident@189..194 "funky"
                 FunctionCallArgList@194..197
                   LParen@194..195 "("
-                  FunctionCallArg@195..196
-                    VariableRef@195..196
+                  VariableRef@195..196
+                    Path@195..196
                       Ident@195..196 "x"
                   RParen@196..197 ")"
               Comma@197..198 ","
               Whitespace@198..199 " "
               FunctionCall@199..207
-                FunctionCallTarget@199..204
-                  VariableRef@199..204
+                VariableRef@199..204
+                  Path@199..204
                     Ident@199..204 "funky"
                 FunctionCallArgList@204..207
                   LParen@204..205 "("
-                  FunctionCallArg@205..206
-                    VariableRef@205..206
+                  VariableRef@205..206
+                    Path@205..206
                       Ident@205..206 "y"
                   RParen@206..207 ")"
               RParen@207..208 ")"

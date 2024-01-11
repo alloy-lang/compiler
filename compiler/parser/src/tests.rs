@@ -4,27 +4,15 @@ use std::ffi::OsStr;
 use std::path::PathBuf;
 use std::{env, fs};
 
-// #[test]
-// fn source_file() {
-//     run_parser_tests("source_file", crate::parse);
-// }
+#[test]
+fn source_file() {
+    run_parser_tests("source_file", crate::parse_source_file);
+}
 
 #[test]
 fn repl_line() {
     run_parser_tests("repl_line", crate::parse_repl_line);
 }
-
-// #[test]
-// fn lambda__parse_destructured_argument() {
-//     let file_name = "lambda__parse_destructured_argument.test";
-//
-//     let test_file = {
-//         let current_dir = env::current_dir().unwrap();
-//         current_dir.join(format!("src/tests/repl_line/{}", file_name))
-//     };
-//
-//     run_parser_test(test_file, crate::parse);
-// }
 
 fn run_parser_test(path: PathBuf, parsing_fn: fn(&str) -> Parse) {
     let test_content = fs::read_to_string(&path).unwrap();
