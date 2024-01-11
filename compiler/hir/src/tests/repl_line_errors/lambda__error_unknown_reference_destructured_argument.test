@@ -48,7 +48,7 @@ HirModule {
         items: Arena {
             len: 2,
             data: [
-                VariableRef {
+                VariableDeclaration {
                     name: ThisModule(
                         Name(
                             "x",
@@ -138,7 +138,7 @@ HirModule {
                     },
                 ),
             },
-            range: 1..16,
+            range: 1..13,
         },
     ],
 }

@@ -1,4 +1,4 @@
-|(a)| -> 5
+|(a, b)| -> a + b
 ===
 HirModule {
     imports: Index {
@@ -14,35 +14,7 @@ HirModule {
     },
     expressions: Index {
         items: Arena {
-            len: 2,
-            data: [
-                IntLiteral(
-                    5,
-                ),
-                Lambda {
-                    args: [
-                        Idx::<Pattern>(0),
-                    ],
-                    body: Idx::<Expression>(0),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    9..10,
-                ),
-                Some(
-                    0..10,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {},
-    },
-    patterns: Index {
-        items: Arena {
-            len: 1,
+            len: 4,
             data: [
                 VariableRef {
                     name: ThisModule(
@@ -51,12 +23,83 @@ HirModule {
                         ),
                     ),
                 },
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "b",
+                        ),
+                    ),
+                },
+                Binary {
+                    op: Add,
+                    lhs: Idx::<Expression>(0),
+                    rhs: Idx::<Expression>(1),
+                },
+                Lambda {
+                    args: [
+                        Idx::<Pattern>(2),
+                    ],
+                    body: Idx::<Expression>(2),
+                },
             ],
         },
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    1..4,
+                    12..14,
+                ),
+                Some(
+                    16..17,
+                ),
+                Some(
+                    12..17,
+                ),
+                Some(
+                    0..17,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+        },
+        item_names: {},
+    },
+    patterns: Index {
+        items: Arena {
+            len: 3,
+            data: [
+                VariableDeclaration {
+                    name: ThisModule(
+                        Name(
+                            "a",
+                        ),
+                    ),
+                },
+                VariableDeclaration {
+                    name: ThisModule(
+                        Name(
+                            "b",
+                        ),
+                    ),
+                },
+                Tuple(
+                    NonEmpty(
+                        [
+                            Idx::<Pattern>(0),
+                            Idx::<Pattern>(1),
+                        ],
+                    ),
+                ),
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    2..3,
+                ),
+                Some(
+                    5..6,
+                ),
+                Some(
+                    1..7,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
@@ -68,6 +111,12 @@ HirModule {
                 ),
                 Idx::<Scope>(1),
             ): Idx::<Pattern>(0),
+            (
+                Name(
+                    "b",
+                ),
+                Idx::<Scope>(1),
+            ): Idx::<Pattern>(1),
         },
     },
     type_annotations: {},

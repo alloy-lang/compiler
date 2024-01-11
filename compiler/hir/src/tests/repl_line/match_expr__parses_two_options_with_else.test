@@ -1,3 +1,5 @@
+import std::bool::Bool::True
+
 let test = True
 
 match test when
@@ -7,14 +9,42 @@ match test when
 HirModule {
     imports: Index {
         items: Arena {
-            len: 0,
-            data: [],
+            len: 1,
+            data: [
+                Import {
+                    segments: [
+                        Name(
+                            "std",
+                        ),
+                        Name(
+                            "bool",
+                        ),
+                        Name(
+                            "Bool",
+                        ),
+                    ],
+                    last: Name(
+                        "True",
+                    ),
+                },
+            ],
         },
         item_ranges: ArenaMap {
-            v: [],
+            v: [
+                Some(
+                    0..30,
+                ),
+            ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
         },
-        item_names: {},
+        item_names: {
+            (
+                Name(
+                    "True",
+                ),
+                Idx::<Scope>(0),
+            ): Idx::<Import>(0),
+        },
     },
     expressions: Index {
         items: Arena {
@@ -58,19 +88,19 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    0..17,
+                    30..47,
                 ),
                 Some(
-                    23..28,
+                    53..58,
                 ),
                 Some(
-                    45..49,
+                    75..79,
                 ),
                 Some(
-                    59..60,
+                    89..90,
                 ),
                 Some(
-                    17..60,
+                    47..90,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
@@ -101,22 +131,15 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    37..42,
+                    67..72,
                 ),
                 Some(
-                    51..52,
+                    81..82,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
         },
-        item_names: {
-            (
-                Name(
-                    "True",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Pattern>(0),
-        },
+        item_names: {},
     },
     type_annotations: {},
     types: Arena {
@@ -139,17 +162,6 @@ HirModule {
         },
     },
     warnings: [],
-    errors: [
-        LoweringError {
-            kind: UnknownReference {
-                path: ThisModule(
-                    Name(
-                        "True",
-                    ),
-                ),
-            },
-            range: 11..17,
-        },
-    ],
+    errors: [],
 }
 []

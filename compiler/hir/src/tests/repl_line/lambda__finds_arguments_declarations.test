@@ -1,4 +1,4 @@
-|arg1, arg2, arg3| -> 17
+|arg1, arg2, arg3| -> (arg1, arg2, arg3)
 ===
 HirModule {
     imports: Index {
@@ -14,37 +14,7 @@ HirModule {
     },
     expressions: Index {
         items: Arena {
-            len: 2,
-            data: [
-                IntLiteral(
-                    17,
-                ),
-                Lambda {
-                    args: [
-                        Idx::<Pattern>(0),
-                        Idx::<Pattern>(1),
-                        Idx::<Pattern>(2),
-                    ],
-                    body: Idx::<Expression>(0),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    22..24,
-                ),
-                Some(
-                    0..24,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {},
-    },
-    patterns: Index {
-        items: Arena {
-            len: 3,
+            len: 5,
             data: [
                 VariableRef {
                     name: ThisModule(
@@ -61,6 +31,72 @@ HirModule {
                     ),
                 },
                 VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "arg3",
+                        ),
+                    ),
+                },
+                Tuple(
+                    NonEmpty(
+                        [
+                            Idx::<Expression>(0),
+                            Idx::<Expression>(1),
+                            Idx::<Expression>(2),
+                        ],
+                    ),
+                ),
+                Lambda {
+                    args: [
+                        Idx::<Pattern>(0),
+                        Idx::<Pattern>(1),
+                        Idx::<Pattern>(2),
+                    ],
+                    body: Idx::<Expression>(3),
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    23..27,
+                ),
+                Some(
+                    29..33,
+                ),
+                Some(
+                    35..39,
+                ),
+                Some(
+                    22..40,
+                ),
+                Some(
+                    0..40,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+        },
+        item_names: {},
+    },
+    patterns: Index {
+        items: Arena {
+            len: 3,
+            data: [
+                VariableDeclaration {
+                    name: ThisModule(
+                        Name(
+                            "arg1",
+                        ),
+                    ),
+                },
+                VariableDeclaration {
+                    name: ThisModule(
+                        Name(
+                            "arg2",
+                        ),
+                    ),
+                },
+                VariableDeclaration {
                     name: ThisModule(
                         Name(
                             "arg3",

@@ -208,7 +208,7 @@ impl LoweringCtx {
 
     pub(crate) fn add_pattern(&mut self, pattern: Pattern, element: &SyntaxElement) -> PatternIdx {
         match &pattern {
-            Pattern::VariableRef { name } => {
+            Pattern::VariableDeclaration { name } => {
                 let res = self.patterns.insert_named(
                     name.local_name().clone(),
                     pattern,

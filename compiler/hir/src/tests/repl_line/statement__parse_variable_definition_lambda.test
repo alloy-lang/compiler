@@ -74,14 +74,14 @@ HirModule {
         items: Arena {
             len: 2,
             data: [
-                VariableRef {
+                VariableDeclaration {
                     name: ThisModule(
                         Name(
                             "a",
                         ),
                     ),
                 },
-                VariableRef {
+                VariableDeclaration {
                     name: ThisModule(
                         Name(
                             "b",

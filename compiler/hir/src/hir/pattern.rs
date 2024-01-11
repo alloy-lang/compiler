@@ -12,6 +12,7 @@ pub enum Pattern {
     StringLiteral(String),
     CharLiteral(char),
     VariableRef { name: Path },
+    VariableDeclaration { name: Path },
     Nil,
     Destructure { target: Path, args: Vec<PatternIdx> },
     Unit,
@@ -54,12 +55,20 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
             Pattern::CharLiteral(value)
         }
         ast::Pattern::VariableRef(var) => {
-            let Some(name) = lower_variable_ref(var) else {
+            let Some(name) = lower_variable_ref(ctx, var) else {
                 todo!("validation");
                 return Pattern::Missing;
             };
 
             Pattern::VariableRef { name }
+        }
+        ast::Pattern::VariableDeclaration(var) => {
+            let Some(name) = lower_variable_declaration(ctx, var) else {
+                todo!("validation");
+                return Pattern::Missing;
+            };
+
+            Pattern::VariableDeclaration { name }
         }
         ast::Pattern::NilIdentifier(_) => Pattern::Nil,
         ast::Pattern::Destructure(destructure) => lower_destructure(ctx, destructure),
@@ -97,15 +106,6 @@ fn lower_destructure(ctx: &mut LoweringCtx, destructure: &ast::Destructure) -> P
         return Pattern::Missing;
     };
 
-    if !ctx.contains_variable_ref(&target) {
-        ctx.error(
-            LoweringErrorKind::UnknownReference {
-                path: target.clone(),
-            },
-            destructure.range(),
-        );
-    }
-
     let args = destructure
         .args()
         .iter()
@@ -115,7 +115,10 @@ fn lower_destructure(ctx: &mut LoweringCtx, destructure: &ast::Destructure) -> P
     Pattern::Destructure { target, args }
 }
 
-pub(super) fn lower_variable_ref(var: &ast::VariableRef) -> Option<Path> {
+pub(super) fn lower_variable_declaration(
+    ctx: &mut LoweringCtx,
+    var: &ast::VariableDeclaration,
+) -> Option<Path> {
     let Some(path) = var.name() else {
         todo!("validation");
         return None;
@@ -125,5 +128,27 @@ pub(super) fn lower_variable_ref(var: &ast::VariableRef) -> Option<Path> {
         todo!("validation");
         return None;
     };
+
+    Some(name)
+}
+
+pub(super) fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Option<Path> {
+    let Some(path) = var.name() else {
+        todo!("validation");
+        return None;
+    };
+
+    let Ok(name) = Path::try_from(path.segments()) else {
+        todo!("validation");
+        return None;
+    };
+
+    if !ctx.contains_variable_ref(&name) {
+        ctx.error(
+            LoweringErrorKind::UnknownReference { path: name.clone() },
+            var.range(),
+        );
+    }
+
     Some(name)
 }

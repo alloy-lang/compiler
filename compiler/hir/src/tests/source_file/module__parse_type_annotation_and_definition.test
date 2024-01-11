@@ -1,4 +1,6 @@
 module TestModule1 where
+    import TestType
+
     typeof testThing : (t2 -> t1) -> t2 -> t2 -> ResultThing where
       typevar t1 = Thing
       typevar t2
@@ -7,14 +9,32 @@ module TestModule1 where
 HirModule {
     imports: Index {
         items: Arena {
-            len: 0,
-            data: [],
+            len: 1,
+            data: [
+                Import {
+                    segments: [],
+                    last: Name(
+                        "TestType",
+                    ),
+                },
+            ],
         },
         item_ranges: ArenaMap {
-            v: [],
+            v: [
+                Some(
+                    29..50,
+                ),
+            ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
         },
-        item_names: {},
+        item_names: {
+            (
+                Name(
+                    "TestType",
+                ),
+                Idx::<Scope>(0),
+            ): Idx::<Import>(0),
+        },
     },
     expressions: Index {
         items: Arena {
@@ -102,28 +122,28 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    171..185,
+                    192..206,
                 ),
                 Some(
-                    195..196,
+                    216..217,
                 ),
                 Some(
-                    189..197,
+                    210..218,
                 ),
                 Some(
-                    205..206,
+                    226..227,
                 ),
                 Some(
-                    199..207,
+                    220..228,
                 ),
                 Some(
-                    188..208,
+                    209..229,
                 ),
                 Some(
-                    171..208,
+                    192..229,
                 ),
                 Some(
-                    138..208,
+                    159..229,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
@@ -141,21 +161,21 @@ HirModule {
         items: Arena {
             len: 3,
             data: [
-                VariableRef {
+                VariableDeclaration {
                     name: ThisModule(
                         Name(
                             "funky",
                         ),
                     ),
                 },
-                VariableRef {
+                VariableDeclaration {
                     name: ThisModule(
                         Name(
                             "x",
                         ),
                     ),
                 },
-                VariableRef {
+                VariableDeclaration {
                     name: ThisModule(
                         Name(
                             "y",
@@ -167,13 +187,13 @@ HirModule {
         item_ranges: ArenaMap {
             v: [
                 Some(
-                    155..160,
+                    176..181,
                 ),
                 Some(
-                    162..163,
+                    183..184,
                 ),
                 Some(
-                    165..166,
+                    186..187,
                 ),
             ],
             _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
@@ -266,34 +286,34 @@ HirModule {
     type_ranges: ArenaMap {
         v: [
             Some(
-                49..52,
+                70..73,
             ),
             Some(
-                55..57,
+                76..78,
             ),
             Some(
-                49..57,
+                70..78,
             ),
             Some(
-                48..59,
+                69..80,
             ),
             Some(
-                62..65,
+                83..86,
             ),
             Some(
-                68..71,
+                89..92,
             ),
             Some(
-                74..86,
+                95..107,
             ),
             Some(
-                68..86,
+                89..107,
             ),
             Some(
-                62..86,
+                83..107,
             ),
             Some(
-                48..86,
+                69..107,
             ),
         ],
         _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
@@ -313,26 +333,6 @@ HirModule {
         },
     },
     warnings: [],
-    errors: [
-        LoweringError {
-            kind: UnknownReference {
-                path: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                Name(
-                                    "TestType",
-                                ),
-                            ],
-                        ),
-                        name: Name(
-                            "new",
-                        ),
-                    },
-                ),
-            },
-            range: 171..185,
-        },
-    ],
+    errors: [],
 }
 []
