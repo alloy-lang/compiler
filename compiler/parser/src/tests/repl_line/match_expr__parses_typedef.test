@@ -72,7 +72,7 @@ SourceFile@0..120
                 Ident@81..85 "Left"
           LParen@85..86 "("
           DestructureArg@86..87
-            VariableRef@86..87
+            VariableDeclaration@86..87
               Path@86..87
                 Ident@86..87 "l"
           RParen@87..88 ")"
@@ -97,7 +97,7 @@ SourceFile@0..120
                 Ident@107..112 "Right"
           LParen@112..113 "("
           DestructureArg@113..114
-            VariableRef@113..114
+            VariableDeclaration@113..114
               Path@113..114
                 Ident@113..114 "r"
           RParen@114..115 ")"

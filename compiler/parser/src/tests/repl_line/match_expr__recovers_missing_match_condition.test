@@ -36,4 +36,4 @@ SourceFile@0..39
       MatchTargetValue@38..39
         IntLiteral@38..39
           Integer@38..39 "1"
-error at position 20 while parsing the condition in a match expression branch. Missing expected integer, fraction, string, char, identifier, ‘(’ or ‘_’
+error at position 20 while parsing the condition in a match expression branch. Missing expected integer, fraction, string, char, identifier, ‘-’, ‘(’ or ‘_’

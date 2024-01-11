@@ -38,6 +38,8 @@ pub(crate) fn parse_argument(
         parse_variable_declaration(p);
     } else if p.at(TokenKind::Ident) {
         parse_variable_ref(p);
+    } else if p.at(TokenKind::Minus) {
+        parse_prefix_expr(p, recovery_set);
     } else if p.at(TokenKind::LParen) {
         parse_tuple_arg(p, identify_declarations);
     } else if p.at(TokenKind::NilIdentifier) {
@@ -93,7 +95,7 @@ fn parse_typedef_destructure_args(p: &mut Parser) {
             SyntaxKind::DestructureArg,
             ParseErrorContext::DestructureArgPattern,
             ts![TokenKind::RParen, TokenKind::Comma],
-            false,
+            true,
         );
 
         if should_stop(p) {
@@ -158,4 +160,23 @@ fn parse_tuple_arg(p: &mut Parser, identify_declarations: bool) -> CompletedMark
     fn should_stop(p: &mut Parser) -> bool {
         p.maybe_at(TokenKind::RParen) || p.at_eof()
     }
+}
+
+fn parse_prefix_expr(p: &mut Parser, parent_recovery_set: TokenSet) -> CompletedMarker {
+    let m = p.start();
+
+    // Eat the operator’s token.
+    p.bump(TokenKind::Minus);
+
+    if p.at(TokenKind::Integer) {
+        p.bump(TokenKind::Integer);
+    } else {
+        p.expect_with_recovery(
+            TokenKind::Fraction,
+            ParseErrorContext::PrefixPatternPattern,
+            parent_recovery_set,
+        );
+    }
+
+    m.complete(p, SyntaxKind::UnaryExpr)
 }

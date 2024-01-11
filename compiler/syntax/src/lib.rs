@@ -81,6 +81,7 @@ pub enum SyntaxKind {
     TuplePattern,
     TuplePatternArg,
     UnaryExpr,
+    UnaryPattern,
     ValueDef,
     VariableRef,
     VariableDeclaration,

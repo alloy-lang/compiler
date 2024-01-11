@@ -14,7 +14,7 @@ SourceFile@0..22
                 Ident@9..13 "Some"
           LParen@13..14 "("
           DestructureArg@14..15
-            VariableRef@14..15
+            VariableDeclaration@14..15
               Path@14..15
                 Ident@14..15 "x"
           RParen@15..16 ")"
