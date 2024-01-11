@@ -153,8 +153,14 @@ HirModule {
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 1,
+            len: 3,
             data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
                 Scope {
                     parent: Idx::<Scope>(0),
                 },

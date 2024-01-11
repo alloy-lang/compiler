@@ -1,0 +1,238 @@
+import std::either::Either
+import test
+
+match test when
+  | Either::Left(x)  -> x
+  | Either::Right(x) -> x
+===
+HirModule {
+    imports: Index {
+        items: Arena {
+            len: 2,
+            data: [
+                Import {
+                    segments: [
+                        Name(
+                            "std",
+                        ),
+                        Name(
+                            "either",
+                        ),
+                    ],
+                    last: Name(
+                        "Either",
+                    ),
+                },
+                Import {
+                    segments: [],
+                    last: Name(
+                        "test",
+                    ),
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    0..27,
+                ),
+                Some(
+                    27..40,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
+        },
+        item_names: {
+            (
+                Name(
+                    "test",
+                ),
+                Idx::<Scope>(0),
+            ): Idx::<Import>(1),
+            (
+                Name(
+                    "Either",
+                ),
+                Idx::<Scope>(0),
+            ): Idx::<Import>(0),
+        },
+    },
+    expressions: Index {
+        items: Arena {
+            len: 4,
+            data: [
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "test",
+                        ),
+                    ),
+                },
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "x",
+                        ),
+                    ),
+                },
+                VariableRef {
+                    name: ThisModule(
+                        Name(
+                            "x",
+                        ),
+                    ),
+                },
+                Match {
+                    condition: Idx::<Expression>(0),
+                    targets: [
+                        (
+                            Idx::<Pattern>(1),
+                            Idx::<Expression>(1),
+                        ),
+                        (
+                            Idx::<Pattern>(3),
+                            Idx::<Expression>(2),
+                        ),
+                    ],
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    46..51,
+                ),
+                Some(
+                    80..84,
+                ),
+                Some(
+                    106..107,
+                ),
+                Some(
+                    40..107,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
+        },
+        item_names: {},
+    },
+    patterns: Index {
+        items: Arena {
+            len: 4,
+            data: [
+                VariableDeclaration {
+                    name: ThisModule(
+                        Name(
+                            "x",
+                        ),
+                    ),
+                },
+                Destructure {
+                    target: OtherModule(
+                        Fqn {
+                            module: NonEmpty(
+                                [
+                                    Name(
+                                        "Either",
+                                    ),
+                                ],
+                            ),
+                            name: Name(
+                                "Left",
+                            ),
+                        },
+                    ),
+                    args: [
+                        Idx::<Pattern>(0),
+                    ],
+                },
+                VariableDeclaration {
+                    name: ThisModule(
+                        Name(
+                            "x",
+                        ),
+                    ),
+                },
+                Destructure {
+                    target: OtherModule(
+                        Fqn {
+                            module: NonEmpty(
+                                [
+                                    Name(
+                                        "Either",
+                                    ),
+                                ],
+                            ),
+                            name: Name(
+                                "Right",
+                            ),
+                        },
+                    ),
+                    args: [
+                        Idx::<Pattern>(2),
+                    ],
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    73..74,
+                ),
+                Some(
+                    60..77,
+                ),
+                Some(
+                    100..101,
+                ),
+                Some(
+                    86..103,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
+        },
+        item_names: {
+            (
+                Name(
+                    "x",
+                ),
+                Idx::<Scope>(1),
+            ): Idx::<Pattern>(0),
+            (
+                Name(
+                    "x",
+                ),
+                Idx::<Scope>(2),
+            ): Idx::<Pattern>(2),
+        },
+    },
+    type_annotations: {},
+    types: Arena {
+        len: 0,
+        data: [],
+    },
+    type_ranges: ArenaMap {
+        v: [],
+        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]
