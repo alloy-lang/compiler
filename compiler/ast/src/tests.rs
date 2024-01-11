@@ -91,7 +91,9 @@ fn run_parser_tests<T: fmt::Debug>(
 
     assert!(
         failed_tests.is_empty(),
-        "{} parser test(s) failed: {:?}", failed_tests.len(), failed_tests,
+        "{} parser test(s) failed: {:?}",
+        failed_tests.len(),
+        failed_tests,
     );
 }
 

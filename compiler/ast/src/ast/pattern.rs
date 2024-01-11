@@ -9,6 +9,7 @@ ast_union_node!(Pattern, kinds: [
     StringLiteral,
     CharLiteral,
     VariableRef,
+    VariableDeclaration,
     NilIdentifier,
     Destructure,
     Unit,
@@ -61,6 +62,15 @@ impl CharLiteral {
 ast_node!(VariableRef, fields: [name]);
 
 impl VariableRef {
+    #[must_use]
+    pub fn name(&self) -> Option<Path> {
+        first_child(self)
+    }
+}
+
+ast_node!(VariableDeclaration, fields: [name]);
+
+impl VariableDeclaration {
     #[must_use]
     pub fn name(&self) -> Option<Path> {
         first_child(self)

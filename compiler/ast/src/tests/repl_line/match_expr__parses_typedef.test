@@ -100,8 +100,8 @@ match test when
                                         },
                                     ),
                                     args: [
-                                        VariableRef(
-                                            VariableRef {
+                                        VariableDeclaration(
+                                            VariableDeclaration {
                                                 name: Some(
                                                     Path {
                                                         segments: [
@@ -146,8 +146,8 @@ match test when
                                         },
                                     ),
                                     args: [
-                                        VariableRef(
-                                            VariableRef {
+                                        VariableDeclaration(
+                                            VariableDeclaration {
                                                 name: Some(
                                                     Path {
                                                         segments: [

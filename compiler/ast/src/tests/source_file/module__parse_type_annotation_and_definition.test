@@ -123,8 +123,8 @@ Some(
                             args: [
                                 LambdaExprArg {
                                     pattern: Some(
-                                        VariableRef(
-                                            VariableRef {
+                                        VariableDeclaration(
+                                            VariableDeclaration {
                                                 name: Some(
                                                     Path {
                                                         segments: [
@@ -138,8 +138,8 @@ Some(
                                 },
                                 LambdaExprArg {
                                     pattern: Some(
-                                        VariableRef(
-                                            VariableRef {
+                                        VariableDeclaration(
+                                            VariableDeclaration {
                                                 name: Some(
                                                     Path {
                                                         segments: [
@@ -153,8 +153,8 @@ Some(
                                 },
                                 LambdaExprArg {
                                     pattern: Some(
-                                        VariableRef(
-                                            VariableRef {
+                                        VariableDeclaration(
+                                            VariableDeclaration {
                                                 name: Some(
                                                     Path {
                                                         segments: [

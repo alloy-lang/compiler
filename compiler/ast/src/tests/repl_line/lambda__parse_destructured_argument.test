@@ -22,8 +22,8 @@
                                         },
                                     ),
                                     args: [
-                                        VariableRef(
-                                            VariableRef {
+                                        VariableDeclaration(
+                                            VariableDeclaration {
                                                 name: Some(
                                                     Path {
                                                         segments: [

@@ -12,8 +12,8 @@
                                     patterns: [
                                         TuplePatternArg {
                                             arg: Some(
-                                                VariableRef(
-                                                    VariableRef {
+                                                VariableDeclaration(
+                                                    VariableDeclaration {
                                                         name: Some(
                                                             Path {
                                                                 segments: [
@@ -27,8 +27,8 @@
                                         },
                                         TuplePatternArg {
                                             arg: Some(
-                                                VariableRef(
-                                                    VariableRef {
+                                                VariableDeclaration(
+                                                    VariableDeclaration {
                                                         name: Some(
                                                             Path {
                                                                 segments: [

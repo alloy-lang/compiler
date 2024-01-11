@@ -98,8 +98,8 @@ let (|>) = |x, f| -> fakeStuff
                         args: [
                             LambdaExprArg {
                                 pattern: Some(
-                                    VariableRef(
-                                        VariableRef {
+                                    VariableDeclaration(
+                                        VariableDeclaration {
                                             name: Some(
                                                 Path {
                                                     segments: [
@@ -113,8 +113,8 @@ let (|>) = |x, f| -> fakeStuff
                             },
                             LambdaExprArg {
                                 pattern: Some(
-                                    VariableRef(
-                                        VariableRef {
+                                    VariableDeclaration(
+                                        VariableDeclaration {
                                             name: Some(
                                                 Path {
                                                     segments: [
