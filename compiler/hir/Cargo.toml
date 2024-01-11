@@ -17,5 +17,4 @@ text-size = "1.1"
 
 [dev-dependencies]
 alloy_parser = {path = "../parser"}
-expect-test = "1.3"
-pretty_assertions = "1.2.1"
+alloy_test_harness = {path = "../test_harness"}

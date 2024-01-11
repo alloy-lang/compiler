@@ -1,24 +1,28 @@
-use expect_test::expect_file;
-use std::ffi::OsStr;
-use std::path::PathBuf;
-use std::{env, fs};
+use std::fs;
+use std::path::Path;
 
 use crate::hir::HirModule;
 use alloy_ast as ast;
 
 #[test]
 fn source_file() {
-    run_parser_tests("source_file", lower_source_file);
+    alloy_test_harness::run_test_dir("source_file", |path, input| {
+        run_hir_test(path, lower_source_file)
+    });
 }
 
 #[test]
 fn repl_line() {
-    run_parser_tests("repl_line", lower_repl_line);
+    alloy_test_harness::run_test_dir("repl_line", |path, input| {
+        run_hir_test(path, lower_repl_line)
+    });
 }
 
 #[test]
 fn repl_line_errors() {
-    run_parser_tests("repl_line_errors", lower_repl_line);
+    alloy_test_harness::run_test_dir("repl_line_errors", |path, input| {
+        run_hir_test(path, lower_repl_line)
+    });
 }
 
 #[track_caller]
@@ -44,79 +48,37 @@ fn lower_repl_line(input: &str) -> (HirModule, Vec<alloy_parser::ParseError>) {
 }
 
 #[track_caller]
-fn run_parser_test(path: PathBuf, func: fn(&str) -> (HirModule, Vec<alloy_parser::ParseError>)) {
+fn run_hir_test(
+    path: &Path,
+    func: fn(&str) -> (HirModule, Vec<alloy_parser::ParseError>),
+) -> String {
     let test_content = fs::read_to_string(&path).unwrap();
     let (input, _expected_parse) = test_content.split_once("\n===\n").unwrap();
 
     let (module, parse_errors) = func(input);
 
-    let expected_test_content = format!("{input}\n===\n{module:#?}\n{parse_errors:#?}\n");
-
-    expect_file![path].assert_eq(&expected_test_content);
-}
-
-#[track_caller]
-fn run_parser_tests(tests_dir: &str, func: fn(&str) -> (HirModule, Vec<alloy_parser::ParseError>)) {
-    let tests_dir = {
-        let current_dir = env::current_dir().unwrap();
-        current_dir.join(format!("src/tests/{tests_dir}"))
-    };
-
-    let mut failed_tests = vec![];
-
-    for file in fs::read_dir(tests_dir).unwrap() {
-        let path = file.unwrap().path();
-        let file_name = path.file_name().unwrap().to_os_string();
-
-        if path.extension() != Some(OsStr::new("test")) {
-            continue;
-        }
-
-        let did_panic = std::panic::catch_unwind(|| run_parser_test(path, func)).is_err();
-
-        if did_panic {
-            failed_tests.push(file_name);
-        }
-    }
-
-    assert!(
-        failed_tests.is_empty(),
-        "{} parser test(s) failed: {:?}",
-        failed_tests.len(),
-        failed_tests,
-    );
+    format!("{module:#?}\n{parse_errors:#?}")
 }
 
 #[test]
 fn test_std_lib() {
-    let std_lib = fs::read_dir("../../std")
-        .expect("Something went wrong reading the std lib dir")
-        .map(|res| {
-            res.expect("Something went wrong reading the directory entry")
-                .path()
-        })
-        .collect::<Vec<_>>();
-
-    for path in std_lib {
+    alloy_test_harness::run_std_lib_tests(|path, source| {
         let file_name = path.to_str().expect("Expected filename");
 
-        let source = fs::read_to_string(file_name)
-            .unwrap_or_else(|_| panic!("Something went wrong reading the file '{:?}'", file_name));
-
-        let (module, parse_errors) = lower_source_file(&source);
+        let (module, parse_errors) = lower_source_file(source);
         let lowering_errors = module.errors();
 
         assert!(
             parse_errors.is_empty(),
-            "file '{}' contained parse errors: {:?}",
+            "file '{}' contained parse errors: {:#?}",
             file_name,
-            module,
+            parse_errors,
         );
         assert!(
             lowering_errors.is_empty(),
-            "file '{}' contained lowering errors: {:?}",
+            "file '{}' contained lowering errors: {:#?}",
             file_name,
-            module,
+            lowering_errors,
         );
-    }
+    });
 }

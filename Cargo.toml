@@ -7,5 +7,6 @@ members = [
     "compiler/parser",
     "compiler/scope",
     "compiler/syntax",
+    "compiler/test_harness",
     "smith/repl",
 ]
