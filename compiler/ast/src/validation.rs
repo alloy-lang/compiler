@@ -39,7 +39,7 @@ impl fmt::Display for ValidationErrorKind {
                 "number literal is larger than an integer’s maximum value, {}",
                 u64::MAX,
             ),
-            ValidationErrorKind::CharLiteralInvalid => todo!(),
+            Self::CharLiteralInvalid => todo!(),
         }
     }
 }
