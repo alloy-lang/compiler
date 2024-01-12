@@ -6,6 +6,9 @@ end
 [
     TypeDefinition(
         TypeDefinition {
+            name: Some(
+                "Test",
+            ),
             type_args: [],
             types: [
                 TypeDefinitionMember {

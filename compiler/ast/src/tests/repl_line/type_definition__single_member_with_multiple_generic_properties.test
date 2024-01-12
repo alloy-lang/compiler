@@ -3,6 +3,9 @@ typedef Test[t1, t2] = Thing t1 t2
 [
     TypeDefinition(
         TypeDefinition {
+            name: Some(
+                "Test",
+            ),
             type_args: [
                 "t1",
                 "t2",

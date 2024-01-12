@@ -10,6 +10,9 @@ match test when
 [
     TypeDefinition(
         TypeDefinition {
+            name: Some(
+                "Either",
+            ),
             type_args: [
                 "l",
                 "r",

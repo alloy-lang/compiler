@@ -1,11 +1,16 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-ast_node!(TypeDefinition, fields: [type_args, types]);
+ast_node!(TypeDefinition, fields: [name, type_args, types]);
 
 ast_token!(Ident, fields: [text]);
 
 impl TypeDefinition {
+    #[must_use]
+    pub fn name(&self) -> Option<String> {
+        first_ident(self)
+    }
+
     #[must_use]
     pub fn type_args(&self) -> Vec<String> {
         all_matching_children(self, SyntaxKind::BoundedTypeArg)
