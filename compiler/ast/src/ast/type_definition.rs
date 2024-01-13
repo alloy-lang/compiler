@@ -12,10 +12,9 @@ impl TypeDefinition {
     }
 
     #[must_use]
-    pub fn type_args(&self) -> Vec<String> {
+    pub fn type_args(&self) -> Vec<Ident> {
         all_matching_children(self, SyntaxKind::BoundedTypeArg)
             .into_iter()
-            .map(|token: Ident| token.text())
             .collect()
     }
 

@@ -14,8 +14,12 @@ match test when
                 "Either",
             ),
             type_args: [
-                "l",
-                "r",
+                Ident {
+                    text: "l",
+                },
+                Ident {
+                    text: "r",
+                },
             ],
             types: [
                 TypeDefinitionMember {

@@ -7,8 +7,12 @@ typedef Test[t1, t2] = Thing t1 t2
                 "Test",
             ),
             type_args: [
-                "t1",
-                "t2",
+                Ident {
+                    text: "t1",
+                },
+                Ident {
+                    text: "t2",
+                },
             ],
             types: [
                 TypeDefinitionMember {
