@@ -88,14 +88,16 @@ HirModule {
             ): Idx::<Pattern>(0),
         },
     },
-    type_annotations: {},
-    types: Arena {
-        len: 0,
-        data: [],
-    },
-    type_ranges: ArenaMap {
-        v: [],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+    types: Index {
+        items: Arena {
+            len: 0,
+            data: [],
+        },
+        item_ranges: ArenaMap {
+            v: [],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+        },
+        item_names: {},
     },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),

@@ -125,87 +125,92 @@ HirModule {
             ): Idx::<Pattern>(1),
         },
     },
-    type_annotations: {
-        Name(
-            "(|>)",
-        ): Idx::<Type>(7),
-    },
-    types: Arena {
-        len: 8,
-        data: [
-            Named(
-                ThisModule(
-                    Name(
-                        "t1",
+    types: Index {
+        items: Arena {
+            len: 8,
+            data: [
+                Named(
+                    ThisModule(
+                        Name(
+                            "t1",
+                        ),
                     ),
                 ),
-            ),
-            Named(
-                ThisModule(
-                    Name(
-                        "t1",
+                Named(
+                    ThisModule(
+                        Name(
+                            "t1",
+                        ),
                     ),
                 ),
-            ),
-            Named(
-                ThisModule(
-                    Name(
-                        "t2",
+                Named(
+                    ThisModule(
+                        Name(
+                            "t2",
+                        ),
                     ),
                 ),
-            ),
-            Lambda {
-                arg_type: Idx::<Type>(1),
-                return_type: Idx::<Type>(2),
-            },
-            ParenthesizedType(
-                Idx::<Type>(3),
-            ),
-            Named(
-                ThisModule(
-                    Name(
-                        "t2",
+                Lambda {
+                    arg_type: Idx::<Type>(1),
+                    return_type: Idx::<Type>(2),
+                },
+                ParenthesizedType(
+                    Idx::<Type>(3),
+                ),
+                Named(
+                    ThisModule(
+                        Name(
+                            "t2",
+                        ),
                     ),
                 ),
-            ),
-            Lambda {
-                arg_type: Idx::<Type>(4),
-                return_type: Idx::<Type>(5),
-            },
-            Lambda {
-                arg_type: Idx::<Type>(0),
-                return_type: Idx::<Type>(6),
-            },
-        ],
-    },
-    type_ranges: ArenaMap {
-        v: [
-            Some(
-                38..41,
-            ),
-            Some(
-                45..48,
-            ),
-            Some(
-                51..53,
-            ),
-            Some(
-                45..53,
-            ),
-            Some(
-                44..55,
-            ),
-            Some(
-                58..61,
-            ),
-            Some(
-                44..61,
-            ),
-            Some(
-                38..61,
-            ),
-        ],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+                Lambda {
+                    arg_type: Idx::<Type>(4),
+                    return_type: Idx::<Type>(5),
+                },
+                Lambda {
+                    arg_type: Idx::<Type>(0),
+                    return_type: Idx::<Type>(6),
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    38..41,
+                ),
+                Some(
+                    45..48,
+                ),
+                Some(
+                    51..53,
+                ),
+                Some(
+                    45..53,
+                ),
+                Some(
+                    44..55,
+                ),
+                Some(
+                    58..61,
+                ),
+                Some(
+                    44..61,
+                ),
+                Some(
+                    38..61,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+        },
+        item_names: {
+            (
+                Name(
+                    "(|>)",
+                ),
+                Idx::<Scope>(0),
+            ): Idx::<Type>(7),
+        },
     },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),

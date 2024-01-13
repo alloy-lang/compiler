@@ -219,104 +219,109 @@ HirModule {
             ): Idx::<Pattern>(2),
         },
     },
-    type_annotations: {
-        Name(
-            "testThing",
-        ): Idx::<Type>(9),
-    },
-    types: Arena {
-        len: 10,
-        data: [
-            Named(
-                ThisModule(
-                    Name(
-                        "t2",
+    types: Index {
+        items: Arena {
+            len: 10,
+            data: [
+                Named(
+                    ThisModule(
+                        Name(
+                            "t2",
+                        ),
                     ),
                 ),
-            ),
-            Named(
-                ThisModule(
-                    Name(
-                        "t1",
+                Named(
+                    ThisModule(
+                        Name(
+                            "t1",
+                        ),
                     ),
                 ),
-            ),
-            Lambda {
-                arg_type: Idx::<Type>(0),
-                return_type: Idx::<Type>(1),
-            },
-            ParenthesizedType(
-                Idx::<Type>(2),
-            ),
-            Named(
-                ThisModule(
-                    Name(
-                        "t2",
+                Lambda {
+                    arg_type: Idx::<Type>(0),
+                    return_type: Idx::<Type>(1),
+                },
+                ParenthesizedType(
+                    Idx::<Type>(2),
+                ),
+                Named(
+                    ThisModule(
+                        Name(
+                            "t2",
+                        ),
                     ),
                 ),
-            ),
-            Named(
-                ThisModule(
-                    Name(
-                        "t2",
+                Named(
+                    ThisModule(
+                        Name(
+                            "t2",
+                        ),
                     ),
                 ),
-            ),
-            Named(
-                ThisModule(
-                    Name(
-                        "ResultThing",
+                Named(
+                    ThisModule(
+                        Name(
+                            "ResultThing",
+                        ),
                     ),
                 ),
-            ),
-            Lambda {
-                arg_type: Idx::<Type>(5),
-                return_type: Idx::<Type>(6),
-            },
-            Lambda {
-                arg_type: Idx::<Type>(4),
-                return_type: Idx::<Type>(7),
-            },
-            Lambda {
-                arg_type: Idx::<Type>(3),
-                return_type: Idx::<Type>(8),
-            },
-        ],
-    },
-    type_ranges: ArenaMap {
-        v: [
-            Some(
-                70..73,
-            ),
-            Some(
-                76..78,
-            ),
-            Some(
-                70..78,
-            ),
-            Some(
-                69..80,
-            ),
-            Some(
-                83..86,
-            ),
-            Some(
-                89..92,
-            ),
-            Some(
-                95..107,
-            ),
-            Some(
-                89..107,
-            ),
-            Some(
-                83..107,
-            ),
-            Some(
-                69..107,
-            ),
-        ],
-        _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+                Lambda {
+                    arg_type: Idx::<Type>(5),
+                    return_type: Idx::<Type>(6),
+                },
+                Lambda {
+                    arg_type: Idx::<Type>(4),
+                    return_type: Idx::<Type>(7),
+                },
+                Lambda {
+                    arg_type: Idx::<Type>(3),
+                    return_type: Idx::<Type>(8),
+                },
+            ],
+        },
+        item_ranges: ArenaMap {
+            v: [
+                Some(
+                    70..73,
+                ),
+                Some(
+                    76..78,
+                ),
+                Some(
+                    70..78,
+                ),
+                Some(
+                    69..80,
+                ),
+                Some(
+                    83..86,
+                ),
+                Some(
+                    89..92,
+                ),
+                Some(
+                    95..107,
+                ),
+                Some(
+                    89..107,
+                ),
+                Some(
+                    83..107,
+                ),
+                Some(
+                    69..107,
+                ),
+            ],
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+        },
+        item_names: {
+            (
+                Name(
+                    "testThing",
+                ),
+                Idx::<Scope>(0),
+            ): Idx::<Type>(9),
+        },
     },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),

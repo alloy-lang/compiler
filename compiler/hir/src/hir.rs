@@ -61,9 +61,7 @@ pub struct HirModule {
     imports: Index<Import>,
     expressions: Index<Expression>,
     patterns: Index<Pattern>,
-    type_annotations: FxHashMap<Name, TypeIdx>,
-    types: Arena<Type>,
-    type_ranges: ArenaMap<TypeIdx, TextRange>,
+    types: Index<Type>,
     scopes: Scopes,
     warnings: Vec<LoweringWarning>,
     errors: Vec<LoweringError>,
@@ -97,6 +95,11 @@ pub enum LoweringErrorKind {
         first: TextRange,
         second: TextRange,
     },
+    ConflictingTypeName {
+        name: Name,
+        first: TextRange,
+        second: TextRange,
+    },
     UnknownReference {
         path: Path,
     },
@@ -122,9 +125,7 @@ struct LoweringCtx {
     imports: Index<Import>,
     expressions: Index<Expression>,
     patterns: Index<Pattern>,
-    type_annotations: FxHashMap<Name, TypeIdx>,
-    types: Arena<Type>,
-    type_ranges: ArenaMap<TypeIdx, TextRange>,
+    types: Index<Type>,
     scopes: Scopes,
     warnings: Vec<LoweringWarning>,
     errors: Vec<LoweringError>,
@@ -136,9 +137,7 @@ impl LoweringCtx {
             imports: Index::new(),
             expressions: Index::new(),
             patterns: Index::new(),
-            type_annotations: FxHashMap::default(),
-            types: Arena::default(),
-            type_ranges: ArenaMap::default(),
+            types: Index::new(),
             scopes: Scopes::default(),
             warnings: vec![],
             errors: vec![],
@@ -150,9 +149,7 @@ impl LoweringCtx {
             imports: self.imports,
             expressions: self.expressions,
             patterns: self.patterns,
-            type_annotations: self.type_annotations,
             types: self.types,
-            type_ranges: self.type_ranges,
             scopes: self.scopes,
             warnings: self.warnings,
             errors: self.errors,
@@ -241,14 +238,33 @@ impl LoweringCtx {
     }
 
     pub(crate) fn add_type_(&mut self, type_: Type, element: &SyntaxElement) -> TypeIdx {
-        let idx = self.types.alloc(type_);
-        self.type_ranges.insert(idx, element.text_range());
-
-        idx
+        self.types.insert_not_named(type_, element.text_range())
     }
 
-    pub(crate) fn add_type_annotation(&mut self, name: Name, type_id: TypeIdx) {
-        self.type_annotations.insert(name, type_id);
+    pub(crate) fn add_missing_type(&mut self, element: &SyntaxElement) -> TypeIdx {
+        self.add_type_(Type::Missing, element)
+    }
+
+    pub(crate) fn add_type_annotation(&mut self, name: Name, type_: &ast::Type) {
+        let type_id = lower_type(self, type_);
+
+        let res = self
+            .types
+            .add_name(name, type_id, type_.range(), &self.scopes);
+
+        match res {
+            Err(err) => {
+                let err = LoweringErrorKind::ConflictingTypeName {
+                    name: err.name,
+                    first: err.first,
+                    second: err.second,
+                };
+                self.error(err, type_.range());
+
+                self.add_missing_type(&type_.syntax())
+            }
+            Ok(pid) => pid,
+        };
     }
 
     pub(crate) fn add_import(&mut self, path: &NonEmpty<Name>, element: &SyntaxElement) {
