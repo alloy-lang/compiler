@@ -219,7 +219,7 @@ HirModule {
             ): Idx::<Pattern>(2),
         },
     },
-    types: Index {
+    type_references: Index {
         items: Arena {
             len: 10,
             data: [
@@ -238,11 +238,11 @@ HirModule {
                     ),
                 ),
                 Lambda {
-                    arg_type: Idx::<Type>(0),
-                    return_type: Idx::<Type>(1),
+                    arg_type: Idx::<TypeReference>(0),
+                    return_type: Idx::<TypeReference>(1),
                 },
                 ParenthesizedType(
-                    Idx::<Type>(2),
+                    Idx::<TypeReference>(2),
                 ),
                 Named(
                     ThisModule(
@@ -266,16 +266,16 @@ HirModule {
                     ),
                 ),
                 Lambda {
-                    arg_type: Idx::<Type>(5),
-                    return_type: Idx::<Type>(6),
+                    arg_type: Idx::<TypeReference>(5),
+                    return_type: Idx::<TypeReference>(6),
                 },
                 Lambda {
-                    arg_type: Idx::<Type>(4),
-                    return_type: Idx::<Type>(7),
+                    arg_type: Idx::<TypeReference>(4),
+                    return_type: Idx::<TypeReference>(7),
                 },
                 Lambda {
-                    arg_type: Idx::<Type>(3),
-                    return_type: Idx::<Type>(8),
+                    arg_type: Idx::<TypeReference>(3),
+                    return_type: Idx::<TypeReference>(8),
                 },
             ],
         },
@@ -312,7 +312,7 @@ HirModule {
                     69..107,
                 ),
             ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
         },
         item_names: {
             (
@@ -320,7 +320,7 @@ HirModule {
                     "testThing",
                 ),
                 Idx::<Scope>(0),
-            ): Idx::<Type>(9),
+            ): Idx::<TypeReference>(9),
         },
     },
     scopes: Scopes {

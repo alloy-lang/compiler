@@ -32,14 +32,14 @@ impl<T> Index<T> {
         &mut self,
         name: Name,
         thing: T,
-        range: TextRange,
+        thing_range: TextRange,
         scopes: &Scopes,
     ) -> Result<Idx<T>, DuplicateNameError> {
-        self.check_for_name(&name, range, scopes)?;
+        self.check_for_name(&name, thing_range, scopes)?;
 
         let current_scope = scopes.current_scope();
 
-        let id = self.insert_not_named(thing, range);
+        let id = self.insert_not_named(thing, thing_range);
         self.item_names.insert((name, current_scope), id);
 
         Ok(id)
@@ -61,7 +61,12 @@ impl<T> Index<T> {
         Ok(id)
     }
 
-    fn check_for_name(&mut self, name: &Name, range: TextRange, scopes: &Scopes) -> Result<(), DuplicateNameError> {
+    fn check_for_name(
+        &mut self,
+        name: &Name,
+        range: TextRange,
+        scopes: &Scopes,
+    ) -> Result<(), DuplicateNameError> {
         let current_scope = scopes.current_scope();
 
         if let Some(id) = self.item_names.get(&(name.clone(), current_scope)).copied() {

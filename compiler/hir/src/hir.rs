@@ -40,8 +40,8 @@ pub use statement::*;
 mod r#trait;
 pub use r#trait::*;
 
-mod r#type;
-pub use r#type::*;
+mod type_reference;
+pub use type_reference::*;
 
 mod type_annotation;
 pub use type_annotation::*;
@@ -237,19 +237,24 @@ impl LoweringCtx {
         self.add_pattern(Pattern::Missing, element)
     }
 
-    pub(crate) fn add_type_(&mut self, type_: Type, element: &SyntaxElement) -> TypeIdx {
-        self.types.insert_not_named(type_, element.text_range())
+    pub(crate) fn add_type_reference(
+        &mut self,
+        type_: TypeReference,
+        element: &SyntaxElement,
+    ) -> TypeIdx {
+        self.type_references
+            .insert_not_named(type_, element.text_range())
     }
 
-    pub(crate) fn add_missing_type(&mut self, element: &SyntaxElement) -> TypeIdx {
-        self.add_type_(Type::Missing, element)
+    pub(crate) fn add_missing_type_reference(&mut self, element: &SyntaxElement) -> TypeIdx {
+        self.add_type_reference(TypeReference::Missing, element)
     }
 
     pub(crate) fn add_type_annotation(&mut self, name: Name, type_: &ast::Type) {
-        let type_id = lower_type(self, type_);
+        let type_id = lower_type_reference(self, type_);
 
         let res = self
-            .types
+            .type_references
             .add_name(name, type_id, type_.range(), &self.scopes);
 
         match res {
@@ -261,7 +266,7 @@ impl LoweringCtx {
                 };
                 self.error(err, type_.range());
 
-                self.add_missing_type(&type_.syntax())
+                self.add_missing_type_reference(&type_.syntax())
             }
             Ok(pid) => pid,
         };

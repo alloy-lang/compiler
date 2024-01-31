@@ -5,10 +5,10 @@ use super::*;
 #[derive(Debug, PartialEq)]
 pub enum BuiltInType {}
 
-pub type TypeIdx = Idx<Type>;
+pub type TypeIdx = Idx<TypeReference>;
 
 #[derive(Debug, PartialEq)]
-pub enum Type {
+pub enum TypeReference {
     Missing,
     SelfRef,
     Unit,
@@ -27,16 +27,16 @@ pub enum Type {
     },
 }
 
-pub(super) fn lower_type(ctx: &mut LoweringCtx, ast: &ast::Type) -> TypeIdx {
+pub(super) fn lower_type_reference(ctx: &mut LoweringCtx, ast: &ast::Type) -> TypeIdx {
     let type_ = lower_type_inner(ctx, ast);
-    ctx.add_type_(type_, &ast.syntax())
+    ctx.add_type_reference(type_, &ast.syntax())
 }
 
-fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> Type {
+fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> TypeReference {
     match ast {
-        ast::Type::SelfType(_) => Type::SelfRef,
-        ast::Type::UnitType(_) => Type::Unit,
-        ast::Type::NilIdentifier(_) => Type::Unknown,
+        ast::Type::SelfType(_) => TypeReference::SelfRef,
+        ast::Type::UnitType(_) => TypeReference::Unit,
+        ast::Type::NilIdentifier(_) => TypeReference::Unknown,
         ast::Type::TypeIdentifier(t) => {
             let Some(path) = t.name() else {
                 unreachable!("parsing error")
@@ -46,20 +46,20 @@ fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> Type {
                 unreachable!("parsing error")
             };
 
-            Type::Named(name)
+            TypeReference::Named(name)
         }
         ast::Type::LambdaType(t) => {
             let Some(arg_type) = t.arg_type() else {
                 unreachable!("parsing error")
             };
-            let arg_type = lower_type(ctx, &arg_type);
+            let arg_type = lower_type_reference(ctx, &arg_type);
 
             let Some(return_type) = t.return_type() else {
                 unreachable!("parsing error")
             };
-            let return_type = lower_type(ctx, &return_type);
+            let return_type = lower_type_reference(ctx, &return_type);
 
-            Type::Lambda {
+            TypeReference::Lambda {
                 arg_type,
                 return_type,
             }
@@ -68,31 +68,31 @@ fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> Type {
             let types = t
                 .members()
                 .iter()
-                .map(|member| lower_type(ctx, member))
+                .map(|member| lower_type_reference(ctx, member))
                 .collect::<Vec<_>>();
-            Type::Tuple(types)
+            TypeReference::Tuple(types)
         }
         ast::Type::ParenthesizedType(t) => {
             let Some(inner) = t.inner() else {
                 unreachable!("parsing error")
             };
 
-            let inner = lower_type(ctx, &inner);
-            Type::ParenthesizedType(inner)
+            let inner = lower_type_reference(ctx, &inner);
+            TypeReference::ParenthesizedType(inner)
         }
         ast::Type::BoundedType(t) => {
             let Some(base) = t.base() else {
                 unreachable!("parsing error")
             };
-            let base = lower_type(ctx, &base);
+            let base = lower_type_reference(ctx, &base);
 
             let args = t
                 .args()
                 .iter()
-                .map(|member| lower_type(ctx, member))
+                .map(|member| lower_type_reference(ctx, member))
                 .collect::<Vec<_>>();
 
-            Type::Bounded { base, args }
+            TypeReference::Bounded { base, args }
         }
     }
 }

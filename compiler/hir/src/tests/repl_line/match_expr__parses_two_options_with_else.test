@@ -141,14 +141,14 @@ HirModule {
         },
         item_names: {},
     },
-    types: Index {
+    type_references: Index {
         items: Arena {
             len: 0,
             data: [],
         },
         item_ranges: ArenaMap {
             v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
         },
         item_names: {},
     },

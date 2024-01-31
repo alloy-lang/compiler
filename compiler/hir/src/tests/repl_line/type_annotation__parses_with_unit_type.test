@@ -34,7 +34,7 @@ HirModule {
         },
         item_names: {},
     },
-    types: Index {
+    type_references: Index {
         items: Arena {
             len: 5,
             data: [
@@ -54,12 +54,12 @@ HirModule {
                 ),
                 Unit,
                 Lambda {
-                    arg_type: Idx::<Type>(1),
-                    return_type: Idx::<Type>(2),
+                    arg_type: Idx::<TypeReference>(1),
+                    return_type: Idx::<TypeReference>(2),
                 },
                 Lambda {
-                    arg_type: Idx::<Type>(0),
-                    return_type: Idx::<Type>(3),
+                    arg_type: Idx::<TypeReference>(0),
+                    return_type: Idx::<TypeReference>(3),
                 },
             ],
         },
@@ -81,7 +81,7 @@ HirModule {
                     14..33,
                 ),
             ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type::Type>>,
+            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
         },
         item_names: {
             (
@@ -89,7 +89,7 @@ HirModule {
                     "test",
                 ),
                 Idx::<Scope>(0),
-            ): Idx::<Type>(4),
+            ): Idx::<TypeReference>(4),
         },
     },
     scopes: Scopes {

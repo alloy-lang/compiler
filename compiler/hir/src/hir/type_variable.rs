@@ -4,5 +4,5 @@ use super::*;
 #[derive(Debug, PartialEq)]
 pub enum TypeVariable {
     Unbound,
-    Bound(Type),
+    Bound(TypeReference),
 }
