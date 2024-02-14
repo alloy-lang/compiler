@@ -196,6 +196,10 @@ fn maybe_parse_function_call(p: &mut Parser, lhs: CompletedMarker) -> CompletedM
 }
 
 fn parse_function_call(p: &mut Parser) -> CompletedMarker {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_set(ts![TokenKind::RParen])
+    }
+
     let paren_m = p.start();
     p.bump(TokenKind::LParen);
 
@@ -223,11 +227,7 @@ fn parse_function_call(p: &mut Parser) -> CompletedMarker {
 
     p.expect(TokenKind::RParen, ParseErrorContext::FunctionCallRightParen);
 
-    return paren_m.complete(p, SyntaxKind::FunctionCallArgList);
-
-    fn should_stop(p: &mut Parser) -> bool {
-        p.maybe_at(TokenKind::RParen) || p.at_top_level_token() || p.at_eof()
-    }
+    paren_m.complete(p, SyntaxKind::FunctionCallArgList)
 }
 
 fn parse_if_then_else_expr(p: &mut Parser) -> CompletedMarker {
@@ -309,7 +309,7 @@ fn parse_match_when_expr(p: &mut Parser) -> CompletedMarker {
 
         when_m.complete(p, SyntaxKind::MatchTarget);
 
-        if !p.at(TokenKind::Pipe) || p.at_eof() {
+        if p.at_top_level_token_or_not_set(ts![TokenKind::Pipe]) {
             break;
         }
     }
@@ -337,6 +337,10 @@ fn parse_prefix_expr(p: &mut Parser) -> CompletedMarker {
 }
 
 fn parse_paren_expr(p: &mut Parser) -> CompletedMarker {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_set(ts![TokenKind::RParen])
+    }
+
     let paren_m = p.start();
     p.bump(TokenKind::LParen);
 
@@ -346,7 +350,7 @@ fn parse_paren_expr(p: &mut Parser) -> CompletedMarker {
             break;
         }
 
-        parse_expr(p, ParseErrorContext::ParenExprExpr);
+        parse_expr_with_recovery(p, ts![TokenKind::RParen], ParseErrorContext::ParenExprExpr);
         arg_len += 1;
 
         if should_stop(p) {
@@ -367,9 +371,5 @@ fn parse_paren_expr(p: &mut Parser) -> CompletedMarker {
         1 => SyntaxKind::ParenExpr,
         _ => SyntaxKind::TupleExpr,
     };
-    return paren_m.complete(p, kind);
-
-    fn should_stop(p: &mut Parser) -> bool {
-        p.maybe_at(TokenKind::RParen) || p.at_eof()
-    }
+    paren_m.complete(p, kind)
 }

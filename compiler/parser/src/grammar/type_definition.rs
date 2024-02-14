@@ -42,7 +42,7 @@ fn parse_type_definition_bounds(p: &mut Parser) {
         );
         m.complete(p, SyntaxKind::BoundedTypeArg);
 
-        if p.maybe_at(TokenKind::RBracket) || p.at_eof() {
+        if p.at_top_level_token_or_set(ts![TokenKind::RBracket]) {
             break;
         }
 
@@ -61,6 +61,10 @@ fn parse_type_definition_bounds(p: &mut Parser) {
 }
 
 fn parse_type_definition_members(p: &mut Parser) {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_not_set(ts![TokenKind::Pipe])
+    }
+
     loop {
         parse_type_definition_member(p);
 
@@ -70,15 +74,13 @@ fn parse_type_definition_members(p: &mut Parser) {
 
         p.expect_with_recovery(TokenKind::Pipe, ParseErrorContext::TypeDefMemberPipe, ts![]);
     }
-
-    return;
-
-    fn should_stop(p: &mut Parser) -> bool {
-        !p.maybe_at(TokenKind::Pipe) || p.at_top_level_token() || p.at_eof()
-    }
 }
 
 fn parse_type_definition_member(p: &mut Parser) -> CompletedMarker {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_set(ts![TokenKind::EndKw, TokenKind::Pipe])
+    }
+
     if p.maybe_at(TokenKind::Pipe) {
         p.bump(TokenKind::Pipe);
     }
@@ -106,9 +108,5 @@ fn parse_type_definition_member(p: &mut Parser) -> CompletedMarker {
         m.complete(p, SyntaxKind::TypeDefinitionMemberProperty);
     }
 
-    return m.complete(p, SyntaxKind::TypeDefinitionMember);
-
-    fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(ts![TokenKind::EndKw, TokenKind::Pipe]) || p.at_top_level_token() || p.at_eof()
-    }
+    m.complete(p, SyntaxKind::TypeDefinitionMember)
 }

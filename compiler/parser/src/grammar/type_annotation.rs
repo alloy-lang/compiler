@@ -32,6 +32,10 @@ pub(crate) fn parse_type_annotation(
 }
 
 fn parse_type_annotation_type_variables(p: &mut Parser, parent_recovery_set: TokenSet) {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_not_set(ts![TokenKind::TypevarKw])
+    }
+
     p.bump(TokenKind::WhereKw);
 
     loop {
@@ -40,12 +44,6 @@ fn parse_type_annotation_type_variables(p: &mut Parser, parent_recovery_set: Tok
         }
 
         parse_generic_type_variable(p, parent_recovery_set);
-    }
-
-    return;
-
-    fn should_stop(p: &mut Parser) -> bool {
-        !p.maybe_at(TokenKind::TypevarKw) || p.at_eof()
     }
 }
 

@@ -88,6 +88,10 @@ fn parse_parenthesized_type(
     mode: ParseMode,
     parent_recovery_set: TokenSet,
 ) -> CompletedMarker {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_not_set(ts![TokenKind::Comma])
+    }
+
     let m = p.start();
     p.bump(TokenKind::LParen);
 
@@ -96,7 +100,7 @@ fn parse_parenthesized_type(
         return m.complete(p, SyntaxKind::UnitType);
     }
 
-    if p.at_set(parent_recovery_set) || p.at_top_level_token() {
+    if p.at_top_level_token_or_set(parent_recovery_set) {
         p.error_with_recovery(ParseErrorContext::UnitTypeRightParen, parent_recovery_set);
         return m.complete(p, SyntaxKind::UnitType);
     }
@@ -130,14 +134,10 @@ fn parse_parenthesized_type(
 
     p.expect_with_recovery(TokenKind::RParen, recovery_context, parent_recovery_set);
 
-    return if comma_count == 0 {
+    if comma_count == 0 {
         m.complete(p, SyntaxKind::ParenthesizedType)
     } else {
         m.complete(p, SyntaxKind::TupleType)
-    };
-
-    fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(ts![TokenKind::Comma]) || p.at_eof()
     }
 }
 
@@ -193,6 +193,10 @@ fn maybe_parse_lambda_type(
 }
 
 fn parse_bounded_type_args(p: &mut Parser, mode: ParseMode, parent_recovery_set: TokenSet) {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_set(ts![TokenKind::RBracket, TokenKind::WhereKw])
+    }
+
     p.expect_with_recovery(
         TokenKind::LBracket,
         ParseErrorContext::BoundedTypeLBracket,
@@ -234,12 +238,4 @@ fn parse_bounded_type_args(p: &mut Parser, mode: ParseMode, parent_recovery_set:
         ParseErrorContext::BoundedTypeRBracket,
         ts![TokenKind::WhereKw],
     );
-
-    return;
-
-    fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(ts![TokenKind::RBracket, TokenKind::WhereKw])
-            || p.at_top_level_token()
-            || p.at_eof()
-    }
 }

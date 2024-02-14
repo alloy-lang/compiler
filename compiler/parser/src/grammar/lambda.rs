@@ -32,6 +32,10 @@ pub(crate) fn parse_lambda_expr(p: &mut Parser) -> CompletedMarker {
 }
 
 fn parse_arg_list(p: &mut Parser) -> CompletedMarker {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_set(ts![TokenKind::Pipe, TokenKind::RightArrow])
+    }
+
     let m = p.start();
     p.bump(TokenKind::Pipe);
 
@@ -65,9 +69,5 @@ fn parse_arg_list(p: &mut Parser) -> CompletedMarker {
         ts![TokenKind::RightArrow],
     );
 
-    return m.complete(p, SyntaxKind::LambdaExprArgList);
-
-    fn should_stop(p: &mut Parser) -> bool {
-        p.at_set(ts![TokenKind::Pipe, TokenKind::RightArrow]) || p.at_eof()
-    }
+    m.complete(p, SyntaxKind::LambdaExprArgList)
 }

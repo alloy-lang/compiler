@@ -83,6 +83,10 @@ fn maybe_parse_typedef_destructure(p: &mut Parser, lhs: CompletedMarker) -> Comp
 }
 
 fn parse_typedef_destructure_args(p: &mut Parser) {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_set(ts![TokenKind::RParen])
+    }
+
     p.bump(TokenKind::LParen);
 
     loop {
@@ -110,15 +114,13 @@ fn parse_typedef_destructure_args(p: &mut Parser) {
     }
 
     p.expect(TokenKind::RParen, ParseErrorContext::DestructureRightParen);
-
-    return;
-
-    fn should_stop(p: &mut Parser) -> bool {
-        p.maybe_at(TokenKind::RParen) || p.at_top_level_token() || p.at_eof()
-    }
 }
 
 fn parse_tuple_arg(p: &mut Parser, identify_declarations: bool) -> CompletedMarker {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_set(ts![TokenKind::RParen])
+    }
+
     let paren_m = p.start();
     p.bump(TokenKind::LParen);
 
@@ -155,11 +157,7 @@ fn parse_tuple_arg(p: &mut Parser, identify_declarations: bool) -> CompletedMark
         1 => SyntaxKind::ParenPattern,
         _ => SyntaxKind::TuplePattern,
     };
-    return paren_m.complete(p, kind);
-
-    fn should_stop(p: &mut Parser) -> bool {
-        p.maybe_at(TokenKind::RParen) || p.at_eof()
-    }
+    paren_m.complete(p, kind)
 }
 
 fn parse_prefix_expr(p: &mut Parser, parent_recovery_set: TokenSet) -> CompletedMarker {

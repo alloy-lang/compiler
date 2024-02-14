@@ -81,8 +81,12 @@ impl<'t, 'input> Parser<'t, 'input> {
             .map_or(false, |k| set.contains(k))
     }
 
-    pub(crate) fn at_top_level_token(&mut self) -> bool {
-        self.at_set(DEFAULT_RECOVERY_SET)
+    pub(crate) fn at_top_level_token_or_set(&mut self, set: TokenSet) -> bool {
+        self.at_set(DEFAULT_RECOVERY_SET.union(set)) || self.at_eof()
+    }
+
+    pub(crate) fn at_top_level_token_or_not_set(&mut self, set: TokenSet) -> bool {
+        self.at_set(DEFAULT_RECOVERY_SET.union(set.invert())) || self.at_eof()
     }
 
     pub(crate) fn at_eof(&mut self) -> bool {

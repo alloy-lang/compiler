@@ -3,9 +3,19 @@ use super::*;
 use crate::grammar::type_variable::TYPEVAR_CONSTRAINT_FIRSTS;
 
 const TRAIT_RECOVERY_SET: TokenSet = ts![TokenKind::SelfKw, TokenKind::TypevarKw, TokenKind::EndKw];
+const TRAIT_MEMBER_FIRSTS: TokenSet = ts![
+    TokenKind::TypeOfKw,
+    TokenKind::LetKw,
+    TokenKind::TypevarKw,
+    TokenKind::SelfKw,
+];
 const TRAIT_TITLE_RECOVERY_SET: TokenSet = TRAIT_RECOVERY_SET.union(ts![TokenKind::WhereKw]);
 
 pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
+    fn should_stop(p: &mut Parser) -> bool {
+        !p.at_set(TRAIT_MEMBER_FIRSTS) && p.at_top_level_token_or_set(ts![TokenKind::EndKw])
+    }
+
     let m = p.start();
     p.bump(TokenKind::TraitKw);
 
@@ -41,11 +51,7 @@ pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
 
     p.expect_only(TokenKind::EndKw, ParseErrorContext::TraitEnd);
 
-    return m.complete(p, SyntaxKind::TraitDef);
-
-    fn should_stop(p: &mut Parser) -> bool {
-        p.maybe_at(TokenKind::EndKw) || p.at_eof()
-    }
+    m.complete(p, SyntaxKind::TraitDef)
 }
 
 enum TraitMemberParseResult {
@@ -71,7 +77,7 @@ fn parse_trait_member(p: &mut Parser) -> TraitMemberParseResult {
     } else if p.at(TokenKind::SelfKw) {
         let cm = parse_trait_self(p);
         TraitMemberParseResult::TraitMember(cm)
-    } else if p.at_set(DEFAULT_RECOVERY_SET) {
+    } else if p.at_set(DEFAULT_RECOVERY_SET) || p.maybe_at(TokenKind::EndKw) {
         TraitMemberParseResult::TopLevelKwFound
     } else {
         TraitMemberParseResult::UnknownToken

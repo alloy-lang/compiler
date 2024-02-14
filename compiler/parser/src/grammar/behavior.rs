@@ -2,10 +2,16 @@
 use super::*;
 
 const BEHAVIOR_RECOVERY_SET: TokenSet = ts![TokenKind::TypevarKw, TokenKind::EndKw];
+const BEHAVIOR_MEMBER_FIRSTS: TokenSet =
+    ts![TokenKind::TypeOfKw, TokenKind::LetKw, TokenKind::TypevarKw,];
 const BEHAVIOR_TITLE_RECOVERY_SET: TokenSet =
     BEHAVIOR_RECOVERY_SET.union(ts![TokenKind::Ident, TokenKind::ForKw, TokenKind::WhereKw,]);
 
 pub(crate) fn parse_behavior(p: &mut Parser) -> CompletedMarker {
+    fn should_stop(p: &mut Parser) -> bool {
+        !p.at_set(BEHAVIOR_MEMBER_FIRSTS) && p.at_top_level_token_or_set(ts![TokenKind::EndKw])
+    }
+
     let m = p.start();
     p.bump(TokenKind::BehaviorKw);
 
@@ -65,11 +71,7 @@ pub(crate) fn parse_behavior(p: &mut Parser) -> CompletedMarker {
 
     p.expect_only(TokenKind::EndKw, ParseErrorContext::BehaviorEnd);
 
-    return m.complete(p, SyntaxKind::BehaviorDef);
-
-    fn should_stop(p: &mut Parser) -> bool {
-        p.maybe_at(TokenKind::EndKw) || p.at_eof()
-    }
+    m.complete(p, SyntaxKind::BehaviorDef)
 }
 
 enum BehaviorMemberParseResult {
@@ -92,7 +94,7 @@ fn parse_behavior_member(p: &mut Parser) -> BehaviorMemberParseResult {
     } else if p.at(TokenKind::TypevarKw) {
         let cm = parse_behavior_type_variable(p);
         BehaviorMemberParseResult::BehaviorMember(cm)
-    } else if p.at_set(DEFAULT_RECOVERY_SET) {
+    } else if p.at_top_level_token_or_set(ts![TokenKind::EndKw]) {
         BehaviorMemberParseResult::TopLevelKwFound
     } else {
         BehaviorMemberParseResult::UnknownToken

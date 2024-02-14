@@ -4,6 +4,10 @@ use super::*;
 const IMPORT_RECOVERY_SET: TokenSet = ts![TokenKind::Ident, TokenKind::LBrace];
 
 pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_not_set(IMPORT_RECOVERY_SET.plus(TokenKind::DoubleColon))
+    }
+
     let m = p.start();
     p.bump(TokenKind::ImportKw);
 
@@ -27,14 +31,14 @@ pub(crate) fn parse_import(p: &mut Parser) -> CompletedMarker {
         }
     }
 
-    return m.complete(p, SyntaxKind::ImportDef);
-
-    fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(IMPORT_RECOVERY_SET.plus(TokenKind::DoubleColon)) || p.at_eof()
-    }
+    m.complete(p, SyntaxKind::ImportDef)
 }
 
 fn parse_import_group(p: &mut Parser) -> CompletedMarker {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_not_set(ts![TokenKind::Comma, TokenKind::Ident])
+    }
+
     let m = p.start();
     p.bump(TokenKind::LBrace);
 
@@ -60,11 +64,7 @@ fn parse_import_group(p: &mut Parser) -> CompletedMarker {
         ts![],
     );
 
-    return m.complete(p, SyntaxKind::ImportDefGroup);
-
-    fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(ts![TokenKind::Comma, TokenKind::Ident]) || p.at_eof()
-    }
+    m.complete(p, SyntaxKind::ImportDefGroup)
 }
 
 const IMPORT_SEGMENT_RECOVERY_SET: TokenSet = ts![TokenKind::RBrace];

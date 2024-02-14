@@ -19,6 +19,10 @@ pub(crate) fn parse_typevar_constraints_with_kind(p: &mut Parser) {
 }
 
 fn inner_parse_typevar_constraints(p: &mut Parser, mode: ParseMode) {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_not_set(TYPEVAR_CONSTRAINT_FIRSTS)
+    }
+
     loop {
         parse_typevar_constraint(p, mode);
 
@@ -31,12 +35,6 @@ fn inner_parse_typevar_constraints(p: &mut Parser, mode: ParseMode) {
             ParseErrorContext::TypeVariableConstraintPlus,
             TYPEVAR_CONSTRAINT_FIRSTS,
         );
-    }
-
-    return;
-
-    fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(TYPEVAR_CONSTRAINT_FIRSTS) || p.at_eof()
     }
 }
 
@@ -61,6 +59,10 @@ const TYPEVAR_CONSTRAINT_KIND_MARKER_CONTINUE: TokenSet =
     ts![TokenKind::Comma, TokenKind::NilIdentifier];
 
 fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_not_set(TYPEVAR_CONSTRAINT_KIND_MARKER_CONTINUE)
+    }
+
     let m = p.start();
     p.bump(TokenKind::Hash);
 
@@ -111,11 +113,7 @@ fn parse_typevar_constraint_kind_marker(p: &mut Parser) -> CompletedMarker {
         TYPEVAR_CONSTRAINT_KIND_MARKER_RECOVERY.plus(TokenKind::TypevarKw),
     );
 
-    return m.complete(p, SyntaxKind::TypeVariableKindConstraint);
-
-    fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(TYPEVAR_CONSTRAINT_KIND_MARKER_CONTINUE) || p.at_eof()
-    }
+    m.complete(p, SyntaxKind::TypeVariableKindConstraint)
 }
 
 fn parse_typevar_constraint_trait_marker(p: &mut Parser) -> CompletedMarker {

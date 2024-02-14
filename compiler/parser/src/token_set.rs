@@ -46,6 +46,10 @@ impl TokenSet {
     pub(crate) const fn minus(self, kind: TokenKind) -> Self {
         Self(self.0 & !mask(kind))
     }
+
+    pub(crate) fn invert(self) -> Self {
+        Self(!self.0)
+    }
 }
 
 const fn mask(kind: TokenKind) -> u64 {
@@ -114,5 +118,13 @@ mod tests {
         assert!(set1.contains(TokenKind::LetKw));
         assert!(set1.contains(TokenKind::Integer));
         assert!(!set1.contains(TokenKind::Ident));
+    }
+
+    #[test]
+    fn invert_works() {
+        let set1 = TokenSet::new([TokenKind::LetKw, TokenKind::Integer, TokenKind::Ident]);
+        let set2 = set1.invert();
+
+        assert_eq!(set1.0, !set2.0);
     }
 }

@@ -7,6 +7,10 @@ pub(super) fn parse_path(
     recovery_set: TokenSet,
     kind: SyntaxKind,
 ) -> CompletedMarker {
+    fn should_stop(p: &mut Parser) -> bool {
+        p.at_top_level_token_or_not_set(ts![TokenKind::DoubleColon, TokenKind::Colon])
+    }
+
     let parent_m = p.start();
     let path_m = p.start();
     if p.maybe_at(TokenKind::OpIdent) {
@@ -29,9 +33,5 @@ pub(super) fn parse_path(
     }
 
     path_m.complete(p, SyntaxKind::Path);
-    return parent_m.complete(p, kind);
-
-    fn should_stop(p: &mut Parser) -> bool {
-        !p.at_set(ts![TokenKind::DoubleColon, TokenKind::Colon]) || p.at_eof()
-    }
+    parent_m.complete(p, kind)
 }
