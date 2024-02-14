@@ -41,7 +41,7 @@ enum UnaryOp {
 impl UnaryOp {
     fn binding_power(&self) -> ((), u8) {
         match self {
-            Self::Neg => ((), 5),
+            Self::Neg => ((), 7),
         }
     }
 }
