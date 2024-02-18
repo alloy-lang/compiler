@@ -1,104 +1,37 @@
 |(a)| -> a + 1
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {},
-    },
-    expressions: Index {
-        items: Arena {
-            len: 4,
-            data: [
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "a",
-                        ),
-                    ),
-                },
-                IntLiteral(
-                    1,
-                ),
-                Binary {
-                    op: Add,
-                    lhs: Idx::<Expression>(0),
-                    rhs: Idx::<Expression>(1),
-                },
-                Lambda {
-                    args: [
-                        Idx::<Pattern>(0),
-                    ],
-                    body: Idx::<Expression>(2),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    9..11,
-                ),
-                Some(
-                    13..14,
-                ),
-                Some(
-                    9..14,
-                ),
-                Some(
-                    0..14,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {},
-    },
-    patterns: Index {
-        items: Arena {
-            len: 1,
-            data: [
-                VariableDeclaration {
-                    name: ThisModule(
-                        Name(
-                            "a",
-                        ),
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    1..4,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "a",
-                ),
-                Idx::<Scope>(1),
-            ): Idx::<Pattern>(0),
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        items: {
+            Idx::<Expression>(0): {
+                "item": "VariableRef { name: ThisModule(\"a\") }",
+                "range": "9..11",
+            },
+            Idx::<Expression>(1): {
+                "item": "IntLiteral(1)",
+                "range": "13..14",
+            },
+            Idx::<Expression>(2): {
+                "item": "Binary { op: Add, lhs: Idx::<Expression>(0), rhs: Idx::<Expression>(1) }",
+                "range": "9..14",
+            },
+            Idx::<Expression>(3): {
+                "item": "Lambda { args: [Idx::<Pattern>(0)], body: Idx::<Expression>(2) }",
+                "range": "0..14",
+            },
         },
     },
-    type_references: Index {
-        items: Arena {
-            len: 0,
-            data: [],
+    patterns: Index::<Pattern> {
+        items: {
+            Idx::<Pattern>(0): {
+                "item": "VariableDeclaration { name: ThisModule(\"a\") }",
+                "name": "a",
+                "range": "1..4",
+            },
         },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {},
     },
+    type_references: EmptyIndex::<TypeReference>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

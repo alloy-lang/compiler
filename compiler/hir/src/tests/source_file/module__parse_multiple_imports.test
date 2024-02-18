@@ -3,103 +3,23 @@ module TestModule1 where
     import really::real::other::Thing2
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 2,
-            data: [
-                Import {
-                    segments: [
-                        Name(
-                            "really",
-                        ),
-                        Name(
-                            "really",
-                        ),
-                        Name(
-                            "real",
-                        ),
-                    ],
-                    last: Name(
-                        "Thing1",
-                    ),
-                },
-                Import {
-                    segments: [
-                        Name(
-                            "really",
-                        ),
-                        Name(
-                            "real",
-                        ),
-                        Name(
-                            "other",
-                        ),
-                    ],
-                    last: Name(
-                        "Thing2",
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    29..69,
-                ),
-                Some(
-                    69..103,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "Thing1",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Import>(0),
-            (
-                Name(
-                    "Thing2",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Import>(1),
+    imports: Index::<Import> {
+        items: {
+            Idx::<Import>(0): {
+                "item": "Import { segments: [\"really\", \"really\", \"real\"], last: \"Thing1\" }",
+                "name": "Thing1",
+                "range": "29..69",
+            },
+            Idx::<Import>(1): {
+                "item": "Import { segments: [\"really\", \"real\", \"other\"], last: \"Thing2\" }",
+                "name": "Thing2",
+                "range": "69..103",
+            },
         },
     },
-    expressions: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {},
-    },
-    patterns: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {},
-    },
-    type_references: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {},
-    },
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

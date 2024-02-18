@@ -1,15 +1,57 @@
 use alloy_scope::{ScopeIdx, Scopes};
 use la_arena::{Arena, ArenaMap, Idx};
+use maplit::btreemap;
 use rustc_hash::FxHashMap;
+use std::collections::BTreeMap;
+use std::fmt;
 use text_size::TextRange;
 
 use crate::Name;
 
-#[derive(Debug)]
 pub struct Index<T> {
     items: Arena<T>,
     item_ranges: ArenaMap<Idx<T>, TextRange>,
     item_names: FxHashMap<(Name, ScopeIdx), Idx<T>>,
+}
+
+impl<T: fmt::Debug> fmt::Debug for Index<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut items = BTreeMap::new();
+
+        for (id, item) in self.items.iter() {
+            let range = self.item_ranges[id];
+            let name = self.item_names.iter().find_map(|(key, value)| {
+                if *value == id {
+                    Some(key.0.clone().0)
+                } else {
+                    None
+                }
+            });
+
+            let mut properties = btreemap! {
+                "item" => format!("{:?}", item),
+                "range" => format!("{:?}", range),
+            };
+            if let Some(name) = name {
+                properties.insert("name", name.to_string());
+            }
+            items.insert(id, properties);
+        }
+
+        let mut type_name = std::any::type_name::<T>();
+        if let Some(idx) = type_name.rfind(':') {
+            type_name = &type_name[idx + 1..];
+        }
+
+        if items.is_empty() {
+            f.debug_struct(&format!("EmptyIndex::<{type_name}>"))
+                .finish()
+        } else {
+            f.debug_struct(&format!("Index::<{type_name}>"))
+                .field("items", &items)
+                .finish()
+        }
+    }
 }
 
 #[derive(Debug)]

@@ -6,210 +6,77 @@ typeof (|>) : t1 -> (t1 -> t2) -> t2 where
 let (|>) = |x, f| -> fakeStuff
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 1,
-            data: [
-                Import {
-                    segments: [
-                        Name(
-                            "fake",
-                        ),
-                    ],
-                    last: Name(
-                        "fakeStuff",
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    0..24,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "fakeStuff",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Import>(0),
+    imports: Index::<Import> {
+        items: {
+            Idx::<Import>(0): {
+                "item": "Import { segments: [\"fake\"], last: \"fakeStuff\" }",
+                "name": "fakeStuff",
+                "range": "0..24",
+            },
         },
     },
-    expressions: Index {
-        items: Arena {
-            len: 2,
-            data: [
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "fakeStuff",
-                        ),
-                    ),
-                },
-                Lambda {
-                    args: [
-                        Idx::<Pattern>(0),
-                        Idx::<Pattern>(1),
-                    ],
-                    body: Idx::<Expression>(0),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    118..127,
-                ),
-                Some(
-                    97..127,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "(|>)",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Expression>(1),
+    expressions: Index::<Expression> {
+        items: {
+            Idx::<Expression>(0): {
+                "item": "VariableRef { name: ThisModule(\"fakeStuff\") }",
+                "range": "118..127",
+            },
+            Idx::<Expression>(1): {
+                "item": "Lambda { args: [Idx::<Pattern>(0), Idx::<Pattern>(1)], body: Idx::<Expression>(0) }",
+                "name": "(|>)",
+                "range": "97..127",
+            },
         },
     },
-    patterns: Index {
-        items: Arena {
-            len: 2,
-            data: [
-                VariableDeclaration {
-                    name: ThisModule(
-                        Name(
-                            "x",
-                        ),
-                    ),
-                },
-                VariableDeclaration {
-                    name: ThisModule(
-                        Name(
-                            "f",
-                        ),
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    109..110,
-                ),
-                Some(
-                    112..113,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "x",
-                ),
-                Idx::<Scope>(1),
-            ): Idx::<Pattern>(0),
-            (
-                Name(
-                    "f",
-                ),
-                Idx::<Scope>(1),
-            ): Idx::<Pattern>(1),
+    patterns: Index::<Pattern> {
+        items: {
+            Idx::<Pattern>(0): {
+                "item": "VariableDeclaration { name: ThisModule(\"x\") }",
+                "name": "x",
+                "range": "109..110",
+            },
+            Idx::<Pattern>(1): {
+                "item": "VariableDeclaration { name: ThisModule(\"f\") }",
+                "name": "f",
+                "range": "112..113",
+            },
         },
     },
-    type_references: Index {
-        items: Arena {
-            len: 8,
-            data: [
-                Named(
-                    ThisModule(
-                        Name(
-                            "t1",
-                        ),
-                    ),
-                ),
-                Named(
-                    ThisModule(
-                        Name(
-                            "t1",
-                        ),
-                    ),
-                ),
-                Named(
-                    ThisModule(
-                        Name(
-                            "t2",
-                        ),
-                    ),
-                ),
-                Lambda {
-                    arg_type: Idx::<TypeReference>(1),
-                    return_type: Idx::<TypeReference>(2),
-                },
-                ParenthesizedType(
-                    Idx::<TypeReference>(3),
-                ),
-                Named(
-                    ThisModule(
-                        Name(
-                            "t2",
-                        ),
-                    ),
-                ),
-                Lambda {
-                    arg_type: Idx::<TypeReference>(4),
-                    return_type: Idx::<TypeReference>(5),
-                },
-                Lambda {
-                    arg_type: Idx::<TypeReference>(0),
-                    return_type: Idx::<TypeReference>(6),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    38..41,
-                ),
-                Some(
-                    45..48,
-                ),
-                Some(
-                    51..53,
-                ),
-                Some(
-                    45..53,
-                ),
-                Some(
-                    44..55,
-                ),
-                Some(
-                    58..61,
-                ),
-                Some(
-                    44..61,
-                ),
-                Some(
-                    38..61,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "(|>)",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<TypeReference>(7),
+    type_references: Index::<TypeReference> {
+        items: {
+            Idx::<TypeReference>(0): {
+                "item": "Named(ThisModule(\"t1\"))",
+                "range": "38..41",
+            },
+            Idx::<TypeReference>(1): {
+                "item": "Named(ThisModule(\"t1\"))",
+                "range": "45..48",
+            },
+            Idx::<TypeReference>(2): {
+                "item": "Named(ThisModule(\"t2\"))",
+                "range": "51..53",
+            },
+            Idx::<TypeReference>(3): {
+                "item": "Lambda { arg_type: Idx::<TypeReference>(1), return_type: Idx::<TypeReference>(2) }",
+                "range": "45..53",
+            },
+            Idx::<TypeReference>(4): {
+                "item": "ParenthesizedType(Idx::<TypeReference>(3))",
+                "range": "44..55",
+            },
+            Idx::<TypeReference>(5): {
+                "item": "Named(ThisModule(\"t2\"))",
+                "range": "58..61",
+            },
+            Idx::<TypeReference>(6): {
+                "item": "Lambda { arg_type: Idx::<TypeReference>(4), return_type: Idx::<TypeReference>(5) }",
+                "range": "44..61",
+            },
+            Idx::<TypeReference>(7): {
+                "item": "Lambda { arg_type: Idx::<TypeReference>(0), return_type: Idx::<TypeReference>(6) }",
+                "name": "(|>)",
+                "range": "38..61",
+            },
         },
     },
     scopes: Scopes {

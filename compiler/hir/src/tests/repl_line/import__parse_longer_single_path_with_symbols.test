@@ -1,75 +1,18 @@
 import std::function::(<|)
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 1,
-            data: [
-                Import {
-                    segments: [
-                        Name(
-                            "std",
-                        ),
-                        Name(
-                            "function",
-                        ),
-                    ],
-                    last: Name(
-                        "(<|)",
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    0..26,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "(<|)",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Import>(0),
+    imports: Index::<Import> {
+        items: {
+            Idx::<Import>(0): {
+                "item": "Import { segments: [\"std\", \"function\"], last: \"(<|)\" }",
+                "name": "(<|)",
+                "range": "0..26",
+            },
         },
     },
-    expressions: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {},
-    },
-    patterns: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {},
-    },
-    type_references: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {},
-    },
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

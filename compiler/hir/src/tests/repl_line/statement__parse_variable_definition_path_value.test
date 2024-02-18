@@ -3,106 +3,26 @@ import fake::ResultThing
 let foo = ResultThing::More::Stuff::here
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 1,
-            data: [
-                Import {
-                    segments: [
-                        Name(
-                            "fake",
-                        ),
-                    ],
-                    last: Name(
-                        "ResultThing",
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    0..26,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "ResultThing",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Import>(0),
+    imports: Index::<Import> {
+        items: {
+            Idx::<Import>(0): {
+                "item": "Import { segments: [\"fake\"], last: \"ResultThing\" }",
+                "name": "ResultThing",
+                "range": "0..26",
+            },
         },
     },
-    expressions: Index {
-        items: Arena {
-            len: 1,
-            data: [
-                VariableRef {
-                    name: OtherModule(
-                        Fqn {
-                            module: NonEmpty(
-                                [
-                                    Name(
-                                        "ResultThing",
-                                    ),
-                                    Name(
-                                        "More",
-                                    ),
-                                    Name(
-                                        "Stuff",
-                                    ),
-                                ],
-                            ),
-                            name: Name(
-                                "here",
-                            ),
-                        },
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    26..66,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "foo",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Expression>(0),
+    expressions: Index::<Expression> {
+        items: {
+            Idx::<Expression>(0): {
+                "item": "VariableRef { name: OtherModule(Fqn { module: NonEmpty([\"ResultThing\", \"More\", \"Stuff\"]), name: \"here\" }) }",
+                "name": "foo",
+                "range": "26..66",
+            },
         },
     },
-    patterns: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {},
-    },
-    type_references: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {},
-    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

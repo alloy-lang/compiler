@@ -3,92 +3,30 @@ let foo = 0
 (1, foo,)
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {},
-    },
-    expressions: Index {
-        items: Arena {
-            len: 4,
-            data: [
-                IntLiteral(
-                    0,
-                ),
-                IntLiteral(
-                    1,
-                ),
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "foo",
-                        ),
-                    ),
-                },
-                Tuple(
-                    NonEmpty(
-                        [
-                            Idx::<Expression>(1),
-                            Idx::<Expression>(2),
-                        ],
-                    ),
-                ),
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    0..13,
-                ),
-                Some(
-                    14..15,
-                ),
-                Some(
-                    17..20,
-                ),
-                Some(
-                    13..22,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "foo",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Expression>(0),
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        items: {
+            Idx::<Expression>(0): {
+                "item": "IntLiteral(0)",
+                "name": "foo",
+                "range": "0..13",
+            },
+            Idx::<Expression>(1): {
+                "item": "IntLiteral(1)",
+                "range": "14..15",
+            },
+            Idx::<Expression>(2): {
+                "item": "VariableRef { name: ThisModule(\"foo\") }",
+                "range": "17..20",
+            },
+            Idx::<Expression>(3): {
+                "item": "Tuple(NonEmpty([Idx::<Expression>(1), Idx::<Expression>(2)]))",
+                "range": "13..22",
+            },
         },
     },
-    patterns: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {},
-    },
-    type_references: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {},
-    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

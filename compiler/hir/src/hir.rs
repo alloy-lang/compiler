@@ -6,10 +6,8 @@ use alloy_scope::Scopes;
 use alloy_syntax::SyntaxElement;
 use ast::AstElement;
 use la_arena::Idx;
-use la_arena::{Arena, ArenaMap};
 use non_empty_vec::NonEmpty;
 use ordered_float::NotNan;
-use rustc_hash::FxHashMap;
 use std::convert::TryFrom;
 use text_size::TextRange;
 
@@ -61,7 +59,7 @@ pub struct HirModule {
     imports: Index<Import>,
     expressions: Index<Expression>,
     patterns: Index<Pattern>,
-    types: Index<Type>,
+    type_references: Index<TypeReference>,
     scopes: Scopes,
     warnings: Vec<LoweringWarning>,
     errors: Vec<LoweringError>,
@@ -95,7 +93,7 @@ pub enum LoweringErrorKind {
         first: TextRange,
         second: TextRange,
     },
-    ConflictingTypeName {
+    ConflictingTypeAnnotationName {
         name: Name,
         first: TextRange,
         second: TextRange,
@@ -259,7 +257,7 @@ impl LoweringCtx {
 
         match res {
             Err(err) => {
-                let err = LoweringErrorKind::ConflictingTypeName {
+                let err = LoweringErrorKind::ConflictingTypeAnnotationName {
                     name: err.name,
                     first: err.first,
                     second: err.second,

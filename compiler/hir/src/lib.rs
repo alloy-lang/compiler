@@ -1,3 +1,4 @@
+use std::fmt;
 use non_empty_vec::NonEmpty;
 
 mod hir;
@@ -8,8 +9,20 @@ mod tests;
 pub use hir::lower_repl_line;
 pub use hir::lower_source_file;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Name(String);
+
+impl fmt::Debug for Name {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self.0)
+    }
+}
+
+impl PartialEq<&str> for Name {
+    fn eq(&self, other: &&str) -> bool {
+        self.0 == *other
+    }
+}
 
 impl Name {
     pub fn new(name: impl Into<String>) -> Self {

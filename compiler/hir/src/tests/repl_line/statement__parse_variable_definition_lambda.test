@@ -1,132 +1,43 @@
 let add = |a, b| -> a + b
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {},
-    },
-    expressions: Index {
-        items: Arena {
-            len: 4,
-            data: [
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "a",
-                        ),
-                    ),
-                },
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "b",
-                        ),
-                    ),
-                },
-                Binary {
-                    op: Add,
-                    lhs: Idx::<Expression>(0),
-                    rhs: Idx::<Expression>(1),
-                },
-                Lambda {
-                    args: [
-                        Idx::<Pattern>(0),
-                        Idx::<Pattern>(1),
-                    ],
-                    body: Idx::<Expression>(2),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    20..22,
-                ),
-                Some(
-                    24..25,
-                ),
-                Some(
-                    20..25,
-                ),
-                Some(
-                    0..25,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "add",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Expression>(3),
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        items: {
+            Idx::<Expression>(0): {
+                "item": "VariableRef { name: ThisModule(\"a\") }",
+                "range": "20..22",
+            },
+            Idx::<Expression>(1): {
+                "item": "VariableRef { name: ThisModule(\"b\") }",
+                "range": "24..25",
+            },
+            Idx::<Expression>(2): {
+                "item": "Binary { op: Add, lhs: Idx::<Expression>(0), rhs: Idx::<Expression>(1) }",
+                "range": "20..25",
+            },
+            Idx::<Expression>(3): {
+                "item": "Lambda { args: [Idx::<Pattern>(0), Idx::<Pattern>(1)], body: Idx::<Expression>(2) }",
+                "name": "add",
+                "range": "0..25",
+            },
         },
     },
-    patterns: Index {
-        items: Arena {
-            len: 2,
-            data: [
-                VariableDeclaration {
-                    name: ThisModule(
-                        Name(
-                            "a",
-                        ),
-                    ),
-                },
-                VariableDeclaration {
-                    name: ThisModule(
-                        Name(
-                            "b",
-                        ),
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    11..12,
-                ),
-                Some(
-                    14..15,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "a",
-                ),
-                Idx::<Scope>(1),
-            ): Idx::<Pattern>(0),
-            (
-                Name(
-                    "b",
-                ),
-                Idx::<Scope>(1),
-            ): Idx::<Pattern>(1),
+    patterns: Index::<Pattern> {
+        items: {
+            Idx::<Pattern>(0): {
+                "item": "VariableDeclaration { name: ThisModule(\"a\") }",
+                "name": "a",
+                "range": "11..12",
+            },
+            Idx::<Pattern>(1): {
+                "item": "VariableDeclaration { name: ThisModule(\"b\") }",
+                "name": "b",
+                "range": "14..15",
+            },
         },
     },
-    type_references: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {},
-    },
+    type_references: EmptyIndex::<TypeReference>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

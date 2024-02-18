@@ -1,73 +1,28 @@
 |()| -> 5
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 0,
-            data: [],
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        items: {
+            Idx::<Expression>(0): {
+                "item": "IntLiteral(5)",
+                "range": "8..9",
+            },
+            Idx::<Expression>(1): {
+                "item": "Lambda { args: [Idx::<Pattern>(0)], body: Idx::<Expression>(0) }",
+                "range": "0..9",
+            },
         },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {},
     },
-    expressions: Index {
-        items: Arena {
-            len: 2,
-            data: [
-                IntLiteral(
-                    5,
-                ),
-                Lambda {
-                    args: [
-                        Idx::<Pattern>(0),
-                    ],
-                    body: Idx::<Expression>(0),
-                },
-            ],
+    patterns: Index::<Pattern> {
+        items: {
+            Idx::<Pattern>(0): {
+                "item": "Unit",
+                "range": "1..3",
+            },
         },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    8..9,
-                ),
-                Some(
-                    0..9,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {},
     },
-    patterns: Index {
-        items: Arena {
-            len: 1,
-            data: [
-                Unit,
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    1..3,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {},
-    },
-    type_references: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {},
-    },
+    type_references: EmptyIndex::<TypeReference>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

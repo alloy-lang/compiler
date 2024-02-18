@@ -10,6 +10,7 @@ alloy_ast = { path = "../ast" }
 alloy_scope = { path = "../scope" }
 alloy_syntax = { path = "../syntax" }
 la-arena = "0.3"
+maplit = "1.0"
 non-empty-vec = "0.2"
 ordered-float = "3.0"
 rustc-hash = "1.1"

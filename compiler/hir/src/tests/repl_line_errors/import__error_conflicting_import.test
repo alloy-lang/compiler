@@ -2,75 +2,18 @@ import std::option::map
 import std::functor::map
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 1,
-            data: [
-                Import {
-                    segments: [
-                        Name(
-                            "std",
-                        ),
-                        Name(
-                            "option",
-                        ),
-                    ],
-                    last: Name(
-                        "map",
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    0..24,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "map",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Import>(0),
+    imports: Index::<Import> {
+        items: {
+            Idx::<Import>(0): {
+                "item": "Import { segments: [\"std\", \"option\"], last: \"map\" }",
+                "name": "map",
+                "range": "0..24",
+            },
         },
     },
-    expressions: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {},
-    },
-    patterns: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {},
-    },
-    type_references: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {},
-    },
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
@@ -86,9 +29,7 @@ HirModule {
     errors: [
         LoweringError {
             kind: ConflictingImport {
-                name: Name(
-                    "map",
-                ),
+                name: "map",
                 first: 0..24,
                 second: 24..48,
             },

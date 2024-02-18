@@ -3,113 +3,36 @@ import std::option::Option
 |Option::None| -> 5
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 1,
-            data: [
-                Import {
-                    segments: [
-                        Name(
-                            "std",
-                        ),
-                        Name(
-                            "option",
-                        ),
-                    ],
-                    last: Name(
-                        "Option",
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    0..28,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "Option",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Import>(0),
+    imports: Index::<Import> {
+        items: {
+            Idx::<Import>(0): {
+                "item": "Import { segments: [\"std\", \"option\"], last: \"Option\" }",
+                "name": "Option",
+                "range": "0..28",
+            },
         },
     },
-    expressions: Index {
-        items: Arena {
-            len: 2,
-            data: [
-                IntLiteral(
-                    5,
-                ),
-                Lambda {
-                    args: [
-                        Idx::<Pattern>(0),
-                    ],
-                    body: Idx::<Expression>(0),
-                },
-            ],
+    expressions: Index::<Expression> {
+        items: {
+            Idx::<Expression>(0): {
+                "item": "IntLiteral(5)",
+                "range": "46..47",
+            },
+            Idx::<Expression>(1): {
+                "item": "Lambda { args: [Idx::<Pattern>(0)], body: Idx::<Expression>(0) }",
+                "range": "28..47",
+            },
         },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    46..47,
-                ),
-                Some(
-                    28..47,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {},
     },
-    patterns: Index {
-        items: Arena {
-            len: 1,
-            data: [
-                VariableRef {
-                    name: OtherModule(
-                        Fqn {
-                            module: NonEmpty(
-                                [
-                                    Name(
-                                        "Option",
-                                    ),
-                                ],
-                            ),
-                            name: Name(
-                                "None",
-                            ),
-                        },
-                    ),
-                },
-            ],
+    patterns: Index::<Pattern> {
+        items: {
+            Idx::<Pattern>(0): {
+                "item": "VariableRef { name: OtherModule(Fqn { module: NonEmpty([\"Option\"]), name: \"None\" }) }",
+                "range": "29..41",
+            },
         },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    29..41,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {},
     },
-    type_references: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {},
-    },
+    type_references: EmptyIndex::<TypeReference>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

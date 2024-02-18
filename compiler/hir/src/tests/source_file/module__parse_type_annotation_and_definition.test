@@ -7,320 +7,114 @@ module TestModule1 where
     let testThing = |funky, x, y| -> TestType::new <| (funky(x), funky(y))
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 1,
-            data: [
-                Import {
-                    segments: [],
-                    last: Name(
-                        "TestType",
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    29..50,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "TestType",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Import>(0),
+    imports: Index::<Import> {
+        items: {
+            Idx::<Import>(0): {
+                "item": "Import { segments: [], last: \"TestType\" }",
+                "name": "TestType",
+                "range": "29..50",
+            },
         },
     },
-    expressions: Index {
-        items: Arena {
-            len: 8,
-            data: [
-                VariableRef {
-                    name: OtherModule(
-                        Fqn {
-                            module: NonEmpty(
-                                [
-                                    Name(
-                                        "TestType",
-                                    ),
-                                ],
-                            ),
-                            name: Name(
-                                "new",
-                            ),
-                        },
-                    ),
-                },
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "x",
-                        ),
-                    ),
-                },
-                FunctionCall {
-                    target: ThisModule(
-                        Name(
-                            "funky",
-                        ),
-                    ),
-                    args: [
-                        Idx::<Expression>(1),
-                    ],
-                },
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "y",
-                        ),
-                    ),
-                },
-                FunctionCall {
-                    target: ThisModule(
-                        Name(
-                            "funky",
-                        ),
-                    ),
-                    args: [
-                        Idx::<Expression>(3),
-                    ],
-                },
-                Tuple(
-                    NonEmpty(
-                        [
-                            Idx::<Expression>(2),
-                            Idx::<Expression>(4),
-                        ],
-                    ),
-                ),
-                Binary {
-                    op: Custom(
-                        ThisModule(
-                            Name(
-                                "<|",
-                            ),
-                        ),
-                    ),
-                    lhs: Idx::<Expression>(0),
-                    rhs: Idx::<Expression>(5),
-                },
-                Lambda {
-                    args: [
-                        Idx::<Pattern>(0),
-                        Idx::<Pattern>(1),
-                        Idx::<Pattern>(2),
-                    ],
-                    body: Idx::<Expression>(6),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    192..206,
-                ),
-                Some(
-                    216..217,
-                ),
-                Some(
-                    210..218,
-                ),
-                Some(
-                    226..227,
-                ),
-                Some(
-                    220..228,
-                ),
-                Some(
-                    209..229,
-                ),
-                Some(
-                    192..229,
-                ),
-                Some(
-                    159..229,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "testThing",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Expression>(7),
+    expressions: Index::<Expression> {
+        items: {
+            Idx::<Expression>(0): {
+                "item": "VariableRef { name: OtherModule(Fqn { module: NonEmpty([\"TestType\"]), name: \"new\" }) }",
+                "range": "192..206",
+            },
+            Idx::<Expression>(1): {
+                "item": "VariableRef { name: ThisModule(\"x\") }",
+                "range": "216..217",
+            },
+            Idx::<Expression>(2): {
+                "item": "FunctionCall { target: ThisModule(\"funky\"), args: [Idx::<Expression>(1)] }",
+                "range": "210..218",
+            },
+            Idx::<Expression>(3): {
+                "item": "VariableRef { name: ThisModule(\"y\") }",
+                "range": "226..227",
+            },
+            Idx::<Expression>(4): {
+                "item": "FunctionCall { target: ThisModule(\"funky\"), args: [Idx::<Expression>(3)] }",
+                "range": "220..228",
+            },
+            Idx::<Expression>(5): {
+                "item": "Tuple(NonEmpty([Idx::<Expression>(2), Idx::<Expression>(4)]))",
+                "range": "209..229",
+            },
+            Idx::<Expression>(6): {
+                "item": "Binary { op: Custom(ThisModule(\"<|\")), lhs: Idx::<Expression>(0), rhs: Idx::<Expression>(5) }",
+                "range": "192..229",
+            },
+            Idx::<Expression>(7): {
+                "item": "Lambda { args: [Idx::<Pattern>(0), Idx::<Pattern>(1), Idx::<Pattern>(2)], body: Idx::<Expression>(6) }",
+                "name": "testThing",
+                "range": "159..229",
+            },
         },
     },
-    patterns: Index {
-        items: Arena {
-            len: 3,
-            data: [
-                VariableDeclaration {
-                    name: ThisModule(
-                        Name(
-                            "funky",
-                        ),
-                    ),
-                },
-                VariableDeclaration {
-                    name: ThisModule(
-                        Name(
-                            "x",
-                        ),
-                    ),
-                },
-                VariableDeclaration {
-                    name: ThisModule(
-                        Name(
-                            "y",
-                        ),
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    176..181,
-                ),
-                Some(
-                    183..184,
-                ),
-                Some(
-                    186..187,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "x",
-                ),
-                Idx::<Scope>(1),
-            ): Idx::<Pattern>(1),
-            (
-                Name(
-                    "funky",
-                ),
-                Idx::<Scope>(1),
-            ): Idx::<Pattern>(0),
-            (
-                Name(
-                    "y",
-                ),
-                Idx::<Scope>(1),
-            ): Idx::<Pattern>(2),
+    patterns: Index::<Pattern> {
+        items: {
+            Idx::<Pattern>(0): {
+                "item": "VariableDeclaration { name: ThisModule(\"funky\") }",
+                "name": "funky",
+                "range": "176..181",
+            },
+            Idx::<Pattern>(1): {
+                "item": "VariableDeclaration { name: ThisModule(\"x\") }",
+                "name": "x",
+                "range": "183..184",
+            },
+            Idx::<Pattern>(2): {
+                "item": "VariableDeclaration { name: ThisModule(\"y\") }",
+                "name": "y",
+                "range": "186..187",
+            },
         },
     },
-    type_references: Index {
-        items: Arena {
-            len: 10,
-            data: [
-                Named(
-                    ThisModule(
-                        Name(
-                            "t2",
-                        ),
-                    ),
-                ),
-                Named(
-                    ThisModule(
-                        Name(
-                            "t1",
-                        ),
-                    ),
-                ),
-                Lambda {
-                    arg_type: Idx::<TypeReference>(0),
-                    return_type: Idx::<TypeReference>(1),
-                },
-                ParenthesizedType(
-                    Idx::<TypeReference>(2),
-                ),
-                Named(
-                    ThisModule(
-                        Name(
-                            "t2",
-                        ),
-                    ),
-                ),
-                Named(
-                    ThisModule(
-                        Name(
-                            "t2",
-                        ),
-                    ),
-                ),
-                Named(
-                    ThisModule(
-                        Name(
-                            "ResultThing",
-                        ),
-                    ),
-                ),
-                Lambda {
-                    arg_type: Idx::<TypeReference>(5),
-                    return_type: Idx::<TypeReference>(6),
-                },
-                Lambda {
-                    arg_type: Idx::<TypeReference>(4),
-                    return_type: Idx::<TypeReference>(7),
-                },
-                Lambda {
-                    arg_type: Idx::<TypeReference>(3),
-                    return_type: Idx::<TypeReference>(8),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    70..73,
-                ),
-                Some(
-                    76..78,
-                ),
-                Some(
-                    70..78,
-                ),
-                Some(
-                    69..80,
-                ),
-                Some(
-                    83..86,
-                ),
-                Some(
-                    89..92,
-                ),
-                Some(
-                    95..107,
-                ),
-                Some(
-                    89..107,
-                ),
-                Some(
-                    83..107,
-                ),
-                Some(
-                    69..107,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "testThing",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<TypeReference>(9),
+    type_references: Index::<TypeReference> {
+        items: {
+            Idx::<TypeReference>(0): {
+                "item": "Named(ThisModule(\"t2\"))",
+                "range": "70..73",
+            },
+            Idx::<TypeReference>(1): {
+                "item": "Named(ThisModule(\"t1\"))",
+                "range": "76..78",
+            },
+            Idx::<TypeReference>(2): {
+                "item": "Lambda { arg_type: Idx::<TypeReference>(0), return_type: Idx::<TypeReference>(1) }",
+                "range": "70..78",
+            },
+            Idx::<TypeReference>(3): {
+                "item": "ParenthesizedType(Idx::<TypeReference>(2))",
+                "range": "69..80",
+            },
+            Idx::<TypeReference>(4): {
+                "item": "Named(ThisModule(\"t2\"))",
+                "range": "83..86",
+            },
+            Idx::<TypeReference>(5): {
+                "item": "Named(ThisModule(\"t2\"))",
+                "range": "89..92",
+            },
+            Idx::<TypeReference>(6): {
+                "item": "Named(ThisModule(\"ResultThing\"))",
+                "range": "95..107",
+            },
+            Idx::<TypeReference>(7): {
+                "item": "Lambda { arg_type: Idx::<TypeReference>(5), return_type: Idx::<TypeReference>(6) }",
+                "range": "89..107",
+            },
+            Idx::<TypeReference>(8): {
+                "item": "Lambda { arg_type: Idx::<TypeReference>(4), return_type: Idx::<TypeReference>(7) }",
+                "range": "83..107",
+            },
+            Idx::<TypeReference>(9): {
+                "item": "Lambda { arg_type: Idx::<TypeReference>(3), return_type: Idx::<TypeReference>(8) }",
+                "name": "testThing",
+                "range": "69..107",
+            },
         },
     },
     scopes: Scopes {

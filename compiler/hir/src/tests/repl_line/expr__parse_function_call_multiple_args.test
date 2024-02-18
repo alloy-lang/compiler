@@ -5,134 +5,44 @@ let z = 2
 funky(x, y, z)
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {},
-    },
-    expressions: Index {
-        items: Arena {
-            len: 7,
-            data: [
-                IntLiteral(
-                    0,
-                ),
-                IntLiteral(
-                    1,
-                ),
-                IntLiteral(
-                    2,
-                ),
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "x",
-                        ),
-                    ),
-                },
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "y",
-                        ),
-                    ),
-                },
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "z",
-                        ),
-                    ),
-                },
-                FunctionCall {
-                    target: ThisModule(
-                        Name(
-                            "funky",
-                        ),
-                    ),
-                    args: [
-                        Idx::<Expression>(3),
-                        Idx::<Expression>(4),
-                        Idx::<Expression>(5),
-                    ],
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    0..10,
-                ),
-                Some(
-                    10..20,
-                ),
-                Some(
-                    20..31,
-                ),
-                Some(
-                    37..38,
-                ),
-                Some(
-                    40..41,
-                ),
-                Some(
-                    43..44,
-                ),
-                Some(
-                    31..45,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "x",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Expression>(0),
-            (
-                Name(
-                    "z",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Expression>(2),
-            (
-                Name(
-                    "y",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Expression>(1),
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        items: {
+            Idx::<Expression>(0): {
+                "item": "IntLiteral(0)",
+                "name": "x",
+                "range": "0..10",
+            },
+            Idx::<Expression>(1): {
+                "item": "IntLiteral(1)",
+                "name": "y",
+                "range": "10..20",
+            },
+            Idx::<Expression>(2): {
+                "item": "IntLiteral(2)",
+                "name": "z",
+                "range": "20..31",
+            },
+            Idx::<Expression>(3): {
+                "item": "VariableRef { name: ThisModule(\"x\") }",
+                "range": "37..38",
+            },
+            Idx::<Expression>(4): {
+                "item": "VariableRef { name: ThisModule(\"y\") }",
+                "range": "40..41",
+            },
+            Idx::<Expression>(5): {
+                "item": "VariableRef { name: ThisModule(\"z\") }",
+                "range": "43..44",
+            },
+            Idx::<Expression>(6): {
+                "item": "FunctionCall { target: ThisModule(\"funky\"), args: [Idx::<Expression>(3), Idx::<Expression>(4), Idx::<Expression>(5)] }",
+                "range": "31..45",
+            },
         },
     },
-    patterns: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {},
-    },
-    type_references: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {},
-    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

@@ -1,82 +1,29 @@
 if test then 2 else 3
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 0,
-            data: [],
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        items: {
+            Idx::<Expression>(0): {
+                "item": "VariableRef { name: ThisModule(\"test\") }",
+                "range": "3..8",
+            },
+            Idx::<Expression>(1): {
+                "item": "IntLiteral(2)",
+                "range": "13..15",
+            },
+            Idx::<Expression>(2): {
+                "item": "IntLiteral(3)",
+                "range": "20..21",
+            },
+            Idx::<Expression>(3): {
+                "item": "IfThenElse { condition: Idx::<Expression>(0), then: Idx::<Expression>(1), else_: Idx::<Expression>(2) }",
+                "range": "0..21",
+            },
         },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {},
     },
-    expressions: Index {
-        items: Arena {
-            len: 4,
-            data: [
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "test",
-                        ),
-                    ),
-                },
-                IntLiteral(
-                    2,
-                ),
-                IntLiteral(
-                    3,
-                ),
-                IfThenElse {
-                    condition: Idx::<Expression>(0),
-                    then: Idx::<Expression>(1),
-                    else_: Idx::<Expression>(2),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    3..8,
-                ),
-                Some(
-                    13..15,
-                ),
-                Some(
-                    20..21,
-                ),
-                Some(
-                    0..21,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {},
-    },
-    patterns: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {},
-    },
-    type_references: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {},
-    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
@@ -93,9 +40,7 @@ HirModule {
         LoweringError {
             kind: UnknownReference {
                 path: ThisModule(
-                    Name(
-                        "test",
-                    ),
+                    "test",
                 ),
             },
             range: 3..8,

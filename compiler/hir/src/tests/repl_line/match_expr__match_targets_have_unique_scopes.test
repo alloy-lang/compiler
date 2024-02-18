@@ -6,217 +6,63 @@ match test when
   | Either::Right(x) -> x
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 2,
-            data: [
-                Import {
-                    segments: [
-                        Name(
-                            "std",
-                        ),
-                        Name(
-                            "either",
-                        ),
-                    ],
-                    last: Name(
-                        "Either",
-                    ),
-                },
-                Import {
-                    segments: [],
-                    last: Name(
-                        "test",
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    0..27,
-                ),
-                Some(
-                    27..40,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "test",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Import>(1),
-            (
-                Name(
-                    "Either",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Import>(0),
+    imports: Index::<Import> {
+        items: {
+            Idx::<Import>(0): {
+                "item": "Import { segments: [\"std\", \"either\"], last: \"Either\" }",
+                "name": "Either",
+                "range": "0..27",
+            },
+            Idx::<Import>(1): {
+                "item": "Import { segments: [], last: \"test\" }",
+                "name": "test",
+                "range": "27..40",
+            },
         },
     },
-    expressions: Index {
-        items: Arena {
-            len: 4,
-            data: [
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "test",
-                        ),
-                    ),
-                },
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "x",
-                        ),
-                    ),
-                },
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "x",
-                        ),
-                    ),
-                },
-                Match {
-                    condition: Idx::<Expression>(0),
-                    targets: [
-                        (
-                            Idx::<Pattern>(1),
-                            Idx::<Expression>(1),
-                        ),
-                        (
-                            Idx::<Pattern>(3),
-                            Idx::<Expression>(2),
-                        ),
-                    ],
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    46..51,
-                ),
-                Some(
-                    80..84,
-                ),
-                Some(
-                    106..107,
-                ),
-                Some(
-                    40..107,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {},
-    },
-    patterns: Index {
-        items: Arena {
-            len: 4,
-            data: [
-                VariableDeclaration {
-                    name: ThisModule(
-                        Name(
-                            "x",
-                        ),
-                    ),
-                },
-                Destructure {
-                    target: OtherModule(
-                        Fqn {
-                            module: NonEmpty(
-                                [
-                                    Name(
-                                        "Either",
-                                    ),
-                                ],
-                            ),
-                            name: Name(
-                                "Left",
-                            ),
-                        },
-                    ),
-                    args: [
-                        Idx::<Pattern>(0),
-                    ],
-                },
-                VariableDeclaration {
-                    name: ThisModule(
-                        Name(
-                            "x",
-                        ),
-                    ),
-                },
-                Destructure {
-                    target: OtherModule(
-                        Fqn {
-                            module: NonEmpty(
-                                [
-                                    Name(
-                                        "Either",
-                                    ),
-                                ],
-                            ),
-                            name: Name(
-                                "Right",
-                            ),
-                        },
-                    ),
-                    args: [
-                        Idx::<Pattern>(2),
-                    ],
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    73..74,
-                ),
-                Some(
-                    60..77,
-                ),
-                Some(
-                    100..101,
-                ),
-                Some(
-                    86..103,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "x",
-                ),
-                Idx::<Scope>(1),
-            ): Idx::<Pattern>(0),
-            (
-                Name(
-                    "x",
-                ),
-                Idx::<Scope>(2),
-            ): Idx::<Pattern>(2),
+    expressions: Index::<Expression> {
+        items: {
+            Idx::<Expression>(0): {
+                "item": "VariableRef { name: ThisModule(\"test\") }",
+                "range": "46..51",
+            },
+            Idx::<Expression>(1): {
+                "item": "VariableRef { name: ThisModule(\"x\") }",
+                "range": "80..84",
+            },
+            Idx::<Expression>(2): {
+                "item": "VariableRef { name: ThisModule(\"x\") }",
+                "range": "106..107",
+            },
+            Idx::<Expression>(3): {
+                "item": "Match { condition: Idx::<Expression>(0), targets: [(Idx::<Pattern>(1), Idx::<Expression>(1)), (Idx::<Pattern>(3), Idx::<Expression>(2))] }",
+                "range": "40..107",
+            },
         },
     },
-    type_references: Index {
-        items: Arena {
-            len: 0,
-            data: [],
+    patterns: Index::<Pattern> {
+        items: {
+            Idx::<Pattern>(0): {
+                "item": "VariableDeclaration { name: ThisModule(\"x\") }",
+                "name": "x",
+                "range": "73..74",
+            },
+            Idx::<Pattern>(1): {
+                "item": "Destructure { target: OtherModule(Fqn { module: NonEmpty([\"Either\"]), name: \"Left\" }), args: [Idx::<Pattern>(0)] }",
+                "range": "60..77",
+            },
+            Idx::<Pattern>(2): {
+                "item": "VariableDeclaration { name: ThisModule(\"x\") }",
+                "name": "x",
+                "range": "100..101",
+            },
+            Idx::<Pattern>(3): {
+                "item": "Destructure { target: OtherModule(Fqn { module: NonEmpty([\"Either\"]), name: \"Right\" }), args: [Idx::<Pattern>(2)] }",
+                "range": "86..103",
+            },
         },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {},
     },
+    type_references: EmptyIndex::<TypeReference>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

@@ -3,104 +3,37 @@ import test_data::test
 if test then 2 else 3
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 1,
-            data: [
-                Import {
-                    segments: [
-                        Name(
-                            "test_data",
-                        ),
-                    ],
-                    last: Name(
-                        "test",
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    0..24,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "test",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Import>(0),
+    imports: Index::<Import> {
+        items: {
+            Idx::<Import>(0): {
+                "item": "Import { segments: [\"test_data\"], last: \"test\" }",
+                "name": "test",
+                "range": "0..24",
+            },
         },
     },
-    expressions: Index {
-        items: Arena {
-            len: 4,
-            data: [
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "test",
-                        ),
-                    ),
-                },
-                IntLiteral(
-                    2,
-                ),
-                IntLiteral(
-                    3,
-                ),
-                IfThenElse {
-                    condition: Idx::<Expression>(0),
-                    then: Idx::<Expression>(1),
-                    else_: Idx::<Expression>(2),
-                },
-            ],
+    expressions: Index::<Expression> {
+        items: {
+            Idx::<Expression>(0): {
+                "item": "VariableRef { name: ThisModule(\"test\") }",
+                "range": "27..32",
+            },
+            Idx::<Expression>(1): {
+                "item": "IntLiteral(2)",
+                "range": "37..39",
+            },
+            Idx::<Expression>(2): {
+                "item": "IntLiteral(3)",
+                "range": "44..45",
+            },
+            Idx::<Expression>(3): {
+                "item": "IfThenElse { condition: Idx::<Expression>(0), then: Idx::<Expression>(1), else_: Idx::<Expression>(2) }",
+                "range": "24..45",
+            },
         },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    27..32,
-                ),
-                Some(
-                    37..39,
-                ),
-                Some(
-                    44..45,
-                ),
-                Some(
-                    24..45,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {},
     },
-    patterns: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {},
-    },
-    type_references: Index {
-        items: Arena {
-            len: 0,
-            data: [],
-        },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {},
-    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

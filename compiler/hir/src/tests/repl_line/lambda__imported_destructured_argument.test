@@ -3,137 +3,41 @@ import std::option::Option
 |Option::Some(x)| -> x
 ===
 HirModule {
-    imports: Index {
-        items: Arena {
-            len: 1,
-            data: [
-                Import {
-                    segments: [
-                        Name(
-                            "std",
-                        ),
-                        Name(
-                            "option",
-                        ),
-                    ],
-                    last: Name(
-                        "Option",
-                    ),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    0..28,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::import::Import>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "Option",
-                ),
-                Idx::<Scope>(0),
-            ): Idx::<Import>(0),
+    imports: Index::<Import> {
+        items: {
+            Idx::<Import>(0): {
+                "item": "Import { segments: [\"std\", \"option\"], last: \"Option\" }",
+                "name": "Option",
+                "range": "0..28",
+            },
         },
     },
-    expressions: Index {
-        items: Arena {
-            len: 2,
-            data: [
-                VariableRef {
-                    name: ThisModule(
-                        Name(
-                            "x",
-                        ),
-                    ),
-                },
-                Lambda {
-                    args: [
-                        Idx::<Pattern>(1),
-                    ],
-                    body: Idx::<Expression>(0),
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    49..50,
-                ),
-                Some(
-                    28..50,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::expression::Expression>>,
-        },
-        item_names: {},
-    },
-    patterns: Index {
-        items: Arena {
-            len: 2,
-            data: [
-                VariableDeclaration {
-                    name: ThisModule(
-                        Name(
-                            "x",
-                        ),
-                    ),
-                },
-                Destructure {
-                    target: OtherModule(
-                        Fqn {
-                            module: NonEmpty(
-                                [
-                                    Name(
-                                        "Option",
-                                    ),
-                                ],
-                            ),
-                            name: Name(
-                                "Some",
-                            ),
-                        },
-                    ),
-                    args: [
-                        Idx::<Pattern>(0),
-                    ],
-                },
-            ],
-        },
-        item_ranges: ArenaMap {
-            v: [
-                Some(
-                    42..43,
-                ),
-                Some(
-                    29..44,
-                ),
-            ],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::pattern::Pattern>>,
-        },
-        item_names: {
-            (
-                Name(
-                    "x",
-                ),
-                Idx::<Scope>(1),
-            ): Idx::<Pattern>(0),
+    expressions: Index::<Expression> {
+        items: {
+            Idx::<Expression>(0): {
+                "item": "VariableRef { name: ThisModule(\"x\") }",
+                "range": "49..50",
+            },
+            Idx::<Expression>(1): {
+                "item": "Lambda { args: [Idx::<Pattern>(1)], body: Idx::<Expression>(0) }",
+                "range": "28..50",
+            },
         },
     },
-    type_references: Index {
-        items: Arena {
-            len: 0,
-            data: [],
+    patterns: Index::<Pattern> {
+        items: {
+            Idx::<Pattern>(0): {
+                "item": "VariableDeclaration { name: ThisModule(\"x\") }",
+                "name": "x",
+                "range": "42..43",
+            },
+            Idx::<Pattern>(1): {
+                "item": "Destructure { target: OtherModule(Fqn { module: NonEmpty([\"Option\"]), name: \"Some\" }), args: [Idx::<Pattern>(0)] }",
+                "range": "29..44",
+            },
         },
-        item_ranges: ArenaMap {
-            v: [],
-            _ty: PhantomData<la_arena::Idx<alloy_hir::hir::type_reference::TypeReference>>,
-        },
-        item_names: {},
     },
+    type_references: EmptyIndex::<TypeReference>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
