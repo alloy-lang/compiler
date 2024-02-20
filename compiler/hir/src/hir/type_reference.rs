@@ -3,7 +3,28 @@ use super::*;
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, PartialEq)]
-pub enum BuiltInType {}
+pub enum BuiltInType {
+    Int,
+    Fraction,
+    String,
+    Char,
+    Bool,
+}
+
+impl TryFrom<ast::Path> for BuiltInType {
+    type Error = ();
+
+    fn try_from(path: ast::Path) -> Result<Self, Self::Error> {
+        match path.segments().join("::").as_str() {
+            "Int" => Ok(Self::Int),
+            "Fraction" => Ok(Self::Fraction),
+            "String" => Ok(Self::String),
+            "Char" => Ok(Self::Char),
+            "Bool" => Ok(Self::Bool),
+            _ => Err(()),
+        }
+    }
+}
 
 pub type TypeIdx = Idx<TypeReference>;
 
@@ -42,11 +63,16 @@ fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> TypeReference {
                 unreachable!("parsing error")
             };
 
-            let Ok(name) = Path::try_from(path.segments()) else {
-                unreachable!("parsing error")
-            };
+            BuiltInType::try_from(path.clone()).map_or_else(
+                |_| {
+                    let Ok(name) = Path::try_from(path.segments()) else {
+                        unreachable!("parsing error")
+                    };
 
-            TypeReference::Named(name)
+                    TypeReference::Named(name)
+                },
+                TypeReference::BuiltIn,
+            )
         }
         ast::Type::LambdaType(t) => {
             let Some(arg_type) = t.arg_type() else {

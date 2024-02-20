@@ -1,5 +1,5 @@
-use std::fmt;
 use non_empty_vec::NonEmpty;
+use std::fmt;
 
 mod hir;
 mod index;

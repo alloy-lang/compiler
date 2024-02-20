@@ -7,11 +7,11 @@ HirModule {
     type_references: Index::<TypeReference> {
         items: {
             Idx::<TypeReference>(0): {
-                "item": "Named(ThisModule(\"Int\"))",
+                "item": "BuiltIn(Int)",
                 "range": "14..18",
             },
             Idx::<TypeReference>(1): {
-                "item": "Named(ThisModule(\"String\"))",
+                "item": "BuiltIn(String)",
                 "range": "21..28",
             },
             Idx::<TypeReference>(2): {
