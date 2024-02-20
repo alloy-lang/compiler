@@ -80,6 +80,7 @@ end
                             },
                         ),
                     ),
+                    named_type_variables: [],
                 },
             ],
             values: [],

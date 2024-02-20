@@ -110,6 +110,32 @@ Some(
                         },
                     ),
                 ),
+                named_type_variables: [
+                    NamedTypeVariable {
+                        name: Some(
+                            "t1",
+                        ),
+                        constraints: [
+                            TypeVariableTraitConstraint(
+                                TypeVariableTraitConstraint {
+                                    trait_: Some(
+                                        Path {
+                                            segments: [
+                                                "Thing",
+                                            ],
+                                        },
+                                    ),
+                                },
+                            ),
+                        ],
+                    },
+                    NamedTypeVariable {
+                        name: Some(
+                            "t2",
+                        ),
+                        constraints: [],
+                    },
+                ],
             },
         ],
         values: [

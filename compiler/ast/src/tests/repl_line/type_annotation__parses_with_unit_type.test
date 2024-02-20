@@ -49,6 +49,7 @@ typeof test : Int -> String -> ()
                     },
                 ),
             ),
+            named_type_variables: [],
         },
     ),
 ]

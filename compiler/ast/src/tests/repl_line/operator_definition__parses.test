@@ -85,6 +85,20 @@ let (|>) = |x, f| -> fakeStuff
                     },
                 ),
             ),
+            named_type_variables: [
+                NamedTypeVariable {
+                    name: Some(
+                        "t1",
+                    ),
+                    constraints: [],
+                },
+                NamedTypeVariable {
+                    name: Some(
+                        "t2",
+                    ),
+                    constraints: [],
+                },
+            ],
         },
     ),
     ValueDef(
