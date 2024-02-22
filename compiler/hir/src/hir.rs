@@ -248,12 +248,15 @@ impl LoweringCtx {
         self.add_type_reference(TypeReference::Missing, element)
     }
 
-    pub(crate) fn add_type_annotation(&mut self, name: Name, type_: &ast::Type) {
-        let type_id = lower_type_reference(self, type_);
-
+    pub(crate) fn add_type_annotation(
+        &mut self,
+        name: Name,
+        type_id: TypeIdx,
+        element: &SyntaxElement,
+    ) {
         let res = self
             .type_references
-            .add_name(name, type_id, type_.range(), &self.scopes);
+            .add_name(name, type_id, element.text_range(), &self.scopes);
 
         match res {
             Err(err) => {
@@ -262,9 +265,9 @@ impl LoweringCtx {
                     first: err.first,
                     second: err.second,
                 };
-                self.error(err, type_.range());
+                self.error(err, element.text_range());
 
-                self.add_missing_type_reference(&type_.syntax())
+                self.add_missing_type_reference(element)
             }
             Ok(pid) => pid,
         };

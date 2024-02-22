@@ -12,5 +12,6 @@ pub(super) fn lower_type_annotation(ctx: &mut LoweringCtx, ast: &ast::TypeAnnota
         // todo!("validation");
         return;
     };
-    ctx.add_type_annotation(name, &type_);
+    let type_id = lower_type_reference(ctx, &type_);
+    ctx.add_type_annotation(name, type_id, &ast.syntax());
 }
