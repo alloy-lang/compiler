@@ -214,7 +214,7 @@ fn lower_if_then_else_expression(ctx: &mut LoweringCtx, e: &ast::IfThenElseExpr)
 }
 
 fn lower_lambda_expression(ctx: &mut LoweringCtx, e: &ast::LambdaExpr) -> Expression {
-    ctx.inside_scope(|ctx| {
+    ctx.inside_scope("lambda expression", |ctx| {
         let args = e
             .args()
             .iter()
@@ -262,7 +262,7 @@ fn lower_match_expression(ctx: &mut LoweringCtx, e: &ast::MatchExpr) -> Expressi
         .targets()
         .iter()
         .map(|a| {
-            ctx.inside_scope(|ctx| {
+            ctx.inside_scope("match expression arm", |ctx| {
                 // map_or_else can't be used here due to a double borrow
                 #[allow(clippy::map_unwrap_or)]
                 let condition = a

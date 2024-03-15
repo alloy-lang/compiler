@@ -312,11 +312,11 @@ impl LoweringCtx {
 }
 
 impl LoweringCtx {
-    fn inside_scope<F, R>(&mut self, f: F) -> R
+    fn inside_scope<F, R>(&mut self, tag: &str, f: F) -> R
     where
         F: FnOnce(&mut Self) -> R,
     {
-        self.scopes.push_scope();
+        self.scopes.push_scope(tag);
 
         let res = f(self);
 

@@ -36,9 +36,11 @@ HirModule {
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
+                    tag: "root",
                 },
                 Scope {
                     parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
                 },
             ],
         },

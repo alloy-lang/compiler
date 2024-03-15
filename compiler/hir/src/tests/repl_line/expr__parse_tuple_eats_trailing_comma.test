@@ -35,6 +35,7 @@ HirModule {
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
+                    tag: "root",
                 },
             ],
         },

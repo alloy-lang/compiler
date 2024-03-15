@@ -4,7 +4,7 @@ use maplit::btreemap;
 use rustc_hash::FxHashMap;
 use std::collections::BTreeMap;
 use std::fmt;
-use text_size::{TextRange};
+use text_size::TextRange;
 
 use crate::Name;
 
@@ -52,7 +52,8 @@ impl<'a, T> IndexIterator<'a, T> {
 
 impl<T: fmt::Debug> fmt::Debug for Index<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let items = self.iter()
+        let items = self
+            .iter()
             .map(|(id, item, range, name)| {
                 let mut properties = btreemap! {
                     "item" => format!("{:?}", item),
@@ -220,7 +221,7 @@ mod tests {
             .insert_named(name.clone(), thing, range, &scopes)
             .expect("testing");
 
-        scopes.push_scope();
+        scopes.push_scope("testing 1");
 
         assert_eq!(index.get_id(&name, &scopes), Some(idx));
         assert_eq!(index.get_by_name(&name, &scopes), Some(&thing));
@@ -235,7 +236,7 @@ mod tests {
         let name = Name::new("hello");
         let range = TextRange::new(TextSize::from(5), TextSize::from(6));
 
-        scopes.push_scope();
+        scopes.push_scope("testing 1");
 
         index
             .insert_named(name.clone(), thing, range, &scopes)
@@ -260,7 +261,7 @@ mod tests {
             .insert_named(name.clone(), thing, range, &scopes)
             .expect("testing");
 
-        scopes.push_scope();
+        scopes.push_scope("testing 1");
 
         let idx_2 = index
             .insert_named(name.clone(), thing, range, &scopes)

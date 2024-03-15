@@ -1,9 +1,10 @@
 use la_arena::{Arena, Idx, RawIdx};
 pub type ScopeIdx = Idx<Scope>;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Scope {
     parent: ScopeIdx,
+    tag: String,
 }
 
 #[derive(Debug)]
@@ -27,6 +28,7 @@ impl Scopes {
 
         let root_scope_id = scopes.alloc(Scope {
             parent: Scopes::ROOT,
+            tag: "root".to_string(),
         });
 
         Self {
@@ -45,9 +47,10 @@ impl Scopes {
         self.scopes[scope_id].parent
     }
 
-    pub fn push_scope(&mut self) -> ScopeIdx {
+    pub fn push_scope(&mut self, tag: &str) -> ScopeIdx {
         let new_scope_id = self.scopes.alloc(Scope {
             parent: self.current_scope,
+            tag: tag.to_string(),
         });
 
         self.current_scope = new_scope_id;
@@ -120,12 +123,12 @@ mod tests {
     fn push_scope() {
         let mut scopes = Scopes::new();
 
-        let new_scope_id_1 = scopes.push_scope();
+        let new_scope_id_1 = scopes.push_scope("testing 1");
 
         assert_eq!(new_scope_id_1, scopes.current_scope);
 
-        let _new_scope_id_2 = scopes.push_scope();
-        let new_scope_id_3 = scopes.push_scope();
+        let _new_scope_id_2 = scopes.push_scope("testing 2");
+        let new_scope_id_3 = scopes.push_scope("testing 3");
 
         assert_eq!(new_scope_id_3, scopes.current_scope);
     }
@@ -144,7 +147,7 @@ mod tests {
     fn pop_scope() {
         let mut scopes = Scopes::new();
 
-        let _ = scopes.push_scope();
+        let _ = scopes.push_scope("testing 1");
         let _ = scopes.pop_scope();
 
         assert_eq!(Scopes::ROOT, scopes.current_scope);
@@ -164,10 +167,10 @@ mod tests {
     fn iter() {
         let mut scopes = Scopes::new();
 
-        scopes.push_scope();
-        scopes.push_scope();
+        scopes.push_scope("testing 1");
+        scopes.push_scope("testing 2");
         scopes.pop_scope();
-        scopes.push_scope();
+        scopes.push_scope("testing 3");
 
         assert_eq!(
             vec![
