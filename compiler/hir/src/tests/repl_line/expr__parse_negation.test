@@ -3,15 +3,18 @@
 HirModule {
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
-        items: {
-            Idx::<Expression>(0): {
-                "item": "IntLiteral(10)",
-                "range": "2..4",
+        Idx::<Expression>(0): {
+            "item": IntLiteral(
+                10,
+            ),
+            "range": 2..4,
+        },
+        Idx::<Expression>(1): {
+            "item": Unary {
+                op: Neg,
+                expression: Idx::<Expression>(0),
             },
-            Idx::<Expression>(1): {
-                "item": "Unary { op: Neg, expression: Idx::<Expression>(0) }",
-                "range": "0..4",
-            },
+            "range": 0..4,
         },
     },
     patterns: EmptyIndex::<Pattern>,

@@ -5,17 +5,21 @@ counter
 HirModule {
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
-        items: {
-            Idx::<Expression>(0): {
-                "item": "IntLiteral(0)",
-                "name": "counter",
-                "range": "0..17",
-                "scope_id": "Idx::<Scope>(0)",
+        Idx::<Expression>(0): {
+            "item": IntLiteral(
+                0,
+            ),
+            "name": "counter",
+            "range": 0..17,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(1): {
+            "item": VariableRef {
+                name: ThisModule(
+                    "counter",
+                ),
             },
-            Idx::<Expression>(1): {
-                "item": "VariableRef { name: ThisModule(\"counter\") }",
-                "range": "17..24",
-            },
+            "range": 17..24,
         },
     },
     patterns: EmptyIndex::<Pattern>,

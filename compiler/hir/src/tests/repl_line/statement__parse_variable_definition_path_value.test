@@ -4,23 +4,37 @@ let foo = ResultThing::More::Stuff::here
 ===
 HirModule {
     imports: Index::<Import> {
-        items: {
-            Idx::<Import>(0): {
-                "item": "Import { segments: [\"fake\"], last: \"ResultThing\" }",
-                "name": "ResultThing",
-                "range": "0..26",
-                "scope_id": "Idx::<Scope>(0)",
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "fake",
+                ],
+                last: "ResultThing",
             },
+            "name": "ResultThing",
+            "range": 0..26,
+            "scope_id": Idx::<Scope>(0),
         },
     },
     expressions: Index::<Expression> {
-        items: {
-            Idx::<Expression>(0): {
-                "item": "VariableRef { name: OtherModule(Fqn { module: NonEmpty([\"ResultThing\", \"More\", \"Stuff\"]), name: \"here\" }) }",
-                "name": "foo",
-                "range": "26..66",
-                "scope_id": "Idx::<Scope>(0)",
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                name: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "ResultThing",
+                                "More",
+                                "Stuff",
+                            ],
+                        ),
+                        name: "here",
+                    },
+                ),
             },
+            "name": "foo",
+            "range": 26..66,
+            "scope_id": Idx::<Scope>(0),
         },
     },
     patterns: EmptyIndex::<Pattern>,

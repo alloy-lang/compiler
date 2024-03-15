@@ -3,49 +3,84 @@
 HirModule {
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
-        items: {
-            Idx::<Expression>(0): {
-                "item": "VariableRef { name: ThisModule(\"arg1\") }",
-                "range": "23..27",
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                name: ThisModule(
+                    "arg1",
+                ),
             },
-            Idx::<Expression>(1): {
-                "item": "VariableRef { name: ThisModule(\"arg2\") }",
-                "range": "29..33",
+            "range": 23..27,
+        },
+        Idx::<Expression>(1): {
+            "item": VariableRef {
+                name: ThisModule(
+                    "arg2",
+                ),
             },
-            Idx::<Expression>(2): {
-                "item": "VariableRef { name: ThisModule(\"arg3\") }",
-                "range": "35..39",
+            "range": 29..33,
+        },
+        Idx::<Expression>(2): {
+            "item": VariableRef {
+                name: ThisModule(
+                    "arg3",
+                ),
             },
-            Idx::<Expression>(3): {
-                "item": "Tuple(NonEmpty([Idx::<Expression>(0), Idx::<Expression>(1), Idx::<Expression>(2)]))",
-                "range": "22..40",
+            "range": 35..39,
+        },
+        Idx::<Expression>(3): {
+            "item": Tuple(
+                NonEmpty(
+                    [
+                        Idx::<Expression>(0),
+                        Idx::<Expression>(1),
+                        Idx::<Expression>(2),
+                    ],
+                ),
+            ),
+            "range": 22..40,
+        },
+        Idx::<Expression>(4): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                    Idx::<Pattern>(2),
+                ],
+                body: Idx::<Expression>(3),
             },
-            Idx::<Expression>(4): {
-                "item": "Lambda { args: [Idx::<Pattern>(0), Idx::<Pattern>(1), Idx::<Pattern>(2)], body: Idx::<Expression>(3) }",
-                "range": "0..40",
-            },
+            "range": 0..40,
         },
     },
     patterns: Index::<Pattern> {
-        items: {
-            Idx::<Pattern>(0): {
-                "item": "VariableDeclaration { name: ThisModule(\"arg1\") }",
-                "name": "arg1",
-                "range": "1..5",
-                "scope_id": "Idx::<Scope>(1)",
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: ThisModule(
+                    "arg1",
+                ),
             },
-            Idx::<Pattern>(1): {
-                "item": "VariableDeclaration { name: ThisModule(\"arg2\") }",
-                "name": "arg2",
-                "range": "7..11",
-                "scope_id": "Idx::<Scope>(1)",
+            "name": "arg1",
+            "range": 1..5,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableDeclaration {
+                name: ThisModule(
+                    "arg2",
+                ),
             },
-            Idx::<Pattern>(2): {
-                "item": "VariableDeclaration { name: ThisModule(\"arg3\") }",
-                "name": "arg3",
-                "range": "13..17",
-                "scope_id": "Idx::<Scope>(1)",
+            "name": "arg2",
+            "range": 7..11,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<Pattern>(2): {
+            "item": VariableDeclaration {
+                name: ThisModule(
+                    "arg3",
+                ),
             },
+            "name": "arg3",
+            "range": 13..17,
+            "scope_id": Idx::<Scope>(1),
         },
     },
     type_references: EmptyIndex::<TypeReference>,

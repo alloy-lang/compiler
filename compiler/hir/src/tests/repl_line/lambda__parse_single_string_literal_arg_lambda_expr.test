@@ -3,23 +3,28 @@
 HirModule {
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
-        items: {
-            Idx::<Expression>(0): {
-                "item": "IntLiteral(5)",
-                "range": "13..14",
+        Idx::<Expression>(0): {
+            "item": IntLiteral(
+                5,
+            ),
+            "range": 13..14,
+        },
+        Idx::<Expression>(1): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                ],
+                body: Idx::<Expression>(0),
             },
-            Idx::<Expression>(1): {
-                "item": "Lambda { args: [Idx::<Pattern>(0)], body: Idx::<Expression>(0) }",
-                "range": "0..14",
-            },
+            "range": 0..14,
         },
     },
     patterns: Index::<Pattern> {
-        items: {
-            Idx::<Pattern>(0): {
-                "item": "StringLiteral(\"hello\")",
-                "range": "1..8",
-            },
+        Idx::<Pattern>(0): {
+            "item": StringLiteral(
+                "hello",
+            ),
+            "range": 1..8,
         },
     },
     type_references: EmptyIndex::<TypeReference>,

@@ -7,41 +7,66 @@ funky(x, y, z)
 HirModule {
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
-        items: {
-            Idx::<Expression>(0): {
-                "item": "IntLiteral(0)",
-                "name": "x",
-                "range": "0..10",
-                "scope_id": "Idx::<Scope>(0)",
+        Idx::<Expression>(0): {
+            "item": IntLiteral(
+                0,
+            ),
+            "name": "x",
+            "range": 0..10,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(1): {
+            "item": IntLiteral(
+                1,
+            ),
+            "name": "y",
+            "range": 10..20,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(2): {
+            "item": IntLiteral(
+                2,
+            ),
+            "name": "z",
+            "range": 20..31,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(3): {
+            "item": VariableRef {
+                name: ThisModule(
+                    "x",
+                ),
             },
-            Idx::<Expression>(1): {
-                "item": "IntLiteral(1)",
-                "name": "y",
-                "range": "10..20",
-                "scope_id": "Idx::<Scope>(0)",
+            "range": 37..38,
+        },
+        Idx::<Expression>(4): {
+            "item": VariableRef {
+                name: ThisModule(
+                    "y",
+                ),
             },
-            Idx::<Expression>(2): {
-                "item": "IntLiteral(2)",
-                "name": "z",
-                "range": "20..31",
-                "scope_id": "Idx::<Scope>(0)",
+            "range": 40..41,
+        },
+        Idx::<Expression>(5): {
+            "item": VariableRef {
+                name: ThisModule(
+                    "z",
+                ),
             },
-            Idx::<Expression>(3): {
-                "item": "VariableRef { name: ThisModule(\"x\") }",
-                "range": "37..38",
+            "range": 43..44,
+        },
+        Idx::<Expression>(6): {
+            "item": FunctionCall {
+                target: ThisModule(
+                    "funky",
+                ),
+                args: [
+                    Idx::<Expression>(3),
+                    Idx::<Expression>(4),
+                    Idx::<Expression>(5),
+                ],
             },
-            Idx::<Expression>(4): {
-                "item": "VariableRef { name: ThisModule(\"y\") }",
-                "range": "40..41",
-            },
-            Idx::<Expression>(5): {
-                "item": "VariableRef { name: ThisModule(\"z\") }",
-                "range": "43..44",
-            },
-            Idx::<Expression>(6): {
-                "item": "FunctionCall { target: ThisModule(\"funky\"), args: [Idx::<Expression>(3), Idx::<Expression>(4), Idx::<Expression>(5)] }",
-                "range": "31..45",
-            },
+            "range": 31..45,
         },
     },
     patterns: EmptyIndex::<Pattern>,

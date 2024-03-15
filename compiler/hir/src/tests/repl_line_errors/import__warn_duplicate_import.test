@@ -5,23 +5,29 @@ let thing = map
 ===
 HirModule {
     imports: Index::<Import> {
-        items: {
-            Idx::<Import>(0): {
-                "item": "Import { segments: [\"std\", \"functor\"], last: \"map\" }",
-                "name": "map",
-                "range": "0..25",
-                "scope_id": "Idx::<Scope>(0)",
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "std",
+                    "functor",
+                ],
+                last: "map",
             },
+            "name": "map",
+            "range": 0..25,
+            "scope_id": Idx::<Scope>(0),
         },
     },
     expressions: Index::<Expression> {
-        items: {
-            Idx::<Expression>(0): {
-                "item": "VariableRef { name: ThisModule(\"map\") }",
-                "name": "thing",
-                "range": "51..66",
-                "scope_id": "Idx::<Scope>(0)",
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                name: ThisModule(
+                    "map",
+                ),
             },
+            "name": "thing",
+            "range": 51..66,
+            "scope_id": Idx::<Scope>(0),
         },
     },
     patterns: EmptyIndex::<Pattern>,

@@ -2,13 +2,17 @@ import std::functor::Functor
 ===
 HirModule {
     imports: Index::<Import> {
-        items: {
-            Idx::<Import>(0): {
-                "item": "Import { segments: [\"std\", \"functor\"], last: \"Functor\" }",
-                "name": "Functor",
-                "range": "0..28",
-                "scope_id": "Idx::<Scope>(0)",
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "std",
+                    "functor",
+                ],
+                last: "Functor",
             },
+            "name": "Functor",
+            "range": 0..28,
+            "scope_id": Idx::<Scope>(0),
         },
     },
     expressions: EmptyIndex::<Expression>,

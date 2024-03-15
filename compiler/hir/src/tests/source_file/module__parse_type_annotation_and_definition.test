@@ -8,119 +8,215 @@ module TestModule1 where
 ===
 HirModule {
     imports: Index::<Import> {
-        items: {
-            Idx::<Import>(0): {
-                "item": "Import { segments: [], last: \"TestType\" }",
-                "name": "TestType",
-                "range": "29..50",
-                "scope_id": "Idx::<Scope>(0)",
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [],
+                last: "TestType",
             },
+            "name": "TestType",
+            "range": 29..50,
+            "scope_id": Idx::<Scope>(0),
         },
     },
     expressions: Index::<Expression> {
-        items: {
-            Idx::<Expression>(0): {
-                "item": "VariableRef { name: OtherModule(Fqn { module: NonEmpty([\"TestType\"]), name: \"new\" }) }",
-                "range": "192..206",
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                name: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "TestType",
+                            ],
+                        ),
+                        name: "new",
+                    },
+                ),
             },
-            Idx::<Expression>(1): {
-                "item": "VariableRef { name: ThisModule(\"x\") }",
-                "range": "216..217",
+            "range": 192..206,
+        },
+        Idx::<Expression>(1): {
+            "item": VariableRef {
+                name: ThisModule(
+                    "x",
+                ),
             },
-            Idx::<Expression>(2): {
-                "item": "FunctionCall { target: ThisModule(\"funky\"), args: [Idx::<Expression>(1)] }",
-                "range": "210..218",
+            "range": 216..217,
+        },
+        Idx::<Expression>(2): {
+            "item": FunctionCall {
+                target: ThisModule(
+                    "funky",
+                ),
+                args: [
+                    Idx::<Expression>(1),
+                ],
             },
-            Idx::<Expression>(3): {
-                "item": "VariableRef { name: ThisModule(\"y\") }",
-                "range": "226..227",
+            "range": 210..218,
+        },
+        Idx::<Expression>(3): {
+            "item": VariableRef {
+                name: ThisModule(
+                    "y",
+                ),
             },
-            Idx::<Expression>(4): {
-                "item": "FunctionCall { target: ThisModule(\"funky\"), args: [Idx::<Expression>(3)] }",
-                "range": "220..228",
+            "range": 226..227,
+        },
+        Idx::<Expression>(4): {
+            "item": FunctionCall {
+                target: ThisModule(
+                    "funky",
+                ),
+                args: [
+                    Idx::<Expression>(3),
+                ],
             },
-            Idx::<Expression>(5): {
-                "item": "Tuple(NonEmpty([Idx::<Expression>(2), Idx::<Expression>(4)]))",
-                "range": "209..229",
+            "range": 220..228,
+        },
+        Idx::<Expression>(5): {
+            "item": Tuple(
+                NonEmpty(
+                    [
+                        Idx::<Expression>(2),
+                        Idx::<Expression>(4),
+                    ],
+                ),
+            ),
+            "range": 209..229,
+        },
+        Idx::<Expression>(6): {
+            "item": Binary {
+                op: Custom(
+                    ThisModule(
+                        "<|",
+                    ),
+                ),
+                lhs: Idx::<Expression>(0),
+                rhs: Idx::<Expression>(5),
             },
-            Idx::<Expression>(6): {
-                "item": "Binary { op: Custom(ThisModule(\"<|\")), lhs: Idx::<Expression>(0), rhs: Idx::<Expression>(5) }",
-                "range": "192..229",
+            "range": 192..229,
+        },
+        Idx::<Expression>(7): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                    Idx::<Pattern>(2),
+                ],
+                body: Idx::<Expression>(6),
             },
-            Idx::<Expression>(7): {
-                "item": "Lambda { args: [Idx::<Pattern>(0), Idx::<Pattern>(1), Idx::<Pattern>(2)], body: Idx::<Expression>(6) }",
-                "name": "testThing",
-                "range": "159..229",
-                "scope_id": "Idx::<Scope>(0)",
-            },
+            "name": "testThing",
+            "range": 159..229,
+            "scope_id": Idx::<Scope>(0),
         },
     },
     patterns: Index::<Pattern> {
-        items: {
-            Idx::<Pattern>(0): {
-                "item": "VariableDeclaration { name: ThisModule(\"funky\") }",
-                "name": "funky",
-                "range": "176..181",
-                "scope_id": "Idx::<Scope>(1)",
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: ThisModule(
+                    "funky",
+                ),
             },
-            Idx::<Pattern>(1): {
-                "item": "VariableDeclaration { name: ThisModule(\"x\") }",
-                "name": "x",
-                "range": "183..184",
-                "scope_id": "Idx::<Scope>(1)",
+            "name": "funky",
+            "range": 176..181,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableDeclaration {
+                name: ThisModule(
+                    "x",
+                ),
             },
-            Idx::<Pattern>(2): {
-                "item": "VariableDeclaration { name: ThisModule(\"y\") }",
-                "name": "y",
-                "range": "186..187",
-                "scope_id": "Idx::<Scope>(1)",
+            "name": "x",
+            "range": 183..184,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<Pattern>(2): {
+            "item": VariableDeclaration {
+                name: ThisModule(
+                    "y",
+                ),
             },
+            "name": "y",
+            "range": 186..187,
+            "scope_id": Idx::<Scope>(1),
         },
     },
     type_references: Index::<TypeReference> {
-        items: {
-            Idx::<TypeReference>(0): {
-                "item": "Named(ThisModule(\"t2\"))",
-                "range": "70..73",
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule(
+                    "t2",
+                ),
+            ),
+            "range": 70..73,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                ThisModule(
+                    "t1",
+                ),
+            ),
+            "range": 76..78,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(0),
+                return_type: Idx::<TypeReference>(1),
             },
-            Idx::<TypeReference>(1): {
-                "item": "Named(ThisModule(\"t1\"))",
-                "range": "76..78",
+            "range": 70..78,
+        },
+        Idx::<TypeReference>(3): {
+            "item": ParenthesizedType(
+                Idx::<TypeReference>(2),
+            ),
+            "range": 69..80,
+        },
+        Idx::<TypeReference>(4): {
+            "item": Named(
+                ThisModule(
+                    "t2",
+                ),
+            ),
+            "range": 83..86,
+        },
+        Idx::<TypeReference>(5): {
+            "item": Named(
+                ThisModule(
+                    "t2",
+                ),
+            ),
+            "range": 89..92,
+        },
+        Idx::<TypeReference>(6): {
+            "item": Named(
+                ThisModule(
+                    "ResultThing",
+                ),
+            ),
+            "range": 95..107,
+        },
+        Idx::<TypeReference>(7): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(5),
+                return_type: Idx::<TypeReference>(6),
             },
-            Idx::<TypeReference>(2): {
-                "item": "Lambda { arg_type: Idx::<TypeReference>(0), return_type: Idx::<TypeReference>(1) }",
-                "range": "70..78",
+            "range": 89..107,
+        },
+        Idx::<TypeReference>(8): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(4),
+                return_type: Idx::<TypeReference>(7),
             },
-            Idx::<TypeReference>(3): {
-                "item": "ParenthesizedType(Idx::<TypeReference>(2))",
-                "range": "69..80",
+            "range": 83..107,
+        },
+        Idx::<TypeReference>(9): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(3),
+                return_type: Idx::<TypeReference>(8),
             },
-            Idx::<TypeReference>(4): {
-                "item": "Named(ThisModule(\"t2\"))",
-                "range": "83..86",
-            },
-            Idx::<TypeReference>(5): {
-                "item": "Named(ThisModule(\"t2\"))",
-                "range": "89..92",
-            },
-            Idx::<TypeReference>(6): {
-                "item": "Named(ThisModule(\"ResultThing\"))",
-                "range": "95..107",
-            },
-            Idx::<TypeReference>(7): {
-                "item": "Lambda { arg_type: Idx::<TypeReference>(5), return_type: Idx::<TypeReference>(6) }",
-                "range": "89..107",
-            },
-            Idx::<TypeReference>(8): {
-                "item": "Lambda { arg_type: Idx::<TypeReference>(4), return_type: Idx::<TypeReference>(7) }",
-                "range": "83..107",
-            },
-            Idx::<TypeReference>(9): {
-                "item": "Lambda { arg_type: Idx::<TypeReference>(3), return_type: Idx::<TypeReference>(8) }",
-                "name": "testThing",
-                "range": "69..107",
-                "scope_id": "Idx::<Scope>(0)",
-            },
+            "name": "testThing",
+            "range": 69..107,
+            "scope_id": Idx::<Scope>(0),
         },
     },
     scopes: Scopes {

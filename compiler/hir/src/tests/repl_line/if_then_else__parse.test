@@ -4,33 +4,46 @@ if test then 2 else 3
 ===
 HirModule {
     imports: Index::<Import> {
-        items: {
-            Idx::<Import>(0): {
-                "item": "Import { segments: [\"test_data\"], last: \"test\" }",
-                "name": "test",
-                "range": "0..24",
-                "scope_id": "Idx::<Scope>(0)",
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "test",
             },
+            "name": "test",
+            "range": 0..24,
+            "scope_id": Idx::<Scope>(0),
         },
     },
     expressions: Index::<Expression> {
-        items: {
-            Idx::<Expression>(0): {
-                "item": "VariableRef { name: ThisModule(\"test\") }",
-                "range": "27..32",
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                name: ThisModule(
+                    "test",
+                ),
             },
-            Idx::<Expression>(1): {
-                "item": "IntLiteral(2)",
-                "range": "37..39",
+            "range": 27..32,
+        },
+        Idx::<Expression>(1): {
+            "item": IntLiteral(
+                2,
+            ),
+            "range": 37..39,
+        },
+        Idx::<Expression>(2): {
+            "item": IntLiteral(
+                3,
+            ),
+            "range": 44..45,
+        },
+        Idx::<Expression>(3): {
+            "item": IfThenElse {
+                condition: Idx::<Expression>(0),
+                then: Idx::<Expression>(1),
+                else_: Idx::<Expression>(2),
             },
-            Idx::<Expression>(2): {
-                "item": "IntLiteral(3)",
-                "range": "44..45",
-            },
-            Idx::<Expression>(3): {
-                "item": "IfThenElse { condition: Idx::<Expression>(0), then: Idx::<Expression>(1), else_: Idx::<Expression>(2) }",
-                "range": "24..45",
-            },
+            "range": 24..45,
         },
     },
     patterns: EmptyIndex::<Pattern>,

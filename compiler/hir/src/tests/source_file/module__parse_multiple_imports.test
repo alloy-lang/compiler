@@ -4,19 +4,31 @@ module TestModule1 where
 ===
 HirModule {
     imports: Index::<Import> {
-        items: {
-            Idx::<Import>(0): {
-                "item": "Import { segments: [\"really\", \"really\", \"real\"], last: \"Thing1\" }",
-                "name": "Thing1",
-                "range": "29..69",
-                "scope_id": "Idx::<Scope>(0)",
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "really",
+                    "really",
+                    "real",
+                ],
+                last: "Thing1",
             },
-            Idx::<Import>(1): {
-                "item": "Import { segments: [\"really\", \"real\", \"other\"], last: \"Thing2\" }",
-                "name": "Thing2",
-                "range": "69..103",
-                "scope_id": "Idx::<Scope>(0)",
+            "name": "Thing1",
+            "range": 29..69,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Import>(1): {
+            "item": Import {
+                segments: [
+                    "really",
+                    "real",
+                    "other",
+                ],
+                last: "Thing2",
             },
+            "name": "Thing2",
+            "range": 69..103,
+            "scope_id": Idx::<Scope>(0),
         },
     },
     expressions: EmptyIndex::<Expression>,

@@ -2,13 +2,17 @@ import std::function::(<|)
 ===
 HirModule {
     imports: Index::<Import> {
-        items: {
-            Idx::<Import>(0): {
-                "item": "Import { segments: [\"std\", \"function\"], last: \"(<|)\" }",
-                "name": "(<|)",
-                "range": "0..26",
-                "scope_id": "Idx::<Scope>(0)",
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "std",
+                    "function",
+                ],
+                last: "(<|)",
             },
+            "name": "(<|)",
+            "range": 0..26,
+            "scope_id": Idx::<Scope>(0),
         },
     },
     expressions: EmptyIndex::<Expression>,

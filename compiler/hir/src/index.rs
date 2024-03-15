@@ -26,7 +26,7 @@ impl<'a, T> Iterator for IndexIterator<'a, T> {
         if self.cursor >= self.index.items.len() {
             return None;
         }
-        if let Some(item) = self.index.items.iter().skip(self.cursor).next() {
+        if let Some(item) = self.index.items.iter().nth(self.cursor) {
             let range = self.index.item_ranges[item.0];
             let name = self.index.item_names.iter().find_map(|(key, value)| {
                 if *value == item.0 {
@@ -52,34 +52,34 @@ impl<'a, T> IndexIterator<'a, T> {
 
 impl<T: fmt::Debug> fmt::Debug for Index<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let items = self
-            .iter()
-            .map(|(id, item, range, name)| {
-                let mut properties = btreemap! {
-                    "item" => format!("{:?}", item),
-                    "range" => format!("{:?}", range),
-                };
-                if let Some((name, scope_id)) = name {
-                    properties.insert("name", format!("{name}"));
-                    properties.insert("scope_id", format!("{scope_id:?}"));
-                }
-                (id, properties)
-            })
-            .collect::<BTreeMap<_, _>>();
-
         let mut type_name = std::any::type_name::<T>();
         if let Some(idx) = type_name.rfind(':') {
             type_name = &type_name[idx + 1..];
         }
 
-        if items.is_empty() {
-            f.debug_struct(&format!("EmptyIndex::<{type_name}>"))
-                .finish()
-        } else {
-            f.debug_struct(&format!("Index::<{type_name}>"))
-                .field("items", &items)
-                .finish()
+        if self.is_empty() {
+            return f
+                .debug_struct(&format!("EmptyIndex::<{type_name}>"))
+                .finish();
         }
+
+        let mut debug_struct = f.debug_struct(&format!("Index::<{type_name}>"));
+        for (id, item, range, name_info) in self.iter() {
+            let mut properties: BTreeMap<&str, &dyn fmt::Debug> = BTreeMap::new();
+            properties.insert("item", item);
+            properties.insert("range", &range);
+
+            if let Some((name, scope_id)) = name_info {
+                properties.insert("name", &name);
+                properties.insert("scope_id", &scope_id);
+                // this is duplicated because borrowing is a little funky in an if statement
+                debug_struct.field(&format!("{id:?}"), &properties);
+            } else {
+                debug_struct.field(&format!("{id:?}"), &properties);
+            }
+        }
+
+        debug_struct.finish()
     }
 }
 
@@ -97,6 +97,10 @@ impl<T> Index<T> {
             item_ranges: ArenaMap::new(),
             item_names: FxHashMap::default(),
         }
+    }
+
+    fn is_empty(&self) -> bool {
+        self.items.is_empty()
     }
 
     fn iter(&self) -> IndexIterator<T> {

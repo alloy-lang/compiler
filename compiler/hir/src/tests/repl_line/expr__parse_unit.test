@@ -3,11 +3,9 @@
 HirModule {
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
-        items: {
-            Idx::<Expression>(0): {
-                "item": "Unit",
-                "range": "0..2",
-            },
+        Idx::<Expression>(0): {
+            "item": Unit,
+            "range": 0..2,
         },
     },
     patterns: EmptyIndex::<Pattern>,

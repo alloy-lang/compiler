@@ -3,13 +3,17 @@ import std::functor::map
 ===
 HirModule {
     imports: Index::<Import> {
-        items: {
-            Idx::<Import>(0): {
-                "item": "Import { segments: [\"std\", \"option\"], last: \"map\" }",
-                "name": "map",
-                "range": "0..24",
-                "scope_id": "Idx::<Scope>(0)",
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "std",
+                    "option",
+                ],
+                last: "map",
             },
+            "name": "map",
+            "range": 0..24,
+            "scope_id": Idx::<Scope>(0),
         },
     },
     expressions: EmptyIndex::<Expression>,
