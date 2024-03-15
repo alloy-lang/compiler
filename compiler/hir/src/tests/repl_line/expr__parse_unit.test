@@ -10,6 +10,7 @@ HirModule {
     },
     patterns: EmptyIndex::<Pattern>,
     type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

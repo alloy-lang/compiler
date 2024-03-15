@@ -126,6 +126,7 @@ HirModule {
             "scope_id": Idx::<Scope>(0),
         },
     },
+    type_definitions: EmptyIndex::<TypeDefinition>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
@@ -143,39 +144,6 @@ HirModule {
         },
     },
     warnings: [],
-    errors: [
-        LoweringError {
-            kind: UnknownReference {
-                path: ThisModule(
-                    "t1",
-                ),
-            },
-            range: 38..41,
-        },
-        LoweringError {
-            kind: UnknownReference {
-                path: ThisModule(
-                    "t1",
-                ),
-            },
-            range: 45..48,
-        },
-        LoweringError {
-            kind: UnknownReference {
-                path: ThisModule(
-                    "t2",
-                ),
-            },
-            range: 51..53,
-        },
-        LoweringError {
-            kind: UnknownReference {
-                path: ThisModule(
-                    "t2",
-                ),
-            },
-            range: 58..61,
-        },
-    ],
+    errors: [],
 }
 []

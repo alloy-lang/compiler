@@ -219,6 +219,7 @@ HirModule {
             "scope_id": Idx::<Scope>(0),
         },
     },
+    type_definitions: EmptyIndex::<TypeDefinition>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

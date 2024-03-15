@@ -1,6 +1,5 @@
 use alloy_scope::{ScopeIdx, Scopes};
 use la_arena::{Arena, ArenaMap, Idx};
-use maplit::btreemap;
 use rustc_hash::FxHashMap;
 use std::collections::BTreeMap;
 use std::fmt;
