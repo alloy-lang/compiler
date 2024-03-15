@@ -7,6 +7,7 @@ HirModule {
                 "item": "Import { segments: [\"std\", \"functor\"], last: \"Functor\" }",
                 "name": "Functor",
                 "range": "0..28",
+                "scope_id": "Idx::<Scope>(0)",
             },
         },
     },

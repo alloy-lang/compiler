@@ -11,11 +11,13 @@ HirModule {
                 "item": "IntLiteral(0)",
                 "name": "func1",
                 "range": "0..14",
+                "scope_id": "Idx::<Scope>(0)",
             },
             Idx::<Expression>(1): {
                 "item": "IntLiteral(1)",
                 "name": "func2",
                 "range": "14..29",
+                "scope_id": "Idx::<Scope>(0)",
             },
             Idx::<Expression>(2): {
                 "item": "VariableRef { name: ThisModule(\"func1\") }",
@@ -29,6 +31,7 @@ HirModule {
                 "item": "FunctionCall { target: ThisModule(\">>\"), args: [Idx::<Expression>(2), Idx::<Expression>(3)] }",
                 "name": "result",
                 "range": "29..58",
+                "scope_id": "Idx::<Scope>(0)",
             },
         },
     },

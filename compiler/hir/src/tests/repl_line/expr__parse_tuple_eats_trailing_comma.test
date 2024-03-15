@@ -10,6 +10,7 @@ HirModule {
                 "item": "IntLiteral(0)",
                 "name": "foo",
                 "range": "0..13",
+                "scope_id": "Idx::<Scope>(0)",
             },
             Idx::<Expression>(1): {
                 "item": "IntLiteral(1)",

@@ -10,6 +10,7 @@ HirModule {
                 "item": "IntLiteral(0)",
                 "name": "counter",
                 "range": "0..17",
+                "scope_id": "Idx::<Scope>(0)",
             },
             Idx::<Expression>(1): {
                 "item": "VariableRef { name: ThisModule(\"counter\") }",

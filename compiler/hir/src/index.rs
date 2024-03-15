@@ -4,7 +4,7 @@ use maplit::btreemap;
 use rustc_hash::FxHashMap;
 use std::collections::BTreeMap;
 use std::fmt;
-use text_size::TextRange;
+use text_size::{TextRange};
 
 use crate::Name;
 
@@ -14,29 +14,57 @@ pub struct Index<T> {
     item_names: FxHashMap<(Name, ScopeIdx), Idx<T>>,
 }
 
-impl<T: fmt::Debug> fmt::Debug for Index<T> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut items = BTreeMap::new();
+struct IndexIterator<'a, T> {
+    cursor: usize,
+    index: &'a Index<T>,
+}
 
-        for (id, item) in self.items.iter() {
-            let range = self.item_ranges[id];
-            let name = self.item_names.iter().find_map(|(key, value)| {
-                if *value == id {
-                    Some(key.0.clone().0)
+impl<'a, T> Iterator for IndexIterator<'a, T> {
+    type Item = (Idx<T>, &'a T, TextRange, Option<(Name, ScopeIdx)>);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.cursor >= self.index.items.len() {
+            return None;
+        }
+        if let Some(item) = self.index.items.iter().skip(self.cursor).next() {
+            let range = self.index.item_ranges[item.0];
+            let name = self.index.item_names.iter().find_map(|(key, value)| {
+                if *value == item.0 {
+                    Some(key.clone())
                 } else {
                     None
                 }
             });
 
-            let mut properties = btreemap! {
-                "item" => format!("{:?}", item),
-                "range" => format!("{:?}", range),
-            };
-            if let Some(name) = name {
-                properties.insert("name", name.to_string());
-            }
-            items.insert(id, properties);
+            self.cursor += 1;
+            Some((item.0, item.1, range, name))
+        } else {
+            None
         }
+    }
+}
+
+impl<'a, T> IndexIterator<'a, T> {
+    pub fn new(index: &'a Index<T>) -> Self {
+        Self { cursor: 0, index }
+    }
+}
+
+impl<T: fmt::Debug> fmt::Debug for Index<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let items = self.iter()
+            .map(|(id, item, range, name)| {
+                let mut properties = btreemap! {
+                    "item" => format!("{:?}", item),
+                    "range" => format!("{:?}", range),
+                };
+                if let Some((name, scope_id)) = name {
+                    properties.insert("name", format!("{name}"));
+                    properties.insert("scope_id", format!("{scope_id:?}"));
+                }
+                (id, properties)
+            })
+            .collect::<BTreeMap<_, _>>();
 
         let mut type_name = std::any::type_name::<T>();
         if let Some(idx) = type_name.rfind(':') {
@@ -68,6 +96,10 @@ impl<T> Index<T> {
             item_ranges: ArenaMap::new(),
             item_names: FxHashMap::default(),
         }
+    }
+
+    fn iter(&self) -> IndexIterator<T> {
+        IndexIterator::new(self)
     }
 
     pub(crate) fn insert_named(

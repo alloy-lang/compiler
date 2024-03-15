@@ -26,6 +26,7 @@ HirModule {
                 "item": "Lambda { arg_type: Idx::<TypeReference>(0), return_type: Idx::<TypeReference>(3) }",
                 "name": "test",
                 "range": "14..33",
+                "scope_id": "Idx::<Scope>(0)",
             },
         },
     },

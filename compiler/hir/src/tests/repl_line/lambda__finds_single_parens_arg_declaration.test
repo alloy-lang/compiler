@@ -28,6 +28,7 @@ HirModule {
                 "item": "VariableDeclaration { name: ThisModule(\"a\") }",
                 "name": "a",
                 "range": "1..4",
+                "scope_id": "Idx::<Scope>(1)",
             },
         },
     },

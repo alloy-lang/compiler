@@ -9,6 +9,7 @@ HirModule {
                 "item": "Import { segments: [\"std\", \"option\"], last: \"Option\" }",
                 "name": "Option",
                 "range": "0..28",
+                "scope_id": "Idx::<Scope>(0)",
             },
         },
     },
@@ -30,6 +31,7 @@ HirModule {
                 "item": "VariableDeclaration { name: ThisModule(\"x\") }",
                 "name": "x",
                 "range": "42..43",
+                "scope_id": "Idx::<Scope>(1)",
             },
             Idx::<Pattern>(1): {
                 "item": "Destructure { target: OtherModule(Fqn { module: NonEmpty([\"Option\"]), name: \"Some\" }), args: [Idx::<Pattern>(0)] }",

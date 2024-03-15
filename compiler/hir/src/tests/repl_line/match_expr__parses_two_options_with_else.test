@@ -13,6 +13,7 @@ HirModule {
                 "item": "Import { segments: [\"std\", \"bool\", \"Bool\"], last: \"True\" }",
                 "name": "True",
                 "range": "0..30",
+                "scope_id": "Idx::<Scope>(0)",
             },
         },
     },
@@ -22,6 +23,7 @@ HirModule {
                 "item": "VariableRef { name: ThisModule(\"True\") }",
                 "name": "test",
                 "range": "30..47",
+                "scope_id": "Idx::<Scope>(0)",
             },
             Idx::<Expression>(1): {
                 "item": "VariableRef { name: ThisModule(\"test\") }",

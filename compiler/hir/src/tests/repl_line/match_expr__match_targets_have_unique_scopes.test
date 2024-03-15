@@ -12,11 +12,13 @@ HirModule {
                 "item": "Import { segments: [\"std\", \"either\"], last: \"Either\" }",
                 "name": "Either",
                 "range": "0..27",
+                "scope_id": "Idx::<Scope>(0)",
             },
             Idx::<Import>(1): {
                 "item": "Import { segments: [], last: \"test\" }",
                 "name": "test",
                 "range": "27..40",
+                "scope_id": "Idx::<Scope>(0)",
             },
         },
     },
@@ -46,6 +48,7 @@ HirModule {
                 "item": "VariableDeclaration { name: ThisModule(\"x\") }",
                 "name": "x",
                 "range": "73..74",
+                "scope_id": "Idx::<Scope>(1)",
             },
             Idx::<Pattern>(1): {
                 "item": "Destructure { target: OtherModule(Fqn { module: NonEmpty([\"Either\"]), name: \"Left\" }), args: [Idx::<Pattern>(0)] }",
@@ -55,6 +58,7 @@ HirModule {
                 "item": "VariableDeclaration { name: ThisModule(\"x\") }",
                 "name": "x",
                 "range": "100..101",
+                "scope_id": "Idx::<Scope>(2)",
             },
             Idx::<Pattern>(3): {
                 "item": "Destructure { target: OtherModule(Fqn { module: NonEmpty([\"Either\"]), name: \"Right\" }), args: [Idx::<Pattern>(2)] }",

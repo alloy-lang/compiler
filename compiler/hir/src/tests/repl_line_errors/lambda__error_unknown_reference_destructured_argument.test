@@ -20,6 +20,7 @@ HirModule {
                 "item": "VariableDeclaration { name: ThisModule(\"x\") }",
                 "name": "x",
                 "range": "14..15",
+                "scope_id": "Idx::<Scope>(1)",
             },
             Idx::<Pattern>(1): {
                 "item": "Destructure { target: OtherModule(Fqn { module: NonEmpty([\"Option\"]), name: \"Some\" }), args: [Idx::<Pattern>(0)] }",

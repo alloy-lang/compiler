@@ -7,6 +7,7 @@ HirModule {
                 "item": "Import { segments: [\"std\", \"function\"], last: \"(<|)\" }",
                 "name": "(<|)",
                 "range": "0..26",
+                "scope_id": "Idx::<Scope>(0)",
             },
         },
     },
