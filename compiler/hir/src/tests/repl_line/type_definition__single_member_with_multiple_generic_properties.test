@@ -1,0 +1,63 @@
+typedef Test[t1, t2] = Thing t1 t2
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule(
+                    "t1",
+                ),
+            ),
+            "range": 29..32,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                ThisModule(
+                    "t2",
+                ),
+            ),
+            "range": 32..34,
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "Test",
+                kind: Single(
+                    TypeDefinitionMember {
+                        name: "Thing",
+                        properties: [
+                            Idx::<TypeReference>(0),
+                            Idx::<TypeReference>(1),
+                        ],
+                    },
+                ),
+            },
+            "name": "Test",
+            "range": 0..34,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]

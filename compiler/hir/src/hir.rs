@@ -99,6 +99,11 @@ pub enum LoweringErrorKind {
         first: TextRange,
         second: TextRange,
     },
+    ConflictingTypeDefinitionName {
+        name: Name,
+        first: TextRange,
+        second: TextRange,
+    },
     UnknownReference {
         path: Path,
     },
@@ -275,6 +280,28 @@ impl LoweringCtx {
             }
             Ok(pid) => pid,
         };
+    }
+
+    pub(crate) fn add_type_definition(
+        &mut self,
+        type_definition: TypeDefinition,
+        element: &SyntaxElement,
+    ) {
+        let res = self.type_definitions.insert_named(
+            type_definition.name.clone(),
+            type_definition,
+            element.text_range(),
+            &self.scopes,
+        );
+
+        if let Err(err) = res {
+            let err = LoweringErrorKind::ConflictingTypeDefinitionName {
+                name: err.name,
+                first: err.first,
+                second: err.second,
+            };
+            self.error(err, element.text_range());
+        }
     }
 
     pub(crate) fn add_import(&mut self, path: &NonEmpty<Name>, element: &SyntaxElement) {

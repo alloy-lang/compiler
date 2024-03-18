@@ -1,0 +1,52 @@
+typedef Test =
+  | Empty1
+  | Empty2
+end
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "Test",
+                kind: Union(
+                    [
+                        TypeDefinitionMember {
+                            name: "Empty1",
+                            properties: [],
+                        },
+                        TypeDefinitionMember {
+                            name: "Empty2",
+                            properties: [],
+                        },
+                    ],
+                ),
+            },
+            "name": "Test",
+            "range": 0..40,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]

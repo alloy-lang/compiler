@@ -1,0 +1,67 @@
+typedef Test = Thing (Int, String)
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": BuiltIn(
+                Int,
+            ),
+            "range": 22..25,
+        },
+        Idx::<TypeReference>(1): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 27..33,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Tuple(
+                [
+                    Idx::<TypeReference>(0),
+                    Idx::<TypeReference>(1),
+                ],
+            ),
+            "range": 21..34,
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "Test",
+                kind: Single(
+                    TypeDefinitionMember {
+                        name: "Thing",
+                        properties: [
+                            Idx::<TypeReference>(2),
+                        ],
+                    },
+                ),
+            },
+            "name": "Test",
+            "range": 0..34,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]

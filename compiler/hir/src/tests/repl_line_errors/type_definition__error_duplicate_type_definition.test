@@ -1,0 +1,57 @@
+typedef TestConflict = Empty
+typedef TestConflict = Empty
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "TestConflict",
+                kind: Single(
+                    TypeDefinitionMember {
+                        name: "Empty",
+                        properties: [],
+                    },
+                ),
+            },
+            "name": "TestConflict",
+            "range": 0..29,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        LoweringError {
+            kind: ConflictingTypeDefinitionName {
+                name: "TestConflict",
+                first: 0..29,
+                second: 29..57,
+            },
+            range: 29..57,
+        },
+    ],
+}
+[]
