@@ -214,7 +214,7 @@ impl LoweringCtx {
         match &pattern {
             Pattern::VariableDeclaration { name } => {
                 let res = self.patterns.insert_named(
-                    name.local_name().clone(),
+                    name.clone(),
                     pattern,
                     element.text_range(),
                     &self.scopes,

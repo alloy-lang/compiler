@@ -32,8 +32,7 @@ SourceFile@0..168
           LParen@24..25 "("
           DestructureArg@25..26
             VariableDeclaration@25..26
-              Path@25..26
-                Ident@25..26 "x"
+              Ident@25..26 "x"
           RParen@26..27 ")"
           Whitespace@27..28 " "
       RightArrow@28..30 "->"

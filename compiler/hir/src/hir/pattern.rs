@@ -12,7 +12,7 @@ pub enum Pattern {
     StringLiteral(String),
     CharLiteral(char),
     VariableRef { name: Path },
-    VariableDeclaration { name: Path },
+    VariableDeclaration { name: Name },
     Nil,
     Destructure { target: Path, args: Vec<PatternIdx> },
     Unit,
@@ -99,16 +99,12 @@ fn lower_destructure(ctx: &mut LoweringCtx, destructure: &ast::Destructure) -> P
     Pattern::Destructure { target, args }
 }
 
-pub(super) fn lower_variable_declaration(var: &ast::VariableDeclaration) -> Path {
-    let Some(path) = var.name() else {
+pub(super) fn lower_variable_declaration(var: &ast::VariableDeclaration) -> Name {
+    let Some(name) = var.name() else {
         unreachable!("parsing error")
     };
 
-    let Ok(name) = Path::try_from(path.segments()) else {
-        unreachable!("parsing error")
-    };
-
-    name
+    Name::new(name.text())
 }
 
 pub(super) fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Path {

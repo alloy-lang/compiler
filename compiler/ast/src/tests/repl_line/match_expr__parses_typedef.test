@@ -110,10 +110,8 @@ match test when
                                         VariableDeclaration(
                                             VariableDeclaration {
                                                 name: Some(
-                                                    Path {
-                                                        segments: [
-                                                            "l",
-                                                        ],
+                                                    Ident {
+                                                        text: "l",
                                                     },
                                                 ),
                                             },
@@ -156,10 +154,8 @@ match test when
                                         VariableDeclaration(
                                             VariableDeclaration {
                                                 name: Some(
-                                                    Path {
-                                                        segments: [
-                                                            "r",
-                                                        ],
+                                                    Ident {
+                                                        text: "r",
                                                     },
                                                 ),
                                             },

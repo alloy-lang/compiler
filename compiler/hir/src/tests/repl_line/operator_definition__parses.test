@@ -44,9 +44,7 @@ HirModule {
     patterns: Index::<Pattern> {
         Idx::<Pattern>(0): {
             "item": VariableDeclaration {
-                name: ThisModule(
-                    "x",
-                ),
+                name: "x",
             },
             "name": "x",
             "range": 109..110,
@@ -54,9 +52,7 @@ HirModule {
         },
         Idx::<Pattern>(1): {
             "item": VariableDeclaration {
-                name: ThisModule(
-                    "f",
-                ),
+                name: "f",
             },
             "name": "f",
             "range": 112..113,

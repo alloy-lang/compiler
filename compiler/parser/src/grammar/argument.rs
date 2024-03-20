@@ -63,12 +63,9 @@ fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
 }
 
 fn parse_variable_declaration(p: &mut Parser) -> CompletedMarker {
-    path::parse_path(
-        p,
-        ParseErrorContext::VariableDeclaration,
-        ts![],
-        SyntaxKind::VariableDeclaration,
-    )
+    let parent_m = p.start();
+    p.expect(TokenKind::Ident, ParseErrorContext::VariableDeclaration);
+    parent_m.complete(p, SyntaxKind::VariableDeclaration)
 }
 
 fn maybe_parse_typedef_destructure(p: &mut Parser, lhs: CompletedMarker) -> CompletedMarker {

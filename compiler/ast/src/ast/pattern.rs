@@ -72,7 +72,7 @@ ast_node!(VariableDeclaration, fields: [name]);
 
 impl VariableDeclaration {
     #[must_use]
-    pub fn name(&self) -> Option<Path> {
+    pub fn name(&self) -> Option<Ident> {
         first_child(self)
     }
 }

@@ -160,8 +160,7 @@ SourceFile@0..819
           Pipe@208..209 "|"
           LambdaExprArg@209..210
             VariableDeclaration@209..210
-              Path@209..210
-                Ident@209..210 "x"
+              Ident@209..210 "x"
           Pipe@210..211 "|"
           Whitespace@211..212 " "
         RightArrow@212..214 "->"
@@ -228,14 +227,12 @@ SourceFile@0..819
           Pipe@320..321 "|"
           LambdaExprArg@321..322
             VariableDeclaration@321..322
-              Path@321..322
-                Ident@321..322 "x"
+              Ident@321..322 "x"
           Comma@322..323 ","
           Whitespace@323..324 " "
           LambdaExprArg@324..325
             VariableDeclaration@324..325
-              Path@324..325
-                Ident@324..325 "y"
+              Ident@324..325 "y"
           Pipe@325..326 "|"
           Whitespace@326..327 " "
         RightArrow@327..329 "->"
@@ -299,14 +296,12 @@ SourceFile@0..819
             Pipe@400..401 "|"
             LambdaExprArg@401..405
               VariableDeclaration@401..405
-                Path@401..405
-                  Ident@401..405 "left"
+                Ident@401..405 "left"
             Comma@405..406 ","
             Whitespace@406..407 " "
             LambdaExprArg@407..412
               VariableDeclaration@407..412
-                Path@407..412
-                  Ident@407..412 "right"
+                Ident@407..412 "right"
             Pipe@412..413 "|"
             Whitespace@413..414 " "
           RightArrow@414..416 "->"
@@ -372,14 +367,12 @@ SourceFile@0..819
             Pipe@514..515 "|"
             LambdaExprArg@515..519
               VariableDeclaration@515..519
-                Path@515..519
-                  Ident@515..519 "left"
+                Ident@515..519 "left"
             Comma@519..520 ","
             Whitespace@520..521 " "
             LambdaExprArg@521..526
               VariableDeclaration@521..526
-                Path@521..526
-                  Ident@521..526 "right"
+                Ident@521..526 "right"
             Pipe@526..527 "|"
             Whitespace@527..528 " "
           RightArrow@528..530 "->"
@@ -542,8 +535,7 @@ SourceFile@0..819
             Pipe@766..767 "|"
             LambdaExprArg@767..768
               VariableDeclaration@767..768
-                Path@767..768
-                  Ident@767..768 "x"
+                Ident@767..768 "x"
             Pipe@768..769 "|"
             Whitespace@769..770 " "
           RightArrow@770..772 "->"

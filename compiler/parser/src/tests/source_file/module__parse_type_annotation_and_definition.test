@@ -84,20 +84,17 @@ SourceFile@0..208
           Pipe@154..155 "|"
           LambdaExprArg@155..160
             VariableDeclaration@155..160
-              Path@155..160
-                Ident@155..160 "funky"
+              Ident@155..160 "funky"
           Comma@160..161 ","
           Whitespace@161..162 " "
           LambdaExprArg@162..163
             VariableDeclaration@162..163
-              Path@162..163
-                Ident@162..163 "x"
+              Ident@162..163 "x"
           Comma@163..164 ","
           Whitespace@164..165 " "
           LambdaExprArg@165..166
             VariableDeclaration@165..166
-              Path@165..166
-                Ident@165..166 "y"
+              Ident@165..166 "y"
           Pipe@166..167 "|"
           Whitespace@167..168 " "
         RightArrow@168..170 "->"

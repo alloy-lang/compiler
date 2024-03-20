@@ -6,9 +6,8 @@ SourceFile@0..20
       Pipe@0..1 "|"
       LambdaExprArg@1..6
         VariableDeclaration@1..6
-          Path@1..6
-            Ident@1..5 "arg1"
-            Whitespace@5..6 " "
+          Ident@1..5 "arg1"
+          Whitespace@5..6 " "
       LambdaExprArg@6..11
         IntLiteral@6..11
           Integer@6..10 "1001"

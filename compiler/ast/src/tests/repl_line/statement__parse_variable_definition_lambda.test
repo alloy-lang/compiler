@@ -15,10 +15,8 @@ let add = |a, b| -> a + b
                                     VariableDeclaration(
                                         VariableDeclaration {
                                             name: Some(
-                                                Path {
-                                                    segments: [
-                                                        "a",
-                                                    ],
+                                                Ident {
+                                                    text: "a",
                                                 },
                                             ),
                                         },
@@ -30,10 +28,8 @@ let add = |a, b| -> a + b
                                     VariableDeclaration(
                                         VariableDeclaration {
                                             name: Some(
-                                                Path {
-                                                    segments: [
-                                                        "b",
-                                                    ],
+                                                Ident {
+                                                    text: "b",
                                                 },
                                             ),
                                         },

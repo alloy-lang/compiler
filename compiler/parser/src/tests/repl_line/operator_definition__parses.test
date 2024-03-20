@@ -63,14 +63,12 @@ SourceFile@0..103
         Pipe@84..85 "|"
         LambdaExprArg@85..86
           VariableDeclaration@85..86
-            Path@85..86
-              Ident@85..86 "x"
+            Ident@85..86 "x"
         Comma@86..87 ","
         Whitespace@87..88 " "
         LambdaExprArg@88..89
           VariableDeclaration@88..89
-            Path@88..89
-              Ident@88..89 "f"
+            Ident@88..89 "f"
         Pipe@89..90 "|"
         Whitespace@90..91 " "
       RightArrow@91..93 "->"

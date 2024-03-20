@@ -6,15 +6,13 @@ SourceFile@0..16
       Pipe@0..1 "|"
       LambdaExprArg@1..5
         VariableDeclaration@1..5
-          Path@1..5
-            Ident@1..5 "arg1"
+          Ident@1..5 "arg1"
       Comma@5..6 ","
       Whitespace@6..7 " "
       LambdaExprArg@7..12
         VariableDeclaration@7..12
-          Path@7..12
-            Ident@7..11 "arg2"
-            Whitespace@11..12 " "
+          Ident@7..11 "arg2"
+          Whitespace@11..12 " "
     RightArrow@12..14 "->"
     Whitespace@14..15 " "
     LambdaExprBody@15..16

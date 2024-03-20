@@ -15,8 +15,7 @@ SourceFile@0..22
           LParen@13..14 "("
           DestructureArg@14..15
             VariableDeclaration@14..15
-              Path@14..15
-                Ident@14..15 "x"
+              Ident@14..15 "x"
           RParen@15..16 ")"
       Pipe@16..17 "|"
       Whitespace@17..18 " "

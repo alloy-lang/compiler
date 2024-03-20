@@ -152,10 +152,8 @@ Some(
                                         VariableDeclaration(
                                             VariableDeclaration {
                                                 name: Some(
-                                                    Path {
-                                                        segments: [
-                                                            "funky",
-                                                        ],
+                                                    Ident {
+                                                        text: "funky",
                                                     },
                                                 ),
                                             },
@@ -167,10 +165,8 @@ Some(
                                         VariableDeclaration(
                                             VariableDeclaration {
                                                 name: Some(
-                                                    Path {
-                                                        segments: [
-                                                            "x",
-                                                        ],
+                                                    Ident {
+                                                        text: "x",
                                                     },
                                                 ),
                                             },
@@ -182,10 +178,8 @@ Some(
                                         VariableDeclaration(
                                             VariableDeclaration {
                                                 name: Some(
-                                                    Path {
-                                                        segments: [
-                                                            "y",
-                                                        ],
+                                                    Ident {
+                                                        text: "y",
                                                     },
                                                 ),
                                             },

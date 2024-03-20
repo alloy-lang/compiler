@@ -10,10 +10,8 @@
                             VariableDeclaration(
                                 VariableDeclaration {
                                     name: Some(
-                                        Path {
-                                            segments: [
-                                                "arg1",
-                                            ],
+                                        Ident {
+                                            text: "arg1",
                                         },
                                     ),
                                 },
@@ -25,10 +23,8 @@
                             VariableDeclaration(
                                 VariableDeclaration {
                                     name: Some(
-                                        Path {
-                                            segments: [
-                                                "arg2",
-                                            ],
+                                        Ident {
+                                            text: "arg2",
                                         },
                                     ),
                                 },
@@ -40,10 +36,8 @@
                             VariableDeclaration(
                                 VariableDeclaration {
                                     name: Some(
-                                        Path {
-                                            segments: [
-                                                "arg3",
-                                            ],
+                                        Ident {
+                                            text: "arg3",
                                         },
                                     ),
                                 },

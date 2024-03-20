@@ -25,10 +25,8 @@
                                         VariableDeclaration(
                                             VariableDeclaration {
                                                 name: Some(
-                                                    Path {
-                                                        segments: [
-                                                            "x",
-                                                        ],
+                                                    Ident {
+                                                        text: "x",
                                                     },
                                                 ),
                                             },

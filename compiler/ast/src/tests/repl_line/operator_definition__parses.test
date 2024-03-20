@@ -115,10 +115,8 @@ let (|>) = |x, f| -> fakeStuff
                                     VariableDeclaration(
                                         VariableDeclaration {
                                             name: Some(
-                                                Path {
-                                                    segments: [
-                                                        "x",
-                                                    ],
+                                                Ident {
+                                                    text: "x",
                                                 },
                                             ),
                                         },
@@ -130,10 +128,8 @@ let (|>) = |x, f| -> fakeStuff
                                     VariableDeclaration(
                                         VariableDeclaration {
                                             name: Some(
-                                                Path {
-                                                    segments: [
-                                                        "f",
-                                                    ],
+                                                Ident {
+                                                    text: "f",
                                                 },
                                             ),
                                         },

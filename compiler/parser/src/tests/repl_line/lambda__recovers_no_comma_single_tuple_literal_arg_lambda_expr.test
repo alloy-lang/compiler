@@ -9,13 +9,11 @@ SourceFile@0..12
           LParen@1..2 "("
           TuplePatternArg@2..4
             VariableDeclaration@2..4
-              Path@2..4
-                Ident@2..3 "a"
-                Whitespace@3..4 " "
+              Ident@2..3 "a"
+              Whitespace@3..4 " "
           TuplePatternArg@4..5
             VariableDeclaration@4..5
-              Path@4..5
-                Ident@4..5 "b"
+              Ident@4..5 "b"
           RParen@5..6 ")"
       Pipe@6..7 "|"
       Whitespace@7..8 " "
