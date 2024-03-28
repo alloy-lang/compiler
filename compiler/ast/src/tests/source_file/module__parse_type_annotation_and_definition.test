@@ -6,6 +6,9 @@ module TestModule1 where
 ===
 Some(
     ModuleDef {
+        name: Some(
+            "TestModule1",
+        ),
         imports: [],
         traits: [],
         behaviors: [],

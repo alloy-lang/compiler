@@ -1,9 +1,13 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-ast_node!(ModuleDef, fields: [imports, traits, behaviors, type_definitions, type_annotations, values]);
+ast_node!(ModuleDef, fields: [name, imports, traits, behaviors, type_definitions, type_annotations, values]);
 
 impl ModuleDef {
+    #[must_use]
+    pub fn name(&self) -> Option<String> {
+        first_ident(self)
+    }
     #[must_use]
     pub fn imports(&self) -> Vec<ImportDef> {
         children(self)
