@@ -22,7 +22,7 @@ HirModule {
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                name: OtherModule(
+                path: OtherModule(
                     Fqn {
                         module: NonEmpty(
                             [

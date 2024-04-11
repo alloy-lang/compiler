@@ -21,7 +21,7 @@ HirModule {
         },
         Idx::<Expression>(2): {
             "item": VariableRef {
-                name: ThisModule(
+                path: ThisModule(
                     NonEmpty(
                         [
                             "foo",

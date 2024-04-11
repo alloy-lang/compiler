@@ -35,7 +35,7 @@ HirModule {
         },
         Idx::<Expression>(3): {
             "item": VariableRef {
-                name: ThisModule(
+                path: ThisModule(
                     NonEmpty(
                         [
                             "x1",
@@ -48,7 +48,7 @@ HirModule {
         },
         Idx::<Expression>(4): {
             "item": VariableRef {
-                name: ThisModule(
+                path: ThisModule(
                     NonEmpty(
                         [
                             "y1",
@@ -69,7 +69,7 @@ HirModule {
         },
         Idx::<Expression>(6): {
             "item": VariableRef {
-                name: ThisModule(
+                path: ThisModule(
                     NonEmpty(
                         [
                             "z1",
@@ -103,7 +103,7 @@ HirModule {
         },
         Idx::<Expression>(9): {
             "item": VariableRef {
-                name: ThisModule(
+                path: ThisModule(
                     NonEmpty(
                         [
                             "x",
@@ -116,7 +116,7 @@ HirModule {
         },
         Idx::<Expression>(10): {
             "item": VariableRef {
-                name: ThisModule(
+                path: ThisModule(
                     NonEmpty(
                         [
                             "y",
@@ -129,7 +129,7 @@ HirModule {
         },
         Idx::<Expression>(11): {
             "item": VariableRef {
-                name: ThisModule(
+                path: ThisModule(
                     NonEmpty(
                         [
                             "z",

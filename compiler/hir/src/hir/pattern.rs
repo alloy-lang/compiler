@@ -12,7 +12,7 @@ pub enum Pattern {
     StringLiteral(String),
     CharLiteral(char),
     VariableRef {
-        name: Path,
+        path: Path,
         scope: ScopeIdx,
     },
     VariableDeclaration {
@@ -60,7 +60,7 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
             Pattern::CharLiteral(value)
         }
         ast::Pattern::VariableRef(var) => Pattern::VariableRef {
-            name: lower_variable_ref(ctx, var),
+            path: lower_variable_ref(ctx, var),
             scope: ctx.scopes.current_scope(),
         },
         ast::Pattern::VariableDeclaration(var) => Pattern::VariableDeclaration {

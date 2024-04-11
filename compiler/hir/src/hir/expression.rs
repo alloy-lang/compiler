@@ -14,7 +14,7 @@ pub enum Expression {
     StringLiteral(String),
     CharLiteral(char),
     VariableRef {
-        name: Path,
+        path: Path,
         scope: ScopeIdx,
     },
     Binary {
@@ -159,7 +159,7 @@ fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Expressi
     };
 
     Expression::VariableRef {
-        name: path,
+        path,
         scope: ctx.scopes.current_scope(),
     }
 }

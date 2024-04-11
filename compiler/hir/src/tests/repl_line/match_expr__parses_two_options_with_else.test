@@ -24,7 +24,7 @@ HirModule {
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                name: OtherModule(
+                path: OtherModule(
                     Fqn {
                         module: NonEmpty(
                             [
@@ -44,7 +44,7 @@ HirModule {
         },
         Idx::<Expression>(1): {
             "item": VariableRef {
-                name: ThisModule(
+                path: ThisModule(
                     NonEmpty(
                         [
                             "test",
@@ -87,7 +87,7 @@ HirModule {
     patterns: Index::<Pattern> {
         Idx::<Pattern>(0): {
             "item": VariableRef {
-                name: OtherModule(
+                path: OtherModule(
                     Fqn {
                         module: NonEmpty(
                             [

@@ -5,7 +5,7 @@ HirModule {
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                name: ThisModule(
+                path: ThisModule(
                     NonEmpty(
                         [
                             "arg1",
@@ -18,7 +18,7 @@ HirModule {
         },
         Idx::<Expression>(1): {
             "item": VariableRef {
-                name: ThisModule(
+                path: ThisModule(
                     NonEmpty(
                         [
                             "arg2",
@@ -31,7 +31,7 @@ HirModule {
         },
         Idx::<Expression>(2): {
             "item": VariableRef {
-                name: ThisModule(
+                path: ThisModule(
                     NonEmpty(
                         [
                             "arg3",
