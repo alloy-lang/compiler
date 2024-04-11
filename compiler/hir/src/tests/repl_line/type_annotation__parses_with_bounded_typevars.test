@@ -1,0 +1,224 @@
+import std::option::Option
+
+typeof apply : Option[(t1 -> t2)] -> Option[t1] -> Option[t2] where
+    typevar t1
+    typevar t2
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "std",
+                    "option",
+                ],
+                last: "Option",
+            },
+            "name": "Option",
+            "range": 0..28,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "option",
+                            ],
+                        ),
+                        name: "Option",
+                        sub_path: [],
+                    },
+                ),
+            ),
+            "range": 43..49,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "t1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 51..54,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "t2",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 57..59,
+        },
+        Idx::<TypeReference>(3): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(1),
+                return_type: Idx::<TypeReference>(2),
+            },
+            "range": 51..59,
+        },
+        Idx::<TypeReference>(4): {
+            "item": ParenthesizedType(
+                Idx::<TypeReference>(3),
+            ),
+            "range": 50..60,
+        },
+        Idx::<TypeReference>(5): {
+            "item": Bounded {
+                base: Idx::<TypeReference>(0),
+                args: [
+                    Idx::<TypeReference>(4),
+                ],
+            },
+            "range": 43..62,
+        },
+        Idx::<TypeReference>(6): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "option",
+                            ],
+                        ),
+                        name: "Option",
+                        sub_path: [],
+                    },
+                ),
+            ),
+            "range": 65..71,
+        },
+        Idx::<TypeReference>(7): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "t1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 72..74,
+        },
+        Idx::<TypeReference>(8): {
+            "item": Bounded {
+                base: Idx::<TypeReference>(6),
+                args: [
+                    Idx::<TypeReference>(7),
+                ],
+            },
+            "range": 65..76,
+        },
+        Idx::<TypeReference>(9): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "option",
+                            ],
+                        ),
+                        name: "Option",
+                        sub_path: [],
+                    },
+                ),
+            ),
+            "range": 79..85,
+        },
+        Idx::<TypeReference>(10): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "t2",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 86..88,
+        },
+        Idx::<TypeReference>(11): {
+            "item": Bounded {
+                base: Idx::<TypeReference>(9),
+                args: [
+                    Idx::<TypeReference>(10),
+                ],
+            },
+            "range": 79..90,
+        },
+        Idx::<TypeReference>(12): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(8),
+                return_type: Idx::<TypeReference>(11),
+            },
+            "range": 65..90,
+        },
+        Idx::<TypeReference>(13): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(5),
+                return_type: Idx::<TypeReference>(12),
+            },
+            "name": "apply",
+            "range": 43..90,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t1",
+            "range": 100..115,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "t2",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t2",
+            "range": 115..125,
+            "scope_id": Idx::<Scope>(1),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]

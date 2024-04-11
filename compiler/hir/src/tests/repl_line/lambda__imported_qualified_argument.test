@@ -41,12 +41,17 @@ HirModule {
                     Fqn {
                         module: NonEmpty(
                             [
-                                "Option",
+                                "std",
+                                "option",
                             ],
                         ),
-                        name: "None",
+                        name: "Option",
+                        sub_path: [
+                            "None",
+                        ],
                     },
                 ),
+                scope: Idx::<Scope>(1),
             },
             "range": 29..41,
         },

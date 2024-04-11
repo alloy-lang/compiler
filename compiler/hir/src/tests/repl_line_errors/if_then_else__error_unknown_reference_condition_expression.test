@@ -5,9 +5,14 @@ HirModule {
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                name: ThisModule(
-                    "test",
+                name: Unknown(
+                    NonEmpty(
+                        [
+                            "test",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(0),
             },
             "range": 3..8,
         },
@@ -51,9 +56,13 @@ HirModule {
     errors: [
         LoweringError {
             kind: UnknownReference {
-                path: ThisModule(
-                    "test",
+                reference: "test",
+                path: NonEmpty(
+                    [
+                        "test",
+                    ],
                 ),
+                current_scope: Idx::<Scope>(0),
             },
             range: 3..8,
         },

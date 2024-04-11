@@ -1,51 +1,21 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-use std::convert::TryFrom;
-
 #[derive(Debug, Clone, PartialEq)]
 pub enum Path {
-    ThisModule(Name),
+    ThisModule(NonEmpty<Name>),
     OtherModule(Fqn),
+    Unknown(NonEmpty<Name>),
 }
 
 impl Path {
-    pub(crate) fn local_name(&self) -> &Name {
-        match self {
-            Self::ThisModule(name) => name,
-            Self::OtherModule(fqn) => fqn.name(),
-        }
-    }
-}
-
-impl From<NonEmpty<String>> for Path {
-    fn from(value: NonEmpty<String>) -> Self {
-        let (target, rest) = value.split_last();
-
-        if rest.is_empty() {
-            Self::ThisModule(Name::new(target))
-        } else {
-            Self::OtherModule(Fqn::new(rest, target))
-        }
-    }
-}
-
-impl From<String> for Path {
-    fn from(value: String) -> Self {
-        Self::ThisModule(Name::new(value))
-    }
-}
-
-#[derive(Debug, PartialEq)]
-pub struct EmptyError;
-
-impl TryFrom<Vec<String>> for Path {
-    type Error = EmptyError;
-    fn try_from(value: Vec<String>) -> Result<Self, Self::Error> {
-        let Ok(value) = NonEmpty::try_from(value) else {
-            return Err(EmptyError);
-        };
-
-        Ok(Path::from(value))
+    pub(crate) fn this_module(
+        rest: impl IntoIterator<Item = impl Into<Name>>,
+        last: impl Into<Name>,
+    ) -> Self {
+        Self::ThisModule(NonEmpty::from((
+            rest.into_iter().map(Into::into).collect(),
+            last.into(),
+        )))
     }
 }

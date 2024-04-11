@@ -1,5 +1,5 @@
 import std::either::Either
-import test
+import test_data::test
 
 match test when
   \ Either::Left(x)  -> x
@@ -21,38 +21,59 @@ HirModule {
         },
         Idx::<Import>(1): {
             "item": Import {
-                segments: [],
+                segments: [
+                    "test_data",
+                ],
                 last: "test",
             },
             "name": "test",
-            "range": 27..40,
+            "range": 27..51,
             "scope_id": Idx::<Scope>(0),
         },
     },
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                name: ThisModule(
-                    "test",
+                name: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "test",
+                        sub_path: [],
+                    },
                 ),
+                scope: Idx::<Scope>(0),
             },
-            "range": 46..51,
+            "range": 57..62,
         },
         Idx::<Expression>(1): {
             "item": VariableRef {
                 name: ThisModule(
-                    "x",
+                    NonEmpty(
+                        [
+                            "x",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(1),
             },
-            "range": 80..84,
+            "range": 91..95,
         },
         Idx::<Expression>(2): {
             "item": VariableRef {
                 name: ThisModule(
-                    "x",
+                    NonEmpty(
+                        [
+                            "x",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(2),
             },
-            "range": 106..107,
+            "range": 117..118,
         },
         Idx::<Expression>(3): {
             "item": Match {
@@ -68,7 +89,7 @@ HirModule {
                     ),
                 ],
             },
-            "range": 40..107,
+            "range": 51..118,
         },
     },
     patterns: Index::<Pattern> {
@@ -77,7 +98,7 @@ HirModule {
                 name: "x",
             },
             "name": "x",
-            "range": 73..74,
+            "range": 84..85,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<Pattern>(1): {
@@ -86,24 +107,29 @@ HirModule {
                     Fqn {
                         module: NonEmpty(
                             [
-                                "Either",
+                                "std",
+                                "either",
                             ],
                         ),
-                        name: "Left",
+                        name: "Either",
+                        sub_path: [
+                            "Left",
+                        ],
                     },
                 ),
+                scope: Idx::<Scope>(1),
                 args: [
                     Idx::<Pattern>(0),
                 ],
             },
-            "range": 60..77,
+            "range": 71..88,
         },
         Idx::<Pattern>(2): {
             "item": VariableDeclaration {
                 name: "x",
             },
             "name": "x",
-            "range": 100..101,
+            "range": 111..112,
             "scope_id": Idx::<Scope>(2),
         },
         Idx::<Pattern>(3): {
@@ -112,17 +138,22 @@ HirModule {
                     Fqn {
                         module: NonEmpty(
                             [
-                                "Either",
+                                "std",
+                                "either",
                             ],
                         ),
-                        name: "Right",
+                        name: "Either",
+                        sub_path: [
+                            "Right",
+                        ],
                     },
                 ),
+                scope: Idx::<Scope>(2),
                 args: [
                     Idx::<Pattern>(2),
                 ],
             },
-            "range": 86..103,
+            "range": 97..114,
         },
     },
     type_references: EmptyIndex::<TypeReference>,

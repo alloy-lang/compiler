@@ -1,6 +1,7 @@
 use non_empty_vec::NonEmpty;
 use std::fmt;
 
+mod ast_glossary;
 mod hir;
 mod index;
 #[cfg(test)]
@@ -36,31 +37,43 @@ impl Name {
     }
 }
 
+impl From<String> for Name {
+    fn from(name: String) -> Self {
+        Self(name)
+    }
+}
+impl From<&str> for Name {
+    fn from(name: &str) -> Self {
+        Self(name.to_string())
+    }
+}
+impl From<&String> for Name {
+    fn from(name: &String) -> Self {
+        Self(name.to_string())
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Fqn {
-    pub module: NonEmpty<Name>,
-    pub name: Name,
+    // todo: consider replacing module path with the module id
+    module: NonEmpty<Name>,
+    name: Name,
+    sub_path: Vec<Name>,
 }
 
 impl Fqn {
     #[inline]
     pub fn new(
-        module: impl IntoIterator<Item = impl Into<String>>,
-        name: impl Into<String>,
+        module: impl IntoIterator<Item = impl Into<Name>>,
+        name: impl Into<Name>,
+        path: impl IntoIterator<Item = impl Into<Name>>,
     ) -> Self {
         unsafe {
             Self {
-                module: NonEmpty::new_unchecked(module.into_iter().map(Name::new).collect()),
-                name: Name::new(name.into()),
+                module: NonEmpty::new_unchecked(module.into_iter().map(Into::into).collect()),
+                name: name.into(),
+                sub_path: path.into_iter().map(Into::into).collect(),
             }
         }
-    }
-
-    fn first_module_segment(&self) -> &Name {
-        self.module.first()
-    }
-
-    fn name(&self) -> &Name {
-        &self.name
     }
 }

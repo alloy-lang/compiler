@@ -23,14 +23,18 @@ HirModule {
                     Fqn {
                         module: NonEmpty(
                             [
-                                "ResultThing",
-                                "More",
-                                "Stuff",
+                                "fake",
                             ],
                         ),
-                        name: "here",
+                        name: "ResultThing",
+                        sub_path: [
+                            "More",
+                            "Stuff",
+                            "here",
+                        ],
                     },
                 ),
+                scope: Idx::<Scope>(0),
             },
             "name": "foo",
             "range": 26..66,

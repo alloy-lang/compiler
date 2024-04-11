@@ -1,0 +1,252 @@
+import test_data::test
+
+typedef Either[l, r] =
+  | Left(l)
+  | Right(r)
+end
+
+match test when
+  | Either::Left(l)  -> l
+  | Either::Right(r) -> r
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "test",
+            },
+            "name": "test",
+            "range": 0..24,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                name: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "test",
+                        sub_path: [],
+                    },
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "range": 83..88,
+        },
+        Idx::<Expression>(1): {
+            "item": VariableRef {
+                name: ThisModule(
+                    NonEmpty(
+                        [
+                            "l",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(2),
+            },
+            "range": 117..121,
+        },
+        Idx::<Expression>(2): {
+            "item": VariableRef {
+                name: ThisModule(
+                    NonEmpty(
+                        [
+                            "r",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(3),
+            },
+            "range": 143..144,
+        },
+        Idx::<Expression>(3): {
+            "item": Match {
+                condition: Idx::<Expression>(0),
+                targets: [
+                    (
+                        Idx::<Pattern>(1),
+                        Idx::<Expression>(1),
+                    ),
+                    (
+                        Idx::<Pattern>(3),
+                        Idx::<Expression>(2),
+                    ),
+                ],
+            },
+            "range": 77..144,
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "l",
+            },
+            "name": "l",
+            "range": 110..111,
+            "scope_id": Idx::<Scope>(2),
+        },
+        Idx::<Pattern>(1): {
+            "item": Destructure {
+                target: ThisModule(
+                    NonEmpty(
+                        [
+                            "Left",
+                            "Either",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(2),
+                args: [
+                    Idx::<Pattern>(0),
+                ],
+            },
+            "range": 97..114,
+        },
+        Idx::<Pattern>(2): {
+            "item": VariableDeclaration {
+                name: "r",
+            },
+            "name": "r",
+            "range": 137..138,
+            "scope_id": Idx::<Scope>(3),
+        },
+        Idx::<Pattern>(3): {
+            "item": Destructure {
+                target: ThisModule(
+                    NonEmpty(
+                        [
+                            "Right",
+                            "Either",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(3),
+                args: [
+                    Idx::<Pattern>(2),
+                ],
+            },
+            "range": 123..140,
+        },
+    },
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "l",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 56..57,
+        },
+        Idx::<TypeReference>(1): {
+            "item": ParenthesizedType(
+                Idx::<TypeReference>(0),
+            ),
+            "range": 55..61,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "r",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 69..70,
+        },
+        Idx::<TypeReference>(3): {
+            "item": ParenthesizedType(
+                Idx::<TypeReference>(2),
+            ),
+            "range": 68..72,
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "l",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "l",
+            "range": 39..40,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "r",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "r",
+            "range": 42..43,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(2): {
+            "item": TypeDefinition {
+                name: "Either",
+                kind: Union(
+                    [
+                        TypeDefinitionMember {
+                            name: "Left",
+                            properties: [
+                                Idx::<TypeReference>(1),
+                            ],
+                        },
+                        TypeDefinitionMember {
+                            name: "Right",
+                            properties: [
+                                Idx::<TypeReference>(3),
+                            ],
+                        },
+                    ],
+                ),
+            },
+            "name": "Either",
+            "range": 24..77,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 4,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "match expression arm",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "match expression arm",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]

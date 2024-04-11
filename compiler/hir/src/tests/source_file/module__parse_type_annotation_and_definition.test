@@ -24,29 +24,41 @@ HirModule {
                 name: OtherModule(
                     Fqn {
                         module: NonEmpty(
-                            [
-                                "TestType",
-                            ],
+                            [],
                         ),
-                        name: "new",
+                        name: "TestType",
+                        sub_path: [
+                            "new",
+                        ],
                     },
                 ),
+                scope: Idx::<Scope>(2),
             },
             "range": 192..206,
         },
         Idx::<Expression>(1): {
             "item": VariableRef {
                 name: ThisModule(
-                    "x",
+                    NonEmpty(
+                        [
+                            "x",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(2),
             },
             "range": 216..217,
         },
         Idx::<Expression>(2): {
             "item": FunctionCall {
                 target: ThisModule(
-                    "funky",
+                    NonEmpty(
+                        [
+                            "funky",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(2),
                 args: [
                     Idx::<Expression>(1),
                 ],
@@ -56,16 +68,26 @@ HirModule {
         Idx::<Expression>(3): {
             "item": VariableRef {
                 name: ThisModule(
-                    "y",
+                    NonEmpty(
+                        [
+                            "y",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(2),
             },
             "range": 226..227,
         },
         Idx::<Expression>(4): {
             "item": FunctionCall {
                 target: ThisModule(
-                    "funky",
+                    NonEmpty(
+                        [
+                            "funky",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(2),
                 args: [
                     Idx::<Expression>(3),
                 ],
@@ -86,8 +108,12 @@ HirModule {
         Idx::<Expression>(6): {
             "item": Binary {
                 op: Custom(
-                    ThisModule(
-                        "<|",
+                    Unknown(
+                        NonEmpty(
+                            [
+                                "<|",
+                            ],
+                        ),
                     ),
                 ),
                 lhs: Idx::<Expression>(0),
@@ -139,7 +165,11 @@ HirModule {
         Idx::<TypeReference>(0): {
             "item": Named(
                 ThisModule(
-                    "t2",
+                    NonEmpty(
+                        [
+                            "t2",
+                        ],
+                    ),
                 ),
             ),
             "range": 70..73,
@@ -147,7 +177,11 @@ HirModule {
         Idx::<TypeReference>(1): {
             "item": Named(
                 ThisModule(
-                    "t1",
+                    NonEmpty(
+                        [
+                            "t1",
+                        ],
+                    ),
                 ),
             ),
             "range": 76..78,
@@ -168,7 +202,11 @@ HirModule {
         Idx::<TypeReference>(4): {
             "item": Named(
                 ThisModule(
-                    "t2",
+                    NonEmpty(
+                        [
+                            "t2",
+                        ],
+                    ),
                 ),
             ),
             "range": 83..86,
@@ -176,15 +214,23 @@ HirModule {
         Idx::<TypeReference>(5): {
             "item": Named(
                 ThisModule(
-                    "t2",
+                    NonEmpty(
+                        [
+                            "t2",
+                        ],
+                    ),
                 ),
             ),
             "range": 89..92,
         },
         Idx::<TypeReference>(6): {
             "item": Named(
-                ThisModule(
-                    "ResultThing",
+                Unknown(
+                    NonEmpty(
+                        [
+                            "ResultThing",
+                        ],
+                    ),
                 ),
             ),
             "range": 95..107,
@@ -258,6 +304,31 @@ HirModule {
         },
     },
     warnings: [],
-    errors: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                reference: "ResultThing",
+                path: NonEmpty(
+                    [
+                        "ResultThing",
+                    ],
+                ),
+                current_scope: Idx::<Scope>(1),
+            },
+            range: 95..107,
+        },
+        LoweringError {
+            kind: UnknownReference {
+                reference: "<|",
+                path: NonEmpty(
+                    [
+                        "<|",
+                    ],
+                ),
+                current_scope: Idx::<Scope>(2),
+            },
+            range: 206..208,
+        },
+    ],
 }
 []

@@ -22,9 +22,18 @@ HirModule {
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                name: ThisModule(
-                    "fakeStuff",
+                name: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "fake",
+                            ],
+                        ),
+                        name: "fakeStuff",
+                        sub_path: [],
+                    },
                 ),
+                scope: Idx::<Scope>(2),
             },
             "range": 118..127,
         },
@@ -63,7 +72,11 @@ HirModule {
         Idx::<TypeReference>(0): {
             "item": Named(
                 ThisModule(
-                    "t1",
+                    NonEmpty(
+                        [
+                            "t1",
+                        ],
+                    ),
                 ),
             ),
             "range": 38..41,
@@ -71,7 +84,11 @@ HirModule {
         Idx::<TypeReference>(1): {
             "item": Named(
                 ThisModule(
-                    "t1",
+                    NonEmpty(
+                        [
+                            "t1",
+                        ],
+                    ),
                 ),
             ),
             "range": 45..48,
@@ -79,7 +96,11 @@ HirModule {
         Idx::<TypeReference>(2): {
             "item": Named(
                 ThisModule(
-                    "t2",
+                    NonEmpty(
+                        [
+                            "t2",
+                        ],
+                    ),
                 ),
             ),
             "range": 51..53,
@@ -100,7 +121,11 @@ HirModule {
         Idx::<TypeReference>(5): {
             "item": Named(
                 ThisModule(
-                    "t2",
+                    NonEmpty(
+                        [
+                            "t2",
+                        ],
+                    ),
                 ),
             ),
             "range": 58..61,

@@ -19,9 +19,18 @@ HirModule {
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                name: ThisModule(
-                    "test",
+                name: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "test",
+                        sub_path: [],
+                    },
                 ),
+                scope: Idx::<Scope>(0),
             },
             "range": 27..32,
         },

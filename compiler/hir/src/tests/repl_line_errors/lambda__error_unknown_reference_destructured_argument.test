@@ -6,8 +6,13 @@ HirModule {
         Idx::<Expression>(0): {
             "item": VariableRef {
                 name: ThisModule(
-                    "x",
+                    NonEmpty(
+                        [
+                            "x",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(1),
             },
             "range": 21..22,
         },
@@ -32,16 +37,15 @@ HirModule {
         },
         Idx::<Pattern>(1): {
             "item": Destructure {
-                target: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                "Option",
-                            ],
-                        ),
-                        name: "Some",
-                    },
+                target: Unknown(
+                    NonEmpty(
+                        [
+                            "Option",
+                            "Some",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(1),
                 args: [
                     Idx::<Pattern>(0),
                 ],
@@ -71,16 +75,14 @@ HirModule {
     errors: [
         LoweringError {
             kind: UnknownReference {
-                path: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                "Option",
-                            ],
-                        ),
-                        name: "Some",
-                    },
+                reference: "Option",
+                path: NonEmpty(
+                    [
+                        "Option",
+                        "Some",
+                    ],
                 ),
+                current_scope: Idx::<Scope>(1),
             },
             range: 1..13,
         },

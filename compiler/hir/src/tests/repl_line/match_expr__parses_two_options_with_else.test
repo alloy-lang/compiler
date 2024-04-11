@@ -1,4 +1,4 @@
-import std::bool::Bool::True
+import std::bool::True
 
 let test = True
 
@@ -13,45 +13,59 @@ HirModule {
                 segments: [
                     "std",
                     "bool",
-                    "Bool",
                 ],
                 last: "True",
             },
             "name": "True",
-            "range": 0..30,
+            "range": 0..24,
             "scope_id": Idx::<Scope>(0),
         },
     },
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                name: ThisModule(
-                    "True",
+                name: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "bool",
+                            ],
+                        ),
+                        name: "True",
+                        sub_path: [],
+                    },
                 ),
+                scope: Idx::<Scope>(0),
             },
             "name": "test",
-            "range": 30..47,
+            "range": 24..41,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(1): {
             "item": VariableRef {
                 name: ThisModule(
-                    "test",
+                    NonEmpty(
+                        [
+                            "test",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(0),
             },
-            "range": 53..58,
+            "range": 47..52,
         },
         Idx::<Expression>(2): {
             "item": IntLiteral(
                 0,
             ),
-            "range": 75..79,
+            "range": 69..73,
         },
         Idx::<Expression>(3): {
             "item": IntLiteral(
                 1,
             ),
-            "range": 89..90,
+            "range": 83..84,
         },
         Idx::<Expression>(4): {
             "item": Match {
@@ -67,21 +81,31 @@ HirModule {
                     ),
                 ],
             },
-            "range": 47..90,
+            "range": 41..84,
         },
     },
     patterns: Index::<Pattern> {
         Idx::<Pattern>(0): {
             "item": VariableRef {
-                name: ThisModule(
-                    "True",
+                name: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "bool",
+                            ],
+                        ),
+                        name: "True",
+                        sub_path: [],
+                    },
                 ),
+                scope: Idx::<Scope>(1),
             },
-            "range": 67..72,
+            "range": 61..66,
         },
         Idx::<Pattern>(1): {
             "item": Nil,
-            "range": 81..82,
+            "range": 75..76,
         },
     },
     type_references: EmptyIndex::<TypeReference>,

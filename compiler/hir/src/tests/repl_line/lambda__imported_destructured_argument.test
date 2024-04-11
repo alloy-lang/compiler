@@ -21,8 +21,13 @@ HirModule {
         Idx::<Expression>(0): {
             "item": VariableRef {
                 name: ThisModule(
-                    "x",
+                    NonEmpty(
+                        [
+                            "x",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(1),
             },
             "range": 49..50,
         },
@@ -51,12 +56,17 @@ HirModule {
                     Fqn {
                         module: NonEmpty(
                             [
-                                "Option",
+                                "std",
+                                "option",
                             ],
                         ),
-                        name: "Some",
+                        name: "Option",
+                        sub_path: [
+                            "Some",
+                        ],
                     },
                 ),
+                scope: Idx::<Scope>(1),
                 args: [
                     Idx::<Pattern>(0),
                 ],

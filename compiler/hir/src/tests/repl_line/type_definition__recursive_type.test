@@ -1,4 +1,6 @@
-typedef Test[t1, t2] = Thing t1 t2
+typedef List =
+  | Cons List
+end
 ===
 HirModule {
     imports: EmptyIndex::<Import>,
@@ -10,64 +12,29 @@ HirModule {
                 ThisModule(
                     NonEmpty(
                         [
-                            "t1",
+                            "List",
                         ],
                     ),
                 ),
             ),
-            "range": 29..32,
-        },
-        Idx::<TypeReference>(1): {
-            "item": Named(
-                ThisModule(
-                    NonEmpty(
-                        [
-                            "t2",
-                        ],
-                    ),
-                ),
-            ),
-            "range": 32..34,
+            "range": 24..29,
         },
     },
     type_definitions: Index::<TypeDefinition> {
         Idx::<TypeDefinition>(0): {
             "item": TypeDefinition {
-                name: "t1",
-                kind: TypeVariable(
-                    Unbound,
-                ),
-            },
-            "name": "t1",
-            "range": 13..15,
-            "scope_id": Idx::<Scope>(1),
-        },
-        Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
-                name: "t2",
-                kind: TypeVariable(
-                    Unbound,
-                ),
-            },
-            "name": "t2",
-            "range": 17..19,
-            "scope_id": Idx::<Scope>(1),
-        },
-        Idx::<TypeDefinition>(2): {
-            "item": TypeDefinition {
-                name: "Test",
+                name: "List",
                 kind: Single(
                     TypeDefinitionMember {
-                        name: "Thing",
+                        name: "Cons",
                         properties: [
                             Idx::<TypeReference>(0),
-                            Idx::<TypeReference>(1),
                         ],
                     },
                 ),
             },
-            "name": "Test",
-            "range": 0..34,
+            "name": "List",
+            "range": 0..32,
             "scope_id": Idx::<Scope>(0),
         },
     },

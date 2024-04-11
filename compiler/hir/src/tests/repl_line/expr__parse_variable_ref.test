@@ -16,8 +16,13 @@ HirModule {
         Idx::<Expression>(1): {
             "item": VariableRef {
                 name: ThisModule(
-                    "counter",
+                    NonEmpty(
+                        [
+                            "counter",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(0),
             },
             "range": 17..24,
         },

@@ -15,6 +15,7 @@ pub enum Expression {
     CharLiteral(char),
     VariableRef {
         name: Path,
+        scope: ScopeIdx,
     },
     Binary {
         op: BinaryOp,
@@ -38,6 +39,7 @@ pub enum Expression {
     },
     FunctionCall {
         target: Path,
+        scope: ScopeIdx,
         args: Vec<ExpressionIdx>,
     },
     Match {
@@ -148,22 +150,18 @@ fn lower_unary_expression(ctx: &mut LoweringCtx, e: &ast::UnaryExpr) -> Expressi
 }
 
 fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Expression {
-    let Some(path) = var.name() else {
+    let Some(ast_path) = var.name() else {
         unreachable!("parsing error")
     };
 
-    let Ok(name) = Path::try_from(path.segments()) else {
+    let Some(path) = ctx.resolve_reference_path(&ast_path) else {
         unreachable!("parsing error")
     };
 
-    if !ctx.contains_variable_ref(&name) {
-        ctx.error(
-            LoweringErrorKind::UnknownReference { path: name.clone() },
-            var.range(),
-        );
+    Expression::VariableRef {
+        name: path,
+        scope: ctx.scopes.current_scope(),
     }
-
-    Expression::VariableRef { name }
 }
 
 fn lower_infix_expression(ctx: &mut LoweringCtx, e: &ast::InfixExpr) -> Expression {
@@ -183,7 +181,13 @@ fn lower_infix_expression(ctx: &mut LoweringCtx, e: &ast::InfixExpr) -> Expressi
                 "-" => BinaryOp::Sub,
                 "*" => BinaryOp::Mul,
                 "/" => BinaryOp::Div,
-                _ => BinaryOp::Custom(Path::from(op_name)),
+                _ => {
+                    let Some(target) = ctx.resolve_reference_segments(&[op_name], op.range())
+                    else {
+                        unreachable!("parsing error")
+                    };
+                    BinaryOp::Custom(target)
+                }
             }
         }
         None => BinaryOp::Missing,
@@ -236,10 +240,7 @@ fn lower_function_call(ctx: &mut LoweringCtx, e: &ast::FunctionCall) -> Expressi
     let Some(target) = e.target() else {
         unreachable!("parsing error")
     };
-    let Some(target) = target.name() else {
-        unreachable!("parsing error")
-    };
-    let Ok(target) = Path::try_from(target.segments()) else {
+    let Some(ast_target) = target.name() else {
         unreachable!("parsing error")
     };
 
@@ -249,7 +250,15 @@ fn lower_function_call(ctx: &mut LoweringCtx, e: &ast::FunctionCall) -> Expressi
         .map(|arg| lower_expression(ctx, arg))
         .collect::<Vec<_>>();
 
-    Expression::FunctionCall { target, args }
+    let Some(target) = ctx.resolve_reference_path(&ast_target) else {
+        unreachable!("parsing error")
+    };
+
+    Expression::FunctionCall {
+        target,
+        scope: ctx.scopes.current_scope(),
+        args,
+    }
 }
 
 fn lower_match_expression(ctx: &mut LoweringCtx, e: &ast::MatchExpr) -> Expression {

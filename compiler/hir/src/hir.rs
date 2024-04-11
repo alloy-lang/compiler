@@ -1,8 +1,9 @@
 use super::{Fqn, Name};
+use crate::ast_glossary::AstGlossary;
 use crate::index::Index;
 
 use alloy_ast as ast;
-use alloy_scope::Scopes;
+use alloy_scope::{ScopeIdx, Scopes};
 use alloy_syntax::SyntaxElement;
 use ast::AstElement;
 use la_arena::Idx;
@@ -52,6 +53,13 @@ pub use type_definition::*;
 
 mod value;
 pub use value::*;
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum HirReference {
+    Expression(ExpressionIdx),
+    Pattern(PatternIdx),
+    Type(TypeIdx),
+}
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug)]
@@ -105,7 +113,9 @@ pub enum LoweringErrorKind {
         second: TextRange,
     },
     UnknownReference {
-        path: Path,
+        reference: Name,
+        path: NonEmpty<Name>,
+        current_scope: ScopeIdx,
     },
 }
 
@@ -126,6 +136,7 @@ pub enum LoweringWarningKind {
 
 #[derive(Debug)]
 struct LoweringCtx {
+    glossary: AstGlossary,
     imports: Index<Import>,
     expressions: Index<Expression>,
     patterns: Index<Pattern>,
@@ -137,8 +148,9 @@ struct LoweringCtx {
 }
 
 impl LoweringCtx {
-    fn new() -> Self {
+    fn new(glossary: AstGlossary) -> Self {
         Self {
+            glossary,
             imports: Index::new(),
             expressions: Index::new(),
             patterns: Index::new(),
@@ -163,18 +175,60 @@ impl LoweringCtx {
         }
     }
 
-    pub(crate) fn contains_variable_ref(&self, path: &Path) -> bool {
-        match path {
-            Path::ThisModule(name) => {
-                self.expressions.get_id(name, &self.scopes).is_some()
-                    || self.patterns.get_id(name, &self.scopes).is_some()
-                    || self.imports.get_id(name, &self.scopes).is_some()
+    pub(crate) fn resolve_reference_path(&mut self, ast_path: &ast::Path) -> Option<Path> {
+        self.resolve_reference_segments(&ast_path.segments(), ast_path.range())
+    }
+
+    pub(crate) fn resolve_reference_segments(
+        &mut self,
+        path_segments: &[String],
+        path_range: TextRange,
+    ) -> Option<Path> {
+        if let [first, rest @ ..] = path_segments {
+            let local_name = Name::new(first);
+
+            if let Some(pid) = self.patterns.get_id(&local_name, &self.scopes) {
+                return Some(Path::this_module(rest, first));
             }
-            Path::OtherModule(fqn) => self
-                .imports
-                .get_id(fqn.first_module_segment(), &self.scopes)
-                .is_some(),
+            if let Some(eid) = self.expressions.get_id(&local_name, &self.scopes) {
+                return Some(Path::this_module(rest, first));
+            }
+            if let Some(ast) = self.glossary.get_value_by_name(first) {
+                return Some(Path::this_module(rest, first));
+            }
+            if let Some(tid) = self.type_definitions.get_id(&local_name, &self.scopes) {
+                return Some(Path::this_module(rest, first));
+            }
+            if let Some(ast) = self.glossary.get_type_definition_by_name(first) {
+                return Some(Path::this_module(rest, first));
+            }
+            if let Some(import) = self.imports.get_by_name(&local_name, &self.scopes) {
+                let fqn = Fqn::new(
+                    import.segments().iter().cloned(),
+                    local_name.clone(),
+                    rest.to_vec(),
+                );
+                return Some(Path::OtherModule(fqn));
+            }
+
+            let segments = NonEmpty::from((
+                Name::new(first),
+                rest.iter().map(Name::new).collect::<Vec<_>>(),
+            ));
+
+            self.error(
+                LoweringErrorKind::UnknownReference {
+                    reference: local_name,
+                    path: segments.clone(),
+                    current_scope: self.scopes.current_scope(),
+                },
+                path_range,
+            );
+
+            return Some(Path::Unknown(segments));
         }
+
+        None
     }
 
     pub(crate) fn add_expression(
@@ -372,14 +426,18 @@ impl LoweringCtx {
 
 #[must_use]
 pub fn lower_source_file(source_file: &ast::SourceFile) -> HirModule {
-    let mut ctx = LoweringCtx::new();
+    let glossary = AstGlossary::summarize_source_file(source_file);
+
+    let mut ctx = LoweringCtx::new(glossary);
     source_file::lower_source_file(&mut ctx, source_file);
     ctx.finish()
 }
 
 #[must_use]
 pub fn lower_repl_line(source_file: &ast::SourceFile) -> HirModule {
-    let mut ctx = LoweringCtx::new();
+    let glossary = AstGlossary::summarize_repl_line(source_file);
+
+    let mut ctx = LoweringCtx::new(glossary);
     source_file::lower_repl_line(&mut ctx, source_file);
     ctx.finish()
 }

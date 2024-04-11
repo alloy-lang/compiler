@@ -11,10 +11,19 @@ pub enum Pattern {
     FractionLiteral(NotNan<f64>),
     StringLiteral(String),
     CharLiteral(char),
-    VariableRef { name: Path },
-    VariableDeclaration { name: Name },
+    VariableRef {
+        name: Path,
+        scope: ScopeIdx,
+    },
+    VariableDeclaration {
+        name: Name,
+    },
     Nil,
-    Destructure { target: Path, args: Vec<PatternIdx> },
+    Destructure {
+        target: Path,
+        scope: ScopeIdx,
+        args: Vec<PatternIdx>,
+    },
     Unit,
     Tuple(NonEmpty<PatternIdx>),
 }
@@ -52,6 +61,7 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
         }
         ast::Pattern::VariableRef(var) => Pattern::VariableRef {
             name: lower_variable_ref(ctx, var),
+            scope: ctx.scopes.current_scope(),
         },
         ast::Pattern::VariableDeclaration(var) => Pattern::VariableDeclaration {
             name: lower_variable_declaration(var),
@@ -83,10 +93,7 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
 }
 
 fn lower_destructure(ctx: &mut LoweringCtx, destructure: &ast::Destructure) -> Pattern {
-    let Some(target) = destructure
-        .target()
-        .map(|target| lower_variable_ref(ctx, &target))
-    else {
+    let Some(ast_target) = destructure.target() else {
         unreachable!("parsing error")
     };
 
@@ -96,7 +103,13 @@ fn lower_destructure(ctx: &mut LoweringCtx, destructure: &ast::Destructure) -> P
         .map(|arg| lower_pattern(ctx, arg))
         .collect::<Vec<_>>();
 
-    Pattern::Destructure { target, args }
+    let target = lower_variable_ref(ctx, &ast_target);
+
+    Pattern::Destructure {
+        target,
+        scope: ctx.scopes.current_scope(),
+        args,
+    }
 }
 
 pub(super) fn lower_variable_declaration(var: &ast::VariableDeclaration) -> Name {
@@ -107,21 +120,14 @@ pub(super) fn lower_variable_declaration(var: &ast::VariableDeclaration) -> Name
     Name::new(name.text())
 }
 
-pub(super) fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Path {
-    let Some(path) = var.name() else {
+fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Path {
+    let Some(ast_path) = var.name() else {
         unreachable!("parsing error")
     };
 
-    let Ok(name) = Path::try_from(path.segments()) else {
+    let Some(path) = ctx.resolve_reference_path(&ast_path) else {
         unreachable!("parsing error")
     };
 
-    if !ctx.contains_variable_ref(&name) {
-        ctx.error(
-            LoweringErrorKind::UnknownReference { path: name.clone() },
-            var.range(),
-        );
-    }
-
-    name
+    path
 }

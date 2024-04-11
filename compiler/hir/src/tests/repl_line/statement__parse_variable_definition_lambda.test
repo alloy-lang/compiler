@@ -6,16 +6,26 @@ HirModule {
         Idx::<Expression>(0): {
             "item": VariableRef {
                 name: ThisModule(
-                    "a",
+                    NonEmpty(
+                        [
+                            "a",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(1),
             },
             "range": 20..22,
         },
         Idx::<Expression>(1): {
             "item": VariableRef {
                 name: ThisModule(
-                    "b",
+                    NonEmpty(
+                        [
+                            "b",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(1),
             },
             "range": 24..25,
         },

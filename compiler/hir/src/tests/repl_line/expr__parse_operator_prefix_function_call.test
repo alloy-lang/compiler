@@ -1,6 +1,8 @@
 let func1 = 0
 let func2 = 1
 
+let >> = |f1, f2| -> f2(f1)
+
 let result = >>(func1, func2)
 ===
 HirModule {
@@ -25,45 +27,122 @@ HirModule {
         Idx::<Expression>(2): {
             "item": VariableRef {
                 name: ThisModule(
-                    "func1",
+                    NonEmpty(
+                        [
+                            "f1",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(1),
             },
-            "range": 45..50,
+            "range": 53..55,
         },
         Idx::<Expression>(3): {
-            "item": VariableRef {
-                name: ThisModule(
-                    "func2",
-                ),
-            },
-            "range": 52..57,
-        },
-        Idx::<Expression>(4): {
             "item": FunctionCall {
                 target: ThisModule(
-                    ">>",
+                    NonEmpty(
+                        [
+                            "f2",
+                        ],
+                    ),
                 ),
+                scope: Idx::<Scope>(1),
                 args: [
                     Idx::<Expression>(2),
-                    Idx::<Expression>(3),
                 ],
             },
-            "name": "result",
+            "range": 50..58,
+        },
+        Idx::<Expression>(4): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                ],
+                body: Idx::<Expression>(3),
+            },
+            "name": ">>",
             "range": 29..58,
             "scope_id": Idx::<Scope>(0),
         },
+        Idx::<Expression>(5): {
+            "item": VariableRef {
+                name: ThisModule(
+                    NonEmpty(
+                        [
+                            "func1",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "range": 74..79,
+        },
+        Idx::<Expression>(6): {
+            "item": VariableRef {
+                name: ThisModule(
+                    NonEmpty(
+                        [
+                            "func2",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "range": 81..86,
+        },
+        Idx::<Expression>(7): {
+            "item": FunctionCall {
+                target: ThisModule(
+                    NonEmpty(
+                        [
+                            ">>",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+                args: [
+                    Idx::<Expression>(5),
+                    Idx::<Expression>(6),
+                ],
+            },
+            "name": "result",
+            "range": 58..87,
+            "scope_id": Idx::<Scope>(0),
+        },
     },
-    patterns: EmptyIndex::<Pattern>,
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "f1",
+            },
+            "name": "f1",
+            "range": 39..41,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableDeclaration {
+                name: "f2",
+            },
+            "name": "f2",
+            "range": 43..45,
+            "scope_id": Idx::<Scope>(1),
+        },
+    },
     type_references: EmptyIndex::<TypeReference>,
     type_definitions: EmptyIndex::<TypeDefinition>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 1,
+            len: 2,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
                 },
             ],
         },

@@ -1,0 +1,71 @@
+let example = Things::ThingA
+
+typedef Things =
+  | ThingA
+  | ThingB
+end
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                name: ThisModule(
+                    NonEmpty(
+                        [
+                            "ThingA",
+                            "Things",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "name": "example",
+            "range": 0..30,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "Things",
+                kind: Union(
+                    [
+                        TypeDefinitionMember {
+                            name: "ThingA",
+                            properties: [],
+                        },
+                        TypeDefinitionMember {
+                            name: "ThingB",
+                            properties: [],
+                        },
+                    ],
+                ),
+            },
+            "name": "Things",
+            "range": 30..72,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]
