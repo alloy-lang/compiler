@@ -42,23 +42,31 @@ impl InfixExpr {
 
 pub struct BinaryOp(SyntaxToken);
 
-impl BinaryOp {
+impl AstElement for BinaryOp {
     #[must_use]
-    pub(crate) fn cast(token: SyntaxToken) -> Option<Self> {
+    fn cast<E: Into<SyntaxElement>>(element: E) -> Option<Self> {
+        let element = element.into();
+        
         if matches!(
-            token.kind(),
+            element.kind(),
             SyntaxKind::Plus
                 | SyntaxKind::Minus
                 | SyntaxKind::Star
                 | SyntaxKind::Slash
                 | SyntaxKind::OpIdent
         ) {
-            Some(Self(token))
+            Some(Self(element.into_token()?))
         } else {
             None
         }
     }
 
+    fn syntax(&self) -> SyntaxElement {
+        self.0.clone().into()
+    }
+}
+
+impl BinaryOp {
     #[must_use]
     pub fn name(&self) -> String {
         self.0.text().to_string()
