@@ -48,7 +48,7 @@ HirModule {
             },
             "name": "x",
             "range": 109..110,
-            "scope_id": Idx::<Scope>(1),
+            "scope_id": Idx::<Scope>(2),
         },
         Idx::<Pattern>(1): {
             "item": VariableDeclaration {
@@ -56,7 +56,7 @@ HirModule {
             },
             "name": "f",
             "range": 112..113,
-            "scope_id": Idx::<Scope>(1),
+            "scope_id": Idx::<Scope>(2),
         },
     },
     type_references: Index::<TypeReference> {
@@ -122,15 +122,42 @@ HirModule {
             "scope_id": Idx::<Scope>(0),
         },
     },
-    type_definitions: EmptyIndex::<TypeDefinition>,
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t1",
+            "range": 71..86,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "t2",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t2",
+            "range": 86..97,
+            "scope_id": Idx::<Scope>(1),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 2,
+            len: 3,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
                 },
                 Scope {
                     parent: Idx::<Scope>(0),

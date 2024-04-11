@@ -10,6 +10,7 @@ pub struct TypeDefinition {
 #[derive(Debug, PartialEq)]
 pub enum TypeDefinitionKind {
     Missing,
+    TypeVariable(type_variable::TypeVariable),
     Single(TypeDefinitionMember),
     Union(Vec<TypeDefinitionMember>),
 }
@@ -22,17 +23,22 @@ pub struct TypeDefinitionMember {
 
 pub(super) fn lower_type_definition(ctx: &mut LoweringCtx, ast: &ast::TypeDefinition) {
     let Some(parent_name) = ast.name() else {
-        // unreachable!("parsing error")
-        return;
+        unreachable!("parsing error")
+        // return;
     };
     let parent_name = Name::new(parent_name);
 
     let type_definition = ctx.inside_scope("type definition", |ctx| {
+        let type_args = ast.type_args();
+        for type_arg in type_args {
+            let name = type_arg.text();
+            ctx.add_type_variable(name, &type_arg.syntax());
+        }
+
         let mut members = vec![];
         for member in ast.types() {
             let Some(sub_name) = member.name() else {
-                // unreachable!("parsing error");
-                continue;
+                unreachable!("parsing error");
             };
 
             let properties = member

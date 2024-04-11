@@ -17,6 +17,17 @@ HirModule {
     type_definitions: Index::<TypeDefinition> {
         Idx::<TypeDefinition>(0): {
             "item": TypeDefinition {
+                name: "t",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t",
+            "range": 13..14,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
                 name: "Test",
                 kind: Single(
                     TypeDefinitionMember {
