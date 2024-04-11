@@ -33,6 +33,9 @@ impl PartialEq<&str> for Name {
 
 impl Name {
     pub fn new(name: impl Into<String>) -> Self {
+        let name = name.into();
+        let name = name.trim_start_matches('(').trim_end_matches(')');
+
         Self(name.into())
     }
 }

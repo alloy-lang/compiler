@@ -212,6 +212,26 @@ mod tests {
     }
 
     #[test]
+    fn index_allows_for_retrieval_when_lookup_has_parentheses() {
+        let scopes = Scopes::default();
+        let mut index = Index::new();
+
+        let thing = 1;
+        let insert_name = Name::new("hello");
+        let lookup_name = Name::new("(hello)");
+        let range = TextRange::new(TextSize::from(5), TextSize::from(6));
+
+        let idx = index
+            .insert_named(insert_name, thing, range, &scopes)
+            .expect("testing");
+
+        assert_eq!(index.get(idx), &thing);
+        assert_eq!(index.get_range(idx), range);
+        assert_eq!(index.get_id(&lookup_name, &scopes), Some(idx));
+        assert_eq!(index.get_by_name(&lookup_name, &scopes), Some(&thing));
+    }
+
+    #[test]
     fn retrieval_checks_parent_scopes() {
         let mut scopes = Scopes::default();
         let mut index = Index::new();

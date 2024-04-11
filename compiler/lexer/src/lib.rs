@@ -32,10 +32,7 @@ impl<'a> Iterator for Lexer<'a> {
     type Item = Token<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let kind = match self.inner.next()? {
-            Ok(kind) => kind,
-            Err(()) => TokenKind::Error,
-        };
+        let kind = self.inner.next()?.unwrap_or(TokenKind::Error);
         let text = self.inner.slice();
 
         let range = {
