@@ -31,7 +31,20 @@ HirModule {
             ],
         },
     },
-    warnings: [],
+    warnings: [
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "std",
+                        "functor",
+                    ],
+                    last: "Functor",
+                },
+            },
+            range: 0..28,
+        },
+    ],
     errors: [],
 }
 []

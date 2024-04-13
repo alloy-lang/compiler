@@ -1,4 +1,4 @@
-import std::function::(<|)
+import std::functor::map
 ===
 HirModule {
     imports: Index::<Import> {
@@ -6,12 +6,12 @@ HirModule {
             "item": Import {
                 segments: [
                     "std",
-                    "function",
+                    "functor",
                 ],
-                last: "<|",
+                last: "map",
             },
-            "name": "<|",
-            "range": 0..26,
+            "name": "map",
+            "range": 0..24,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -37,12 +37,12 @@ HirModule {
                 import: Import {
                     segments: [
                         "std",
-                        "function",
+                        "functor",
                     ],
-                    last: "<|",
+                    last: "map",
                 },
             },
-            range: 0..26,
+            range: 0..24,
         },
     ],
     errors: [],

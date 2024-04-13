@@ -13,7 +13,7 @@ pub struct Index<T> {
     item_names: FxHashMap<(Name, ScopeIdx), Idx<T>>,
 }
 
-struct IndexIterator<'a, T> {
+pub(crate) struct IndexIterator<'a, T> {
     cursor: usize,
     index: &'a Index<T>,
 }
@@ -102,7 +102,7 @@ impl<T> Index<T> {
         self.items.is_empty()
     }
 
-    fn iter(&self) -> IndexIterator<T> {
+    pub(crate) fn iter(&self) -> IndexIterator<T> {
         IndexIterator::new(self)
     }
 

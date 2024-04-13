@@ -1,6 +1,9 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
+#[allow(clippy::module_name_repetitions)]
+pub type ImportIdx = Idx<Import>;
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Import {
     segments: Vec<Name>,

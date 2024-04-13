@@ -32,7 +32,20 @@ HirModule {
             ],
         },
     },
-    warnings: [],
+    warnings: [
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "std",
+                        "option",
+                    ],
+                    last: "map",
+                },
+            },
+            range: 0..24,
+        },
+    ],
     errors: [
         LoweringError {
             kind: ConflictingImport {

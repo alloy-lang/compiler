@@ -47,7 +47,34 @@ HirModule {
             ],
         },
     },
-    warnings: [],
+    warnings: [
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "really",
+                        "really",
+                        "real",
+                    ],
+                    last: "Thing1",
+                },
+            },
+            range: 29..69,
+        },
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "really",
+                        "real",
+                        "other",
+                    ],
+                    last: "Thing2",
+                },
+            },
+            range: 69..103,
+        },
+    ],
     errors: [],
 }
 []

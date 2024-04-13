@@ -9,6 +9,7 @@ use ast::AstElement;
 use la_arena::Idx;
 use non_empty_vec::NonEmpty;
 use ordered_float::NotNan;
+use std::collections::HashSet;
 use std::convert::TryFrom;
 use text_size::TextRange;
 
@@ -132,6 +133,9 @@ pub enum LoweringWarningKind {
         first: TextRange,
         second: TextRange,
     },
+    UnusedImport {
+        import: Import,
+    },
 }
 
 #[derive(Debug)]
@@ -143,6 +147,7 @@ struct LoweringCtx {
     type_references: Index<TypeReference>,
     type_definitions: Index<TypeDefinition>,
     scopes: Scopes,
+    used_imports: HashSet<ImportIdx>,
     warnings: Vec<LoweringWarning>,
     errors: Vec<LoweringError>,
 }
@@ -157,12 +162,27 @@ impl LoweringCtx {
             type_references: Index::new(),
             type_definitions: Index::new(),
             scopes: Scopes::default(),
+            used_imports: HashSet::new(),
             warnings: vec![],
             errors: vec![],
         }
     }
 
     fn finish(self) -> HirModule {
+        let mut warnings = self.warnings;
+
+        for (id, import, _, _) in self.imports.iter() {
+            if !self.used_imports.contains(&id) {
+                let warn = LoweringWarningKind::UnusedImport {
+                    import: import.clone(),
+                };
+                warnings.push(LoweringWarning {
+                    kind: warn,
+                    range: self.imports.get_range(id),
+                });
+            }
+        }
+
         HirModule {
             imports: self.imports,
             expressions: self.expressions,
@@ -170,7 +190,7 @@ impl LoweringCtx {
             type_references: self.type_references,
             type_definitions: self.type_definitions,
             scopes: self.scopes,
-            warnings: self.warnings,
+            warnings,
             errors: self.errors,
         }
     }
@@ -202,12 +222,16 @@ impl LoweringCtx {
             if let Some(ast) = self.glossary.get_type_definition_by_name(first) {
                 return Some(Path::this_module(rest, first));
             }
-            if let Some(import) = self.imports.get_by_name(&local_name, &self.scopes) {
+            if let Some(import_id) = self.imports.get_id(&local_name, &self.scopes) {
+                self.used_imports.insert(import_id);
+
+                let import = self.imports.get(import_id);
                 let fqn = Fqn::new(
                     import.segments().iter().cloned(),
                     local_name.clone(),
                     rest.to_vec(),
                 );
+
                 return Some(Path::OtherModule(fqn));
             }
 
