@@ -1,0 +1,132 @@
+match test when
+  | True ->
+  | False -> 1
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: Unknown(
+                    NonEmpty(
+                        [
+                            "test",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "range": 6..11,
+        },
+        Idx::<Expression>(1): {
+            "item": IntLiteral(
+                1,
+            ),
+            "range": 41..42,
+        },
+        Idx::<Expression>(2): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(1),
+                ],
+                body: Idx::<Expression>(1),
+            },
+            "range": 30..42,
+        },
+        Idx::<Expression>(3): {
+            "item": Match {
+                condition: Idx::<Expression>(0),
+                targets: [
+                    (
+                        Idx::<Pattern>(0),
+                        Idx::<Expression>(2),
+                    ),
+                ],
+            },
+            "range": 0..42,
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableRef {
+                path: Unknown(
+                    NonEmpty(
+                        [
+                            "True",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(1),
+            },
+            "range": 20..25,
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableDeclaration {
+                name: "False",
+            },
+            "name": "False",
+            "range": 32..38,
+            "scope_id": Idx::<Scope>(2),
+        },
+    },
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "match expression arm",
+                },
+                Scope {
+                    parent: Idx::<Scope>(1),
+                    tag: "lambda expression",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                reference: "test",
+                path: NonEmpty(
+                    [
+                        "test",
+                    ],
+                ),
+                current_scope: Idx::<Scope>(0),
+            },
+            range: 6..11,
+        },
+        LoweringError {
+            kind: UnknownReference {
+                reference: "True",
+                path: NonEmpty(
+                    [
+                        "True",
+                    ],
+                ),
+                current_scope: Idx::<Scope>(1),
+            },
+            range: 20..25,
+        },
+    ],
+}
+[
+    ParseError {
+        expected: [
+            Pipe,
+        ],
+        kind: Missing {
+            offset: 38,
+        },
+        context: LambdaArgPipe,
+    },
+]

@@ -1,0 +1,227 @@
+let funky = |x1, y1, z1| -> x1 + y1 + z1
+
+let x = 1
+let y = 1
+let z = 1
+funky(x y z)
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "x1",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(1),
+            },
+            "range": 28..31,
+        },
+        Idx::<Expression>(1): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "y1",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(1),
+            },
+            "range": 33..36,
+        },
+        Idx::<Expression>(2): {
+            "item": Binary {
+                op: Add,
+                lhs: Idx::<Expression>(0),
+                rhs: Idx::<Expression>(1),
+            },
+            "range": 28..36,
+        },
+        Idx::<Expression>(3): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "z1",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(1),
+            },
+            "range": 38..42,
+        },
+        Idx::<Expression>(4): {
+            "item": Binary {
+                op: Add,
+                lhs: Idx::<Expression>(2),
+                rhs: Idx::<Expression>(3),
+            },
+            "range": 28..42,
+        },
+        Idx::<Expression>(5): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                    Idx::<Pattern>(2),
+                ],
+                body: Idx::<Expression>(4),
+            },
+            "name": "funky",
+            "range": 0..42,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(6): {
+            "item": IntLiteral(
+                1,
+            ),
+            "name": "x",
+            "range": 42..52,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(7): {
+            "item": IntLiteral(
+                1,
+            ),
+            "name": "y",
+            "range": 52..62,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(8): {
+            "item": IntLiteral(
+                1,
+            ),
+            "name": "z",
+            "range": 62..72,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(9): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "x",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "range": 78..80,
+        },
+        Idx::<Expression>(10): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "y",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "range": 80..82,
+        },
+        Idx::<Expression>(11): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "z",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "range": 82..83,
+        },
+        Idx::<Expression>(12): {
+            "item": FunctionCall {
+                target: ThisModule(
+                    NonEmpty(
+                        [
+                            "funky",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+                args: [
+                    Idx::<Expression>(9),
+                    Idx::<Expression>(10),
+                    Idx::<Expression>(11),
+                ],
+            },
+            "range": 72..84,
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "x1",
+            },
+            "name": "x1",
+            "range": 13..15,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableDeclaration {
+                name: "y1",
+            },
+            "name": "y1",
+            "range": 17..19,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<Pattern>(2): {
+            "item": VariableDeclaration {
+                name: "z1",
+            },
+            "name": "z1",
+            "range": 21..23,
+            "scope_id": Idx::<Scope>(1),
+        },
+    },
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 80,
+        },
+        context: FunctionCallArgComma,
+    },
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 82,
+        },
+        context: FunctionCallArgComma,
+    },
+]

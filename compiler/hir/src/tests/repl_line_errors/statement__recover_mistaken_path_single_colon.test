@@ -1,0 +1,90 @@
+let foo = ResultThing:More:Stuff:here
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: Unknown(
+                    NonEmpty(
+                        [
+                            "ResultThing",
+                            "More",
+                            "Stuff",
+                            "here",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "name": "foo",
+            "range": 0..37,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                reference: "ResultThing",
+                path: NonEmpty(
+                    [
+                        "ResultThing",
+                        "More",
+                        "Stuff",
+                        "here",
+                    ],
+                ),
+                current_scope: Idx::<Scope>(0),
+            },
+            range: 10..37,
+        },
+    ],
+}
+[
+    ParseError {
+        expected: [
+            DoubleColon,
+        ],
+        kind: Unexpected {
+            found: Colon,
+            range: 21..22,
+        },
+        context: VariableRef,
+    },
+    ParseError {
+        expected: [
+            DoubleColon,
+        ],
+        kind: Unexpected {
+            found: Colon,
+            range: 26..27,
+        },
+        context: VariableRef,
+    },
+    ParseError {
+        expected: [
+            DoubleColon,
+        ],
+        kind: Unexpected {
+            found: Colon,
+            range: 32..33,
+        },
+        context: VariableRef,
+    },
+]

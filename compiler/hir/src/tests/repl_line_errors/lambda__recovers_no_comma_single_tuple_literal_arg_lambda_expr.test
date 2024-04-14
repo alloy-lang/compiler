@@ -1,0 +1,82 @@
+|(a b)| -> 5
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": IntLiteral(
+                5,
+            ),
+            "range": 11..12,
+        },
+        Idx::<Expression>(1): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(2),
+                ],
+                body: Idx::<Expression>(0),
+            },
+            "range": 0..12,
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "a",
+            },
+            "name": "a",
+            "range": 2..4,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableDeclaration {
+                name: "b",
+            },
+            "name": "b",
+            "range": 4..5,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<Pattern>(2): {
+            "item": Tuple(
+                NonEmpty(
+                    [
+                        Idx::<Pattern>(0),
+                        Idx::<Pattern>(1),
+                    ],
+                ),
+            ),
+            "range": 1..6,
+        },
+    },
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 4,
+        },
+        context: ParenExprComma,
+    },
+]

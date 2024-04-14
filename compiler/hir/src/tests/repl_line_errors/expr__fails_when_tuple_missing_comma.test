@@ -1,0 +1,58 @@
+(1 2)
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": IntLiteral(
+                1,
+            ),
+            "range": 1..3,
+        },
+        Idx::<Expression>(1): {
+            "item": IntLiteral(
+                2,
+            ),
+            "range": 3..4,
+        },
+        Idx::<Expression>(2): {
+            "item": Tuple(
+                NonEmpty(
+                    [
+                        Idx::<Expression>(0),
+                        Idx::<Expression>(1),
+                    ],
+                ),
+            ),
+            "range": 0..5,
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 3,
+        },
+        context: ParenExprComma,
+    },
+]

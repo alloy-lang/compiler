@@ -1,0 +1,58 @@
+let foo = 1
+
+(foo,
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": IntLiteral(
+                1,
+            ),
+            "name": "foo",
+            "range": 0..13,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(1): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "foo",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "range": 13..18,
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            RParen,
+        ],
+        kind: Missing {
+            offset: 18,
+        },
+        context: ParenExprRightParen,
+    },
+]

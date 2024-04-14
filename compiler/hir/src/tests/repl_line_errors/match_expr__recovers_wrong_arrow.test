@@ -1,0 +1,171 @@
+import test_data::test
+import std::bool::Bool::{True, False}
+
+match test when
+  | True > 0
+  | False -> 1
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "test",
+            },
+            "name": "test",
+            "range": 0..23,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Import>(1): {
+            "item": Import {
+                segments: [
+                    "std",
+                    "bool",
+                    "Bool",
+                ],
+                last: "True",
+            },
+            "name": "True",
+            "range": 23..62,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Import>(2): {
+            "item": Import {
+                segments: [
+                    "std",
+                    "bool",
+                    "Bool",
+                ],
+                last: "False",
+            },
+            "name": "False",
+            "range": 23..62,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "test",
+                        sub_path: [],
+                    },
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "range": 68..73,
+        },
+        Idx::<Expression>(1): {
+            "item": IntLiteral(
+                0,
+            ),
+            "range": 89..93,
+        },
+        Idx::<Expression>(2): {
+            "item": IntLiteral(
+                1,
+            ),
+            "range": 104..105,
+        },
+        Idx::<Expression>(3): {
+            "item": Match {
+                condition: Idx::<Expression>(0),
+                targets: [
+                    (
+                        Idx::<Pattern>(0),
+                        Idx::<Expression>(1),
+                    ),
+                    (
+                        Idx::<Pattern>(1),
+                        Idx::<Expression>(2),
+                    ),
+                ],
+            },
+            "range": 62..105,
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableRef {
+                path: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "bool",
+                                "Bool",
+                            ],
+                        ),
+                        name: "True",
+                        sub_path: [],
+                    },
+                ),
+                scope: Idx::<Scope>(1),
+            },
+            "range": 82..87,
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableRef {
+                path: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "bool",
+                                "Bool",
+                            ],
+                        ),
+                        name: "False",
+                        sub_path: [],
+                    },
+                ),
+                scope: Idx::<Scope>(2),
+            },
+            "range": 95..101,
+        },
+    },
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "match expression arm",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "match expression arm",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            RightArrow,
+        ],
+        kind: Unexpected {
+            found: RAngle,
+            range: 87..88,
+        },
+        context: MatchTargetRightArrow,
+    },
+]

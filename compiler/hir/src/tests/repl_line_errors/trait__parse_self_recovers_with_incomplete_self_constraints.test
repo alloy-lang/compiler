@@ -1,0 +1,48 @@
+trait TestTrait1 where
+    self
+
+    typeof distraction : String
+end
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Equals,
+        ],
+        kind: Missing {
+            offset: 37,
+        },
+        context: TraitSelfConstraintsEquals,
+    },
+    ParseError {
+        expected: [
+            Hash,
+            Ident,
+        ],
+        kind: Missing {
+            offset: 37,
+        },
+        context: TypeVariableConstraint,
+    },
+]

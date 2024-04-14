@@ -1,0 +1,65 @@
+let = 1
+let b = a
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: Unknown(
+                    NonEmpty(
+                        [
+                            "a",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "name": "b",
+            "range": 8..17,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                reference: "a",
+                path: NonEmpty(
+                    [
+                        "a",
+                    ],
+                ),
+                current_scope: Idx::<Scope>(0),
+            },
+            range: 16..17,
+        },
+    ],
+}
+[
+    ParseError {
+        expected: [
+            OpIdent,
+            Ident,
+        ],
+        kind: Missing {
+            offset: 4,
+        },
+        context: ValueDefIdent,
+    },
+]

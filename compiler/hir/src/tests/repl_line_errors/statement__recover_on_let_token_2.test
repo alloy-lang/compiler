@@ -1,0 +1,94 @@
+let 1
+let b = a
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: Unknown(
+                    NonEmpty(
+                        [
+                            "a",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "name": "b",
+            "range": 6..15,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                reference: "a",
+                path: NonEmpty(
+                    [
+                        "a",
+                    ],
+                ),
+                current_scope: Idx::<Scope>(0),
+            },
+            range: 14..15,
+        },
+    ],
+}
+[
+    ParseError {
+        expected: [
+            OpIdent,
+            Ident,
+        ],
+        kind: Unexpected {
+            found: Integer,
+            range: 4..5,
+        },
+        context: ValueDefIdent,
+    },
+    ParseError {
+        expected: [
+            Equals,
+        ],
+        kind: Missing {
+            offset: 6,
+        },
+        context: ValueDefEquals,
+    },
+    ParseError {
+        expected: [
+            Integer,
+            Fraction,
+            String,
+            Char,
+            Ident,
+            OpIdent,
+            Minus,
+            LParen,
+            IfKw,
+            MatchKw,
+            Pipe,
+        ],
+        kind: Missing {
+            offset: 6,
+        },
+        context: ValueDefExpr,
+    },
+]

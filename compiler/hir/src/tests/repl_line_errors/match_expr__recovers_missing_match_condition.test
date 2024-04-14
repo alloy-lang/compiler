@@ -1,0 +1,136 @@
+match test when
+  | -> 0
+  | False -> 1
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: Unknown(
+                    NonEmpty(
+                        [
+                            "test",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "range": 6..11,
+        },
+        Idx::<Expression>(1): {
+            "item": IntLiteral(
+                0,
+            ),
+            "range": 23..27,
+        },
+        Idx::<Expression>(2): {
+            "item": IntLiteral(
+                1,
+            ),
+            "range": 38..39,
+        },
+        Idx::<Expression>(3): {
+            "item": Match {
+                condition: Idx::<Expression>(0),
+                targets: [
+                    (
+                        Idx::<Pattern>(0),
+                        Idx::<Expression>(1),
+                    ),
+                    (
+                        Idx::<Pattern>(1),
+                        Idx::<Expression>(2),
+                    ),
+                ],
+            },
+            "range": 0..39,
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": Missing,
+            "range": 18..27,
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableRef {
+                path: Unknown(
+                    NonEmpty(
+                        [
+                            "False",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(2),
+            },
+            "range": 29..35,
+        },
+    },
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "match expression arm",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "match expression arm",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                reference: "test",
+                path: NonEmpty(
+                    [
+                        "test",
+                    ],
+                ),
+                current_scope: Idx::<Scope>(0),
+            },
+            range: 6..11,
+        },
+        LoweringError {
+            kind: UnknownReference {
+                reference: "False",
+                path: NonEmpty(
+                    [
+                        "False",
+                    ],
+                ),
+                current_scope: Idx::<Scope>(2),
+            },
+            range: 29..35,
+        },
+    ],
+}
+[
+    ParseError {
+        expected: [
+            Integer,
+            Fraction,
+            String,
+            Char,
+            Ident,
+            Minus,
+            LParen,
+            NilIdentifier,
+        ],
+        kind: Missing {
+            offset: 20,
+        },
+        context: MatchTargetCondition,
+    },
+]

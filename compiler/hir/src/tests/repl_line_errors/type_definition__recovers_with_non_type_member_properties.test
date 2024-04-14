@@ -1,0 +1,103 @@
+typedef Test1 =
+  | Thing1 0 Int
+  | Thing2 "hi"
+  | Thing3 String Int
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": BuiltIn(
+                Int,
+            ),
+            "range": 29..35,
+        },
+        Idx::<TypeReference>(1): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 60..67,
+        },
+        Idx::<TypeReference>(2): {
+            "item": BuiltIn(
+                Int,
+            ),
+            "range": 67..70,
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "Test1",
+                kind: Union(
+                    [
+                        TypeDefinitionMember {
+                            name: "Thing1",
+                            properties: [
+                                Idx::<TypeReference>(0),
+                            ],
+                        },
+                        TypeDefinitionMember {
+                            name: "Thing2",
+                            properties: [],
+                        },
+                        TypeDefinitionMember {
+                            name: "Thing3",
+                            properties: [
+                                Idx::<TypeReference>(1),
+                                Idx::<TypeReference>(2),
+                            ],
+                        },
+                    ],
+                ),
+            },
+            "name": "Test1",
+            "range": 0..70,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+            LParen,
+        ],
+        kind: Unexpected {
+            found: Integer,
+            range: 27..28,
+        },
+        context: TypeDefMemberPropertyType,
+    },
+    ParseError {
+        expected: [
+            Ident,
+            LParen,
+        ],
+        kind: Unexpected {
+            found: String,
+            range: 44..48,
+        },
+        context: TypeDefMemberPropertyType,
+    },
+]

@@ -1,0 +1,86 @@
+|arg1 1001 'c'| -> 8
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": IntLiteral(
+                8,
+            ),
+            "range": 19..20,
+        },
+        Idx::<Expression>(1): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                    Idx::<Pattern>(2),
+                ],
+                body: Idx::<Expression>(0),
+            },
+            "range": 0..20,
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "arg1",
+            },
+            "name": "arg1",
+            "range": 1..6,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<Pattern>(1): {
+            "item": IntLiteral(
+                1001,
+            ),
+            "range": 6..11,
+        },
+        Idx::<Pattern>(2): {
+            "item": CharLiteral(
+                'c',
+            ),
+            "range": 11..14,
+        },
+    },
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 6,
+        },
+        context: LambdaArgComma,
+    },
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 11,
+        },
+        context: LambdaArgComma,
+    },
+]

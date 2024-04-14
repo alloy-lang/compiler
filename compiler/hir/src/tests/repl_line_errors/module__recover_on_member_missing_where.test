@@ -1,0 +1,90 @@
+module TestModule1
+    import really::really::real::Thing1
+    import really::real::other::Thing2
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "really",
+                    "really",
+                    "real",
+                ],
+                last: "Thing1",
+            },
+            "name": "Thing1",
+            "range": 23..63,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Import>(1): {
+            "item": Import {
+                segments: [
+                    "really",
+                    "real",
+                    "other",
+                ],
+                last: "Thing2",
+            },
+            "name": "Thing2",
+            "range": 63..97,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+            ],
+        },
+    },
+    warnings: [
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "really",
+                        "really",
+                        "real",
+                    ],
+                    last: "Thing1",
+                },
+            },
+            range: 23..63,
+        },
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "really",
+                        "real",
+                        "other",
+                    ],
+                    last: "Thing2",
+                },
+            },
+            range: 63..97,
+        },
+    ],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            WhereKw,
+        ],
+        kind: Missing {
+            offset: 23,
+        },
+        context: ModuleWhere,
+    },
+]
