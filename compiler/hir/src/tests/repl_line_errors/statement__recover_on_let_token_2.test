@@ -1,20 +1,13 @@
 let 1
-let b = a
+let b = 2
 ===
 HirModule {
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
-            "item": VariableRef {
-                path: Unknown(
-                    NonEmpty(
-                        [
-                            "a",
-                        ],
-                    ),
-                ),
-                scope: Idx::<Scope>(0),
-            },
+            "item": IntLiteral(
+                2,
+            ),
             "name": "b",
             "range": 6..15,
             "scope_id": Idx::<Scope>(0),
@@ -36,20 +29,7 @@ HirModule {
         },
     },
     warnings: [],
-    errors: [
-        LoweringError {
-            kind: UnknownReference {
-                reference: "a",
-                path: NonEmpty(
-                    [
-                        "a",
-                    ],
-                ),
-                current_scope: Idx::<Scope>(0),
-            },
-            range: 14..15,
-        },
-    ],
+    errors: [],
 }
 [
     ParseError {

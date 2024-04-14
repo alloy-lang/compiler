@@ -1,28 +1,73 @@
+import test_data::test
+import std::bool::Bool::{True, False}
+
 match test when
   | True ->
   | False -> 1
 ===
 HirModule {
-    imports: EmptyIndex::<Import>,
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "test",
+            },
+            "name": "test",
+            "range": 0..23,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Import>(1): {
+            "item": Import {
+                segments: [
+                    "std",
+                    "bool",
+                    "Bool",
+                ],
+                last: "True",
+            },
+            "name": "True",
+            "range": 23..62,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Import>(2): {
+            "item": Import {
+                segments: [
+                    "std",
+                    "bool",
+                    "Bool",
+                ],
+                last: "False",
+            },
+            "name": "False",
+            "range": 23..62,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                path: Unknown(
-                    NonEmpty(
-                        [
-                            "test",
-                        ],
-                    ),
+                path: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "test",
+                        sub_path: [],
+                    },
                 ),
                 scope: Idx::<Scope>(0),
             },
-            "range": 6..11,
+            "range": 68..73,
         },
         Idx::<Expression>(1): {
             "item": IntLiteral(
                 1,
             ),
-            "range": 41..42,
+            "range": 103..104,
         },
         Idx::<Expression>(2): {
             "item": Lambda {
@@ -31,7 +76,7 @@ HirModule {
                 ],
                 body: Idx::<Expression>(1),
             },
-            "range": 30..42,
+            "range": 92..104,
         },
         Idx::<Expression>(3): {
             "item": Match {
@@ -43,29 +88,35 @@ HirModule {
                     ),
                 ],
             },
-            "range": 0..42,
+            "range": 62..104,
         },
     },
     patterns: Index::<Pattern> {
         Idx::<Pattern>(0): {
             "item": VariableRef {
-                path: Unknown(
-                    NonEmpty(
-                        [
-                            "True",
-                        ],
-                    ),
+                path: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "bool",
+                                "Bool",
+                            ],
+                        ),
+                        name: "True",
+                        sub_path: [],
+                    },
                 ),
                 scope: Idx::<Scope>(1),
             },
-            "range": 20..25,
+            "range": 82..87,
         },
         Idx::<Pattern>(1): {
             "item": VariableDeclaration {
                 name: "False",
             },
             "name": "False",
-            "range": 32..38,
+            "range": 94..100,
             "scope_id": Idx::<Scope>(2),
         },
     },
@@ -91,33 +142,22 @@ HirModule {
             ],
         },
     },
-    warnings: [],
-    errors: [
-        LoweringError {
-            kind: UnknownReference {
-                reference: "test",
-                path: NonEmpty(
-                    [
-                        "test",
+    warnings: [
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "std",
+                        "bool",
+                        "Bool",
                     ],
-                ),
-                current_scope: Idx::<Scope>(0),
+                    last: "False",
+                },
             },
-            range: 6..11,
-        },
-        LoweringError {
-            kind: UnknownReference {
-                reference: "True",
-                path: NonEmpty(
-                    [
-                        "True",
-                    ],
-                ),
-                current_scope: Idx::<Scope>(1),
-            },
-            range: 20..25,
+            range: 23..62,
         },
     ],
+    errors: [],
 }
 [
     ParseError {
@@ -125,7 +165,7 @@ HirModule {
             Pipe,
         ],
         kind: Missing {
-            offset: 38,
+            offset: 100,
         },
         context: LambdaArgPipe,
     },

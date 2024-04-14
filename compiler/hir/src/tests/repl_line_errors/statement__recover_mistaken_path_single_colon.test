@@ -1,24 +1,43 @@
+import test_data::ResultThing
+
 let foo = ResultThing:More:Stuff:here
 ===
 HirModule {
-    imports: EmptyIndex::<Import>,
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "ResultThing",
+            },
+            "name": "ResultThing",
+            "range": 0..31,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                path: Unknown(
-                    NonEmpty(
-                        [
-                            "ResultThing",
+                path: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "ResultThing",
+                        sub_path: [
                             "More",
                             "Stuff",
                             "here",
                         ],
-                    ),
+                    },
                 ),
                 scope: Idx::<Scope>(0),
             },
             "name": "foo",
-            "range": 0..37,
+            "range": 31..68,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -38,23 +57,7 @@ HirModule {
         },
     },
     warnings: [],
-    errors: [
-        LoweringError {
-            kind: UnknownReference {
-                reference: "ResultThing",
-                path: NonEmpty(
-                    [
-                        "ResultThing",
-                        "More",
-                        "Stuff",
-                        "here",
-                    ],
-                ),
-                current_scope: Idx::<Scope>(0),
-            },
-            range: 10..37,
-        },
-    ],
+    errors: [],
 }
 [
     ParseError {
@@ -63,7 +66,7 @@ HirModule {
         ],
         kind: Unexpected {
             found: Colon,
-            range: 21..22,
+            range: 52..53,
         },
         context: VariableRef,
     },
@@ -73,7 +76,7 @@ HirModule {
         ],
         kind: Unexpected {
             found: Colon,
-            range: 26..27,
+            range: 57..58,
         },
         context: VariableRef,
     },
@@ -83,7 +86,7 @@ HirModule {
         ],
         kind: Unexpected {
             found: Colon,
-            range: 32..33,
+            range: 63..64,
         },
         context: VariableRef,
     },

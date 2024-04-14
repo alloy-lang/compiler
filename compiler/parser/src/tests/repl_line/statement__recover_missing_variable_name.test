@@ -1,5 +1,5 @@
 let = 1
-let b = a
+let b = 2
 ===
 SourceFile@0..17
   ValueDef@0..8
@@ -17,7 +17,6 @@ SourceFile@0..17
     Whitespace@13..14 " "
     Equals@14..15 "="
     Whitespace@15..16 " "
-    VariableRef@16..17
-      Path@16..17
-        Ident@16..17 "a"
+    IntLiteral@16..17
+      Integer@16..17 "2"
 error at position 4 while parsing the name in a value definition. Missing expected operator identifier or identifier

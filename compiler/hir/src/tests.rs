@@ -6,21 +6,28 @@ use alloy_ast as ast;
 #[test]
 fn source_file() {
     alloy_test_harness::run_test_dir("source_file", |path, input| {
-        run_hir_test(path, input, false, lower_source_file)
+        run_hir_test(path, input, false, false, lower_source_file)
     });
 }
 
 #[test]
 fn repl_line() {
     alloy_test_harness::run_test_dir("repl_line", |path, input| {
-        run_hir_test(path, input, false, lower_repl_line)
+        run_hir_test(path, input, false, false, lower_repl_line)
+    });
+}
+
+#[test]
+fn repl_line_lowering_errors() {
+    alloy_test_harness::run_test_dir("repl_line_lowering_errors", |path, input| {
+        run_hir_test(path, input, false, true, lower_repl_line)
     });
 }
 
 #[test]
 fn repl_line_errors() {
     alloy_test_harness::run_test_dir("repl_line_errors", |path, input| {
-        run_hir_test(path, input, true, lower_repl_line)
+        run_hir_test(path, input, true, false, lower_repl_line)
     });
 }
 
@@ -50,20 +57,23 @@ fn lower_repl_line(input: &str) -> (HirModule, Vec<alloy_parser::ParseError>) {
 fn run_hir_test(
     path: &Path,
     input: &str,
-    ignore_parse_errors: bool,
+    expect_parse_errors: bool,
+    expect_lowering_errors: bool,
     func: fn(&str) -> (HirModule, Vec<alloy_parser::ParseError>),
 ) -> String {
     let (module, parse_errors) = func(input);
 
-    if !ignore_parse_errors {
-        let file_name = path.to_str().expect("Expected filename");
-        assert!(
-            parse_errors.is_empty(),
-            "file '{}' contained parse errors: {:?}",
-            file_name,
-            parse_errors
-        );
-    }
+    let file_name = path.to_str().expect("Expected filename");
+    assert_eq!(
+        !parse_errors.is_empty(),
+        expect_parse_errors,
+        "file '{file_name}' contained parse errors: {parse_errors:?}",
+    );
+    assert_eq!(
+        !module.errors().is_empty(),
+        expect_lowering_errors,
+        "file '{file_name}' contained parse errors: {parse_errors:?}",
+    );
 
     format!("{module:#?}\n{parse_errors:#?}")
 }
