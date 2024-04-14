@@ -103,6 +103,11 @@ pub enum LoweringErrorKind {
         first: TextRange,
         second: TextRange,
     },
+    ImportGroupNotAtEnd {
+        group_range: TextRange,
+        position: usize,
+        num_segments: usize,
+    },
     ConflictingTypeAnnotationName {
         name: Name,
         first: TextRange,

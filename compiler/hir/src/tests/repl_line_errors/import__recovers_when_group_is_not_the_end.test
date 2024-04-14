@@ -1,0 +1,60 @@
+import std::{functor, option}::map
+import std::functor::Functor
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "std",
+                    "functor",
+                ],
+                last: "Functor",
+            },
+            "name": "Functor",
+            "range": 35..63,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+            ],
+        },
+    },
+    warnings: [
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "std",
+                        "functor",
+                    ],
+                    last: "Functor",
+                },
+            },
+            range: 35..63,
+        },
+    ],
+    errors: [
+        LoweringError {
+            kind: ImportGroupNotAtEnd {
+                group_range: 12..29,
+                position: 1,
+                num_segments: 3,
+            },
+            range: 0..35,
+        },
+    ],
+}
+[]
