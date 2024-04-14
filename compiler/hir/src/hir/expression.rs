@@ -100,7 +100,8 @@ pub(super) fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expressio
         ast::Expression::IfThenElseExpr(e) => lower_if_then_else_expression(ctx, e),
         ast::Expression::ParenExpr(e) => {
             let Some(inner) = e.expression() else {
-                // todo!("validation");
+                // if we don't have an inner expression, we don't have anything to lower
+                // we can count it missing, since it'll be reported as a parsing error
                 return Expression::Missing;
             };
 
@@ -128,7 +129,8 @@ pub(super) fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expressio
 
 fn lower_unary_expression(ctx: &mut LoweringCtx, e: &ast::UnaryExpr) -> Expression {
     let Some(inner) = e.expression() else {
-        // todo!("validation");
+        // if we don't have an inner expression, we don't have anything to lower
+        // we can count it missing, since it'll be reported as a parsing error
         return Expression::Missing;
     };
     let Some(op) = e.op() else {
