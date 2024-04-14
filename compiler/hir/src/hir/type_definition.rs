@@ -23,8 +23,9 @@ pub struct TypeDefinitionMember {
 
 pub(super) fn lower_type_definition(ctx: &mut LoweringCtx, ast: &ast::TypeDefinition) {
     let Some(parent_name) = ast.name() else {
-        unreachable!("parsing error")
-        // return;
+        // we can't lower a type that we don't have a name for
+        // we can skip it since it'll be reported as a parsing error
+        return;
     };
     let parent_name = Name::new(parent_name);
 
@@ -38,7 +39,8 @@ pub(super) fn lower_type_definition(ctx: &mut LoweringCtx, ast: &ast::TypeDefini
         let mut members = vec![];
         for member in ast.types() {
             let Some(sub_name) = member.name() else {
-                unreachable!("parsing error");
+                // if the sub_name is missing for a type, we can skip it since it'll be reported as a parsing error
+                continue;
             };
 
             let properties = member

@@ -1,0 +1,76 @@
+typedef Test1
+typedef Test2 = Empty
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "Test1",
+                kind: Missing,
+            },
+            "name": "Test1",
+            "range": 0..14,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "Test2",
+                kind: Single(
+                    TypeDefinitionMember {
+                        name: "Empty",
+                        properties: [],
+                    },
+                ),
+            },
+            "name": "Test2",
+            "range": 14..35,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Equals,
+        ],
+        kind: Missing {
+            offset: 14,
+        },
+        context: TypeDefEquals,
+    },
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Missing {
+            offset: 14,
+        },
+        context: TypeDefMemberName,
+    },
+]
