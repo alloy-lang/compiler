@@ -1,7 +1,10 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-pub(super) fn lower_type_annotation(ctx: &mut LoweringCtx, ast: &ast::TypeAnnotation) {
+pub(super) fn lower_type_annotation(
+    ctx: &mut LoweringCtx,
+    ast: &ast::TypeAnnotation,
+) -> Option<TypeIdx> {
     let type_id = ctx.inside_scope("type annotation", |ctx| {
         for type_var in ast.named_type_variables() {
             lower_named_type_variable(ctx, &type_var);
@@ -16,9 +19,9 @@ pub(super) fn lower_type_annotation(ctx: &mut LoweringCtx, ast: &ast::TypeAnnota
     let Some(name) = ast.name() else {
         // we can't lower a type annotation that we don't have a name for
         // we can skip it since it'll be reported as a parsing error
-        return;
+        return None;
     };
     let name = Name::new(name);
 
-    ctx.add_type_annotation(name, type_id, &ast.syntax());
+    Some(ctx.add_type_annotation(name, type_id, &ast.syntax()))
 }

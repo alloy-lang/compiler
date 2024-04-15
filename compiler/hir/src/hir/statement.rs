@@ -13,7 +13,11 @@ pub(super) fn lower_statement(ctx: &mut LoweringCtx, statement: &ast::Statement)
         ast::Statement::TraitDef(t) => lower_trait(ctx, t),
         ast::Statement::BehaviorDef(b) => lower_behavior(ctx, b),
         ast::Statement::TypeDefinition(td) => lower_type_definition(ctx, td),
-        ast::Statement::TypeAnnotation(ta) => lower_type_annotation(ctx, ta),
-        ast::Statement::ValueDef(v) => lower_value(ctx, v),
+        ast::Statement::TypeAnnotation(ta) => {
+            lower_type_annotation(ctx, ta);
+        }
+        ast::Statement::ValueDef(v) => {
+            lower_value(ctx, v);
+        }
     }
 }

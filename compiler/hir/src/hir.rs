@@ -283,18 +283,23 @@ impl LoweringCtx {
         name: Name,
         expression: Expression,
         element: &SyntaxElement,
-    ) {
+    ) -> ExpressionIdx {
         let res =
             self.expressions
                 .insert_named(name, expression, element.text_range(), &self.scopes);
 
-        if let Err(err) = res {
-            let err = LoweringErrorKind::ConflictingValue {
-                name: err.name,
-                first: err.first,
-                second: err.second,
-            };
-            self.error(err, element.text_range());
+        match res {
+            Err(err) => {
+                let err = LoweringErrorKind::ConflictingValue {
+                    name: err.name,
+                    first: err.first,
+                    second: err.second,
+                };
+                self.error(err, element.text_range());
+
+                self.add_missing_expression(element)
+            }
+            Ok(id) => id,
         }
     }
 
@@ -350,7 +355,7 @@ impl LoweringCtx {
         name: Name,
         type_id: TypeIdx,
         element: &SyntaxElement,
-    ) {
+    ) -> TypeIdx {
         let res = self
             .type_references
             .add_name(name, type_id, element.text_range(), &self.scopes);
@@ -367,7 +372,7 @@ impl LoweringCtx {
                 self.add_missing_type_reference(element)
             }
             Ok(pid) => pid,
-        };
+        }
     }
 
     pub(crate) fn add_type_definition(
