@@ -1,0 +1,122 @@
+import test_data::ResultThing
+
+typeof test1 : String -> ResultThing::
+typeof test2 : String -> ResultThing::More
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "ResultThing",
+            },
+            "name": "ResultThing",
+            "range": 0..31,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 46..53,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "ResultThing",
+                        sub_path: [],
+                    },
+                ),
+            ),
+            "range": 56..70,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(0),
+                return_type: Idx::<TypeReference>(1),
+            },
+            "name": "test1",
+            "range": 46..70,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeReference>(3): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 85..92,
+        },
+        Idx::<TypeReference>(4): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "ResultThing",
+                        sub_path: [
+                            "More",
+                        ],
+                    },
+                ),
+            ),
+            "range": 95..112,
+        },
+        Idx::<TypeReference>(5): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(3),
+                return_type: Idx::<TypeReference>(4),
+            },
+            "name": "test2",
+            "range": 85..112,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Missing {
+            offset: 70,
+        },
+        context: TypeOfType,
+    },
+]

@@ -64,16 +64,32 @@ fn run_hir_test(
     let (module, parse_errors) = func(input);
 
     let file_name = path.to_str().expect("Expected filename");
-    assert_eq!(
-        !parse_errors.is_empty(),
-        expect_parse_errors,
-        "file '{file_name}' contained parse errors: {parse_errors:?}",
-    );
-    assert_eq!(
-        !module.errors().is_empty(),
-        expect_lowering_errors,
-        "file '{file_name}' contained parse errors: {parse_errors:?}",
-    );
+    if expect_parse_errors {
+        assert!(
+            !parse_errors.is_empty(),
+            "file '{}' did not contain parse errors",
+            file_name
+        );
+    } else {
+        assert!(
+            parse_errors.is_empty(),
+            "file '{}' contained parse errors: {parse_errors:?}",
+            file_name
+        );
+    }
+    if expect_lowering_errors {
+        assert!(
+            !module.errors().is_empty() || !module.warnings().is_empty(),
+            "file '{}' did not contain lowering errors or warnings",
+            file_name
+        );
+    } else {
+        assert!(
+            module.errors().is_empty(),
+            "file '{file_name}' contained lowering errors: {:?}",
+            module.errors(),
+        );
+    }
 
     format!("{module:#?}\n{parse_errors:#?}")
 }
@@ -85,6 +101,7 @@ fn test_std_lib() {
         let file_name = path.to_str().expect("Expected filename");
 
         let (module, parse_errors) = lower_source_file(source);
+        let lowering_warnings = module.warnings();
         let lowering_errors = module.errors();
 
         assert!(
@@ -92,6 +109,12 @@ fn test_std_lib() {
             "file '{}' contained parse errors: {:#?}",
             file_name,
             parse_errors,
+        );
+        assert!(
+            lowering_warnings.is_empty(),
+            "file '{}' contained lowering warnings: {:#?}",
+            file_name,
+            lowering_warnings,
         );
         assert!(
             lowering_errors.is_empty(),

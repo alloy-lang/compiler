@@ -1,0 +1,140 @@
+import test_data::Test
+
+typeof test1 : Test -> String -> (String
+typeof test2 : Test -> String
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "Test",
+            },
+            "name": "Test",
+            "range": 0..24,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "Test",
+                        sub_path: [],
+                    },
+                ),
+            ),
+            "range": 39..44,
+        },
+        Idx::<TypeReference>(1): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 47..54,
+        },
+        Idx::<TypeReference>(2): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 58..65,
+        },
+        Idx::<TypeReference>(3): {
+            "item": ParenthesizedType(
+                Idx::<TypeReference>(2),
+            ),
+            "range": 57..65,
+        },
+        Idx::<TypeReference>(4): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(1),
+                return_type: Idx::<TypeReference>(3),
+            },
+            "range": 47..65,
+        },
+        Idx::<TypeReference>(5): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(0),
+                return_type: Idx::<TypeReference>(4),
+            },
+            "name": "test1",
+            "range": 39..65,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeReference>(6): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "Test",
+                        sub_path: [],
+                    },
+                ),
+            ),
+            "range": 80..85,
+        },
+        Idx::<TypeReference>(7): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 88..94,
+        },
+        Idx::<TypeReference>(8): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(6),
+                return_type: Idx::<TypeReference>(7),
+            },
+            "name": "test2",
+            "range": 80..94,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+            RParen,
+        ],
+        kind: Missing {
+            offset: 65,
+        },
+        context: ParenthesizedTypeRightParen,
+    },
+]

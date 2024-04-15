@@ -1,0 +1,130 @@
+import test_data::Test
+
+typeof apply : Test[t1, t2 where
+    typevar t1
+    typevar t2
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "Test",
+            },
+            "name": "Test",
+            "range": 0..24,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "Test",
+                        sub_path: [],
+                    },
+                ),
+            ),
+            "range": 39..43,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "t1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 44..46,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "t2",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 48..51,
+        },
+        Idx::<TypeReference>(3): {
+            "item": Bounded {
+                base: Idx::<TypeReference>(0),
+                args: [
+                    Idx::<TypeReference>(1),
+                    Idx::<TypeReference>(2),
+                ],
+            },
+            "name": "apply",
+            "range": 39..51,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t1",
+            "range": 61..76,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "t2",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t2",
+            "range": 76..86,
+            "scope_id": Idx::<Scope>(1),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            RBracket,
+        ],
+        kind: Missing {
+            offset: 51,
+        },
+        context: BoundedTypeRBracket,
+    },
+]

@@ -1,0 +1,110 @@
+import test_data::Test
+
+typeof test1   String
+typeof test2 : Test -> String -> Int
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "Test",
+            },
+            "name": "Test",
+            "range": 0..24,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": BuiltIn(
+                String,
+            ),
+            "name": "test1",
+            "range": 39..46,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "Test",
+                        sub_path: [],
+                    },
+                ),
+            ),
+            "range": 61..66,
+        },
+        Idx::<TypeReference>(2): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 69..76,
+        },
+        Idx::<TypeReference>(3): {
+            "item": BuiltIn(
+                Int,
+            ),
+            "range": 79..82,
+        },
+        Idx::<TypeReference>(4): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(2),
+                return_type: Idx::<TypeReference>(3),
+            },
+            "range": 69..82,
+        },
+        Idx::<TypeReference>(5): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(1),
+                return_type: Idx::<TypeReference>(4),
+            },
+            "name": "test2",
+            "range": 61..82,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Colon,
+        ],
+        kind: Missing {
+            offset: 39,
+        },
+        context: TypeOfColon,
+    },
+]

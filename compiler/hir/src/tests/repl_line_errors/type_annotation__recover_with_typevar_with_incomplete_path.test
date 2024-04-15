@@ -1,0 +1,158 @@
+import test_data::Test
+import std::functor
+
+typeof test : t1 -> t2 -> Test where
+    typevar t1 = functor::
+    typevar t2
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "Test",
+            },
+            "name": "Test",
+            "range": 0..23,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Import>(1): {
+            "item": Import {
+                segments: [
+                    "std",
+                ],
+                last: "functor",
+            },
+            "name": "functor",
+            "range": 23..44,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "t1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 58..61,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "t2",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 64..67,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "Test",
+                        sub_path: [],
+                    },
+                ),
+            ),
+            "range": 70..75,
+        },
+        Idx::<TypeReference>(3): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(1),
+                return_type: Idx::<TypeReference>(2),
+            },
+            "range": 64..75,
+        },
+        Idx::<TypeReference>(4): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(0),
+                return_type: Idx::<TypeReference>(3),
+            },
+            "name": "test",
+            "range": 58..75,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t1",
+            "range": 85..112,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "t2",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t2",
+            "range": 112..122,
+            "scope_id": Idx::<Scope>(1),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "std",
+                    ],
+                    last: "functor",
+                },
+            },
+            range: 23..44,
+        },
+    ],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Missing {
+            offset: 112,
+        },
+        context: TypeVariableTraitConstraint,
+    },
+]
