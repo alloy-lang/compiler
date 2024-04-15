@@ -46,7 +46,7 @@ impl AstElement for BinaryOp {
     #[must_use]
     fn cast<E: Into<SyntaxElement>>(element: E) -> Option<Self> {
         let element = element.into();
-        
+
         if matches!(
             element.kind(),
             SyntaxKind::Plus
