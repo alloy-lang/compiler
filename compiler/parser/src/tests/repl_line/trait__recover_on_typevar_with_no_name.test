@@ -1,0 +1,21 @@
+trait TestTrait1 where
+    typevar t1 =
+end
+===
+SourceFile@0..43
+  TraitDef@0..43
+    TraitKw@0..5 "trait"
+    Whitespace@5..6 " "
+    Ident@6..16 "TestTrait1"
+    Whitespace@16..17 " "
+    WhereKw@17..22 "where"
+    Whitespace@22..27 "\n    "
+    NamedTypeVariable@27..40
+      TypevarKw@27..34 "typevar"
+      Whitespace@34..35 " "
+      Ident@35..37 "t1"
+      Whitespace@37..38 " "
+      Equals@38..39 "="
+      Whitespace@39..40 "\n"
+    EndKw@40..43 "end"
+error at position 40 while parsing the constraints for a type variable. Missing expected ‘#’ or identifier

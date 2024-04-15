@@ -54,7 +54,7 @@ fn parse_generic_type_variable(p: &mut Parser, parent_recovery_set: TokenSet) ->
     p.expect_with_recovery(
         TokenKind::Ident,
         ParseErrorContext::TypeVariableName,
-        parent_recovery_set,
+        parent_recovery_set.plus(TokenKind::TypevarKw),
     );
 
     if p.maybe_at(TokenKind::Equals) {
