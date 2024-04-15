@@ -1,5 +1,11 @@
 trait TestTrait1 where
+    -- imagine all the things here
+
     typevar t1
+
+trait TestTrait2 where
+    -- imagine all the things here
+
     typevar t1
 end
 ===
@@ -17,19 +23,10 @@ HirModule {
                 ),
             },
             "name": "t1",
-            "range": 27..42,
+            "range": 63..75,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
-                name: "t1",
-                kind: TypeVariable(
-                    Unbound,
-                ),
-            },
-            "range": 42..53,
-        },
-        Idx::<TypeDefinition>(2): {
             "item": TypeDefinition {
                 name: "TestTrait1",
                 kind: Trait(
@@ -37,7 +34,7 @@ HirModule {
                         name: "TestTrait1",
                         self_constraints: [],
                         named_type_variables: {
-                            "t1": Idx::<TypeDefinition>(1),
+                            "t1": Idx::<TypeDefinition>(0),
                         },
                         type_annotations: {},
                         values: {},
@@ -45,14 +42,44 @@ HirModule {
                 ),
             },
             "name": "TestTrait1",
-            "range": 0..56,
+            "range": 0..75,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeDefinition>(2): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t1",
+            "range": 138..149,
+            "scope_id": Idx::<Scope>(2),
+        },
+        Idx::<TypeDefinition>(3): {
+            "item": TypeDefinition {
+                name: "TestTrait2",
+                kind: Trait(
+                    Trait {
+                        name: "TestTrait2",
+                        self_constraints: [],
+                        named_type_variables: {
+                            "t1": Idx::<TypeDefinition>(2),
+                        },
+                        type_annotations: {},
+                        values: {},
+                    },
+                ),
+            },
+            "name": "TestTrait2",
+            "range": 75..152,
             "scope_id": Idx::<Scope>(0),
         },
     },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 2,
+            len: 3,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -62,19 +89,24 @@ HirModule {
                     parent: Idx::<Scope>(0),
                     tag: "trait",
                 },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "trait",
+                },
             ],
         },
     },
     warnings: [],
-    errors: [
-        LoweringError {
-            kind: ConflictingTypeVariableName {
-                name: "t1",
-                first: 27..42,
-                second: 42..53,
-            },
-            range: 42..53,
-        },
-    ],
+    errors: [],
 }
-[]
+[
+    ParseError {
+        expected: [
+            EndKw,
+        ],
+        kind: Missing {
+            offset: 75,
+        },
+        context: TraitEnd,
+    },
+]

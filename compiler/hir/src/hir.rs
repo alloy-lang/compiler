@@ -128,6 +128,10 @@ pub enum LoweringErrorKind {
         path: NonEmpty<Name>,
         current_scope: ScopeIdx,
     },
+    MultipleSelfTypeVariablesInTraitDefinition {
+        trait_name: Name,
+        ranges: Vec<TextRange>,
+    },
 }
 
 #[derive(Debug)]
@@ -227,6 +231,9 @@ impl LoweringCtx {
                 return Some(Path::this_module(rest, first));
             }
             if let Some(tid) = self.type_definitions.get_id(&local_name, &self.scopes) {
+                return Some(Path::this_module(rest, first));
+            }
+            if let Some(tid) = self.type_references.get_id(&local_name, &self.scopes) {
                 return Some(Path::this_module(rest, first));
             }
             if let Some(ast) = self.glossary.get_type_definition_by_name(first) {
@@ -430,6 +437,18 @@ impl LoweringCtx {
             }
             Ok(pid) => pid,
         }
+    }
+
+    pub(crate) fn add_trait(&mut self, name: Name, trait_: Trait, element: &SyntaxElement) {
+        let _ = self.type_definitions.insert_named(
+            name.clone(),
+            TypeDefinition {
+                name,
+                kind: TypeDefinitionKind::Trait(trait_),
+            },
+            element.text_range(),
+            &self.scopes,
+        );
     }
 
     pub(crate) fn add_import(&mut self, path: &NonEmpty<Name>, element: &SyntaxElement) {

@@ -13,6 +13,7 @@ pub struct TypeDefinition {
 pub enum TypeDefinitionKind {
     Missing,
     TypeVariable(TypeVariable),
+    Trait(Trait),
     Single(TypeDefinitionMember),
     Union(Vec<TypeDefinitionMember>),
 }

@@ -1,7 +1,5 @@
-trait TestTrait1 where
-    self
-
-    typeof distraction : String
+trait TestTrait1
+    typeof test : String
 end
 ===
 HirModule {
@@ -13,8 +11,8 @@ HirModule {
             "item": BuiltIn(
                 String,
             ),
-            "name": "distraction",
-            "range": 58..65,
+            "name": "test",
+            "range": 35..42,
             "scope_id": Idx::<Scope>(1),
         },
     },
@@ -28,14 +26,14 @@ HirModule {
                         self_constraints: [],
                         named_type_variables: {},
                         type_annotations: {
-                            "distraction": Idx::<TypeReference>(0),
+                            "test": Idx::<TypeReference>(0),
                         },
                         values: {},
                     },
                 ),
             },
             "name": "TestTrait1",
-            "range": 0..68,
+            "range": 0..45,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -65,21 +63,11 @@ HirModule {
 [
     ParseError {
         expected: [
-            Equals,
+            WhereKw,
         ],
         kind: Missing {
-            offset: 37,
+            offset: 21,
         },
-        context: TraitSelfConstraintsEquals,
-    },
-    ParseError {
-        expected: [
-            Hash,
-            Ident,
-        ],
-        kind: Missing {
-            offset: 37,
-        },
-        context: TypeVariableConstraint,
+        context: TraitWhere,
     },
 ]

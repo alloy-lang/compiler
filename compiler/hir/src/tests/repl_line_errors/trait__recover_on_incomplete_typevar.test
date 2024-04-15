@@ -1,6 +1,5 @@
 trait TestTrait1 where
-    typevar t1
-    typevar t1
+    typevar t1 =
 end
 ===
 HirModule {
@@ -17,19 +16,10 @@ HirModule {
                 ),
             },
             "name": "t1",
-            "range": 27..42,
+            "range": 27..40,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
-                name: "t1",
-                kind: TypeVariable(
-                    Unbound,
-                ),
-            },
-            "range": 42..53,
-        },
-        Idx::<TypeDefinition>(2): {
             "item": TypeDefinition {
                 name: "TestTrait1",
                 kind: Trait(
@@ -37,7 +27,7 @@ HirModule {
                         name: "TestTrait1",
                         self_constraints: [],
                         named_type_variables: {
-                            "t1": Idx::<TypeDefinition>(1),
+                            "t1": Idx::<TypeDefinition>(0),
                         },
                         type_annotations: {},
                         values: {},
@@ -45,7 +35,7 @@ HirModule {
                 ),
             },
             "name": "TestTrait1",
-            "range": 0..56,
+            "range": 0..43,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -66,15 +56,17 @@ HirModule {
         },
     },
     warnings: [],
-    errors: [
-        LoweringError {
-            kind: ConflictingTypeVariableName {
-                name: "t1",
-                first: 27..42,
-                second: 42..53,
-            },
-            range: 42..53,
-        },
-    ],
+    errors: [],
 }
-[]
+[
+    ParseError {
+        expected: [
+            Hash,
+            Ident,
+        ],
+        kind: Missing {
+            offset: 40,
+        },
+        context: TypeVariableConstraint,
+    },
+]

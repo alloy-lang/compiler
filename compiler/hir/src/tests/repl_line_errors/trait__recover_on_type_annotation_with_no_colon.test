@@ -1,0 +1,135 @@
+trait TestTrait1 where
+    typeof test1   self -> String -> Int
+    typeof test2 : self -> String -> Int
+end
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": SelfRef,
+            "range": 42..47,
+        },
+        Idx::<TypeReference>(1): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 50..57,
+        },
+        Idx::<TypeReference>(2): {
+            "item": BuiltIn(
+                Int,
+            ),
+            "range": 60..68,
+        },
+        Idx::<TypeReference>(3): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(1),
+                return_type: Idx::<TypeReference>(2),
+            },
+            "range": 50..68,
+        },
+        Idx::<TypeReference>(4): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(0),
+                return_type: Idx::<TypeReference>(3),
+            },
+            "name": "test1",
+            "range": 42..68,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeReference>(5): {
+            "item": SelfRef,
+            "range": 83..88,
+        },
+        Idx::<TypeReference>(6): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 91..98,
+        },
+        Idx::<TypeReference>(7): {
+            "item": BuiltIn(
+                Int,
+            ),
+            "range": 101..105,
+        },
+        Idx::<TypeReference>(8): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(6),
+                return_type: Idx::<TypeReference>(7),
+            },
+            "range": 91..105,
+        },
+        Idx::<TypeReference>(9): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(5),
+                return_type: Idx::<TypeReference>(8),
+            },
+            "name": "test2",
+            "range": 83..105,
+            "scope_id": Idx::<Scope>(1),
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "TestTrait1",
+                kind: Trait(
+                    Trait {
+                        name: "TestTrait1",
+                        self_constraints: [],
+                        named_type_variables: {},
+                        type_annotations: {
+                            "test2": Idx::<TypeReference>(9),
+                            "test1": Idx::<TypeReference>(4),
+                        },
+                        values: {},
+                    },
+                ),
+            },
+            "name": "TestTrait1",
+            "range": 0..108,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 4,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "trait",
+                },
+                Scope {
+                    parent: Idx::<Scope>(1),
+                    tag: "type annotation",
+                },
+                Scope {
+                    parent: Idx::<Scope>(1),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Colon,
+        ],
+        kind: Missing {
+            offset: 42,
+        },
+        context: TypeOfColon,
+    },
+]

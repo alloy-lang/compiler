@@ -13,15 +13,35 @@ pub enum TypeVariableConstraint {
     Trait(Path),
 }
 
-pub(super) fn lower_named_type_variable(ctx: &mut LoweringCtx, ast: &ast::NamedTypeVariable) {
+pub(super) fn lower_named_type_variable(ctx: &mut LoweringCtx, ast: &ast::NamedTypeVariable) -> Option<(Name, TypeDefinitionIdx)> {
     let Some(name) = ast.name() else {
         // we can't add a type arg that we don't have a name for
         // we can skip it since it'll be reported as a parsing error
-        return;
+        return None;
     };
 
-    let constraints = ast
-        .constraints()
+    let constraints = lower_type_variable_constraints(ctx, &ast.constraints());
+    let type_variable = if constraints.is_empty() {
+        TypeVariable::Unbound
+    } else {
+        TypeVariable::Constrained(constraints)
+    };
+
+    Some((Name::new(&name), ctx.add_type_variable(name, type_variable, &ast.syntax())))
+}
+
+pub(super) fn lower_self_type_variable_constraints(
+    ctx: &mut LoweringCtx,
+    ast: &ast::SelfTypeVariable,
+) -> Vec<TypeVariableConstraint> {
+    lower_type_variable_constraints(ctx, &ast.constraints())
+}
+
+fn lower_type_variable_constraints(
+    ctx: &mut LoweringCtx,
+    type_variable_constraints: &[ast::TypeVariableConstraint],
+) -> Vec<TypeVariableConstraint> {
+    type_variable_constraints
         .iter()
         .map(|constraint| match constraint {
             ast::TypeVariableConstraint::TypeVariableKindConstraint(kind) => {
@@ -38,13 +58,5 @@ pub(super) fn lower_named_type_variable(ctx: &mut LoweringCtx, ast: &ast::NamedT
                 TypeVariableConstraint::Trait(path)
             }
         })
-        .collect::<Vec<_>>();
-
-    let type_variable = if constraints.is_empty() {
-        TypeVariable::Unbound
-    } else {
-        TypeVariable::Constrained(constraints)
-    };
-
-    ctx.add_type_variable(name, type_variable, &ast.syntax());
+        .collect::<Vec<_>>()
 }

@@ -1,7 +1,6 @@
 trait TestTrait1 where
-    self
-
-    typeof distraction : String
+    typeof test1
+    typeof test2 : self -> String -> Int
 end
 ===
 HirModule {
@@ -10,11 +9,41 @@ HirModule {
     patterns: EmptyIndex::<Pattern>,
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
+            "item": Missing,
+            "name": "test1",
+            "range": 27..44,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeReference>(1): {
+            "item": SelfRef,
+            "range": 59..64,
+        },
+        Idx::<TypeReference>(2): {
             "item": BuiltIn(
                 String,
             ),
-            "name": "distraction",
-            "range": 58..65,
+            "range": 67..74,
+        },
+        Idx::<TypeReference>(3): {
+            "item": BuiltIn(
+                Int,
+            ),
+            "range": 77..81,
+        },
+        Idx::<TypeReference>(4): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(2),
+                return_type: Idx::<TypeReference>(3),
+            },
+            "range": 67..81,
+        },
+        Idx::<TypeReference>(5): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(1),
+                return_type: Idx::<TypeReference>(4),
+            },
+            "name": "test2",
+            "range": 59..81,
             "scope_id": Idx::<Scope>(1),
         },
     },
@@ -28,21 +57,22 @@ HirModule {
                         self_constraints: [],
                         named_type_variables: {},
                         type_annotations: {
-                            "distraction": Idx::<TypeReference>(0),
+                            "test2": Idx::<TypeReference>(5),
+                            "test1": Idx::<TypeReference>(0),
                         },
                         values: {},
                     },
                 ),
             },
             "name": "TestTrait1",
-            "range": 0..68,
+            "range": 0..84,
             "scope_id": Idx::<Scope>(0),
         },
     },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 3,
+            len: 4,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -51,6 +81,10 @@ HirModule {
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "trait",
+                },
+                Scope {
+                    parent: Idx::<Scope>(1),
+                    tag: "type annotation",
                 },
                 Scope {
                     parent: Idx::<Scope>(1),
@@ -65,21 +99,22 @@ HirModule {
 [
     ParseError {
         expected: [
-            Equals,
+            Colon,
         ],
         kind: Missing {
-            offset: 37,
+            offset: 44,
         },
-        context: TraitSelfConstraintsEquals,
+        context: TypeOfColon,
     },
     ParseError {
         expected: [
-            Hash,
             Ident,
+            SelfKw,
+            LParen,
         ],
         kind: Missing {
-            offset: 37,
+            offset: 44,
         },
-        context: TypeVariableConstraint,
+        context: TypeOfType,
     },
 ]

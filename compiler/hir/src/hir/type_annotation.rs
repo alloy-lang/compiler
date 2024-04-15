@@ -4,7 +4,7 @@ use super::*;
 pub(super) fn lower_type_annotation(
     ctx: &mut LoweringCtx,
     ast: &ast::TypeAnnotation,
-) -> Option<TypeIdx> {
+) -> Option<(Name, TypeIdx)> {
     let type_id = ctx.inside_scope("type annotation", |ctx| {
         for type_var in ast.named_type_variables() {
             lower_named_type_variable(ctx, &type_var);
@@ -23,5 +23,5 @@ pub(super) fn lower_type_annotation(
     };
     let name = Name::new(name);
 
-    Some(ctx.add_type_annotation(name, type_id, &ast.syntax()))
+    Some((name.clone(), ctx.add_type_annotation(name, type_id, &ast.syntax())))
 }

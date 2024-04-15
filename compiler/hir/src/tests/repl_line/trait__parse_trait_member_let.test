@@ -1,20 +1,36 @@
 trait TestTrait1 where
-    self
+    typeof test : Int
 
-    typeof distraction : String
+    let thing = test
 end
 ===
 HirModule {
     imports: EmptyIndex::<Import>,
-    expressions: EmptyIndex::<Expression>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "test",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(1),
+            },
+            "name": "thing",
+            "range": 50..67,
+            "scope_id": Idx::<Scope>(1),
+        },
+    },
     patterns: EmptyIndex::<Pattern>,
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
             "item": BuiltIn(
-                String,
+                Int,
             ),
-            "name": "distraction",
-            "range": 58..65,
+            "name": "test",
+            "range": 41..50,
             "scope_id": Idx::<Scope>(1),
         },
     },
@@ -28,14 +44,16 @@ HirModule {
                         self_constraints: [],
                         named_type_variables: {},
                         type_annotations: {
-                            "distraction": Idx::<TypeReference>(0),
+                            "test": Idx::<TypeReference>(0),
                         },
-                        values: {},
+                        values: {
+                            "thing": Idx::<Expression>(0),
+                        },
                     },
                 ),
             },
             "name": "TestTrait1",
-            "range": 0..68,
+            "range": 0..70,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -62,24 +80,4 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Equals,
-        ],
-        kind: Missing {
-            offset: 37,
-        },
-        context: TraitSelfConstraintsEquals,
-    },
-    ParseError {
-        expected: [
-            Hash,
-            Ident,
-        ],
-        kind: Missing {
-            offset: 37,
-        },
-        context: TypeVariableConstraint,
-    },
-]
+[]

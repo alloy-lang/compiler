@@ -1,0 +1,119 @@
+trait TestTrait1 where
+    typeof test1 : self -> String -> (String
+
+    typevar t1
+end
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": SelfRef,
+            "range": 42..47,
+        },
+        Idx::<TypeReference>(1): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 50..57,
+        },
+        Idx::<TypeReference>(2): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 61..73,
+        },
+        Idx::<TypeReference>(3): {
+            "item": ParenthesizedType(
+                Idx::<TypeReference>(2),
+            ),
+            "range": 60..73,
+        },
+        Idx::<TypeReference>(4): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(1),
+                return_type: Idx::<TypeReference>(3),
+            },
+            "range": 50..73,
+        },
+        Idx::<TypeReference>(5): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(0),
+                return_type: Idx::<TypeReference>(4),
+            },
+            "name": "test1",
+            "range": 42..73,
+            "scope_id": Idx::<Scope>(1),
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t1",
+            "range": 73..84,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "TestTrait1",
+                kind: Trait(
+                    Trait {
+                        name: "TestTrait1",
+                        self_constraints: [],
+                        named_type_variables: {
+                            "t1": Idx::<TypeDefinition>(0),
+                        },
+                        type_annotations: {
+                            "test1": Idx::<TypeReference>(5),
+                        },
+                        values: {},
+                    },
+                ),
+            },
+            "name": "TestTrait1",
+            "range": 0..87,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "trait",
+                },
+                Scope {
+                    parent: Idx::<Scope>(1),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+            RParen,
+        ],
+        kind: Missing {
+            offset: 73,
+        },
+        context: ParenthesizedTypeRightParen,
+    },
+]

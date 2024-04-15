@@ -1,0 +1,81 @@
+import std::functor
+
+trait TestTrait1 where
+    self = #Type[_] + functor::Functor
+end
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "std",
+                ],
+                last: "functor",
+            },
+            "name": "functor",
+            "range": 0..21,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "TestTrait1",
+                kind: Trait(
+                    Trait {
+                        name: "TestTrait1",
+                        self_constraints: [
+                            Kind(
+                                1,
+                            ),
+                            Trait(
+                                OtherModule(
+                                    Fqn {
+                                        module: NonEmpty(
+                                            [
+                                                "std",
+                                            ],
+                                        ),
+                                        name: "functor",
+                                        sub_path: [
+                                            "Functor",
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ],
+                        named_type_variables: {},
+                        type_annotations: {},
+                        values: {},
+                    },
+                ),
+            },
+            "name": "TestTrait1",
+            "range": 21..86,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "trait",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]

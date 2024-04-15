@@ -1,0 +1,108 @@
+import std::{functor, debug}
+
+trait TestTrait1 where
+    self = functor::Functor
+    self = debug::Debug
+end
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "std",
+                ],
+                last: "functor",
+            },
+            "name": "functor",
+            "range": 0..30,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Import>(1): {
+            "item": Import {
+                segments: [
+                    "std",
+                ],
+                last: "debug",
+            },
+            "name": "debug",
+            "range": 0..30,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "TestTrait1",
+                kind: Trait(
+                    Trait {
+                        name: "TestTrait1",
+                        self_constraints: [],
+                        named_type_variables: {},
+                        type_annotations: {},
+                        values: {},
+                    },
+                ),
+            },
+            "name": "TestTrait1",
+            "range": 30..108,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "trait",
+                },
+            ],
+        },
+    },
+    warnings: [
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "std",
+                    ],
+                    last: "functor",
+                },
+            },
+            range: 0..30,
+        },
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "std",
+                    ],
+                    last: "debug",
+                },
+            },
+            range: 0..30,
+        },
+    ],
+    errors: [
+        LoweringError {
+            kind: MultipleSelfTypeVariablesInTraitDefinition {
+                trait_name: "TestTrait1",
+                ranges: [
+                    57..85,
+                    85..105,
+                ],
+            },
+            range: 30..108,
+        },
+    ],
+}
+[]

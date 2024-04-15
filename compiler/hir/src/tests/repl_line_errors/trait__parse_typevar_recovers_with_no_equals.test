@@ -1,0 +1,104 @@
+import std::functor
+
+trait TestTrait1 where
+    typevar t1 functor::Functor
+end
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "std",
+                ],
+                last: "functor",
+            },
+            "name": "functor",
+            "range": 0..21,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Constrained(
+                        [
+                            Trait(
+                                OtherModule(
+                                    Fqn {
+                                        module: NonEmpty(
+                                            [
+                                                "std",
+                                            ],
+                                        ),
+                                        name: "functor",
+                                        sub_path: [
+                                            "Functor",
+                                        ],
+                                    },
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+            },
+            "name": "t1",
+            "range": 48..76,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "TestTrait1",
+                kind: Trait(
+                    Trait {
+                        name: "TestTrait1",
+                        self_constraints: [],
+                        named_type_variables: {
+                            "t1": Idx::<TypeDefinition>(0),
+                        },
+                        type_annotations: {},
+                        values: {},
+                    },
+                ),
+            },
+            "name": "TestTrait1",
+            "range": 21..79,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "trait",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Equals,
+            Equals,
+        ],
+        kind: Missing {
+            offset: 59,
+        },
+        context: TypeVariableConstraint,
+    },
+]
