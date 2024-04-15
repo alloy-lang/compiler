@@ -32,7 +32,8 @@ pub fn run_test_dir(
         let test_path = entry.unwrap().path().canonicalize().unwrap();
 
         println!(
-            "\n==== RUNNING TEST {:?} ====",
+            "\n==== RUNNING TEST [{}] {:?} ====",
+            raw_tests_dir,
             test_path.file_stem().unwrap()
         );
 
