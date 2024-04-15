@@ -3,13 +3,8 @@ use super::*;
 
 pub(super) fn lower_type_annotation(ctx: &mut LoweringCtx, ast: &ast::TypeAnnotation) {
     let type_id = ctx.inside_scope("type annotation", |ctx| {
-        for type_arg in ast.named_type_variables() {
-            let Some(name) = type_arg.name() else {
-                // we can't add a type arg that we don't have a name for
-                // we can skip it since it'll be reported as a parsing error
-                continue;
-            };
-            ctx.add_type_variable(name, &type_arg.syntax());
+        for type_var in ast.named_type_variables() {
+            lower_named_type_variable(ctx, &type_var);
         }
 
         match ast.type_() {

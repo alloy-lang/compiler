@@ -95,7 +95,23 @@ HirModule {
             "item": TypeDefinition {
                 name: "t1",
                 kind: TypeVariable(
-                    Unbound,
+                    Constrained(
+                        [
+                            Trait(
+                                OtherModule(
+                                    Fqn {
+                                        module: NonEmpty(
+                                            [
+                                                "std",
+                                            ],
+                                        ),
+                                        name: "functor",
+                                        sub_path: [],
+                                    },
+                                ),
+                            ),
+                        ],
+                    ),
                 ),
             },
             "name": "t1",
@@ -130,19 +146,7 @@ HirModule {
             ],
         },
     },
-    warnings: [
-        LoweringWarning {
-            kind: UnusedImport {
-                import: Import {
-                    segments: [
-                        "std",
-                    ],
-                    last: "functor",
-                },
-            },
-            range: 23..44,
-        },
-    ],
+    warnings: [],
     errors: [],
 }
 [

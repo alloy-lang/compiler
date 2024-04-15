@@ -387,13 +387,18 @@ impl LoweringCtx {
         }
     }
 
-    pub(crate) fn add_type_variable(&mut self, name: String, element: &SyntaxElement) {
+    pub(crate) fn add_type_variable(
+        &mut self,
+        name: String,
+        type_variable: TypeVariable,
+        element: &SyntaxElement,
+    ) {
         let name = Name::new(name);
         let _ = self.type_definitions.insert_named(
             name.clone(),
             TypeDefinition {
                 name,
-                kind: TypeDefinitionKind::TypeVariable(TypeVariable::Unbound),
+                kind: TypeDefinitionKind::TypeVariable(type_variable),
             },
             element.text_range(),
             &self.scopes,

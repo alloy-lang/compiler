@@ -309,7 +309,23 @@ HirModule {
             "item": TypeDefinition {
                 name: "t1",
                 kind: TypeVariable(
-                    Unbound,
+                    Constrained(
+                        [
+                            Trait(
+                                OtherModule(
+                                    Fqn {
+                                        module: NonEmpty(
+                                            [
+                                                "test_data",
+                                            ],
+                                        ),
+                                        name: "Thing",
+                                        sub_path: [],
+                                    },
+                                ),
+                            ),
+                        ],
+                    ),
                 ),
             },
             "name": "t1",
@@ -348,19 +364,7 @@ HirModule {
             ],
         },
     },
-    warnings: [
-        LoweringWarning {
-            kind: UnusedImport {
-                import: Import {
-                    segments: [
-                        "test_data",
-                    ],
-                    last: "Thing",
-                },
-            },
-            range: 29..89,
-        },
-    ],
+    warnings: [],
     errors: [],
 }
 []

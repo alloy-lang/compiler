@@ -10,7 +10,7 @@ pub struct TypeDefinition {
 #[derive(Debug, PartialEq)]
 pub enum TypeDefinitionKind {
     Missing,
-    TypeVariable(type_variable::TypeVariable),
+    TypeVariable(TypeVariable),
     Single(TypeDefinitionMember),
     Union(Vec<TypeDefinitionMember>),
 }
@@ -33,7 +33,7 @@ pub(super) fn lower_type_definition(ctx: &mut LoweringCtx, ast: &ast::TypeDefini
         let type_args = ast.type_args();
         for type_arg in type_args {
             let name = type_arg.text();
-            ctx.add_type_variable(name, &type_arg.syntax());
+            ctx.add_type_variable(name, TypeVariable::Unbound, &type_arg.syntax());
         }
 
         let mut members = vec![];
