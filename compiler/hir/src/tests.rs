@@ -25,8 +25,8 @@ fn repl_line_lowering_errors() {
 }
 
 #[test]
-fn repl_line_errors() {
-    alloy_test_harness::run_test_dir("repl_line_errors", |path, input| {
+fn repl_line_parse_errors() {
+    alloy_test_harness::run_test_dir("repl_line_parse_errors", |path, input| {
         run_hir_test(path, input, true, false, lower_repl_line)
     });
 }
