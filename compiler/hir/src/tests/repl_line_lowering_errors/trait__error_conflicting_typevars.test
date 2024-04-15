@@ -1,0 +1,77 @@
+trait TestTrait1 where
+    typevar t1
+    typevar t1
+end
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t1",
+            "range": 27..42,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "range": 42..53,
+        },
+        Idx::<TypeDefinition>(2): {
+            "item": TypeDefinition {
+                name: "TestTrait1",
+                kind: Trait(
+                    Trait {
+                        name: "TestTrait1",
+                        self_constraints: [],
+                        type_annotations: [],
+                        values: [],
+                    },
+                ),
+            },
+            "name": "TestTrait1",
+            "range": 0..56,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "trait",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        LoweringError {
+            kind: ConflictingTypeVariableName {
+                name: "t1",
+                first: 27..42,
+                second: 42..53,
+            },
+            range: 42..53,
+        },
+    ],
+}
+[]

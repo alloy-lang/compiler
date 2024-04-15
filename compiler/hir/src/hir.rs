@@ -118,6 +118,11 @@ pub enum LoweringErrorKind {
         first: TextRange,
         second: TextRange,
     },
+    ConflictingTypeVariableName {
+        name: Name,
+        first: TextRange,
+        second: TextRange,
+    },
     UnknownReference {
         reference: Name,
         path: NonEmpty<Name>,
@@ -392,17 +397,34 @@ impl LoweringCtx {
         name: String,
         type_variable: TypeVariable,
         element: &SyntaxElement,
-    ) {
+    ) -> TypeDefinitionIdx {
         let name = Name::new(name);
-        let _ = self.type_definitions.insert_named(
+        let type_definition = TypeDefinition {
+            name: name.clone(),
+            kind: TypeDefinitionKind::TypeVariable(type_variable),
+        };
+
+        let res = self.type_definitions.insert_named(
             name.clone(),
-            TypeDefinition {
-                name,
-                kind: TypeDefinitionKind::TypeVariable(type_variable),
-            },
+            type_definition.clone(),
             element.text_range(),
             &self.scopes,
         );
+
+        match res {
+            Err(err) => {
+                let err = LoweringErrorKind::ConflictingTypeVariableName {
+                    name: err.name,
+                    first: err.first,
+                    second: err.second,
+                };
+                self.error(err, element.text_range());
+
+                self.type_definitions
+                    .insert_not_named(type_definition, element.text_range())
+            }
+            Ok(pid) => pid,
+        }
     }
 
     pub(crate) fn add_import(&mut self, path: &NonEmpty<Name>, element: &SyntaxElement) {

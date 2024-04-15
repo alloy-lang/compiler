@@ -1,13 +1,15 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-#[derive(Debug, PartialEq)]
+pub type TypeDefinitionIdx = Idx<TypeDefinition>;
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct TypeDefinition {
     pub(crate) name: Name,
     pub(crate) kind: TypeDefinitionKind,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TypeDefinitionKind {
     Missing,
     TypeVariable(TypeVariable),
@@ -15,7 +17,7 @@ pub enum TypeDefinitionKind {
     Union(Vec<TypeDefinitionMember>),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct TypeDefinitionMember {
     name: Name,
     properties: Vec<TypeIdx>,

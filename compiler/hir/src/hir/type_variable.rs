@@ -1,13 +1,13 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TypeVariable {
     Unbound,
     Constrained(Vec<TypeVariableConstraint>),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TypeVariableConstraint {
     Kind(usize),
     Trait(Path),
