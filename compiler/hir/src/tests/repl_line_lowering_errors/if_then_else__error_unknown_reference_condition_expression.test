@@ -57,6 +57,7 @@ HirModule {
         LoweringError {
             kind: UnknownReference {
                 reference: "test",
+                reference_type: Expression,
                 path: NonEmpty(
                     [
                         "test",

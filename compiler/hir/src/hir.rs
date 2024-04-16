@@ -57,9 +57,9 @@ pub use value::*;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum HirReference {
-    Expression(ExpressionIdx),
-    Pattern(PatternIdx),
-    Type(TypeIdx),
+    Expression,
+    Pattern,
+    Type,
 }
 
 #[allow(clippy::module_name_repetitions)]
@@ -125,6 +125,7 @@ pub enum LoweringErrorKind {
     },
     UnknownReference {
         reference: Name,
+        reference_type: HirReference,
         path: NonEmpty<Name>,
         current_scope: ScopeIdx,
     },
@@ -209,14 +210,19 @@ impl LoweringCtx {
         }
     }
 
-    pub(crate) fn resolve_reference_path(&mut self, ast_path: &ast::Path) -> Option<Path> {
-        self.resolve_reference_segments(&ast_path.segments(), ast_path.range())
+    pub(crate) fn resolve_reference_path(
+        &mut self,
+        ast_path: &ast::Path,
+        reference_type: HirReference,
+    ) -> Option<Path> {
+        self.resolve_reference_segments(&ast_path.segments(), ast_path.range(), reference_type)
     }
 
     pub(crate) fn resolve_reference_segments(
         &mut self,
         path_segments: &[String],
         path_range: TextRange,
+        reference_type: HirReference,
     ) -> Option<Path> {
         if let [first, rest @ ..] = path_segments {
             let local_name = Name::new(first);
@@ -260,6 +266,7 @@ impl LoweringCtx {
             self.error(
                 LoweringErrorKind::UnknownReference {
                     reference: local_name,
+                    reference_type,
                     path: segments.clone(),
                     current_scope: self.scopes.current_scope(),
                 },

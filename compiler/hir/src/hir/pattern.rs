@@ -125,7 +125,7 @@ fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Path {
         unreachable!("parsing error")
     };
 
-    let Some(path) = ctx.resolve_reference_path(&ast_path) else {
+    let Some(path) = ctx.resolve_reference_path(&ast_path, HirReference::Pattern) else {
         unreachable!("parsing error")
     };
 

@@ -156,7 +156,7 @@ fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Expressi
         unreachable!("parsing error")
     };
 
-    let Some(path) = ctx.resolve_reference_path(&ast_path) else {
+    let Some(path) = ctx.resolve_reference_path(&ast_path, HirReference::Expression) else {
         unreachable!("parsing error")
     };
 
@@ -184,8 +184,11 @@ fn lower_infix_expression(ctx: &mut LoweringCtx, e: &ast::InfixExpr) -> Expressi
                 "*" => BinaryOp::Mul,
                 "/" => BinaryOp::Div,
                 _ => {
-                    let Some(target) = ctx.resolve_reference_segments(&[op_name], op.range())
-                    else {
+                    let Some(target) = ctx.resolve_reference_segments(
+                        &[op_name],
+                        op.range(),
+                        HirReference::Expression,
+                    ) else {
                         unreachable!("parsing error")
                     };
                     BinaryOp::Custom(target)
@@ -252,7 +255,7 @@ fn lower_function_call(ctx: &mut LoweringCtx, e: &ast::FunctionCall) -> Expressi
         .map(|arg| lower_expression(ctx, arg))
         .collect::<Vec<_>>();
 
-    let Some(target) = ctx.resolve_reference_path(&ast_target) else {
+    let Some(target) = ctx.resolve_reference_path(&ast_target, HirReference::Expression) else {
         unreachable!("parsing error")
     };
 

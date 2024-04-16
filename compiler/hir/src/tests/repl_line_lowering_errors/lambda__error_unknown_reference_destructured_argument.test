@@ -76,6 +76,7 @@ HirModule {
         LoweringError {
             kind: UnknownReference {
                 reference: "Option",
+                reference_type: Pattern,
                 path: NonEmpty(
                     [
                         "Option",

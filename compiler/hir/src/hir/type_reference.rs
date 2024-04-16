@@ -65,7 +65,7 @@ fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> TypeReference {
 
             BuiltInType::try_from(path.clone()).map_or_else(
                 |_| {
-                    let Some(name) = ctx.resolve_reference_path(&path) else {
+                    let Some(name) = ctx.resolve_reference_path(&path, HirReference::Type) else {
                         unreachable!("parsing error")
                     };
 
