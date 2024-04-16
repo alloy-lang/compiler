@@ -15,7 +15,7 @@ SourceFile@0..42
     Whitespace@15..18 "\n  "
     MatchTarget@18..30
       MatchTargetCondition@18..23
-        VariableRef@18..23
+        PatternRef@18..23
           Path@18..23
             Ident@18..22 "True"
             Whitespace@22..23 " "
@@ -29,7 +29,7 @@ SourceFile@0..42
       Backslash@30..31 "\\"
       Whitespace@31..32 " "
       MatchTargetCondition@32..38
-        VariableRef@32..38
+        PatternRef@32..38
           Path@32..38
             Ident@32..37 "False"
             Whitespace@37..38 " "

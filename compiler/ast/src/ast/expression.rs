@@ -66,6 +66,15 @@ impl AstElement for BinaryOp {
     }
 }
 
+ast_node!(VariableRef, fields: [name]);
+
+impl VariableRef {
+    #[must_use]
+    pub fn name(&self) -> Option<Path> {
+        first_child(self)
+    }
+}
+
 impl BinaryOp {
     #[must_use]
     pub fn name(&self) -> String {

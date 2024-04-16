@@ -10,7 +10,7 @@
                             Destructure(
                                 Destructure {
                                     target: Some(
-                                        VariableRef {
+                                        PatternRef {
                                             name: Some(
                                                 Path {
                                                     segments: [

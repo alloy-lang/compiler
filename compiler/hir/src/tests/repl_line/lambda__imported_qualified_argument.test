@@ -36,7 +36,7 @@ HirModule {
     },
     patterns: Index::<Pattern> {
         Idx::<Pattern>(0): {
-            "item": VariableRef {
+            "item": PatternRef {
                 path: OtherModule(
                     Fqn {
                         module: NonEmpty(

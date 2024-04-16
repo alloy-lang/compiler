@@ -65,7 +65,7 @@ SourceFile@0..120
       MatchTargetCondition@73..90
         Destructure@73..90
           DestructureTarget@73..85
-            VariableRef@73..85
+            PatternRef@73..85
               Path@73..85
                 Ident@73..79 "Either"
                 DoubleColon@79..81 "::"
@@ -89,7 +89,7 @@ SourceFile@0..120
       MatchTargetCondition@99..116
         Destructure@99..116
           DestructureTarget@99..112
-            VariableRef@99..112
+            PatternRef@99..112
               Path@99..112
                 Ident@99..105 "Either"
                 DoubleColon@105..107 "::"

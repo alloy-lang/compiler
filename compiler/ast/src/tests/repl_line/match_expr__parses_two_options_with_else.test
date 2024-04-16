@@ -22,8 +22,8 @@ match test when
                 targets: [
                     MatchTarget {
                         condition: Some(
-                            VariableRef(
-                                VariableRef {
+                            PatternRef(
+                                PatternRef {
                                     name: Some(
                                         Path {
                                             segments: [

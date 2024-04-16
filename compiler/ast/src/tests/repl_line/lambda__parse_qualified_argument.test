@@ -7,8 +7,8 @@
                 args: [
                     LambdaExprArg {
                         pattern: Some(
-                            VariableRef(
-                                VariableRef {
+                            PatternRef(
+                                PatternRef {
                                     name: Some(
                                         Path {
                                             segments: [

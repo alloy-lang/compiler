@@ -26,7 +26,7 @@ SourceFile@0..168
       MatchTargetCondition@20..28
         Destructure@20..28
           DestructureTarget@20..24
-            VariableRef@20..24
+            PatternRef@20..24
               Path@20..24
                 Ident@20..24 "Some"
           LParen@24..25 "("
@@ -45,7 +45,7 @@ SourceFile@0..168
       Backslash@35..36 "\\"
       Whitespace@36..37 " "
       MatchTargetCondition@37..45
-        VariableRef@37..45
+        PatternRef@37..45
           Path@37..45
             Ident@37..41 "None"
             Whitespace@41..45 "    "
@@ -59,7 +59,7 @@ SourceFile@0..168
       Backslash@52..53 "\\"
       Whitespace@53..54 " "
       MatchTargetCondition@54..62
-        VariableRef@54..62
+        PatternRef@54..62
           Path@54..62
             Ident@54..58 "True"
             Whitespace@58..62 "    "
@@ -73,7 +73,7 @@ SourceFile@0..168
       Backslash@69..70 "\\"
       Whitespace@70..71 " "
       MatchTargetCondition@71..79
-        VariableRef@71..79
+        PatternRef@71..79
           Path@71..79
             Ident@71..76 "False"
             Whitespace@76..79 "   "
@@ -140,7 +140,7 @@ SourceFile@0..168
       Backslash@154..155 "\\"
       Whitespace@155..156 " "
       MatchTargetCondition@156..164
-        VariableRef@156..164
+        PatternRef@156..164
           Path@156..164
             Ident@156..157 "x"
             Whitespace@157..164 "       "

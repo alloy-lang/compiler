@@ -92,7 +92,7 @@ HirModule {
     },
     patterns: Index::<Pattern> {
         Idx::<Pattern>(0): {
-            "item": VariableRef {
+            "item": PatternRef {
                 path: OtherModule(
                     Fqn {
                         module: NonEmpty(
@@ -111,7 +111,7 @@ HirModule {
             "range": 82..87,
         },
         Idx::<Pattern>(1): {
-            "item": VariableRef {
+            "item": PatternRef {
                 path: OtherModule(
                     Fqn {
                         module: NonEmpty(

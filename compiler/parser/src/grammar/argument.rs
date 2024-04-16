@@ -34,6 +34,7 @@ pub(crate) fn parse_argument(
     } else if identify_declarations
         && p.at(TokenKind::Ident)
         && !p.maybe_at_nth(TokenKind::DoubleColon, 1)
+        && !p.maybe_at_nth(TokenKind::LParen, 1)
     {
         parse_variable_declaration(p);
     } else if p.at(TokenKind::Ident) {
@@ -54,9 +55,9 @@ pub(crate) fn parse_argument(
 fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
     let cm = path::parse_path(
         p,
-        ParseErrorContext::VariableRef,
+        ParseErrorContext::PatternRef,
         ts![],
-        SyntaxKind::VariableRef,
+        SyntaxKind::PatternRef,
     );
 
     maybe_parse_typedef_destructure(p, cm)

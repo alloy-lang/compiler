@@ -11,7 +11,7 @@ pub enum Pattern {
     FractionLiteral(NotNan<f64>),
     StringLiteral(String),
     CharLiteral(char),
-    VariableRef {
+    PatternRef {
         path: Path,
         scope: ScopeIdx,
     },
@@ -59,8 +59,8 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
             };
             Pattern::CharLiteral(value)
         }
-        ast::Pattern::VariableRef(var) => Pattern::VariableRef {
-            path: lower_variable_ref(ctx, var),
+        ast::Pattern::PatternRef(var) => Pattern::PatternRef {
+            path: lower_pattern_ref(ctx, var),
             scope: ctx.scopes.current_scope(),
         },
         ast::Pattern::VariableDeclaration(var) => Pattern::VariableDeclaration {
@@ -103,7 +103,7 @@ fn lower_destructure(ctx: &mut LoweringCtx, destructure: &ast::Destructure) -> P
         .map(|arg| lower_pattern(ctx, arg))
         .collect::<Vec<_>>();
 
-    let target = lower_variable_ref(ctx, &ast_target);
+    let target = lower_pattern_ref(ctx, &ast_target);
 
     Pattern::Destructure {
         target,
@@ -120,7 +120,7 @@ pub(super) fn lower_variable_declaration(var: &ast::VariableDeclaration) -> Name
     Name::new(name.text())
 }
 
-fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Path {
+fn lower_pattern_ref(ctx: &mut LoweringCtx, var: &ast::PatternRef) -> Path {
     let Some(ast_path) = var.name() else {
         unreachable!("parsing error")
     };
