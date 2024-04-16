@@ -13,7 +13,10 @@ pub enum TypeVariableConstraint {
     Trait(Path),
 }
 
-pub(super) fn lower_named_type_variable(ctx: &mut LoweringCtx, ast: &ast::NamedTypeVariable) -> Option<(Name, TypeDefinitionIdx)> {
+pub(super) fn lower_named_type_variable(
+    ctx: &mut LoweringCtx,
+    ast: &ast::NamedTypeVariable,
+) -> Option<(Name, TypeDefinitionIdx)> {
     let Some(name) = ast.name() else {
         // we can't add a type arg that we don't have a name for
         // we can skip it since it'll be reported as a parsing error
@@ -27,7 +30,10 @@ pub(super) fn lower_named_type_variable(ctx: &mut LoweringCtx, ast: &ast::NamedT
         TypeVariable::Constrained(constraints)
     };
 
-    Some((Name::new(&name), ctx.add_type_variable(name, type_variable, &ast.syntax())))
+    Some((
+        Name::new(&name),
+        ctx.add_type_variable(name, type_variable, &ast.syntax()),
+    ))
 }
 
 pub(super) fn lower_self_type_variable_constraints(

@@ -11,11 +11,11 @@ pub enum Path {
 impl Path {
     pub(crate) fn this_module(
         rest: impl IntoIterator<Item = impl Into<Name>>,
-        last: impl Into<Name>,
+        first: impl Into<Name>,
     ) -> Self {
         Self::ThisModule(NonEmpty::from((
+            first.into(),
             rest.into_iter().map(Into::into).collect(),
-            last.into(),
         )))
     }
 }

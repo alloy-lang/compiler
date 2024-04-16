@@ -23,5 +23,8 @@ pub(super) fn lower_type_annotation(
     };
     let name = Name::new(name);
 
-    Some((name.clone(), ctx.add_type_annotation(name, type_id, &ast.syntax())))
+    Some((
+        name.clone(),
+        ctx.add_type_annotation(name, type_id, &ast.syntax()),
+    ))
 }

@@ -13,8 +13,8 @@ HirModule {
                 path: ThisModule(
                     NonEmpty(
                         [
-                            "ThingA",
                             "Things",
+                            "ThingA",
                         ],
                     ),
                 ),

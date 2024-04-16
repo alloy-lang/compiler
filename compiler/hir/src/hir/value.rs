@@ -1,7 +1,10 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
-pub(super) fn lower_value(ctx: &mut LoweringCtx, ast: &ast::ValueDef) -> Option<(Name, ExpressionIdx)> {
+pub(super) fn lower_value(
+    ctx: &mut LoweringCtx,
+    ast: &ast::ValueDef,
+) -> Option<(Name, ExpressionIdx)> {
     let value = match ast.value() {
         Some(value) => lower_expression_inner(ctx, &value),
         None => Expression::Missing,

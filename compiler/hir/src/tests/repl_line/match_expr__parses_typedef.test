@@ -98,8 +98,8 @@ HirModule {
                 target: ThisModule(
                     NonEmpty(
                         [
-                            "Left",
                             "Either",
+                            "Left",
                         ],
                     ),
                 ),
@@ -123,8 +123,8 @@ HirModule {
                 target: ThisModule(
                     NonEmpty(
                         [
-                            "Right",
                             "Either",
+                            "Right",
                         ],
                     ),
                 ),

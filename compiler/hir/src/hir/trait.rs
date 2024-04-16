@@ -1,6 +1,6 @@
-use rustc_hash::FxHashMap;
 #[allow(clippy::wildcard_imports)]
 use super::*;
+use rustc_hash::FxHashMap;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Trait {
@@ -20,7 +20,8 @@ pub(super) fn lower_trait(ctx: &mut LoweringCtx, ast: &ast::TraitDef) {
     let name = Name::new(name);
 
     let trait_ = ctx.inside_scope("trait", |ctx| {
-        let named_type_variables = ast.named_type_variables()
+        let named_type_variables = ast
+            .named_type_variables()
             .iter()
             .filter_map(|type_var| lower_named_type_variable(ctx, type_var))
             .collect();
