@@ -56,7 +56,7 @@ mod value;
 pub use value::*;
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum HirReference {
+pub enum HirReferenceType {
     Expression,
     Pattern,
     Type,
@@ -125,7 +125,7 @@ pub enum LoweringErrorKind {
     },
     UnknownReference {
         reference: Name,
-        reference_type: HirReference,
+        reference_type: HirReferenceType,
         path: NonEmpty<Name>,
         current_scope: ScopeIdx,
     },
@@ -213,7 +213,7 @@ impl LoweringCtx {
     pub(crate) fn resolve_reference_path(
         &mut self,
         ast_path: &ast::Path,
-        reference_type: HirReference,
+        reference_type: HirReferenceType,
     ) -> Option<Path> {
         self.resolve_reference_segments(&ast_path.segments(), ast_path.range(), reference_type)
     }
@@ -222,20 +222,28 @@ impl LoweringCtx {
         &mut self,
         path_segments: &[String],
         path_range: TextRange,
-        reference_type: HirReference,
+        reference_type: HirReferenceType,
+    ) -> Option<Path> {
+        let x = 0;
+        match reference_type {
+            HirReferenceType::Expression => {
+                self.resolve_expression_reference(path_segments, path_range, reference_type)
+            }
+            HirReferenceType::Pattern | HirReferenceType::Type => {
+                self.resolve_type_reference(path_segments, path_range, reference_type)
+            }
+        }
+    }
+
+    fn resolve_type_reference(
+        &mut self,
+        path_segments: &[String],
+        path_range: TextRange,
+        reference_type: HirReferenceType,
     ) -> Option<Path> {
         if let [first, rest @ ..] = path_segments {
             let local_name = Name::new(first);
 
-            if let Some(pid) = self.patterns.get_id(&local_name, &self.scopes) {
-                return Some(Path::this_module(rest, first));
-            }
-            if let Some(eid) = self.expressions.get_id(&local_name, &self.scopes) {
-                return Some(Path::this_module(rest, first));
-            }
-            if let Some(ast) = self.glossary.get_value_by_name(first) {
-                return Some(Path::this_module(rest, first));
-            }
             if let Some(tid) = self.type_definitions.get_id(&local_name, &self.scopes) {
                 return Some(Path::this_module(rest, first));
             }
@@ -274,6 +282,30 @@ impl LoweringCtx {
             );
 
             return Some(Path::Unknown(segments));
+        }
+
+        None
+    }
+
+    fn resolve_expression_reference(
+        &mut self,
+        path_segments: &[String],
+        path_range: TextRange,
+        reference_type: HirReferenceType,
+    ) -> Option<Path> {
+        if let [first, rest @ ..] = path_segments {
+            let local_name = Name::new(first);
+
+            if let Some(pid) = self.patterns.get_id(&local_name, &self.scopes) {
+                return Some(Path::this_module(rest, first));
+            }
+            if let Some(eid) = self.expressions.get_id(&local_name, &self.scopes) {
+                return Some(Path::this_module(rest, first));
+            }
+            if let Some(ast) = self.glossary.get_value_by_name(first) {
+                return Some(Path::this_module(rest, first));
+            }
+            return self.resolve_type_reference(path_segments, path_range, reference_type);
         }
 
         None

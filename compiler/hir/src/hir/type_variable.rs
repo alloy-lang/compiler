@@ -58,7 +58,8 @@ fn lower_type_variable_constraints(
                     unreachable!("parsing error")
                 };
 
-                let Some(path) = ctx.resolve_reference_path(&ast_path, HirReference::Type) else {
+                let Some(path) = ctx.resolve_reference_path(&ast_path, HirReferenceType::Type)
+                else {
                     unreachable!("parsing error")
                 };
                 TypeVariableConstraint::Trait(path)

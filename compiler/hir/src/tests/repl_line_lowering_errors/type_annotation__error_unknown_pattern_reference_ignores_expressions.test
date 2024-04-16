@@ -1,0 +1,114 @@
+let unknown = 1
+
+|unknown(a)| -> a + "a"
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": IntLiteral(
+                1,
+            ),
+            "name": "unknown",
+            "range": 0..17,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(1): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "a",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(1),
+            },
+            "range": 33..35,
+        },
+        Idx::<Expression>(2): {
+            "item": StringLiteral(
+                "a",
+            ),
+            "range": 37..40,
+        },
+        Idx::<Expression>(3): {
+            "item": Binary {
+                op: Add,
+                lhs: Idx::<Expression>(1),
+                rhs: Idx::<Expression>(2),
+            },
+            "range": 33..40,
+        },
+        Idx::<Expression>(4): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(1),
+                ],
+                body: Idx::<Expression>(3),
+            },
+            "range": 17..40,
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "a",
+            },
+            "name": "a",
+            "range": 26..27,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<Pattern>(1): {
+            "item": Destructure {
+                target: Unknown(
+                    NonEmpty(
+                        [
+                            "unknown",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(1),
+                args: [
+                    Idx::<Pattern>(0),
+                ],
+            },
+            "range": 18..28,
+        },
+    },
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                reference: "unknown",
+                reference_type: Pattern,
+                path: NonEmpty(
+                    [
+                        "unknown",
+                    ],
+                ),
+                current_scope: Idx::<Scope>(1),
+            },
+            range: 18..25,
+        },
+    ],
+}
+[]

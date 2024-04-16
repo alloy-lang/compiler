@@ -125,7 +125,7 @@ fn lower_pattern_ref(ctx: &mut LoweringCtx, var: &ast::PatternRef) -> Path {
         unreachable!("parsing error")
     };
 
-    let Some(path) = ctx.resolve_reference_path(&ast_path, HirReference::Pattern) else {
+    let Some(path) = ctx.resolve_reference_path(&ast_path, HirReferenceType::Pattern) else {
         unreachable!("parsing error")
     };
 

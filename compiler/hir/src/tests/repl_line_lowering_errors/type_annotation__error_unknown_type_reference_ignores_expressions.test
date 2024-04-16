@@ -1,0 +1,94 @@
+let unknown = 1
+
+typeof test : unknown -> Int -> String where
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": IntLiteral(
+                1,
+            ),
+            "name": "unknown",
+            "range": 0..17,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                Unknown(
+                    NonEmpty(
+                        [
+                            "unknown",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 31..39,
+        },
+        Idx::<TypeReference>(1): {
+            "item": BuiltIn(
+                Int,
+            ),
+            "range": 42..46,
+        },
+        Idx::<TypeReference>(2): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 49..56,
+        },
+        Idx::<TypeReference>(3): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(1),
+                return_type: Idx::<TypeReference>(2),
+            },
+            "range": 42..56,
+        },
+        Idx::<TypeReference>(4): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(0),
+                return_type: Idx::<TypeReference>(3),
+            },
+            "name": "test",
+            "range": 31..56,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                reference: "unknown",
+                reference_type: Type,
+                path: NonEmpty(
+                    [
+                        "unknown",
+                    ],
+                ),
+                current_scope: Idx::<Scope>(1),
+            },
+            range: 31..39,
+        },
+    ],
+}
+[]
