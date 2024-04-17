@@ -5,6 +5,7 @@ members = [
     "compiler/hir",
     "compiler/lexer",
     "compiler/parser",
+    "compiler/project",
     "compiler/scope",
     "compiler/syntax",
     "compiler/test_harness",

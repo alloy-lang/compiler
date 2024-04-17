@@ -12,15 +12,12 @@ typedef Bool =
   | True
 end
 
-let True = Bool::True
-let False = Bool::False
-
 --! Boolean 'not'
 typeof not : Bool -> Bool
 let not = |x| ->
   if x
-  then False
-  else True
+  then Bool::False
+  else Bool::True
 
 
 --! Boolean 'exclusive or'
@@ -42,10 +39,10 @@ end
 behavior Ord for Bool where
   let compare = |left, right| ->
     match (left, right) when
-      \ (True, True)   -> Ordering::EQ
-      \ (False, False) -> Ordering::EQ
-      \ (True, False)  -> Ordering::GT
-      \ (False, True)  -> Ordering::LT
+      \ (Bool::True,  Bool::True)  -> Ordering::EQ
+      \ (Bool::False, Bool::False) -> Ordering::EQ
+      \ (Bool::True,  Bool::False) -> Ordering::GT
+      \ (Bool::False, Bool::True)  -> Ordering::LT
 end
 
 

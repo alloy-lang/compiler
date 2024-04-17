@@ -1,3 +1,4 @@
+use alloy_project::Project;
 use expect_test::expect_file;
 use std::ffi::OsStr;
 use std::panic::{RefUnwindSafe, UnwindSafe};
@@ -61,28 +62,25 @@ pub fn run_test_dir(
     );
 }
 
-pub fn run_std_lib_tests(test_fn: impl Fn(&Path, &str) + RefUnwindSafe + UnwindSafe) {
-    let std_lib = fs::read_dir("../../std")
-        .expect("Something went wrong reading the std lib dir")
-        .map(|res| {
-            res.expect("Something went wrong reading the directory entry")
-                .path()
-                .canonicalize()
-                .expect("Something went wrong canonicalize-ing the directory entry")
-        })
-        .collect::<Vec<_>>();
+pub fn run_std_lib_tests(test_fn: impl Fn(&Path, &str)) {
+    let project = Project::new(Path::new("../../std")).expect("expected project to be created");
 
     let mut failed_tests = vec![];
-    for path in std_lib {
-        let file_name = path.to_str().expect("Expected filename").to_string();
+    for (_name, path) in project.modules() {
+        let file_name = path.to_str().expect("Expected filename");
 
-        let source = fs::read_to_string(&file_name)
+        println!(
+            "\n==== RUNNING STD LIB TEST {:?} ====",
+            path.file_stem().unwrap()
+        );
+
+        let source = fs::read_to_string(file_name)
             .unwrap_or_else(|_| panic!("Something went wrong reading the file '{:?}'", file_name));
 
         let did_panic = std::panic::catch_unwind(|| {
             test_fn(&path, &source);
         })
-        .is_err();
+            .is_err();
 
         if did_panic {
             failed_tests.push(file_name);
