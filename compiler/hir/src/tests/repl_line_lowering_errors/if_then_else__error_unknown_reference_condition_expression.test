@@ -17,14 +17,18 @@ HirModule {
             "range": 3..8,
         },
         Idx::<Expression>(1): {
-            "item": IntLiteral(
-                2,
+            "item": Literal(
+                Int(
+                    2,
+                ),
             ),
             "range": 13..15,
         },
         Idx::<Expression>(2): {
-            "item": IntLiteral(
-                3,
+            "item": Literal(
+                Int(
+                    3,
+                ),
             ),
             "range": 20..21,
         },

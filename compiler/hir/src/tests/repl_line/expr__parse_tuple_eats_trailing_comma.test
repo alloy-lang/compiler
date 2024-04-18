@@ -6,16 +6,20 @@ HirModule {
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
-            "item": IntLiteral(
-                0,
+            "item": Literal(
+                Int(
+                    0,
+                ),
             ),
             "name": "foo",
             "range": 0..13,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(1): {
-            "item": IntLiteral(
-                1,
+            "item": Literal(
+                Int(
+                    1,
+                ),
             ),
             "range": 14..15,
         },

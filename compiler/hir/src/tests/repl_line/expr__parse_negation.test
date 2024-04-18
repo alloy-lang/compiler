@@ -4,8 +4,10 @@ HirModule {
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
-            "item": IntLiteral(
-                10,
+            "item": Literal(
+                Int(
+                    10,
+                ),
             ),
             "range": 2..4,
         },

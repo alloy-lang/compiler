@@ -19,8 +19,10 @@ HirModule {
     },
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
-            "item": IntLiteral(
-                5,
+            "item": Literal(
+                Int(
+                    5,
+                ),
             ),
             "range": 46..47,
         },

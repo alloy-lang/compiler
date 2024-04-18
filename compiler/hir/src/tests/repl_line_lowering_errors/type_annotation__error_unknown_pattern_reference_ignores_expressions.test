@@ -6,8 +6,10 @@ HirModule {
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
-            "item": IntLiteral(
-                1,
+            "item": Literal(
+                Int(
+                    1,
+                ),
             ),
             "name": "unknown",
             "range": 0..17,
@@ -27,8 +29,10 @@ HirModule {
             "range": 33..35,
         },
         Idx::<Expression>(2): {
-            "item": StringLiteral(
-                "a",
+            "item": Literal(
+                String(
+                    "a",
+                ),
             ),
             "range": 37..40,
         },

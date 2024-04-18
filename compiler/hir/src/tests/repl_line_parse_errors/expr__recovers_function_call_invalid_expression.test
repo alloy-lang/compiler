@@ -30,8 +30,10 @@ HirModule {
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(2): {
-            "item": IntLiteral(
-                1,
+            "item": Literal(
+                Int(
+                    1,
+                ),
             ),
             "range": 28..30,
         },

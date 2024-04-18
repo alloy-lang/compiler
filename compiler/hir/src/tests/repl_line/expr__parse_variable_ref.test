@@ -6,8 +6,10 @@ HirModule {
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
-            "item": IntLiteral(
-                0,
+            "item": Literal(
+                Int(
+                    0,
+                ),
             ),
             "name": "counter",
             "range": 0..17,

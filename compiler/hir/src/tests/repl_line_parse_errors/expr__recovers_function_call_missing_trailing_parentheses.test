@@ -77,24 +77,30 @@ HirModule {
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(6): {
-            "item": IntLiteral(
-                1,
+            "item": Literal(
+                Int(
+                    1,
+                ),
             ),
             "name": "x",
             "range": 42..52,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(7): {
-            "item": IntLiteral(
-                1,
+            "item": Literal(
+                Int(
+                    1,
+                ),
             ),
             "name": "y",
             "range": 52..62,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(8): {
-            "item": IntLiteral(
-                1,
+            "item": Literal(
+                Int(
+                    1,
+                ),
             ),
             "name": "z",
             "range": 62..72,

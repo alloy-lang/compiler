@@ -68,8 +68,10 @@ HirModule {
             "range": 80..94,
         },
         Idx::<Expression>(2): {
-            "item": IntLiteral(
-                1,
+            "item": Literal(
+                Int(
+                    1,
+                ),
             ),
             "range": 105..106,
         },

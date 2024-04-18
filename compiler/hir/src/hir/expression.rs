@@ -5,14 +5,17 @@ use super::*;
 pub type ExpressionIdx = Idx<Expression>;
 
 #[derive(Debug, PartialEq)]
+pub enum ExpressionLiteral {
+    Int(u64),
+    Fraction(NotNan<f64>),
+    String(String),
+    Char(char),
+}
+
+#[derive(Debug, PartialEq)]
 pub enum Expression {
     Missing,
-    /// is `None` if the number is too big to fit in a u64
-    IntLiteral(u64),
-    /// is `None` if the number is too big to fit in a f64
-    FractionLiteral(NotNan<f64>),
-    StringLiteral(String),
-    CharLiteral(char),
+    Literal(ExpressionLiteral),
     VariableRef {
         path: Path,
         scope: ScopeIdx,
@@ -74,25 +77,25 @@ pub(super) fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expressio
             let Some(value) = lit.value() else {
                 unreachable!("parsing error")
             };
-            Expression::IntLiteral(value)
+            Expression::Literal(ExpressionLiteral::Int(value))
         }
         ast::Expression::FractionLiteral(lit) => {
             let Some(value) = lit.value() else {
                 unreachable!("parsing error")
             };
-            Expression::FractionLiteral(value)
+            Expression::Literal(ExpressionLiteral::Fraction(value))
         }
         ast::Expression::StringLiteral(lit) => {
             let Some(value) = lit.value() else {
                 unreachable!("parsing error")
             };
-            Expression::StringLiteral(value)
+            Expression::Literal(ExpressionLiteral::String(value))
         }
         ast::Expression::CharLiteral(lit) => {
             let Some(value) = lit.value() else {
                 unreachable!("parsing error")
             };
-            Expression::CharLiteral(value)
+            Expression::Literal(ExpressionLiteral::Char(value))
         }
         ast::Expression::VariableRef(var) => lower_variable_ref(ctx, var),
         ast::Expression::InfixExpr(e) => lower_infix_expression(ctx, e),
