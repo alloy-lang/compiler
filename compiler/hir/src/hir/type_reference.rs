@@ -30,10 +30,10 @@ pub type TypeIdx = Idx<TypeReference>;
 
 #[derive(Debug, PartialEq)]
 pub enum TypeReference {
+    Unknown,
     Missing,
     SelfRef,
     Unit,
-    Unknown,
     Named(Path),
     BuiltIn(BuiltInType),
     Lambda {
