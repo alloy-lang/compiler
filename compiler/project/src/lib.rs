@@ -17,10 +17,10 @@ pub struct ProjectConfigPackage {
 }
 #[derive(Deserialize, Debug, PartialEq)]
 pub enum ProjectConfigPackageType {
-    #[serde(alias = "library")]
+    #[serde(alias = "lib")]
     Library,
-    #[serde(alias = "executable")]
-    Executable,
+    #[serde(alias = "bin")]
+    Binary,
 }
 
 #[derive(Debug)]
