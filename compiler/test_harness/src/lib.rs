@@ -63,22 +63,19 @@ pub fn run_test_dir(
 }
 
 pub fn run_std_lib_tests(test_fn: impl Fn(&Path, &str)) {
-    let project = Project::new(Path::new("../../std")).expect("expected project to be created");
+    let project = Project::new("../../std").expect("expected project to be created");
 
     let mut failed_tests = vec![];
-    for (_name, path) in project.modules() {
-        let file_name = path.to_str().expect("Expected filename");
+    for module_file in project.modules() {
+        let path = module_file.path();
 
         println!(
             "\n==== RUNNING STD LIB TEST {:?} ====",
             path.file_stem().unwrap()
         );
 
-        let source = fs::read_to_string(file_name)
-            .unwrap_or_else(|_| panic!("Something went wrong reading the file '{:?}'", file_name));
-
         let did_panic = std::panic::catch_unwind(|| {
-            test_fn(&path, &source);
+            test_fn(path.as_std_path(), module_file.contents());
         })
             .is_err();
 

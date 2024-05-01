@@ -1,4 +1,4 @@
 [package]
-name = "missing_source"
+name = "ignores_non_alloy_files"
 version = "0.0.1"
 type = "lib"

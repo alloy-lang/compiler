@@ -1,4 +1,4 @@
 [package]
-name = "missing_source"
+name = "recursive_src"
 version = "0.0.1"
 type = "lib"

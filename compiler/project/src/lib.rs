@@ -1,8 +1,8 @@
+use camino::{Utf8Path, Utf8PathBuf};
 use std::fs;
-use std::path::{Path, PathBuf};
 
-use rustc_hash::FxHashMap;
 use serde::Deserialize;
+use walkdir::WalkDir;
 
 #[derive(Deserialize, Debug)]
 pub struct ProjectConfig {
@@ -25,8 +25,27 @@ pub enum ProjectConfigPackageType {
 
 #[derive(Debug)]
 pub struct Project {
-    modules: FxHashMap<String, PathBuf>,
+    modules: Vec<ModuleFile>,
     config: ProjectConfig,
+}
+
+#[derive(Debug)]
+pub struct ModuleFile {
+    slug: String,
+    path: Utf8PathBuf,
+    contents: String,
+}
+
+impl ModuleFile {
+    #[must_use]
+    pub fn path(&self) -> &Utf8Path {
+        &self.path
+    }
+    
+    #[must_use]
+    pub fn contents(&self) -> &str {
+        &self.contents
+    }
 }
 
 #[derive(Debug)]
@@ -36,8 +55,8 @@ pub struct ProjectError {
 
 #[derive(Debug)]
 pub enum ProjectErrorKind {
-    MissingAlloyToml(PathBuf),
-    MissingSourceDirectory(PathBuf),
+    MissingAlloyToml(Utf8PathBuf),
+    MissingSourceDirectory(Utf8PathBuf),
     Toml(toml::de::Error),
     MissingRootModule(ProjectConfigPackageType),
 }
@@ -51,9 +70,10 @@ impl From<toml::de::Error> for ProjectError {
 }
 
 impl Project {
-    pub fn new(root: &Path) -> Result<Self, ProjectError> {
+    pub fn new(root: impl Into<Utf8PathBuf>) -> Result<Self, ProjectError> {
+        let root = root.into();
         let alloy_toml_path = root.join("Alloy.toml");
-        let source_path = root.join("src");
+        let source_root = root.join("src");
 
         let Ok(raw_project_config) = fs::read_to_string(&alloy_toml_path) else {
             return Err(ProjectError {
@@ -62,119 +82,187 @@ impl Project {
         };
         let config: ProjectConfig = toml::from_str(&raw_project_config)?;
 
-        let mut modules = FxHashMap::default();
-
-        let Ok(module_files) = fs::read_dir(&source_path) else {
+        let Ok(_) = fs::read_dir(&source_root) else {
             return Err(ProjectError {
-                kind: ProjectErrorKind::MissingSourceDirectory(source_path),
+                kind: ProjectErrorKind::MissingSourceDirectory(source_root),
             });
         };
 
-        for entry in module_files {
-            let Ok(entry) = entry else {
-                continue;
-            };
-            let Ok(metadata) = entry.metadata() else {
-                continue;
-            };
-
-            if !metadata.is_file() {
-                continue;
-            }
-
-            let file_name = entry.file_name();
-            let Some(file_name) = file_name.to_str() else {
-                continue;
-            };
-
-            let Some((module_name, "alloy")) = file_name.rsplit_once('.') else {
-                continue;
-            };
-
-            modules.insert(module_name.to_string(), entry.path());
-        }
+        let modules = Self::build_module_files(&config.package.name, &source_root);
 
         Ok(Self { modules, config })
     }
 
-    #[must_use]
-    pub fn is_module(&self, path: &Path) -> bool {
-        self.modules.values().any(|p| p == path)
+    fn build_module_files(package_name: &str, source_root: &Utf8PathBuf) -> Vec<ModuleFile> {
+        let mut modules = Vec::new();
+
+        for entry in WalkDir::new(source_root).follow_links(true) {
+            let Ok(entry) = entry else {
+                continue;
+            };
+            let Some(path) = Utf8Path::from_path(entry.path()) else {
+                continue;
+            };
+
+            let trimmed_path = {
+                if !path.is_file() {
+                    continue;
+                }
+                if Some("alloy") != path.extension() {
+                    continue;
+                }
+                path.strip_prefix(source_root)
+                    .expect("expected root path to be a prefix")
+            };
+
+            let module_slug = {
+                let raw_module_path_formatted = trimmed_path
+                    .iter()
+                    .filter(|s| !s.is_empty())
+                    .collect::<Vec<_>>()
+                    .join("::");
+
+                format!(
+                    "{}::{}",
+                    package_name,
+                    raw_module_path_formatted.trim_end_matches(".alloy")
+                )
+                .to_string()
+            };
+
+            let contents = fs::read_to_string(path).unwrap_or_else(|_| {
+                panic!("Something went wrong reading the file '{:?}'", trimmed_path)
+            });
+
+            modules.push(ModuleFile {
+                slug: module_slug,
+                path: path.to_owned(),
+                contents,
+            });
+        }
+        modules
     }
 
-    pub fn modules(&self) -> impl Iterator<Item = (&String, &Path)> {
-        self.modules
-            .iter()
-            .map(|(name, path)| (name, path.as_path()))
+    #[must_use]
+    pub fn is_module(&self, path: &Utf8Path) -> bool {
+        self.modules.iter().any(|m| m.path == path)
+    }
+
+    pub fn modules(&self) -> impl Iterator<Item = &ModuleFile> {
+        self.modules.iter()
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use std::path::Path;
-
     use crate::{Project, ProjectConfigPackageType, ProjectErrorKind};
 
     #[test]
     fn test_std_lib() {
-        let project = Project::new(Path::new("../../std")).expect("expected project to be created");
+        let project = Project::new("../../std").expect("expected project to be created");
 
         assert_eq!(project.config.package.name, "std");
         assert_eq!(project.config.package.version, "0.0.1");
-        assert_eq!(project.config.package.type_, ProjectConfigPackageType::Library);
         assert_eq!(
-            project.modules().map(|(name, _)| name).collect::<Vec<_>>(),
+            project.config.package.type_,
+            ProjectConfigPackageType::Library
+        );
+        assert_eq!(
+            project
+                .modules()
+                .map(|module| module.slug.clone())
+                .collect::<Vec<_>>(),
             vec![
-                "monad",
-                "functor",
-                "function",
-                "bool",
-                "either",
-                "option",
-                "order",
-                "eq",
-                "applicative",
-                "debug"
+                "std::applicative",
+                "std::bool",
+                "std::function",
+                "std::debug",
+                "std::monad",
+                "std::eq",
+                "std::functor",
+                "std::either",
+                "std::option",
+                "std::order",
             ],
         );
     }
 
     #[test]
+    fn test_ignores_non_alloy_files() {
+        let project = Project::new("./test_projects/ignores_non_alloy_files")
+            .expect("expected project to be created");
+
+        assert_eq!(project.config.package.name, "ignores_non_alloy_files");
+        assert_eq!(project.config.package.version, "0.0.1");
+        assert_eq!(
+            project.config.package.type_,
+            ProjectConfigPackageType::Library
+        );
+        assert_eq!(
+            project
+                .modules()
+                .map(|module| module.slug.clone())
+                .collect::<Vec<_>>(),
+            vec!["ignores_non_alloy_files::one_file"],
+        );
+    }
+
+    #[test]
+    fn test_recursive_src() {
+        let project =
+            Project::new("./test_projects/recursive_src").expect("expected project to be created");
+
+        assert_eq!(project.config.package.name, "recursive_src");
+        assert_eq!(project.config.package.version, "0.0.1");
+        assert_eq!(
+            project.config.package.type_,
+            ProjectConfigPackageType::Library
+        );
+        assert_eq!(
+            project
+                .modules()
+                .map(|module| module.slug.clone())
+                .collect::<Vec<_>>(),
+            vec!["recursive_src::sub::two_file", "recursive_src::one_file",],
+        );
+    }
+
+    #[test]
     fn test_missing_all() {
-        let project = Project::new(Path::new("./test_projects/missing_all"))
+        let project = Project::new("./test_projects/missing_all")
             .expect_err("expected project to be missing");
 
         let ProjectErrorKind::MissingAlloyToml(path): ProjectErrorKind = project.kind else {
             panic!("expected io error, was {:?}", project.kind);
         };
 
-        assert_eq!(
-            path.to_str(),
-            Some("./test_projects/missing_all/Alloy.toml")
-        );
+        assert_eq!(path.as_str(), "./test_projects/missing_all/Alloy.toml");
     }
 
     #[test]
     fn test_missing_source() {
-        let project = Project::new(Path::new("./test_projects/missing_source"))
+        let project = Project::new("./test_projects/missing_source")
             .expect_err("expected project to be missing");
 
         let ProjectErrorKind::MissingSourceDirectory(path): ProjectErrorKind = project.kind else {
             panic!("expected io error, was {:?}", project.kind);
         };
 
-        assert_eq!(path.to_str(), Some("./test_projects/missing_source/src"));
+        assert_eq!(path.as_str(), "./test_projects/missing_source/src");
     }
 
     #[test]
     fn test_incorrect_package_type() {
-        let project = Project::new(Path::new("./test_projects/incorrect_package_type"))
+        let project = Project::new("./test_projects/incorrect_package_type")
             .expect_err("expected project to be missing");
 
         let ProjectErrorKind::Toml(toml_error): ProjectErrorKind = project.kind else {
             panic!("expected io error, was {:?}", project.kind);
         };
 
-        assert_eq!(toml_error.message(), "unknown variant `fake`, expected `Library` or `Executable`");
+        assert_eq!(
+            toml_error.message(),
+            "unknown variant `fake`, expected `Library` or `Binary`"
+        );
     }
 }
