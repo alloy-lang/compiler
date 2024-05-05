@@ -11,7 +11,7 @@ alloy_parser = { path = "../../compiler/parser" }
 alloy_ast = { path = "../../compiler/ast" }
 alloy_hir = { path = "../../compiler/hir" }
 reedline = "0.23.0"
-nu-ansi-term = "0.49"
+nu-ansi-term = "0.50"
 dirs = "5.0"
 
 [dev-dependencies]
