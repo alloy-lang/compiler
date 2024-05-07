@@ -1,0 +1,15 @@
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[package]
+name = "alloy_hir_index"
+version = "0.1.0"
+authors = ["theochupp <tclchiam@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+alloy_ast = { path = "../ast" }
+non-empty-vec = "0.2"
+text-size = "1.1"
+
+[dev-dependencies]
+alloy_parser = {path = "../parser"}
+alloy_test_harness = {path = "../test_harness"}

@@ -1,0 +1,24 @@
+import std::option::map
+import std::functor::map
+===
+IndexedModule {
+    imports: [
+        IndexedImport {
+            segments: [
+                "std",
+                "option",
+            ],
+            last: "map",
+        },
+        IndexedImport {
+            segments: [
+                "std",
+                "functor",
+            ],
+            last: "map",
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[]

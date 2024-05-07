@@ -1,0 +1,26 @@
+import std::functor::map
+import std::functor::map
+
+let thing = map
+===
+IndexedModule {
+    imports: [
+        IndexedImport {
+            segments: [
+                "std",
+                "functor",
+            ],
+            last: "map",
+        },
+        IndexedImport {
+            segments: [
+                "std",
+                "functor",
+            ],
+            last: "map",
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[]

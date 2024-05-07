@@ -1,0 +1,16 @@
+import std::functor::Functor
+===
+IndexedModule {
+    imports: [
+        IndexedImport {
+            segments: [
+                "std",
+                "functor",
+            ],
+            last: "Functor",
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[]

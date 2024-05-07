@@ -1,0 +1,26 @@
+import std::{functor, option}::map
+import std::functor::Functor
+===
+IndexedModule {
+    imports: [
+        IndexedImport {
+            segments: [
+                "std",
+                "functor",
+            ],
+            last: "Functor",
+        },
+    ],
+    warnings: [],
+    errors: [
+        IndexingError {
+            kind: ImportGroupNotAtEnd {
+                group_range: 12..29,
+                position: 1,
+                num_segments: 3,
+            },
+            range: 0..35,
+        },
+    ],
+}
+[]

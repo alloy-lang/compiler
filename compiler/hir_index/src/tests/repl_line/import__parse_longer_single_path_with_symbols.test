@@ -1,0 +1,16 @@
+import std::function::(<|)
+===
+IndexedModule {
+    imports: [
+        IndexedImport {
+            segments: [
+                "std",
+                "function",
+            ],
+            last: "<|",
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[]
