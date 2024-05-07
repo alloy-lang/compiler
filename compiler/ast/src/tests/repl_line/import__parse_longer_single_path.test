@@ -7,21 +7,33 @@ import std::functor::Functor
                 ImportDefSegment(
                     ImportDefSegment {
                         name: Some(
-                            "std",
+                            Ident(
+                                Ident {
+                                    text: "std",
+                                },
+                            ),
                         ),
                     },
                 ),
                 ImportDefSegment(
                     ImportDefSegment {
                         name: Some(
-                            "functor",
+                            Ident(
+                                Ident {
+                                    text: "functor",
+                                },
+                            ),
                         ),
                     },
                 ),
                 ImportDefSegment(
                     ImportDefSegment {
                         name: Some(
-                            "Functor",
+                            Ident(
+                                Ident {
+                                    text: "Functor",
+                                },
+                            ),
                         ),
                     },
                 ),

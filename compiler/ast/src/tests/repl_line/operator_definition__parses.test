@@ -7,7 +7,11 @@ let (|>) = |x, f| -> fakeStuff
     TypeAnnotation(
         TypeAnnotation {
             name: Some(
-                "(|>)",
+                OpIdent(
+                    OpIdent {
+                        text: "(|>)",
+                    },
+                ),
             ),
             type_: Some(
                 LambdaType(
@@ -88,13 +92,17 @@ let (|>) = |x, f| -> fakeStuff
             named_type_variables: [
                 NamedTypeVariable {
                     name: Some(
-                        "t1",
+                        Ident {
+                            text: "t1",
+                        },
                     ),
                     constraints: [],
                 },
                 NamedTypeVariable {
                     name: Some(
-                        "t2",
+                        Ident {
+                            text: "t2",
+                        },
                     ),
                     constraints: [],
                 },
@@ -104,7 +112,11 @@ let (|>) = |x, f| -> fakeStuff
     ValueDef(
         ValueDef {
             name: Some(
-                "(|>)",
+                OpIdent(
+                    OpIdent {
+                        text: "(|>)",
+                    },
+                ),
             ),
             value: Some(
                 LambdaExpr(

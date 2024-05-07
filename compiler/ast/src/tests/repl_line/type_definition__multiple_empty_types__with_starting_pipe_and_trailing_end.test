@@ -7,19 +7,25 @@ end
     TypeDefinition(
         TypeDefinition {
             name: Some(
-                "Test",
+                Ident {
+                    text: "Test",
+                },
             ),
             type_args: [],
             types: [
                 TypeDefinitionMember {
                     name: Some(
-                        "Empty1",
+                        Ident {
+                            text: "Empty1",
+                        },
                     ),
                     properties: [],
                 },
                 TypeDefinitionMember {
                     name: Some(
-                        "Empty2",
+                        Ident {
+                            text: "Empty2",
+                        },
                     ),
                     properties: [],
                 },

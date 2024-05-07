@@ -7,7 +7,9 @@ module TestModule1 where
 Some(
     ModuleDef {
         name: Some(
-            "TestModule1",
+            Ident {
+                text: "TestModule1",
+            },
         ),
         imports: [],
         traits: [],
@@ -16,7 +18,11 @@ Some(
         type_annotations: [
             TypeAnnotation {
                 name: Some(
-                    "testThing",
+                    Ident(
+                        Ident {
+                            text: "testThing",
+                        },
+                    ),
                 ),
                 type_: Some(
                     LambdaType(
@@ -116,7 +122,9 @@ Some(
                 named_type_variables: [
                     NamedTypeVariable {
                         name: Some(
-                            "t1",
+                            Ident {
+                                text: "t1",
+                            },
                         ),
                         constraints: [
                             TypeVariableTraitConstraint(
@@ -134,7 +142,9 @@ Some(
                     },
                     NamedTypeVariable {
                         name: Some(
-                            "t2",
+                            Ident {
+                                text: "t2",
+                            },
                         ),
                         constraints: [],
                     },
@@ -144,7 +154,11 @@ Some(
         values: [
             ValueDef {
                 name: Some(
-                    "testThing",
+                    Ident(
+                        Ident {
+                            text: "testThing",
+                        },
+                    ),
                 ),
                 value: Some(
                     LambdaExpr(

@@ -5,7 +5,7 @@ ast_node!(TraitDef, fields: [name, self_type_variables, named_type_variables, ty
 
 impl TraitDef {
     #[must_use]
-    pub fn name(&self) -> Option<String> {
+    pub fn name(&self) -> Option<Ident> {
         first_ident(self)
     }
 

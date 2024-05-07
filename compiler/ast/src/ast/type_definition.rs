@@ -4,10 +4,12 @@ use super::*;
 ast_node!(TypeDefinition, fields: [name, type_args, types]);
 
 ast_token!(Ident, fields: [text]);
+ast_token!(OpIdent, fields: [text]);
+ast_union_node!(IdentOrOp, kinds: [Ident, OpIdent]);
 
 impl TypeDefinition {
     #[must_use]
-    pub fn name(&self) -> Option<String> {
+    pub fn name(&self) -> Option<Ident> {
         first_ident(self)
     }
 
@@ -28,7 +30,7 @@ ast_node!(TypeDefinitionMember, fields: [name, properties]);
 
 impl TypeDefinitionMember {
     #[must_use]
-    pub fn name(&self) -> Option<String> {
+    pub fn name(&self) -> Option<Ident> {
         first_ident(self)
     }
 

@@ -4,13 +4,17 @@ typedef Test = Thing Int String
     TypeDefinition(
         TypeDefinition {
             name: Some(
-                "Test",
+                Ident {
+                    text: "Test",
+                },
             ),
             type_args: [],
             types: [
                 TypeDefinitionMember {
                     name: Some(
-                        "Thing",
+                        Ident {
+                            text: "Thing",
+                        },
                     ),
                     properties: [
                         TypeIdentifier(

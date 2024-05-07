@@ -5,8 +5,8 @@ ast_node!(ValueDef, fields: [name, value]);
 
 impl ValueDef {
     #[must_use]
-    pub fn name(&self) -> Option<String> {
-        first_ident(self)
+    pub fn name(&self) -> Option<IdentOrOp> {
+        first_ident_or_op_ident(self)
     }
 
     #[must_use]

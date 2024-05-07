@@ -57,7 +57,9 @@ end
             named_type_variables: [
                 NamedTypeVariable {
                     name: Some(
-                        "t1",
+                        Ident {
+                            text: "t1",
+                        },
                     ),
                     constraints: [],
                 },

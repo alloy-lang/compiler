@@ -170,13 +170,22 @@ pub trait AstElement: Sized {
     }
 }
 
-fn first_ident(node: &impl AstElement) -> Option<String> {
+fn first_ident(node: &impl AstElement) -> Option<Ident> {
+    node.syntax()
+        .into_node()?
+        .children_with_tokens()
+        .filter_map(SyntaxElement::into_token)
+        .find(|token| matches!(token.kind(), SyntaxKind::Ident))
+        .and_then(Ident::cast)
+}
+
+fn first_ident_or_op_ident(node: &impl AstElement) -> Option<IdentOrOp> {
     node.syntax()
         .into_node()?
         .children_with_tokens()
         .filter_map(SyntaxElement::into_token)
         .find(|token| matches!(token.kind(), SyntaxKind::Ident | SyntaxKind::OpIdent))
-        .map(|token| token.text().into())
+        .and_then(IdentOrOp::cast)
 }
 
 fn first_child<Parent: AstElement, Child: AstElement>(parent: &Parent) -> Option<Child> {

@@ -5,7 +5,7 @@ ast_node!(ModuleDef, fields: [name, imports, traits, behaviors, type_definitions
 
 impl ModuleDef {
     #[must_use]
-    pub fn name(&self) -> Option<String> {
+    pub fn name(&self) -> Option<Ident> {
         first_ident(self)
     }
     #[must_use]

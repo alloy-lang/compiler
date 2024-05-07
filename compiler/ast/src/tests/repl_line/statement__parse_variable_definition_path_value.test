@@ -4,7 +4,11 @@ let foo = ResultThing::More::Stuff::here
     ValueDef(
         ValueDef {
             name: Some(
-                "foo",
+                Ident(
+                    Ident {
+                        text: "foo",
+                    },
+                ),
             ),
             value: Some(
                 VariableRef(

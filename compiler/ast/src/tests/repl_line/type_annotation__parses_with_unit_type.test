@@ -4,7 +4,11 @@ typeof test : Int -> String -> ()
     TypeAnnotation(
         TypeAnnotation {
             name: Some(
-                "test",
+                Ident(
+                    Ident {
+                        text: "test",
+                    },
+                ),
             ),
             type_: Some(
                 LambdaType(

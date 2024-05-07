@@ -4,7 +4,9 @@ typedef Test[t1, t2] = Thing t1 t2
     TypeDefinition(
         TypeDefinition {
             name: Some(
-                "Test",
+                Ident {
+                    text: "Test",
+                },
             ),
             type_args: [
                 Ident {
@@ -17,7 +19,9 @@ typedef Test[t1, t2] = Thing t1 t2
             types: [
                 TypeDefinitionMember {
                     name: Some(
-                        "Thing",
+                        Ident {
+                            text: "Thing",
+                        },
                     ),
                     properties: [
                         TypeIdentifier(

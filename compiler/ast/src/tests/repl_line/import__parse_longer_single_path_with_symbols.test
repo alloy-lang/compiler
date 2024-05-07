@@ -7,21 +7,33 @@ import std::function::(<|)
                 ImportDefSegment(
                     ImportDefSegment {
                         name: Some(
-                            "std",
+                            Ident(
+                                Ident {
+                                    text: "std",
+                                },
+                            ),
                         ),
                     },
                 ),
                 ImportDefSegment(
                     ImportDefSegment {
                         name: Some(
-                            "function",
+                            Ident(
+                                Ident {
+                                    text: "function",
+                                },
+                            ),
                         ),
                     },
                 ),
                 ImportDefSegment(
                     ImportDefSegment {
                         name: Some(
-                            "(<|)",
+                            OpIdent(
+                                OpIdent {
+                                    text: "(<|)",
+                                },
+                            ),
                         ),
                     },
                 ),

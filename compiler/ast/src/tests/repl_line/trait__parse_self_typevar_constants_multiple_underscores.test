@@ -6,7 +6,9 @@ end
     TraitDef(
         TraitDef {
             name: Some(
-                "TestTrait1",
+                Ident {
+                    text: "TestTrait1",
+                },
             ),
             self_type_variables: [
                 SelfTypeVariable {

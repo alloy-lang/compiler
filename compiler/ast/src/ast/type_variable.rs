@@ -5,7 +5,7 @@ ast_node!(NamedTypeVariable, fields: [name, constraints]);
 
 impl NamedTypeVariable {
     #[must_use]
-    pub fn name(&self) -> Option<String> {
+    pub fn name(&self) -> Option<Ident> {
         first_ident(self)
     }
 

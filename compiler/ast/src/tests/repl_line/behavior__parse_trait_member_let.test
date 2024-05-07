@@ -37,7 +37,11 @@ end
             type_annotations: [
                 TypeAnnotation {
                     name: Some(
-                        "test",
+                        Ident(
+                            Ident {
+                                text: "test",
+                            },
+                        ),
                     ),
                     type_: Some(
                         TypeIdentifier(
@@ -58,7 +62,11 @@ end
             values: [
                 ValueDef {
                     name: Some(
-                        "thing",
+                        Ident(
+                            Ident {
+                                text: "thing",
+                            },
+                        ),
                     ),
                     value: Some(
                         VariableRef(

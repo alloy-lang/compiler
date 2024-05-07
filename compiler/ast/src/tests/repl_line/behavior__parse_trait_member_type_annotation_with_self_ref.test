@@ -35,7 +35,11 @@ end
             type_annotations: [
                 TypeAnnotation {
                     name: Some(
-                        "test",
+                        Ident(
+                            Ident {
+                                text: "test",
+                            },
+                        ),
                     ),
                     type_: Some(
                         LambdaType(

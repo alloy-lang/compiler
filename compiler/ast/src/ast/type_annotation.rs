@@ -5,8 +5,8 @@ ast_node!(TypeAnnotation, fields: [name, type_, named_type_variables]);
 
 impl TypeAnnotation {
     #[must_use]
-    pub fn name(&self) -> Option<String> {
-        first_ident(self)
+    pub fn name(&self) -> Option<IdentOrOp> {
+        first_ident_or_op_ident(self)
     }
 
     #[must_use]

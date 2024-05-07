@@ -8,14 +8,20 @@ end
     TraitDef(
         TraitDef {
             name: Some(
-                "TestTrait1",
+                Ident {
+                    text: "TestTrait1",
+                },
             ),
             self_type_variables: [],
             named_type_variables: [],
             type_annotations: [
                 TypeAnnotation {
                     name: Some(
-                        "test",
+                        Ident(
+                            Ident {
+                                text: "test",
+                            },
+                        ),
                     ),
                     type_: Some(
                         TypeIdentifier(
@@ -36,7 +42,11 @@ end
             values: [
                 ValueDef {
                     name: Some(
-                        "thing",
+                        Ident(
+                            Ident {
+                                text: "thing",
+                            },
+                        ),
                     ),
                     value: Some(
                         VariableRef(
