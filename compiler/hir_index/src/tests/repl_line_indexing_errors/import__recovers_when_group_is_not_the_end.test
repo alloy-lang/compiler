@@ -5,10 +5,19 @@ IndexedModule {
     imports: [
         IndexedImport {
             segments: [
-                "std",
-                "functor",
+                SpannedName(
+                    "std",
+                    42..45,
+                ),
+                SpannedName(
+                    "functor",
+                    47..54,
+                ),
             ],
-            last: "Functor",
+            last: SpannedName(
+                "Functor",
+                56..63,
+            ),
         },
     ],
     warnings: [],

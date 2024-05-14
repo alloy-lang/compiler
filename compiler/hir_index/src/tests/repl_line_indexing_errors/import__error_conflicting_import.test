@@ -5,17 +5,35 @@ IndexedModule {
     imports: [
         IndexedImport {
             segments: [
-                "std",
-                "option",
+                SpannedName(
+                    "std",
+                    7..10,
+                ),
+                SpannedName(
+                    "option",
+                    12..18,
+                ),
             ],
-            last: "map",
+            last: SpannedName(
+                "map",
+                20..23,
+            ),
         },
         IndexedImport {
             segments: [
-                "std",
-                "functor",
+                SpannedName(
+                    "std",
+                    31..34,
+                ),
+                SpannedName(
+                    "functor",
+                    36..43,
+                ),
             ],
-            last: "map",
+            last: SpannedName(
+                "map",
+                45..48,
+            ),
         },
     ],
     warnings: [],

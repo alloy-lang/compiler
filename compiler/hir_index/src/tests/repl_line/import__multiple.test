@@ -1,0 +1,81 @@
+import std::functor::Functor
+import std::function::(<|)
+import std::{
+    function,
+    debug
+}
+-- TODO: Add support for nested import groups
+-- import std::{
+--     function::{
+--         (<|),
+--         id,
+--         const
+--     },
+--     debug::{
+--         Debug
+--     }
+-- }
+===
+IndexedModule {
+    imports: [
+        IndexedImport {
+            segments: [
+                SpannedName(
+                    "std",
+                    7..10,
+                ),
+                SpannedName(
+                    "functor",
+                    12..19,
+                ),
+            ],
+            last: SpannedName(
+                "Functor",
+                21..28,
+            ),
+        },
+        IndexedImport {
+            segments: [
+                SpannedName(
+                    "std",
+                    36..39,
+                ),
+                SpannedName(
+                    "function",
+                    41..49,
+                ),
+            ],
+            last: SpannedName(
+                "<|",
+                51..55,
+            ),
+        },
+        IndexedImport {
+            segments: [
+                SpannedName(
+                    "std",
+                    63..66,
+                ),
+            ],
+            last: SpannedName(
+                "function",
+                74..82,
+            ),
+        },
+        IndexedImport {
+            segments: [
+                SpannedName(
+                    "std",
+                    63..66,
+                ),
+            ],
+            last: SpannedName(
+                "debug",
+                88..93,
+            ),
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[]

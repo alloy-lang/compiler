@@ -1,6 +1,7 @@
 use alloy_ast as ast;
 use std::fmt;
 use text_size::TextRange;
+use alloy_ast::AstElement;
 use crate::import::IndexedImport;
 
 #[cfg(test)]
@@ -14,7 +15,20 @@ mod import;
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Name(String);
 
-pub type SpannedName = (Name, TextRange);
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SpannedName(Name, TextRange);
+
+impl From<ast::Ident> for SpannedName {
+    fn from(ident: ast::Ident) -> Self {
+        Self(Name::new(ident.text()), ident.range())
+    }
+}
+
+impl From<ast::IdentOrOp> for SpannedName {
+    fn from(ident: ast::IdentOrOp) -> Self {
+        Self(Name::new(ident.text()), ident.range())
+    }
+}
 
 impl fmt::Debug for Name {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

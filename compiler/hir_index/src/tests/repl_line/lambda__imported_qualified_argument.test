@@ -1,4 +1,6 @@
-import std::functor::map
+import std::option::Option
+
+|Option::None| -> 5
 ===
 IndexedModule {
     imports: [
@@ -9,13 +11,13 @@ IndexedModule {
                     7..10,
                 ),
                 SpannedName(
-                    "functor",
-                    12..19,
+                    "option",
+                    12..18,
                 ),
             ],
             last: SpannedName(
-                "map",
-                21..24,
+                "Option",
+                20..26,
             ),
         },
     ],

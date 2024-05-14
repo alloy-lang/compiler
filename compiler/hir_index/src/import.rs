@@ -7,8 +7,8 @@ use alloy_ast::AstElement;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct IndexedImport {
-    segments: Vec<Name>,
-    last: Name,
+    segments: Vec<SpannedName>,
+    last: SpannedName,
 }
 
 pub(super) fn index(ctx: &mut IndexingCtx, import: &ast::ImportDef) {
@@ -41,18 +41,24 @@ pub(super) fn index(ctx: &mut IndexingCtx, import: &ast::ImportDef) {
 fn gather_all_import_segments(
     first: &ast::ImportDefChild,
     rest: &[(usize, ast::ImportDefChild)],
-) -> Result<Vec<NonEmpty<Name>>, IndexingErrorKind> {
+) -> Result<Vec<NonEmpty<SpannedName>>, IndexingErrorKind> {
     // add 1 because 'rest' is missing the first segment
     let num_segments = rest.len() + 1;
 
     let mut segments = match first {
         ast::ImportDefChild::ImportDefSegment(segment) => {
-            NonEmpty::new(lower_import_def_segment(segment))
+            let Some(segment) = lower_import_def_segment(&segment) else {
+                unreachable!("parsing error");
+            };
+            NonEmpty::new(segment)
         }
         ast::ImportDefChild::ImportDefGroup(group) if 1 == num_segments => {
             let mut all = Vec::new();
             for segment in group.children() {
-                all.push(NonEmpty::new(lower_import_def_segment(&segment)));
+                let Some(segment) = lower_import_def_segment(&segment) else {
+                    continue;
+                };
+                all.push(NonEmpty::new(segment));
             }
             return Ok(all);
         }
@@ -68,13 +74,19 @@ fn gather_all_import_segments(
     for (segment_num, child) in rest {
         match child {
             ast::ImportDefChild::ImportDefSegment(segment) => {
-                segments.push(lower_import_def_segment(segment));
+                let Some(segment) = lower_import_def_segment(segment) else {
+                    continue;
+                };
+                segments.push(segment);
             }
             ast::ImportDefChild::ImportDefGroup(group) if segment_num + 1 == num_segments => {
                 let mut all = Vec::new();
                 for segment in group.children() {
                     let mut local_segments = segments.clone();
-                    local_segments.push(lower_import_def_segment(&segment));
+                    let Some(segment) = lower_import_def_segment(&segment) else {
+                        continue;
+                    };
+                    local_segments.push(segment);
                     all.push(local_segments);
                 }
                 return Ok(all);
@@ -92,11 +104,7 @@ fn gather_all_import_segments(
     Ok(vec![segments])
 }
 
-fn lower_import_def_segment(ast: &ast::ImportDefSegment) -> Name {
-    match ast.name() {
-        None => {
-            unreachable!("parsing error")
-        }
-        Some(segment) => Name::new(segment),
-    }
+fn lower_import_def_segment(ast: &ast::ImportDefSegment) -> Option<SpannedName> {
+    let ident = ast.name()?;
+    Some(ident.into())
 }

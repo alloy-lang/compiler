@@ -7,17 +7,35 @@ IndexedModule {
     imports: [
         IndexedImport {
             segments: [
-                "std",
-                "functor",
+                SpannedName(
+                    "std",
+                    7..10,
+                ),
+                SpannedName(
+                    "functor",
+                    12..19,
+                ),
             ],
-            last: "map",
+            last: SpannedName(
+                "map",
+                21..24,
+            ),
         },
         IndexedImport {
             segments: [
-                "std",
-                "functor",
+                SpannedName(
+                    "std",
+                    32..35,
+                ),
+                SpannedName(
+                    "functor",
+                    37..44,
+                ),
             ],
-            last: "map",
+            last: SpannedName(
+                "map",
+                46..49,
+            ),
         },
     ],
     warnings: [],
