@@ -5,7 +5,7 @@ authors = ["theochupp <tclchiam@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-la-arena = "0.3"
-rustc-hash = "1.1"
+la-arena = { workspace = true }
+rustc-hash = { workspace = true }
 
 [dev-dependencies]

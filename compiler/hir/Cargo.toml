@@ -9,12 +9,12 @@ edition = "2018"
 alloy_ast = { path = "../ast" }
 alloy_scope = { path = "../scope" }
 alloy_syntax = { path = "../syntax" }
-la-arena = "0.3"
-maplit = "1.0"
-non-empty-vec = "0.2"
-ordered-float = "3.0"
-rustc-hash = "1.1"
-text-size = "1.1"
+la-arena = { workspace = true }
+maplit = { workspace = true }
+non-empty-vec = { workspace = true }
+ordered-float = { workspace = true }
+rustc-hash = { workspace = true }
+text-size = { workspace = true }
 
 [dev-dependencies]
 alloy_parser = {path = "../parser"}
