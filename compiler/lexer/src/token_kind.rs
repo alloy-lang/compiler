@@ -95,7 +95,7 @@ pub enum TokenKind {
     #[token("/")]
     Slash,
 
-    #[token("=")]
+    #[token("=", priority = 3)]
     Equals,
 
     #[token("{")]
@@ -116,10 +116,10 @@ pub enum TokenKind {
     #[token(")")]
     RParen,
 
-    #[token("<")]
+    #[token("<", priority = 3)]
     LAngle,
 
-    #[token(">")]
+    #[token(">", priority = 3)]
     RAngle,
 
     #[token("_")]

@@ -6,7 +6,7 @@ authors = ["theochupp <tclchiam@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-logos = "0.13"
+logos = "0.14"
 text-size = { workspace = true }
 
 [dev-dependencies]
