@@ -86,7 +86,7 @@ mod tests {
 
     #[track_caller]
     fn check(input: &str, expected_errors: &[(ValidationErrorKind, StdRange<u32>)]) {
-        let parse = alloy_parser::parse_repl_line(input);
+        let parse = alloy_parser::parse_source_file(input);
 
         let expected_errors: Vec<_> = expected_errors
             .iter()

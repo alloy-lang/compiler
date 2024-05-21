@@ -49,12 +49,6 @@ impl<'t, 'input> Parser<'t, 'input> {
         self.events
     }
 
-    #[must_use]
-    pub(crate) fn parse_repl_line(mut self) -> Vec<Event> {
-        grammar::repl_line(&mut self);
-        self.events
-    }
-
     pub(crate) fn start(&mut self) -> Marker {
         let pos = self.events.len();
         self.events.push(Event::Placeholder);

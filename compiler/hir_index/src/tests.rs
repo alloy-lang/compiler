@@ -44,7 +44,7 @@ fn index_source_file(input: &str) -> (IndexedModule, Vec<alloy_parser::ParseErro
 
 #[track_caller]
 fn index_repl_line(input: &str) -> (IndexedModule, Vec<alloy_parser::ParseError>) {
-    let parse = alloy_parser::parse_repl_line(input);
+    let parse = alloy_parser::parse_source_file(input);
     let parse_errors = parse.errors().to_vec();
     let root = parse.syntax();
     let source_file = ast::source_file(root).unwrap();

@@ -32,17 +32,6 @@ pub fn parse_source_file(input: &str) -> Parse {
     sink.finish()
 }
 
-#[must_use]
-pub fn parse_repl_line(input: &str) -> Parse {
-    let tokens: Vec<_> = Lexer::new(input).collect();
-    let source = Source::new(&tokens);
-    let parser = Parser::new(source);
-    let events = parser.parse_repl_line();
-    let sink = Sink::new(&tokens, events);
-
-    sink.finish()
-}
-
 pub struct Parse {
     green_node: GreenNode,
     errors: Vec<ParseError>,

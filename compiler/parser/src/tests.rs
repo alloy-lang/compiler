@@ -10,7 +10,7 @@ fn source_file() {
 #[test]
 fn repl_line() {
     alloy_test_harness::run_test_dir("repl_line", |_path, input| {
-        run_parser_test(input, crate::parse_repl_line)
+        run_parser_test(input, crate::parse_source_file)
     });
 }
 
