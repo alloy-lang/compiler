@@ -50,10 +50,8 @@ fn run_ast_test<T: fmt::Debug>(
         );
     }
 
-    let validation_errors = crate::validation::validate(&syntax);
-    let source_file = SourceFile::cast(syntax).unwrap();
-
-    format!("{:#?}\n{:#?}", thing_fn(&source_file), validation_errors)
+    // todo: ast validation was moved to hir lowering
+    format!("{:#?}\n{:#?}", thing_fn(source_file), Vec::<String>::new())
 }
 
 #[test]
@@ -63,15 +61,15 @@ fn test_std_lib() {
 
         let actual = alloy_parser::parse_source_file(source);
 
-        let syntax = actual.syntax();
-        let validation_errors = crate::validation::validate(&syntax);
-        let source_file = SourceFile::cast(syntax).unwrap();
+        let did_panic = std::panic::catch_unwind(|| {
+            let syntax = actual.syntax();
+            let _ = SourceFile::cast(syntax).unwrap();
+        }).is_err();
 
         assert!(
-            validation_errors.is_empty(),
-            "file '{}' contained: {:#?}",
+            !did_panic,
+            "file '{}' failed to parse as a SourceFile",
             file_name,
-            source_file,
         );
     });
 }

@@ -75,7 +75,8 @@ pub(super) fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expressio
     match ast {
         ast::Expression::IntLiteral(lit) => {
             let Some(value) = lit.value() else {
-                unreachable!("parsing error")
+                ctx.error(LoweringErrorKind::NumberLiteralTooLarge, ast.range());
+                return Expression::Missing;
             };
             Expression::Literal(ExpressionLiteral::Int(value))
         }
@@ -93,7 +94,8 @@ pub(super) fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expressio
         }
         ast::Expression::CharLiteral(lit) => {
             let Some(value) = lit.value() else {
-                unreachable!("parsing error")
+                ctx.error(LoweringErrorKind::CharLiteralInvalid, ast.range());
+                return Expression::Missing;
             };
             Expression::Literal(ExpressionLiteral::Char(value))
         }

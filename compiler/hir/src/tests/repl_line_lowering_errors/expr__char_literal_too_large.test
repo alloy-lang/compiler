@@ -1,0 +1,51 @@
+let c = 'characters'
+
+c
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": Missing,
+            "name": "c",
+            "range": 0..22,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(1): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "c",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "range": 22..23,
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        LoweringError {
+            kind: CharLiteralInvalid,
+            range: 8..22,
+        },
+    ],
+}
+[]

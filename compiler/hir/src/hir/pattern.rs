@@ -37,7 +37,8 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
     match ast {
         ast::Pattern::IntLiteral(lit) => {
             let Some(value) = lit.value() else {
-                unreachable!("parsing error")
+                ctx.error(LoweringErrorKind::NumberLiteralTooLarge, ast.range());
+                return Pattern::Missing;
             };
             Pattern::IntLiteral(value)
         }
@@ -55,7 +56,8 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
         }
         ast::Pattern::CharLiteral(lit) => {
             let Some(value) = lit.value() else {
-                unreachable!("parsing error")
+                ctx.error(LoweringErrorKind::CharLiteralInvalid, ast.range());
+                return Pattern::Missing;
             };
             Pattern::CharLiteral(value)
         }

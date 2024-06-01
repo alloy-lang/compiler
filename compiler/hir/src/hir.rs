@@ -133,6 +133,8 @@ pub enum LoweringErrorKind {
         trait_name: Name,
         ranges: Vec<TextRange>,
     },
+    NumberLiteralTooLarge,
+    CharLiteralInvalid,
 }
 
 #[derive(Debug)]
