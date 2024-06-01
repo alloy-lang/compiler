@@ -64,7 +64,8 @@ fn test_std_lib() {
         let did_panic = std::panic::catch_unwind(|| {
             let syntax = actual.syntax();
             let _ = SourceFile::cast(syntax).unwrap();
-        }).is_err();
+        })
+        .is_err();
 
         assert!(
             !did_panic,

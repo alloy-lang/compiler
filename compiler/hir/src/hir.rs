@@ -226,7 +226,6 @@ impl LoweringCtx {
         path_range: TextRange,
         reference_type: HirReferenceType,
     ) -> Option<Path> {
-        let x = 0;
         match reference_type {
             HirReferenceType::Expression => {
                 self.resolve_expression_reference(path_segments, path_range, reference_type)
@@ -246,13 +245,13 @@ impl LoweringCtx {
         if let [first, rest @ ..] = path_segments {
             let local_name = Name::new(first);
 
-            if let Some(tid) = self.type_definitions.get_id(&local_name, &self.scopes) {
+            if let Some(_tid) = self.type_definitions.get_id(&local_name, &self.scopes) {
                 return Some(Path::this_module(rest, first));
             }
-            if let Some(tid) = self.type_references.get_id(&local_name, &self.scopes) {
+            if let Some(_tid) = self.type_references.get_id(&local_name, &self.scopes) {
                 return Some(Path::this_module(rest, first));
             }
-            if let Some(ast) = self.glossary.get_type_definition_by_name(first) {
+            if let Some(_ast) = self.glossary.get_type_definition_by_name(first) {
                 return Some(Path::this_module(rest, first));
             }
             if let Some(import_id) = self.imports.get_id(&local_name, &self.scopes) {
@@ -298,13 +297,13 @@ impl LoweringCtx {
         if let [first, rest @ ..] = path_segments {
             let local_name = Name::new(first);
 
-            if let Some(pid) = self.patterns.get_id(&local_name, &self.scopes) {
+            if let Some(_pid) = self.patterns.get_id(&local_name, &self.scopes) {
                 return Some(Path::this_module(rest, first));
             }
-            if let Some(eid) = self.expressions.get_id(&local_name, &self.scopes) {
+            if let Some(_eid) = self.expressions.get_id(&local_name, &self.scopes) {
                 return Some(Path::this_module(rest, first));
             }
-            if let Some(ast) = self.glossary.get_value_by_name(first) {
+            if let Some(_ast) = self.glossary.get_value_by_name(first) {
                 return Some(Path::this_module(rest, first));
             }
             return self.resolve_type_reference(path_segments, path_range, reference_type);

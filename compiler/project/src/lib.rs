@@ -41,7 +41,7 @@ impl ModuleFile {
     pub fn path(&self) -> &Utf8Path {
         &self.path
     }
-    
+
     #[must_use]
     pub fn contents(&self) -> &str {
         &self.contents
