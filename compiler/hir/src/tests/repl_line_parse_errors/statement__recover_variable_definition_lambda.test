@@ -77,8 +77,10 @@ HirModule {
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<Pattern>(1): {
-            "item": IntLiteral(
-                9,
+            "item": Literal(
+                Int(
+                    9,
+                ),
             ),
             "range": 15..16,
         },

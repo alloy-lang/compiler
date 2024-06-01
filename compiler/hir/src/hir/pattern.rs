@@ -7,10 +7,7 @@ pub type PatternIdx = Idx<Pattern>;
 #[derive(Debug)]
 pub enum Pattern {
     Missing,
-    IntLiteral(u64),
-    FractionLiteral(NotNan<f64>),
-    StringLiteral(String),
-    CharLiteral(char),
+    Literal(Literal),
     PatternRef {
         path: Path,
         scope: ScopeIdx,
@@ -40,26 +37,26 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
                 ctx.error(LoweringErrorKind::NumberLiteralTooLarge, ast.range());
                 return Pattern::Missing;
             };
-            Pattern::IntLiteral(value)
+            Pattern::Literal(Literal::Int(value))
         }
         ast::Pattern::FractionLiteral(lit) => {
             let Some(value) = lit.value() else {
                 unreachable!("parsing error")
             };
-            Pattern::FractionLiteral(value)
+            Pattern::Literal(Literal::Fraction(value))
         }
         ast::Pattern::StringLiteral(lit) => {
             let Some(value) = lit.value() else {
                 unreachable!("parsing error")
             };
-            Pattern::StringLiteral(value)
+            Pattern::Literal(Literal::String(value))
         }
         ast::Pattern::CharLiteral(lit) => {
             let Some(value) = lit.value() else {
                 ctx.error(LoweringErrorKind::CharLiteralInvalid, ast.range());
                 return Pattern::Missing;
             };
-            Pattern::CharLiteral(value)
+            Pattern::Literal(Literal::Char(value))
         }
         ast::Pattern::PatternRef(var) => Pattern::PatternRef {
             path: lower_pattern_ref(ctx, var),

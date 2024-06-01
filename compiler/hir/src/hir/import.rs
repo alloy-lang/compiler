@@ -11,7 +11,7 @@ pub struct Import {
 }
 
 impl Import {
-    pub(crate) fn new(segments: &NonEmpty<Name>) -> Self {
+    pub(super) fn new(segments: &NonEmpty<Name>) -> Self {
         let (last, path) = segments.split_last();
         Self {
             segments: path.to_vec(),

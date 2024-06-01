@@ -23,8 +23,10 @@ HirModule {
     },
     patterns: Index::<Pattern> {
         Idx::<Pattern>(0): {
-            "item": StringLiteral(
-                "hello",
+            "item": Literal(
+                String(
+                    "hello",
+                ),
             ),
             "range": 1..8,
         },

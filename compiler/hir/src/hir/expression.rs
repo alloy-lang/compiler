@@ -4,8 +4,8 @@ use super::*;
 #[allow(clippy::module_name_repetitions)]
 pub type ExpressionIdx = Idx<Expression>;
 
-#[derive(Debug, PartialEq)]
-pub enum ExpressionLiteral {
+#[derive(Debug, Clone, PartialEq)]
+pub enum Literal {
     Int(u64),
     Fraction(NotNan<f64>),
     String(String),
@@ -15,7 +15,7 @@ pub enum ExpressionLiteral {
 #[derive(Debug, PartialEq)]
 pub enum Expression {
     Missing,
-    Literal(ExpressionLiteral),
+    Literal(Literal),
     VariableRef {
         path: Path,
         scope: ScopeIdx,
@@ -78,26 +78,26 @@ pub(super) fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expressio
                 ctx.error(LoweringErrorKind::NumberLiteralTooLarge, ast.range());
                 return Expression::Missing;
             };
-            Expression::Literal(ExpressionLiteral::Int(value))
+            Expression::Literal(Literal::Int(value))
         }
         ast::Expression::FractionLiteral(lit) => {
             let Some(value) = lit.value() else {
                 unreachable!("parsing error")
             };
-            Expression::Literal(ExpressionLiteral::Fraction(value))
+            Expression::Literal(Literal::Fraction(value))
         }
         ast::Expression::StringLiteral(lit) => {
             let Some(value) = lit.value() else {
                 unreachable!("parsing error")
             };
-            Expression::Literal(ExpressionLiteral::String(value))
+            Expression::Literal(Literal::String(value))
         }
         ast::Expression::CharLiteral(lit) => {
             let Some(value) = lit.value() else {
                 ctx.error(LoweringErrorKind::CharLiteralInvalid, ast.range());
                 return Expression::Missing;
             };
-            Expression::Literal(ExpressionLiteral::Char(value))
+            Expression::Literal(Literal::Char(value))
         }
         ast::Expression::VariableRef(var) => lower_variable_ref(ctx, var),
         ast::Expression::InfixExpr(e) => lower_infix_expression(ctx, e),

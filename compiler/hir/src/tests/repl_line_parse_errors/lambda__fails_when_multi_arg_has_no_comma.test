@@ -33,14 +33,18 @@ HirModule {
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<Pattern>(1): {
-            "item": IntLiteral(
-                1001,
+            "item": Literal(
+                Int(
+                    1001,
+                ),
             ),
             "range": 6..11,
         },
         Idx::<Pattern>(2): {
-            "item": CharLiteral(
-                'c',
+            "item": Literal(
+                Char(
+                    'c',
+                ),
             ),
             "range": 11..14,
         },
