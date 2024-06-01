@@ -1,7 +1,7 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
-use non_empty_vec::NonEmpty;
 use alloy_ast::AstElement;
+use non_empty_vec::NonEmpty;
 
 // Import
 

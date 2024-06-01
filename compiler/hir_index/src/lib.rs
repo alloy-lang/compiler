@@ -88,7 +88,7 @@ impl IndexingCtx {
             errors: Vec::new(),
         }
     }
-    
+
     fn finish(self) -> IndexedModule {
         IndexedModule {
             imports: self.imports,
@@ -100,7 +100,7 @@ impl IndexingCtx {
     pub fn add_import(&mut self, import: IndexedImport) {
         self.imports.push(import);
     }
-    
+
     fn warning(&mut self, kind: IndexingWarningKind, range: TextRange) {
         self.warnings.push(IndexingWarning { kind, range });
     }
@@ -157,8 +157,7 @@ pub struct IndexedModule {
     errors: Vec<IndexingError>,
 }
 
-impl IndexedModule {
-}
+impl IndexedModule {}
 
 #[must_use]
 pub fn index_source_file(source_file: &ast::SourceFile) -> IndexedModule {
@@ -177,7 +176,7 @@ pub fn index_source_file(source_file: &ast::SourceFile) -> IndexedModule {
             ast::Statement::ValueDef(_) => {}
         }
     }
-    
+
     ctx.finish()
 }
 
