@@ -109,6 +109,6 @@ fn lower_import_def_segment(ast: &ast::ImportDefSegment) -> Name {
         None => {
             unreachable!("parsing error")
         }
-        Some(segment) => Name::new(segment),
+        Some(segment) => Name::new(segment.text()),
     }
 }

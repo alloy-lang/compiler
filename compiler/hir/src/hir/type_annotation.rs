@@ -21,7 +21,7 @@ pub(super) fn lower_type_annotation(
         // we can skip it since it'll be reported as a parsing error
         return None;
     };
-    let name = Name::new(name);
+    let name = Name::new(name.text());
 
     Some((
         name.clone(),

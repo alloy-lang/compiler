@@ -30,7 +30,7 @@ pub(super) fn lower_type_definition(ctx: &mut LoweringCtx, ast: &ast::TypeDefini
         // we can skip it since it'll be reported as a parsing error
         return;
     };
-    let parent_name = Name::new(parent_name);
+    let parent_name = Name::new(parent_name.text());
 
     let type_definition = ctx.inside_scope("type definition", |ctx| {
         let type_args = ast.type_args();
@@ -53,7 +53,7 @@ pub(super) fn lower_type_definition(ctx: &mut LoweringCtx, ast: &ast::TypeDefini
                 .collect::<Vec<_>>();
 
             members.push(TypeDefinitionMember {
-                name: Name::new(sub_name),
+                name: Name::new(sub_name.text()),
                 properties,
             });
         }

@@ -1,4 +1,5 @@
 use alloy_ast as ast;
+use alloy_ast::AstElement;
 use rustc_hash::FxHashMap;
 
 #[derive(Debug)]
@@ -69,7 +70,7 @@ impl AstGlossary {
             return;
         };
 
-        self.type_definitions.insert(name, ast);
+        self.type_definitions.insert(name.text(), ast);
     }
 
     fn add_value_definition(&mut self, ast: ast::ValueDef) {
@@ -77,6 +78,6 @@ impl AstGlossary {
             return;
         };
 
-        self.value_definitions.insert(name, ast);
+        self.value_definitions.insert(name.text(), ast);
     }
 }

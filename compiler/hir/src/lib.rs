@@ -56,7 +56,7 @@ impl From<&String> for Name {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct Fqn {
     // todo: consider replacing module path with the module id
     module: NonEmpty<Name>,

@@ -31,8 +31,8 @@ pub(super) fn lower_named_type_variable(
     };
 
     Some((
-        Name::new(&name),
-        ctx.add_type_variable(name, type_variable, &ast.syntax()),
+        Name::new(name.text()),
+        ctx.add_type_variable(name.text(), type_variable, &ast.syntax()),
     ))
 }
 

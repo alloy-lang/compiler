@@ -2,7 +2,7 @@
 use super::*;
 
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum BuiltInType {
     Int,
     Fraction,

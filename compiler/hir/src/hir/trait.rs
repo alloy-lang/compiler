@@ -17,7 +17,7 @@ pub(super) fn lower_trait(ctx: &mut LoweringCtx, ast: &ast::TraitDef) {
         // we can skip it since it'll be reported as a parsing error
         return;
     };
-    let name = Name::new(name);
+    let name = Name::new(name.text());
 
     let trait_ = ctx.inside_scope("trait", |ctx| {
         let named_type_variables = ast
