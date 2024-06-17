@@ -54,6 +54,8 @@ pub fn run_test_dir(
         }
     }
 
+    failed_tests.sort();
+
     assert!(
         failed_tests.is_empty(),
         "{} test(s) failed: {:#?}",
