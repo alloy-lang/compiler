@@ -11,10 +11,10 @@ pub enum BuiltInType {
     Bool,
 }
 
-impl TryFrom<ast::Path> for BuiltInType {
+impl TryFrom<&ast::Path> for BuiltInType {
     type Error = ();
 
-    fn try_from(path: ast::Path) -> Result<Self, Self::Error> {
+    fn try_from(path: &ast::Path) -> Result<Self, Self::Error> {
         match path.segments().join("::").as_str() {
             "Int" => Ok(Self::Int),
             "Fraction" => Ok(Self::Fraction),
@@ -63,7 +63,7 @@ fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> TypeReference {
                 unreachable!("parsing error")
             };
 
-            BuiltInType::try_from(path.clone()).map_or_else(
+            BuiltInType::try_from(&path).map_or_else(
                 |_| {
                     let Some(name) = ctx.resolve_reference_path(&path, HirReferenceType::Type)
                     else {
