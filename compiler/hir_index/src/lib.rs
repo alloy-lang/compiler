@@ -2,12 +2,14 @@ use crate::import::IndexedImport;
 use crate::value::IndexedValue;
 use alloy_ast as ast;
 use alloy_ast::AstElement;
+use rustc_hash::FxHashMap;
+use std::collections::hash_map::Entry::Occupied;
 use std::fmt;
 use text_size::TextRange;
 
+mod import;
 #[cfg(test)]
 mod tests;
-mod import;
 mod value;
 
 //
@@ -77,8 +79,8 @@ impl From<&String> for Name {
 
 #[derive(Debug, Default)]
 pub struct IndexingCtx {
-    imports: Vec<IndexedImport>,
-    values: Vec<IndexedValue>,
+    imports: FxHashMap<Name, IndexedImport>,
+    values: FxHashMap<Name, IndexedValue>,
     warnings: Vec<IndexingWarning>,
     errors: Vec<IndexingError>,
 }
@@ -99,11 +101,50 @@ impl IndexingCtx {
     }
 
     fn add_import(&mut self, import: IndexedImport) {
-        self.imports.push(import);
+        if let Occupied(existing) = self.imports.entry(import.last.0.clone()) {
+            let existing = existing.get();
+            let first = existing.range();
+            let second = import.range();
+
+            if import.equivalent(existing) {
+                self.warning(
+                    IndexingWarningKind::DuplicateImport {
+                        name: import.last.0,
+                        first,
+                        second,
+                    },
+                    second,
+                );
+            } else {
+                self.error(
+                    IndexingErrorKind::ConflictingImport {
+                        name: import.last.0,
+                        first,
+                        second,
+                    },
+                    second,
+                );
+            }
+        } else {
+            self.imports.insert(import.last.0.clone(), import);
+        }
     }
 
     fn add_value(&mut self, value: IndexedValue) {
-        self.values.push(value);
+        if let Occupied(existing) = self.values.entry(value.name.0.clone()) {
+            let first = existing.get().name.1;
+            let second = value.name.1;
+            self.error(
+                IndexingErrorKind::ConflictingValue {
+                    name: value.name.0,
+                    first,
+                    second,
+                },
+                second,
+            );
+        } else {
+            self.values.insert(value.name.0.clone(), value);
+        }
     }
 
     fn warning(&mut self, kind: IndexingWarningKind, range: TextRange) {
@@ -157,13 +198,23 @@ pub enum IndexingWarningKind {
 
 #[derive(Debug)]
 pub struct IndexedModule {
-    imports: Vec<IndexedImport>,
-    values: Vec<IndexedValue>,
+    imports: FxHashMap<Name, IndexedImport>,
+    values: FxHashMap<Name, IndexedValue>,
     warnings: Vec<IndexingWarning>,
     errors: Vec<IndexingError>,
 }
 
-impl IndexedModule {}
+impl IndexedModule {
+    #[must_use]
+    pub fn warnings(&self) -> &[IndexingWarning] {
+        &self.warnings
+    }
+
+    #[must_use]
+    pub fn errors(&self) -> &[IndexingError] {
+        &self.errors
+    }
+}
 
 #[must_use]
 pub fn index_source_file(source_file: &ast::SourceFile) -> IndexedModule {

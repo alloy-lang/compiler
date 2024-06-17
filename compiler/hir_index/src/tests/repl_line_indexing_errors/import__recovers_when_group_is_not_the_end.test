@@ -2,8 +2,8 @@ import std::{functor, option}::map
 import std::functor::Functor
 ===
 IndexedModule {
-    imports: [
-        IndexedImport {
+    imports: {
+        "Functor": IndexedImport {
             segments: [
                 SpannedName(
                     "std",
@@ -19,8 +19,8 @@ IndexedModule {
                 56..63,
             ),
         },
-    ],
-    values: [],
+    },
+    values: {},
     warnings: [],
     errors: [
         IndexingError {

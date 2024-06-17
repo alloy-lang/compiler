@@ -64,19 +64,19 @@ fn run_hir_test(
     let (indexed, parse_errors) = func(input);
 
     let file_name = path.to_str().expect("Expected filename");
-    // if expect_parse_errors {
-    //     assert!(
-    //         !parse_errors.is_empty(),
-    //         "file '{}' did not contain parse errors",
-    //         file_name
-    //     );
-    // } else {
-    //     assert!(
-    //         parse_errors.is_empty(),
-    //         "file '{}' contained parse errors: {parse_errors:?}",
-    //         file_name
-    //     );
-    // }
+    if expect_parse_errors {
+        assert!(
+            !parse_errors.is_empty(),
+            "file '{}' did not contain parse errors",
+            file_name
+        );
+    } else {
+        assert!(
+            parse_errors.is_empty(),
+            "file '{}' contained parse errors: {parse_errors:?}",
+            file_name
+        );
+    }
     // if expect_indexing_errors {
     //     assert!(
     //         !indexed.errors().is_empty() || !indexed.warnings().is_empty(),
@@ -100,8 +100,8 @@ fn test_std_lib() {
         let file_name = path.to_str().expect("Expected filename");
 
         let (module, parse_errors) = index_source_file(source);
-        // let indexing_warnings = module.warnings();
-        // let indexing_errors = module.errors();
+        let indexing_warnings = module.warnings();
+        let indexing_errors = module.errors();
 
         assert!(
             parse_errors.is_empty(),
@@ -109,17 +109,17 @@ fn test_std_lib() {
             file_name,
             parse_errors,
         );
-        // assert!(
-        //     indexing_warnings.is_empty(),
-        //     "file '{}' contained indexing warnings: {:#?}",
-        //     file_name,
-        //     indexing_warnings,
-        // );
-        // assert!(
-        //     indexing_errors.is_empty(),
-        //     "file '{}' contained indexing errors: {:#?}",
-        //     file_name,
-        //     indexing_errors,
-        // );
+        assert!(
+            indexing_warnings.is_empty(),
+            "file '{}' contained indexing warnings: {:#?}",
+            file_name,
+            indexing_warnings,
+        );
+        assert!(
+            indexing_errors.is_empty(),
+            "file '{}' contained indexing errors: {:#?}",
+            file_name,
+            indexing_errors,
+        );
     });
 }

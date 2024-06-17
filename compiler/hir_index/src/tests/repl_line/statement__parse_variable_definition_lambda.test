@@ -1,9 +1,9 @@
 let add = |a, b| -> a + b
 ===
 IndexedModule {
-    imports: [],
-    values: [
-        IndexedValue {
+    imports: {},
+    values: {
+        "add": IndexedValue {
             name: SpannedName(
                 "add",
                 4..7,
@@ -16,7 +16,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+    },
     warnings: [],
     errors: [],
 }

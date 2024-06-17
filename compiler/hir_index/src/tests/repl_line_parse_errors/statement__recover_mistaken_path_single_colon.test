@@ -3,8 +3,8 @@ import test_data::ResultThing
 let foo = ResultThing:More:Stuff:here
 ===
 IndexedModule {
-    imports: [
-        IndexedImport {
+    imports: {
+        "ResultThing": IndexedImport {
             segments: [
                 SpannedName(
                     "test_data",
@@ -16,9 +16,9 @@ IndexedModule {
                 18..29,
             ),
         },
-    ],
-    values: [
-        IndexedValue {
+    },
+    values: {
+        "foo": IndexedValue {
             name: SpannedName(
                 "foo",
                 35..38,
@@ -31,7 +31,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+    },
     warnings: [],
     errors: [],
 }

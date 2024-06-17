@@ -4,8 +4,8 @@ import std::functor::map
 let thing = map
 ===
 IndexedModule {
-    imports: [
-        IndexedImport {
+    imports: {
+        "map": IndexedImport {
             segments: [
                 SpannedName(
                     "std",
@@ -21,25 +21,9 @@ IndexedModule {
                 21..24,
             ),
         },
-        IndexedImport {
-            segments: [
-                SpannedName(
-                    "std",
-                    32..35,
-                ),
-                SpannedName(
-                    "functor",
-                    37..44,
-                ),
-            ],
-            last: SpannedName(
-                "map",
-                46..49,
-            ),
-        },
-    ],
-    values: [
-        IndexedValue {
+    },
+    values: {
+        "thing": IndexedValue {
             name: SpannedName(
                 "thing",
                 55..60,
@@ -52,8 +36,17 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
+    },
+    warnings: [
+        IndexingWarning {
+            kind: DuplicateImport {
+                name: "map",
+                first: 7..24,
+                second: 32..49,
+            },
+            range: 32..49,
+        },
     ],
-    warnings: [],
     errors: [],
 }
 []

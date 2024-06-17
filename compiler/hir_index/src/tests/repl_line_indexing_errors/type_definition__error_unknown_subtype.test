@@ -6,9 +6,9 @@ let unknown = Either::Nothing
 
 ===
 IndexedModule {
-    imports: [],
-    values: [
-        IndexedValue {
+    imports: {},
+    values: {
+        "unknown": IndexedValue {
             name: SpannedName(
                 "unknown",
                 41..48,
@@ -21,7 +21,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+    },
     warnings: [],
     errors: [],
 }

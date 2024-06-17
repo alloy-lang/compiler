@@ -6,48 +6,9 @@ let z = 1
 funky(x, y, z
 ===
 IndexedModule {
-    imports: [],
-    values: [
-        IndexedValue {
-            name: SpannedName(
-                "funky",
-                4..9,
-            ),
-            expression: AstElementPointer {
-                raw: SyntaxNodePtr {
-                    kind: LambdaExpr,
-                    range: 12..42,
-                },
-                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
-            },
-        },
-        IndexedValue {
-            name: SpannedName(
-                "x",
-                46..47,
-            ),
-            expression: AstElementPointer {
-                raw: SyntaxNodePtr {
-                    kind: IntLiteral,
-                    range: 50..52,
-                },
-                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
-            },
-        },
-        IndexedValue {
-            name: SpannedName(
-                "y",
-                56..57,
-            ),
-            expression: AstElementPointer {
-                raw: SyntaxNodePtr {
-                    kind: IntLiteral,
-                    range: 60..62,
-                },
-                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
-            },
-        },
-        IndexedValue {
+    imports: {},
+    values: {
+        "z": IndexedValue {
             name: SpannedName(
                 "z",
                 66..67,
@@ -60,7 +21,46 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+        "y": IndexedValue {
+            name: SpannedName(
+                "y",
+                56..57,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 60..62,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+        "funky": IndexedValue {
+            name: SpannedName(
+                "funky",
+                4..9,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: LambdaExpr,
+                    range: 12..42,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+        "x": IndexedValue {
+            name: SpannedName(
+                "x",
+                46..47,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 50..52,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    },
     warnings: [],
     errors: [],
 }

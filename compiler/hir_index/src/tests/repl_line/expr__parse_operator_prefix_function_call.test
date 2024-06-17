@@ -6,9 +6,9 @@ let >> = |f1, f2| -> f2(f1)
 let result = >>(func1, func2)
 ===
 IndexedModule {
-    imports: [],
-    values: [
-        IndexedValue {
+    imports: {},
+    values: {
+        "func1": IndexedValue {
             name: SpannedName(
                 "func1",
                 4..9,
@@ -21,20 +21,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-        IndexedValue {
-            name: SpannedName(
-                "func2",
-                18..23,
-            ),
-            expression: AstElementPointer {
-                raw: SyntaxNodePtr {
-                    kind: IntLiteral,
-                    range: 26..29,
-                },
-                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
-            },
-        },
-        IndexedValue {
+        ">>": IndexedValue {
             name: SpannedName(
                 ">>",
                 33..35,
@@ -47,7 +34,20 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-        IndexedValue {
+        "func2": IndexedValue {
+            name: SpannedName(
+                "func2",
+                18..23,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 26..29,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+        "result": IndexedValue {
             name: SpannedName(
                 "result",
                 62..68,
@@ -60,7 +60,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+    },
     warnings: [],
     errors: [],
 }

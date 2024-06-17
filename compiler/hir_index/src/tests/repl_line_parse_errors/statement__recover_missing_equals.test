@@ -2,22 +2,9 @@ let a (1 + 2)
 let b = a
 ===
 IndexedModule {
-    imports: [],
-    values: [
-        IndexedValue {
-            name: SpannedName(
-                "a",
-                4..5,
-            ),
-            expression: AstElementPointer {
-                raw: SyntaxNodePtr {
-                    kind: ParenExpr,
-                    range: 6..14,
-                },
-                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
-            },
-        },
-        IndexedValue {
+    imports: {},
+    values: {
+        "b": IndexedValue {
             name: SpannedName(
                 "b",
                 18..19,
@@ -30,7 +17,20 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+        "a": IndexedValue {
+            name: SpannedName(
+                "a",
+                4..5,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: ParenExpr,
+                    range: 6..14,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    },
     warnings: [],
     errors: [],
 }

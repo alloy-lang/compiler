@@ -3,9 +3,9 @@ let unknown = 1
 |unknown(a)| -> a + "a"
 ===
 IndexedModule {
-    imports: [],
-    values: [
-        IndexedValue {
+    imports: {},
+    values: {
+        "unknown": IndexedValue {
             name: SpannedName(
                 "unknown",
                 4..11,
@@ -18,7 +18,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+    },
     warnings: [],
     errors: [],
 }

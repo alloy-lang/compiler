@@ -3,9 +3,9 @@ let foo = 0
 (1, foo,)
 ===
 IndexedModule {
-    imports: [],
-    values: [
-        IndexedValue {
+    imports: {},
+    values: {
+        "foo": IndexedValue {
             name: SpannedName(
                 "foo",
                 4..7,
@@ -18,7 +18,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+    },
     warnings: [],
     errors: [],
 }

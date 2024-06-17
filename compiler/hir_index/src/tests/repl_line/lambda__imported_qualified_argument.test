@@ -3,8 +3,8 @@ import std::option::Option
 |Option::None| -> 5
 ===
 IndexedModule {
-    imports: [
-        IndexedImport {
+    imports: {
+        "Option": IndexedImport {
             segments: [
                 SpannedName(
                     "std",
@@ -20,8 +20,8 @@ IndexedModule {
                 20..26,
             ),
         },
-    ],
-    values: [],
+    },
+    values: {},
     warnings: [],
     errors: [],
 }

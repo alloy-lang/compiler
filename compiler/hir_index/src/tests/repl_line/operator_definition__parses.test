@@ -6,8 +6,8 @@ typeof (|>) : t1 -> (t1 -> t2) -> t2 where
 let (|>) = |x, f| -> fakeStuff
 ===
 IndexedModule {
-    imports: [
-        IndexedImport {
+    imports: {
+        "fakeStuff": IndexedImport {
             segments: [
                 SpannedName(
                     "fake",
@@ -19,9 +19,9 @@ IndexedModule {
                 13..22,
             ),
         },
-    ],
-    values: [
-        IndexedValue {
+    },
+    values: {
+        "|>": IndexedValue {
             name: SpannedName(
                 "|>",
                 101..105,
@@ -34,7 +34,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+    },
     warnings: [],
     errors: [],
 }

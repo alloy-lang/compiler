@@ -7,8 +7,23 @@ use non_empty_vec::NonEmpty;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub(crate) struct IndexedImport {
-    segments: Vec<SpannedName>,
-    last: SpannedName,
+    pub segments: Vec<SpannedName>,
+    pub last: SpannedName,
+}
+
+impl IndexedImport {
+    pub(super) fn equivalent(&self, other: &Self) -> bool {
+        let self_s = self.segments.iter().map(|n| &n.0).collect::<Vec<_>>();
+        let other_s = other.segments.iter().map(|n| &n.0).collect::<Vec<_>>();
+
+        self.last.0 == other.last.0 && self_s == other_s
+    }
+
+    pub(crate) fn range(&self) -> TextRange {
+        let first = self.segments.first().unwrap_or(&self.last);
+
+        TextRange::new(first.1.start(), self.last.1.end())
+    }
 }
 
 pub(super) fn index(ctx: &mut IndexingCtx, import: &ast::ImportDef) {

@@ -7,8 +7,8 @@ match test when
   | _    -> 1
 ===
 IndexedModule {
-    imports: [
-        IndexedImport {
+    imports: {
+        "True": IndexedImport {
             segments: [
                 SpannedName(
                     "std",
@@ -24,9 +24,9 @@ IndexedModule {
                 18..22,
             ),
         },
-    ],
-    values: [
-        IndexedValue {
+    },
+    values: {
+        "test": IndexedValue {
             name: SpannedName(
                 "test",
                 28..32,
@@ -39,7 +39,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+    },
     warnings: [],
     errors: [],
 }

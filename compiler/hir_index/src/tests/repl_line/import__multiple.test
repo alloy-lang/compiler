@@ -17,24 +17,8 @@ import std::{
 -- }
 ===
 IndexedModule {
-    imports: [
-        IndexedImport {
-            segments: [
-                SpannedName(
-                    "std",
-                    7..10,
-                ),
-                SpannedName(
-                    "functor",
-                    12..19,
-                ),
-            ],
-            last: SpannedName(
-                "Functor",
-                21..28,
-            ),
-        },
-        IndexedImport {
+    imports: {
+        "<|": IndexedImport {
             segments: [
                 SpannedName(
                     "std",
@@ -50,7 +34,7 @@ IndexedModule {
                 51..55,
             ),
         },
-        IndexedImport {
+        "function": IndexedImport {
             segments: [
                 SpannedName(
                     "std",
@@ -62,7 +46,7 @@ IndexedModule {
                 74..82,
             ),
         },
-        IndexedImport {
+        "debug": IndexedImport {
             segments: [
                 SpannedName(
                     "std",
@@ -74,8 +58,24 @@ IndexedModule {
                 88..93,
             ),
         },
-    ],
-    values: [],
+        "Functor": IndexedImport {
+            segments: [
+                SpannedName(
+                    "std",
+                    7..10,
+                ),
+                SpannedName(
+                    "functor",
+                    12..19,
+                ),
+            ],
+            last: SpannedName(
+                "Functor",
+                21..28,
+            ),
+        },
+    },
+    values: {},
     warnings: [],
     errors: [],
 }

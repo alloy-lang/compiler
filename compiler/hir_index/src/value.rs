@@ -4,8 +4,8 @@ use alloy_ast::{AstElementPointer, Expression};
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub(crate) struct IndexedValue {
-    name: SpannedName,
-    expression: AstElementPointer<Expression>,
+    pub name: SpannedName,
+    pub expression: AstElementPointer<Expression>,
 }
 
 pub(super) fn index(ctx: &mut IndexingCtx, value: &ast::ValueDef) {

@@ -7,35 +7,9 @@ let funky = |x1, y1, z1| -> x1 + y1 + z1
 funky(x, y, z)
 ===
 IndexedModule {
-    imports: [],
-    values: [
-        IndexedValue {
-            name: SpannedName(
-                "x",
-                4..5,
-            ),
-            expression: AstElementPointer {
-                raw: SyntaxNodePtr {
-                    kind: IntLiteral,
-                    range: 8..10,
-                },
-                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
-            },
-        },
-        IndexedValue {
-            name: SpannedName(
-                "y",
-                14..15,
-            ),
-            expression: AstElementPointer {
-                raw: SyntaxNodePtr {
-                    kind: IntLiteral,
-                    range: 18..20,
-                },
-                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
-            },
-        },
-        IndexedValue {
+    imports: {},
+    values: {
+        "z": IndexedValue {
             name: SpannedName(
                 "z",
                 24..25,
@@ -48,7 +22,20 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-        IndexedValue {
+        "y": IndexedValue {
+            name: SpannedName(
+                "y",
+                14..15,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 18..20,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+        "funky": IndexedValue {
             name: SpannedName(
                 "funky",
                 35..40,
@@ -61,7 +48,20 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+        "x": IndexedValue {
+            name: SpannedName(
+                "x",
+                4..5,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 8..10,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    },
     warnings: [],
     errors: [],
 }

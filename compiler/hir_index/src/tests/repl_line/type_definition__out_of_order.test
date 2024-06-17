@@ -6,9 +6,9 @@ typedef Things =
 end
 ===
 IndexedModule {
-    imports: [],
-    values: [
-        IndexedValue {
+    imports: {},
+    values: {
+        "example": IndexedValue {
             name: SpannedName(
                 "example",
                 4..11,
@@ -21,7 +21,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+    },
     warnings: [],
     errors: [],
 }

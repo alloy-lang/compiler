@@ -2,9 +2,9 @@ let = 1
 let b = 2
 ===
 IndexedModule {
-    imports: [],
-    values: [
-        IndexedValue {
+    imports: {},
+    values: {
+        "b": IndexedValue {
             name: SpannedName(
                 "b",
                 12..13,
@@ -17,7 +17,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+    },
     warnings: [],
     errors: [],
 }

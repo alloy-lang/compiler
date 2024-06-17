@@ -2,9 +2,9 @@ let add1 = |a, 9| -
 let add2 = |a, b| -> a + b
 ===
 IndexedModule {
-    imports: [],
-    values: [
-        IndexedValue {
+    imports: {},
+    values: {
+        "add1": IndexedValue {
             name: SpannedName(
                 "add1",
                 4..8,
@@ -17,7 +17,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-        IndexedValue {
+        "add2": IndexedValue {
             name: SpannedName(
                 "add2",
                 24..28,
@@ -30,7 +30,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+    },
     warnings: [],
     errors: [],
 }

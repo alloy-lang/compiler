@@ -3,9 +3,9 @@ let funky = |a, b| -> a + b
 funky(1 + ,)
 ===
 IndexedModule {
-    imports: [],
-    values: [
-        IndexedValue {
+    imports: {},
+    values: {
+        "funky": IndexedValue {
             name: SpannedName(
                 "funky",
                 4..9,
@@ -18,7 +18,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+    },
     warnings: [],
     errors: [],
 }

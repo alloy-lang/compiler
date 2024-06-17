@@ -2,8 +2,8 @@ import std::option::map
 import std::functor::map
 ===
 IndexedModule {
-    imports: [
-        IndexedImport {
+    imports: {
+        "map": IndexedImport {
             segments: [
                 SpannedName(
                     "std",
@@ -19,25 +19,18 @@ IndexedModule {
                 20..23,
             ),
         },
-        IndexedImport {
-            segments: [
-                SpannedName(
-                    "std",
-                    31..34,
-                ),
-                SpannedName(
-                    "functor",
-                    36..43,
-                ),
-            ],
-            last: SpannedName(
-                "map",
-                45..48,
-            ),
+    },
+    values: {},
+    warnings: [],
+    errors: [
+        IndexingError {
+            kind: ConflictingImport {
+                name: "map",
+                first: 7..23,
+                second: 31..48,
+            },
+            range: 31..48,
         },
     ],
-    values: [],
-    warnings: [],
-    errors: [],
 }
 []

@@ -3,9 +3,9 @@ let counter = 0
 counter
 ===
 IndexedModule {
-    imports: [],
-    values: [
-        IndexedValue {
+    imports: {},
+    values: {
+        "counter": IndexedValue {
             name: SpannedName(
                 "counter",
                 4..11,
@@ -18,7 +18,7 @@ IndexedModule {
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },
         },
-    ],
+    },
     warnings: [],
     errors: [],
 }
