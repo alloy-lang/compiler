@@ -1,0 +1,64 @@
+let 1
+let b = 2
+===
+IndexedModule {
+    imports: [],
+    values: [
+        IndexedValue {
+            name: SpannedName(
+                "b",
+                10..11,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 14..15,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            OpIdent,
+            Ident,
+        ],
+        kind: Unexpected {
+            found: Integer,
+            range: 4..5,
+        },
+        context: ValueDefIdent,
+    },
+    ParseError {
+        expected: [
+            Equals,
+        ],
+        kind: Missing {
+            offset: 6,
+        },
+        context: ValueDefEquals,
+    },
+    ParseError {
+        expected: [
+            Integer,
+            Fraction,
+            String,
+            Char,
+            Ident,
+            OpIdent,
+            Minus,
+            LParen,
+            IfKw,
+            MatchKw,
+            Pipe,
+        ],
+        kind: Missing {
+            offset: 6,
+        },
+        context: ValueDefExpr,
+    },
+]

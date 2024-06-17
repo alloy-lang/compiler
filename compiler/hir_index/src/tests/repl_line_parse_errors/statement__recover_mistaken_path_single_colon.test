@@ -1,0 +1,69 @@
+import test_data::ResultThing
+
+let foo = ResultThing:More:Stuff:here
+===
+IndexedModule {
+    imports: [
+        IndexedImport {
+            segments: [
+                SpannedName(
+                    "test_data",
+                    7..16,
+                ),
+            ],
+            last: SpannedName(
+                "ResultThing",
+                18..29,
+            ),
+        },
+    ],
+    values: [
+        IndexedValue {
+            name: SpannedName(
+                "foo",
+                35..38,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: VariableRef,
+                    range: 41..68,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            DoubleColon,
+        ],
+        kind: Unexpected {
+            found: Colon,
+            range: 52..53,
+        },
+        context: VariableRef,
+    },
+    ParseError {
+        expected: [
+            DoubleColon,
+        ],
+        kind: Unexpected {
+            found: Colon,
+            range: 57..58,
+        },
+        context: VariableRef,
+    },
+    ParseError {
+        expected: [
+            DoubleColon,
+        ],
+        kind: Unexpected {
+            found: Colon,
+            range: 63..64,
+        },
+        context: VariableRef,
+    },
+]

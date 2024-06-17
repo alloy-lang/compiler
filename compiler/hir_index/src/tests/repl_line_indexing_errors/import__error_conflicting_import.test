@@ -36,6 +36,7 @@ IndexedModule {
             ),
         },
     ],
+    values: [],
     warnings: [],
     errors: [],
 }

@@ -1,0 +1,28 @@
+typedef Either =
+  | Left
+  | Right
+
+let unknown = Either::Nothing
+
+===
+IndexedModule {
+    imports: [],
+    values: [
+        IndexedValue {
+            name: SpannedName(
+                "unknown",
+                41..48,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: VariableRef,
+                    range: 51..67,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[]

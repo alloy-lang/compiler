@@ -1,0 +1,25 @@
+let unknown = 1
+
+|unknown(a)| -> a + "a"
+===
+IndexedModule {
+    imports: [],
+    values: [
+        IndexedValue {
+            name: SpannedName(
+                "unknown",
+                4..11,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 14..17,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[]

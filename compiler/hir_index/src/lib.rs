@@ -1,12 +1,14 @@
+use crate::import::IndexedImport;
+use crate::value::IndexedValue;
 use alloy_ast as ast;
+use alloy_ast::AstElement;
 use std::fmt;
 use text_size::TextRange;
-use alloy_ast::AstElement;
-use crate::import::IndexedImport;
 
 #[cfg(test)]
 mod tests;
 mod import;
+mod value;
 
 //
 // Name
@@ -73,32 +75,35 @@ impl From<&String> for Name {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct IndexingCtx {
     imports: Vec<IndexedImport>,
+    values: Vec<IndexedValue>,
     warnings: Vec<IndexingWarning>,
     errors: Vec<IndexingError>,
 }
 
 impl IndexingCtx {
+    #[must_use]
     pub fn new() -> Self {
-        Self {
-            imports: Vec::new(),
-            warnings: Vec::new(),
-            errors: Vec::new(),
-        }
+        Self::default()
     }
 
     fn finish(self) -> IndexedModule {
         IndexedModule {
             imports: self.imports,
+            values: self.values,
             warnings: self.warnings,
             errors: self.errors,
         }
     }
 
-    pub fn add_import(&mut self, import: IndexedImport) {
+    fn add_import(&mut self, import: IndexedImport) {
         self.imports.push(import);
+    }
+
+    fn add_value(&mut self, value: IndexedValue) {
+        self.values.push(value);
     }
 
     fn warning(&mut self, kind: IndexingWarningKind, range: TextRange) {
@@ -153,6 +158,7 @@ pub enum IndexingWarningKind {
 #[derive(Debug)]
 pub struct IndexedModule {
     imports: Vec<IndexedImport>,
+    values: Vec<IndexedValue>,
     warnings: Vec<IndexingWarning>,
     errors: Vec<IndexingError>,
 }
@@ -173,7 +179,9 @@ pub fn index_source_file(source_file: &ast::SourceFile) -> IndexedModule {
             ast::Statement::BehaviorDef(_) => {}
             ast::Statement::TypeDefinition(_) => {}
             ast::Statement::TypeAnnotation(_) => {}
-            ast::Statement::ValueDef(_) => {}
+            ast::Statement::ValueDef(value) => {
+                value::index(&mut ctx, &value);
+            }
         }
     }
 

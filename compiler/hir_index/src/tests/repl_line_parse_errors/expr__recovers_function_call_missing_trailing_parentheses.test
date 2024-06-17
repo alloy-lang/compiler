@@ -1,0 +1,77 @@
+let funky = |x1, y1, z1| -> x1 + y1 + z1
+
+let x = 1
+let y = 1
+let z = 1
+funky(x, y, z
+===
+IndexedModule {
+    imports: [],
+    values: [
+        IndexedValue {
+            name: SpannedName(
+                "funky",
+                4..9,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: LambdaExpr,
+                    range: 12..42,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+        IndexedValue {
+            name: SpannedName(
+                "x",
+                46..47,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 50..52,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+        IndexedValue {
+            name: SpannedName(
+                "y",
+                56..57,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 60..62,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+        IndexedValue {
+            name: SpannedName(
+                "z",
+                66..67,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 70..72,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            RParen,
+        ],
+        kind: Missing {
+            offset: 85,
+        },
+        context: FunctionCallRightParen,
+    },
+]

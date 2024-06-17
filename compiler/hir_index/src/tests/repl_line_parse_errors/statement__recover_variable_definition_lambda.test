@@ -1,0 +1,67 @@
+let add1 = |a, 9| -
+let add2 = |a, b| -> a + b
+===
+IndexedModule {
+    imports: [],
+    values: [
+        IndexedValue {
+            name: SpannedName(
+                "add1",
+                4..8,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: LambdaExpr,
+                    range: 11..20,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+        IndexedValue {
+            name: SpannedName(
+                "add2",
+                24..28,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: LambdaExpr,
+                    range: 31..46,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            RightArrow,
+        ],
+        kind: Unexpected {
+            found: Minus,
+            range: 18..19,
+        },
+        context: LambdaExprRightArrow,
+    },
+    ParseError {
+        expected: [
+            Integer,
+            Fraction,
+            String,
+            Char,
+            Ident,
+            OpIdent,
+            Minus,
+            LParen,
+            IfKw,
+            MatchKw,
+            Pipe,
+        ],
+        kind: Missing {
+            offset: 20,
+        },
+        context: LambdaExprExpr,
+    },
+]

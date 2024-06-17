@@ -1,0 +1,25 @@
+let foo = 0
+
+(1, foo,)
+===
+IndexedModule {
+    imports: [],
+    values: [
+        IndexedValue {
+            name: SpannedName(
+                "foo",
+                4..7,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 10..13,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[]

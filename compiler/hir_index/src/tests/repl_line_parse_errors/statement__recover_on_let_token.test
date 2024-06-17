@@ -1,0 +1,44 @@
+let a =
+let b = a
+===
+IndexedModule {
+    imports: [],
+    values: [
+        IndexedValue {
+            name: SpannedName(
+                "b",
+                12..13,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: VariableRef,
+                    range: 16..17,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Integer,
+            Fraction,
+            String,
+            Char,
+            Ident,
+            OpIdent,
+            Minus,
+            LParen,
+            IfKw,
+            MatchKw,
+            Pipe,
+        ],
+        kind: Missing {
+            offset: 8,
+        },
+        context: ValueDefExpr,
+    },
+]

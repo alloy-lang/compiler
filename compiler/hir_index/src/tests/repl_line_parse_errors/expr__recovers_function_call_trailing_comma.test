@@ -1,0 +1,45 @@
+let funky = |a, b| -> a + b
+
+funky(1 + ,)
+===
+IndexedModule {
+    imports: [],
+    values: [
+        IndexedValue {
+            name: SpannedName(
+                "funky",
+                4..9,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: LambdaExpr,
+                    range: 12..29,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Integer,
+            Fraction,
+            String,
+            Char,
+            Ident,
+            OpIdent,
+            Minus,
+            LParen,
+            IfKw,
+            MatchKw,
+            Pipe,
+        ],
+        kind: Missing {
+            offset: 39,
+        },
+        context: FunctionCallArgExpr,
+    },
+]

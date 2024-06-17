@@ -1,0 +1,41 @@
+import fake::fakeStuff
+
+typeof (|>) : t1 -> (t1 -> t2) -> t2 where
+    typevar t1
+    typevar t2
+let (|>) = |x, f| -> fakeStuff
+===
+IndexedModule {
+    imports: [
+        IndexedImport {
+            segments: [
+                SpannedName(
+                    "fake",
+                    7..11,
+                ),
+            ],
+            last: SpannedName(
+                "fakeStuff",
+                13..22,
+            ),
+        },
+    ],
+    values: [
+        IndexedValue {
+            name: SpannedName(
+                "|>",
+                101..105,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: LambdaExpr,
+                    range: 108..127,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[]

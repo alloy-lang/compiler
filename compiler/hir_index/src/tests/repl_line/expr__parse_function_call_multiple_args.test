@@ -1,0 +1,68 @@
+let x = 0
+let y = 1
+let z = 2
+
+let funky = |x1, y1, z1| -> x1 + y1 + z1
+
+funky(x, y, z)
+===
+IndexedModule {
+    imports: [],
+    values: [
+        IndexedValue {
+            name: SpannedName(
+                "x",
+                4..5,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 8..10,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+        IndexedValue {
+            name: SpannedName(
+                "y",
+                14..15,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 18..20,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+        IndexedValue {
+            name: SpannedName(
+                "z",
+                24..25,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 28..31,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+        IndexedValue {
+            name: SpannedName(
+                "funky",
+                35..40,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: LambdaExpr,
+                    range: 43..73,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[]

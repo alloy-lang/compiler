@@ -75,6 +75,7 @@ IndexedModule {
             ),
         },
     ],
+    values: [],
     warnings: [],
     errors: [],
 }

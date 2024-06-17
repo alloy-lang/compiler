@@ -1,0 +1,38 @@
+import fake::ResultThing
+
+let foo = ResultThing::More::Stuff::here
+===
+IndexedModule {
+    imports: [
+        IndexedImport {
+            segments: [
+                SpannedName(
+                    "fake",
+                    7..11,
+                ),
+            ],
+            last: SpannedName(
+                "ResultThing",
+                13..24,
+            ),
+        },
+    ],
+    values: [
+        IndexedValue {
+            name: SpannedName(
+                "foo",
+                30..33,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: VariableRef,
+                    range: 36..66,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[]

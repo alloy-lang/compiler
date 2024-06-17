@@ -1,0 +1,67 @@
+let func1 = 0
+let func2 = 1
+
+let >> = |f1, f2| -> f2(f1)
+
+let result = >>(func1, func2)
+===
+IndexedModule {
+    imports: [],
+    values: [
+        IndexedValue {
+            name: SpannedName(
+                "func1",
+                4..9,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 12..14,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+        IndexedValue {
+            name: SpannedName(
+                "func2",
+                18..23,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: IntLiteral,
+                    range: 26..29,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+        IndexedValue {
+            name: SpannedName(
+                ">>",
+                33..35,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: LambdaExpr,
+                    range: 38..58,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+        IndexedValue {
+            name: SpannedName(
+                "result",
+                62..68,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: FunctionCall,
+                    range: 71..87,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[]

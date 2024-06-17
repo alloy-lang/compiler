@@ -5,7 +5,7 @@ use non_empty_vec::NonEmpty;
 
 // Import
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub(crate) struct IndexedImport {
     segments: Vec<SpannedName>,
     last: SpannedName,

@@ -1,7 +1,10 @@
-import std::functor::map
-import std::functor::map
+import std::bool::True
 
-let thing = map
+let test = True
+
+match test when
+  | True -> 0
+  | _    -> 1
 ===
 IndexedModule {
     imports: [
@@ -12,42 +15,26 @@ IndexedModule {
                     7..10,
                 ),
                 SpannedName(
-                    "functor",
-                    12..19,
+                    "bool",
+                    12..16,
                 ),
             ],
             last: SpannedName(
-                "map",
-                21..24,
-            ),
-        },
-        IndexedImport {
-            segments: [
-                SpannedName(
-                    "std",
-                    32..35,
-                ),
-                SpannedName(
-                    "functor",
-                    37..44,
-                ),
-            ],
-            last: SpannedName(
-                "map",
-                46..49,
+                "True",
+                18..22,
             ),
         },
     ],
     values: [
         IndexedValue {
             name: SpannedName(
-                "thing",
-                55..60,
+                "test",
+                28..32,
             ),
             expression: AstElementPointer {
                 raw: SyntaxNodePtr {
                     kind: VariableRef,
-                    range: 63..66,
+                    range: 35..41,
                 },
                 _ty: PhantomData<alloy_ast::ast::expression::Expression>,
             },

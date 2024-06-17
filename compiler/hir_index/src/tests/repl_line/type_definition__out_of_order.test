@@ -1,0 +1,28 @@
+let example = Things::ThingA
+
+typedef Things =
+  | ThingA
+  | ThingB
+end
+===
+IndexedModule {
+    imports: [],
+    values: [
+        IndexedValue {
+            name: SpannedName(
+                "example",
+                4..11,
+            ),
+            expression: AstElementPointer {
+                raw: SyntaxNodePtr {
+                    kind: VariableRef,
+                    range: 14..30,
+                },
+                _ty: PhantomData<alloy_ast::ast::expression::Expression>,
+            },
+        },
+    ],
+    warnings: [],
+    errors: [],
+}
+[]

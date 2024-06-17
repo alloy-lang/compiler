@@ -21,6 +21,7 @@ IndexedModule {
             ),
         },
     ],
+    values: [],
     warnings: [],
     errors: [],
 }
