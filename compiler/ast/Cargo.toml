@@ -6,10 +6,10 @@ authors = ["theochupp <tclchiam@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+alloy_parser = {path = "../parser"}
 alloy_syntax = { path = "../syntax" }
 ordered-float = { workspace = true }
 text-size = { workspace = true }
 
 [dev-dependencies]
-alloy_parser = {path = "../parser"}
 alloy_test_harness = {path = "../test_harness"}

@@ -1,4 +1,4 @@
-use alloy_syntax::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken};
+use alloy_syntax::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxNodePointer, SyntaxToken};
 use std::fmt;
 use text_size::TextRange;
 
@@ -33,7 +33,7 @@ macro_rules! ast_token {
 
 macro_rules! ast_node {
     ($kind:ident, fields: [$($field:ident),*]) => {
-        #[derive(Clone, PartialEq, Eq)]
+        #[derive(PartialEq, Eq)]
         pub struct $kind(SyntaxNode);
 
         impl AstElement for $kind {

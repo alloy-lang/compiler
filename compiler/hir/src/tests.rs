@@ -13,43 +13,30 @@ fn source_file() {
 #[test]
 fn repl_line() {
     alloy_test_harness::run_test_dir("repl_line", |path, input| {
-        run_hir_test(path, input, false, false, lower_repl_line)
+        run_hir_test(path, input, false, false, lower_source_file)
     });
 }
 
 #[test]
 fn repl_line_lowering_errors() {
     alloy_test_harness::run_test_dir("repl_line_lowering_errors", |path, input| {
-        run_hir_test(path, input, false, true, lower_repl_line)
+        run_hir_test(path, input, false, true, lower_source_file)
     });
 }
 
 #[test]
 fn repl_line_parse_errors() {
     alloy_test_harness::run_test_dir("repl_line_parse_errors", |path, input| {
-        run_hir_test(path, input, true, false, lower_repl_line)
+        run_hir_test(path, input, true, false, lower_source_file)
     });
 }
 
 #[track_caller]
 fn lower_source_file(input: &str) -> (HirModule, Vec<alloy_parser::ParseError>) {
-    let parse = alloy_parser::parse_source_file(input);
-    let parse_errors = parse.errors().to_vec();
-    let root = parse.syntax();
-    let source_file = ast::source_file(root).unwrap();
+    let (source_file, parse_errors) = ast::source_file(input);
+    let source_file = source_file.expect("Failed to parse source file");
 
     let hir = crate::lower_source_file(&source_file);
-    (hir, parse_errors)
-}
-
-#[track_caller]
-fn lower_repl_line(input: &str) -> (HirModule, Vec<alloy_parser::ParseError>) {
-    let parse = alloy_parser::parse_repl_line(input);
-    let parse_errors = parse.errors().to_vec();
-    let root = parse.syntax();
-    let source_file = ast::source_file(root).unwrap();
-
-    let hir = crate::lower_repl_line(&source_file);
     (hir, parse_errors)
 }
 

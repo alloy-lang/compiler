@@ -553,15 +553,6 @@ pub fn lower_source_file(source_file: &ast::SourceFile) -> HirModule {
     ctx.finish()
 }
 
-#[must_use]
-pub fn lower_repl_line(source_file: &ast::SourceFile) -> HirModule {
-    let glossary = AstGlossary::summarize_repl_line(source_file);
-
-    let mut ctx = LoweringCtx::new(glossary);
-    source_file::lower_repl_line(&mut ctx, source_file);
-    ctx.finish()
-}
-
 impl LoweringCtx {
     fn warning(&mut self, kind: LoweringWarningKind, range: TextRange) {
         self.warnings.push(LoweringWarning { kind, range });

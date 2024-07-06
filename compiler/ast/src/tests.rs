@@ -3,45 +3,27 @@ use std::path::Path;
 
 use crate::ast::AstElement;
 use crate::ast::SourceFile;
-use alloy_parser::Parse;
 
 #[test]
 fn source_file() {
     alloy_test_harness::run_test_dir("source_file", |path, input| {
-        run_ast_test(
-            path,
-            input,
-            alloy_parser::parse_source_file,
-            SourceFile::module,
-        )
+        run_ast_test(path, input, SourceFile::module)
     });
 }
 
 #[test]
 fn repl_line() {
     alloy_test_harness::run_test_dir("repl_line", |path, input| {
-        run_ast_test(
-            path,
-            input,
-            alloy_parser::parse_repl_line,
-            SourceFile::statements,
-        )
+        run_ast_test(path, input, SourceFile::statements)
     });
 }
 
-fn run_ast_test<T: fmt::Debug>(
-    path: &Path,
-    input: &str,
-    parsing_fn: fn(&str) -> Parse,
-    thing_fn: fn(&SourceFile) -> T,
-) -> String {
-    let actual = parsing_fn(input);
-
-    let syntax = actual.syntax();
+fn run_ast_test<T: fmt::Debug>(path: &Path, input: &str, thing_fn: fn(&SourceFile) -> T) -> String {
+    let (source_file, parse_errors) = crate::source_file(input);
+    let source_file = source_file.expect("Failed to parse source file");
 
     {
         let file_name = path.to_str().expect("Expected filename");
-        let parse_errors = actual.errors();
         assert!(
             parse_errors.is_empty(),
             "file '{}' contained parse errors: {:?}",
@@ -51,7 +33,7 @@ fn run_ast_test<T: fmt::Debug>(
     }
 
     // todo: ast validation was moved to hir lowering
-    format!("{:#?}\n{:#?}", thing_fn(source_file), Vec::<String>::new())
+    format!("{:#?}\n{:#?}", thing_fn(&source_file), Vec::<String>::new())
 }
 
 #[test]

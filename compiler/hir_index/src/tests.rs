@@ -33,10 +33,8 @@ fn repl_line_parse_errors() {
 
 #[track_caller]
 fn index_source_file(input: &str) -> (IndexedModule, Vec<alloy_parser::ParseError>) {
-    let parse = alloy_parser::parse_source_file(input);
-    let parse_errors = parse.errors().to_vec();
-    let root = parse.syntax();
-    let source_file = ast::source_file(root).unwrap();
+    let (source_file, parse_errors) = ast::source_file(input);
+    let source_file = source_file.expect("Failed to parse source file");
 
     let hir = crate::index_source_file(&source_file);
     (hir, parse_errors)
@@ -44,10 +42,8 @@ fn index_source_file(input: &str) -> (IndexedModule, Vec<alloy_parser::ParseErro
 
 #[track_caller]
 fn index_repl_line(input: &str) -> (IndexedModule, Vec<alloy_parser::ParseError>) {
-    let parse = alloy_parser::parse_source_file(input);
-    let parse_errors = parse.errors().to_vec();
-    let root = parse.syntax();
-    let source_file = ast::source_file(root).unwrap();
+    let (source_file, parse_errors) = ast::source_file(input);
+    let source_file = source_file.expect("Failed to parse source file");
 
     let hir = crate::index_repl_line(&source_file);
     (hir, parse_errors)
