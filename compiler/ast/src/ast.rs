@@ -1,4 +1,4 @@
-use alloy_syntax::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxNodePointer, SyntaxToken};
+use alloy_syntax::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken};
 use std::fmt;
 use text_size::TextRange;
 
