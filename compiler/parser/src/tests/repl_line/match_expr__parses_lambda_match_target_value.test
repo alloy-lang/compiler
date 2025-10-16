@@ -1,0 +1,100 @@
+match test when
+  \ True    -> (|a, b| -> a + b)
+  \ False   -> (|a, b| -> a - b)
+===
+SourceFile@0..81
+  MatchExpr@0..81
+    MatchKw@0..5 "match"
+    Whitespace@5..6 " "
+    MatchExprArg@6..11
+      VariableRef@6..11
+        Path@6..11
+          Ident@6..10 "test"
+          Whitespace@10..11 " "
+    WhenKw@11..15 "when"
+    Whitespace@15..18 "\n  "
+    MatchTarget@18..51
+      Backslash@18..19 "\\"
+      Whitespace@19..20 " "
+      MatchTargetCondition@20..28
+        VariableRef@20..28
+          Path@20..28
+            Ident@20..24 "True"
+            Whitespace@24..28 "    "
+      RightArrow@28..30 "->"
+      Whitespace@30..31 " "
+      MatchTargetValue@31..51
+        ParenExpr@31..51
+          LParen@31..32 "("
+          LambdaExpr@32..47
+            LambdaExprArgList@32..39
+              Pipe@32..33 "|"
+              LambdaExprArg@33..34
+                VariableDeclaration@33..34
+                  Path@33..34
+                    Ident@33..34 "a"
+              Comma@34..35 ","
+              Whitespace@35..36 " "
+              LambdaExprArg@36..37
+                VariableDeclaration@36..37
+                  Path@36..37
+                    Ident@36..37 "b"
+              Pipe@37..38 "|"
+              Whitespace@38..39 " "
+            RightArrow@39..41 "->"
+            Whitespace@41..42 " "
+            LambdaExprBody@42..47
+              InfixExpr@42..47
+                VariableRef@42..44
+                  Path@42..44
+                    Ident@42..43 "a"
+                    Whitespace@43..44 " "
+                Plus@44..45 "+"
+                Whitespace@45..46 " "
+                VariableRef@46..47
+                  Path@46..47
+                    Ident@46..47 "b"
+          RParen@47..48 ")"
+          Whitespace@48..51 "\n  "
+    MatchTarget@51..81
+      Backslash@51..52 "\\"
+      Whitespace@52..53 " "
+      MatchTargetCondition@53..61
+        VariableRef@53..61
+          Path@53..61
+            Ident@53..58 "False"
+            Whitespace@58..61 "   "
+      RightArrow@61..63 "->"
+      Whitespace@63..64 " "
+      MatchTargetValue@64..81
+        ParenExpr@64..81
+          LParen@64..65 "("
+          LambdaExpr@65..80
+            LambdaExprArgList@65..72
+              Pipe@65..66 "|"
+              LambdaExprArg@66..67
+                VariableDeclaration@66..67
+                  Path@66..67
+                    Ident@66..67 "a"
+              Comma@67..68 ","
+              Whitespace@68..69 " "
+              LambdaExprArg@69..70
+                VariableDeclaration@69..70
+                  Path@69..70
+                    Ident@69..70 "b"
+              Pipe@70..71 "|"
+              Whitespace@71..72 " "
+            RightArrow@72..74 "->"
+            Whitespace@74..75 " "
+            LambdaExprBody@75..80
+              InfixExpr@75..80
+                VariableRef@75..77
+                  Path@75..77
+                    Ident@75..76 "a"
+                    Whitespace@76..77 " "
+                Minus@77..78 "-"
+                Whitespace@78..79 " "
+                VariableRef@79..80
+                  Path@79..80
+                    Ident@79..80 "b"
+          RParen@80..81 ")"

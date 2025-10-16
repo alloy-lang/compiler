@@ -39,10 +39,10 @@ end
 behavior Ord for Bool where
   let compare = |left, right| ->
     match (left, right) when
-      | (True, True)   -> Ordering::EQ
-      | (False, False) -> Ordering::EQ
-      | (True, False)  -> Ordering::GT
-      | (False, True)  -> Ordering::LT
+      \ (True, True)   -> Ordering::EQ
+      \ (False, False) -> Ordering::EQ
+      \ (True, False)  -> Ordering::GT
+      \ (False, True)  -> Ordering::LT
 end
 
 

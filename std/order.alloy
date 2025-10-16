@@ -29,33 +29,33 @@ let comparing = |convert, x, y| -> Ord::compare <| (convert(x), convert(y))
 typeof (<=) : t -> t -> Bool where
   typevar t = Ord
 let (<=) = |left, right| -> match Ord::compare(left, right) when
-  | LT -> True
-  | EQ -> True
-  | GT -> False
+  \ LT -> True
+  \ EQ -> True
+  \ GT -> False
 
 --! Returns whether `left` is less than `right`.
 typeof (<) : t -> t -> Bool where
   typevar t = Ord
 let (<) = |left, right| -> match Ord::compare(left, right) when
-  | LT -> True
-  | EQ -> False
-  | GT -> False
+  \ LT -> True
+  \ EQ -> False
+  \ GT -> False
 
 --! Returns whether `left` is greater than `right`.
 typeof (>) : t -> t -> Bool where
   typevar t = Ord
 let (>) = |left, right| -> match Ord::compare(left, right) when
-  | LT -> False
-  | EQ -> False
-  | GT -> True
+  \ LT -> False
+  \ EQ -> False
+  \ GT -> True
 
 --! Returns whether `left` is greater than or equal to `right`.
 typeof (>=) : t -> t -> Bool where
   typevar t = Ord
 let (>=) = |left, right| -> match Ord::compare(left, right) when
-  | LT -> False
-  | EQ -> True
-  | GT -> True
+  \ LT -> False
+  \ EQ -> True
+  \ GT -> True
 
 --! Returns `left` if `left` is less than or equal to `right`, otherwise `right`.
 typeof min : t -> t -> t where

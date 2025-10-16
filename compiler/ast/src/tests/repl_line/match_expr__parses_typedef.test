@@ -4,8 +4,8 @@ typedef Either[l, r] =
 end
 
 match test when
-  | Either::Left(l)  -> l
-  | Either::Right(r) -> r
+  \ Either::Left(l)  -> l
+  \ Either::Right(r) -> r
 ===
 [
     TypeDefinition(

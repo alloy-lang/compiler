@@ -1,6 +1,6 @@
 match test
-  | True -> 0
-  | False -> 1
+  \ True -> 0
+  \ False -> 1
 ===
 SourceFile@0..39
   MatchExpr@0..39
@@ -11,9 +11,10 @@ SourceFile@0..39
         Path@6..13
           Ident@6..10 "test"
           Whitespace@10..13 "\n  "
-    MatchTarget@13..27
-      Pipe@13..14 "|"
+    Error@13..15
+      Backslash@13..14 "\\"
       Whitespace@14..15 " "
+    MatchTarget@15..27
       MatchTargetCondition@15..20
         VariableRef@15..20
           Path@15..20
@@ -26,7 +27,7 @@ SourceFile@0..39
           Integer@23..24 "0"
           Whitespace@24..27 "\n  "
     MatchTarget@27..39
-      Pipe@27..28 "|"
+      Backslash@27..28 "\\"
       Whitespace@28..29 " "
       MatchTargetCondition@29..35
         VariableRef@29..35
@@ -38,4 +39,5 @@ SourceFile@0..39
       MatchTargetValue@38..39
         IntLiteral@38..39
           Integer@38..39 "1"
-error at position 13 while parsing the when keyword of a match expression. Missing expected ‘when‘
+error in range 13..14 while parsing the when keyword of a match expression. Found ’\’, but expected ‘when‘
+error at position 15 while parsing the `|` at the start of a match expression branch. Missing expected ’\’

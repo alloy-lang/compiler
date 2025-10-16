@@ -2,8 +2,8 @@ import std::either::Either
 import test
 
 match test when
-  | Either::Left(x)  -> x
-  | Either::Right(x) -> x
+  \ Either::Left(x)  -> x
+  \ Either::Right(x) -> x
 ===
 HirModule {
     imports: Index::<Import> {

@@ -38,10 +38,10 @@ end
 behavior Ord for Bool where
   let compare = |left, right| ->
     match (left, right) when
-      | (True, True)   -> Ordering::EQ
-      | (False, False) -> Ordering::EQ
-      | (True, False)  -> Ordering::GT
-      | (False, True)  -> Ordering::LT
+      \ (True, True)   -> Ordering::EQ
+      \ (False, False) -> Ordering::EQ
+      \ (True, False)  -> Ordering::GT
+      \ (False, True)  -> Ordering::LT
 end
 
 
@@ -404,7 +404,7 @@ SourceFile@0..819
               WhenKw@555..559 "when"
               Whitespace@559..566 "\n      "
               MatchTarget@566..605
-                Pipe@566..567 "|"
+                Backslash@566..567 "\\"
                 Whitespace@567..568 " "
                 MatchTargetCondition@568..583
                   TuplePattern@568..583
@@ -431,7 +431,7 @@ SourceFile@0..819
                       Ident@596..598 "EQ"
                       Whitespace@598..605 "\n      "
               MatchTarget@605..644
-                Pipe@605..606 "|"
+                Backslash@605..606 "\\"
                 Whitespace@606..607 " "
                 MatchTargetCondition@607..622
                   TuplePattern@607..622
@@ -458,7 +458,7 @@ SourceFile@0..819
                       Ident@635..637 "EQ"
                       Whitespace@637..644 "\n      "
               MatchTarget@644..683
-                Pipe@644..645 "|"
+                Backslash@644..645 "\\"
                 Whitespace@645..646 " "
                 MatchTargetCondition@646..661
                   TuplePattern@646..661
@@ -485,7 +485,7 @@ SourceFile@0..819
                       Ident@674..676 "GT"
                       Whitespace@676..683 "\n      "
               MatchTarget@683..716
-                Pipe@683..684 "|"
+                Backslash@683..684 "\\"
                 Whitespace@684..685 " "
                 MatchTargetCondition@685..700
                   TuplePattern@685..700

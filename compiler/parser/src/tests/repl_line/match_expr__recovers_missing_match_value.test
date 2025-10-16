@@ -1,11 +1,9 @@
--- TODO this test displays a situation the parser can't handle yet
--- where the match target value expression is missing
 match test when
-  | True ->
-  | False -> 1
+  \ True ->
+  \ False -> 1
 ===
-SourceFile@0..44
-  MatchExpr@0..44
+SourceFile@0..42
+  MatchExpr@0..42
     MatchKw@0..5 "match"
     Whitespace@5..6 " "
     MatchExprArg@6..11
@@ -15,8 +13,8 @@ SourceFile@0..44
           Whitespace@10..11 " "
     WhenKw@11..15 "when"
     Whitespace@15..18 "\n  "
-    MatchTarget@18..32
-      Pipe@18..19 "|"
+    MatchTarget@18..30
+      Backslash@18..19 "\\"
       Whitespace@19..20 " "
       MatchTargetCondition@20..25
         VariableRef@20..25
@@ -24,17 +22,19 @@ SourceFile@0..44
             Ident@20..24 "True"
             Whitespace@24..25 " "
       RightArrow@25..27 "->"
-    MatchTarget@32..44
-      Pipe@32..33 "|"
-      Whitespace@33..34 " "
-      MatchTargetCondition@34..40
-        VariableRef@34..40
-          Path@34..40
-            Ident@34..39 "False"
-            Whitespace@39..40 " "
-      RightArrow@40..42 "->"
-      Whitespace@42..43 " "
-      MatchTargetValue@43..44
-        IntLiteral@43..44
-          Integer@43..44 "1"
-error at position 38 while parsing the value in a match expression branch. Expected expression
+      Whitespace@27..30 "\n  "
+      MatchTargetValue@30..30
+    MatchTarget@30..42
+      Backslash@30..31 "\\"
+      Whitespace@31..32 " "
+      MatchTargetCondition@32..38
+        VariableRef@32..38
+          Path@32..38
+            Ident@32..37 "False"
+            Whitespace@37..38 " "
+      RightArrow@38..40 "->"
+      Whitespace@40..41 " "
+      MatchTargetValue@41..42
+        IntLiteral@41..42
+          Integer@41..42 "1"
+error at position 30 while parsing the value in a match expression branch. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’

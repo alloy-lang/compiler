@@ -2,9 +2,7 @@
 use super::*;
 
 #[derive(Debug, PartialEq)]
-pub struct TypeDefinition {
-    
-}
+pub struct TypeDefinition {}
 
 pub(super) fn lower_type_definition(
     _ctx: &mut LoweringCtx,

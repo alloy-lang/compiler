@@ -1,6 +1,6 @@
 match test when
-  | True -> 0
-  | _    -> 1
+  \ True -> 0
+  \ _    -> 1
 ===
 [
     Expression(

@@ -1,6 +1,6 @@
 match test when
-  | True -> 0
-  | _    -> 1
+  \ True -> 0
+  \ _    -> 1
 ===
 SourceFile@0..43
   MatchExpr@0..43
@@ -14,7 +14,7 @@ SourceFile@0..43
     WhenKw@11..15 "when"
     Whitespace@15..18 "\n  "
     MatchTarget@18..32
-      Pipe@18..19 "|"
+      Backslash@18..19 "\\"
       Whitespace@19..20 " "
       MatchTargetCondition@20..25
         VariableRef@20..25
@@ -28,7 +28,7 @@ SourceFile@0..43
           Integer@28..29 "0"
           Whitespace@29..32 "\n  "
     MatchTarget@32..43
-      Pipe@32..33 "|"
+      Backslash@32..33 "\\"
       Whitespace@33..34 " "
       MatchTargetCondition@34..39
         NilIdentifier@34..35 "_"
