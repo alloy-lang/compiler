@@ -29,12 +29,12 @@ pub fn run_test_dir(
 
     let mut failed_tests = vec![];
 
-    for entry in fs::read_dir(tests_dir).unwrap() {
+    for entry in fs::read_dir(&tests_dir).unwrap() {
         let test_path = entry.unwrap().path().canonicalize().unwrap();
 
         println!(
-            "\n==== RUNNING TEST [{}] {:?} ====",
-            raw_tests_dir,
+            "\n==== RUNNING TEST [{:?}] {:?} ====",
+            &tests_dir,
             test_path.file_stem().unwrap()
         );
 
@@ -64,7 +64,7 @@ pub fn run_test_dir(
     );
 }
 
-pub fn run_std_lib_tests(test_fn: impl Fn(&Path, &str)) {
+pub fn run_std_lib_tests(test_fn: impl Fn(&Path, &str) + RefUnwindSafe + UnwindSafe) {
     let project = Project::new("../../std").expect("expected project to be created");
 
     let mut failed_tests = vec![];
@@ -82,7 +82,7 @@ pub fn run_std_lib_tests(test_fn: impl Fn(&Path, &str)) {
             .is_err();
 
         if did_panic {
-            failed_tests.push(file_name);
+            failed_tests.push(path.as_std_path());
         }
     }
 

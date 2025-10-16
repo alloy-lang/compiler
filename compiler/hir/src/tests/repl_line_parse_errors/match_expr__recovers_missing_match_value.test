@@ -2,8 +2,8 @@ import test_data::test
 import std::bool::Bool::{True, False}
 
 match test when
-  | True ->
-  | False -> 1
+  \ True ->
+  \ False -> 1
 ===
 HirModule {
     imports: Index::<Import> {
@@ -64,6 +64,10 @@ HirModule {
             "range": 68..73,
         },
         Idx::<Expression>(1): {
+            "item": Missing,
+            "range": 80..92,
+        },
+        Idx::<Expression>(2): {
             "item": Literal(
                 Int(
                     1,
@@ -71,21 +75,16 @@ HirModule {
             ),
             "range": 103..104,
         },
-        Idx::<Expression>(2): {
-            "item": Lambda {
-                args: [
-                    Idx::<Pattern>(1),
-                ],
-                body: Idx::<Expression>(1),
-            },
-            "range": 92..104,
-        },
         Idx::<Expression>(3): {
             "item": Match {
                 condition: Idx::<Expression>(0),
                 targets: [
                     (
                         Idx::<Pattern>(0),
+                        Idx::<Expression>(1),
+                    ),
+                    (
+                        Idx::<Pattern>(1),
                         Idx::<Expression>(2),
                     ),
                 ],
@@ -114,12 +113,23 @@ HirModule {
             "range": 82..87,
         },
         Idx::<Pattern>(1): {
-            "item": VariableDeclaration {
-                name: "False",
+            "item": PatternRef {
+                path: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "bool",
+                                "Bool",
+                            ],
+                        ),
+                        name: "False",
+                        sub_path: [],
+                    },
+                ),
+                scope: Idx::<Scope>(2),
             },
-            "name": "False",
             "range": 94..100,
-            "scope_id": Idx::<Scope>(2),
         },
     },
     type_references: EmptyIndex::<TypeReference>,
@@ -138,37 +148,33 @@ HirModule {
                     tag: "match expression arm",
                 },
                 Scope {
-                    parent: Idx::<Scope>(1),
-                    tag: "lambda expression",
+                    parent: Idx::<Scope>(0),
+                    tag: "match expression arm",
                 },
             ],
         },
     },
-    warnings: [
-        LoweringWarning {
-            kind: UnusedImport {
-                import: Import {
-                    segments: [
-                        "std",
-                        "bool",
-                        "Bool",
-                    ],
-                    last: "False",
-                },
-            },
-            range: 23..62,
-        },
-    ],
+    warnings: [],
     errors: [],
 }
 [
     ParseError {
         expected: [
+            Integer,
+            Fraction,
+            String,
+            Char,
+            Ident,
+            OpIdent,
+            Minus,
+            LParen,
+            IfKw,
+            MatchKw,
             Pipe,
         ],
         kind: Missing {
-            offset: 100,
+            offset: 92,
         },
-        context: LambdaArgPipe,
+        context: MatchTargetValue,
     },
 ]

@@ -2,8 +2,8 @@ import test_data::test
 import std::bool::Bool::{True, False}
 
 match test when
-  | True -> _
-  | False -> 1
+  \ True -> _
+  \ False -> 1
 ===
 HirModule {
     imports: Index::<Import> {

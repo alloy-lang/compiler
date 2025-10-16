@@ -7,7 +7,6 @@ mod index;
 #[cfg(test)]
 mod tests;
 
-pub use hir::lower_repl_line;
 pub use hir::lower_source_file;
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]

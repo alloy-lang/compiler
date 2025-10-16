@@ -17,7 +17,7 @@ SourceFile@0..81
       Backslash@18..19 "\\"
       Whitespace@19..20 " "
       MatchTargetCondition@20..28
-        VariableRef@20..28
+        PatternRef@20..28
           Path@20..28
             Ident@20..24 "True"
             Whitespace@24..28 "    "
@@ -31,14 +31,12 @@ SourceFile@0..81
               Pipe@32..33 "|"
               LambdaExprArg@33..34
                 VariableDeclaration@33..34
-                  Path@33..34
-                    Ident@33..34 "a"
+                  Ident@33..34 "a"
               Comma@34..35 ","
               Whitespace@35..36 " "
               LambdaExprArg@36..37
                 VariableDeclaration@36..37
-                  Path@36..37
-                    Ident@36..37 "b"
+                  Ident@36..37 "b"
               Pipe@37..38 "|"
               Whitespace@38..39 " "
             RightArrow@39..41 "->"
@@ -60,7 +58,7 @@ SourceFile@0..81
       Backslash@51..52 "\\"
       Whitespace@52..53 " "
       MatchTargetCondition@53..61
-        VariableRef@53..61
+        PatternRef@53..61
           Path@53..61
             Ident@53..58 "False"
             Whitespace@58..61 "   "
@@ -74,14 +72,12 @@ SourceFile@0..81
               Pipe@65..66 "|"
               LambdaExprArg@66..67
                 VariableDeclaration@66..67
-                  Path@66..67
-                    Ident@66..67 "a"
+                  Ident@66..67 "a"
               Comma@67..68 ","
               Whitespace@68..69 " "
               LambdaExprArg@69..70
                 VariableDeclaration@69..70
-                  Path@69..70
-                    Ident@69..70 "b"
+                  Ident@69..70 "b"
               Pipe@70..71 "|"
               Whitespace@71..72 " "
             RightArrow@72..74 "->"

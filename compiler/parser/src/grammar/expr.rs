@@ -278,7 +278,7 @@ fn parse_match_when_expr(p: &mut Parser) -> CompletedMarker {
     p.expect_with_recovery(
         TokenKind::WhenKw,
         ParseErrorContext::MatchExprWhenKw,
-        EXPR_FIRSTS,
+        ts![TokenKind::Backslash],
     );
 
     loop {

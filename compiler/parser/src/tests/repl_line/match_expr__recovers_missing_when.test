@@ -11,10 +11,9 @@ SourceFile@0..39
         Path@6..13
           Ident@6..10 "test"
           Whitespace@10..13 "\n  "
-    Error@13..15
+    MatchTarget@13..27
       Backslash@13..14 "\\"
       Whitespace@14..15 " "
-    MatchTarget@15..27
       MatchTargetCondition@15..20
         PatternRef@15..20
           Path@15..20
@@ -39,5 +38,4 @@ SourceFile@0..39
       MatchTargetValue@38..39
         IntLiteral@38..39
           Integer@38..39 "1"
-error in range 13..14 while parsing the when keyword of a match expression. Found ’\’, but expected ‘when‘
-error at position 15 while parsing the `|` at the start of a match expression branch. Missing expected ’\’
+error at position 13 while parsing the when keyword of a match expression. Missing expected ‘when‘

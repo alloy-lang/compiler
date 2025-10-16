@@ -403,13 +403,13 @@ SourceFile@0..819
                   TuplePattern@568..583
                     LParen@568..569 "("
                     TuplePatternArg@569..573
-                      VariableRef@569..573
+                      PatternRef@569..573
                         Path@569..573
                           Ident@569..573 "True"
                     Comma@573..574 ","
                     Whitespace@574..575 " "
                     TuplePatternArg@575..579
-                      VariableRef@575..579
+                      PatternRef@575..579
                         Path@575..579
                           Ident@575..579 "True"
                     RParen@579..580 ")"
@@ -430,13 +430,13 @@ SourceFile@0..819
                   TuplePattern@607..622
                     LParen@607..608 "("
                     TuplePatternArg@608..613
-                      VariableRef@608..613
+                      PatternRef@608..613
                         Path@608..613
                           Ident@608..613 "False"
                     Comma@613..614 ","
                     Whitespace@614..615 " "
                     TuplePatternArg@615..620
-                      VariableRef@615..620
+                      PatternRef@615..620
                         Path@615..620
                           Ident@615..620 "False"
                     RParen@620..621 ")"
@@ -457,13 +457,13 @@ SourceFile@0..819
                   TuplePattern@646..661
                     LParen@646..647 "("
                     TuplePatternArg@647..651
-                      VariableRef@647..651
+                      PatternRef@647..651
                         Path@647..651
                           Ident@647..651 "True"
                     Comma@651..652 ","
                     Whitespace@652..653 " "
                     TuplePatternArg@653..658
-                      VariableRef@653..658
+                      PatternRef@653..658
                         Path@653..658
                           Ident@653..658 "False"
                     RParen@658..659 ")"
@@ -484,13 +484,13 @@ SourceFile@0..819
                   TuplePattern@685..700
                     LParen@685..686 "("
                     TuplePatternArg@686..691
-                      VariableRef@686..691
+                      PatternRef@686..691
                         Path@686..691
                           Ident@686..691 "False"
                     Comma@691..692 ","
                     Whitespace@692..693 " "
                     TuplePatternArg@693..697
-                      VariableRef@693..697
+                      PatternRef@693..697
                         Path@693..697
                           Ident@693..697 "True"
                     RParen@697..698 ")"

@@ -3,7 +3,7 @@ import std::bool::Bool::{True, False}
 
 match test when
   True -> 0
-  | False -> 1
+  \ False -> 1
 ===
 HirModule {
     imports: Index::<Import> {
@@ -164,7 +164,7 @@ HirModule {
 [
     ParseError {
         expected: [
-            Pipe,
+            Backslash,
         ],
         kind: Missing {
             offset: 80,
