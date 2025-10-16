@@ -1,10 +1,13 @@
 use alloy_project::Project;
 use expect_test::expect_file;
-use std::ffi::OsStr;
 use std::panic::{RefUnwindSafe, UnwindSafe};
 use std::path::{Path, PathBuf};
 use std::{env, fs};
 
+/// # Panics
+///
+/// Will panic if tests fail.
+#[track_caller]
 pub fn run_test_case(
     test_path: PathBuf,
     test_fn: impl Fn(&Path, &str) -> String + RefUnwindSafe + UnwindSafe,
@@ -18,6 +21,10 @@ pub fn run_test_case(
     expect_file![test_path].assert_eq(&expected_test_content);
 }
 
+/// # Panics
+///
+/// Will panic if tests fail.
+#[track_caller]
 pub fn run_test_dir(
     tests_dir: &str,
     test_fn: impl Fn(&Path, &str) -> String + RefUnwindSafe + UnwindSafe,
@@ -40,7 +47,7 @@ pub fn run_test_dir(
 
         let file_name = test_path.file_name().unwrap().to_os_string();
 
-        if test_path.extension() != Some(OsStr::new("test")) {
+        if test_path.ends_with("test") {
             continue;
         }
 
@@ -64,6 +71,10 @@ pub fn run_test_dir(
     );
 }
 
+/// # Panics
+///
+/// Will panic if tests fail.
+#[track_caller]
 pub fn run_std_lib_tests(test_fn: impl Fn(&Path, &str) + RefUnwindSafe + UnwindSafe) {
     let project = Project::new("../../std").expect("expected project to be created");
 
