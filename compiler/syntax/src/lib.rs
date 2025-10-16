@@ -55,6 +55,7 @@ pub enum SyntaxKind {
     RAngle,
     NilIdentifier,
     Pipe,
+    Backslash,
     Comment,
     Error,
 
@@ -170,6 +171,7 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::RAngle => Self::RAngle,
             TokenKind::NilIdentifier => Self::NilIdentifier,
             TokenKind::Pipe => Self::Pipe,
+            TokenKind::Backslash => Self::Backslash,
             TokenKind::Comment => Self::Comment,
             TokenKind::Error => Self::Error,
         }

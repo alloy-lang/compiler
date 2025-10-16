@@ -128,6 +128,9 @@ pub enum TokenKind {
     #[token("|")]
     Pipe,
 
+    #[token("\\")]
+    Backslash,
+
     #[regex("--[^\n]*")]
     Comment,
 
@@ -189,6 +192,7 @@ impl fmt::Display for TokenKind {
             Self::RAngle => "‘>’",
             Self::NilIdentifier => "‘_’",
             Self::Pipe => "‘|’",
+            Self::Backslash => "’\\’",
             Self::Comment => "comment",
             Self::Error => "an unrecognized token",
         })
@@ -283,6 +287,7 @@ mod tests {
             "{" => TokenKind::LBrace,
             "}" => TokenKind::RBrace,
             "|" => TokenKind::Pipe,
+            "\\" => TokenKind::Backslash,
         };
 
         for (source, expected) in source {

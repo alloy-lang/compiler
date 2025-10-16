@@ -4,7 +4,10 @@ use std::panic::{RefUnwindSafe, UnwindSafe};
 use std::path::{Path, PathBuf};
 use std::{env, fs};
 
-pub fn run_test_case(test_path: PathBuf, test_fn: impl Fn(&Path, &str) -> String + RefUnwindSafe + UnwindSafe) {
+pub fn run_test_case(
+    test_path: PathBuf,
+    test_fn: impl Fn(&Path, &str) -> String + RefUnwindSafe + UnwindSafe,
+) {
     let test_content = fs::read_to_string(&test_path).unwrap();
     let (input, _expected) = test_content.split_once("\n===\n").unwrap();
 
@@ -14,7 +17,10 @@ pub fn run_test_case(test_path: PathBuf, test_fn: impl Fn(&Path, &str) -> String
     expect_file![test_path].assert_eq(&expected_test_content);
 }
 
-pub fn run_test_dir(tests_dir: &str, test_fn: impl Fn(&Path, &str) -> String + RefUnwindSafe + UnwindSafe) {
+pub fn run_test_dir(
+    tests_dir: &str,
+    test_fn: impl Fn(&Path, &str) -> String + RefUnwindSafe + UnwindSafe,
+) {
     let tests_dir = {
         let current_dir = env::current_dir().unwrap();
         current_dir.join(format!("src/tests/{tests_dir}"))
