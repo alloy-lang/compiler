@@ -54,13 +54,13 @@ pub fn run_test_dir(
 
     assert!(
         failed_tests.is_empty(),
-        "{} test(s) failed: {:?}",
+        "{} test(s) failed: {:#?}",
         failed_tests.len(),
         failed_tests,
     );
 }
 
-pub fn run_std_lib_tests(test_fn: impl Fn(&Path, &str)) {
+pub fn run_std_lib_tests(test_fn: impl Fn(&Path, &str) + RefUnwindSafe + UnwindSafe) {
     let std_lib = fs::read_dir("../../std")
         .expect("Something went wrong reading the std lib dir")
         .map(|res| {
@@ -71,12 +71,27 @@ pub fn run_std_lib_tests(test_fn: impl Fn(&Path, &str)) {
         })
         .collect::<Vec<_>>();
 
+    let mut failed_tests = vec![];
     for path in std_lib {
-        let file_name = path.to_str().expect("Expected filename");
+        let file_name = path.to_str().expect("Expected filename").to_string();
 
-        let source = fs::read_to_string(file_name)
+        let source = fs::read_to_string(&file_name)
             .unwrap_or_else(|_| panic!("Something went wrong reading the file '{:?}'", file_name));
 
-        test_fn(&path, &source);
+        let did_panic = std::panic::catch_unwind(|| {
+            test_fn(&path, &source);
+        })
+        .is_err();
+
+        if did_panic {
+            failed_tests.push(file_name);
+        }
     }
+
+    assert!(
+        failed_tests.is_empty(),
+        "{} test(s) failed: {:#?}",
+        failed_tests.len(),
+        failed_tests,
+    );
 }
