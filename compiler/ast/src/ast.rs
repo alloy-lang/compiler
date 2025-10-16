@@ -1,4 +1,4 @@
-use alloy_syntax::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken};
+use alloy_syntax::{SyntaxElement, SyntaxKind, SyntaxNode, SyntaxNodePointer, SyntaxToken};
 use std::fmt;
 use text_size::TextRange;
 
@@ -167,6 +167,45 @@ pub trait AstElement: Sized {
 
     fn range(&self) -> TextRange {
         self.syntax().text_range()
+    }
+}
+
+#[derive(Debug)]
+pub struct AstElementPointer<E: AstElement> {
+    raw: SyntaxNodePointer,
+    _ty: std::marker::PhantomData<E>,
+}
+
+impl<E: AstElement> AstElementPointer<E> {
+    pub fn new(node: E) -> Self {
+        Self {
+            raw: SyntaxNodePointer::new(&node.syntax().into_node().expect("expected Syntax Node")),
+            _ty: std::marker::PhantomData,
+        }
+    }
+}
+
+impl<E: AstElement> Eq for AstElementPointer<E> {}
+
+impl<E: AstElement> PartialEq for AstElementPointer<E> {
+    fn eq(&self, other: &Self) -> bool {
+        self.raw == other.raw
+    }
+}
+
+impl<E: AstElement> std::hash::Hash for AstElementPointer<E> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        let AstElementPointer { raw, _ty } = self;
+        raw.hash(state);
+    }
+}
+
+impl<E: AstElement> Clone for AstElementPointer<E> {
+    fn clone(&self) -> Self {
+        Self {
+            raw: self.raw.clone(),
+            _ty: self._ty,
+        }
     }
 }
 
