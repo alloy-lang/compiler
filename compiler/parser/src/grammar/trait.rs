@@ -37,7 +37,7 @@ pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
 
         let result = parse_trait_member(p);
         match result {
-            TraitMemberParseResult::TraitMember(_) => {
+            TraitMemberParseResult::TraitMember => {
                 // empty
             }
             TraitMemberParseResult::TopLevelKwFound => {
@@ -55,28 +55,28 @@ pub(crate) fn parse_trait(p: &mut Parser) -> CompletedMarker {
 }
 
 enum TraitMemberParseResult {
-    TraitMember(CompletedMarker),
+    TraitMember,
     TopLevelKwFound,
     UnknownToken,
 }
 
 fn parse_trait_member(p: &mut Parser) -> TraitMemberParseResult {
     if p.at(TokenKind::TypeOfKw) {
-        let cm = type_annotation::parse_type_annotation(
+        let _cm = type_annotation::parse_type_annotation(
             p,
             r#type::ParseMode::InsideSelfContext,
             TRAIT_RECOVERY_SET,
         );
-        TraitMemberParseResult::TraitMember(cm)
+        TraitMemberParseResult::TraitMember
     } else if p.at(TokenKind::LetKw) {
-        let cm = value::parse_value(p);
-        TraitMemberParseResult::TraitMember(cm)
+        let _cm = value::parse_value(p);
+        TraitMemberParseResult::TraitMember
     } else if p.at(TokenKind::TypevarKw) {
-        let cm = parse_trait_type_variable(p);
-        TraitMemberParseResult::TraitMember(cm)
+        let _cm = parse_trait_type_variable(p);
+        TraitMemberParseResult::TraitMember
     } else if p.at(TokenKind::SelfKw) {
-        let cm = parse_trait_self(p);
-        TraitMemberParseResult::TraitMember(cm)
+        let _cm = parse_trait_self(p);
+        TraitMemberParseResult::TraitMember
     } else if p.at_set(DEFAULT_RECOVERY_SET) || p.maybe_at(TokenKind::EndKw) {
         TraitMemberParseResult::TopLevelKwFound
     } else {

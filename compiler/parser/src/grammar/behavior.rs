@@ -54,7 +54,7 @@ pub(crate) fn parse_behavior(p: &mut Parser) -> CompletedMarker {
 
         let result = parse_behavior_member(p);
         match result {
-            BehaviorMemberParseResult::BehaviorMember(_) => {
+            BehaviorMemberParseResult::BehaviorMember => {
                 // empty
             }
             BehaviorMemberParseResult::TopLevelKwFound => {
@@ -75,25 +75,25 @@ pub(crate) fn parse_behavior(p: &mut Parser) -> CompletedMarker {
 }
 
 enum BehaviorMemberParseResult {
-    BehaviorMember(CompletedMarker),
+    BehaviorMember,
     TopLevelKwFound,
     UnknownToken,
 }
 
 fn parse_behavior_member(p: &mut Parser) -> BehaviorMemberParseResult {
     if p.at(TokenKind::TypeOfKw) {
-        let cm = type_annotation::parse_type_annotation(
+        let _cm = type_annotation::parse_type_annotation(
             p,
             r#type::ParseMode::InsideSelfContext,
             BEHAVIOR_RECOVERY_SET,
         );
-        BehaviorMemberParseResult::BehaviorMember(cm)
+        BehaviorMemberParseResult::BehaviorMember
     } else if p.at(TokenKind::LetKw) {
-        let cm = value::parse_value(p);
-        BehaviorMemberParseResult::BehaviorMember(cm)
+        let _cm = value::parse_value(p);
+        BehaviorMemberParseResult::BehaviorMember
     } else if p.at(TokenKind::TypevarKw) {
-        let cm = parse_behavior_type_variable(p);
-        BehaviorMemberParseResult::BehaviorMember(cm)
+        let _cm = parse_behavior_type_variable(p);
+        BehaviorMemberParseResult::BehaviorMember
     } else if p.at_top_level_token_or_set(ts![TokenKind::EndKw]) {
         BehaviorMemberParseResult::TopLevelKwFound
     } else {
