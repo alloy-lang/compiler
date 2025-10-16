@@ -15,7 +15,7 @@ members = [
 [workspace.dependencies]
 camino = "1.1.6"
 expect-test = "1.5"
-itertools = "0.13"
+itertools = "0.14"
 la-arena = "0.3"
 maplit = "1.0"
 non-empty-vec = "0.2"
