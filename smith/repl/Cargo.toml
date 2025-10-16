@@ -10,7 +10,7 @@ alloy_compiler = { path = "../../compiler" }
 alloy_parser = { path = "../../compiler/parser" }
 alloy_ast = { path = "../../compiler/ast" }
 alloy_hir = { path = "../../compiler/hir" }
-reedline = "0.32"
+reedline = "0.43"
 nu-ansi-term = "0.50"
 dirs = "5.0"
 
