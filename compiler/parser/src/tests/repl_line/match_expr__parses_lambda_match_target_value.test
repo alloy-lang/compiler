@@ -1,6 +1,6 @@
 match test when
-  | True    -> (|a, b| -> a + b)
-  | False   -> (|a, b| -> a - b)
+  \ True    -> (|a, b| -> a + b)
+  \ False   -> (|a, b| -> a - b)
 ===
 SourceFile@0..81
   MatchExpr@0..81
@@ -14,7 +14,7 @@ SourceFile@0..81
     WhenKw@11..15 "when"
     Whitespace@15..18 "\n  "
     MatchTarget@18..51
-      Pipe@18..19 "|"
+      Backslash@18..19 "\\"
       Whitespace@19..20 " "
       MatchTargetCondition@20..28
         VariableRef@20..28
@@ -57,7 +57,7 @@ SourceFile@0..81
           RParen@47..48 ")"
           Whitespace@48..51 "\n  "
     MatchTarget@51..81
-      Pipe@51..52 "|"
+      Backslash@51..52 "\\"
       Whitespace@52..53 " "
       MatchTargetCondition@53..61
         VariableRef@53..61

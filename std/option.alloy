@@ -18,9 +18,9 @@ behavior Eq for Option[t] where
   typeof eq : Option[t] -> Option[t] -> Bool
   let eq = |left, right| ->
     match (left, right) when
-      | (Some(l_val), Some(r_val)) -> Eq::eq(l_val, r_val)
-      | (None, None)               -> True
-      | _                          -> False
+      \ (Some(l_val), Some(r_val)) -> Eq::eq(l_val, r_val)
+      \ (None, None)               -> True
+      \ _                          -> False
 
 end
 
@@ -30,10 +30,10 @@ behavior Ord for Option[t] where
   typeof compare : Option[t] -> Option[t] -> Ordering
   let compare = |left, right| ->
     match (left, right) when
-      | (Some(l_val), Some(r_val)) -> Ord::compare(l_val, r_val)
-      | (None, Some(_))            -> LT
-      | (Some(_), None)            -> GT
-      | (None, None)               -> EQ
+      \ (Some(l_val), Some(r_val)) -> Ord::compare(l_val, r_val)
+      \ (None, Some(_))            -> LT
+      \ (Some(_), None)            -> GT
+      \ (None, None)               -> EQ
 
 end
 
@@ -43,8 +43,8 @@ behavior Debug for Option[t] where
   typeof debug : Option[t] -> String
   let debug = |op| ->
     match op when
-      | Some(x) -> "Some(#{x})"
-      | None    -> "None"
+      \ Some(x) -> "Some(#{x})"
+      \ None    -> "None"
 
 end
 
@@ -54,8 +54,8 @@ behavior Functor for Option[_] where
     typevar t1
     typevar t2
   let map = |convert, x| -> match x when
-    | Some(x_val) -> Some(convert(x_val))
-    | None        -> None
+    \ Some(x_val) -> Some(convert(x_val))
+    \ None        -> None
 
 end
 
@@ -65,8 +65,8 @@ behavior Applicative for Option[_] where
     typevar t1
     typevar t2
   let apply = |f, x| -> match (f, x) when
-    | (Some(f_val), Some(x_val)) -> Some(f_val(x_val))
-    | _                          -> None
+    \ (Some(f_val), Some(x_val)) -> Some(f_val(x_val))
+    \ _                          -> None
 
 end
 
@@ -81,7 +81,7 @@ behavior Monad for Option[_] where
     typevar t1
     typevar t2
   let flat_map = |convert, x| -> match x when
-    | Some(x_val) -> convert(x_val)
-    | None        -> None
+    \ Some(x_val) -> convert(x_val)
+    \ None        -> None
 
 end

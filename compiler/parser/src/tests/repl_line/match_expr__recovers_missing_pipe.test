@@ -1,6 +1,6 @@
 match test when
   True -> 0
-  | False -> 1
+  \ False -> 1
 ===
 SourceFile@0..42
   MatchExpr@0..42
@@ -26,7 +26,7 @@ SourceFile@0..42
           Integer@26..27 "0"
           Whitespace@27..30 "\n  "
     MatchTarget@30..42
-      Pipe@30..31 "|"
+      Backslash@30..31 "\\"
       Whitespace@31..32 " "
       MatchTargetCondition@32..38
         VariableRef@32..38
@@ -38,4 +38,4 @@ SourceFile@0..42
       MatchTargetValue@41..42
         IntLiteral@41..42
           Integer@41..42 "1"
-error at position 18 while parsing the `|` at the start of a match expression branch. Missing expected ‘|’
+error at position 18 while parsing the `|` at the start of a match expression branch. Missing expected ’\’

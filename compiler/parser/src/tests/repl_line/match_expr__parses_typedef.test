@@ -4,8 +4,8 @@ typedef Either[l, r] =
 end
 
 match test when
-  | Either::Left(l)  -> l
-  | Either::Right(r) -> r
+  \ Either::Left(l)  -> l
+  \ Either::Right(r) -> r
 ===
 SourceFile@0..120
   TypeDefinition@0..53
@@ -60,7 +60,7 @@ SourceFile@0..120
     WhenKw@64..68 "when"
     Whitespace@68..71 "\n  "
     MatchTarget@71..97
-      Pipe@71..72 "|"
+      Backslash@71..72 "\\"
       Whitespace@72..73 " "
       MatchTargetCondition@73..90
         Destructure@73..90
@@ -85,7 +85,7 @@ SourceFile@0..120
             Ident@93..94 "l"
             Whitespace@94..97 "\n  "
     MatchTarget@97..120
-      Pipe@97..98 "|"
+      Backslash@97..98 "\\"
       Whitespace@98..99 " "
       MatchTargetCondition@99..116
         Destructure@99..116

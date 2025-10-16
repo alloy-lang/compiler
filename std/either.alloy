@@ -21,9 +21,9 @@ behavior Eq for Either[l, r] where
 
   let eq = |left, right| ->
     match (left, right) when
-      | (Left(l_val), Left(r_val))   -> Eq::eq(l_val, r_val)
-      | (Right(l_val), Right(r_val)) -> Eq::eq(l_val, r_val)
-      | _                            -> False
+      \ (Left(l_val), Left(r_val))   -> Eq::eq(l_val, r_val)
+      \ (Right(l_val), Right(r_val)) -> Eq::eq(l_val, r_val)
+      \ _                            -> False
 end
 
 
@@ -33,10 +33,10 @@ behavior Ord for Either[l, r] where
 
   let compare = |left, right| ->
     match (left, right) when
-      | (Right(l_val), Right(r_val)) -> Ord::compare(l_val, r_val)
-      | (Left(l_val), Left(r_val))   -> Ord::compare(l_val, r_val)
-      | (Right(_), Left(_))          -> Ordering::LT
-      | (Left(_), Right(_))          -> Ordering::GT
+      \ (Right(l_val), Right(r_val)) -> Ord::compare(l_val, r_val)
+      \ (Left(l_val), Left(r_val))   -> Ord::compare(l_val, r_val)
+      \ (Right(_), Left(_))          -> Ordering::LT
+      \ (Left(_), Right(_))          -> Ordering::GT
 end
 
 
@@ -46,8 +46,8 @@ behavior Debug for Either[l, r] where
 
   let debug = |e| ->
     match e when
-      | (Left(x))  -> "Left(#{x})"
-      | (Right(x)) -> "Right(#{x})"
+      \ (Left(x))  -> "Left(#{x})"
+      \ (Right(x)) -> "Right(#{x})"
 end
 
 
@@ -58,8 +58,8 @@ behavior Functor for Either[l, _] where
     typevar r1
     typevar r2
   let map = |convert, x| -> match x when
-    | (Right(x_val)) -> Right(convert(x_val))
-    | (Left(x_val))  -> Left(x_val)
+    \ (Right(x_val)) -> Right(convert(x_val))
+    \ (Left(x_val))  -> Left(x_val)
 end
 
 
@@ -70,9 +70,9 @@ behavior Applicative for Either[l, _] where
     typevar r1
     typevar r2
   let apply = |f, x| -> match (f, x) when
-    | (Right(f_val), Right(x_val)) -> Right(f_val(x_val))
-    | (Right(_),     Left(x_val))  -> Left(x_val)
-    | (Left(f_val),  _)            -> Left(f_val)
+    \ (Right(f_val), Right(x_val)) -> Right(f_val(x_val))
+    \ (Right(_),     Left(x_val))  -> Left(x_val)
+    \ (Left(f_val),  _)            -> Left(f_val)
 
 
   typeof wrap : r1 -> Either[l, r1] where
@@ -88,7 +88,7 @@ behavior Monad for Either[l, _] where
     typevar r1
     typevar r2
   let flat_map = |convert, x| -> match x when
-    | (Right(x_val)) -> convert(x_val)
-    | (Left(x_val))  -> Left(x_val)
+    \ (Right(x_val)) -> convert(x_val)
+    \ (Left(x_val))  -> Left(x_val)
 
 end

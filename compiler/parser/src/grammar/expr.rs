@@ -284,7 +284,7 @@ fn parse_match_when_expr(p: &mut Parser) -> CompletedMarker {
     loop {
         let when_m = p.start();
         p.expect_with_recovery(
-            TokenKind::Pipe,
+            TokenKind::Backslash,
             ParseErrorContext::MatchTargetPipe,
             ARGUMENT_RECOVERY_SET,
         );
@@ -304,12 +304,16 @@ fn parse_match_when_expr(p: &mut Parser) -> CompletedMarker {
         );
 
         let when_value_m = p.start();
-        parse_expr_with_recovery(p, ts![TokenKind::Pipe], ParseErrorContext::MatchTargetValue);
+        parse_expr_with_recovery(
+            p,
+            ts![TokenKind::Backslash],
+            ParseErrorContext::MatchTargetValue,
+        );
         when_value_m.complete(p, SyntaxKind::MatchTargetValue);
 
         when_m.complete(p, SyntaxKind::MatchTarget);
 
-        if p.at_top_level_token_or_not_set(ts![TokenKind::Pipe]) {
+        if p.at_top_level_token_or_not_set(ts![TokenKind::Backslash]) {
             break;
         }
     }

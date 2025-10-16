@@ -1,13 +1,13 @@
 match test when
-  | Some(x) -> 0
-  | None    -> 1
-  | True    -> 2
-  | False   -> 3
-  | 0       -> 4
-  | -1.3    -> 5
-  | "hi"    -> 6
-  | 'o'     -> 7
-  | x       -> 8
+  \ Some(x) -> 0
+  \ None    -> 1
+  \ True    -> 2
+  \ False   -> 3
+  \ 0       -> 4
+  \ -1.3    -> 5
+  \ "hi"    -> 6
+  \ 'o'     -> 7
+  \ x       -> 8
 ===
 SourceFile@0..168
   MatchExpr@0..168
@@ -21,7 +21,7 @@ SourceFile@0..168
     WhenKw@11..15 "when"
     Whitespace@15..18 "\n  "
     MatchTarget@18..35
-      Pipe@18..19 "|"
+      Backslash@18..19 "\\"
       Whitespace@19..20 " "
       MatchTargetCondition@20..28
         Destructure@20..28
@@ -43,7 +43,7 @@ SourceFile@0..168
           Integer@31..32 "0"
           Whitespace@32..35 "\n  "
     MatchTarget@35..52
-      Pipe@35..36 "|"
+      Backslash@35..36 "\\"
       Whitespace@36..37 " "
       MatchTargetCondition@37..45
         VariableRef@37..45
@@ -57,7 +57,7 @@ SourceFile@0..168
           Integer@48..49 "1"
           Whitespace@49..52 "\n  "
     MatchTarget@52..69
-      Pipe@52..53 "|"
+      Backslash@52..53 "\\"
       Whitespace@53..54 " "
       MatchTargetCondition@54..62
         VariableRef@54..62
@@ -71,7 +71,7 @@ SourceFile@0..168
           Integer@65..66 "2"
           Whitespace@66..69 "\n  "
     MatchTarget@69..86
-      Pipe@69..70 "|"
+      Backslash@69..70 "\\"
       Whitespace@70..71 " "
       MatchTargetCondition@71..79
         VariableRef@71..79
@@ -85,7 +85,7 @@ SourceFile@0..168
           Integer@82..83 "3"
           Whitespace@83..86 "\n  "
     MatchTarget@86..103
-      Pipe@86..87 "|"
+      Backslash@86..87 "\\"
       Whitespace@87..88 " "
       MatchTargetCondition@88..96
         IntLiteral@88..96
@@ -98,7 +98,7 @@ SourceFile@0..168
           Integer@99..100 "4"
           Whitespace@100..103 "\n  "
     MatchTarget@103..120
-      Pipe@103..104 "|"
+      Backslash@103..104 "\\"
       Whitespace@104..105 " "
       MatchTargetCondition@105..113
         UnaryExpr@105..113
@@ -112,7 +112,7 @@ SourceFile@0..168
           Integer@116..117 "5"
           Whitespace@117..120 "\n  "
     MatchTarget@120..137
-      Pipe@120..121 "|"
+      Backslash@120..121 "\\"
       Whitespace@121..122 " "
       MatchTargetCondition@122..130
         StringLiteral@122..130
@@ -125,7 +125,7 @@ SourceFile@0..168
           Integer@133..134 "6"
           Whitespace@134..137 "\n  "
     MatchTarget@137..154
-      Pipe@137..138 "|"
+      Backslash@137..138 "\\"
       Whitespace@138..139 " "
       MatchTargetCondition@139..147
         CharLiteral@139..147
@@ -138,7 +138,7 @@ SourceFile@0..168
           Integer@150..151 "7"
           Whitespace@151..154 "\n  "
     MatchTarget@154..168
-      Pipe@154..155 "|"
+      Backslash@154..155 "\\"
       Whitespace@155..156 " "
       MatchTargetCondition@156..164
         VariableRef@156..164
