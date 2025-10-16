@@ -1,7 +1,7 @@
 use expect_test::expect_file;
 use std::ffi::OsStr;
-use std::path::Path;
 use std::panic::RefUnwindSafe;
+use std::path::Path;
 use std::{env, fs};
 
 pub fn run_test_dir(tests_dir: &str, test_fn: impl Fn(&Path, &str) -> String + RefUnwindSafe) {
@@ -26,16 +26,16 @@ pub fn run_test_dir(tests_dir: &str, test_fn: impl Fn(&Path, &str) -> String + R
             continue;
         }
 
-        let did_panic =
-            std::panic::catch_unwind(|| {
-                let test_content = fs::read_to_string(&test_path).unwrap();
-                let (input, _expected) = test_content.split_once("\n===\n").unwrap();
+        let did_panic = std::panic::catch_unwind(|| {
+            let test_content = fs::read_to_string(&test_path).unwrap();
+            let (input, _expected) = test_content.split_once("\n===\n").unwrap();
 
-                let result = test_fn(&test_path, input);
+            let result = test_fn(&test_path, input);
 
-                let expected_test_content = format!("{input}\n===\n{result}\n");
-                expect_file![test_path].assert_eq(&expected_test_content);
-            }).is_err();
+            let expected_test_content = format!("{input}\n===\n{result}\n");
+            expect_file![test_path].assert_eq(&expected_test_content);
+        })
+        .is_err();
 
         if did_panic {
             failed_tests.push(file_name);
