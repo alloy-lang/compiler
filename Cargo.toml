@@ -23,7 +23,7 @@ num-derive = "0.4"
 num-traits = "0.2"
 ordered-float = "3.0"
 pretty_assertions = "1.2"
-rowan = "0.15"
+rowan = "0.16"
 rustc-hash = "1.1"
 salsa = { git = "https://github.com/salsa-rs/salsa", package = "salsa-2022", rev = "05b4e3ebdcdc47730cdd359e7e97fb2470527279" }
 serde = "1.0"
