@@ -90,7 +90,7 @@ pub fn run_std_lib_tests(test_fn: impl Fn(&Path, &str) + RefUnwindSafe + UnwindS
         let did_panic = std::panic::catch_unwind(|| {
             test_fn(path.as_std_path(), module_file.contents());
         })
-            .is_err();
+        .is_err();
 
         if did_panic {
             failed_tests.push(path.as_std_path());
