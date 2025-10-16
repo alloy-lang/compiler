@@ -58,7 +58,6 @@ fn parse_expr_with_recovery(
     parse_expr_with_binding_power(p, 0, recovery_set, context)
 }
 
-
 const SUPPORTED_OPERATORS: TokenSet = ts![
     TokenKind::Plus,
     TokenKind::Minus,
@@ -118,7 +117,6 @@ fn parse_expr_with_binding_power(
     Some(lhs)
 }
 
-
 fn parse_lhs(
     p: &mut Parser,
     recovery_set: TokenSet,
@@ -151,7 +149,6 @@ fn parse_lhs(
 
     Some(cm)
 }
-
 
 pub(crate) fn parse_int_literal(p: &mut Parser) -> CompletedMarker {
     let m = p.start();
