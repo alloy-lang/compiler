@@ -32,7 +32,7 @@ impl AstGlossary {
         }
     }
 
-    pub(crate) fn summarize_repl_line(ast: &ast::SourceFile) -> Self {
+    pub(crate) fn summarize_source_file(ast: &ast::SourceFile) -> Self {
         let mut glossary = Self::new();
 
         for statement in ast.statements() {
@@ -46,12 +46,6 @@ impl AstGlossary {
                 _ => {}
             }
         }
-
-        glossary
-    }
-
-    pub(crate) fn summarize_source_file(ast: &ast::SourceFile) -> Self {
-        let mut glossary = Self::new();
 
         if let Some(module) = ast.module() {
             for type_definition in module.type_definitions() {
