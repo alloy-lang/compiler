@@ -1,0 +1,10 @@
+typedef TestConflict = Empty
+typedef TestConflict = Empty
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[]

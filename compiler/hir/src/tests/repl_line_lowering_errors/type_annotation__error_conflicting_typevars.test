@@ -3,6 +3,7 @@ typeof test : t1 -> Int -> String where
     typevar t1
 ===
 HirModule {
+    [salsa id]: 0,
     imports: EmptyIndex::<Import>,
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,

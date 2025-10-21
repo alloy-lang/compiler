@@ -1,0 +1,9 @@
+typedef Test[t] = Thing t
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[]

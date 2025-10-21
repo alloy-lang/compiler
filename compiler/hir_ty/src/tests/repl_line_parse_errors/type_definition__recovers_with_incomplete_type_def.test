@@ -1,0 +1,26 @@
+typedef Test1
+typedef Test2 = Empty
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Equals,
+        ],
+        kind: Missing {
+            offset: 14,
+        },
+        context: TypeDefEquals,
+    },
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Missing {
+            offset: 14,
+        },
+        context: TypeDefMemberName,
+    },
+]

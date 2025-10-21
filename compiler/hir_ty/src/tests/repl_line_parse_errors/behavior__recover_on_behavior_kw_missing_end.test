@@ -1,0 +1,25 @@
+behavior TestTrait1 for Type1 where
+    -- imagine all the things here
+
+    typevar t1
+
+behavior TestTrait2 for Type1 where
+    -- imagine all the things here
+
+    typevar t1
+end
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            EndKw,
+        ],
+        kind: Missing {
+            offset: 88,
+        },
+        context: BehaviorEnd,
+    },
+]

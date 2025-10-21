@@ -1,0 +1,30 @@
+-where
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Integer,
+            Fraction,
+            String,
+            Char,
+            Ident,
+            OpIdent,
+            Minus,
+            LParen,
+            IfKw,
+            MatchKw,
+            Pipe,
+        ],
+        kind: Unexpected {
+            found: WhereKw,
+            range: 1..6,
+        },
+        context: PrefixExprExpr,
+    },
+]

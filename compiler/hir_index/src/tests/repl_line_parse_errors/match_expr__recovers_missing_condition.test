@@ -1,0 +1,74 @@
+import std::bool::Bool::{True, False}
+
+match when
+  \ True -> 0
+  \ False -> 1
+===
+IndexedModule {
+    imports: {
+        "True": IndexedImport {
+            segments: [
+                SpannedName(
+                    "std",
+                    7..10,
+                ),
+                SpannedName(
+                    "bool",
+                    12..16,
+                ),
+                SpannedName(
+                    "Bool",
+                    18..22,
+                ),
+            ],
+            last: SpannedName(
+                "True",
+                25..29,
+            ),
+        },
+        "False": IndexedImport {
+            segments: [
+                SpannedName(
+                    "std",
+                    7..10,
+                ),
+                SpannedName(
+                    "bool",
+                    12..16,
+                ),
+                SpannedName(
+                    "Bool",
+                    18..22,
+                ),
+            ],
+            last: SpannedName(
+                "False",
+                31..36,
+            ),
+        },
+    },
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Integer,
+            Fraction,
+            String,
+            Char,
+            Ident,
+            OpIdent,
+            Minus,
+            LParen,
+            IfKw,
+            MatchKw,
+            Pipe,
+        ],
+        kind: Missing {
+            offset: 45,
+        },
+        context: MatchExprArg,
+    },
+]

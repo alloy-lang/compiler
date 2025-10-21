@@ -1,0 +1,15 @@
+module TestModule1 where
+    import test_data::{TestType, ResultThing, Thing, (<|)}
+
+    typeof testThing : (t2 -> t1) -> t2 -> t2 -> ResultThing where
+      typevar t1 = Thing
+      typevar t2
+    let testThing = |funky, x, y| -> TestType::new <| (funky(x), funky(y))
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[]

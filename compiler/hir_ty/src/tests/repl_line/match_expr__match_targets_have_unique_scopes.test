@@ -1,0 +1,184 @@
+import std::either::Either
+import test_data::test
+
+match test when
+  | Either::Left(x)  -> x
+  | Either::Right(x) -> x
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "std",
+                    "either",
+                ],
+                last: "Either",
+            },
+            "name": "Either",
+            "range": 0..27,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Import>(1): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "test",
+            },
+            "name": "test",
+            "range": 27..51,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "test",
+                        sub_path: [],
+                    },
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "range": 57..62,
+        },
+        Idx::<Expression>(1): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "x",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(1),
+            },
+            "range": 91..95,
+        },
+        Idx::<Expression>(2): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "x",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(2),
+            },
+            "range": 117..118,
+        },
+        Idx::<Expression>(3): {
+            "item": Match {
+                condition: Idx::<Expression>(0),
+                targets: [
+                    (
+                        Idx::<Pattern>(1),
+                        Idx::<Expression>(1),
+                    ),
+                    (
+                        Idx::<Pattern>(3),
+                        Idx::<Expression>(2),
+                    ),
+                ],
+            },
+            "range": 51..118,
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "x",
+            },
+            "name": "x",
+            "range": 84..85,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<Pattern>(1): {
+            "item": Destructure {
+                target: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "either",
+                            ],
+                        ),
+                        name: "Either",
+                        sub_path: [
+                            "Left",
+                        ],
+                    },
+                ),
+                scope: Idx::<Scope>(1),
+                args: [
+                    Idx::<Pattern>(0),
+                ],
+            },
+            "range": 71..88,
+        },
+        Idx::<Pattern>(2): {
+            "item": VariableDeclaration {
+                name: "x",
+            },
+            "name": "x",
+            "range": 111..112,
+            "scope_id": Idx::<Scope>(2),
+        },
+        Idx::<Pattern>(3): {
+            "item": Destructure {
+                target: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "either",
+                            ],
+                        ),
+                        name: "Either",
+                        sub_path: [
+                            "Right",
+                        ],
+                    },
+                ),
+                scope: Idx::<Scope>(2),
+                args: [
+                    Idx::<Pattern>(2),
+                ],
+            },
+            "range": 97..114,
+        },
+    },
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "match expression arm",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "match expression arm",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]

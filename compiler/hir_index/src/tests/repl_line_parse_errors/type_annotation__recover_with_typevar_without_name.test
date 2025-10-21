@@ -1,0 +1,36 @@
+import test_data::Test
+
+typeof test : Test -> t2 -> Test where
+    typevar
+    typevar t2
+===
+IndexedModule {
+    imports: {
+        "Test": IndexedImport {
+            segments: [
+                SpannedName(
+                    "test_data",
+                    7..16,
+                ),
+            ],
+            last: SpannedName(
+                "Test",
+                18..22,
+            ),
+        },
+    },
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Missing {
+            offset: 79,
+        },
+        context: TypeVariableName,
+    },
+]

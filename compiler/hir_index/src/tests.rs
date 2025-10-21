@@ -3,6 +3,14 @@ use std::path::Path;
 use crate::IndexedModule;
 use alloy_ast as ast;
 
+#[derive(Default)]
+#[salsa::db]
+pub(crate) struct TestHirIndexDatabase {
+    storage: salsa::Storage<Self>,
+}
+
+impl salsa::Database for TestHirIndexDatabase {}
+
 #[test]
 fn source_file() {
     alloy_test_harness::run_test_dir("source_file", |path, input| {

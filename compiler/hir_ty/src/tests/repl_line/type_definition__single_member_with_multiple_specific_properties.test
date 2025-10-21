@@ -1,0 +1,6 @@
+typedef Test = Thing Int String
+===
+InferenceContext {
+    type_map: {},
+}
+[]

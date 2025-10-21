@@ -1,0 +1,21 @@
+import test_data::Test
+
+typeof test : t1 -> t2 -> Test where
+    typevar t1 = 0
+    typevar t2
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Unexpected {
+            found: Integer,
+            range: 78..79,
+        },
+        context: TypeVariableConstraint,
+    },
+]

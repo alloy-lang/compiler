@@ -6,25 +6,24 @@ trait TestTrait1 where
 end
 ===
 HirModule {
+    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "std",
-                ],
-                last: "functor",
-            },
+            "item": Import(
+                Id {
+                    value: 3,
+                },
+            ),
             "name": "functor",
             "range": 0..30,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
-            "item": Import {
-                segments: [
-                    "std",
-                ],
-                last: "debug",
-            },
+            "item": Import(
+                Id {
+                    value: 4,
+                },
+            ),
             "name": "debug",
             "range": 0..30,
             "scope_id": Idx::<Scope>(0),
@@ -71,23 +70,21 @@ HirModule {
     warnings: [
         LoweringWarning {
             kind: UnusedImport {
-                import: Import {
-                    segments: [
-                        "std",
-                    ],
-                    last: "functor",
-                },
+                import: Import(
+                    Id {
+                        value: 3,
+                    },
+                ),
             },
             range: 0..30,
         },
         LoweringWarning {
             kind: UnusedImport {
-                import: Import {
-                    segments: [
-                        "std",
-                    ],
-                    last: "debug",
-                },
+                import: Import(
+                    Id {
+                        value: 4,
+                    },
+                ),
             },
             range: 0..30,
         },

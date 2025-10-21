@@ -1,0 +1,19 @@
+behavior TestTrait1 for Type1 where
+    typevar
+    typevar t2
+end
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Missing {
+            offset: 52,
+        },
+        context: TypeVariableName,
+    },
+]

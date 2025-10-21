@@ -1,0 +1,9 @@
+|(a, b)| -> a + b
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[]

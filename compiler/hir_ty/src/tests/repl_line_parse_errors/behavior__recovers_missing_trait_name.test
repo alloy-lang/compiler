@@ -1,0 +1,23 @@
+behavior for Type1 where
+    -- imagine all the things here
+end
+
+trait Trait1 where
+    -- imagine all the things here
+end
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+            LParen,
+        ],
+        kind: Missing {
+            offset: 9,
+        },
+        context: BehaviorTraitName,
+    },
+]

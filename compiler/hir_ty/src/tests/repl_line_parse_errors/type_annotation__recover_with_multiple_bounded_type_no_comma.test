@@ -1,0 +1,20 @@
+import test_data::Test
+
+typeof apply : Test[t1 t2] where
+    typevar t1
+    typevar t2
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 47,
+        },
+        context: BoundedTypeComma,
+    },
+]

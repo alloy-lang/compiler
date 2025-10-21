@@ -1,0 +1,12 @@
+behavior Trait1 for Type1[t1, _] where
+    typevar t1
+    -- imagine all the things here
+end
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[]

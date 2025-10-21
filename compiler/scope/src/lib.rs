@@ -7,7 +7,7 @@ pub struct Scope {
     tag: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Scopes {
     current_scope: ScopeIdx,
     scopes: Arena<Scope>,

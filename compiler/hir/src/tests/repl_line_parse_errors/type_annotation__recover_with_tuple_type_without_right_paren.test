@@ -4,14 +4,14 @@ typeof test1 : Test -> String -> (String, String
 typeof test2 : Test -> String
 ===
 HirModule {
+    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "test_data",
-                ],
-                last: "Test",
-            },
+            "item": Import(
+                Id {
+                    value: 2,
+                },
+            ),
             "name": "Test",
             "range": 0..24,
             "scope_id": Idx::<Scope>(0),

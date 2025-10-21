@@ -1,0 +1,19 @@
+behavior TestTrait1 for Type1 where
+    typeof test1   self -> String -> Int
+    typeof test2 : self -> String -> Int
+end
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Colon,
+        ],
+        kind: Missing {
+            offset: 55,
+        },
+        context: TypeOfColon,
+    },
+]

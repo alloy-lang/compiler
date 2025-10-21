@@ -1,0 +1,29 @@
+typedef Test1
+typedef Test2 = Empty
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Equals,
+        ],
+        kind: Missing {
+            offset: 14,
+        },
+        context: TypeDefEquals,
+    },
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Missing {
+            offset: 14,
+        },
+        context: TypeDefMemberName,
+    },
+]

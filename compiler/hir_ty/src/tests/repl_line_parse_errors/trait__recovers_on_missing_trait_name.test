@@ -1,0 +1,24 @@
+trait where
+    typevar t1
+end
+
+trait TestTrait2 where
+    -- imagine all the things here
+
+    typevar t1
+end
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Missing {
+            offset: 6,
+        },
+        context: TraitName,
+    },
+]

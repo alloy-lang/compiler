@@ -1,13 +1,12 @@
 extern crate dirs;
 
-use alloy_compiler::parser::parse_repl_line;
 use nu_ansi_term::{Color as AnsiColor, Style};
 use std::path::PathBuf;
 
 use reedline::{
     default_emacs_keybindings, ColumnarMenu, DefaultCompleter, DefaultHinter, DefaultPrompt,
     DefaultPromptSegment, EditCommand, Emacs, ExampleHighlighter, FileBackedHistory, KeyCode,
-    KeyModifiers, Reedline, ReedlineEvent, ReedlineMenu, Signal,
+    KeyModifiers, MenuBuilder, Reedline, ReedlineEvent, ReedlineMenu, Signal,
 };
 
 fn main() {
@@ -76,22 +75,22 @@ fn reedline_repl() {
                     break;
                 }
                 _ => {
-                    let parse = parse_repl_line(buffer.as_str());
-                    println!("{}", parse.debug_tree());
+                    // let parse = parse_source_file(buffer.as_str());
+                    // println!("{}", parse.debug_tree());
+                    //
+                    // let syntax = parse.syntax();
+                    //
+                    // for error in alloy_ast::validation::validate(&syntax) {
+                    //     println!("{error}");
+                    // }
 
-                    let syntax = parse.syntax();
-
-                    for error in alloy_ast::validation::validate(&syntax) {
-                        println!("{error}");
-                    }
-
-                    let source_file = alloy_ast::source_file(syntax).unwrap();
-
-                    let ast_statements = source_file.statements();
-                    let hir_statements = alloy_hir::lower_repl_line(&source_file);
-
-                    dbg!(ast_statements);
-                    dbg!(hir_statements);
+                    // let source_file = alloy_ast::source_file(syntax).unwrap();
+                    //
+                    // let ast_statements = source_file.statements();
+                    // let hir_statements = alloy_hir::lower_repl_line(&source_file);
+                    //
+                    // dbg!(ast_statements);
+                    // dbg!(hir_statements);
                 }
             },
             Ok(Signal::CtrlD) => {

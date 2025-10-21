@@ -1,0 +1,16 @@
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[package]
+name = "alloy_diagnostics"
+version = "0.1.0"
+authors = ["theochupp <tclchiam@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+alloy_syntax = { path = "../syntax" }
+ordered-float = { workspace = true }
+text-size = { workspace = true }
+
+[dev-dependencies]
+alloy_parser = {path = "../parser"}
+expect-test = { workspace = true }
+pretty_assertions = { workspace = true }

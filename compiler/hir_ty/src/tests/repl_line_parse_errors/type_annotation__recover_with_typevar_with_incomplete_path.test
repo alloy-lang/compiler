@@ -1,0 +1,21 @@
+import test_data::Test
+import std::functor
+
+typeof test : t1 -> t2 -> Test where
+    typevar t1 = functor::
+    typevar t2
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Missing {
+            offset: 112,
+        },
+        context: TypeVariableTraitConstraint,
+    },
+]

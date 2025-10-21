@@ -1,0 +1,24 @@
+trait TestTrait1 where
+    unknown
+
+    typevar t1
+end
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            TypeOfKw,
+            LetKw,
+            TypevarKw,
+            SelfKw,
+        ],
+        kind: Unexpected {
+            found: Ident,
+            range: 27..34,
+        },
+        context: TraitMemberFirst,
+    },
+]

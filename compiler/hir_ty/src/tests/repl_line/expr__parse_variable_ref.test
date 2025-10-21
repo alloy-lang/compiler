@@ -1,0 +1,12 @@
+let counter = 0
+
+counter
+===
+InferenceContext {
+    type_map: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+    },
+}
+[]

@@ -1,0 +1,29 @@
+trait TestTrait1 where
+    self = #Type_]
+    typevar t1
+end
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            TypeKw,
+        ],
+        kind: Unexpected {
+            found: Ident,
+            range: 35..39,
+        },
+        context: TypeVariableKindConstraintTypeKw,
+    },
+    ParseError {
+        expected: [
+            LBracket,
+        ],
+        kind: Missing {
+            offset: 39,
+        },
+        context: TypeVariableKindConstraintLBracket,
+    },
+]

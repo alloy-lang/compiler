@@ -2,6 +2,7 @@ let add1 = |a, 9| -
 let add2 = |a, b| -> a + b
 ===
 HirModule {
+    [salsa id]: 0,
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {

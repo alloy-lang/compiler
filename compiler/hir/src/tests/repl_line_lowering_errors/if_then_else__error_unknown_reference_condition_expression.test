@@ -1,6 +1,7 @@
 if test then 2 else 3
 ===
 HirModule {
+    [salsa id]: 0,
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {

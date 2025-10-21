@@ -1,0 +1,32 @@
+typedef Test1 =
+  | Thing1 0 Int
+  | Thing2 "hi"
+  | Thing3 String Int
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+            LParen,
+        ],
+        kind: Unexpected {
+            found: Integer,
+            range: 27..28,
+        },
+        context: TypeDefMemberPropertyType,
+    },
+    ParseError {
+        expected: [
+            Ident,
+            LParen,
+        ],
+        kind: Unexpected {
+            found: String,
+            range: 44..48,
+        },
+        context: TypeDefMemberPropertyType,
+    },
+]

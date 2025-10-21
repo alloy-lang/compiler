@@ -1,0 +1,13 @@
+let unknown = 1
+
+|unknown(a)| -> a + "a"
+===
+{
+    Idx::<Expression>(0): BuiltIn(
+        Int,
+    ),
+    Idx::<Expression>(2): BuiltIn(
+        String,
+    ),
+}
+[]

@@ -2,15 +2,14 @@ import std::option::map
 import std::functor::map
 ===
 HirModule {
+    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "std",
-                    "option",
-                ],
-                last: "map",
-            },
+            "item": Import(
+                Id {
+                    value: 3,
+                },
+            ),
             "name": "map",
             "range": 0..24,
             "scope_id": Idx::<Scope>(0),
@@ -35,13 +34,11 @@ HirModule {
     warnings: [
         LoweringWarning {
             kind: UnusedImport {
-                import: Import {
-                    segments: [
-                        "std",
-                        "option",
-                    ],
-                    last: "map",
-                },
+                import: Import(
+                    Id {
+                        value: 3,
+                    },
+                ),
             },
             range: 0..24,
         },

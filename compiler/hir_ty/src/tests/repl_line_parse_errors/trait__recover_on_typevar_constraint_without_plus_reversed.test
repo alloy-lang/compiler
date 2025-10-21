@@ -1,0 +1,21 @@
+import std::functor::Functor
+
+trait TestTrait1 where
+    self = Functor #Type[_]
+    typevar t1
+end
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Plus,
+        ],
+        kind: Missing {
+            offset: 72,
+        },
+        context: TypeVariableConstraintPlus,
+    },
+]

@@ -4,7 +4,7 @@ use super::*;
 #[allow(clippy::module_name_repetitions)]
 pub type PatternIdx = Idx<Pattern>;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Pattern {
     Missing,
     Literal(Literal),

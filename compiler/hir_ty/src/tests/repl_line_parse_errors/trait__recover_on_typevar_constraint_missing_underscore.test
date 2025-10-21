@@ -1,0 +1,19 @@
+trait TestTrait1 where
+    self = #Type[]
+    typevar t1
+end
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            NilIdentifier,
+        ],
+        kind: Missing {
+            offset: 40,
+        },
+        context: TypeVariableKindConstraintUnderscore,
+    },
+]

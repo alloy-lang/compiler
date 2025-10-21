@@ -1,0 +1,22 @@
+let a (1 + 2)
+let b = a
+===
+{
+    Idx::<Expression>(0): BuiltIn(
+        Int,
+    ),
+    Idx::<Expression>(1): BuiltIn(
+        Int,
+    ),
+}
+[
+    ParseError {
+        expected: [
+            Equals,
+        ],
+        kind: Missing {
+            offset: 6,
+        },
+        context: ValueDefEquals,
+    },
+]

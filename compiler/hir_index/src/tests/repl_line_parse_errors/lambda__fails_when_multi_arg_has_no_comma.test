@@ -1,0 +1,28 @@
+|arg1 1001 'c'| -> 8
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 6,
+        },
+        context: LambdaArgComma,
+    },
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 11,
+        },
+        context: LambdaArgComma,
+    },
+]

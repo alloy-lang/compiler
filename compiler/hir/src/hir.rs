@@ -1,6 +1,7 @@
-use super::{Fqn, Name};
+use super::{Fqn, HirDatabase, Name};
 use crate::ast_glossary::AstGlossary;
-use crate::index::Index;
+use crate::index::{Index, IndexItem};
+use std::sync::Arc;
 
 use alloy_ast as ast;
 use alloy_scope::{ScopeIdx, Scopes};
@@ -14,48 +15,62 @@ use std::convert::TryFrom;
 use text_size::TextRange;
 
 mod behavior;
+
 pub use behavior::*;
 
 mod expression;
+
 pub use expression::*;
 
 mod import;
+
 pub use import::*;
 
 mod module;
+
 pub use module::*;
 
 mod path;
+
 pub use path::*;
 
 mod pattern;
+
 pub use pattern::*;
 
 mod source_file;
+
 pub use source_file::*;
 
 mod statement;
+
 pub use statement::*;
 
 mod r#trait;
+
 pub use r#trait::*;
 
 mod type_reference;
+
 pub use type_reference::*;
 
 mod type_annotation;
+
 pub use type_annotation::*;
 
 mod type_variable;
+
 pub use type_variable::*;
 
 mod type_definition;
+
 pub use type_definition::*;
 
 mod value;
+
 pub use value::*;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum HirReferenceType {
     Expression,
     Pattern,
@@ -63,35 +78,101 @@ pub enum HirReferenceType {
 }
 
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug)]
+#[salsa::tracked]
 pub struct HirModule {
-    imports: Index<Import>,
-    expressions: Index<Expression>,
-    patterns: Index<Pattern>,
-    type_references: Index<TypeReference>,
-    type_definitions: Index<TypeDefinition>,
-    scopes: Scopes,
-    warnings: Vec<LoweringWarning>,
-    errors: Vec<LoweringError>,
+    pub imports: Arc<Index<Import>>,
+    pub expressions: Arc<Index<Expression>>,
+    pub patterns: Arc<Index<Pattern>>,
+    pub type_references: Arc<Index<TypeReference>>,
+    pub type_definitions: Arc<Index<TypeDefinition>>,
+    pub scopes: Arc<Scopes>,
+    pub warnings: Vec<LoweringWarning>,
+    pub errors: Vec<LoweringError>,
 }
 
-impl HirModule {
-    pub fn warnings(&self) -> &[LoweringWarning] {
-        &self.warnings
-    }
+// impl HirModule {
+//     pub fn imports(&self) -> impl Iterator<Item = IndexItem<Import>> {
+//         self.imports.iter()
+//     }
+//
+//     pub fn expressions(&self) -> impl Iterator<Item = IndexItem<Expression>> {
+//         self.expressions.iter()
+//     }
+//
+//     #[must_use]
+//     pub fn get_expression(&self, id: ExpressionIdx) -> &Expression {
+//         self.expressions.get(id)
+//     }
+//
+//     #[must_use]
+//     pub fn get_expression_by_name(
+//         &self,
+//         name: &Name,
+//         scope: ScopeIdx,
+//     ) -> Option<(ExpressionIdx, &Expression)> {
+//         self.expressions.get_by_scoped_name(name, scope)
+//     }
+//
+//     pub fn patterns(&self) -> impl Iterator<Item = IndexItem<Pattern>> {
+//         self.patterns.iter()
+//     }
+//
+//     #[must_use]
+//     pub fn get_pattern_by_name(
+//         &self,
+//         name: &Name,
+//         scope: ScopeIdx,
+//     ) -> Option<(PatternIdx, &Pattern)> {
+//         self.patterns.get_by_scoped_name(name, scope)
+//     }
+//
+//     #[must_use]
+//     pub fn get_pattern(&self, id: PatternIdx) -> &Pattern {
+//         self.patterns.get(id)
+//     }
+//
+//     pub fn type_references(&self) -> impl Iterator<Item = IndexItem<TypeReference>> {
+//         self.type_references.iter()
+//     }
+//
+//     #[must_use]
+//     pub fn get_type_reference_by_name(
+//         &self,
+//         name: &Name,
+//         scope: ScopeIdx,
+//     ) -> Option<(TypeIdx, &TypeReference)> {
+//         self.type_references.get_by_scoped_name(name, scope)
+//     }
+//
+//     pub fn type_definitions(&self) -> impl Iterator<Item = IndexItem<TypeDefinition>> {
+//         self.type_definitions.iter()
+//     }
+//
+//     #[must_use]
+//     pub fn warnings(&self) -> &[LoweringWarning] {
+//         &self.warnings
+//     }
+//
+//     #[must_use]
+//     pub fn errors(&self) -> &[LoweringError] {
+//         &self.errors
+//     }
+// }
 
-    pub fn errors(&self) -> &[LoweringError] {
-        &self.errors
-    }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct LoweringError {
     kind: LoweringErrorKind,
     range: TextRange,
 }
 
-#[derive(Debug)]
+impl LoweringError {
+    #[must_use]
+    pub fn new(kind: LoweringErrorKind, range: TextRange) -> Self {
+        Self { kind, range }
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum LoweringErrorKind {
     ConflictingValue {
         name: Name,
@@ -137,13 +218,13 @@ pub enum LoweringErrorKind {
     CharLiteralInvalid,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct LoweringWarning {
     kind: LoweringWarningKind,
     range: TextRange,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum LoweringWarningKind {
     DuplicateImport {
         name: Name,
@@ -155,8 +236,8 @@ pub enum LoweringWarningKind {
     },
 }
 
-#[derive(Debug)]
-struct LoweringCtx {
+struct LoweringCtx<'db> {
+    db: &'db dyn HirDatabase,
     glossary: AstGlossary,
     imports: Index<Import>,
     expressions: Index<Expression>,
@@ -169,9 +250,10 @@ struct LoweringCtx {
     errors: Vec<LoweringError>,
 }
 
-impl LoweringCtx {
-    fn new(glossary: AstGlossary) -> Self {
+impl<'db> LoweringCtx<'db> {
+    fn new(db: &'db dyn HirDatabase, glossary: AstGlossary) -> Self {
         Self {
+            db,
             glossary,
             imports: Index::new(),
             expressions: Index::new(),
@@ -190,9 +272,7 @@ impl LoweringCtx {
 
         for (id, import, _, _) in self.imports.iter() {
             if !self.used_imports.contains(&id) {
-                let warn = LoweringWarningKind::UnusedImport {
-                    import: import.clone(),
-                };
+                let warn = LoweringWarningKind::UnusedImport { import: *import };
                 warnings.push(LoweringWarning {
                     kind: warn,
                     range: self.imports.get_range(id),
@@ -200,16 +280,17 @@ impl LoweringCtx {
             }
         }
 
-        HirModule {
-            imports: self.imports,
-            expressions: self.expressions,
-            patterns: self.patterns,
-            type_references: self.type_references,
-            type_definitions: self.type_definitions,
-            scopes: self.scopes,
+        HirModule::new(
+            self.db,
+            self.imports.into(),
+            self.expressions.into(),
+            self.patterns.into(),
+            self.type_references.into(),
+            self.type_definitions.into(),
+            self.scopes.into(),
             warnings,
-            errors: self.errors,
-        }
+            self.errors,
+        )
     }
 
     pub(crate) fn resolve_reference_path(
@@ -259,7 +340,7 @@ impl LoweringCtx {
 
                 let import = self.imports.get(import_id);
                 let fqn = Fqn::new(
-                    import.segments().iter().cloned(),
+                    import.segments(self.db).iter().cloned(),
                     local_name.clone(),
                     rest.to_vec(),
                 );
@@ -491,17 +572,17 @@ impl LoweringCtx {
         );
     }
 
-    pub(crate) fn add_import(&mut self, path: &NonEmpty<Name>, element: &SyntaxElement) {
-        let new_import = Import::new(path);
-        let name = path.last();
+    pub(crate) fn add_import(&mut self, segments: &NonEmpty<Name>, element: &SyntaxElement) {
+        let (last, path) = segments.split_last();
+        let new_import = Import::new(self.db, path.to_vec(), last.clone());
 
-        if let Some(existing_id) = self.imports.get_id(name, &self.scopes) {
+        if let Some(existing_id) = self.imports.get_id(last, &self.scopes) {
             let existing_import = self.imports.get(existing_id);
             let existing_import_range = self.imports.get_range(existing_id);
 
             if &new_import == existing_import {
                 let warn = LoweringWarningKind::DuplicateImport {
-                    name: name.clone(),
+                    name: last.clone(),
                     first: existing_import_range,
                     second: element.text_range(),
                 };
@@ -512,7 +593,7 @@ impl LoweringCtx {
         }
 
         let res = self.imports.insert_named(
-            name.clone(),
+            last.clone(),
             new_import.clone(),
             element.text_range(),
             &self.scopes,
@@ -529,7 +610,7 @@ impl LoweringCtx {
     }
 }
 
-impl LoweringCtx {
+impl<'db> LoweringCtx<'db> {
     fn inside_scope<F, R>(&mut self, tag: &str, f: F) -> R
     where
         F: FnOnce(&mut Self) -> R,
@@ -545,15 +626,15 @@ impl LoweringCtx {
 }
 
 #[must_use]
-pub fn lower_source_file(source_file: &ast::SourceFile) -> HirModule {
+pub fn lower_source_file(db: &dyn HirDatabase, source_file: &ast::SourceFile) -> HirModule {
     let glossary = AstGlossary::summarize_source_file(source_file);
 
-    let mut ctx = LoweringCtx::new(glossary);
+    let mut ctx = LoweringCtx::new(db, glossary);
     source_file::lower_source_file(&mut ctx, source_file);
     ctx.finish()
 }
 
-impl LoweringCtx {
+impl<'db> LoweringCtx<'db> {
     fn warning(&mut self, kind: LoweringWarningKind, range: TextRange) {
         self.warnings.push(LoweringWarning { kind, range });
     }

@@ -1,0 +1,22 @@
+trait TestTrait1 where
+    self = #Type[_ _]
+    typevar t1
+end
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 42,
+        },
+        context: TypeVariableKindConstraintUnderscoreComma,
+    },
+]

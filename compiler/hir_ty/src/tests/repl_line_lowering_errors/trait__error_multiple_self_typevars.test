@@ -1,0 +1,11 @@
+import std::{functor, debug}
+
+trait TestTrait1 where
+    self = functor::Functor
+    self = debug::Debug
+end
+===
+InferenceContext {
+    type_map: {},
+}
+[]

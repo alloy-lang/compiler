@@ -1,0 +1,11 @@
+behavior Trait1 for other::Type1 where
+    -- imagine all the things here
+end
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[]

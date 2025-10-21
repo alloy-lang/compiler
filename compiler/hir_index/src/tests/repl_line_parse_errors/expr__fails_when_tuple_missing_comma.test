@@ -1,0 +1,19 @@
+(1 2)
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 3,
+        },
+        context: ParenExprComma,
+    },
+]

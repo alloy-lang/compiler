@@ -1,0 +1,19 @@
+|arg1, arg2 -> 8
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Pipe,
+        ],
+        kind: Missing {
+            offset: 12,
+        },
+        context: LambdaArgPipe,
+    },
+]

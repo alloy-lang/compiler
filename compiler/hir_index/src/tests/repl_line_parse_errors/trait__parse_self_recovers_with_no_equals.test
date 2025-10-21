@@ -1,0 +1,36 @@
+import std::functor
+
+trait TestTrait1 where
+    self functor::Functor
+end
+===
+IndexedModule {
+    imports: {
+        "functor": IndexedImport {
+            segments: [
+                SpannedName(
+                    "std",
+                    7..10,
+                ),
+            ],
+            last: SpannedName(
+                "functor",
+                12..19,
+            ),
+        },
+    },
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Equals,
+        ],
+        kind: Missing {
+            offset: 53,
+        },
+        context: TraitSelfConstraintsEquals,
+    },
+]

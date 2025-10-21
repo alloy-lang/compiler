@@ -1,0 +1,20 @@
+typedef Test1[t1 t2] = Empty
+typedef Test2        = Empty
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 17,
+        },
+        context: BoundedTypeComma,
+    },
+]

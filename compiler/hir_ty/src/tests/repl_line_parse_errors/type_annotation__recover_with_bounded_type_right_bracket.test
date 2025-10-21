@@ -1,0 +1,20 @@
+import test_data::Test
+
+typeof apply : Test[t1] -> Test t2] where
+    typevar t1
+    typevar t2
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            LBracket,
+        ],
+        kind: Missing {
+            offset: 56,
+        },
+        context: BoundedTypeLBracket,
+    },
+]

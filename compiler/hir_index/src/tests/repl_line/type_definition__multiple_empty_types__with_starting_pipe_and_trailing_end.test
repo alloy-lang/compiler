@@ -1,0 +1,12 @@
+typedef Test =
+  | Empty1
+  | Empty2
+end
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[]

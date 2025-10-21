@@ -1,0 +1,11 @@
+typedef Either =
+  | Left
+  | Right
+
+let unknown = Either::Nothing
+
+===
+InferenceContext {
+    type_map: {},
+}
+[]

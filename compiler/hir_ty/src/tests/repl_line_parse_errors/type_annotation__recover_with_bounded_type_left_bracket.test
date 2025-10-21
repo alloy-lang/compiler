@@ -1,0 +1,19 @@
+import test_data::Test
+
+typeof apply : Test[t1 -> Test where
+    typevar t1
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            RBracket,
+        ],
+        kind: Missing {
+            offset: 55,
+        },
+        context: BoundedTypeRBracket,
+    },
+]

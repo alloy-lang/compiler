@@ -1,15 +1,14 @@
 import std::function::(<|)
 ===
 HirModule {
+    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "std",
-                    "function",
-                ],
-                last: "<|",
-            },
+            "item": Import(
+                Id {
+                    value: 2,
+                },
+            ),
             "name": "<|",
             "range": 0..26,
             "scope_id": Idx::<Scope>(0),
@@ -34,13 +33,11 @@ HirModule {
     warnings: [
         LoweringWarning {
             kind: UnusedImport {
-                import: Import {
-                    segments: [
-                        "std",
-                        "function",
-                    ],
-                    last: "<|",
-                },
+                import: Import(
+                    Id {
+                        value: 2,
+                    },
+                ),
             },
             range: 0..26,
         },

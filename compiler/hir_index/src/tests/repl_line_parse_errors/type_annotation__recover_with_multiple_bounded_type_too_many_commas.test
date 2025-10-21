@@ -1,0 +1,37 @@
+import test_data::Test
+
+typeof apply : Test[t1, , t2] where
+    typevar t1
+    typevar t2
+===
+IndexedModule {
+    imports: {
+        "Test": IndexedImport {
+            segments: [
+                SpannedName(
+                    "test_data",
+                    7..16,
+                ),
+            ],
+            last: SpannedName(
+                "Test",
+                18..22,
+            ),
+        },
+    },
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+            LParen,
+        ],
+        kind: Missing {
+            offset: 48,
+        },
+        context: BoundedTypeArgType,
+    },
+]

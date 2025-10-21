@@ -1,0 +1,20 @@
+import test_data::Test
+
+typeof test : t1 -> t2 -> Test where
+    typevar t1 =
+    typevar t2
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Missing {
+            offset: 82,
+        },
+        context: TypeVariableConstraint,
+    },
+]

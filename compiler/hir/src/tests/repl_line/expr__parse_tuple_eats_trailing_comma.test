@@ -3,6 +3,7 @@ let foo = 0
 (1, foo,)
 ===
 HirModule {
+    [salsa id]: 0,
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {

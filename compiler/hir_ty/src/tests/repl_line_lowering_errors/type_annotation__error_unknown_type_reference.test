@@ -1,0 +1,6 @@
+typeof test : Unknown -> Int -> String where
+===
+InferenceContext {
+    type_map: {},
+}
+[]

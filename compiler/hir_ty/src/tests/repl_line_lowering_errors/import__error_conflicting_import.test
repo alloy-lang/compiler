@@ -1,0 +1,7 @@
+import std::option::map
+import std::functor::map
+===
+InferenceContext {
+    type_map: {},
+}
+[]

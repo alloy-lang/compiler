@@ -3,29 +3,24 @@ module where
     import really::real::other::Thing2
 ===
 HirModule {
+    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "really",
-                    "really",
-                    "real",
-                ],
-                last: "Thing1",
-            },
+            "item": Import(
+                Id {
+                    value: 1,
+                },
+            ),
             "name": "Thing1",
             "range": 17..57,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
-            "item": Import {
-                segments: [
-                    "really",
-                    "real",
-                    "other",
-                ],
-                last: "Thing2",
-            },
+            "item": Import(
+                Id {
+                    value: 2,
+                },
+            ),
             "name": "Thing2",
             "range": 57..91,
             "scope_id": Idx::<Scope>(0),
@@ -50,27 +45,21 @@ HirModule {
     warnings: [
         LoweringWarning {
             kind: UnusedImport {
-                import: Import {
-                    segments: [
-                        "really",
-                        "really",
-                        "real",
-                    ],
-                    last: "Thing1",
-                },
+                import: Import(
+                    Id {
+                        value: 1,
+                    },
+                ),
             },
             range: 17..57,
         },
         LoweringWarning {
             kind: UnusedImport {
-                import: Import {
-                    segments: [
-                        "really",
-                        "real",
-                        "other",
-                    ],
-                    last: "Thing2",
-                },
+                import: Import(
+                    Id {
+                        value: 2,
+                    },
+                ),
             },
             range: 57..91,
         },

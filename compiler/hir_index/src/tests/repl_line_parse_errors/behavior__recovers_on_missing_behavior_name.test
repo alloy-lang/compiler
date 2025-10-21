@@ -1,0 +1,28 @@
+behavior for Type1 where
+    typevar t1
+end
+
+behavior TestTrait2 for Type1 where
+    -- imagine all the things here
+
+    typevar t1
+end
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+            LParen,
+        ],
+        kind: Missing {
+            offset: 9,
+        },
+        context: BehaviorTraitName,
+    },
+]

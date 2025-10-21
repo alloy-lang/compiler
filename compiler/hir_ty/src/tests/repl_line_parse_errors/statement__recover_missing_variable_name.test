@@ -1,0 +1,22 @@
+let = 1
+let b = 2
+===
+InferenceContext {
+    type_map: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+    },
+}
+[
+    ParseError {
+        expected: [
+            OpIdent,
+            Ident,
+        ],
+        kind: Missing {
+            offset: 4,
+        },
+        context: ValueDefIdent,
+    },
+]

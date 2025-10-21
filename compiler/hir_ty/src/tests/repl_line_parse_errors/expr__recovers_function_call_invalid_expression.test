@@ -1,0 +1,118 @@
+let funky = |a| -> a
+
+funky(1 + )
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "a",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(1),
+            },
+            "range": 19..22,
+        },
+        Idx::<Expression>(1): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                ],
+                body: Idx::<Expression>(0),
+            },
+            "name": "funky",
+            "range": 0..22,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(2): {
+            "item": IntLiteral(
+                1,
+            ),
+            "range": 28..30,
+        },
+        Idx::<Expression>(3): {
+            "item": Missing,
+            "range": 28..32,
+        },
+        Idx::<Expression>(4): {
+            "item": Binary {
+                op: Add,
+                lhs: Idx::<Expression>(2),
+                rhs: Idx::<Expression>(3),
+            },
+            "range": 28..32,
+        },
+        Idx::<Expression>(5): {
+            "item": FunctionCall {
+                target: ThisModule(
+                    NonEmpty(
+                        [
+                            "funky",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(0),
+                args: [
+                    Idx::<Expression>(4),
+                ],
+            },
+            "range": 22..33,
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "a",
+            },
+            "name": "a",
+            "range": 13..14,
+            "scope_id": Idx::<Scope>(1),
+        },
+    },
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Integer,
+            Fraction,
+            String,
+            Char,
+            Ident,
+            OpIdent,
+            Minus,
+            LParen,
+            IfKw,
+            MatchKw,
+            Pipe,
+        ],
+        kind: Missing {
+            offset: 32,
+        },
+        context: FunctionCallArgExpr,
+    },
+]

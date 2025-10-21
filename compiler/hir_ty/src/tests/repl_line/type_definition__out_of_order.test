@@ -1,0 +1,11 @@
+let example = Things::ThingA
+
+typedef Things =
+  | ThingA
+  | ThingB
+end
+===
+InferenceContext {
+    type_map: {},
+}
+[]

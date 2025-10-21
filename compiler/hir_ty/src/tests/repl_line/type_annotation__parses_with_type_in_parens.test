@@ -1,0 +1,8 @@
+import test_data::Test
+
+typeof test : Test -> (String)
+===
+InferenceContext {
+    type_map: {},
+}
+[]

@@ -1,0 +1,20 @@
+import std::functor::Functor
+
+trait TestTrait1
+    self = Functor
+end
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            WhereKw,
+        ],
+        kind: Missing {
+            offset: 51,
+        },
+        context: TraitWhere,
+    },
+]

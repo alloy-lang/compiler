@@ -3,12 +3,15 @@ members = [
     "compiler",
     "compiler/ast",
     "compiler/hir",
+    "compiler/hir_index",
+    "compiler/hir_ty",
     "compiler/lexer",
     "compiler/parser",
     "compiler/project",
     "compiler/scope",
     "compiler/syntax",
     "compiler/test_harness",
+    "compiler/workspace",
     "smith/repl",
 ]
 

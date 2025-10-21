@@ -1,0 +1,37 @@
+behavior TestTrait1 for Type1
+    typevar t1
+end
+===
+HirModule {
+    [salsa id]: 0,
+    imports: EmptyIndex::<Import>,
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            WhereKw,
+        ],
+        kind: Missing {
+            offset: 34,
+        },
+        context: BehaviorWhere,
+    },
+]

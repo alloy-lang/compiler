@@ -1,0 +1,35 @@
+import test_data::ResultThing
+
+typeof test1 : String -> ResultThing::
+typeof test2 : String -> ResultThing::More
+===
+IndexedModule {
+    imports: {
+        "ResultThing": IndexedImport {
+            segments: [
+                SpannedName(
+                    "test_data",
+                    7..16,
+                ),
+            ],
+            last: SpannedName(
+                "ResultThing",
+                18..29,
+            ),
+        },
+    },
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Missing {
+            offset: 70,
+        },
+        context: TypeOfType,
+    },
+]

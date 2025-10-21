@@ -1,0 +1,93 @@
+import test_data::ResultThing
+
+let foo = ResultThing:More:Stuff:here
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "ResultThing",
+            },
+            "name": "ResultThing",
+            "range": 0..31,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "ResultThing",
+                        sub_path: [
+                            "More",
+                            "Stuff",
+                            "here",
+                        ],
+                    },
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "name": "foo",
+            "range": 31..68,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            DoubleColon,
+        ],
+        kind: Unexpected {
+            found: Colon,
+            range: 52..53,
+        },
+        context: VariableRef,
+    },
+    ParseError {
+        expected: [
+            DoubleColon,
+        ],
+        kind: Unexpected {
+            found: Colon,
+            range: 57..58,
+        },
+        context: VariableRef,
+    },
+    ParseError {
+        expected: [
+            DoubleColon,
+        ],
+        kind: Unexpected {
+            found: Colon,
+            range: 63..64,
+        },
+        context: VariableRef,
+    },
+]

@@ -1,0 +1,11 @@
+typeof test : t1 -> Int -> String where
+    typevar t1
+    typevar t1
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[]

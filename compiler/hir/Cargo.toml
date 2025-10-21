@@ -13,6 +13,7 @@ la-arena = { workspace = true }
 maplit = { workspace = true }
 non-empty-vec = { workspace = true }
 ordered-float = { workspace = true }
+salsa = { workspace = true }
 rustc-hash = { workspace = true }
 text-size = { workspace = true }
 

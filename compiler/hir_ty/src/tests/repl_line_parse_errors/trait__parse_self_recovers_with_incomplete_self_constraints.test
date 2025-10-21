@@ -1,0 +1,30 @@
+trait TestTrait1 where
+    self
+
+    typeof distraction : String
+end
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Equals,
+        ],
+        kind: Missing {
+            offset: 37,
+        },
+        context: TraitSelfConstraintsEquals,
+    },
+    ParseError {
+        expected: [
+            Hash,
+            Ident,
+        ],
+        kind: Missing {
+            offset: 37,
+        },
+        context: TypeVariableConstraint,
+    },
+]

@@ -5,29 +5,24 @@ match when
   \ False -> 1
 ===
 HirModule {
+    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "std",
-                    "bool",
-                    "Bool",
-                ],
-                last: "True",
-            },
+            "item": Import(
+                Id {
+                    value: 3,
+                },
+            ),
             "name": "True",
             "range": 0..39,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
-            "item": Import {
-                segments: [
-                    "std",
-                    "bool",
-                    "Bool",
-                ],
-                last: "False",
-            },
+            "item": Import(
+                Id {
+                    value: 4,
+                },
+            ),
             "name": "False",
             "range": 0..39,
             "scope_id": Idx::<Scope>(0),

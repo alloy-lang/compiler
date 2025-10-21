@@ -1,0 +1,28 @@
+import std::option::Option
+
+|Option::Some(x)| -> x
+===
+IndexedModule {
+    imports: {
+        "Option": IndexedImport {
+            segments: [
+                SpannedName(
+                    "std",
+                    7..10,
+                ),
+                SpannedName(
+                    "option",
+                    12..18,
+                ),
+            ],
+            last: SpannedName(
+                "Option",
+                20..26,
+            ),
+        },
+    },
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[]

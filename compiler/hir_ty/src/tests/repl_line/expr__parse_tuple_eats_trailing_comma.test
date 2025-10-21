@@ -1,0 +1,13 @@
+let foo = 0
+
+(1, foo,)
+===
+{
+    Idx::<Expression>(0): BuiltIn(
+        Int,
+    ),
+    Idx::<Expression>(1): BuiltIn(
+        Int,
+    ),
+}
+[]

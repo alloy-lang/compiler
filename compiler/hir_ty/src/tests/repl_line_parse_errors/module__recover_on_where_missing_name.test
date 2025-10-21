@@ -1,0 +1,18 @@
+module where
+    import really::really::real::Thing1
+    import really::real::other::Thing2
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Missing {
+            offset: 7,
+        },
+        context: ModuleName,
+    },
+]

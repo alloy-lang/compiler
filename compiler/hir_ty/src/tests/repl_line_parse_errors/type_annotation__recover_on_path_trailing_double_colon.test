@@ -1,0 +1,19 @@
+import test_data::ResultThing
+
+typeof test1 : String -> ResultThing::
+typeof test2 : String -> ResultThing::More
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Missing {
+            offset: 70,
+        },
+        context: TypeOfType,
+    },
+]

@@ -1,0 +1,17 @@
+typedef Test1[t1, ] = Empty
+typedef Test2       = Empty
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Ident,
+        ],
+        kind: Missing {
+            offset: 18,
+        },
+        context: BoundedTypeArgName,
+    },
+]

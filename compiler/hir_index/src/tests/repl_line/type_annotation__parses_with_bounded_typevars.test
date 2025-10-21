@@ -1,0 +1,30 @@
+import std::option::Option
+
+typeof apply : Option[(t1 -> t2)] -> Option[t1] -> Option[t2] where
+    typevar t1
+    typevar t2
+===
+IndexedModule {
+    imports: {
+        "Option": IndexedImport {
+            segments: [
+                SpannedName(
+                    "std",
+                    7..10,
+                ),
+                SpannedName(
+                    "option",
+                    12..18,
+                ),
+            ],
+            last: SpannedName(
+                "Option",
+                20..26,
+            ),
+        },
+    },
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[]

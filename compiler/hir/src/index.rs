@@ -7,6 +7,7 @@ use text_size::TextRange;
 
 use crate::Name;
 
+#[derive(PartialEq)]
 pub struct Index<T> {
     items: Arena<T>,
     item_ranges: ArenaMap<Idx<T>, TextRange>,
@@ -18,8 +19,10 @@ pub(crate) struct IndexIterator<'a, T> {
     index: &'a Index<T>,
 }
 
+pub type IndexItem<'a, T> = (Idx<T>, &'a T, TextRange, Option<(Name, ScopeIdx)>);
+
 impl<'a, T> Iterator for IndexIterator<'a, T> {
-    type Item = (Idx<T>, &'a T, TextRange, Option<(Name, ScopeIdx)>);
+    type Item = IndexItem<'a, T>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.cursor >= self.index.items.len() {
@@ -66,6 +69,49 @@ impl<T: fmt::Debug> fmt::Debug for Index<T> {
         for (id, item, range, name_info) in self.iter() {
             let mut properties: BTreeMap<&str, &dyn fmt::Debug> = BTreeMap::new();
             properties.insert("item", item);
+            properties.insert("range", &range);
+
+            if let Some((name, scope_id)) = name_info {
+                properties.insert("name", &name);
+                properties.insert("scope_id", &scope_id);
+                // this is duplicated because borrowing is a little funky in an if statement
+                debug_struct.field(&format!("{id:?}"), &properties);
+            } else {
+                debug_struct.field(&format!("{id:?}"), &properties);
+            }
+        }
+
+        debug_struct.finish()
+    }
+}
+
+impl<T: fmt::Debug> salsa::DebugWithDb<<crate::Jar as salsa::jar::Jar<'_>>::DynDb> for Index<T> {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter<'_>,
+        db: &<crate::Jar as salsa::jar::Jar<'_>>::DynDb,
+    ) -> fmt::Result {
+        let mut type_name = std::any::type_name::<T>();
+        if let Some(idx) = type_name.rfind(':') {
+            type_name = &type_name[idx + 1..];
+        }
+
+        if self.is_empty() {
+            return f
+                .debug_struct(&format!("EmptyIndex::<{type_name}>"))
+                .finish();
+        }
+
+        let mut debug_struct = f.debug_struct(&format!("Index::<{type_name}>"));
+        for (id, item, range, name_info) in self.iter() {
+            use ::salsa::debug::helper::Fallback;
+
+            let mut properties: BTreeMap<&str, &dyn fmt::Debug> = BTreeMap::new();
+            let debug_with = salsa::debug::helper::SalsaDebug::<
+                T,
+                <crate::Jar as salsa::jar::Jar<'_>>::DynDb,
+            >::salsa_debug(&item, db);
+            properties.insert("item", &debug_with);
             properties.insert("range", &range);
 
             if let Some((name, scope_id)) = name_info {
@@ -181,8 +227,17 @@ impl<T> Index<T> {
             .copied()
     }
 
-    pub fn get_by_name(&self, name: &Name, scopes: &Scopes) -> Option<&T> {
-        self.get_id(name, scopes).map(|id| self.get(id))
+    fn get_id_scoped(&self, name: &Name, scope: ScopeIdx) -> Option<Idx<T>> {
+        self.item_names.get(&(name.clone(), scope)).copied()
+    }
+
+    #[cfg(test)]
+    pub fn get_by_name(&self, name: &Name, scopes: &Scopes) -> Option<(Idx<T>, &T)> {
+        self.get_id(name, scopes).map(|id| (id, self.get(id)))
+    }
+
+    pub fn get_by_scoped_name(&self, name: &Name, scope: ScopeIdx) -> Option<(Idx<T>, &T)> {
+        self.get_id_scoped(name, scope).map(|id| (id, self.get(id)))
     }
 }
 
@@ -208,7 +263,7 @@ mod tests {
         assert_eq!(index.get(idx), &thing);
         assert_eq!(index.get_range(idx), range);
         assert_eq!(index.get_id(&name, &scopes), Some(idx));
-        assert_eq!(index.get_by_name(&name, &scopes), Some(&thing));
+        assert_eq!(index.get_by_name(&name, &scopes), Some((idx, &thing)));
     }
 
     #[test]
@@ -228,7 +283,10 @@ mod tests {
         assert_eq!(index.get(idx), &thing);
         assert_eq!(index.get_range(idx), range);
         assert_eq!(index.get_id(&lookup_name, &scopes), Some(idx));
-        assert_eq!(index.get_by_name(&lookup_name, &scopes), Some(&thing));
+        assert_eq!(
+            index.get_by_name(&lookup_name, &scopes),
+            Some((idx, &thing))
+        );
     }
 
     #[test]
@@ -247,7 +305,7 @@ mod tests {
         scopes.push_scope("testing 1");
 
         assert_eq!(index.get_id(&name, &scopes), Some(idx));
-        assert_eq!(index.get_by_name(&name, &scopes), Some(&thing));
+        assert_eq!(index.get_by_name(&name, &scopes), Some((idx, &thing)));
     }
 
     #[test]

@@ -1,0 +1,21 @@
+trait TestTrait1 where
+    typeof test : Int
+
+    let thing = test
+end
+===
+InferenceContext {
+    type_map: {
+        Idx::<Expression>(0): Named {
+            path: ThisModule(
+                NonEmpty(
+                    [
+                        "test",
+                    ],
+                ),
+            ),
+            id: Idx::<TypeReference>(0),
+        },
+    },
+}
+[]

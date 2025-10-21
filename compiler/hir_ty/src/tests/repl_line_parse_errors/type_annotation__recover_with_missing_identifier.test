@@ -1,0 +1,20 @@
+import test_data::Test
+
+typeof       : String
+typeof test2 : Test -> String -> Int
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            OpIdent,
+            Ident,
+        ],
+        kind: Missing {
+            offset: 37,
+        },
+        context: TypeOfName,
+    },
+]

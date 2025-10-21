@@ -1,0 +1,35 @@
+(1, 2
+===
+InferenceContext {
+    type_map: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(2): Tuple(
+            NonEmpty(
+                [
+                    BuiltIn(
+                        Int,
+                    ),
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            ),
+        ),
+    },
+}
+[
+    ParseError {
+        expected: [
+            RParen,
+        ],
+        kind: Missing {
+            offset: 5,
+        },
+        context: ParenExprRightParen,
+    },
+]

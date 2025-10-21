@@ -1,0 +1,12 @@
+import std::option::Option
+
+|Option::None| -> 5
+===
+InferenceContext {
+    type_map: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+    },
+}
+[]

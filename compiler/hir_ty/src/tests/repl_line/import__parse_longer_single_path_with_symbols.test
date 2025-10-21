@@ -1,0 +1,6 @@
+import std::function::(<|)
+===
+InferenceContext {
+    type_map: {},
+}
+[]

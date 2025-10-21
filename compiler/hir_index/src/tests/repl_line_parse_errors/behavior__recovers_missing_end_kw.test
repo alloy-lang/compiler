@@ -1,0 +1,24 @@
+behavior Trait1 for Type1 where
+    -- imagine all the things here
+
+trait Trait1 where
+    -- imagine all the things here
+end
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            EndKw,
+        ],
+        kind: Missing {
+            offset: 68,
+        },
+        context: BehaviorEnd,
+    },
+]

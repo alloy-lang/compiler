@@ -1,0 +1,31 @@
+import test_data::test
+
+typedef Either[l, r] =
+  | Left(l)
+  | Right(r)
+end
+
+match test when
+  \ Either::Left(l)  -> l
+  \ Either::Right(r) -> r
+===
+IndexedModule {
+    imports: {
+        "test": IndexedImport {
+            segments: [
+                SpannedName(
+                    "test_data",
+                    7..16,
+                ),
+            ],
+            last: SpannedName(
+                "test",
+                18..22,
+            ),
+        },
+    },
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[]

@@ -1,0 +1,18 @@
+let func1 = 0
+let func2 = 1
+
+let >> = |f1, f2| -> f2(f1)
+
+let result = >>(func1, func2)
+===
+InferenceContext {
+    type_map: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+    },
+}
+[]

@@ -6,14 +6,14 @@ typeof (|>) : t1 -> (t1 -> t2) -> t2 where
 let (|>) = |x, f| -> fakeStuff
 ===
 HirModule {
+    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "fake",
-                ],
-                last: "fakeStuff",
-            },
+            "item": Import(
+                Id {
+                    value: 2,
+                },
+            ),
             "name": "fakeStuff",
             "range": 0..24,
             "scope_id": Idx::<Scope>(0),

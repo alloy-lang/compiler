@@ -1,0 +1,41 @@
+import std::functor::Functor
+
+trait TestTrait1 where
+    self = Functor #Type[_]
+    typevar t1
+end
+===
+IndexedModule {
+    imports: {
+        "Functor": IndexedImport {
+            segments: [
+                SpannedName(
+                    "std",
+                    7..10,
+                ),
+                SpannedName(
+                    "functor",
+                    12..19,
+                ),
+            ],
+            last: SpannedName(
+                "Functor",
+                21..28,
+            ),
+        },
+    },
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Plus,
+        ],
+        kind: Missing {
+            offset: 72,
+        },
+        context: TypeVariableConstraintPlus,
+    },
+]

@@ -6,26 +6,24 @@ match test when
   \ Either::Right(x) -> x
 ===
 HirModule {
+    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "std",
-                    "either",
-                ],
-                last: "Either",
-            },
+            "item": Import(
+                Id {
+                    value: 3,
+                },
+            ),
             "name": "Either",
             "range": 0..27,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
-            "item": Import {
-                segments: [
-                    "test_data",
-                ],
-                last: "test",
-            },
+            "item": Import(
+                Id {
+                    value: 4,
+                },
+            ),
             "name": "test",
             "range": 27..51,
             "scope_id": Idx::<Scope>(0),

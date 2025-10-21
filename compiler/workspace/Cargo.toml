@@ -1,0 +1,10 @@
+[package]
+name = "alloy_workspace"
+version = "0.1.0"
+authors = ["theochupp <tclchiam@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+salsa = { workspace = true }
+
+[dev-dependencies]

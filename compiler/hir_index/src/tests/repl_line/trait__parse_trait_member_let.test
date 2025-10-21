@@ -1,0 +1,13 @@
+trait TestTrait1 where
+    typeof test : Int
+
+    let thing = test
+end
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[]

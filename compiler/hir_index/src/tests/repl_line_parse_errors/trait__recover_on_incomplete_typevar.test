@@ -1,0 +1,22 @@
+trait TestTrait1 where
+    typevar t1 =
+end
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Hash,
+            Ident,
+        ],
+        kind: Missing {
+            offset: 40,
+        },
+        context: TypeVariableConstraint,
+    },
+]

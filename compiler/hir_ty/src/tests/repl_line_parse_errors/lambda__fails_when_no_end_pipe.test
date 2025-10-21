@@ -1,0 +1,20 @@
+|arg1, arg2 -> 8
+===
+InferenceContext {
+    type_map: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+    },
+}
+[
+    ParseError {
+        expected: [
+            Pipe,
+        ],
+        kind: Missing {
+            offset: 12,
+        },
+        context: LambdaArgPipe,
+    },
+]

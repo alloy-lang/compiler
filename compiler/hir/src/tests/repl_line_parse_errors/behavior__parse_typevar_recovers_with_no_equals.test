@@ -1,0 +1,38 @@
+behavior TestTrait1 for Type1 where
+    typevar t1 functor::Functor
+end
+===
+HirModule {
+    [salsa id]: 0,
+    imports: EmptyIndex::<Import>,
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Equals,
+            Equals,
+        ],
+        kind: Missing {
+            offset: 51,
+        },
+        context: TypeVariableConstraint,
+    },
+]

@@ -1,0 +1,22 @@
+trait TestTrait1 where
+    typeof test1   self -> String -> Int
+    typeof test2 : self -> String -> Int
+end
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Colon,
+        ],
+        kind: Missing {
+            offset: 42,
+        },
+        context: TypeOfColon,
+    },
+]

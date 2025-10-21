@@ -1,0 +1,21 @@
+behavior TestTrait1 for Type1
+    typeof test : String
+end
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            WhereKw,
+        ],
+        kind: Missing {
+            offset: 34,
+        },
+        context: BehaviorWhere,
+    },
+]

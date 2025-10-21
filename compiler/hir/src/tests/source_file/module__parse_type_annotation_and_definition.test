@@ -7,47 +7,44 @@ module TestModule1 where
     let testThing = |funky, x, y| -> TestType::new <| (funky(x), funky(y))
 ===
 HirModule {
+    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "test_data",
-                ],
-                last: "TestType",
-            },
+            "item": Import(
+                Id {
+                    value: 1,
+                },
+            ),
             "name": "TestType",
             "range": 29..89,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
-            "item": Import {
-                segments: [
-                    "test_data",
-                ],
-                last: "ResultThing",
-            },
+            "item": Import(
+                Id {
+                    value: 2,
+                },
+            ),
             "name": "ResultThing",
             "range": 29..89,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(2): {
-            "item": Import {
-                segments: [
-                    "test_data",
-                ],
-                last: "Thing",
-            },
+            "item": Import(
+                Id {
+                    value: 3,
+                },
+            ),
             "name": "Thing",
             "range": 29..89,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(3): {
-            "item": Import {
-                segments: [
-                    "test_data",
-                ],
-                last: "<|",
-            },
+            "item": Import(
+                Id {
+                    value: 4,
+                },
+            ),
             "name": "<|",
             "range": 29..89,
             "scope_id": Idx::<Scope>(0),

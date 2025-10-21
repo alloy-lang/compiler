@@ -5,15 +5,14 @@ typeof apply : Option[(t1 -> t2)] -> Option[t1] -> Option[t2] where
     typevar t2
 ===
 HirModule {
+    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "std",
-                    "option",
-                ],
-                last: "Option",
-            },
+            "item": Import(
+                Id {
+                    value: 2,
+                },
+            ),
             "name": "Option",
             "range": 0..28,
             "scope_id": Idx::<Scope>(0),

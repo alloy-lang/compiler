@@ -1,0 +1,370 @@
+module TestModule1 where
+    import test_data::{TestType, ResultThing, Thing, (<|)}
+
+    typeof testThing : (t2 -> t1) -> t2 -> t2 -> ResultThing where
+      typevar t1 = Thing
+      typevar t2
+    let testThing = |funky, x, y| -> TestType::new <| (funky(x), funky(y))
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "TestType",
+            },
+            "name": "TestType",
+            "range": 29..89,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Import>(1): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "ResultThing",
+            },
+            "name": "ResultThing",
+            "range": 29..89,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Import>(2): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "Thing",
+            },
+            "name": "Thing",
+            "range": 29..89,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Import>(3): {
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "<|",
+            },
+            "name": "<|",
+            "range": 29..89,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "TestType",
+                        sub_path: [
+                            "new",
+                        ],
+                    },
+                ),
+                scope: Idx::<Scope>(2),
+            },
+            "range": 231..245,
+        },
+        Idx::<Expression>(1): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "x",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(2),
+            },
+            "range": 255..256,
+        },
+        Idx::<Expression>(2): {
+            "item": FunctionCall {
+                target: ThisModule(
+                    NonEmpty(
+                        [
+                            "funky",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(2),
+                args: [
+                    Idx::<Expression>(1),
+                ],
+            },
+            "range": 249..257,
+        },
+        Idx::<Expression>(3): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "y",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(2),
+            },
+            "range": 265..266,
+        },
+        Idx::<Expression>(4): {
+            "item": FunctionCall {
+                target: ThisModule(
+                    NonEmpty(
+                        [
+                            "funky",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(2),
+                args: [
+                    Idx::<Expression>(3),
+                ],
+            },
+            "range": 259..267,
+        },
+        Idx::<Expression>(5): {
+            "item": Tuple(
+                NonEmpty(
+                    [
+                        Idx::<Expression>(2),
+                        Idx::<Expression>(4),
+                    ],
+                ),
+            ),
+            "range": 248..268,
+        },
+        Idx::<Expression>(6): {
+            "item": Binary {
+                op: Custom(
+                    OtherModule(
+                        Fqn {
+                            module: NonEmpty(
+                                [
+                                    "test_data",
+                                ],
+                            ),
+                            name: "<|",
+                            sub_path: [],
+                        },
+                    ),
+                ),
+                lhs: Idx::<Expression>(0),
+                rhs: Idx::<Expression>(5),
+            },
+            "range": 231..268,
+        },
+        Idx::<Expression>(7): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                    Idx::<Pattern>(2),
+                ],
+                body: Idx::<Expression>(6),
+            },
+            "name": "testThing",
+            "range": 198..268,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "funky",
+            },
+            "name": "funky",
+            "range": 215..220,
+            "scope_id": Idx::<Scope>(2),
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableDeclaration {
+                name: "x",
+            },
+            "name": "x",
+            "range": 222..223,
+            "scope_id": Idx::<Scope>(2),
+        },
+        Idx::<Pattern>(2): {
+            "item": VariableDeclaration {
+                name: "y",
+            },
+            "name": "y",
+            "range": 225..226,
+            "scope_id": Idx::<Scope>(2),
+        },
+    },
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "t2",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 109..112,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "t1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 115..117,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(0),
+                return_type: Idx::<TypeReference>(1),
+            },
+            "range": 109..117,
+        },
+        Idx::<TypeReference>(3): {
+            "item": ParenthesizedType(
+                Idx::<TypeReference>(2),
+            ),
+            "range": 108..119,
+        },
+        Idx::<TypeReference>(4): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "t2",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 122..125,
+        },
+        Idx::<TypeReference>(5): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "t2",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 128..131,
+        },
+        Idx::<TypeReference>(6): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "test_data",
+                            ],
+                        ),
+                        name: "ResultThing",
+                        sub_path: [],
+                    },
+                ),
+            ),
+            "range": 134..146,
+        },
+        Idx::<TypeReference>(7): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(5),
+                return_type: Idx::<TypeReference>(6),
+            },
+            "range": 128..146,
+        },
+        Idx::<TypeReference>(8): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(4),
+                return_type: Idx::<TypeReference>(7),
+            },
+            "range": 122..146,
+        },
+        Idx::<TypeReference>(9): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(3),
+                return_type: Idx::<TypeReference>(8),
+            },
+            "name": "testThing",
+            "range": 108..146,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Constrained(
+                        [
+                            Trait(
+                                OtherModule(
+                                    Fqn {
+                                        module: NonEmpty(
+                                            [
+                                                "test_data",
+                                            ],
+                                        ),
+                                        name: "Thing",
+                                        sub_path: [],
+                                    },
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+            },
+            "name": "t1",
+            "range": 158..183,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "t2",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t2",
+            "range": 183..198,
+            "scope_id": Idx::<Scope>(1),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]

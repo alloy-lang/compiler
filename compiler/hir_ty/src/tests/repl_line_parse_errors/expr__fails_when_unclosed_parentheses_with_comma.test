@@ -1,0 +1,22 @@
+let foo = 1
+
+(foo,
+===
+InferenceContext {
+    type_map: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+    },
+}
+[
+    ParseError {
+        expected: [
+            RParen,
+        ],
+        kind: Missing {
+            offset: 18,
+        },
+        context: ParenExprRightParen,
+    },
+]

@@ -1,0 +1,62 @@
+import fake::ResultThing
+
+let foo = ResultThing::More::Stuff::here
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "fake",
+                ],
+                last: "ResultThing",
+            },
+            "name": "ResultThing",
+            "range": 0..26,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "fake",
+                            ],
+                        ),
+                        name: "ResultThing",
+                        sub_path: [
+                            "More",
+                            "Stuff",
+                            "here",
+                        ],
+                    },
+                ),
+                scope: Idx::<Scope>(0),
+            },
+            "name": "foo",
+            "range": 26..66,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: EmptyIndex::<TypeReference>,
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 1,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]

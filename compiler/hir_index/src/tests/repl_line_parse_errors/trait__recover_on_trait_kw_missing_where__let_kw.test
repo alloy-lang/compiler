@@ -1,0 +1,21 @@
+trait TestTrait1
+    let a = 1
+end
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            WhereKw,
+        ],
+        kind: Missing {
+            offset: 21,
+        },
+        context: TraitWhere,
+    },
+]

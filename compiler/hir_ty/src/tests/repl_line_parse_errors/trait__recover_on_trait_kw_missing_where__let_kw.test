@@ -1,0 +1,22 @@
+trait TestTrait1
+    let a = 1
+end
+===
+InferenceContext {
+    type_map: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+    },
+}
+[
+    ParseError {
+        expected: [
+            WhereKw,
+        ],
+        kind: Missing {
+            offset: 21,
+        },
+        context: TraitWhere,
+    },
+]

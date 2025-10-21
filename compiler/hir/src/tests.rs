@@ -1,7 +1,17 @@
+use salsa::DebugWithDb;
 use std::path::Path;
 
 use crate::hir::HirModule;
+use crate::AstSourceFile;
 use alloy_ast as ast;
+
+#[derive(Default)]
+#[salsa::db(crate::Jar)]
+pub(crate) struct TestHirDatabase {
+    storage: salsa::Storage<Self>,
+}
+
+impl salsa::Database for TestHirDatabase {}
 
 #[test]
 fn source_file() {
@@ -32,12 +42,14 @@ fn repl_line_parse_errors() {
 }
 
 #[track_caller]
-fn lower_source_file(input: &str) -> (HirModule, Vec<alloy_parser::ParseError>) {
+fn lower_source_file(input: &str) -> (TestHirDatabase, HirModule, Vec<alloy_parser::ParseError>) {
     let (source_file, parse_errors) = ast::source_file(input);
     let source_file = source_file.expect("Failed to parse source file");
 
-    let hir = crate::lower_source_file(&source_file);
-    (hir, parse_errors)
+    let db = TestHirDatabase::default();
+    let source_file = AstSourceFile::new(&db, source_file.into());
+    let hir = crate::lower(&db, source_file);
+    (db, hir, parse_errors)
 }
 
 #[track_caller]
@@ -46,9 +58,9 @@ fn run_hir_test(
     input: &str,
     expect_parse_errors: bool,
     expect_lowering_errors: bool,
-    func: fn(&str) -> (HirModule, Vec<alloy_parser::ParseError>),
+    func: fn(&str) -> (TestHirDatabase, HirModule, Vec<alloy_parser::ParseError>),
 ) -> String {
-    let (module, parse_errors) = func(input);
+    let (db, module, parse_errors) = func(input);
 
     let file_name = path.to_str().expect("Expected filename");
     if expect_parse_errors {
@@ -66,19 +78,19 @@ fn run_hir_test(
     }
     if expect_lowering_errors {
         assert!(
-            !module.errors().is_empty() || !module.warnings().is_empty(),
+            !module.errors(&db).is_empty() || !module.warnings(&db).is_empty(),
             "file '{}' did not contain lowering errors or warnings",
             file_name
         );
     } else {
         assert!(
-            module.errors().is_empty(),
-            "file '{file_name}' contained lowering errors: {:?}",
-            module.errors(),
+            module.errors(&db).is_empty(),
+            "file '{file_name}' contained lowering errors: {:#?}",
+            module.errors(&db),
         );
     }
 
-    format!("{module:#?}\n{parse_errors:#?}")
+    format!("{:#?}\n{parse_errors:#?}", module.debug(&db))
 }
 
 // TODO: continue fixing lowering errors in std lib
@@ -87,9 +99,9 @@ fn test_std_lib() {
     alloy_test_harness::run_std_lib_tests(|path, source| {
         let file_name = path.to_str().expect("Expected filename");
 
-        let (module, parse_errors) = lower_source_file(source);
-        let lowering_warnings = module.warnings();
-        let lowering_errors = module.errors();
+        let (db, module, parse_errors) = lower_source_file(source);
+        let lowering_warnings = module.warnings(&db);
+        let lowering_errors = module.errors(&db);
 
         assert!(
             parse_errors.is_empty(),

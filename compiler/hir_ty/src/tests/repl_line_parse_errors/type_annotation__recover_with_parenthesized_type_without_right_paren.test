@@ -1,0 +1,20 @@
+import test_data::Test
+
+typeof test1 : Test -> String -> (String
+typeof test2 : Test -> String
+===
+InferenceContext {
+    type_map: {},
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+            RParen,
+        ],
+        kind: Missing {
+            offset: 65,
+        },
+        context: ParenthesizedTypeRightParen,
+    },
+]

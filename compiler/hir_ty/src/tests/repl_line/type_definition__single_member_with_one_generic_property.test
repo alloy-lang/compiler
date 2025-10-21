@@ -1,0 +1,6 @@
+typedef Test[t] = Thing t
+===
+InferenceContext {
+    type_map: {},
+}
+[]

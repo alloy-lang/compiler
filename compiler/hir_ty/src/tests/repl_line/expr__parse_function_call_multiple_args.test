@@ -1,0 +1,20 @@
+let x = 0
+let y = 1
+let z = 2
+
+let funky = |x1, y1, z1| -> x1 + y1 + z1
+
+funky(x, y, z)
+===
+{
+    Idx::<Expression>(0): BuiltIn(
+        Int,
+    ),
+    Idx::<Expression>(1): BuiltIn(
+        Int,
+    ),
+    Idx::<Expression>(2): BuiltIn(
+        Int,
+    ),
+}
+[]

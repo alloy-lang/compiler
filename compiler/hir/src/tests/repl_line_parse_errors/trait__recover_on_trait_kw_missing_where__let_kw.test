@@ -3,6 +3,7 @@ trait TestTrait1
 end
 ===
 HirModule {
+    [salsa id]: 0,
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {

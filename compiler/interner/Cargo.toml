@@ -1,0 +1,10 @@
+[package]
+name = "alloy_interner"
+version = "0.1.0"
+authors = ["theochupp <tclchiam@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+lasso = "0.6.0"
+
+[dev-dependencies]

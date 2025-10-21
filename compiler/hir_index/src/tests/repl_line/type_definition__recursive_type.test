@@ -1,0 +1,11 @@
+typedef List =
+  | Cons List
+end
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[]

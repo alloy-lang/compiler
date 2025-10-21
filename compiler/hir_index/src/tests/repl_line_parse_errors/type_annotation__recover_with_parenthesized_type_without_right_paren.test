@@ -1,0 +1,36 @@
+import test_data::Test
+
+typeof test1 : Test -> String -> (String
+typeof test2 : Test -> String
+===
+IndexedModule {
+    imports: {
+        "Test": IndexedImport {
+            segments: [
+                SpannedName(
+                    "test_data",
+                    7..16,
+                ),
+            ],
+            last: SpannedName(
+                "Test",
+                18..22,
+            ),
+        },
+    },
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+            RParen,
+        ],
+        kind: Missing {
+            offset: 65,
+        },
+        context: ParenthesizedTypeRightParen,
+    },
+]

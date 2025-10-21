@@ -1,0 +1,11 @@
+module TestModule1 where
+    import really::really::real::Thing1
+    import really::real::other::Thing2
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[]

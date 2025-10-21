@@ -5,14 +5,14 @@ trait TestTrait1 where
 end
 ===
 HirModule {
+    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "std",
-                ],
-                last: "functor",
-            },
+            "item": Import(
+                Id {
+                    value: 2,
+                },
+            ),
             "name": "functor",
             "range": 0..21,
             "scope_id": Idx::<Scope>(0),

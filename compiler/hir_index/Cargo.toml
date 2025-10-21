@@ -8,7 +8,9 @@ edition = "2018"
 [dependencies]
 alloy_ast = { path = "../ast" }
 non-empty-vec = { workspace = true }
+salsa = { workspace = true }
 text-size = { workspace = true }
+rustc-hash = { workspace = true }
 
 [dev-dependencies]
 alloy_parser = {path = "../parser"}

@@ -1,0 +1,28 @@
+trait TestTrait1 where
+    -- imagine all the things here
+
+    typevar t1
+
+trait TestTrait2 where
+    -- imagine all the things here
+
+    typevar t1
+end
+===
+IndexedModule {
+    imports: {},
+    values: {},
+    warnings: [],
+    errors: [],
+}
+[
+    ParseError {
+        expected: [
+            EndKw,
+        ],
+        kind: Missing {
+            offset: 75,
+        },
+        context: TraitEnd,
+    },
+]

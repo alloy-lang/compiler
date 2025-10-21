@@ -1,0 +1,38 @@
+let funky = |x1, y1, z1| -> x1 + y1 + z1
+
+let x = 1
+let y = 1
+let z = 1
+funky(x y z)
+===
+{
+    Idx::<Expression>(8): BuiltIn(
+        Int,
+    ),
+    Idx::<Expression>(6): BuiltIn(
+        Int,
+    ),
+    Idx::<Expression>(7): BuiltIn(
+        Int,
+    ),
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 80,
+        },
+        context: FunctionCallArgComma,
+    },
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 82,
+        },
+        context: FunctionCallArgComma,
+    },
+]
