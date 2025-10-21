@@ -262,7 +262,7 @@ mod tests {
 
         assert_eq!(
             toml_error.message(),
-            "unknown variant `fake`, expected `Library` or `Binary`"
+            "unknown variant `fake`, expected one of `Library`, `lib`, `Binary`, `bin`"
         );
     }
 }
