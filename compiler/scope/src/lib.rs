@@ -1,13 +1,13 @@
 use la_arena::{Arena, Idx, RawIdx};
 pub type ScopeIdx = Idx<Scope>;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Hash)]
 pub struct Scope {
     parent: ScopeIdx,
     tag: String,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Hash)]
 pub struct Scopes {
     current_scope: ScopeIdx,
     scopes: Arena<Scope>,
@@ -67,7 +67,7 @@ impl Scopes {
     }
 
     #[must_use]
-    pub fn iter(&self) -> ScopesIterator {
+    pub fn iter(&self) -> ScopesIterator<'_> {
         ScopesIterator::new(self)
     }
 }
