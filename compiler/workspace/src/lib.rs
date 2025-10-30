@@ -1,42 +1,26 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-#[salsa::jar(db = WorkspaceDatabase)]
-pub struct Jar(FileSlug, RawSourceFile, Workspace, PackageId, Package);
-
-pub trait WorkspaceDatabase: salsa::DbWithJar<Jar> {
-    fn upcast_workspace(&self) -> &dyn WorkspaceDatabase;
-}
-
-impl<DB> WorkspaceDatabase for DB
-where
-    DB: Sized + salsa::DbWithJar<Jar>,
-{
-    fn upcast_workspace(&self) -> &dyn WorkspaceDatabase {
-        self
-    }
-}
-
-//
-//
-//
+pub trait WorkspaceDatabase: salsa::Database {}
 
 #[salsa::interned]
-pub struct FileSlug {
-    #[return_ref]
-    raw_path: Arc<str>,
+pub struct FileSlug<'db> {
+    #[returns(ref)]
+    pub raw_path: Arc<str>,
 }
 
 #[salsa::input]
 pub struct RawSourceFile {
-    pub slug: FileSlug,
-    #[return_ref]
+    #[returns(ref)]
+    pub raw_path: Arc<str>,
+    #[returns(ref)]
     pub contents: Arc<str>,
 }
 
 #[salsa::input]
 pub struct Workspace {
-    pub files: HashMap<FileSlug, RawSourceFile>,
+    #[returns(ref)]
+    pub files: HashMap<String, RawSourceFile>,
 }
 
 impl Workspace {
@@ -46,18 +30,22 @@ impl Workspace {
 }
 
 #[salsa::interned]
-pub struct PackageId {
+pub struct PackageId<'db> {
+    #[returns(ref)]
     pub raw: Arc<str>,
 }
 
 #[salsa::tracked]
-pub struct Package {
-    pub id: PackageId,
+pub struct Package<'db> {
+    pub id: PackageId<'db>,
+    #[returns(ref)]
     pub files: Vec<RawSourceFile>,
 }
 
-impl Package {
-    pub fn contains(&self, db: &dyn WorkspaceDatabase, slug: FileSlug) -> bool {
-        self.files(db).iter().any(|f| f.slug(db) == slug)
+impl<'db> Package<'db> {
+    pub fn contains(self, db: &'db dyn WorkspaceDatabase, path: &str) -> bool {
+        self.files(db)
+            .iter()
+            .any(|f| f.raw_path(db).as_ref() == path)
     }
 }
