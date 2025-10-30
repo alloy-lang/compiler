@@ -301,7 +301,7 @@ impl<'db> LoweringCtx<'db> {
         self.resolve_reference_segments(&ast_path.segments(), ast_path.range(), reference_type)
     }
 
-    pub(crate) fn resolve_reference_segments(
+    fn resolve_reference_segments(
         &mut self,
         path_segments: &[String],
         path_range: TextRange,
@@ -348,25 +348,38 @@ impl<'db> LoweringCtx<'db> {
                 return Some(Path::OtherModule(fqn));
             }
 
-            let segments = NonEmpty::from((
-                Name::new(first),
-                rest.iter().map(Name::new).collect::<Vec<_>>(),
-            ));
+            let path =
+                self.report_unknown_reference(path_range, reference_type, first, rest, local_name);
 
-            self.error(
-                LoweringErrorKind::UnknownReference {
-                    reference: local_name,
-                    reference_type,
-                    path: segments.clone(),
-                    current_scope: self.scopes.current_scope(),
-                },
-                path_range,
-            );
-
-            return Some(Path::Unknown(segments));
+            return Some(path);
         }
 
         None
+    }
+
+    fn report_unknown_reference(
+        &mut self,
+        path_range: TextRange,
+        reference_type: HirReferenceType,
+        first: &String,
+        rest: &[String],
+        local_name: Name,
+    ) -> Path {
+        let segments = NonEmpty::from((
+            Name::new(first),
+            rest.iter().map(Name::new).collect::<Vec<_>>(),
+        ));
+
+        self.error(
+            LoweringErrorKind::UnknownReference {
+                reference: local_name,
+                reference_type,
+                path: segments.clone(),
+                current_scope: self.scopes.current_scope(),
+            },
+            path_range,
+        );
+        Path::Unknown(segments)
     }
 
     fn resolve_expression_reference(
