@@ -1,10 +1,11 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
+use crate::SourceFile;
 
 #[allow(clippy::module_name_repetitions)]
 pub type PatternIdx = Idx<Pattern>;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Pattern {
     Missing,
     Literal(Literal),
@@ -23,6 +24,11 @@ pub enum Pattern {
     },
     Unit,
     Tuple(NonEmpty<PatternIdx>),
+}
+
+#[salsa::tracked]
+pub fn lower_patterns<'db>(db: &'db dyn HirDatabase, ast: SourceFile) -> Vec<Pattern> {
+    vec![] // Placeholder implementation
 }
 
 pub(super) fn lower_pattern(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> PatternIdx {

@@ -3,7 +3,6 @@ use std::path::Path;
 use crate::IndexedModule;
 use alloy_ast as ast;
 
-#[derive(Default)]
 #[salsa::db]
 pub(crate) struct TestHirIndexDatabase {
     storage: salsa::Storage<Self>,

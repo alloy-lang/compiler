@@ -2,9 +2,9 @@
 members = [
     "compiler",
     "compiler/ast",
-    "compiler/hir",
-    "compiler/hir_index",
-    "compiler/hir_ty",
+     "compiler/hir",
+    # "compiler/hir_index",  # Temporarily disabled due to API changes
+    # "compiler/hir_ty",     # Temporarily disabled due to API changes
     "compiler/lexer",
     "compiler/parser",
     "compiler/project",
@@ -28,7 +28,7 @@ ordered-float = "3.0"
 pretty_assertions = "1.2"
 rowan = "0.15"
 rustc-hash = "1.1"
-salsa = { git = "https://github.com/salsa-rs/salsa", package = "salsa-2022", rev = "05b4e3ebdcdc47730cdd359e7e97fb2470527279" }
+salsa = "0.24.0"
 serde = "1.0"
 text-size = "1.1"
 toml = "0.8"

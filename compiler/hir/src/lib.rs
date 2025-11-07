@@ -1,8 +1,6 @@
 use alloy_ast as ast;
-use alloy_ast::AstElement;
 use non_empty_vec::NonEmpty;
 use std::fmt;
-use std::sync::Arc;
 
 mod ast_glossary;
 mod hir;
@@ -13,96 +11,25 @@ mod index;
 #[cfg(test)]
 mod tests;
 
-pub use hir::lower_source_file;
+#[salsa::db]
+pub trait HirDatabase: salsa::Database {}
 
-#[salsa::jar(db = HirDatabase)]
-pub struct Jar(
-    LoweringErrors,
-    LoweringWarnings,
-    AstSourceFile,
-    lower,
-    HirModule,
-    Import,
-    lower_imports,
-);
-
-pub trait HirDatabase: salsa::DbWithJar<Jar> {
-    fn upcast_hir(&self) -> &dyn HirDatabase;
+#[salsa::input(debug)]
+pub struct SourceFile {
+    #[returns(ref)]
+    pub source_text: String,
 }
 
-impl<DB> HirDatabase for DB
-where
-    DB: Sized + salsa::DbWithJar<Jar>,
-{
-    fn upcast_hir(&self) -> &dyn HirDatabase {
-        self
+impl SourceFile {
+    fn ast(&self, db: &dyn HirDatabase) -> Option<ast::SourceFile> {
+        parse_source_text(self.source_text(db))
     }
 }
 
-#[salsa::input]
-pub struct AstSourceFile {
-    #[return_ref]
-    pub source_file: Arc<ast::SourceFile>,
-}
-
-#[salsa::accumulator]
-pub struct LoweringErrors(LoweringError);
-
-#[salsa::accumulator]
-pub struct LoweringWarnings(LoweringWarning);
-
-#[salsa::tracked]
-pub fn lower(db: &dyn HirDatabase, ast: AstSourceFile) -> HirModule {
-    let mut errors = vec![];
-    // let mut warnings = vec![];
-
-    let imports = lower_imports(db, ast);
-    errors.append(&mut lower_imports::accumulated::<LoweringErrors>(db, ast));
-    // let type_definitions = lower_type_definitions(db, ast);
-    // let traits = lower_traits(db, ast);
-    // let behaviors = lower_behaviors(db, ast);
-    // let values = lower_values(db, ast);
-
-    lower_source_file(db, ast.source_file(db))
-}
-
-#[salsa::tracked]
-pub fn lower_imports(db: &dyn HirDatabase, ast: AstSourceFile) -> Vec<Import> {
-    let source_file = ast.source_file(db);
-
+// Helper function to parse source text (not a salsa function due to AST Send/Sync issues)
+fn parse_source_text(source_text: &str) -> Option<ast::SourceFile> {
+    let (source_file, _errors) = alloy_ast::source_file(source_text);
     source_file
-        .statements()
-        .iter()
-        .filter_map(|stmt| match stmt {
-            ast::Statement::ImportDef(i) => Some(i),
-            _ => None,
-        })
-        .flat_map(|ast_import| {
-            let children = ast_import
-                .children()
-                .into_iter()
-                .enumerate()
-                .collect::<Vec<_>>();
-            let Some(((_, first), rest)) = children.split_first() else {
-                unreachable!("parsing error")
-            };
-
-            let mut imports = vec![];
-            match gather_all_import_segments(first, rest) {
-                Ok(all_import_segments) => {
-                    for import_segments in all_import_segments {
-                        let (last, path) = import_segments.split_last();
-                        imports.push(Import::new(db, path.to_vec(), last.clone()));
-                    }
-                }
-                Err(error) => {
-                    LoweringErrors::push(db, LoweringError::new(error, ast_import.range()));
-                }
-            };
-
-            imports
-        })
-        .collect()
 }
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]

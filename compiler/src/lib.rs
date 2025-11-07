@@ -15,8 +15,8 @@ use std::collections::HashMap;
 // output:
 // - Vec<u8>
 
-pub struct CompilationTarget {
-    entrypoint: Option<FileSlug>,
+pub struct CompilationTarget<'db> {
+    entrypoint: Option<FileSlug<'db>>,
     _type: CompilationTargetType,
 }
 pub enum CompilationTargetType {
@@ -29,17 +29,17 @@ pub struct PackageMetadata {
     name: String,
 }
 
-pub fn compile(
-    db: &dyn db::CompilerDatabase,
+pub fn compile<'db>(
+    db: &'db dyn db::CompilerDatabase,
     external_packages: &[PackageMetadata],
-    current_package: Package,
-    target: CompilationTarget,
+    current_package: Package<'db>,
+    _target: CompilationTarget<'db>,
 ) {
     let workspace = build_workspace(db, external_packages, current_package);
 
     let mut parse_errors = HashMap::new();
-    for (slug, source_file) in workspace.files(db.upcast_workspace()) {
-        let (_, errs) = alloy_ast::source_file(source_file.contents(db.upcast_workspace()));
+    for (slug, source_file) in workspace.files(db) {
+        let (_, errs) = alloy_ast::source_file(source_file.contents(db));
         parse_errors.insert(slug, errs);
     }
 
@@ -90,16 +90,16 @@ pub fn compile(
     // IR generation shouldn't generate for anything not referenced by the entrypoints (defined above)
 }
 
-fn build_workspace(
-    db: &dyn db::CompilerDatabase,
+fn build_workspace<'db>(
+    db: &'db dyn db::CompilerDatabase,
     _external_packages: &[PackageMetadata],
-    current_package: Package,
+    current_package: Package<'db>,
 ) -> Workspace {
     let files = current_package
-        .files(db.upcast_workspace())
+        .files(db)
         .iter()
-        .map(|file| (file.slug(db.upcast_workspace()), *file))
+        .map(|file| (file.raw_path(db).to_string(), *file))
         .collect();
 
-    Workspace::new(db.upcast_workspace(), files)
+    Workspace::new(db, files)
 }

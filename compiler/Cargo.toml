@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 alloy_ast = { path = "./ast" }
-alloy_hir = { path = "./hir" }
+# alloy_hir = { path = "./hir" }  # Complex migration in progress
 alloy_lexer = { path = "./lexer" }
 alloy_parser = { path = "./parser" }
 alloy_syntax = { path = "./syntax" }

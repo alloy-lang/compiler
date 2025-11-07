@@ -85,49 +85,6 @@ impl<T: fmt::Debug> fmt::Debug for Index<T> {
     }
 }
 
-impl<T: fmt::Debug> salsa::DebugWithDb<<crate::Jar as salsa::jar::Jar<'_>>::DynDb> for Index<T> {
-    fn fmt(
-        &self,
-        f: &mut fmt::Formatter<'_>,
-        db: &<crate::Jar as salsa::jar::Jar<'_>>::DynDb,
-    ) -> fmt::Result {
-        let mut type_name = std::any::type_name::<T>();
-        if let Some(idx) = type_name.rfind(':') {
-            type_name = &type_name[idx + 1..];
-        }
-
-        if self.is_empty() {
-            return f
-                .debug_struct(&format!("EmptyIndex::<{type_name}>"))
-                .finish();
-        }
-
-        let mut debug_struct = f.debug_struct(&format!("Index::<{type_name}>"));
-        for (id, item, range, name_info) in self.iter() {
-            use ::salsa::debug::helper::Fallback;
-
-            let mut properties: BTreeMap<&str, &dyn fmt::Debug> = BTreeMap::new();
-            let debug_with = salsa::debug::helper::SalsaDebug::<
-                T,
-                <crate::Jar as salsa::jar::Jar<'_>>::DynDb,
-            >::salsa_debug(&item, db);
-            properties.insert("item", &debug_with);
-            properties.insert("range", &range);
-
-            if let Some((name, scope_id)) = name_info {
-                properties.insert("name", &name);
-                properties.insert("scope_id", &scope_id);
-                // this is duplicated because borrowing is a little funky in an if statement
-                debug_struct.field(&format!("{id:?}"), &properties);
-            } else {
-                debug_struct.field(&format!("{id:?}"), &properties);
-            }
-        }
-
-        debug_struct.finish()
-    }
-}
-
 #[derive(Debug)]
 pub(crate) struct DuplicateNameError {
     pub(crate) name: Name,

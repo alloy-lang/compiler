@@ -1,5 +1,6 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
+use crate::SourceFile;
 
 pub type TypeDefinitionIdx = Idx<TypeDefinition>;
 
@@ -22,6 +23,14 @@ pub enum TypeDefinitionKind {
 pub struct TypeDefinitionMember {
     name: Name,
     properties: Vec<TypeIdx>,
+}
+
+#[salsa::tracked]
+pub fn lower_type_definitions<'db>(
+    db: &'db dyn HirDatabase,
+    ast: SourceFile,
+) -> Vec<TypeDefinition> {
+    vec![] // Placeholder implementation
 }
 
 pub(super) fn lower_type_definition(ctx: &mut LoweringCtx, ast: &ast::TypeDefinition) {

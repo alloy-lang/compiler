@@ -1,13 +1,57 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
+use crate::{parse_source_text, SourceFile};
+use salsa::Accumulator;
 
 #[allow(clippy::module_name_repetitions)]
-pub type ImportIdx = Idx<Import>;
+pub type ImportIdx<'db> = Idx<Import<'db>>;
 
-#[salsa::tracked]
-pub struct Import {
+#[salsa::tracked(debug)]
+pub struct Import<'db> {
+    #[returns(ref)]
     pub segments: Vec<Name>,
     pub last: Name,
+}
+
+#[salsa::tracked]
+pub fn lower_imports<'db>(db: &'db dyn HirDatabase, ast: SourceFile) -> Vec<Import<'db>> {
+    let Some(source_file) = parse_source_text(ast.source_text(db)) else {
+        return vec![];
+    };
+
+    source_file
+        .statements()
+        .iter()
+        .filter_map(|stmt| match stmt {
+            ast::Statement::ImportDef(i) => Some(i),
+            _ => None,
+        })
+        .flat_map(|ast_import| {
+            let children = ast_import
+                .children()
+                .into_iter()
+                .enumerate()
+                .collect::<Vec<_>>();
+            let Some(((_, first), rest)) = children.split_first() else {
+                unreachable!("parsing error")
+            };
+
+            let mut imports = vec![];
+            match gather_all_import_segments(first, rest) {
+                Ok(all_import_segments) => {
+                    for import_segments in all_import_segments {
+                        let (last, path) = import_segments.split_last();
+                        imports.push(Import::new(db, path.to_vec(), last.clone()));
+                    }
+                }
+                Err(error) => {
+                    LoweringError::new(error, ast_import.range()).accumulate(db);
+                }
+            };
+
+            imports
+        })
+        .collect()
 }
 
 pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
