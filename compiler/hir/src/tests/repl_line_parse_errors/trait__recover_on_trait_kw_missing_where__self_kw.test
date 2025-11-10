@@ -7,11 +7,13 @@ end
 HirModule {
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import(
-                Id {
-                    value: 2,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "std",
+                    "functor",
+                ],
+                last: "Functor",
+            },
             "name": "Functor",
             "range": 0..30,
             "scope_id": Idx::<Scope>(0),

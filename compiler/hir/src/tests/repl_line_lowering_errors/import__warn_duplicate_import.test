@@ -6,11 +6,13 @@ let thing = map
 HirModule {
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import(
-                Id {
-                    value: 3,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "std",
+                    "functor",
+                ],
+                last: "map",
+            },
             "name": "map",
             "range": 0..25,
             "scope_id": Idx::<Scope>(0),
@@ -53,10 +55,9 @@ HirModule {
             ],
         },
     },
-    warnings: [],
-    errors: [
-        LoweringError {
-            kind: ConflictingImport {
+    warnings: [
+        LoweringWarning {
+            kind: DuplicateImport {
                 name: "map",
                 first: 0..25,
                 second: 25..51,
@@ -64,5 +65,6 @@ HirModule {
             range: 25..51,
         },
     ],
+    errors: [],
 }
 []

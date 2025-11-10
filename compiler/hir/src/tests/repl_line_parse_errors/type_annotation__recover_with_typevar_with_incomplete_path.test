@@ -8,21 +8,23 @@ typeof test : t1 -> t2 -> Test where
 HirModule {
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import(
-                Id {
-                    value: 3,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "Test",
+            },
             "name": "Test",
             "range": 0..23,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
-            "item": Import(
-                Id {
-                    value: 4,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "std",
+                ],
+                last: "functor",
+            },
             "name": "functor",
             "range": 23..44,
             "scope_id": Idx::<Scope>(0),

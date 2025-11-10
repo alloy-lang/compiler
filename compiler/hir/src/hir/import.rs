@@ -1,57 +1,31 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
-use crate::{parse_source_text, SourceFile};
-use salsa::Accumulator;
 
 #[allow(clippy::module_name_repetitions)]
-pub type ImportIdx<'db> = Idx<Import<'db>>;
+pub type ImportIdx = Idx<Import>;
 
-#[salsa::tracked(debug)]
-pub struct Import<'db> {
-    #[returns(ref)]
-    pub segments: Vec<Name>,
-    pub last: Name,
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Import {
+    segments: Vec<Name>,
+    last: Name,
 }
 
-#[salsa::tracked]
-pub fn lower_imports<'db>(db: &'db dyn HirDatabase, ast: SourceFile) -> Vec<Import<'db>> {
-    let Some(source_file) = parse_source_text(ast.source_text(db)) else {
-        return vec![];
-    };
+impl Import {
+    pub(super) fn new(segments: &NonEmpty<Name>) -> Self {
+        let (last, path) = segments.split_last();
+        Self {
+            segments: path.to_vec(),
+            last: last.clone(),
+        }
+    }
 
-    source_file
-        .statements()
-        .iter()
-        .filter_map(|stmt| match stmt {
-            ast::Statement::ImportDef(i) => Some(i),
-            _ => None,
-        })
-        .flat_map(|ast_import| {
-            let children = ast_import
-                .children()
-                .into_iter()
-                .enumerate()
-                .collect::<Vec<_>>();
-            let Some(((_, first), rest)) = children.split_first() else {
-                unreachable!("parsing error")
-            };
+    pub fn last(&self) -> &Name {
+        &self.last
+    }
 
-            let mut imports = vec![];
-            match gather_all_import_segments(first, rest) {
-                Ok(all_import_segments) => {
-                    for import_segments in all_import_segments {
-                        let (last, path) = import_segments.split_last();
-                        imports.push(Import::new(db, path.to_vec(), last.clone()));
-                    }
-                }
-                Err(error) => {
-                    LoweringError::new(error, ast_import.range()).accumulate(db);
-                }
-            };
-
-            imports
-        })
-        .collect()
+    pub fn segments(&self) -> &[Name] {
+        &self.segments
+    }
 }
 
 pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
@@ -76,7 +50,7 @@ pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
     }
 }
 
-pub(crate) fn gather_all_import_segments(
+fn gather_all_import_segments(
     first: &ast::ImportDefChild,
     rest: &[(usize, ast::ImportDefChild)],
 ) -> Result<Vec<NonEmpty<Name>>, LoweringErrorKind> {

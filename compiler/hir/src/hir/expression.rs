@@ -1,6 +1,5 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
-use crate::SourceFile;
 
 #[allow(clippy::module_name_repetitions)]
 pub type ExpressionIdx = Idx<Expression>;
@@ -65,11 +64,6 @@ pub enum BinaryOp {
 #[derive(Debug, Clone, PartialEq)]
 pub enum UnaryOp {
     Neg,
-}
-
-#[salsa::tracked]
-pub fn lower_expressions<'db>(db: &'db dyn HirDatabase, ast: SourceFile) -> Vec<Expression> {
-    vec![] // Placeholder implementation
 }
 
 pub(super) fn lower_expression(ctx: &mut LoweringCtx, ast: &ast::Expression) -> ExpressionIdx {

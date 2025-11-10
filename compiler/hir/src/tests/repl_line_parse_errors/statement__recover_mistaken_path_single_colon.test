@@ -5,11 +5,12 @@ let foo = ResultThing:More:Stuff:here
 HirModule {
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import(
-                Id {
-                    value: 2,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "ResultThing",
+            },
             "name": "ResultThing",
             "range": 0..31,
             "scope_id": Idx::<Scope>(0),

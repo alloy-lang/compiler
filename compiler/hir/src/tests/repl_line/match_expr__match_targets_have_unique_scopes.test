@@ -8,21 +8,24 @@ match test when
 HirModule {
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import(
-                Id {
-                    value: 3,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "std",
+                    "either",
+                ],
+                last: "Either",
+            },
             "name": "Either",
             "range": 0..27,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
-            "item": Import(
-                Id {
-                    value: 4,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "test",
+            },
             "name": "test",
             "range": 27..51,
             "scope_id": Idx::<Scope>(0),

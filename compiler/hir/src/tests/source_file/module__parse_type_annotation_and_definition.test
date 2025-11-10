@@ -9,41 +9,45 @@ module TestModule1 where
 HirModule {
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import(
-                Id {
-                    value: 1,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "TestType",
+            },
             "name": "TestType",
             "range": 29..89,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
-            "item": Import(
-                Id {
-                    value: 2,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "ResultThing",
+            },
             "name": "ResultThing",
             "range": 29..89,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(2): {
-            "item": Import(
-                Id {
-                    value: 3,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "Thing",
+            },
             "name": "Thing",
             "range": 29..89,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(3): {
-            "item": Import(
-                Id {
-                    value: 4,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "<|",
+            },
             "name": "<|",
             "range": 29..89,
             "scope_id": Idx::<Scope>(0),

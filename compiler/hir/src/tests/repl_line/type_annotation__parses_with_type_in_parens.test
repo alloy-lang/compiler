@@ -5,11 +5,12 @@ typeof test : Test -> (String)
 HirModule {
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import(
-                Id {
-                    value: 2,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "test_data",
+                ],
+                last: "Test",
+            },
             "name": "Test",
             "range": 0..24,
             "scope_id": Idx::<Scope>(0),

@@ -1,10 +1,5 @@
-use crate::{
-    lower_expressions, lower_imports, lower_patterns, lower_type_definitions,
-    lower_type_references, Expression, Import, LoweringError, LoweringWarning, Pattern, SourceFile,
-    TypeDefinition, TypeReference,
-};
-use alloy_scope::Scopes;
-use salsa::plumbing::DatabaseDownCaster;
+use crate::hir::HirModule;
+use alloy_ast as ast;
 use std::path::Path;
 
 #[salsa::db]
@@ -47,81 +42,16 @@ fn repl_line_parse_errors() {
     });
 }
 
-#[derive(Debug)]
-pub struct HirModule<'db> {
-    pub imports: Vec<Import<'db>>,
-    pub expressions: Vec<Expression>,
-    pub patterns: Vec<Pattern>,
-    pub type_references: Vec<TypeReference>,
-    pub type_definitions: Vec<TypeDefinition>,
-    pub scopes: Scopes,
-    pub warnings: Vec<LoweringWarning>,
-    pub errors: Vec<LoweringError>,
-}
-
 #[track_caller]
 fn lower_source_file<'db>(
     db: &'db dyn crate::HirDatabase,
     input: &str,
-) -> (HirModule<'db>, Vec<alloy_parser::ParseError>) {
-    let (_, parse_errors) = alloy_ast::source_file(input);
-    let hir = lower_inner(db, input);
+) -> (HirModule, Vec<alloy_parser::ParseError>) {
+    let (source_file, parse_errors) = ast::source_file(input);
+    let source_file = source_file.expect("Failed to parse source file");
 
+    let hir = crate::lower_source_file(db, &source_file);
     (hir, parse_errors)
-}
-
-#[track_caller]
-fn lower_inner<'db>(db: &'db dyn crate::HirDatabase, input: &str) -> HirModule<'db> {
-    let mut errors = vec![];
-
-    let source_file = SourceFile::new(db, input.to_string());
-    let imports = lower_imports(db, source_file);
-    errors.append(
-        &mut lower_imports::accumulated::<LoweringError>(db, source_file)
-            .into_iter()
-            .cloned()
-            .collect(),
-    );
-
-    let expressions = lower_expressions(db, source_file);
-    errors.append(
-        &mut lower_expressions::accumulated::<LoweringError>(db, source_file)
-            .into_iter()
-            .cloned()
-            .collect(),
-    );
-    let patterns = lower_patterns(db, source_file);
-    errors.append(
-        &mut lower_patterns::accumulated::<LoweringError>(db, source_file)
-            .into_iter()
-            .cloned()
-            .collect(),
-    );
-    let type_references = lower_type_references(db, source_file);
-    errors.append(
-        &mut lower_type_references::accumulated::<LoweringError>(db, source_file)
-            .into_iter()
-            .cloned()
-            .collect(),
-    );
-    let type_definitions = lower_type_definitions(db, source_file);
-    errors.append(
-        &mut lower_type_definitions::accumulated::<LoweringError>(db, source_file)
-            .into_iter()
-            .cloned()
-            .collect(),
-    );
-
-    HirModule {
-        imports,
-        expressions,
-        patterns,
-        type_references,
-        type_definitions,
-        scopes: Default::default(),
-        warnings: vec![],
-        errors,
-    }
 }
 
 #[track_caller]
@@ -150,15 +80,15 @@ fn run_hir_test<'db>(
     }
     if expect_lowering_errors {
         assert!(
-            !module.errors.is_empty() || !module.warnings.is_empty(),
+            !module.errors().is_empty() || !module.warnings().is_empty(),
             "file '{}' did not contain lowering errors or warnings",
             file_name
         );
     } else {
         assert!(
-            module.errors.is_empty(),
+            module.errors().is_empty(),
             "file '{file_name}' contained lowering errors: {:#?}",
-            module.errors,
+            module.errors(),
         );
     }
 
@@ -173,8 +103,8 @@ fn test_std_lib() {
 
         let db = TestHirDatabase::default();
         let (module, parse_errors) = lower_source_file(&db, source);
-        let lowering_warnings = module.warnings;
-        let lowering_errors = module.errors;
+        let lowering_warnings = module.warnings();
+        let lowering_errors = module.errors();
 
         assert!(
             parse_errors.is_empty(),

@@ -3,11 +3,13 @@ import std::functor::map
 HirModule {
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import(
-                Id {
-                    value: 2,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "std",
+                    "functor",
+                ],
+                last: "map",
+            },
             "name": "map",
             "range": 0..24,
             "scope_id": Idx::<Scope>(0),
@@ -32,11 +34,13 @@ HirModule {
     warnings: [
         LoweringWarning {
             kind: UnusedImport {
-                import: Import(
-                    Id {
-                        value: 2,
-                    },
-                ),
+                import: Import {
+                    segments: [
+                        "std",
+                        "functor",
+                    ],
+                    last: "map",
+                },
             },
             range: 0..24,
         },

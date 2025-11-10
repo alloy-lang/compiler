@@ -14,24 +14,6 @@ mod tests;
 #[salsa::db]
 pub trait HirDatabase: salsa::Database {}
 
-#[salsa::input(debug)]
-pub struct SourceFile {
-    #[returns(ref)]
-    pub source_text: String,
-}
-
-impl SourceFile {
-    fn ast(&self, db: &dyn HirDatabase) -> Option<ast::SourceFile> {
-        parse_source_text(self.source_text(db))
-    }
-}
-
-// Helper function to parse source text (not a salsa function due to AST Send/Sync issues)
-fn parse_source_text(source_text: &str) -> Option<ast::SourceFile> {
-    let (source_file, _errors) = alloy_ast::source_file(source_text);
-    source_file
-}
-
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Name(String);
 

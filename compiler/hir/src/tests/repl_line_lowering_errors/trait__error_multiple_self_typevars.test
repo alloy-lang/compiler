@@ -8,21 +8,23 @@ end
 HirModule {
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import(
-                Id {
-                    value: 3,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "std",
+                ],
+                last: "functor",
+            },
             "name": "functor",
             "range": 0..30,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
-            "item": Import(
-                Id {
-                    value: 4,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "std",
+                ],
+                last: "debug",
+            },
             "name": "debug",
             "range": 0..30,
             "scope_id": Idx::<Scope>(0),
@@ -69,21 +71,23 @@ HirModule {
     warnings: [
         LoweringWarning {
             kind: UnusedImport {
-                import: Import(
-                    Id {
-                        value: 3,
-                    },
-                ),
+                import: Import {
+                    segments: [
+                        "std",
+                    ],
+                    last: "functor",
+                },
             },
             range: 0..30,
         },
         LoweringWarning {
             kind: UnusedImport {
-                import: Import(
-                    Id {
-                        value: 4,
-                    },
-                ),
+                import: Import {
+                    segments: [
+                        "std",
+                    ],
+                    last: "debug",
+                },
             },
             range: 0..30,
         },

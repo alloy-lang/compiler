@@ -1,6 +1,5 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
-use crate::SourceFile;
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -47,11 +46,6 @@ pub enum TypeReference {
         base: TypeIdx,
         args: Vec<TypeIdx>,
     },
-}
-
-#[salsa::tracked]
-pub fn lower_type_references<'db>(db: &'db dyn HirDatabase, ast: SourceFile) -> Vec<TypeReference> {
-    vec![] // Placeholder implementation
 }
 
 pub(super) fn lower_type_reference(ctx: &mut LoweringCtx, ast: &ast::Type) -> TypeIdx {

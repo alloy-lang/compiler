@@ -76,7 +76,29 @@ pub enum HirReferenceType {
     Type,
 }
 
-#[salsa::accumulator]
+#[allow(clippy::module_name_repetitions)]
+#[derive(Debug)]
+pub struct HirModule {
+    imports: Index<Import>,
+    expressions: Index<Expression>,
+    patterns: Index<Pattern>,
+    type_references: Index<TypeReference>,
+    type_definitions: Index<TypeDefinition>,
+    scopes: Scopes,
+    warnings: Vec<LoweringWarning>,
+    errors: Vec<LoweringError>,
+}
+
+impl HirModule {
+    pub fn warnings(&self) -> &[LoweringWarning] {
+        &self.warnings
+    }
+
+    pub fn errors(&self) -> &[LoweringError] {
+        &self.errors
+    }
+}
+
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct LoweringError {
     kind: LoweringErrorKind,
@@ -136,7 +158,6 @@ pub enum LoweringErrorKind {
     CharLiteralInvalid,
 }
 
-#[salsa::accumulator]
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct LoweringWarning {
     kind: LoweringWarningKind,
@@ -151,20 +172,20 @@ pub enum LoweringWarningKind {
         second: TextRange,
     },
     UnusedImport {
-        // import: Import,
+        import: Import,
     },
 }
 
 struct LoweringCtx<'db> {
     db: &'db dyn HirDatabase,
     glossary: AstGlossary,
-    imports: Index<Import<'db>>,
+    imports: Index<Import>,
     expressions: Index<Expression>,
     patterns: Index<Pattern>,
     type_references: Index<TypeReference>,
     type_definitions: Index<TypeDefinition>,
     scopes: Scopes,
-    used_imports: HashSet<ImportIdx<'db>>,
+    used_imports: HashSet<ImportIdx>,
     warnings: Vec<LoweringWarning>,
     errors: Vec<LoweringError>,
 }
@@ -186,31 +207,32 @@ impl<'db> LoweringCtx<'db> {
         }
     }
 
-    // fn finish(self) -> HirModule {
-    //     let mut warnings = self.warnings;
-    //
-    //     for (id, import, _, _) in self.imports.iter() {
-    //         if !self.used_imports.contains(&id) {
-    //             let warn = LoweringWarningKind::UnusedImport { import: *import };
-    //             warnings.push(LoweringWarning {
-    //                 kind: warn,
-    //                 range: self.imports.get_range(id),
-    //             });
-    //         }
-    //     }
-    //
-    //     HirModule::new(
-    //         self.db,
-    //         self.imports.into(),
-    //         self.expressions.into(),
-    //         self.patterns.into(),
-    //         self.type_references.into(),
-    //         self.type_definitions.into(),
-    //         self.scopes.into(),
-    //         warnings,
-    //         self.errors,
-    //     )
-    // }
+    fn finish(self) -> HirModule {
+        let mut warnings = self.warnings;
+
+        for (id, import, _, _) in self.imports.iter() {
+            if !self.used_imports.contains(&id) {
+                let warn = LoweringWarningKind::UnusedImport {
+                    import: import.clone(),
+                };
+                warnings.push(LoweringWarning {
+                    kind: warn,
+                    range: self.imports.get_range(id),
+                });
+            }
+        }
+
+        HirModule {
+            imports: self.imports,
+            expressions: self.expressions,
+            patterns: self.patterns,
+            type_references: self.type_references,
+            type_definitions: self.type_definitions,
+            scopes: self.scopes,
+            warnings,
+            errors: self.errors,
+        }
+    }
 
     pub(crate) fn resolve_reference_path(
         &mut self,
@@ -259,7 +281,7 @@ impl<'db> LoweringCtx<'db> {
 
                 let import = self.imports.get(import_id);
                 let fqn = Fqn::new(
-                    import.segments(self.db).iter().cloned(),
+                    import.segments().iter().cloned(),
                     local_name.clone(),
                     rest.to_vec(),
                 );
@@ -505,8 +527,8 @@ impl<'db> LoweringCtx<'db> {
     }
 
     pub(crate) fn add_import(&mut self, segments: &NonEmpty<Name>, element: &SyntaxElement) {
-        let (last, path) = segments.split_last();
-        let new_import = Import::new(self.db, path.to_vec(), last.clone());
+        let new_import = Import::new(segments);
+        let last = segments.last();
 
         if let Some(existing_id) = self.imports.get_id(last, &self.scopes) {
             let existing_import = self.imports.get(existing_id);
@@ -557,17 +579,17 @@ impl<'db> LoweringCtx<'db> {
     }
 }
 
-// #[must_use]
-// pub fn lower_source_file<'db>(
-//     db: &'db dyn HirDatabase,
-//     source_file: &ast::SourceFile,
-// ) -> HirModule<'db> {
-//     let glossary = AstGlossary::summarize_source_file(source_file);
-//
-//     let mut ctx = LoweringCtx::new(db, glossary);
-//     source_file::lower_source_file(&mut ctx, source_file);
-//     ctx.finish()
-// }
+#[must_use]
+pub fn lower_source_file<'db>(
+    db: &'db dyn HirDatabase,
+    source_file: &ast::SourceFile,
+) -> HirModule {
+    let glossary = AstGlossary::summarize_source_file(source_file);
+
+    let mut ctx = LoweringCtx::new(db, glossary);
+    source_file::lower_source_file(&mut ctx, source_file);
+    ctx.finish()
+}
 
 impl<'db> LoweringCtx<'db> {
     fn warning(&mut self, kind: LoweringWarningKind, range: TextRange) {

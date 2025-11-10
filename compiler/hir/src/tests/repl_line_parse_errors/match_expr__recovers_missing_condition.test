@@ -7,21 +7,27 @@ match when
 HirModule {
     imports: Index::<Import> {
         Idx::<Import>(0): {
-            "item": Import(
-                Id {
-                    value: 3,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "std",
+                    "bool",
+                    "Bool",
+                ],
+                last: "True",
+            },
             "name": "True",
             "range": 0..39,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
-            "item": Import(
-                Id {
-                    value: 4,
-                },
-            ),
+            "item": Import {
+                segments: [
+                    "std",
+                    "bool",
+                    "Bool",
+                ],
+                last: "False",
+            },
             "name": "False",
             "range": 0..39,
             "scope_id": Idx::<Scope>(0),
