@@ -1,5 +1,13 @@
+typedef Type1 = Thing
+
+trait Trait1 where
+    -- empty
+end
+
 behavior Trait1[t1, t2] for Type1 where
-    -- imagine all the things here
+    typevar t1
+    typevar t2
+    -- TODO: I don't think these cases make sense?
 end
 ===
 InferenceContext {

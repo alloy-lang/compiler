@@ -1,3 +1,5 @@
+typedef Type1 = Thing
+
 behavior Trait1 Type1 where
     -- imagine all the things here
 end
@@ -10,9 +12,48 @@ HirModule {
     imports: EmptyIndex::<Import>,
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,
-    type_references: EmptyIndex::<TypeReference>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "Trait1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 32..39,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "Type1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 39..45,
+        },
+    },
     type_definitions: Index::<TypeDefinition> {
         Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "Type1",
+                kind: Single(
+                    TypeDefinitionMember {
+                        name: "Thing",
+                        properties: [],
+                    },
+                ),
+            },
+            "name": "Type1",
+            "range": 0..23,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeDefinition>(1): {
             "item": TypeDefinition {
                 name: "Trait1",
                 kind: Trait(
@@ -26,14 +67,14 @@ HirModule {
                 ),
             },
             "name": "Trait1",
-            "range": 68..125,
+            "range": 91..148,
             "scope_id": Idx::<Scope>(0),
         },
     },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 2,
+            len: 4,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -41,7 +82,15 @@ HirModule {
                 },
                 Scope {
                     parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
                     tag: "trait",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "behavior",
                 },
             ],
         },
@@ -55,7 +104,7 @@ HirModule {
             ForKw,
         ],
         kind: Missing {
-            offset: 16,
+            offset: 39,
         },
         context: BehaviorFor,
     },

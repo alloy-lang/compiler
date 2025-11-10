@@ -1,3 +1,13 @@
+typedef Type1 = Thing
+
+trait TestTrait1 where
+    -- empty
+end
+
+trait TestTrait2 where
+    -- empty
+end
+
 behavior TestTrait1 for Type1 where
     -- imagine all the things here
 
@@ -13,16 +23,156 @@ HirModule {
     imports: EmptyIndex::<Import>,
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,
-    type_references: EmptyIndex::<TypeReference>,
-    type_definitions: EmptyIndex::<TypeDefinition>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "TestTrait1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 114..125,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "Type1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 129..135,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "TestTrait2",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 202..213,
+        },
+        Idx::<TypeReference>(3): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "Type1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 217..223,
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "Type1",
+                kind: Single(
+                    TypeDefinitionMember {
+                        name: "Thing",
+                        properties: [],
+                    },
+                ),
+            },
+            "name": "Type1",
+            "range": 0..23,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "TestTrait1",
+                kind: Trait(
+                    Trait {
+                        name: "TestTrait1",
+                        self_constraints: [],
+                        named_type_variables: {},
+                        type_annotations: {},
+                        values: {},
+                    },
+                ),
+            },
+            "name": "TestTrait1",
+            "range": 23..64,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeDefinition>(2): {
+            "item": TypeDefinition {
+                name: "TestTrait2",
+                kind: Trait(
+                    Trait {
+                        name: "TestTrait2",
+                        self_constraints: [],
+                        named_type_variables: {},
+                        type_annotations: {},
+                        values: {},
+                    },
+                ),
+            },
+            "name": "TestTrait2",
+            "range": 64..105,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeDefinition>(3): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t1",
+            "range": 181..193,
+            "scope_id": Idx::<Scope>(4),
+        },
+        Idx::<TypeDefinition>(4): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t1",
+            "range": 269..280,
+            "scope_id": Idx::<Scope>(5),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 1,
+            len: 6,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "trait",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "trait",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "behavior",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "behavior",
                 },
             ],
         },
@@ -36,7 +186,7 @@ HirModule {
             EndKw,
         ],
         kind: Missing {
-            offset: 88,
+            offset: 193,
         },
         context: BehaviorEnd,
     },

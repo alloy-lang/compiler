@@ -1,21 +1,92 @@
+import other
+
+trait Trait1 where
+    -- empty
+end
+
 behavior Trait1 for other::Type1 where
     -- imagine all the things here
 end
 ===
 HirModule {
-    imports: EmptyIndex::<Import>,
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [],
+                last: "other",
+            },
+            "name": "other",
+            "range": 0..14,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,
-    type_references: EmptyIndex::<TypeReference>,
-    type_definitions: EmptyIndex::<TypeDefinition>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "Trait1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 60..67,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [],
+                        ),
+                        name: "other",
+                        sub_path: [
+                            "Type1",
+                        ],
+                    },
+                ),
+            ),
+            "range": 71..84,
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "Trait1",
+                kind: Trait(
+                    Trait {
+                        name: "Trait1",
+                        self_constraints: [],
+                        named_type_variables: {},
+                        type_annotations: {},
+                        values: {},
+                    },
+                ),
+            },
+            "name": "Trait1",
+            "range": 14..51,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 1,
+            len: 3,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "trait",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "behavior",
                 },
             ],
         },

@@ -1,5 +1,5 @@
 behavior Trait1[t1, t2] for Type1 where
-    -- imagine all the things here
+    -- TODO: I don't think these cases make sense?
 end
 ===
 IndexedModule {

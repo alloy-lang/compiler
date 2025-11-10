@@ -1,7 +1,7 @@
-behavior Trait1 for Type1 where
+behavior TestTrait1 for Type1 where
     -- imagine all the things here
 
-trait Trait1 where
+trait TestTrait1 where
     -- imagine all the things here
 end
 ===

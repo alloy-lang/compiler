@@ -1,3 +1,5 @@
+typedef Type1 = Thing
+
 behavior Trait1 for where
     -- imagine all the things here
 end
@@ -14,6 +16,20 @@ HirModule {
     type_definitions: Index::<TypeDefinition> {
         Idx::<TypeDefinition>(0): {
             "item": TypeDefinition {
+                name: "Type1",
+                kind: Single(
+                    TypeDefinitionMember {
+                        name: "Thing",
+                        properties: [],
+                    },
+                ),
+            },
+            "name": "Type1",
+            "range": 0..23,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
                 name: "Trait1",
                 kind: Trait(
                     Trait {
@@ -26,18 +42,22 @@ HirModule {
                 ),
             },
             "name": "Trait1",
-            "range": 66..123,
+            "range": 89..146,
             "scope_id": Idx::<Scope>(0),
         },
     },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 2,
+            len: 3,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
                 },
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -56,7 +76,7 @@ HirModule {
             LParen,
         ],
         kind: Missing {
-            offset: 20,
+            offset: 43,
         },
         context: BehaviorTypeName,
     },

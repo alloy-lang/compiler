@@ -1,4 +1,4 @@
-trait TestTrait1 where
+trait Trait1 where
     self = #Type[_, _, _,_,_,   _,  ]
 end
 ===
@@ -10,10 +10,10 @@ HirModule {
     type_definitions: Index::<TypeDefinition> {
         Idx::<TypeDefinition>(0): {
             "item": TypeDefinition {
-                name: "TestTrait1",
+                name: "Trait1",
                 kind: Trait(
                     Trait {
-                        name: "TestTrait1",
+                        name: "Trait1",
                         self_constraints: [
                             Kind(
                                 6,
@@ -25,8 +25,8 @@ HirModule {
                     },
                 ),
             },
-            "name": "TestTrait1",
-            "range": 0..64,
+            "name": "Trait1",
+            "range": 0..60,
             "scope_id": Idx::<Scope>(0),
         },
     },

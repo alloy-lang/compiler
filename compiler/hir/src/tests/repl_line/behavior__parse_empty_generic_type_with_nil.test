@@ -1,3 +1,9 @@
+typedef Type1[t1, t2] = Thing
+
+trait Trait1 where
+    -- empty
+end
+
 behavior Trait1 for Type1[t1, _] where
     typevar t1
     -- imagine all the things here
@@ -7,16 +13,144 @@ HirModule {
     imports: EmptyIndex::<Import>,
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,
-    type_references: EmptyIndex::<TypeReference>,
-    type_definitions: EmptyIndex::<TypeDefinition>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "Trait1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 77..84,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "Type1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 88..93,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "t1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 94..96,
+        },
+        Idx::<TypeReference>(3): {
+            "item": Unconstrained,
+            "range": 98..99,
+        },
+        Idx::<TypeReference>(4): {
+            "item": Bounded {
+                base: Idx::<TypeReference>(1),
+                args: [
+                    Idx::<TypeReference>(2),
+                    Idx::<TypeReference>(3),
+                ],
+            },
+            "range": 88..101,
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t1",
+            "range": 14..16,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "t2",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t2",
+            "range": 18..20,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(2): {
+            "item": TypeDefinition {
+                name: "Type1",
+                kind: Single(
+                    TypeDefinitionMember {
+                        name: "Thing",
+                        properties: [],
+                    },
+                ),
+            },
+            "name": "Type1",
+            "range": 0..31,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeDefinition>(3): {
+            "item": TypeDefinition {
+                name: "Trait1",
+                kind: Trait(
+                    Trait {
+                        name: "Trait1",
+                        self_constraints: [],
+                        named_type_variables: {},
+                        type_annotations: {},
+                        values: {},
+                    },
+                ),
+            },
+            "name": "Trait1",
+            "range": 31..68,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeDefinition>(4): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t1",
+            "range": 111..157,
+            "scope_id": Idx::<Scope>(3),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 1,
+            len: 4,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "trait",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "behavior",
                 },
             ],
         },

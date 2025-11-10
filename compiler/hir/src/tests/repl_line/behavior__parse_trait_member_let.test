@@ -1,4 +1,12 @@
-behavior TestTrait1 for Type1 where
+typedef Type1 = Thing
+
+trait Trait1 where
+    typeof test : Int
+
+    let thing = test
+end
+
+behavior Trait1 for Type1 where
     typeof test : Int
 
     let thing = test
@@ -6,18 +14,119 @@ end
 ===
 HirModule {
     imports: EmptyIndex::<Import>,
-    expressions: EmptyIndex::<Expression>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "test",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(2),
+            },
+            "name": "thing",
+            "range": 69..86,
+            "scope_id": Idx::<Scope>(2),
+        },
+    },
     patterns: EmptyIndex::<Pattern>,
-    type_references: EmptyIndex::<TypeReference>,
-    type_definitions: EmptyIndex::<TypeDefinition>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": BuiltIn(
+                Int,
+            ),
+            "name": "test",
+            "range": 60..69,
+            "scope_id": Idx::<Scope>(2),
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "Trait1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 100..107,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "Type1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 111..117,
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "Type1",
+                kind: Single(
+                    TypeDefinitionMember {
+                        name: "Thing",
+                        properties: [],
+                    },
+                ),
+            },
+            "name": "Type1",
+            "range": 0..23,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "Trait1",
+                kind: Trait(
+                    Trait {
+                        name: "Trait1",
+                        self_constraints: [],
+                        named_type_variables: {},
+                        type_annotations: {
+                            "test": Idx::<TypeReference>(0),
+                        },
+                        values: {
+                            "thing": Idx::<Expression>(0),
+                        },
+                    },
+                ),
+            },
+            "name": "Trait1",
+            "range": 23..91,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 1,
+            len: 5,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "trait",
+                },
+                Scope {
+                    parent: Idx::<Scope>(2),
+                    tag: "type annotation",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "behavior",
                 },
             ],
         },

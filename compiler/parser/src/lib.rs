@@ -17,8 +17,6 @@ mod source;
 mod token_set;
 
 #[cfg(test)]
-mod on_demand_test;
-#[cfg(test)]
 mod tests;
 
 #[must_use]

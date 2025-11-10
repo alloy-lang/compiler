@@ -30,7 +30,7 @@ pub type TypeIdx = Idx<TypeReference>;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TypeReference {
-    Unknown,
+    Unconstrained,
     Missing,
     SelfRef,
     Unit,
@@ -57,7 +57,7 @@ fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> TypeReference {
     match ast {
         ast::Type::SelfType(_) => TypeReference::SelfRef,
         ast::Type::UnitType(_) => TypeReference::Unit,
-        ast::Type::NilIdentifier(_) => TypeReference::Unknown,
+        ast::Type::NilIdentifier(_) => TypeReference::Unconstrained,
         ast::Type::TypeIdentifier(t) => {
             let Some(path) = t.name() else {
                 unreachable!("parsing error")

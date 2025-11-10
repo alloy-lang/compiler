@@ -13,6 +13,11 @@ impl SourceFile {
     pub fn statements(&self) -> Vec<Statement> {
         children(self)
     }
+
+    #[must_use]
+    pub fn statements_by_type<T: AstElement>(&self) -> Vec<T> {
+        children(self)
+    }
 }
 
 ast_union_node!(

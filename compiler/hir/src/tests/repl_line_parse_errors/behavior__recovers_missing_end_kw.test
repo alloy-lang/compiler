@@ -1,7 +1,9 @@
-behavior Trait1 for Type1 where
+typedef Type1 = Thing
+
+behavior TestTrait1 for Type1 where
     -- imagine all the things here
 
-trait Trait1 where
+trait TestTrait1 where
     -- imagine all the things here
 end
 ===
@@ -9,14 +11,53 @@ HirModule {
     imports: EmptyIndex::<Import>,
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,
-    type_references: EmptyIndex::<TypeReference>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "TestTrait1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 32..43,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "Type1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 47..53,
+        },
+    },
     type_definitions: Index::<TypeDefinition> {
         Idx::<TypeDefinition>(0): {
             "item": TypeDefinition {
-                name: "Trait1",
+                name: "Type1",
+                kind: Single(
+                    TypeDefinitionMember {
+                        name: "Thing",
+                        properties: [],
+                    },
+                ),
+            },
+            "name": "Type1",
+            "range": 0..23,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "TestTrait1",
                 kind: Trait(
                     Trait {
-                        name: "Trait1",
+                        name: "TestTrait1",
                         self_constraints: [],
                         named_type_variables: {},
                         type_annotations: {},
@@ -24,15 +65,15 @@ HirModule {
                     },
                 ),
             },
-            "name": "Trait1",
-            "range": 68..125,
+            "name": "TestTrait1",
+            "range": 95..156,
             "scope_id": Idx::<Scope>(0),
         },
     },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 2,
+            len: 4,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -40,7 +81,15 @@ HirModule {
                 },
                 Scope {
                     parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
                     tag: "trait",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "behavior",
                 },
             ],
         },
@@ -54,7 +103,7 @@ HirModule {
             EndKw,
         ],
         kind: Missing {
-            offset: 68,
+            offset: 95,
         },
         context: BehaviorEnd,
     },

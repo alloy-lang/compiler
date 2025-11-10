@@ -1,6 +1,6 @@
 import std::functor
 
-trait TestTrait1 where
+trait Trait1 where
     self = #Type[_] + functor::Functor
 end
 ===
@@ -24,10 +24,10 @@ HirModule {
     type_definitions: Index::<TypeDefinition> {
         Idx::<TypeDefinition>(0): {
             "item": TypeDefinition {
-                name: "TestTrait1",
+                name: "Trait1",
                 kind: Trait(
                     Trait {
-                        name: "TestTrait1",
+                        name: "Trait1",
                         self_constraints: [
                             Kind(
                                 1,
@@ -54,8 +54,8 @@ HirModule {
                     },
                 ),
             },
-            "name": "TestTrait1",
-            "range": 21..86,
+            "name": "Trait1",
+            "range": 21..82,
             "scope_id": Idx::<Scope>(0),
         },
     },

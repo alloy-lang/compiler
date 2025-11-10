@@ -1,4 +1,4 @@
-trait TestTrait1 where
+trait Trait1 where
     typeof test : Int
 
     let thing = test
@@ -19,7 +19,7 @@ HirModule {
                 scope: Idx::<Scope>(1),
             },
             "name": "thing",
-            "range": 50..67,
+            "range": 46..63,
             "scope_id": Idx::<Scope>(1),
         },
     },
@@ -30,17 +30,17 @@ HirModule {
                 Int,
             ),
             "name": "test",
-            "range": 41..50,
+            "range": 37..46,
             "scope_id": Idx::<Scope>(1),
         },
     },
     type_definitions: Index::<TypeDefinition> {
         Idx::<TypeDefinition>(0): {
             "item": TypeDefinition {
-                name: "TestTrait1",
+                name: "Trait1",
                 kind: Trait(
                     Trait {
-                        name: "TestTrait1",
+                        name: "Trait1",
                         self_constraints: [],
                         named_type_variables: {},
                         type_annotations: {
@@ -52,8 +52,8 @@ HirModule {
                     },
                 ),
             },
-            "name": "TestTrait1",
-            "range": 0..70,
+            "name": "Trait1",
+            "range": 0..66,
             "scope_id": Idx::<Scope>(0),
         },
     },

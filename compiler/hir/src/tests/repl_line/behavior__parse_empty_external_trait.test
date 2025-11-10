@@ -1,21 +1,87 @@
+import other
+
+typedef Type1 = Thing
+
 behavior other::Trait1 for Type1 where
     -- imagine all the things here
 end
 ===
 HirModule {
-    imports: EmptyIndex::<Import>,
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [],
+                last: "other",
+            },
+            "name": "other",
+            "range": 0..14,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,
-    type_references: EmptyIndex::<TypeReference>,
-    type_definitions: EmptyIndex::<TypeDefinition>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [],
+                        ),
+                        name: "other",
+                        sub_path: [
+                            "Trait1",
+                        ],
+                    },
+                ),
+            ),
+            "range": 46..60,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                ThisModule(
+                    NonEmpty(
+                        [
+                            "Type1",
+                        ],
+                    ),
+                ),
+            ),
+            "range": 64..70,
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "Type1",
+                kind: Single(
+                    TypeDefinitionMember {
+                        name: "Thing",
+                        properties: [],
+                    },
+                ),
+            },
+            "name": "Type1",
+            "range": 14..37,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 1,
+            len: 3,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "behavior",
                 },
             ],
         },

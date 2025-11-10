@@ -41,10 +41,6 @@ mod source_file;
 
 pub use source_file::*;
 
-mod statement;
-
-pub use statement::*;
-
 mod r#trait;
 
 pub use r#trait::*;
@@ -524,6 +520,10 @@ impl<'db> LoweringCtx<'db> {
             element.text_range(),
             &self.scopes,
         );
+    }
+
+    pub(crate) fn add_behavior(&mut self, _behavior: Behavior, _element: &SyntaxElement) {
+        // todo!()
     }
 
     pub(crate) fn add_import(&mut self, segments: &NonEmpty<Name>, element: &SyntaxElement) {
