@@ -3,7 +3,6 @@ let counter = 0
 counter
 ===
 HirModule {
-    [salsa id]: 0,
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {

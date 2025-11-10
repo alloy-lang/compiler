@@ -6,7 +6,6 @@ let >> = |f1, f2| -> f2(f1)
 let result = >>(func1, func2)
 ===
 HirModule {
-    [salsa id]: 0,
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {

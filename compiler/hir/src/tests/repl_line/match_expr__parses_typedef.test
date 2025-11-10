@@ -10,7 +10,6 @@ match test when
   \ Either::Right(r) -> r
 ===
 HirModule {
-    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
             "item": Import(

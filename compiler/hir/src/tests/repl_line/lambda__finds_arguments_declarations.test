@@ -1,7 +1,6 @@
 |arg1, arg2, arg3| -> (arg1, arg2, arg3)
 ===
 HirModule {
-    [salsa id]: 0,
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {

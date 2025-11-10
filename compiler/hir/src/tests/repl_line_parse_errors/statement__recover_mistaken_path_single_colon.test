@@ -3,7 +3,6 @@ import test_data::ResultThing
 let foo = ResultThing:More:Stuff:here
 ===
 HirModule {
-    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
             "item": Import(

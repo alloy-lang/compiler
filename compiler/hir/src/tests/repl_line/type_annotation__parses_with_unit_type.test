@@ -1,7 +1,6 @@
 typeof test : Int -> String -> ()
 ===
 HirModule {
-    [salsa id]: 0,
     imports: EmptyIndex::<Import>,
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,

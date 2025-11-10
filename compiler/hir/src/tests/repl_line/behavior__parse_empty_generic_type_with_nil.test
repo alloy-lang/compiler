@@ -4,7 +4,6 @@ behavior Trait1 for Type1[t1, _] where
 end
 ===
 HirModule {
-    [salsa id]: 0,
     imports: EmptyIndex::<Import>,
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,

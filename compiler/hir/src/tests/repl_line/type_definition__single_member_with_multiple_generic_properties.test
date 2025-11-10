@@ -1,7 +1,6 @@
 typedef Test[t1, t2] = Thing t1 t2
 ===
 HirModule {
-    [salsa id]: 0,
     imports: EmptyIndex::<Import>,
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,

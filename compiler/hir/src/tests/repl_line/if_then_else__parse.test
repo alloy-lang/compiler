@@ -3,7 +3,6 @@ import test_data::test
 if test then 2 else 3
 ===
 HirModule {
-    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
             "item": Import(

@@ -7,7 +7,6 @@ let funky = |x1, y1, z1| -> x1 + y1 + z1
 funky(x, y, z)
 ===
 HirModule {
-    [salsa id]: 0,
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {

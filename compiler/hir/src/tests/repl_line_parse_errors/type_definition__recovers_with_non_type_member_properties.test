@@ -4,7 +4,6 @@ typedef Test1 =
   | Thing3 String Int
 ===
 HirModule {
-    [salsa id]: 0,
     imports: EmptyIndex::<Import>,
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,

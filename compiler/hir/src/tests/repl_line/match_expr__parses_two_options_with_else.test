@@ -7,7 +7,6 @@ match test when
   \ _    -> 1
 ===
 HirModule {
-    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
             "item": Import(

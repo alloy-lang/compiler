@@ -3,7 +3,6 @@ import std::option::Option
 |Option::Some(x)| -> x
 ===
 HirModule {
-    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
             "item": Import(

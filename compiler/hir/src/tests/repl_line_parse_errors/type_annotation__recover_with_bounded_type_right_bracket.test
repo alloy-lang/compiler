@@ -5,7 +5,6 @@ typeof apply : Test[t1] -> Test t2] where
     typevar t2
 ===
 HirModule {
-    [salsa id]: 0,
     imports: Index::<Import> {
         Idx::<Import>(0): {
             "item": Import(
