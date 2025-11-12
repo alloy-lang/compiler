@@ -103,6 +103,7 @@ HirModule {
         },
     },
     type_definitions: EmptyIndex::<TypeDefinition>,
+    behaviors: EmptyIndex::<Behavior>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

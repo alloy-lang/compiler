@@ -130,6 +130,7 @@ HirModule {
             "scope_id": Idx::<Scope>(1),
         },
     },
+    behaviors: EmptyIndex::<Behavior>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
