@@ -1,0 +1,217 @@
+import std::eq::Eq
+import std::bool::not
+
+typedef Bool =
+  | False
+  | True
+end
+
+behavior Eq for Bool where
+  let eq = |left, right| ->
+    if left
+    then right
+    else not(right)
+end
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [
+                    "std",
+                    "eq",
+                ],
+                last: "Eq",
+            },
+            "name": "Eq",
+            "range": 0..19,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Import>(1): {
+            "item": Import {
+                segments: [
+                    "std",
+                    "bool",
+                ],
+                last: "not",
+            },
+            "name": "not",
+            "range": 19..42,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "left",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(3),
+            },
+            "range": 143..152,
+        },
+        Idx::<Expression>(1): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "right",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(3),
+            },
+            "range": 157..167,
+        },
+        Idx::<Expression>(2): {
+            "item": VariableRef {
+                path: ThisModule(
+                    NonEmpty(
+                        [
+                            "right",
+                        ],
+                    ),
+                ),
+                scope: Idx::<Scope>(3),
+            },
+            "range": 176..181,
+        },
+        Idx::<Expression>(3): {
+            "item": FunctionCall {
+                target: OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "bool",
+                            ],
+                        ),
+                        name: "not",
+                        sub_path: [],
+                    },
+                ),
+                scope: Idx::<Scope>(3),
+                args: [
+                    Idx::<Expression>(2),
+                ],
+            },
+            "range": 172..183,
+        },
+        Idx::<Expression>(4): {
+            "item": IfThenElse {
+                condition: Idx::<Expression>(0),
+                then: Idx::<Expression>(1),
+                else_: Idx::<Expression>(3),
+            },
+            "range": 140..183,
+        },
+        Idx::<Expression>(5): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                ],
+                body: Idx::<Expression>(4),
+            },
+            "name": "eq",
+            "range": 110..183,
+            "scope_id": Idx::<Scope>(2),
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "left",
+            },
+            "name": "left",
+            "range": 120..124,
+            "scope_id": Idx::<Scope>(3),
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableDeclaration {
+                name: "right",
+            },
+            "name": "right",
+            "range": 126..131,
+            "scope_id": Idx::<Scope>(3),
+        },
+    },
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "eq",
+                            ],
+                        ),
+                        name: "Eq",
+                        sub_path: [],
+                    },
+                ),
+            ),
+            "range": 90..93,
+        },
+        Idx::<TypeReference>(1): {
+            "item": BuiltIn(
+                Bool,
+            ),
+            "range": 97..102,
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "Bool",
+                kind: Union(
+                    [
+                        TypeDefinitionMember {
+                            name: "False",
+                            properties: [],
+                        },
+                        TypeDefinitionMember {
+                            name: "True",
+                            properties: [],
+                        },
+                    ],
+                ),
+            },
+            "name": "Bool",
+            "range": 42..81,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 4,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "behavior",
+                },
+                Scope {
+                    parent: Idx::<Scope>(2),
+                    tag: "lambda expression",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]

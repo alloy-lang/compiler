@@ -42,7 +42,9 @@ trait Monad where
   --!
   --! * Known as `Option::and_then` and `Result::and_then` in Rust
   --! * Known as `flat_map` or `flat_map` in other languages
-  typeof flat_map : (a -> self[b]) -> self[a] -> self[b]
+  typeof flat_map : (a -> self[b]) -> self[a] -> self[b] where
+    typevar a
+    typevar b
 end
 
 --#[infix(right, 1)]

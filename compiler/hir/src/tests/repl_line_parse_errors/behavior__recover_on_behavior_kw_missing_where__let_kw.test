@@ -10,7 +10,18 @@ end
 ===
 HirModule {
     imports: EmptyIndex::<Import>,
-    expressions: EmptyIndex::<Expression>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": Literal(
+                Int(
+                    1,
+                ),
+            ),
+            "name": "a",
+            "range": 98..108,
+            "scope_id": Idx::<Scope>(3),
+        },
+    },
     patterns: EmptyIndex::<Pattern>,
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {

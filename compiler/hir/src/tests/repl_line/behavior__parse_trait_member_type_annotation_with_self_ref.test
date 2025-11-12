@@ -5,13 +5,51 @@ trait Trait1 where
 end
 
 behavior Trait1 for Type1 where
-    typeof test : self -> String -> Int
+    let test = |me, it| -> 0
 end
 ===
 HirModule {
     imports: EmptyIndex::<Import>,
-    expressions: EmptyIndex::<Expression>,
-    patterns: EmptyIndex::<Pattern>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": Literal(
+                Int(
+                    0,
+                ),
+            ),
+            "range": 146..148,
+        },
+        Idx::<Expression>(1): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                ],
+                body: Idx::<Expression>(0),
+            },
+            "name": "test",
+            "range": 123..148,
+            "scope_id": Idx::<Scope>(4),
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "me",
+            },
+            "name": "me",
+            "range": 135..137,
+            "scope_id": Idx::<Scope>(5),
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableDeclaration {
+                name: "it",
+            },
+            "name": "it",
+            "range": 139..141,
+            "scope_id": Idx::<Scope>(5),
+        },
+    },
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
             "item": SelfRef,
@@ -108,7 +146,7 @@ HirModule {
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 5,
+            len: 6,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -129,6 +167,10 @@ HirModule {
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "behavior",
+                },
+                Scope {
+                    parent: Idx::<Scope>(4),
+                    tag: "lambda expression",
                 },
             ],
         },

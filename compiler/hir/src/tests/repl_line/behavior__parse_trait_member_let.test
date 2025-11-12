@@ -8,8 +8,7 @@ end
 
 behavior Trait1 for Type1 where
     typeof test : Int
-
-    let thing = test
+    let test = 0
 end
 ===
 HirModule {
@@ -29,6 +28,16 @@ HirModule {
             "name": "thing",
             "range": 69..86,
             "scope_id": Idx::<Scope>(2),
+        },
+        Idx::<Expression>(1): {
+            "item": Literal(
+                Int(
+                    0,
+                ),
+            ),
+            "name": "test",
+            "range": 149..162,
+            "scope_id": Idx::<Scope>(4),
         },
     },
     patterns: EmptyIndex::<Pattern>,
@@ -64,6 +73,14 @@ HirModule {
                 ),
             ),
             "range": 111..117,
+        },
+        Idx::<TypeReference>(3): {
+            "item": BuiltIn(
+                Int,
+            ),
+            "name": "test",
+            "range": 141..149,
+            "scope_id": Idx::<Scope>(4),
         },
     },
     type_definitions: Index::<TypeDefinition> {
@@ -106,7 +123,7 @@ HirModule {
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 5,
+            len: 6,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -127,6 +144,10 @@ HirModule {
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "behavior",
+                },
+                Scope {
+                    parent: Idx::<Scope>(4),
+                    tag: "type annotation",
                 },
             ],
         },

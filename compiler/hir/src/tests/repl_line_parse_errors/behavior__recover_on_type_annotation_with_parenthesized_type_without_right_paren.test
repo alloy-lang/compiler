@@ -39,6 +39,44 @@ HirModule {
             ),
             "range": 88..94,
         },
+        Idx::<TypeReference>(2): {
+            "item": SelfRef,
+            "range": 119..124,
+        },
+        Idx::<TypeReference>(3): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 127..134,
+        },
+        Idx::<TypeReference>(4): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 138..150,
+        },
+        Idx::<TypeReference>(5): {
+            "item": ParenthesizedType(
+                Idx::<TypeReference>(4),
+            ),
+            "range": 137..150,
+        },
+        Idx::<TypeReference>(6): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(3),
+                return_type: Idx::<TypeReference>(5),
+            },
+            "range": 127..150,
+        },
+        Idx::<TypeReference>(7): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(2),
+                return_type: Idx::<TypeReference>(6),
+            },
+            "name": "test1",
+            "range": 119..150,
+            "scope_id": Idx::<Scope>(3),
+        },
     },
     type_definitions: Index::<TypeDefinition> {
         Idx::<TypeDefinition>(0): {
@@ -87,7 +125,7 @@ HirModule {
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 4,
+            len: 5,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -104,6 +142,10 @@ HirModule {
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "behavior",
+                },
+                Scope {
+                    parent: Idx::<Scope>(3),
+                    tag: "type annotation",
                 },
             ],
         },

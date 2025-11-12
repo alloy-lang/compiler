@@ -28,26 +28,24 @@ pub(super) fn lower_behavior(ctx: &mut LoweringCtx, ast: &ast::BehaviorDef) {
         let trait_id = lower_type_reference(ctx, &trait_);
         let type_id = lower_type_reference(ctx, &type_);
 
-        // let type_annotations = ast
-        //     .type_annotations()
-        //     .iter()
-        //     .filter_map(|type_annotation| lower_type_annotation(ctx, type_annotation))
-        //     .collect();
-        //
-        // let values = ast
-        //     .values()
-        //     .iter()
-        //     .filter_map(|value| lower_value(ctx, value))
-        //     .collect();
+        let type_annotations = ast
+            .type_annotations()
+            .iter()
+            .filter_map(|type_annotation| lower_type_annotation(ctx, type_annotation))
+            .collect();
+
+        let values = ast
+            .values()
+            .iter()
+            .filter_map(|value| lower_value(ctx, value))
+            .collect();
 
         Behavior {
             attached_trait: trait_id,
             attached_type: type_id,
             named_type_variables,
-            type_annotations: Default::default(),
-            // type_annotations: type_annotations,
-            values: Default::default(),
-            // values: values,
+            type_annotations,
+            values,
         }
     });
 

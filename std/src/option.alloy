@@ -4,6 +4,9 @@ where
 import std::eq::Eq
 import std::order::Ord
 import std::debug::Debug
+import std::functor::Functor
+import std::monad::Monad
+import std::applicative::Applicative
 
 --! `Option[t]` represents a value `t` which may not exist.
 --! `Option[t]` requires a "concrete" type as a type argument

@@ -38,6 +38,44 @@ HirModule {
             ),
             "range": 88..94,
         },
+        Idx::<TypeReference>(2): {
+            "item": Missing,
+            "name": "test1",
+            "range": 104..121,
+            "scope_id": Idx::<Scope>(3),
+        },
+        Idx::<TypeReference>(3): {
+            "item": SelfRef,
+            "range": 136..141,
+        },
+        Idx::<TypeReference>(4): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 144..151,
+        },
+        Idx::<TypeReference>(5): {
+            "item": BuiltIn(
+                Int,
+            ),
+            "range": 154..158,
+        },
+        Idx::<TypeReference>(6): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(4),
+                return_type: Idx::<TypeReference>(5),
+            },
+            "range": 144..158,
+        },
+        Idx::<TypeReference>(7): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(3),
+                return_type: Idx::<TypeReference>(6),
+            },
+            "name": "test2",
+            "range": 136..158,
+            "scope_id": Idx::<Scope>(3),
+        },
     },
     type_definitions: Index::<TypeDefinition> {
         Idx::<TypeDefinition>(0): {
@@ -75,7 +113,7 @@ HirModule {
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 4,
+            len: 6,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -92,6 +130,14 @@ HirModule {
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "behavior",
+                },
+                Scope {
+                    parent: Idx::<Scope>(3),
+                    tag: "type annotation",
+                },
+                Scope {
+                    parent: Idx::<Scope>(3),
+                    tag: "type annotation",
                 },
             ],
         },
