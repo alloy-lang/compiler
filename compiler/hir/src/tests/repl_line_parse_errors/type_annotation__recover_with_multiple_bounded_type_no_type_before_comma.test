@@ -85,6 +85,7 @@ HirModule {
             "scope_id": Idx::<Scope>(1),
         },
     },
+    traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),

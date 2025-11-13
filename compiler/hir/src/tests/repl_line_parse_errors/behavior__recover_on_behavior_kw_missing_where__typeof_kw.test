@@ -61,25 +61,40 @@ HirModule {
             "range": 0..23,
             "scope_id": Idx::<Scope>(0),
         },
-        Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
+    },
+    traits: Index::<Trait> {
+        Idx::<Trait>(0): {
+            "item": Trait {
                 name: "TestTrait1",
-                kind: Trait(
-                    Trait {
-                        name: "TestTrait1",
-                        self_constraints: [],
-                        named_type_variables: {},
-                        type_annotations: {},
-                        values: {},
-                    },
-                ),
+                self_constraints: [],
+                named_type_variables: {},
+                type_annotations: {},
+                values: {},
             },
             "name": "TestTrait1",
             "range": 23..64,
             "scope_id": Idx::<Scope>(0),
         },
     },
-    behaviors: EmptyIndex::<Behavior>,
+    behaviors: Index::<Behavior> {
+        Idx::<Behavior>(0): {
+            "item": Behavior {
+                attached_trait: Idx::<TypeReference>(0),
+                attached_type: Idx::<TypeReference>(1),
+                named_type_variables: {},
+                type_annotations: {
+                    "test": Idx::<TypeReference>(2),
+                },
+                values: {},
+            },
+            "name": (
+                Idx::<TypeReference>(1),
+                Idx::<TypeReference>(0),
+            ),
+            "range": 64..122,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

@@ -21,35 +21,31 @@ HirModule {
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,
     type_references: EmptyIndex::<TypeReference>,
-    type_definitions: Index::<TypeDefinition> {
-        Idx::<TypeDefinition>(0): {
-            "item": TypeDefinition {
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    traits: Index::<Trait> {
+        Idx::<Trait>(0): {
+            "item": Trait {
                 name: "TestTrait1",
-                kind: Trait(
-                    Trait {
-                        name: "TestTrait1",
-                        self_constraints: [
-                            Trait(
-                                OtherModule(
-                                    Fqn {
-                                        module: NonEmpty(
-                                            [
-                                                "std",
-                                            ],
-                                        ),
-                                        name: "functor",
-                                        sub_path: [
-                                            "Functor",
-                                        ],
-                                    },
+                self_constraints: [
+                    Trait(
+                        OtherModule(
+                            Fqn {
+                                module: NonEmpty(
+                                    [
+                                        "std",
+                                    ],
                                 ),
-                            ),
-                        ],
-                        named_type_variables: {},
-                        type_annotations: {},
-                        values: {},
-                    },
-                ),
+                                name: "functor",
+                                sub_path: [
+                                    "Functor",
+                                ],
+                            },
+                        ),
+                    ),
+                ],
+                named_type_variables: {},
+                type_annotations: {},
+                values: {},
             },
             "name": "TestTrait1",
             "range": 21..73,

@@ -18,21 +18,17 @@ HirModule {
     },
     patterns: EmptyIndex::<Pattern>,
     type_references: EmptyIndex::<TypeReference>,
-    type_definitions: Index::<TypeDefinition> {
-        Idx::<TypeDefinition>(0): {
-            "item": TypeDefinition {
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    traits: Index::<Trait> {
+        Idx::<Trait>(0): {
+            "item": Trait {
                 name: "TestTrait1",
-                kind: Trait(
-                    Trait {
-                        name: "TestTrait1",
-                        self_constraints: [],
-                        named_type_variables: {},
-                        type_annotations: {},
-                        values: {
-                            "a": Idx::<Expression>(0),
-                        },
-                    },
-                ),
+                self_constraints: [],
+                named_type_variables: {},
+                type_annotations: {},
+                values: {
+                    "a": Idx::<Expression>(0),
+                },
             },
             "name": "TestTrait1",
             "range": 0..34,

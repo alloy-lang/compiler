@@ -187,7 +187,26 @@ HirModule {
             "scope_id": Idx::<Scope>(0),
         },
     },
-    behaviors: EmptyIndex::<Behavior>,
+    traits: EmptyIndex::<Trait>,
+    behaviors: Index::<Behavior> {
+        Idx::<Behavior>(0): {
+            "item": Behavior {
+                attached_trait: Idx::<TypeReference>(0),
+                attached_type: Idx::<TypeReference>(1),
+                named_type_variables: {},
+                type_annotations: {},
+                values: {
+                    "eq": Idx::<Expression>(5),
+                },
+            },
+            "name": (
+                Idx::<TypeReference>(1),
+                Idx::<TypeReference>(0),
+            ),
+            "range": 81..186,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

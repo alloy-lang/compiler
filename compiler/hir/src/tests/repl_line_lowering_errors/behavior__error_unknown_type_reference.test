@@ -1,25 +1,13 @@
-import other
-
-trait Trait1 where
+trait TestTrait1 where
     -- empty
 end
 
-behavior Trait1 for other::Type1 where
-    -- imagine all the things here
+behavior TestTrait1 for Type1 where
+    -- empty
 end
 ===
 HirModule {
-    imports: Index::<Import> {
-        Idx::<Import>(0): {
-            "item": Import {
-                segments: [],
-                last: "other",
-            },
-            "name": "other",
-            "range": 0..14,
-            "scope_id": Idx::<Scope>(0),
-        },
-    },
+    imports: EmptyIndex::<Import>,
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,
     type_references: Index::<TypeReference> {
@@ -28,42 +16,38 @@ HirModule {
                 ThisModule(
                     NonEmpty(
                         [
-                            "Trait1",
+                            "TestTrait1",
                         ],
                     ),
                 ),
             ),
-            "range": 60..67,
+            "range": 50..61,
         },
         Idx::<TypeReference>(1): {
             "item": Named(
-                OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [],
-                        ),
-                        name: "other",
-                        sub_path: [
+                Unknown(
+                    NonEmpty(
+                        [
                             "Type1",
                         ],
-                    },
+                    ),
                 ),
             ),
-            "range": 71..84,
+            "range": 65..71,
         },
     },
     type_definitions: EmptyIndex::<TypeDefinition>,
     traits: Index::<Trait> {
         Idx::<Trait>(0): {
             "item": Trait {
-                name: "Trait1",
+                name: "TestTrait1",
                 self_constraints: [],
                 named_type_variables: {},
                 type_annotations: {},
                 values: {},
             },
-            "name": "Trait1",
-            "range": 14..51,
+            "name": "TestTrait1",
+            "range": 0..41,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -80,7 +64,7 @@ HirModule {
                 Idx::<TypeReference>(1),
                 Idx::<TypeReference>(0),
             ),
-            "range": 51..128,
+            "range": 41..93,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -105,6 +89,20 @@ HirModule {
         },
     },
     warnings: [],
-    errors: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                reference: "Type1",
+                reference_type: Type,
+                path: NonEmpty(
+                    [
+                        "Type1",
+                    ],
+                ),
+                current_scope: Idx::<Scope>(2),
+            },
+            range: 65..71,
+        },
+    ],
 }
 []

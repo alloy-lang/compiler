@@ -21,38 +21,34 @@ HirModule {
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,
     type_references: EmptyIndex::<TypeReference>,
-    type_definitions: Index::<TypeDefinition> {
-        Idx::<TypeDefinition>(0): {
-            "item": TypeDefinition {
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    traits: Index::<Trait> {
+        Idx::<Trait>(0): {
+            "item": Trait {
                 name: "Trait1",
-                kind: Trait(
-                    Trait {
-                        name: "Trait1",
-                        self_constraints: [
-                            Kind(
-                                1,
-                            ),
-                            Trait(
-                                OtherModule(
-                                    Fqn {
-                                        module: NonEmpty(
-                                            [
-                                                "std",
-                                            ],
-                                        ),
-                                        name: "functor",
-                                        sub_path: [
-                                            "Functor",
-                                        ],
-                                    },
+                self_constraints: [
+                    Kind(
+                        1,
+                    ),
+                    Trait(
+                        OtherModule(
+                            Fqn {
+                                module: NonEmpty(
+                                    [
+                                        "std",
+                                    ],
                                 ),
-                            ),
-                        ],
-                        named_type_variables: {},
-                        type_annotations: {},
-                        values: {},
-                    },
-                ),
+                                name: "functor",
+                                sub_path: [
+                                    "Functor",
+                                ],
+                            },
+                        ),
+                    ),
+                ],
+                named_type_variables: {},
+                type_annotations: {},
+                values: {},
             },
             "name": "Trait1",
             "range": 21..82,

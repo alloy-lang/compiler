@@ -1,6 +1,7 @@
 use super::{Fqn, HirDatabase, Name};
 use crate::ast_glossary::AstGlossary;
 use crate::index::Index;
+use std::any::Any;
 
 use alloy_ast as ast;
 use alloy_scope::{ScopeIdx, Scopes};
@@ -9,6 +10,7 @@ use ast::AstElement;
 use la_arena::Idx;
 use non_empty_vec::NonEmpty;
 use ordered_float::NotNan;
+use rustc_hash::FxHashMap;
 use std::collections::HashSet;
 use std::convert::TryFrom;
 use text_size::TextRange;
@@ -80,7 +82,8 @@ pub struct HirModule {
     patterns: Index<Pattern>,
     type_references: Index<TypeReference>,
     type_definitions: Index<TypeDefinition>,
-    behaviors: Index<Behavior>,
+    traits: Index<Trait>,
+    behaviors: Index<Behavior, (TypeIdx, TypeIdx)>,
     scopes: Scopes,
     warnings: Vec<LoweringWarning>,
     errors: Vec<LoweringError>,
@@ -136,6 +139,17 @@ pub enum LoweringErrorKind {
         first: TextRange,
         second: TextRange,
     },
+    ConflictingTraitDefinitionName {
+        name: Name,
+        first: TextRange,
+        second: TextRange,
+    },
+    ConflictingBehaviorDefinition {
+        type_: TypeIdx,
+        trait_: TypeIdx,
+        first: TextRange,
+        second: TextRange,
+    },
     ConflictingTypeVariableName {
         name: Name,
         first: TextRange,
@@ -181,7 +195,8 @@ struct LoweringCtx<'db> {
     patterns: Index<Pattern>,
     type_references: Index<TypeReference>,
     type_definitions: Index<TypeDefinition>,
-    behaviors: Index<Behavior>,
+    traits: Index<Trait>,
+    behaviors: Index<Behavior, (TypeIdx, TypeIdx)>,
     scopes: Scopes,
     used_imports: HashSet<ImportIdx>,
     warnings: Vec<LoweringWarning>,
@@ -198,6 +213,7 @@ impl<'db> LoweringCtx<'db> {
             patterns: Index::new(),
             type_references: Index::new(),
             type_definitions: Index::new(),
+            traits: Index::new(),
             behaviors: Index::new(),
             scopes: Scopes::default(),
             used_imports: HashSet::new(),
@@ -227,6 +243,7 @@ impl<'db> LoweringCtx<'db> {
             patterns: self.patterns,
             type_references: self.type_references,
             type_definitions: self.type_definitions,
+            traits: self.traits,
             behaviors: self.behaviors,
             scopes: self.scopes,
             warnings,
@@ -267,6 +284,9 @@ impl<'db> LoweringCtx<'db> {
         if let [first, rest @ ..] = path_segments {
             let local_name = Name::new(first);
 
+            if let Some(_tid) = self.traits.get_id(&local_name, &self.scopes) {
+                return Some(Path::this_module(rest, first));
+            }
             if let Some(_tid) = self.type_definitions.get_id(&local_name, &self.scopes) {
                 return Some(Path::this_module(rest, first));
             }
@@ -514,20 +534,41 @@ impl<'db> LoweringCtx<'db> {
         }
     }
 
-    pub(crate) fn add_trait(&mut self, name: Name, trait_: Trait, element: &SyntaxElement) {
-        let _ = self.type_definitions.insert_named(
-            name.clone(),
-            TypeDefinition {
-                name,
-                kind: TypeDefinitionKind::Trait(trait_),
-            },
+    pub(crate) fn add_trait(&mut self, trait_: Trait, element: &SyntaxElement) {
+        let res = self.traits.insert_named(
+            trait_.name.clone(),
+            trait_,
             element.text_range(),
             &self.scopes,
         );
+
+        if let Err(err) = res {
+            let err = LoweringErrorKind::ConflictingTraitDefinitionName {
+                name: err.name,
+                first: err.first,
+                second: err.second,
+            };
+            self.error(err, element.text_range());
+        }
     }
 
-    pub(crate) fn add_behavior(&mut self, _behavior: Behavior, _element: &SyntaxElement) {
-        // todo!()
+    pub(crate) fn add_behavior(&mut self, behavior: Behavior, element: &SyntaxElement) {
+        let res = self.behaviors.insert_named(
+            (behavior.attached_type, behavior.attached_trait),
+            behavior.clone(),
+            element.text_range(),
+            &self.scopes,
+        );
+
+        if let Err(err) = res {
+            let err = LoweringErrorKind::ConflictingBehaviorDefinition {
+                type_: behavior.attached_type,
+                trait_: behavior.attached_trait,
+                first: err.first,
+                second: err.second,
+            };
+            self.error(err, element.text_range());
+        }
     }
 
     pub(crate) fn add_import(&mut self, segments: &NonEmpty<Name>, element: &SyntaxElement) {

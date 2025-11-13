@@ -3,26 +3,27 @@ use la_arena::{Arena, ArenaMap, Idx};
 use rustc_hash::FxHashMap;
 use std::collections::BTreeMap;
 use std::fmt;
+use std::hash::Hash;
 use text_size::TextRange;
 
 use crate::Name;
 
 #[derive(PartialEq)]
-pub struct Index<T> {
+pub struct Index<T, N: Eq + Hash = Name> {
     items: Arena<T>,
     item_ranges: ArenaMap<Idx<T>, TextRange>,
-    item_names: FxHashMap<(Name, ScopeIdx), Idx<T>>,
+    item_names: FxHashMap<(N, ScopeIdx), Idx<T>>,
 }
 
-pub(crate) struct IndexIterator<'a, T> {
+pub(crate) struct IndexIterator<'a, T, N: Eq + Hash> {
     cursor: usize,
-    index: &'a Index<T>,
+    index: &'a Index<T, N>,
 }
 
-pub type IndexItem<'a, T> = (Idx<T>, &'a T, TextRange, Option<(Name, ScopeIdx)>);
+pub type IndexItem<'a, T, N> = (Idx<T>, &'a T, TextRange, Option<(N, ScopeIdx)>);
 
-impl<'a, T> Iterator for IndexIterator<'a, T> {
-    type Item = IndexItem<'a, T>;
+impl<'a, T, N: Eq + Hash + Clone> Iterator for IndexIterator<'a, T, N> {
+    type Item = IndexItem<'a, T, N>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.cursor >= self.index.items.len() {
@@ -46,13 +47,13 @@ impl<'a, T> Iterator for IndexIterator<'a, T> {
     }
 }
 
-impl<'a, T> IndexIterator<'a, T> {
-    pub fn new(index: &'a Index<T>) -> Self {
+impl<'a, T, N: Eq + Hash> IndexIterator<'a, T, N> {
+    pub fn new(index: &'a Index<T, N>) -> Self {
         Self { cursor: 0, index }
     }
 }
 
-impl<T: fmt::Debug> fmt::Debug for Index<T> {
+impl<T: fmt::Debug, N: Eq + Hash + Clone + fmt::Debug> fmt::Debug for Index<T, N> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut type_name = std::any::type_name::<T>();
         if let Some(idx) = type_name.rfind(':') {
@@ -86,13 +87,13 @@ impl<T: fmt::Debug> fmt::Debug for Index<T> {
 }
 
 #[derive(Debug)]
-pub(crate) struct DuplicateNameError {
-    pub(crate) name: Name,
+pub(crate) struct DuplicateNameError<N> {
+    pub(crate) name: N,
     pub(crate) first: TextRange,
     pub(crate) second: TextRange,
 }
 
-impl<T> Index<T> {
+impl<T, N: Eq + Hash + Clone + fmt::Debug> Index<T, N> {
     pub(crate) fn new() -> Self {
         Self {
             items: Arena::new(),
@@ -105,17 +106,17 @@ impl<T> Index<T> {
         self.items.is_empty()
     }
 
-    pub(crate) fn iter(&self) -> IndexIterator<T> {
+    pub(crate) fn iter(&self) -> IndexIterator<T, N> {
         IndexIterator::new(self)
     }
 
     pub(crate) fn insert_named(
         &mut self,
-        name: Name,
+        name: N,
         thing: T,
         thing_range: TextRange,
         scopes: &Scopes,
-    ) -> Result<Idx<T>, DuplicateNameError> {
+    ) -> Result<Idx<T>, DuplicateNameError<N>> {
         self.check_for_name(&name, thing_range, scopes)?;
 
         let current_scope = scopes.current_scope();
@@ -128,11 +129,11 @@ impl<T> Index<T> {
 
     pub(crate) fn add_name(
         &mut self,
-        name: Name,
+        name: N,
         id: Idx<T>,
         range: TextRange,
         scopes: &Scopes,
-    ) -> Result<Idx<T>, DuplicateNameError> {
+    ) -> Result<Idx<T>, DuplicateNameError<N>> {
         self.check_for_name(&name, range, scopes)?;
 
         let current_scope = scopes.current_scope();
@@ -144,10 +145,10 @@ impl<T> Index<T> {
 
     fn check_for_name(
         &mut self,
-        name: &Name,
+        name: &N,
         range: TextRange,
         scopes: &Scopes,
-    ) -> Result<(), DuplicateNameError> {
+    ) -> Result<(), DuplicateNameError<N>> {
         let current_scope = scopes.current_scope();
 
         if let Some(id) = self.item_names.get(&(name.clone(), current_scope)).copied() {
@@ -177,23 +178,23 @@ impl<T> Index<T> {
         self.item_ranges[id]
     }
 
-    pub fn get_id(&self, name: &Name, scopes: &Scopes) -> Option<Idx<T>> {
+    pub fn get_id(&self, name: &N, scopes: &Scopes) -> Option<Idx<T>> {
         scopes
             .iter()
             .find_map(|scope| self.item_names.get(&(name.clone(), scope)))
             .copied()
     }
 
-    fn get_id_scoped(&self, name: &Name, scope: ScopeIdx) -> Option<Idx<T>> {
+    fn get_id_scoped(&self, name: &N, scope: ScopeIdx) -> Option<Idx<T>> {
         self.item_names.get(&(name.clone(), scope)).copied()
     }
 
     #[cfg(test)]
-    pub fn get_by_name(&self, name: &Name, scopes: &Scopes) -> Option<(Idx<T>, &T)> {
+    pub fn get_by_name(&self, name: &N, scopes: &Scopes) -> Option<(Idx<T>, &T)> {
         self.get_id(name, scopes).map(|id| (id, self.get(id)))
     }
 
-    pub fn get_by_scoped_name(&self, name: &Name, scope: ScopeIdx) -> Option<(Idx<T>, &T)> {
+    pub fn get_by_scoped_name(&self, name: &N, scope: ScopeIdx) -> Option<(Idx<T>, &T)> {
         self.get_id_scoped(name, scope).map(|id| (id, self.get(id)))
     }
 }

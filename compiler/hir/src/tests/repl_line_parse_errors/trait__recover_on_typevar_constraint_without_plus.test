@@ -35,38 +35,35 @@ HirModule {
             "range": 85..96,
             "scope_id": Idx::<Scope>(1),
         },
-        Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
+    },
+    traits: Index::<Trait> {
+        Idx::<Trait>(0): {
+            "item": Trait {
                 name: "TestTrait1",
-                kind: Trait(
-                    Trait {
-                        name: "TestTrait1",
-                        self_constraints: [
-                            Kind(
-                                1,
-                            ),
-                            Trait(
-                                OtherModule(
-                                    Fqn {
-                                        module: NonEmpty(
-                                            [
-                                                "std",
-                                                "functor",
-                                            ],
-                                        ),
-                                        name: "Functor",
-                                        sub_path: [],
-                                    },
+                self_constraints: [
+                    Kind(
+                        1,
+                    ),
+                    Trait(
+                        OtherModule(
+                            Fqn {
+                                module: NonEmpty(
+                                    [
+                                        "std",
+                                        "functor",
+                                    ],
                                 ),
-                            ),
-                        ],
-                        named_type_variables: {
-                            "t1": Idx::<TypeDefinition>(0),
-                        },
-                        type_annotations: {},
-                        values: {},
-                    },
-                ),
+                                name: "Functor",
+                                sub_path: [],
+                            },
+                        ),
+                    ),
+                ],
+                named_type_variables: {
+                    "t1": Idx::<TypeDefinition>(0),
+                },
+                type_annotations: {},
+                values: {},
             },
             "name": "TestTrait1",
             "range": 30..99,

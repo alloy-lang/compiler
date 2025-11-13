@@ -2,9 +2,11 @@
 use super::*;
 use rustc_hash::FxHashMap;
 
+pub type TraitIdx = Idx<Trait>;
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Trait {
-    name: Name,
+    pub(crate) name: Name,
     self_constraints: Vec<TypeVariableConstraint>,
     named_type_variables: FxHashMap<Name, TypeDefinitionIdx>,
     type_annotations: FxHashMap<Name, TypeIdx>,
@@ -62,5 +64,5 @@ pub(super) fn lower_trait(ctx: &mut LoweringCtx, ast: &ast::TraitDef) {
         }
     });
 
-    ctx.add_trait(name, trait_, &ast.syntax());
+    ctx.add_trait(trait_, &ast.syntax());
 }

@@ -104,23 +104,6 @@ HirModule {
         },
         Idx::<TypeDefinition>(3): {
             "item": TypeDefinition {
-                name: "Trait1",
-                kind: Trait(
-                    Trait {
-                        name: "Trait1",
-                        self_constraints: [],
-                        named_type_variables: {},
-                        type_annotations: {},
-                        values: {},
-                    },
-                ),
-            },
-            "name": "Trait1",
-            "range": 31..68,
-            "scope_id": Idx::<Scope>(0),
-        },
-        Idx::<TypeDefinition>(4): {
-            "item": TypeDefinition {
                 name: "t1",
                 kind: TypeVariable(
                     Unbound,
@@ -131,7 +114,39 @@ HirModule {
             "scope_id": Idx::<Scope>(3),
         },
     },
-    behaviors: EmptyIndex::<Behavior>,
+    traits: Index::<Trait> {
+        Idx::<Trait>(0): {
+            "item": Trait {
+                name: "Trait1",
+                self_constraints: [],
+                named_type_variables: {},
+                type_annotations: {},
+                values: {},
+            },
+            "name": "Trait1",
+            "range": 31..68,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    behaviors: Index::<Behavior> {
+        Idx::<Behavior>(0): {
+            "item": Behavior {
+                attached_trait: Idx::<TypeReference>(0),
+                attached_type: Idx::<TypeReference>(4),
+                named_type_variables: {
+                    "t1": Idx::<TypeDefinition>(3),
+                },
+                type_annotations: {},
+                values: {},
+            },
+            "name": (
+                Idx::<TypeReference>(4),
+                Idx::<TypeReference>(0),
+            ),
+            "range": 68..160,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

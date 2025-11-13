@@ -103,6 +103,7 @@ HirModule {
     },
     type_references: EmptyIndex::<TypeReference>,
     type_definitions: EmptyIndex::<TypeDefinition>,
+    traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),

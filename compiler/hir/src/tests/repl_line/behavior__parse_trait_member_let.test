@@ -98,29 +98,46 @@ HirModule {
             "range": 0..23,
             "scope_id": Idx::<Scope>(0),
         },
-        Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
+    },
+    traits: Index::<Trait> {
+        Idx::<Trait>(0): {
+            "item": Trait {
                 name: "Trait1",
-                kind: Trait(
-                    Trait {
-                        name: "Trait1",
-                        self_constraints: [],
-                        named_type_variables: {},
-                        type_annotations: {
-                            "test": Idx::<TypeReference>(0),
-                        },
-                        values: {
-                            "thing": Idx::<Expression>(0),
-                        },
-                    },
-                ),
+                self_constraints: [],
+                named_type_variables: {},
+                type_annotations: {
+                    "test": Idx::<TypeReference>(0),
+                },
+                values: {
+                    "thing": Idx::<Expression>(0),
+                },
             },
             "name": "Trait1",
             "range": 23..91,
             "scope_id": Idx::<Scope>(0),
         },
     },
-    behaviors: EmptyIndex::<Behavior>,
+    behaviors: Index::<Behavior> {
+        Idx::<Behavior>(0): {
+            "item": Behavior {
+                attached_trait: Idx::<TypeReference>(1),
+                attached_type: Idx::<TypeReference>(2),
+                named_type_variables: {},
+                type_annotations: {
+                    "test": Idx::<TypeReference>(3),
+                },
+                values: {
+                    "test": Idx::<Expression>(1),
+                },
+            },
+            "name": (
+                Idx::<TypeReference>(2),
+                Idx::<TypeReference>(1),
+            ),
+            "range": 91..165,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

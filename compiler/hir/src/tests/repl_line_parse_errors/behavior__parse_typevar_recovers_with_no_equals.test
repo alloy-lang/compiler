@@ -69,23 +69,6 @@ HirModule {
         },
         Idx::<TypeDefinition>(1): {
             "item": TypeDefinition {
-                name: "TestTrait1",
-                kind: Trait(
-                    Trait {
-                        name: "TestTrait1",
-                        self_constraints: [],
-                        named_type_variables: {},
-                        type_annotations: {},
-                        values: {},
-                    },
-                ),
-            },
-            "name": "TestTrait1",
-            "range": 44..85,
-            "scope_id": Idx::<Scope>(0),
-        },
-        Idx::<TypeDefinition>(2): {
-            "item": TypeDefinition {
                 name: "t1",
                 kind: TypeVariable(
                     Constrained(
@@ -114,7 +97,39 @@ HirModule {
             "scope_id": Idx::<Scope>(3),
         },
     },
-    behaviors: EmptyIndex::<Behavior>,
+    traits: Index::<Trait> {
+        Idx::<Trait>(0): {
+            "item": Trait {
+                name: "TestTrait1",
+                self_constraints: [],
+                named_type_variables: {},
+                type_annotations: {},
+                values: {},
+            },
+            "name": "TestTrait1",
+            "range": 44..85,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    behaviors: Index::<Behavior> {
+        Idx::<Behavior>(0): {
+            "item": Behavior {
+                attached_trait: Idx::<TypeReference>(0),
+                attached_type: Idx::<TypeReference>(1),
+                named_type_variables: {
+                    "t1": Idx::<TypeDefinition>(1),
+                },
+                type_annotations: {},
+                values: {},
+            },
+            "name": (
+                Idx::<TypeReference>(1),
+                Idx::<TypeReference>(0),
+            ),
+            "range": 85..156,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

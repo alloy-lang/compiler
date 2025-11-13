@@ -123,27 +123,42 @@ HirModule {
             "range": 0..23,
             "scope_id": Idx::<Scope>(0),
         },
-        Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
+    },
+    traits: Index::<Trait> {
+        Idx::<Trait>(0): {
+            "item": Trait {
                 name: "Trait1",
-                kind: Trait(
-                    Trait {
-                        name: "Trait1",
-                        self_constraints: [],
-                        named_type_variables: {},
-                        type_annotations: {
-                            "test": Idx::<TypeReference>(4),
-                        },
-                        values: {},
-                    },
-                ),
+                self_constraints: [],
+                named_type_variables: {},
+                type_annotations: {
+                    "test": Idx::<TypeReference>(4),
+                },
+                values: {},
             },
             "name": "Trait1",
             "range": 23..87,
             "scope_id": Idx::<Scope>(0),
         },
     },
-    behaviors: EmptyIndex::<Behavior>,
+    behaviors: Index::<Behavior> {
+        Idx::<Behavior>(0): {
+            "item": Behavior {
+                attached_trait: Idx::<TypeReference>(5),
+                attached_type: Idx::<TypeReference>(6),
+                named_type_variables: {},
+                type_annotations: {},
+                values: {
+                    "test": Idx::<Expression>(1),
+                },
+            },
+            "name": (
+                Idx::<TypeReference>(6),
+                Idx::<TypeReference>(5),
+            ),
+            "range": 87..151,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

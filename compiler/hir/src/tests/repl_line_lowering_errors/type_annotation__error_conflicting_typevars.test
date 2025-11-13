@@ -70,6 +70,7 @@ HirModule {
             "range": 59..69,
         },
     },
+    traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),

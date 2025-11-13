@@ -28,18 +28,15 @@ HirModule {
             "range": 0..23,
             "scope_id": Idx::<Scope>(0),
         },
-        Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
+    },
+    traits: Index::<Trait> {
+        Idx::<Trait>(0): {
+            "item": Trait {
                 name: "Trait1",
-                kind: Trait(
-                    Trait {
-                        name: "Trait1",
-                        self_constraints: [],
-                        named_type_variables: {},
-                        type_annotations: {},
-                        values: {},
-                    },
-                ),
+                self_constraints: [],
+                named_type_variables: {},
+                type_annotations: {},
+                values: {},
             },
             "name": "Trait1",
             "range": 89..146,

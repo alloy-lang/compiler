@@ -29,20 +29,17 @@ HirModule {
             },
             "range": 42..53,
         },
-        Idx::<TypeDefinition>(2): {
-            "item": TypeDefinition {
+    },
+    traits: Index::<Trait> {
+        Idx::<Trait>(0): {
+            "item": Trait {
                 name: "TestTrait1",
-                kind: Trait(
-                    Trait {
-                        name: "TestTrait1",
-                        self_constraints: [],
-                        named_type_variables: {
-                            "t1": Idx::<TypeDefinition>(1),
-                        },
-                        type_annotations: {},
-                        values: {},
-                    },
-                ),
+                self_constraints: [],
+                named_type_variables: {
+                    "t1": Idx::<TypeDefinition>(1),
+                },
+                type_annotations: {},
+                values: {},
             },
             "name": "TestTrait1",
             "range": 0..56,

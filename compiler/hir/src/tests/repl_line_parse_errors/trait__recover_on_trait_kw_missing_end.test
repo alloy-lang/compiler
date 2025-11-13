@@ -28,25 +28,6 @@ HirModule {
         },
         Idx::<TypeDefinition>(1): {
             "item": TypeDefinition {
-                name: "TestTrait1",
-                kind: Trait(
-                    Trait {
-                        name: "TestTrait1",
-                        self_constraints: [],
-                        named_type_variables: {
-                            "t1": Idx::<TypeDefinition>(0),
-                        },
-                        type_annotations: {},
-                        values: {},
-                    },
-                ),
-            },
-            "name": "TestTrait1",
-            "range": 0..75,
-            "scope_id": Idx::<Scope>(0),
-        },
-        Idx::<TypeDefinition>(2): {
-            "item": TypeDefinition {
                 name: "t1",
                 kind: TypeVariable(
                     Unbound,
@@ -56,20 +37,31 @@ HirModule {
             "range": 138..149,
             "scope_id": Idx::<Scope>(2),
         },
-        Idx::<TypeDefinition>(3): {
-            "item": TypeDefinition {
+    },
+    traits: Index::<Trait> {
+        Idx::<Trait>(0): {
+            "item": Trait {
+                name: "TestTrait1",
+                self_constraints: [],
+                named_type_variables: {
+                    "t1": Idx::<TypeDefinition>(0),
+                },
+                type_annotations: {},
+                values: {},
+            },
+            "name": "TestTrait1",
+            "range": 0..75,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Trait>(1): {
+            "item": Trait {
                 name: "TestTrait2",
-                kind: Trait(
-                    Trait {
-                        name: "TestTrait2",
-                        self_constraints: [],
-                        named_type_variables: {
-                            "t1": Idx::<TypeDefinition>(2),
-                        },
-                        type_annotations: {},
-                        values: {},
-                    },
-                ),
+                self_constraints: [],
+                named_type_variables: {
+                    "t1": Idx::<TypeDefinition>(1),
+                },
+                type_annotations: {},
+                values: {},
             },
             "name": "TestTrait2",
             "range": 75..152,

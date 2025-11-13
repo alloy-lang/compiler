@@ -1,6 +1,9 @@
 trait TestTrait1 where
-    self = #Type[_
-    typevar t1
+    -- empty
+end
+
+trait TestTrait1 where
+    -- empty
 end
 ===
 HirModule {
@@ -8,36 +11,18 @@ HirModule {
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,
     type_references: EmptyIndex::<TypeReference>,
-    type_definitions: Index::<TypeDefinition> {
-        Idx::<TypeDefinition>(0): {
-            "item": TypeDefinition {
-                name: "t1",
-                kind: TypeVariable(
-                    Unbound,
-                ),
-            },
-            "name": "t1",
-            "range": 46..57,
-            "scope_id": Idx::<Scope>(1),
-        },
-    },
+    type_definitions: EmptyIndex::<TypeDefinition>,
     traits: Index::<Trait> {
         Idx::<Trait>(0): {
             "item": Trait {
                 name: "TestTrait1",
-                self_constraints: [
-                    Kind(
-                        1,
-                    ),
-                ],
-                named_type_variables: {
-                    "t1": Idx::<TypeDefinition>(0),
-                },
+                self_constraints: [],
+                named_type_variables: {},
                 type_annotations: {},
                 values: {},
             },
             "name": "TestTrait1",
-            "range": 0..60,
+            "range": 0..41,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -45,7 +30,7 @@ HirModule {
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 2,
+            len: 3,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -55,20 +40,23 @@ HirModule {
                     parent: Idx::<Scope>(0),
                     tag: "trait",
                 },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "trait",
+                },
             ],
         },
     },
     warnings: [],
-    errors: [],
-}
-[
-    ParseError {
-        expected: [
-            RBracket,
-        ],
-        kind: Missing {
-            offset: 46,
+    errors: [
+        LoweringError {
+            kind: ConflictingTraitDefinitionName {
+                name: "TestTrait1",
+                first: 0..41,
+                second: 41..80,
+            },
+            range: 41..80,
         },
-        context: TypeVariableKindConstraintRBracket,
-    },
-]
+    ],
+}
+[]
