@@ -37,22 +37,22 @@ pub fn compile<'db>(
 ) {
     let workspace = build_workspace(db, external_packages, current_package);
 
-    // Phase 1: Parse all files and collect parse errors
+    // Phase 1 & 2: Parse and lower all files to HIR (single pass)
+    // This efficiently parses each file once and returns both parse errors and HIR
     let mut parse_errors = HashMap::new();
-    for (slug, source_file) in workspace.files(db) {
-        let errs = alloy_workspace::parse_errors(db, *source_file);
-        parse_errors.insert(slug, errs);
-    }
-
-    // Phase 2: Lower all files to HIR and collect lowering errors
     let mut hir_modules = HashMap::new();
     let mut lowering_errors = HashMap::new();
     let mut lowering_warnings = HashMap::new();
 
     for (slug, source_file) in workspace.files(db) {
-        let hir_module = alloy_hir::lower_file(db, *source_file);
+        let (hir_module, parse_errs) = alloy_hir::lower_file(db, *source_file);
 
-        // Collect errors and warnings from HIR lowering
+        // Collect parse errors
+        if !parse_errs.is_empty() {
+            parse_errors.insert(slug.clone(), parse_errs);
+        }
+
+        // Collect lowering errors and warnings
         if !hir_module.errors().is_empty() {
             lowering_errors.insert(slug.clone(), hir_module.errors().to_vec());
         }
