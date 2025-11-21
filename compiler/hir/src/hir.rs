@@ -642,19 +642,21 @@ impl<'db> LoweringCtx<'db> {
 /// Lower a raw source file to HIR.
 /// This query is cached by salsa, so repeated calls with the same file
 /// will return the cached result unless the file contents have changed.
+/// Returns both parse errors and the HIR module.
 #[salsa::tracked]
 pub fn lower_file<'db>(
     db: &'db dyn HirDatabase,
     file: alloy_workspace::RawSourceFile,
-) -> HirModule {
-    let (source_file, _parse_errors) = ast::source_file(file.contents(db));
+) -> (HirModule, Vec<alloy_parser::ParseError>) {
+    let (source_file, parse_errors) = ast::source_file(file.contents(db));
 
-    // If parsing failed, return an empty HIR module
+    // If parsing failed, return an empty HIR module with parse errors
     let Some(source_file) = source_file else {
-        return HirModule::empty();
+        return (HirModule::empty(), parse_errors);
     };
 
-    lower_source_file(db, &source_file)
+    let hir_module = lower_source_file(db, &source_file);
+    (hir_module, parse_errors)
 }
 
 #[must_use]

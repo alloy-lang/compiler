@@ -6,7 +6,5 @@ edition = "2018"
 
 [dependencies]
 salsa = { workspace = true }
-alloy_parser = { path = "../parser" }
-alloy_ast = { path = "../ast" }
 
 [dev-dependencies]
