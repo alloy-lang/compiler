@@ -75,7 +75,7 @@ pub enum HirReferenceType {
 }
 
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct HirModule {
     imports: Index<Import>,
     expressions: Index<Expression>,
@@ -96,6 +96,21 @@ impl HirModule {
 
     pub fn errors(&self) -> &[LoweringError] {
         &self.errors
+    }
+
+    fn empty() -> Self {
+        Self {
+            imports: Default::default(),
+            expressions: Default::default(),
+            patterns: Default::default(),
+            type_references: Default::default(),
+            type_definitions: Default::default(),
+            traits: Default::default(),
+            behaviors: Default::default(),
+            scopes: Default::default(),
+            warnings: Vec::new(),
+            errors: Vec::new(),
+        }
     }
 }
 
@@ -622,6 +637,24 @@ impl<'db> LoweringCtx<'db> {
 
         res
     }
+}
+
+/// Lower a raw source file to HIR.
+/// This query is cached by salsa, so repeated calls with the same file
+/// will return the cached result unless the file contents have changed.
+#[salsa::tracked]
+pub fn lower_file<'db>(
+    db: &'db dyn HirDatabase,
+    file: alloy_workspace::RawSourceFile,
+) -> HirModule {
+    let (source_file, _parse_errors) = ast::source_file(file.contents(db));
+
+    // If parsing failed, return an empty HIR module
+    let Some(source_file) = source_file else {
+        return HirModule::empty();
+    };
+
+    lower_source_file(db, &source_file)
 }
 
 #[must_use]
