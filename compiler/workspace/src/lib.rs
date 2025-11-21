@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+#[salsa::db]
 pub trait WorkspaceDatabase: salsa::Database {}
 
 #[salsa::interned]
@@ -48,4 +49,16 @@ impl<'db> Package<'db> {
             .iter()
             .any(|f| f.raw_path(db).as_ref() == path)
     }
+}
+
+/// Parses a source file and returns the parse errors.
+/// This query is cached by salsa, so repeated calls with the same file
+/// will return the cached result unless the file contents have changed.
+#[salsa::tracked]
+pub fn parse_errors(
+    db: &dyn WorkspaceDatabase,
+    file: RawSourceFile,
+) -> Vec<alloy_parser::ParseError> {
+    let (_, errors) = alloy_ast::source_file(file.contents(db));
+    errors
 }

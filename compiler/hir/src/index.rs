@@ -8,11 +8,21 @@ use text_size::TextRange;
 
 use crate::Name;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub struct Index<T, N: Eq + Hash = Name> {
     items: Arena<T>,
     item_ranges: ArenaMap<Idx<T>, TextRange>,
     item_names: FxHashMap<(N, ScopeIdx), Idx<T>>,
+}
+
+impl<T, N: Eq + Hash> Default for Index<T, N> {
+    fn default() -> Self {
+        Self {
+            items: Arena::new(),
+            item_ranges: ArenaMap::new(),
+            item_names: FxHashMap::default(),
+        }
+    }
 }
 
 pub(crate) struct IndexIterator<'a, T, N: Eq + Hash> {

@@ -13,6 +13,9 @@ pub(crate) struct TestHirDatabase {
 impl salsa::Database for TestHirDatabase {}
 
 #[salsa::db]
+impl alloy_workspace::WorkspaceDatabase for TestHirDatabase {}
+
+#[salsa::db]
 impl crate::HirDatabase for TestHirDatabase {}
 
 #[test]

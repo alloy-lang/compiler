@@ -12,7 +12,7 @@ mod index;
 mod tests;
 
 #[salsa::db]
-pub trait HirDatabase: salsa::Database {}
+pub trait HirDatabase: alloy_workspace::WorkspaceDatabase {}
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Name(String);

@@ -37,11 +37,34 @@ pub fn compile<'db>(
 ) {
     let workspace = build_workspace(db, external_packages, current_package);
 
+    // Phase 1: Parse all files and collect parse errors
     let mut parse_errors = HashMap::new();
     for (slug, source_file) in workspace.files(db) {
-        let (_, errs) = alloy_ast::source_file(source_file.contents(db));
+        let errs = alloy_workspace::parse_errors(db, *source_file);
         parse_errors.insert(slug, errs);
     }
+
+    // Phase 2: Lower all files to HIR and collect lowering errors
+    let mut hir_modules = HashMap::new();
+    let mut lowering_errors = HashMap::new();
+    let mut lowering_warnings = HashMap::new();
+
+    for (slug, source_file) in workspace.files(db) {
+        let hir_module = alloy_hir::lower_file(db, *source_file);
+
+        // Collect errors and warnings from HIR lowering
+        if !hir_module.errors().is_empty() {
+            lowering_errors.insert(slug.clone(), hir_module.errors().to_vec());
+        }
+        if !hir_module.warnings().is_empty() {
+            lowering_warnings.insert(slug.clone(), hir_module.warnings().to_vec());
+        }
+
+        hir_modules.insert(slug, hir_module);
+    }
+
+    // TODO: Phase 3: Type checking
+    // TODO: Phase 4: IR generation (only for files reachable from entrypoint)
 
     // entrypoint(s) of the current package
     //   for a binary, this is the `main` function in the entrypoint file

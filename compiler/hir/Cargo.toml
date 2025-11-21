@@ -9,6 +9,7 @@ edition = "2018"
 alloy_ast = { path = "../ast" }
 alloy_scope = { path = "../scope" }
 alloy_syntax = { path = "../syntax" }
+alloy_workspace = { path = "../workspace" }
 la-arena = { workspace = true }
 maplit = { workspace = true }
 non-empty-vec = { workspace = true }
