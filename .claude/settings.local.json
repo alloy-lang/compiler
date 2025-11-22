@@ -4,7 +4,8 @@
       "Bash(find:*)",
       "Bash(cargo check:*)",
       "Bash(cargo test:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(cargo build:*)"
     ],
     "deny": [],
     "ask": []
