@@ -74,6 +74,27 @@ pub enum HirReferenceType {
     Type,
 }
 
+/// Represents exported symbols from a module at root scope (scope 0)
+#[derive(Clone, PartialEq, Eq)]
+pub struct ModuleExports {
+    /// Type definitions exported by this module
+    pub types: FxHashMap<Name, TypeDefinitionIdx>,
+    /// Expression definitions exported by this module
+    pub expressions: FxHashMap<Name, ExpressionIdx>,
+    /// Trait definitions exported by this module
+    pub traits: FxHashMap<Name, TraitIdx>,
+}
+
+impl ModuleExports {
+    fn new() -> Self {
+        Self {
+            types: FxHashMap::default(),
+            expressions: FxHashMap::default(),
+            traits: FxHashMap::default(),
+        }
+    }
+}
+
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq)]
 pub struct HirModule {
@@ -198,6 +219,43 @@ impl HirModule {
 
     pub fn get_trait(&self, idx: TraitIdx) -> &Trait {
         self.traits.get(idx)
+    }
+
+    /// Collect all exported symbols from this module
+    /// For now, we export everything at the root scope (scope 0)
+    pub fn module_exports(&self) -> ModuleExports {
+        let mut exports = ModuleExports::new();
+
+        // Root scope is always index 0
+
+        // Collect type definitions at root scope
+        for (type_idx, _type_def, _range, name_scope) in self.type_definitions() {
+            if let Some((name, scope)) = name_scope {
+                if scope == Scopes::ROOT {
+                    exports.types.insert(name, type_idx);
+                }
+            }
+        }
+
+        // Collect trait definitions at root scope
+        for (trait_idx, _trait_def, _range, name_scope) in self.traits() {
+            if let Some((name, scope)) = name_scope {
+                if scope == Scopes::ROOT {
+                    exports.traits.insert(name, trait_idx);
+                }
+            }
+        }
+
+        // Collect expression exports (patterns are never exported)
+        for (expr_idx, _expr, _range, name_scope) in self.expressions() {
+            if let Some((name, scope)) = name_scope {
+                if scope == Scopes::ROOT {
+                    exports.expressions.insert(name, expr_idx);
+                }
+            }
+        }
+
+        exports
     }
 }
 

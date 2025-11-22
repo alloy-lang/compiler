@@ -46,87 +46,18 @@
 
 use alloy_hir as hir;
 use alloy_workspace::{RawSourceFile, Workspace};
-use rustc_hash::FxHashMap;
-use std::sync::Arc;
 
 use crate::HirTyDatabase;
 
-/// Represents exported symbols from a module
-#[derive(Clone, PartialEq, Eq)]
-pub struct ModuleExports {
-    /// Type definitions exported by this module (at root scope)
-    pub types: FxHashMap<hir::Name, hir::TypeDefinitionIdx>,
-    /// Value definitions (patterns/expressions) exported by this module (at root scope)
-    pub values: FxHashMap<hir::Name, ValueExport>,
-    /// Trait definitions exported by this module (at root scope)
-    pub traits: FxHashMap<hir::Name, hir::TraitIdx>,
-}
-
-#[derive(Clone, PartialEq, Eq)]
-pub enum ValueExport {
-    Expression(hir::ExpressionIdx),
-    Pattern(hir::PatternIdx),
-}
-
-impl ModuleExports {
-    fn new() -> Self {
-        Self {
-            types: FxHashMap::default(),
-            values: FxHashMap::default(),
-            traits: FxHashMap::default(),
-        }
-    }
-}
+// Re-export ModuleExports from hir
+pub use hir::ModuleExports;
 
 /// Collect all exported symbols from a module
 /// For now, we export everything at the root scope (scope 0)
 #[salsa::tracked]
 pub fn module_exports(db: &dyn HirTyDatabase, file: RawSourceFile) -> ModuleExports {
     let (hir_module, _parse_errors) = hir::lower_file(db, file);
-    let mut exports = ModuleExports::new();
-
-    // Collect type definitions at root scope
-    for (type_idx, _type_def, _range, name_scope) in hir_module.type_definitions() {
-        if let Some((name, scope)) = name_scope {
-            if scope == alloy_scope::Scopes::ROOT {
-                exports.types.insert(name, type_idx);
-            }
-        }
-    }
-
-    // Collect trait definitions at root scope
-    for (trait_idx, _trait_def, _range, name_scope) in hir_module.traits() {
-        if let Some((name, scope)) = name_scope {
-            if scope == alloy_scope::Scopes::ROOT {
-                exports.traits.insert(name, trait_idx);
-            }
-        }
-    }
-
-    // Collect value exports (patterns have priority over expressions)
-    // First collect expressions
-    for (expr_idx, _expr, _range, name_scope) in hir_module.expressions() {
-        if let Some((name, scope)) = name_scope {
-            if scope == alloy_scope::Scopes::ROOT {
-                exports
-                    .values
-                    .insert(name, ValueExport::Expression(expr_idx));
-            }
-        }
-    }
-
-    // Then collect patterns (overwriting expressions if same name)
-    for (pattern_idx, _pattern, _range, name_scope) in hir_module.patterns() {
-        if let Some((name, scope)) = name_scope {
-            if scope == alloy_scope::Scopes::ROOT {
-                exports
-                    .values
-                    .insert(name, ValueExport::Pattern(pattern_idx));
-            }
-        }
-    }
-
-    exports
+    hir_module.module_exports()
 }
 
 /// Get all files in the workspace
@@ -220,17 +151,11 @@ pub fn resolve_cross_module_symbol(
         });
     }
 
-    // Check if it's a value (pattern or expression)
-    if let Some(value_export) = exports.values.get(symbol_name) {
-        return Some(match value_export {
-            ValueExport::Expression(expr_idx) => ResolvedSymbol::Expression {
-                file: imported_file,
-                idx: *expr_idx,
-            },
-            ValueExport::Pattern(pattern_idx) => ResolvedSymbol::Pattern {
-                file: imported_file,
-                idx: *pattern_idx,
-            },
+    // Check if it's an expression
+    if let Some(expr_idx) = exports.expressions.get(symbol_name) {
+        return Some(ResolvedSymbol::Expression {
+            file: imported_file,
+            idx: *expr_idx,
         });
     }
 
@@ -251,10 +176,6 @@ pub enum ResolvedSymbol {
     Expression {
         file: RawSourceFile,
         idx: hir::ExpressionIdx,
-    },
-    Pattern {
-        file: RawSourceFile,
-        idx: hir::PatternIdx,
     },
 }
 
@@ -310,11 +231,11 @@ let p = types.Point(1, 2)
             "Expected Point type to be exported from types.alloy"
         );
 
-        // Check that origin value is exported
+        // Check that origin expression is exported
         let origin_name = hir::Name::new("origin");
         assert!(
-            types_exports.values.contains_key(&origin_name),
-            "Expected origin value to be exported from types.alloy"
+            types_exports.expressions.contains_key(&origin_name),
+            "Expected origin expression to be exported from types.alloy"
         );
 
         // Test 2: resolve_import should find types.alloy from main.alloy
@@ -360,7 +281,7 @@ let p = types.Point(1, 2)
             _ => panic!("Expected Point to resolve as a Type"),
         }
 
-        // Test 4: resolve_cross_module_symbol should find origin value in types.alloy
+        // Test 4: resolve_cross_module_symbol should find origin expression in types.alloy
         let resolved_symbol = crate::resolve_cross_module_symbol(&db, types_file, &origin_name);
         assert!(
             resolved_symbol.is_some(),
@@ -368,14 +289,13 @@ let p = types.Point(1, 2)
         );
 
         match resolved_symbol.unwrap() {
-            crate::ResolvedSymbol::Pattern { file, .. }
-            | crate::ResolvedSymbol::Expression { file, .. } => {
+            crate::ResolvedSymbol::Expression { file, .. } => {
                 assert!(
                     file == types_file,
                     "Expected symbol to come from types.alloy"
                 );
             }
-            _ => panic!("Expected origin to resolve as a Pattern or Expression"),
+            _ => panic!("Expected origin to resolve as an Expression"),
         }
     }
 }
