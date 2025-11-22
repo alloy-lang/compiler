@@ -5,7 +5,9 @@ typedef Either =
 let unknown = Either::Nothing
 
 ===
-InferenceContext {
-    type_map: {},
+InferenceResult {
+    type_map: {
+        Idx::<Expression>(0): Unknown,
+    },
 }
 []

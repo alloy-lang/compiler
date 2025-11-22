@@ -4,7 +4,7 @@ typeof test : Test -> t2 -> Test where
     typevar
     typevar t2
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 [

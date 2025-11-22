@@ -2,9 +2,12 @@ let counter = 0
 
 counter
 ===
-InferenceContext {
+InferenceResult {
     type_map: {
         Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
             Int,
         ),
     },

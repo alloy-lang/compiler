@@ -4,13 +4,23 @@ use alloy_ast as ast;
 use alloy_hir as hir;
 use alloy_parser::ParseError;
 
-#[derive(Default)]
-#[salsa::db(hir::Jar, crate::Jar)]
+#[salsa::db]
+#[derive(Default, Clone)]
 pub(crate) struct TestHirTyDatabase {
     storage: salsa::Storage<Self>,
 }
 
+#[salsa::db]
 impl salsa::Database for TestHirTyDatabase {}
+
+#[salsa::db]
+impl alloy_workspace::WorkspaceDatabase for TestHirTyDatabase {}
+
+#[salsa::db]
+impl hir::HirDatabase for TestHirTyDatabase {}
+
+#[salsa::db]
+impl crate::HirTyDatabase for TestHirTyDatabase {}
 
 #[test]
 fn source_file() {
@@ -44,10 +54,11 @@ fn repl_line_parse_errors() {
 pub(crate) fn infer_types_source_file(
     input: &str,
 ) -> (crate::InferenceResult, hir::HirModule, Vec<ParseError>) {
+    let db = TestHirTyDatabase::default();
     let (source_file, parse_errors) = ast::source_file(input);
     let source_file = source_file.expect("Failed to parse source file");
 
-    let hir = hir::lower_source_file(&source_file);
+    let hir = hir::lower_source_file(&db, &source_file);
     (crate::infer_types(&hir), hir, parse_errors)
 }
 
@@ -55,10 +66,11 @@ pub(crate) fn infer_types_source_file(
 pub(crate) fn infer_types_repl_line(
     input: &str,
 ) -> (crate::InferenceResult, hir::HirModule, Vec<ParseError>) {
+    let db = TestHirTyDatabase::default();
     let (source_file, parse_errors) = ast::source_file(input);
     let source_file = source_file.expect("Failed to parse source file");
 
-    let hir = hir::lower_source_file(&source_file);
+    let hir = hir::lower_source_file(&db, &source_file);
     (crate::infer_types(&hir), hir, parse_errors)
 }
 

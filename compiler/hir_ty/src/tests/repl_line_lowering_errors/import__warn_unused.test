@@ -1,6 +1,6 @@
 import std::functor::map
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 []

@@ -3,7 +3,7 @@ typedef Test1 =
   | Thing2 "hi"
   | Thing3 String Int
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 [

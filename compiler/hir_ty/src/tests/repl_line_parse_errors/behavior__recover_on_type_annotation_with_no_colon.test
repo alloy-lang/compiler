@@ -3,7 +3,7 @@ behavior TestTrait1 for Type1 where
     typeof test2 : self -> String -> Int
 end
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 [

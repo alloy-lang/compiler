@@ -1,6 +1,6 @@
 use super::{Fqn, HirDatabase, Name};
 use crate::ast_glossary::AstGlossary;
-use crate::index::Index;
+use crate::index::{Index, IndexItem};
 use std::any::Any;
 
 use alloy_ast as ast;
@@ -111,6 +111,93 @@ impl HirModule {
             warnings: Vec::new(),
             errors: Vec::new(),
         }
+    }
+
+    // Iterator methods for accessing collections
+    pub fn type_definitions(&'_ self) -> impl Iterator<Item = IndexItem<'_, TypeDefinition, Name>> {
+        self.type_definitions.iter()
+    }
+
+    pub fn expressions(&'_ self) -> impl Iterator<Item = IndexItem<'_, Expression, Name>> {
+        self.expressions.iter()
+    }
+
+    pub fn patterns(&'_ self) -> impl Iterator<Item = IndexItem<'_, Pattern, Name>> {
+        self.patterns.iter()
+    }
+
+    pub fn type_references(&'_ self) -> impl Iterator<Item = IndexItem<'_, TypeReference, Name>> {
+        self.type_references.iter()
+    }
+
+    pub fn imports(&'_ self) -> impl Iterator<Item = IndexItem<'_, Import, Name>> {
+        self.imports.iter()
+    }
+
+    pub fn traits(&'_ self) -> impl Iterator<Item = IndexItem<'_, Trait, Name>> {
+        self.traits.iter()
+    }
+
+    // Lookup methods by name and scope
+    pub fn get_type_definition_by_name(
+        &self,
+        name: &Name,
+        scope: ScopeIdx,
+    ) -> Option<(TypeDefinitionIdx, &TypeDefinition)> {
+        self.type_definitions.get_by_scoped_name(name, scope)
+    }
+
+    pub fn get_expression_by_name(
+        &self,
+        name: &Name,
+        scope: ScopeIdx,
+    ) -> Option<(ExpressionIdx, &Expression)> {
+        self.expressions.get_by_scoped_name(name, scope)
+    }
+
+    pub fn get_pattern_by_name(
+        &self,
+        name: &Name,
+        scope: ScopeIdx,
+    ) -> Option<(PatternIdx, &Pattern)> {
+        self.patterns.get_by_scoped_name(name, scope)
+    }
+
+    pub fn get_type_reference_by_name(
+        &self,
+        name: &Name,
+        scope: ScopeIdx,
+    ) -> Option<(TypeIdx, &TypeReference)> {
+        self.type_references.get_by_scoped_name(name, scope)
+    }
+
+    pub fn get_trait_by_name(&self, name: &Name, scope: ScopeIdx) -> Option<(TraitIdx, &Trait)> {
+        self.traits.get_by_scoped_name(name, scope)
+    }
+
+    // Get methods by index
+    pub fn get_type_definition(&self, idx: TypeDefinitionIdx) -> &TypeDefinition {
+        self.type_definitions.get(idx)
+    }
+
+    pub fn get_expression(&self, idx: ExpressionIdx) -> &Expression {
+        self.expressions.get(idx)
+    }
+
+    pub fn get_pattern(&self, idx: PatternIdx) -> &Pattern {
+        self.patterns.get(idx)
+    }
+
+    pub fn get_type_reference(&self, idx: TypeIdx) -> &TypeReference {
+        self.type_references.get(idx)
+    }
+
+    pub fn get_import(&self, idx: ImportIdx) -> &Import {
+        self.imports.get(idx)
+    }
+
+    pub fn get_trait(&self, idx: TraitIdx) -> &Trait {
+        self.traits.get(idx)
     }
 }
 

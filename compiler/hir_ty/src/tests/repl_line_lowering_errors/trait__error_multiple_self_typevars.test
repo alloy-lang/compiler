@@ -5,7 +5,7 @@ trait TestTrait1 where
     self = debug::Debug
 end
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 []

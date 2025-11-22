@@ -42,6 +42,10 @@ impl Name {
 
         Self(name.into())
     }
+
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
 }
 
 impl From<String> for Name {

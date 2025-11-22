@@ -2,8 +2,12 @@ behavior TestTrait1 for Type1
     let a = 1
 end
 ===
-InferenceContext {
-    type_map: {},
+InferenceResult {
+    type_map: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+    },
 }
 [
     ParseError {

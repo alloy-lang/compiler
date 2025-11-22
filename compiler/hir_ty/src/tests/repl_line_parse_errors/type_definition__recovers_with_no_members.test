@@ -1,7 +1,7 @@
 typedef Test1 =
 typedef Test2 = Empty
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 [

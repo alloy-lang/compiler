@@ -1,6 +1,6 @@
 ()
 ===
-InferenceContext {
+InferenceResult {
     type_map: {
         Idx::<Expression>(0): Unit,
     },
