@@ -1,6 +1,6 @@
 typeof test : Int -> String -> ()
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 []

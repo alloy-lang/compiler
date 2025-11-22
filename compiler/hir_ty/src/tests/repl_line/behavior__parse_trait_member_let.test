@@ -4,7 +4,9 @@ behavior TestTrait1 for Type1 where
     let thing = test
 end
 ===
-InferenceContext {
-    type_map: {},
+InferenceResult {
+    type_map: {
+        Idx::<Expression>(0): Unknown,
+    },
 }
 []

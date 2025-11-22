@@ -1,6 +1,6 @@
 typedef Test[t] = Thing t
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 []

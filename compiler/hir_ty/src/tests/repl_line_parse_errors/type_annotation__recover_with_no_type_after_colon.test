@@ -3,7 +3,7 @@ import test_data::Test
 typeof test1 :
 typeof test2 : Test -> String -> Int
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 [

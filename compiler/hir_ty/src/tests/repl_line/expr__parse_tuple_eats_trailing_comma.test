@@ -2,12 +2,29 @@ let foo = 0
 
 (1, foo,)
 ===
-{
-    Idx::<Expression>(0): BuiltIn(
-        Int,
-    ),
-    Idx::<Expression>(1): BuiltIn(
-        Int,
-    ),
+InferenceResult {
+    type_map: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(3): Tuple(
+            NonEmpty(
+                [
+                    BuiltIn(
+                        Int,
+                    ),
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            ),
+        ),
+    },
 }
 []

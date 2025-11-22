@@ -8,12 +8,14 @@ edition = "2018"
 [dependencies]
 alloy_ast = { path = "../ast" }
 alloy_hir = {path = "../hir"}
+alloy_workspace = {path = "../workspace"}
+alloy_scope = { path = "../scope" }
+la-arena = { workspace = true }
 rustc-hash = { workspace = true }
 non-empty-vec = { workspace = true }
 salsa = { workspace = true }
 
 [dev-dependencies]
-la-arena = { workspace = true }
 alloy_parser = {path = "../parser"}
-alloy_scope = { path = "../scope" }
 alloy_test_harness = {path = "../test_harness"}
+alloy_workspace = {path = "../workspace"}

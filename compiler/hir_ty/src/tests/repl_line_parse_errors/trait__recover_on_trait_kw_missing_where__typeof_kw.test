@@ -2,7 +2,7 @@ trait TestTrait1
     typeof test : String
 end
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 [

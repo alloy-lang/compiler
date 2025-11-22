@@ -2,7 +2,7 @@ import test_data::Test
 
 typeof test : Test -> (String)
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 []

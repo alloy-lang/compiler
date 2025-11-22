@@ -10,7 +10,7 @@ behavior Trait1[t1, t2] for Type1 where
     -- TODO: I don't think these cases make sense?
 end
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 []

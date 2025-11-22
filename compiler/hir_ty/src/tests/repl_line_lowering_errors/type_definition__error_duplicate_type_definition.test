@@ -1,7 +1,7 @@
 typedef TestConflict = Empty
 typedef TestConflict = Empty
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 []

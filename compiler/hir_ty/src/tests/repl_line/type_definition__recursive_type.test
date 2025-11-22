@@ -2,7 +2,7 @@ typedef List =
   | Cons List
 end
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 []

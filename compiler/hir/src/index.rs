@@ -116,7 +116,7 @@ impl<T, N: Eq + Hash + Clone + fmt::Debug> Index<T, N> {
         self.items.is_empty()
     }
 
-    pub(crate) fn iter(&self) -> IndexIterator<T, N> {
+    pub(crate) fn iter(&'_ self) -> IndexIterator<'_, T, N> {
         IndexIterator::new(self)
     }
 

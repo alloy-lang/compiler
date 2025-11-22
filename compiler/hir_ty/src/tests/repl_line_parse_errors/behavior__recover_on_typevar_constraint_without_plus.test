@@ -3,7 +3,7 @@ behavior TestTrait1 for Type1 where
     typevar t2
 end
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 [

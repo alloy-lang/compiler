@@ -1,7 +1,7 @@
 let = 1
 let b = 2
 ===
-InferenceContext {
+InferenceResult {
     type_map: {
         Idx::<Expression>(0): BuiltIn(
             Int,

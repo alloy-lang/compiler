@@ -4,18 +4,9 @@ trait TestTrait1 where
     let thing = test
 end
 ===
-InferenceContext {
+InferenceResult {
     type_map: {
-        Idx::<Expression>(0): Named {
-            path: ThisModule(
-                NonEmpty(
-                    [
-                        "test",
-                    ],
-                ),
-            ),
-            id: Idx::<TypeReference>(0),
-        },
+        Idx::<Expression>(0): Unknown,
     },
 }
 []

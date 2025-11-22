@@ -2,7 +2,7 @@ trait TestTrait1
     let a = 1
 end
 ===
-InferenceContext {
+InferenceResult {
     type_map: {
         Idx::<Expression>(0): BuiltIn(
             Int,

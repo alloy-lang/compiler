@@ -5,7 +5,7 @@ trait TestTrait1 where
     -- imagine all the things here
 end
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 [
@@ -14,7 +14,7 @@ InferenceContext {
             EndKw,
         ],
         kind: Missing {
-            offset: 68,
+            offset: 72,
         },
         context: BehaviorEnd,
     },

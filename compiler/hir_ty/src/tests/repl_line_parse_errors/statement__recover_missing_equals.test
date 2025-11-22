@@ -1,13 +1,17 @@
 let a (1 + 2)
 let b = a
 ===
-{
-    Idx::<Expression>(0): BuiltIn(
-        Int,
-    ),
-    Idx::<Expression>(1): BuiltIn(
-        Int,
-    ),
+InferenceResult {
+    type_map: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(2): Unknown,
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(3): Unknown,
+    },
 }
 [
     ParseError {

@@ -1,6 +1,6 @@
 (1 2)
 ===
-InferenceContext {
+InferenceResult {
     type_map: {
         Idx::<Expression>(0): BuiltIn(
             Int,

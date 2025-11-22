@@ -2,7 +2,7 @@ module where
     import really::really::real::Thing1
     import really::real::other::Thing2
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 [

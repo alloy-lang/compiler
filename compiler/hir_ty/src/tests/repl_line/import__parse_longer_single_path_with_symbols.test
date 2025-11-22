@@ -1,6 +1,6 @@
 import std::function::(<|)
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 []

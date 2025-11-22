@@ -8,7 +8,7 @@ trait TestTrait2 where
     typevar t1
 end
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 [

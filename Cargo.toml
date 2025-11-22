@@ -4,7 +4,7 @@ members = [
     "compiler/ast",
      "compiler/hir",
     # "compiler/hir_index",  # Temporarily disabled due to API changes
-    # "compiler/hir_ty",     # Temporarily disabled due to API changes
+     "compiler/hir_ty",
     "compiler/lexer",
     "compiler/parser",
     "compiler/project",

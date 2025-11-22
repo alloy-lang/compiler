@@ -4,7 +4,7 @@ typeof apply : Test[t1, t2 where
     typevar t1
     typevar t2
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 [

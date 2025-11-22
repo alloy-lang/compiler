@@ -4,7 +4,7 @@ trait TestTrait1
     self = Functor
 end
 ===
-InferenceContext {
+InferenceResult {
     type_map: {},
 }
 [

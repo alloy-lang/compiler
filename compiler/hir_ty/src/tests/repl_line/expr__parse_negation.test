@@ -1,10 +1,11 @@
 - 10
 ===
-InferenceContext {
+InferenceResult {
     type_map: {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
+        Idx::<Expression>(1): Unknown,
     },
 }
 []
