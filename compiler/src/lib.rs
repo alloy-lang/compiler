@@ -4,7 +4,7 @@ pub mod parser {
     pub use alloy_parser::parse_source_file;
 }
 
-use alloy_workspace::{FileSlug, Package, Workspace};
+use alloy_workspace::{FileSlug, ModuleId, Package, Workspace};
 use std::collections::HashMap;
 
 // compile
@@ -44,7 +44,7 @@ pub fn compile<'db>(
     let mut lowering_errors = HashMap::new();
     let mut lowering_warnings = HashMap::new();
 
-    for (slug, source_file) in workspace.files(db) {
+    for (slug, source_file) in workspace.files() {
         let (hir_module, parse_errs) = alloy_hir::lower_file(db, *source_file);
 
         // Collect parse errors
@@ -117,12 +117,22 @@ fn build_workspace<'db>(
     db: &'db dyn db::CompilerDatabase,
     _external_packages: &[PackageMetadata],
     current_package: Package<'db>,
-) -> Workspace {
+) -> Workspace<'db> {
     let files = current_package
         .files(db)
         .iter()
-        .map(|file| (file.raw_path(db).to_string(), *file))
+        .map(|file| {
+            // Create a ModuleId from the file path
+            // For now, use the filename (without path and extension) as the module name
+            let raw_path = file.raw_path(db);
+            let module_name = std::path::Path::new(raw_path.as_ref())
+                .file_stem()
+                .and_then(|s| s.to_str())
+                .unwrap_or("unknown");
+            let module_id = ModuleId::new(db, std::sync::Arc::from(module_name));
+            (module_id, *file)
+        })
         .collect();
 
-    Workspace::new(db, files)
+    Workspace::new(files)
 }
