@@ -8,35 +8,14 @@ pub trait WorkspaceDatabase: salsa::Database {
 
     fn get_source(&'_ self, module_id: ModuleId) -> SourceFile<'_>;
 
-    fn find_module_by_slug(&self, slug: &str) -> Option<ModuleId> {
-        let module_id = ModuleId::new(self, Arc::from(slug));
-        match self.get_source(module_id) {
-            SourceFile::Raw(_) | SourceFile::Virtual(_) => Some(module_id),
-        }
-    }
+    fn find_module_by_slug(&self, slug: &str) -> Option<ModuleId>;
 }
 
 /// Represents a module identifier using :: syntax (e.g., "std::collections::HashMap")
 #[salsa::interned(no_lifetime, debug)]
 pub struct ModuleId {
     /// The module path as a string (e.g., "std::collections")
-    #[returns(ref)]
-    pub path: Arc<str>,
-}
-
-impl<'db> ModuleId {
-    /// Get the segments of this module path
-    pub fn segments(&self, db: &'db dyn WorkspaceDatabase) -> Vec<String> {
-        self.path(db).split("::").map(|s| s.to_string()).collect()
-    }
-
-    /// Get the file system path for this module (e.g., "std::collections" -> "std/collections.alloy")
-    pub fn file_path(&self, db: &'db dyn WorkspaceDatabase) -> String {
-        let segments = self.segments(db);
-        let mut path = segments.join("/");
-        path.push_str(".alloy");
-        path
-    }
+    pub path: String,
 }
 
 pub enum SourceFile<'a> {
@@ -66,6 +45,46 @@ pub struct Workspace {
     virtual_files: HashMap<ModuleId, VirtualSourceFile>,
 }
 
+/// Prepared module data ready to be inserted into a workspace
+///
+/// This struct holds all Salsa-tracked items that have been created,
+/// allowing the two-phase approach to avoid borrow checker conflicts.
+pub struct PreparedModule {
+    module_id: ModuleId,
+    file: RawSourceFile,
+    virtual_entries: Vec<(ModuleId, String)>,
+}
+
+/// Phase 1: Prepare module data by creating Salsa-tracked items
+///
+/// This function only reads from the database and creates new Salsa items.
+/// It doesn't mutate the workspace, allowing it to be called with `&self`.
+pub fn prepare_module(
+    db: &dyn WorkspaceDatabase,
+    slug: &str,
+    path: &Utf8Path,
+    contents: &str,
+) -> PreparedModule {
+    let module_id = ModuleId::new(db, slug.to_string());
+    let file = RawSourceFile::new(db, Arc::from(path.as_str()), Arc::from(contents));
+
+    // Prepare virtual module data
+    let virtual_slugs = Workspace::compound_slugs(slug);
+    let virtual_entries: Vec<(ModuleId, String)> = virtual_slugs
+        .iter()
+        .map(|&virtual_slug| {
+            let virtual_module_id = ModuleId::new(db, virtual_slug.to_string());
+            (virtual_module_id, virtual_slug.to_string())
+        })
+        .collect();
+
+    PreparedModule {
+        module_id,
+        file,
+        virtual_entries,
+    }
+}
+
 impl Workspace {
     pub fn empty() -> Workspace {
         Workspace {
@@ -74,25 +93,22 @@ impl Workspace {
         }
     }
 
-    pub fn add_module<'db>(
-        &mut self,
-        db: &'db dyn WorkspaceDatabase,
-        slug: &str,
-        path: &Utf8Path,
-        contents: &str,
-    ) -> ModuleId {
-        let module_id = ModuleId::new(db, Arc::from(slug));
-        let file = RawSourceFile::new(db, Arc::from(path.as_str()), Arc::from(contents));
-        self.raw_files.insert(module_id, file);
+    /// Phase 2: Insert a prepared module into the workspace
+    ///
+    /// This method only mutates the workspace and doesn't need database access,
+    /// completing the two-phase add_module process.
+    pub fn insert_prepared_module(&mut self, prepared: PreparedModule) -> ModuleId {
+        let module_id = prepared.module_id;
 
-        let virtual_slugs = Workspace::compound_slugs(slug);
+        // Insert the raw source file
+        self.raw_files.insert(prepared.module_id, prepared.file);
 
-        for virtual_slug in virtual_slugs {
-            let virtual_module_id = ModuleId::new(db, Arc::from(virtual_slug));
+        // Insert virtual file entries
+        for (virtual_module_id, name) in prepared.virtual_entries {
             self.virtual_files
                 .entry(virtual_module_id)
                 .or_insert_with(|| VirtualSourceFile {
-                    name: virtual_slug.to_string(),
+                    name,
                     children: Vec::new(),
                 })
                 .children
@@ -122,6 +138,15 @@ impl Workspace {
             .map(SourceFile::Raw)
             .or_else(|| self.virtual_files.get(&module_id).map(SourceFile::Virtual))
             .expect("module ID not found")
+    }
+
+    pub fn find_module_by_slug(&self, db: &dyn WorkspaceDatabase, slug: &str) -> Option<ModuleId> {
+        let module_id = ModuleId::new(db, slug.to_string());
+        if self.raw_files.contains_key(&module_id) || self.virtual_files.contains_key(&module_id) {
+            Some(module_id)
+        } else {
+            None
+        }
     }
 }
 
@@ -154,11 +179,11 @@ mod tests {
     fn compound_slug() {
         // long module path
         assert_eq!(
-            Workspace::<'_>::compound_slugs("really::long::module::path"),
+            Workspace::compound_slugs("really::long::module::path"),
             vec!["really", "really::long", "really::long::module",]
         );
 
         // short module path
-        assert_eq!(Workspace::<'_>::compound_slugs("short"), Vec::<&str>::new(),);
+        assert_eq!(Workspace::compound_slugs("short"), Vec::<&str>::new(),);
     }
 }

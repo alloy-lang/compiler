@@ -13,11 +13,16 @@ impl salsa::Database for CompilerDatabase {}
 #[salsa::db]
 impl alloy_workspace::WorkspaceDatabase for CompilerDatabase {
     fn add_module(&mut self, slug: &str, path: &camino::Utf8Path, contents: &str) -> ModuleId {
-        self.workspace.add_module(self, slug, path, contents)
+        let prepared = alloy_workspace::prepare_module(self, slug, path, contents);
+        self.workspace.insert_prepared_module(prepared)
     }
 
     fn get_source(&'_ self, module_id: ModuleId) -> SourceFile<'_> {
         self.workspace.get_source(module_id)
+    }
+
+    fn find_module_by_slug(&self, slug: &str) -> Option<ModuleId> {
+        self.workspace.find_module_by_slug(self, slug)
     }
 }
 

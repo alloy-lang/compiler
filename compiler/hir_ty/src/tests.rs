@@ -3,7 +3,7 @@ use std::path::Path;
 use alloy_ast as ast;
 use alloy_hir as hir;
 use alloy_parser::ParseError;
-use alloy_workspace::{ModuleId, SourceFile, Workspace};
+use alloy_workspace::{ModuleId, SourceFile, Workspace, WorkspaceDatabase};
 
 #[salsa::db]
 #[derive(Default, Clone)]
@@ -18,11 +18,16 @@ impl salsa::Database for TestHirTyDatabase {}
 #[salsa::db]
 impl alloy_workspace::WorkspaceDatabase for TestHirTyDatabase {
     fn add_module(&mut self, slug: &str, path: &camino::Utf8Path, contents: &str) -> ModuleId {
-        self.workspace.add_module(self, slug, path, contents)
+        let prepared = alloy_workspace::prepare_module(self, slug, path, contents);
+        self.workspace.insert_prepared_module(prepared)
     }
 
     fn get_source(&'_ self, module_id: ModuleId) -> SourceFile<'_> {
         self.workspace.get_source(module_id)
+    }
+
+    fn find_module_by_slug(&self, slug: &str) -> Option<ModuleId> {
+        self.workspace.find_module_by_slug(self, slug)
     }
 }
 
@@ -35,52 +40,40 @@ impl crate::HirTyDatabase for TestHirTyDatabase {}
 #[test]
 fn source_file() {
     alloy_test_harness::run_test_dir("source_file", |path, input| {
-        run_hir_ty_test(path, input, false, false, infer_types_source_file)
+        run_hir_ty_test(path, input, false, false)
     });
 }
 
 #[test]
 fn repl_line() {
     alloy_test_harness::run_test_dir("repl_line", |path, input| {
-        run_hir_ty_test(path, input, false, false, infer_types_repl_line)
+        run_hir_ty_test(path, input, false, false)
     });
 }
 
 #[test]
 fn repl_line_lowering_errors() {
     alloy_test_harness::run_test_dir("repl_line_lowering_errors", |path, input| {
-        run_hir_ty_test(path, input, false, true, infer_types_repl_line)
+        run_hir_ty_test(path, input, false, true)
     });
 }
 
 #[test]
 fn repl_line_parse_errors() {
     alloy_test_harness::run_test_dir("repl_line_parse_errors", |path, input| {
-        run_hir_ty_test(path, input, true, false, infer_types_repl_line)
+        run_hir_ty_test(path, input, true, false)
     });
 }
 
 #[track_caller]
-pub(crate) fn infer_types_source_file(
+pub(crate) fn infer_types_source_file<'db>(
+    db: &'db dyn crate::HirTyDatabase,
     input: &str,
 ) -> (crate::InferenceResult, hir::HirModule, Vec<ParseError>) {
-    let db = TestHirTyDatabase::default();
     let (source_file, parse_errors) = ast::source_file(input);
     let source_file = source_file.expect("Failed to parse source file");
 
-    let hir = hir::lower_source_file(&db, &source_file);
-    (crate::infer_types(&hir), hir, parse_errors)
-}
-
-#[track_caller]
-pub(crate) fn infer_types_repl_line(
-    input: &str,
-) -> (crate::InferenceResult, hir::HirModule, Vec<ParseError>) {
-    let db = TestHirTyDatabase::default();
-    let (source_file, parse_errors) = ast::source_file(input);
-    let source_file = source_file.expect("Failed to parse source file");
-
-    let hir = hir::lower_source_file(&db, &source_file);
+    let hir = hir::lower_source_file(db, &source_file);
     (crate::infer_types(&hir), hir, parse_errors)
 }
 
@@ -90,9 +83,9 @@ fn run_hir_ty_test(
     input: &str,
     expect_parse_errors: bool,
     _expect_lowering_errors: bool,
-    func: fn(&str) -> (crate::InferenceResult, hir::HirModule, Vec<ParseError>),
 ) -> String {
-    let (type_map, _hir_module, parse_errors) = func(input);
+    let mut db = TestHirTyDatabase::default();
+    let (type_map, _hir_module, parse_errors) = infer_types_source_file(&db, input);
 
     let file_name = path.to_str().expect("Expected filename");
     if expect_parse_errors {

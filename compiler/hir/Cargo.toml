@@ -17,6 +17,7 @@ ordered-float = { workspace = true }
 salsa = { workspace = true }
 rustc-hash = { workspace = true }
 text-size = { workspace = true }
+itertools = { workspace = true }
 
 [dev-dependencies]
 alloy_parser = {path = "../parser"}

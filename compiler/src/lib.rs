@@ -31,7 +31,7 @@ pub struct PackageMetadata {
 
 pub fn compile<'db>(
     db: &'db mut db::CompilerDatabase,
-    external_packages: &[PackageMetadata],
+    _external_packages: &[PackageMetadata],
     current_project: Project,
     _target: CompilationTarget,
 ) {
