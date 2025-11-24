@@ -17,11 +17,16 @@ impl salsa::Database for TestHirDatabase {}
 #[salsa::db]
 impl alloy_workspace::WorkspaceDatabase for TestHirDatabase {
     fn add_module(&mut self, slug: &str, path: &camino::Utf8Path, contents: &str) -> ModuleId {
-        self.workspace.add_module(self, slug, path, contents)
+        let prepared = alloy_workspace::prepare_module(self, slug, path, contents);
+        self.workspace.insert_prepared_module(prepared)
     }
 
     fn get_source(&self, module_id: ModuleId) -> SourceFile {
         self.workspace.get_source(module_id)
+    }
+
+    fn find_module_by_slug(&self, slug: &str) -> Option<ModuleId> {
+        self.workspace.find_module_by_slug(self, slug)
     }
 }
 
@@ -82,8 +87,8 @@ fn on_demand_test() {
 }
 
 #[track_caller]
-fn lower_source_file<'db>(
-    db: &'db dyn crate::HirDatabase,
+fn lower_source_file(
+    db: &dyn crate::HirDatabase,
     input: &str,
 ) -> (HirModule, Vec<alloy_parser::ParseError>) {
     let (source_file, parse_errors) = ast::source_file(input);
@@ -94,7 +99,7 @@ fn lower_source_file<'db>(
 }
 
 #[track_caller]
-fn run_hir_test<'db>(
+fn run_hir_test(
     path: &Path,
     input: &str,
     expect_parse_errors: bool,

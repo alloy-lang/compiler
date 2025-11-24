@@ -1,5 +1,6 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
+use itertools::Itertools;
 
 #[allow(clippy::module_name_repetitions)]
 pub type ImportIdx = Idx<Import>;
@@ -37,12 +38,8 @@ impl Import {
         slug
     }
 
-    /// Get all segments including the last one (full import path)
-    pub fn all_segments(&self) -> Vec<&Name> {
-        let mut all = Vec::with_capacity(self.segments.len() + 1);
-        all.extend(self.segments.iter());
-        all.push(&self.last);
-        all
+    pub fn as_slug_no_last(&self) -> String {
+        self.segments().iter().join("::")
     }
 }
 

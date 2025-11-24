@@ -62,9 +62,6 @@ use alloy_hir as hir;
 use alloy_workspace::{ModuleId, RawSourceFile, SourceFile, Workspace};
 use rustc_hash::FxHashMap;
 
-// Re-export ModuleExports from hir
-pub use hir::ModuleExports;
-
 /// Represents the result of resolving an import statement
 /// The presence of a ResolvedImport guarantees that the module exists and was found
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -78,6 +75,7 @@ pub enum ResolvedImport {
         /// The validated module path
         module_id: ModuleId,
         symbol_name: hir::Name,
+        symbol: ResolvedSymbol,
     },
 }
 
@@ -125,14 +123,6 @@ pub fn resolve_imports<'db>(
     imports
 }
 
-/// Collect all exported symbols from a module file
-/// For now, we export everything at the root scope (scope 0)
-#[salsa::tracked]
-pub fn module_exports(db: &dyn HirTyDatabase, file: RawSourceFile) -> ModuleExports {
-    let (hir_module, _parse_errors) = hir::lower_file(db, file);
-    hir_module.module_exports()
-}
-
 /// Resolve an import statement, which may be either:
 /// - A module import: "import std::collections" -> ResolvedImport::Module
 /// - A specific export: "import std::collections::HashMap" -> ResolvedImport::Symbol
@@ -144,30 +134,44 @@ pub fn module_exports(db: &dyn HirTyDatabase, file: RawSourceFile) -> ModuleExpo
 ///
 /// Returns None if the module cannot be found in the workspace
 /// The returned ResolvedImport guarantees the module exists and was validated
-pub fn resolve_import<'db>(
-    db: &'db dyn HirTyDatabase,
-    import: &hir::Import,
-) -> Option<ResolvedImport> {
-    let Some(module_id) = db.find_module_by_slug(&import.as_slug()) else {
-        return None;
+fn resolve_import<'db>(db: &'db dyn HirTyDatabase, import: &hir::Import) -> Option<ResolvedImport> {
+    if let Some(module_id) = db.find_module_by_slug(&import.as_slug()) {
+        return Some(ResolvedImport::Module(module_id));
     };
 
-    Some(ResolvedImport::Module(module_id))
+    if let Some(imported_module_id) = db.find_module_by_slug(&import.as_slug_no_last()) {
+        return resolve_cross_module_symbol(db, imported_module_id, import.last()).map(|symbol| {
+            ResolvedImport::Symbol {
+                module_id: imported_module_id,
+                symbol_name: import.last().clone(),
+                symbol,
+            }
+        });
+    };
+
+    None
 }
 
 /// Resolve a cross-module reference
 /// Given an import and a symbol name, find the symbol in the imported module
 pub fn resolve_cross_module_symbol(
     db: &dyn HirTyDatabase,
-    imported_file: RawSourceFile,
+    imported_module_id: ModuleId,
     symbol_name: &hir::Name,
 ) -> Option<ResolvedSymbol> {
-    let exports = module_exports(db, imported_file);
+    let imported_file = db.get_source(imported_module_id);
+    let imported_file = match imported_file {
+        SourceFile::Raw(raw) => raw,
+        SourceFile::Virtual(_) => todo!("need to implement virtual module support"),
+    };
+
+    let (hir_module, _) = hir::lower_file(db, *imported_file);
+    let exports = hir_module.module_exports();
 
     // Check if it's a type
     if let Some(type_idx) = exports.types.get(symbol_name) {
         return Some(ResolvedSymbol::Type {
-            file: imported_file,
+            module: imported_module_id,
             idx: *type_idx,
         });
     }
@@ -175,7 +179,7 @@ pub fn resolve_cross_module_symbol(
     // Check if it's a trait
     if let Some(trait_idx) = exports.traits.get(symbol_name) {
         return Some(ResolvedSymbol::Trait {
-            file: imported_file,
+            module: imported_module_id,
             idx: *trait_idx,
         });
     }
@@ -183,7 +187,7 @@ pub fn resolve_cross_module_symbol(
     // Check if it's an expression
     if let Some(expr_idx) = exports.expressions.get(symbol_name) {
         return Some(ResolvedSymbol::Expression {
-            file: imported_file,
+            module: imported_module_id,
             idx: *expr_idx,
         });
     }
@@ -192,18 +196,18 @@ pub fn resolve_cross_module_symbol(
 }
 
 /// Represents a resolved symbol that may be in any module
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ResolvedSymbol {
     Type {
-        file: RawSourceFile,
+        module: ModuleId,
         idx: hir::TypeDefinitionIdx,
     },
     Trait {
-        file: RawSourceFile,
+        module: ModuleId,
         idx: hir::TraitIdx,
     },
     Expression {
-        file: RawSourceFile,
+        module: ModuleId,
         idx: hir::ExpressionIdx,
     },
 }
@@ -212,43 +216,49 @@ pub enum ResolvedSymbol {
 mod tests {
     use crate::tests::TestHirTyDatabase;
     use alloy_hir as hir;
-    use alloy_workspace::WorkspaceDatabase;
+    use alloy_workspace::{ModuleId, WorkspaceDatabase};
+    use la_arena::RawIdx;
     use maplit::hashmap;
     use std::collections::HashMap;
 
+    fn add_test_module(db: &mut TestHirTyDatabase, slug: &str, contents: &str) -> ModuleId {
+        db.add_module(slug, &camino::Utf8Path::new("/test/stuff.alloy"), contents)
+    }
+
+    fn add_types_module(db: &mut TestHirTyDatabase) -> ModuleId {
+        add_test_module(
+            db,
+            "types",
+            r#"
+                trait TestTrait1 where
+                    typeof test : Int
+
+                    let thing = test
+                end
+
+                typedef Point =
+                    | Point(x: Int, y: Int)
+                end
+
+                let origin = Point(0, 0)
+                "#,
+        )
+    }
+
     #[test]
-    fn test_cross_module_resolution() {
+    fn test_module_import_resolution() {
         let mut db = TestHirTyDatabase::default();
 
-        // File 1: types.alloy - exports a type definition
-        let types_module_id = {
-            let types_content = r#"
-typedef Point =
-  | Point(x: Int, y: Int)
-end
+        let types_module_id = add_types_module(&mut db);
+        let main_module_id = add_test_module(
+            &mut db,
+            "main",
+            r#"
+                import types
 
-let origin = Point(0, 0)
-"#;
-            db.add_module(
-                "types",
-                &camino::Utf8Path::new("/test/types.alloy"),
-                types_content,
-            )
-        };
-
-        // File 2: main.alloy - imports from types.alloy
-        let main_module_id = {
-            let main_content = r#"
-import types
-
-let p = types.Point(1, 2)
-"#;
-            db.add_module(
-                "main",
-                &camino::Utf8Path::new("/test/main.alloy"),
-                main_content,
-            )
-        };
+                let p = Point(1, 2)
+                "#,
+        );
 
         let resolved_imports = crate::resolve_imports(&db, main_module_id)
             .into_iter()
@@ -261,59 +271,108 @@ let p = types.Point(1, 2)
             resolved_imports, expected,
             "Expected exactly one import in main.alloy"
         );
+    }
 
-        //     // Convert to ModuleId and verify it resolves to the correct file
-        //     let module_id = resolved_import.to_module_id();
-        //     let resolved_file = crate::resolve_module_id(&db, module_id, workspace, main_file);
-        //     assert!(
-        //         resolved_file.is_some(),
-        //         "Expected module to resolve to a file"
-        //     );
-        //     assert!(
-        //         resolved_file.unwrap() == types_file,
-        //         "Expected module to resolve to types.alloy"
-        //     );
-        //
-        //     // Test 3: resolve_cross_module_symbol should find Point in types.alloy
-        //     let resolved_symbol = crate::resolve_cross_module_symbol(&db, types_file, &point_name);
-        //     assert!(
-        //         resolved_symbol.is_some(),
-        //         "Expected to resolve Point symbol from types.alloy"
-        //     );
-        //
-        //     match resolved_symbol.unwrap() {
-        //         crate::ResolvedSymbol::Type { file, idx } => {
-        //             assert!(
-        //                 file == types_file,
-        //                 "Expected symbol to come from types.alloy"
-        //             );
-        //             // Verify we can get the actual type definition
-        //             let (types_hir, _) = hir::lower_file(&db, types_file);
-        //             let _type_def = types_hir.get_type_definition(idx);
-        //             // Type definition exists if we got here without panic
-        //         }
-        //         _ => panic!("Expected Point to resolve as a Type"),
-        //     }
-        //
-        //     // Test 4: resolve_cross_module_symbol should find origin expression in types.alloy
-        //     let resolved_symbol = crate::resolve_cross_module_symbol(&db, types_file, &origin_name);
-        //     assert!(
-        //         resolved_symbol.is_some(),
-        //         "Expected to resolve origin symbol from types.alloy"
-        //     );
-        //
-        //     match resolved_symbol.unwrap() {
-        //         crate::ResolvedSymbol::Expression { file, .. } => {
-        //             assert!(
-        //                 file == types_file,
-        //                 "Expected symbol to come from types.alloy"
-        //             );
-        //         }
-        //         _ => panic!("Expected origin to resolve as an Expression"),
-        //     }
-        //
-        //     // Note: Testing specific symbol imports (like "import types::Point") would require
-        //     // creating Import instances directly, but Import::new is private.
-        //     // This functionality will be tested through integration tests with actual source code.
+    #[test]
+    fn test_module_type_resolution() {
+        let mut db = TestHirTyDatabase::default();
+
+        let types_module_id = add_types_module(&mut db);
+        let main_module_id = add_test_module(
+            &mut db,
+            "main",
+            r#"
+                import types::Point
+
+                let p = Point(1, 2)
+                "#,
+        );
+
+        let resolved_imports = crate::resolve_imports(&db, main_module_id)
+            .into_iter()
+            .collect::<HashMap<_, _>>();
+        let expected = hashmap! {
+            hir::Name::new("Point") => crate::ResolvedImport::Symbol {
+                module_id: types_module_id,
+                symbol_name: hir::Name::new("Point"),
+                symbol: crate::ResolvedSymbol::Type {
+                    module: types_module_id,
+                    idx: hir::TypeDefinitionIdx::from_raw(RawIdx::from_u32(0)),
+                }
+            },
+        };
+
+        assert_eq!(
+            resolved_imports, expected,
+            "Expected exactly one import in main.alloy"
+        );
+    }
+
+    #[test]
+    fn test_module_value_resolution() {
+        let mut db = TestHirTyDatabase::default();
+
+        let types_module_id = add_types_module(&mut db);
+        let main_module_id = add_test_module(
+            &mut db,
+            "main",
+            r#"
+                import types::origin
+
+                let p = origin
+                "#,
+        );
+
+        let resolved_imports = crate::resolve_imports(&db, main_module_id)
+            .into_iter()
+            .collect::<HashMap<_, _>>();
+        let expected = hashmap! {
+            hir::Name::new("origin") => crate::ResolvedImport::Symbol {
+                module_id: types_module_id,
+                symbol_name: hir::Name::new("origin"),
+                symbol: crate::ResolvedSymbol::Expression {
+                    module: types_module_id,
+                    idx: hir::ExpressionIdx::from_raw(RawIdx::from_u32(3)),
+                }
+            },
+        };
+
+        assert_eq!(
+            resolved_imports, expected,
+            "Expected exactly one import in main.alloy"
+        );
+    }
+
+    #[test]
+    fn test_module_trait_resolution() {
+        let mut db = TestHirTyDatabase::default();
+
+        let types_module_id = add_types_module(&mut db);
+        let main_module_id = add_test_module(
+            &mut db,
+            "main",
+            r#"
+                import types::TestTrait1
+                "#,
+        );
+
+        let resolved_imports = crate::resolve_imports(&db, main_module_id)
+            .into_iter()
+            .collect::<HashMap<_, _>>();
+        let expected = hashmap! {
+            hir::Name::new("TestTrait1") => crate::ResolvedImport::Symbol {
+                module_id: types_module_id,
+                symbol_name: hir::Name::new("TestTrait1"),
+                symbol: crate::ResolvedSymbol::Trait {
+                    module: types_module_id,
+                    idx: hir::TraitIdx::from_raw(RawIdx::from_u32(0)),
+                }
+            },
+        };
+
+        assert_eq!(
+            resolved_imports, expected,
+            "Expected exactly one import in main.alloy"
+        );
     }
 }
