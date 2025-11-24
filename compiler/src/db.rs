@@ -1,16 +1,28 @@
+use alloy_workspace::{ModuleId, SourceFile, Workspace};
+
 #[salsa::db]
 #[derive(Default, Clone)]
-pub(crate) struct Compiler {
+pub(crate) struct CompilerDatabase {
     storage: salsa::Storage<Self>,
+    workspace: Workspace,
 }
 
 #[salsa::db]
-impl salsa::Database for Compiler {}
+impl salsa::Database for CompilerDatabase {}
 
 #[salsa::db]
-impl alloy_workspace::WorkspaceDatabase for Compiler {}
+impl alloy_workspace::WorkspaceDatabase for CompilerDatabase {
+    fn add_module(&mut self, slug: &str, path: &camino::Utf8Path, contents: &str) -> ModuleId {
+        self.workspace.add_module(self, slug, path, contents)
+    }
+
+    fn get_source(&'_ self, module_id: ModuleId) -> SourceFile<'_> {
+        self.workspace.get_source(module_id)
+    }
+}
 
 #[salsa::db]
-impl alloy_hir::HirDatabase for Compiler {}
+impl alloy_hir::HirDatabase for CompilerDatabase {}
 
-pub trait CompilerDatabase: alloy_hir::HirDatabase {}
+#[salsa::db]
+impl alloy_hir_typed::HirTyDatabase for CompilerDatabase {}

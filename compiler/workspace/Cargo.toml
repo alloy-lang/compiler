@@ -6,5 +6,6 @@ edition = "2018"
 
 [dependencies]
 salsa = { workspace = true }
+camino = { workspace = true }
 
 [dev-dependencies]

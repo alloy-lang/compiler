@@ -7,7 +7,10 @@ edition = "2018"
 
 [dependencies]
 expect-test = { workspace = true }
+salsa = { workspace = true }
 pretty_assertions = { workspace = true }
 alloy_project = { path = "../project" }
+alloy_workspace = { path = "../workspace" }
+camino = { workspace = true }
 
 [dev-dependencies]
