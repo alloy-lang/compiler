@@ -3,18 +3,28 @@ use std::path::Path;
 use alloy_ast as ast;
 use alloy_hir as hir;
 use alloy_parser::ParseError;
+use alloy_workspace::{ModuleId, SourceFile, Workspace};
 
 #[salsa::db]
 #[derive(Default, Clone)]
 pub(crate) struct TestHirTyDatabase {
     storage: salsa::Storage<Self>,
+    workspace: Workspace,
 }
 
 #[salsa::db]
 impl salsa::Database for TestHirTyDatabase {}
 
 #[salsa::db]
-impl alloy_workspace::WorkspaceDatabase for TestHirTyDatabase {}
+impl alloy_workspace::WorkspaceDatabase for TestHirTyDatabase {
+    fn add_module(&mut self, slug: &str, path: &camino::Utf8Path, contents: &str) -> ModuleId {
+        self.workspace.add_module(self, slug, path, contents)
+    }
+
+    fn get_source(&'_ self, module_id: ModuleId) -> SourceFile<'_> {
+        self.workspace.get_source(module_id)
+    }
+}
 
 #[salsa::db]
 impl hir::HirDatabase for TestHirTyDatabase {}
@@ -79,7 +89,7 @@ fn run_hir_ty_test(
     path: &Path,
     input: &str,
     expect_parse_errors: bool,
-    expect_lowering_errors: bool,
+    _expect_lowering_errors: bool,
     func: fn(&str) -> (crate::InferenceResult, hir::HirModule, Vec<ParseError>),
 ) -> String {
     let (type_map, _hir_module, parse_errors) = func(input);

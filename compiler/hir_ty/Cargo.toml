@@ -19,3 +19,5 @@ salsa = { workspace = true }
 alloy_parser = {path = "../parser"}
 alloy_test_harness = {path = "../test_harness"}
 alloy_workspace = {path = "../workspace"}
+camino = { workspace = true }
+maplit = { workspace = true }

@@ -38,6 +38,11 @@ pub struct ModuleFile {
 
 impl ModuleFile {
     #[must_use]
+    pub fn slug(&self) -> &String {
+        &self.slug
+    }
+
+    #[must_use]
     pub fn path(&self) -> &Utf8Path {
         &self.path
     }
@@ -148,8 +153,14 @@ impl Project {
         self.modules.iter().any(|m| m.path == path)
     }
 
+    #[must_use]
     pub fn modules(&self) -> impl Iterator<Item = &ModuleFile> {
         self.modules.iter()
+    }
+
+    #[must_use]
+    pub fn config(&self) -> &ProjectConfig {
+        &self.config
     }
 }
 

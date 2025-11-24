@@ -607,21 +607,19 @@ mod tests {
 
     #[test]
     fn infer_variable_ref_unused_lambda() {
-        unsafe {
-            check_named(
-                &infer_types_repl_line("let x = |a, b| => a + b"),
-                &[(
-                    "x",
-                    0,
-                    ResolvedType::Lambda {
-                        arg_type: Box::new(ResolvedType::TypeVar(0)),
-                        return_type: Box::new(ResolvedType::Lambda {
-                            arg_type: Box::new(ResolvedType::TypeVar(1)),
-                            return_type: Box::new(ResolvedType::TypeVar(2)),
-                        }),
-                    },
-                )],
-            );
-        }
+        check_named(
+            &infer_types_repl_line("let x = |a, b| => a + b"),
+            &[(
+                "x",
+                0,
+                ResolvedType::Lambda {
+                    arg_type: Box::new(ResolvedType::TypeVar(0)),
+                    return_type: Box::new(ResolvedType::Lambda {
+                        arg_type: Box::new(ResolvedType::TypeVar(1)),
+                        return_type: Box::new(ResolvedType::TypeVar(2)),
+                    }),
+                },
+            )],
+        );
     }
 }

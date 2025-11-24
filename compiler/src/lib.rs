@@ -4,9 +4,9 @@ pub mod parser {
     pub use alloy_parser::parse_source_file;
 }
 
-use alloy_workspace::{FileSlug, ModuleId, Package, Workspace};
+use alloy_project::Project;
+use alloy_workspace::{ModuleId, SourceFile, WorkspaceDatabase};
 use std::collections::HashMap;
-
 // compile
 // input:
 // - external packages: Vec<Package> (these are the packages that the current package depends on, maybe be incomplete which results in a compilation error)
@@ -15,8 +15,8 @@ use std::collections::HashMap;
 // output:
 // - Vec<u8>
 
-pub struct CompilationTarget<'db> {
-    entrypoint: Option<FileSlug<'db>>,
+pub struct CompilationTarget {
+    _entrypoint: Option<ModuleId>,
     _type: CompilationTargetType,
 }
 pub enum CompilationTargetType {
@@ -30,12 +30,15 @@ pub struct PackageMetadata {
 }
 
 pub fn compile<'db>(
-    db: &'db dyn db::CompilerDatabase,
+    db: &'db mut db::CompilerDatabase,
     external_packages: &[PackageMetadata],
-    current_package: Package<'db>,
-    _target: CompilationTarget<'db>,
+    current_project: Project,
+    _target: CompilationTarget,
 ) {
-    let workspace = build_workspace(db, external_packages, current_package);
+    let module_ids: Vec<ModuleId> = current_project
+        .modules()
+        .map(|file| db.add_module(file.slug(), file.path(), file.contents()))
+        .collect();
 
     // Phase 1 & 2: Parse and lower all files to HIR (single pass)
     // This efficiently parses each file once and returns both parse errors and HIR
@@ -44,23 +47,29 @@ pub fn compile<'db>(
     let mut lowering_errors = HashMap::new();
     let mut lowering_warnings = HashMap::new();
 
-    for (slug, source_file) in workspace.files() {
+    for module_id in module_ids.iter() {
+        let source_file = db.get_source(*module_id);
+        let source_file = match source_file {
+            SourceFile::Raw(raw) => raw,
+            SourceFile::Virtual(_) => continue,
+        };
+
         let (hir_module, parse_errs) = alloy_hir::lower_file(db, *source_file);
 
         // Collect parse errors
         if !parse_errs.is_empty() {
-            parse_errors.insert(slug.clone(), parse_errs);
+            parse_errors.insert(module_id, parse_errs);
         }
 
         // Collect lowering errors and warnings
         if !hir_module.errors().is_empty() {
-            lowering_errors.insert(slug.clone(), hir_module.errors().to_vec());
+            lowering_errors.insert(module_id, hir_module.errors().to_vec());
         }
         if !hir_module.warnings().is_empty() {
-            lowering_warnings.insert(slug.clone(), hir_module.warnings().to_vec());
+            lowering_warnings.insert(module_id, hir_module.warnings().to_vec());
         }
 
-        hir_modules.insert(slug, hir_module);
+        hir_modules.insert(module_id, hir_module);
     }
 
     // TODO: Phase 3: Type checking
@@ -111,28 +120,4 @@ pub fn compile<'db>(
 
     // type checking should report errors for the entire codebase, even if it's not referenced by the entrypoint
     // IR generation shouldn't generate for anything not referenced by the entrypoints (defined above)
-}
-
-fn build_workspace<'db>(
-    db: &'db dyn db::CompilerDatabase,
-    _external_packages: &[PackageMetadata],
-    current_package: Package<'db>,
-) -> Workspace<'db> {
-    let files = current_package
-        .files(db)
-        .iter()
-        .map(|file| {
-            // Create a ModuleId from the file path
-            // For now, use the filename (without path and extension) as the module name
-            let raw_path = file.raw_path(db);
-            let module_name = std::path::Path::new(raw_path.as_ref())
-                .file_stem()
-                .and_then(|s| s.to_str())
-                .unwrap_or("unknown");
-            let module_id = ModuleId::new(db, std::sync::Arc::from(module_name));
-            (module_id, *file)
-        })
-        .collect();
-
-    Workspace::new(files)
 }

@@ -1,19 +1,29 @@
 use crate::hir::HirModule;
 use alloy_ast as ast;
+use alloy_workspace::{ModuleId, SourceFile, Workspace};
 use std::env;
 use std::path::Path;
 
 #[salsa::db]
-#[derive(Clone, Default)]
+#[derive(Default, Clone)]
 pub(crate) struct TestHirDatabase {
     storage: salsa::Storage<Self>,
+    workspace: Workspace,
 }
 
 #[salsa::db]
 impl salsa::Database for TestHirDatabase {}
 
 #[salsa::db]
-impl alloy_workspace::WorkspaceDatabase for TestHirDatabase {}
+impl alloy_workspace::WorkspaceDatabase for TestHirDatabase {
+    fn add_module(&mut self, slug: &str, path: &camino::Utf8Path, contents: &str) -> ModuleId {
+        self.workspace.add_module(self, slug, path, contents)
+    }
+
+    fn get_source(&self, module_id: ModuleId) -> SourceFile {
+        self.workspace.get_source(module_id)
+    }
+}
 
 #[salsa::db]
 impl crate::HirDatabase for TestHirDatabase {}
