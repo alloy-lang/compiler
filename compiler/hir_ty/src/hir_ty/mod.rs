@@ -25,7 +25,6 @@ pub enum ResolvedType {
         base: hir::TypeIdx,
         args: Vec<hir::TypeIdx>,
     },
-    TypeVar(usize),
 }
 
 #[derive(Debug)]
@@ -408,7 +407,11 @@ fn collect_expr_type(
                 },
             );
         }
-        hir::Expression::FunctionCall { target, scope, args } => {
+        hir::Expression::FunctionCall {
+            target,
+            scope,
+            args,
+        } => {
             ctx.insert_expr_type_variable(expression_id);
 
             // Collect types for all arguments
@@ -420,20 +423,29 @@ fn collect_expr_type(
             match target {
                 hir::Path::ThisModule(this_path) => {
                     // Try to find the function as an expression (lambda or function reference)
-                    if let Some((func_id, func_expr)) = hir_module.get_expression_by_name(this_path.first(), *scope) {
+                    if let Some((func_id, func_expr)) =
+                        hir_module.get_expression_by_name(this_path.first(), *scope)
+                    {
                         collect_expr_type(ctx, hir_module, func_id, func_expr);
 
                         // If the function is a lambda, create bidirectional constraints
-                        if let hir::Expression::Lambda { args: lambda_args, .. } = func_expr {
+                        if let hir::Expression::Lambda {
+                            args: lambda_args, ..
+                        } = func_expr
+                        {
                             // Link each call argument to the corresponding lambda parameter (bidirectional)
                             for (call_arg, lambda_param) in args.iter().zip(lambda_args.iter()) {
                                 ctx.add_expr_requirements(
                                     *call_arg,
-                                    TypeRequirements::MustBeSameAs(ExpressionOrPatternIdx::Pattern(*lambda_param)),
+                                    TypeRequirements::MustBeSameAs(
+                                        ExpressionOrPatternIdx::Pattern(*lambda_param),
+                                    ),
                                 );
                                 ctx.add_pattern_requirements(
                                     *lambda_param,
-                                    TypeRequirements::MustBeSameAs(ExpressionOrPatternIdx::Expression(*call_arg)),
+                                    TypeRequirements::MustBeSameAs(
+                                        ExpressionOrPatternIdx::Expression(*call_arg),
+                                    ),
                                 );
                             }
                         }
@@ -446,22 +458,39 @@ fn collect_expr_type(
                                 args: args.clone(),
                             },
                         );
-                    } else if let Some((pattern_id, _)) = hir_module.get_pattern_by_name(this_path.first(), *scope) {
-                        collect_pattern_type(ctx, hir_module, pattern_id, hir_module.get_pattern(pattern_id));
+                    } else if let Some((pattern_id, _)) =
+                        hir_module.get_pattern_by_name(this_path.first(), *scope)
+                    {
+                        collect_pattern_type(
+                            ctx,
+                            hir_module,
+                            pattern_id,
+                            hir_module.get_pattern(pattern_id),
+                        );
 
                         // Try to find what expression this pattern is bound to
                         // For "let x = |a, b| -> ...", we need to find the lambda
-                        if let Some((bound_expr_id, bound_expr)) = hir_module.get_expression_by_name(this_path.first(), *scope) {
-                            if let hir::Expression::Lambda { args: lambda_args, .. } = bound_expr {
+                        if let Some((bound_expr_id, bound_expr)) =
+                            hir_module.get_expression_by_name(this_path.first(), *scope)
+                        {
+                            if let hir::Expression::Lambda {
+                                args: lambda_args, ..
+                            } = bound_expr
+                            {
                                 // Link each call argument to the corresponding lambda parameter (bidirectional)
-                                for (call_arg, lambda_param) in args.iter().zip(lambda_args.iter()) {
+                                for (call_arg, lambda_param) in args.iter().zip(lambda_args.iter())
+                                {
                                     ctx.add_expr_requirements(
                                         *call_arg,
-                                        TypeRequirements::MustBeSameAs(ExpressionOrPatternIdx::Pattern(*lambda_param)),
+                                        TypeRequirements::MustBeSameAs(
+                                            ExpressionOrPatternIdx::Pattern(*lambda_param),
+                                        ),
                                     );
                                     ctx.add_pattern_requirements(
                                         *lambda_param,
-                                        TypeRequirements::MustBeSameAs(ExpressionOrPatternIdx::Expression(*call_arg)),
+                                        TypeRequirements::MustBeSameAs(
+                                            ExpressionOrPatternIdx::Expression(*call_arg),
+                                        ),
                                     );
                                 }
                             }
@@ -690,7 +719,10 @@ fn unify(ctx: &InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
         // Apply each argument to unwrap the curried lambda type
         for arg in args {
             match func_type {
-                ResolvedType::Lambda { arg_type: _, return_type } => {
+                ResolvedType::Lambda {
+                    arg_type: _,
+                    return_type,
+                } => {
                     // The argument type must match the parameter type (bidirectional constraint)
                     // This happens automatically through unification
                     let _arg_ty = unify(ctx, ExpressionOrPatternIdx::Expression(*arg));
@@ -738,7 +770,7 @@ fn unify(ctx: &InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
         .iter()
         .find(|c| matches!(c, TypeRequirements::Variable(_)))
     {
-        return ResolvedType::TypeVar(*var_id);
+        return ResolvedType::Unknown;
     }
 
     ResolvedType::Unknown

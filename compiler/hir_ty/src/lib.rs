@@ -247,10 +247,10 @@ mod small_tests {
                 "x",
                 0,
                 ResolvedType::Lambda {
-                    arg_type: Box::new(ResolvedType::TypeVar(1)),
+                    arg_type: Box::new(ResolvedType::Unknown),
                     return_type: Box::new(ResolvedType::Lambda {
-                        arg_type: Box::new(ResolvedType::TypeVar(3)),
-                        return_type: Box::new(ResolvedType::TypeVar(1)),
+                        arg_type: Box::new(ResolvedType::Unknown),
+                        return_type: Box::new(ResolvedType::Unknown),
                     }),
                 },
             )],
