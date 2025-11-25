@@ -5,7 +5,7 @@ pub mod parser {
 }
 
 use alloy_project::Project;
-use alloy_workspace::{ModuleId, SourceFile, WorkspaceDatabase};
+use alloy_workspace::{ModuleId, WorkspaceDatabase};
 use std::collections::HashMap;
 // compile
 // input:
@@ -48,11 +48,11 @@ pub fn compile<'db>(
     let mut lowering_warnings = HashMap::new();
 
     for module_id in module_ids.iter() {
-        let (hir_module, parse_errs) = alloy_hir::lower_file(db, *module_id);
+        let (hir_module, module_parse_errors) = alloy_hir::lower_file(db, *module_id);
 
         // Collect parse errors
-        if !parse_errs.is_empty() {
-            parse_errors.insert(module_id, parse_errs);
+        if !module_parse_errors.is_empty() {
+            parse_errors.insert(module_id, module_parse_errors);
         }
 
         // Collect lowering errors and warnings
