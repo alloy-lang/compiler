@@ -1,5 +1,7 @@
 use alloy_hir as hir;
+use alloy_hir::{Expression, Pattern};
 use alloy_workspace::ModuleId;
+use rustc_hash::FxHashMap;
 use std::os::unix::raw::mode_t;
 
 mod hir_ty;
@@ -17,6 +19,8 @@ pub trait HirTyDatabase: hir::HirDatabase {}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct HirTypedModule {
+    expression_types: FxHashMap<hir::ExpressionIdx, ResolvedType>,
+    pattern_types: FxHashMap<hir::PatternIdx, ResolvedType>,
     warnings: Vec<TypeInferenceWarning>,
     errors: Vec<TypeInferenceError>,
 }
@@ -24,6 +28,8 @@ pub struct HirTypedModule {
 impl HirTypedModule {
     pub(crate) fn empty() -> Self {
         Self {
+            expression_types: Default::default(),
+            pattern_types: Default::default(),
             warnings: Vec::new(),
             errors: Vec::new(),
         }
@@ -43,9 +49,10 @@ pub struct TypeResolutionResult {
 /// during full compilation, we will want to generate errors and warnings for all modules
 #[salsa::tracked]
 pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedModule {
-    todo!()
+    HirTypedModule::empty()
 }
 
+/// find an expression's type in a module
 #[salsa::tracked]
 pub fn find_expression_type(
     db: &dyn HirTyDatabase,
@@ -55,7 +62,17 @@ pub fn find_expression_type(
     let (hir_module, _) = hir::lower_file(db, module_id);
     let expression = hir_module.get_expression(expression_id);
     match expression {
-        _ => todo!(),
+        Expression::Missing => {}
+        Expression::Literal(_) => {}
+        Expression::VariableRef { .. } => {}
+        Expression::Binary { .. } => {}
+        Expression::Unit => {}
+        Expression::IfThenElse { .. } => {}
+        Expression::Tuple(_) => {}
+        Expression::Unary { .. } => {}
+        Expression::Lambda { .. } => {}
+        Expression::FunctionCall { .. } => {}
+        Expression::Match { .. } => {}
     }
 
     todo!()
@@ -67,5 +84,179 @@ pub fn find_pattern_type(
     module_id: ModuleId,
     pattern_id: hir::PatternIdx,
 ) -> TypeResolutionResult {
+    let (hir_module, _) = hir::lower_file(db, module_id);
+    let pattern = hir_module.get_pattern(pattern_id);
+    match pattern {
+        Pattern::Missing => {}
+        Pattern::Literal(_) => {}
+        Pattern::PatternRef { .. } => {}
+        Pattern::VariableDeclaration { .. } => {}
+        Pattern::Nil => {}
+        Pattern::Destructure { .. } => {}
+        Pattern::Unit => {}
+        Pattern::Tuple(_) => {}
+    }
+
     todo!()
+}
+
+// #[salsa::tracked]
+// pub fn infer_type(db: &dyn HirTyDatabase, expression: hir::Expression) -> ResolvedType {
+//     // let type_annotation = hir::type_annotation(db, &expression); // optional
+//
+//     let inferred_type = match expression {
+//         hir::Expression::Missing => ResolvedType::Unknown,
+//         hir::Expression::Literal(_) => todo!(),
+//         hir::Expression::VariableRef { .. } => todo!(),
+//         hir::Expression::Binary { .. } => todo!(),
+//         hir::Expression::Unit => todo!(),
+//         hir::Expression::IfThenElse { .. } => todo!(),
+//         hir::Expression::Tuple(_) => todo!(),
+//         hir::Expression::Unary { .. } => todo!(),
+//         hir::Expression::Lambda { .. } => todo!(),
+//         hir::Expression::FunctionCall { .. } => todo!(),
+//         hir::Expression::Match { .. } => todo!(),
+//     };
+//
+//     // if let Some(ta) = type_annotation {
+//     //     let resolved_ta = to_resolved(ta);
+//     //     if inferred_type != resolved_ta {
+//     //         todo!("type mis-match");
+//     return ResolvedType::Unknown;
+//     // }
+//     // }
+//
+//     return inferred_type;
+// }
+
+#[cfg(test)]
+mod small_tests {
+    use crate::hir_ty::ResolvedType;
+    use crate::tests::TestHirTyDatabase;
+    use alloy_ast as ast;
+    use alloy_hir as hir;
+    use alloy_hir::ExpressionIdx;
+    use alloy_scope::ScopeIdx;
+    use alloy_workspace::WorkspaceDatabase;
+    use la_arena::RawIdx;
+    use non_empty_vec::NonEmpty;
+
+    fn check(input: &str, expected: &[(u32, ResolvedType)]) {
+        let (_, parse_errors) = ast::source_file(input);
+
+        let mut db = TestHirTyDatabase::default();
+        let module_id = db.add_module(
+            "test_data",
+            camino::Utf8Path::new("./test/test_data.alloy"),
+            input,
+        );
+
+        let ctx = crate::type_check_module(&db, module_id);
+
+        assert_eq!(parse_errors, &[]);
+
+        let expected = expected
+            .into_iter()
+            .map(|(id, ty)| (ExpressionIdx::from_raw(RawIdx::from(*id)), ty.clone()))
+            .collect();
+
+        assert_eq!(ctx.expression_types, expected);
+    }
+
+    fn check_named(input: &str, expected: &[(&str, u32, ResolvedType)]) {
+        let mut db = TestHirTyDatabase::default();
+        let module_id = db.add_module(
+            "test_data",
+            camino::Utf8Path::new("./test/test_data.alloy"),
+            input,
+        );
+
+        let (hir_module, parse_errors) = hir::lower_file(&db, module_id);
+        let ctx = crate::infer_types(&db, module_id);
+
+        assert_eq!(parse_errors, &[]);
+
+        let actual = expected
+            .iter()
+            .map(|(name, scope, _ty)| {
+                let (expression_id, expression) = hir_module
+                    .get_expression_by_name(
+                        &hir::Name::new(*name),
+                        ScopeIdx::from_raw(RawIdx::from(*scope)),
+                    )
+                    .expect("expression not found");
+                (*name, *scope, ctx.expression_types[&expression_id].clone())
+            })
+            .collect::<Vec<_>>();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn infer_literals() {
+        check("1", &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Int))]);
+        check(
+            "1.1",
+            &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Fraction))],
+        );
+        check(
+            r#""hello""#,
+            &[(0, ResolvedType::BuiltIn(hir::BuiltInType::String))],
+        );
+        check("'c'", &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Char))]);
+    }
+
+    #[test]
+    fn infer_variable_ref_literal() {
+        check_named(
+            r"
+                let x = 1
+                let y = x
+            ",
+            &[("y", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int))],
+        );
+    }
+
+    #[test]
+    fn infer_variable_ref_tuple() {
+        unsafe {
+            check_named(
+                r#"
+                let x = 1
+                let y = "a"
+                let z = (x, y)
+            "#,
+                &[
+                    ("x", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int)),
+                    ("y", 0, ResolvedType::BuiltIn(hir::BuiltInType::String)),
+                    (
+                        "z",
+                        0,
+                        ResolvedType::Tuple(NonEmpty::new_unchecked(vec![
+                            ResolvedType::BuiltIn(hir::BuiltInType::Int),
+                            ResolvedType::BuiltIn(hir::BuiltInType::String),
+                        ])),
+                    ),
+                ],
+            );
+        }
+    }
+
+    #[test]
+    fn infer_variable_ref_unused_lambda() {
+        check_named(
+            "let x = |a, b| => a + b",
+            &[(
+                "x",
+                0,
+                ResolvedType::Lambda {
+                    arg_type: Box::new(ResolvedType::TypeVar(0)),
+                    return_type: Box::new(ResolvedType::Lambda {
+                        arg_type: Box::new(ResolvedType::TypeVar(1)),
+                        return_type: Box::new(ResolvedType::TypeVar(2)),
+                    }),
+                },
+            )],
+        );
+    }
 }
