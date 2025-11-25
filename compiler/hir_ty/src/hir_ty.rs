@@ -1,4 +1,6 @@
+use crate::{resolve_imports, ResolvedImport};
 use alloy_hir as hir;
+use alloy_workspace::{ModuleId, SourceFile};
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
 use std::collections::HashSet;
@@ -32,12 +34,14 @@ pub struct InferenceContext {
 #[derive(Debug)]
 pub struct InferenceResult {
     type_map: FxHashMap<hir::ExpressionIdx, ResolvedType>,
+    resolved_imports: FxHashMap<hir::Name, ResolvedImport>,
 }
 
 impl InferenceResult {
     fn new() -> Self {
         Self {
             type_map: FxHashMap::default(),
+            resolved_imports: FxHashMap::default(),
         }
     }
 }
@@ -163,12 +167,16 @@ impl InferenceContext {
 }
 
 #[must_use]
-pub fn infer_types(hir_module: &hir::HirModule) -> InferenceResult {
-    let mut ctx = InferenceContext::new();
+pub fn infer_types(db: &dyn crate::HirTyDatabase, module_id: ModuleId) -> InferenceResult {
     let mut result = InferenceResult::new();
 
-    for (expression_id, expression, _range, name_op) in hir_module.expressions() {
-        collect_expr_type(&mut ctx, hir_module, expression_id, expression);
+    let (hir_module, _) = hir::lower_file(db, module_id);
+
+    let mut ctx = InferenceContext::new();
+    result.resolved_imports = resolve_imports(db, module_id);
+
+    for (expression_id, expression, _range, _name_op) in hir_module.expressions() {
+        collect_expr_type(&mut ctx, &hir_module, expression_id, expression);
 
         result.type_map.insert(
             expression_id,
@@ -499,20 +507,28 @@ fn unify(ctx: &InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
 
 #[cfg(test)]
 mod tests {
+    use crate::tests::TestHirTyDatabase;
+    use crate::ResolvedType;
+    use alloy_ast as ast;
     use alloy_hir as hir;
     use alloy_hir::ExpressionIdx;
-    use alloy_parser::ParseError;
     use alloy_scope::ScopeIdx;
+    use alloy_workspace::WorkspaceDatabase;
     use la_arena::RawIdx;
     use non_empty_vec::NonEmpty;
 
-    use crate::tests::infer_types_repl_line;
-    use crate::{InferenceResult, ResolvedType};
+    fn check(input: &str, expected: &[(u32, ResolvedType)]) {
+        let (_, parse_errors) = ast::source_file(input);
 
-    fn check(
-        (ctx, _hir_module, parse_errors): &(InferenceResult, hir::HirModule, Vec<ParseError>),
-        expected: &[(u32, ResolvedType)],
-    ) {
+        let mut db = TestHirTyDatabase::default();
+        let module_id = db.add_module(
+            "test_data",
+            camino::Utf8Path::new("./test/test_data.alloy"),
+            input,
+        );
+
+        let ctx = crate::infer_types(&db, module_id);
+
         assert_eq!(parse_errors, &[]);
 
         let expected = expected
@@ -523,10 +539,17 @@ mod tests {
         assert_eq!(ctx.type_map, expected);
     }
 
-    fn check_named(
-        (ctx, hir_module, parse_errors): &(InferenceResult, hir::HirModule, Vec<ParseError>),
-        expected: &[(&str, u32, ResolvedType)],
-    ) {
+    fn check_named(input: &str, expected: &[(&str, u32, ResolvedType)]) {
+        let mut db = TestHirTyDatabase::default();
+        let module_id = db.add_module(
+            "test_data",
+            camino::Utf8Path::new("./test/test_data.alloy"),
+            input,
+        );
+
+        let (hir_module, parse_errors) = hir::lower_file(&db, module_id);
+        let ctx = crate::infer_types(&db, module_id);
+
         assert_eq!(parse_errors, &[]);
 
         let actual = expected
@@ -547,33 +570,25 @@ mod tests {
 
     #[test]
     fn infer_literals() {
+        check("1", &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Int))]);
         check(
-            &infer_types_repl_line("1"),
-            &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Int))],
-        );
-        check(
-            &infer_types_repl_line("1.1"),
+            "1.1",
             &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Fraction))],
         );
         check(
-            &infer_types_repl_line(r#""hello""#),
+            r#""hello""#,
             &[(0, ResolvedType::BuiltIn(hir::BuiltInType::String))],
         );
-        check(
-            &infer_types_repl_line("'c'"),
-            &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Char))],
-        );
+        check("'c'", &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Char))]);
     }
 
     #[test]
     fn infer_variable_ref_literal() {
         check_named(
-            &infer_types_repl_line(
-                r"
+            r"
                 let x = 1
                 let y = x
             ",
-            ),
             &[("y", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int))],
         );
     }
@@ -582,13 +597,11 @@ mod tests {
     fn infer_variable_ref_tuple() {
         unsafe {
             check_named(
-                &infer_types_repl_line(
-                    r#"
+                r#"
                 let x = 1
                 let y = "a"
                 let z = (x, y)
             "#,
-                ),
                 &[
                     ("x", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int)),
                     ("y", 0, ResolvedType::BuiltIn(hir::BuiltInType::String)),
@@ -608,7 +621,7 @@ mod tests {
     #[test]
     fn infer_variable_ref_unused_lambda() {
         check_named(
-            &infer_types_repl_line("let x = |a, b| => a + b"),
+            "let x = |a, b| => a + b",
             &[(
                 "x",
                 0,

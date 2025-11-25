@@ -5,6 +5,7 @@ typeof test2 : String -> ResultThing::More
 ===
 InferenceResult {
     type_map: {},
+    resolved_imports: {},
 }
 [
     ParseError {

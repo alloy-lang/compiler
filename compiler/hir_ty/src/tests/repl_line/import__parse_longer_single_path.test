@@ -2,5 +2,6 @@ import std::functor::Functor
 ===
 InferenceResult {
     type_map: {},
+    resolved_imports: {},
 }
 []

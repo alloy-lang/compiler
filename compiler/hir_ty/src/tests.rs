@@ -66,26 +66,26 @@ fn repl_line_parse_errors() {
 }
 
 #[track_caller]
-pub(crate) fn infer_types_source_file<'db>(
-    db: &'db dyn crate::HirTyDatabase,
-    input: &str,
-) -> (crate::InferenceResult, hir::HirModule, Vec<ParseError>) {
-    let (source_file, parse_errors) = ast::source_file(input);
-    let source_file = source_file.expect("Failed to parse source file");
-
-    let hir = hir::lower_source_file(db, &source_file);
-    (crate::infer_types(&hir), hir, parse_errors)
-}
-
-#[track_caller]
 fn run_hir_ty_test(
     path: &Path,
     input: &str,
     expect_parse_errors: bool,
     _expect_lowering_errors: bool,
 ) -> String {
+    let (_, parse_errors) = ast::source_file(input);
+
     let mut db = TestHirTyDatabase::default();
-    let (type_map, _hir_module, parse_errors) = infer_types_source_file(&db, input);
+    db.add_module(
+        "test_data",
+        camino::Utf8Path::new("./test/test_data.alloy"),
+        r#"
+    typedef Test[t] = Thing t
+    let test = Thing 0
+    "#,
+    );
+    let test_module_id = db.add_module("main", camino::Utf8Path::new("./test/main.alloy"), input);
+
+    let type_map = crate::infer_types(&db, test_module_id);
 
     let file_name = path.to_str().expect("Expected filename");
     if expect_parse_errors {

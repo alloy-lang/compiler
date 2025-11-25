@@ -6,5 +6,6 @@ typeof apply : Option[(t1 -> t2)] -> Option[t1] -> Option[t2] where
 ===
 InferenceResult {
     type_map: {},
+    resolved_imports: {},
 }
 []

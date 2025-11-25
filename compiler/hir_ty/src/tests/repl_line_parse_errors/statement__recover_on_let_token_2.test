@@ -7,6 +7,7 @@ InferenceResult {
             Int,
         ),
     },
+    resolved_imports: {},
 }
 [
     ParseError {

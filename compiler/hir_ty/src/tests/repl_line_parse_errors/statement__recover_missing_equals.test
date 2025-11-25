@@ -12,6 +12,7 @@ InferenceResult {
         ),
         Idx::<Expression>(3): Unknown,
     },
+    resolved_imports: {},
 }
 [
     ParseError {

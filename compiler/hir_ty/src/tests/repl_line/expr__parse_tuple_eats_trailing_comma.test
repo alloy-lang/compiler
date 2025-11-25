@@ -26,5 +26,6 @@ InferenceResult {
             ),
         ),
     },
+    resolved_imports: {},
 }
 []

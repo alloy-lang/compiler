@@ -2,5 +2,6 @@ typedef Test[t] = Thing t
 ===
 InferenceResult {
     type_map: {},
+    resolved_imports: {},
 }
 []

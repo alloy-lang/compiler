@@ -48,13 +48,7 @@ pub fn compile<'db>(
     let mut lowering_warnings = HashMap::new();
 
     for module_id in module_ids.iter() {
-        let source_file = db.get_source(*module_id);
-        let source_file = match source_file {
-            SourceFile::Raw(raw) => raw,
-            SourceFile::Virtual(_) => continue,
-        };
-
-        let (hir_module, parse_errs) = alloy_hir::lower_file(db, *source_file);
+        let (hir_module, parse_errs) = alloy_hir::lower_file(db, *module_id);
 
         // Collect parse errors
         if !parse_errs.is_empty() {

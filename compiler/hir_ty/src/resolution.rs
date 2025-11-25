@@ -59,6 +59,7 @@
 
 use crate::HirTyDatabase;
 use alloy_hir as hir;
+use alloy_hir::HirDatabase;
 use alloy_workspace::{ModuleId, RawSourceFile, SourceFile, Workspace};
 use rustc_hash::FxHashMap;
 
@@ -104,13 +105,7 @@ pub fn resolve_imports<'db>(
 ) -> FxHashMap<hir::Name, ResolvedImport> {
     let mut imports = FxHashMap::default();
 
-    let current_file = db.get_source(current_module_id);
-    let current_file = match current_file {
-        SourceFile::Raw(raw) => raw,
-        SourceFile::Virtual(_) => return FxHashMap::default(),
-    };
-
-    let (hir_module, _) = hir::lower_file(db, *current_file);
+    let (hir_module, _) = hir::lower_file(db, current_module_id);
 
     for (_, import, _, _) in hir_module.imports() {
         let Some(resolved) = resolve_import(db, import) else {
@@ -159,13 +154,7 @@ pub fn resolve_cross_module_symbol(
     imported_module_id: ModuleId,
     symbol_name: &hir::Name,
 ) -> Option<ResolvedSymbol> {
-    let imported_file = db.get_source(imported_module_id);
-    let imported_file = match imported_file {
-        SourceFile::Raw(raw) => raw,
-        SourceFile::Virtual(_) => todo!("need to implement virtual module support"),
-    };
-
-    let (hir_module, _) = hir::lower_file(db, *imported_file);
+    let (hir_module, _) = hir::lower_file(db, imported_module_id);
     let exports = hir_module.module_exports();
 
     // Check if it's a type

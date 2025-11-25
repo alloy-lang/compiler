@@ -7,5 +7,6 @@ InferenceResult {
         ),
         Idx::<Expression>(1): Unknown,
     },
+    resolved_imports: {},
 }
 []
