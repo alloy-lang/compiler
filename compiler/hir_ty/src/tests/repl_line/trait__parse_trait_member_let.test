@@ -8,5 +8,6 @@ InferenceResult {
     type_map: {
         Idx::<Expression>(0): Unknown,
     },
+    resolved_imports: {},
 }
 []

@@ -8,5 +8,6 @@ InferenceResult {
             Int,
         ),
     },
+    resolved_imports: {},
 }
 []

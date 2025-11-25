@@ -6,5 +6,6 @@ end
 ===
 InferenceResult {
     type_map: {},
+    resolved_imports: {},
 }
 []

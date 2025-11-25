@@ -4,6 +4,7 @@ module TestModule1
 ===
 InferenceResult {
     type_map: {},
+    resolved_imports: {},
 }
 [
     ParseError {

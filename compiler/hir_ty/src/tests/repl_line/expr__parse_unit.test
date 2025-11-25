@@ -4,5 +4,6 @@ InferenceResult {
     type_map: {
         Idx::<Expression>(0): Unit,
     },
+    resolved_imports: {},
 }
 []

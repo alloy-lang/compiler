@@ -6,6 +6,7 @@ use std::any::Any;
 use alloy_ast as ast;
 use alloy_scope::{ScopeIdx, Scopes};
 use alloy_syntax::SyntaxElement;
+use alloy_workspace::{ModuleId, SourceFile};
 use ast::AstElement;
 use la_arena::Idx;
 use non_empty_vec::NonEmpty;
@@ -791,9 +792,15 @@ impl<'db> LoweringCtx<'db> {
 #[salsa::tracked]
 pub fn lower_file<'db>(
     db: &'db dyn HirDatabase,
-    file: alloy_workspace::RawSourceFile,
+    module_id: ModuleId,
 ) -> (HirModule, Vec<alloy_parser::ParseError>) {
-    let (source_file, parse_errors) = ast::source_file(file.contents(db));
+    let current_file = db.get_source(module_id);
+    let current_file = match current_file {
+        SourceFile::Raw(raw) => raw,
+        SourceFile::Virtual(_) => return (HirModule::empty(), vec![]),
+    };
+
+    let (source_file, parse_errors) = ast::source_file(current_file.contents(db));
 
     // If parsing failed, return an empty HIR module with parse errors
     let Some(source_file) = source_file else {

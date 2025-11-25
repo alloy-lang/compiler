@@ -1,4 +1,3 @@
-use alloy_ast as ast;
 use non_empty_vec::NonEmpty;
 use std::fmt;
 

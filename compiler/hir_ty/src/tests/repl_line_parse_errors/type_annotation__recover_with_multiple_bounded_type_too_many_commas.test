@@ -6,6 +6,20 @@ typeof apply : Test[t1, , t2] where
 ===
 InferenceResult {
     type_map: {},
+    resolved_imports: {
+        "Test": Symbol {
+            module_id: ModuleId(
+                Id(0),
+            ),
+            symbol_name: "Test",
+            symbol: Type {
+                module: ModuleId(
+                    Id(0),
+                ),
+                idx: Idx::<TypeDefinition>(1),
+            },
+        },
+    },
 }
 [
     ParseError {

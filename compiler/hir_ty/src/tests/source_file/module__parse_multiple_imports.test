@@ -4,5 +4,6 @@ module TestModule1 where
 ===
 InferenceResult {
     type_map: {},
+    resolved_imports: {},
 }
 []
