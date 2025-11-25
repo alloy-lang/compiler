@@ -1,0 +1,15 @@
+import other
+
+trait TestTrait1 where
+    -- empty
+end
+
+behavior TestTrait1 for other::Type1 where
+    -- empty
+end
+===
+HirTypedModule {
+    warnings: [],
+    errors: [],
+}
+[]
