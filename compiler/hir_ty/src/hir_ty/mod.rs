@@ -39,6 +39,10 @@ enum TypeRequirements {
     MustImplementTrait(hir::Path),
     Annotated(hir::Path, hir::TypeIdx),
     Variable(usize),
+    Lambda {
+        args: Vec<hir::PatternIdx>,
+        body: hir::ExpressionIdx,
+    },
 }
 
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -155,19 +159,41 @@ impl InferenceContext {
 pub fn infer_types(db: &dyn crate::HirTyDatabase, module_id: ModuleId) -> HirTypedModule {
     let mut result = HirTypedModule::empty();
 
-    // let (hir_module, _) = hir::lower_file(db, module_id);
+    let (hir_module, _) = hir::lower_file(db, module_id);
 
-    // let mut ctx = InferenceContext::new();
-    // result.resolved_imports = resolve_imports(db, module_id);
-    //
-    // for (expression_id, expression, _range, _name_op) in hir_module.expressions() {
-    //     collect_expr_type(&mut ctx, &hir_module, expression_id, expression);
-    //
-    //     result.type_map.insert(
-    //         expression_id,
-    //         unify(&ctx, ExpressionOrPatternIdx::Expression(expression_id)),
-    //     );
-    // }
+    let mut ctx = InferenceContext::new();
+
+    // Collect type requirements for all expressions
+    for (expression_id, expression, _range, _name_op) in hir_module.expressions() {
+        collect_expr_type(&mut ctx, &hir_module, expression_id, expression);
+    }
+
+    // Collect type requirements for all patterns
+    for (pattern_id, pattern, _range, _name_op) in hir_module.patterns() {
+        collect_pattern_type(&mut ctx, &hir_module, pattern_id, pattern);
+    }
+
+    // Unify and resolve types for all expressions
+    for (expression_id, _expression, _range, _name_op) in hir_module.expressions() {
+        if ctx
+            .type_requirements
+            .contains_key(&ExpressionOrPatternIdx::Expression(expression_id))
+        {
+            let resolved_type = unify(&ctx, ExpressionOrPatternIdx::Expression(expression_id));
+            result.expression_types.insert(expression_id, resolved_type);
+        }
+    }
+
+    // Unify and resolve types for all patterns
+    for (pattern_id, _pattern, _range, _name_op) in hir_module.patterns() {
+        if ctx
+            .type_requirements
+            .contains_key(&ExpressionOrPatternIdx::Pattern(pattern_id))
+        {
+            let resolved_type = unify(&ctx, ExpressionOrPatternIdx::Pattern(pattern_id));
+            result.pattern_types.insert(pattern_id, resolved_type);
+        }
+    }
 
     result
 }
@@ -300,8 +326,23 @@ fn collect_expr_type(
                 hir_module.get_expression(*inner_id),
             );
         }
-        hir::Expression::Lambda { .. } => {
-            todo!("lambda")
+        hir::Expression::Lambda { args, body } => {
+            // Collect type requirements for lambda arguments (patterns)
+            for arg in args {
+                collect_pattern_type(ctx, hir_module, *arg, hir_module.get_pattern(*arg));
+            }
+
+            // Collect type requirements for the body
+            collect_expr_type(ctx, hir_module, *body, hir_module.get_expression(*body));
+
+            // Add lambda constraint for this expression
+            ctx.add_expr_requirements(
+                expression_id,
+                TypeRequirements::Lambda {
+                    args: args.to_vec(),
+                    body: *body,
+                },
+            );
         }
         hir::Expression::FunctionCall { .. } => {
             todo!("function call")
@@ -381,11 +422,31 @@ fn collect_pattern_type(
                 hir::Path::Unknown(_) => todo!("unknown path"),
             }
         }
-        hir::Pattern::VariableDeclaration { .. } => {}
-        hir::Pattern::Nil => {}
-        hir::Pattern::Destructure { .. } => {}
-        hir::Pattern::Unit => {}
-        hir::Pattern::Tuple(_) => {}
+        hir::Pattern::VariableDeclaration { .. } => {
+            // Variable declarations get a type variable
+            ctx.insert_pattern_type_variable(pattern_id);
+        }
+        hir::Pattern::Nil => {
+            // Nil has a specific type
+            ctx.add_pattern_requirements(
+                pattern_id,
+                TypeRequirements::MustBeType(ResolvedType::Unit),
+            );
+        }
+        hir::Pattern::Destructure { .. } => {
+            // TODO: Handle destructuring patterns
+            ctx.insert_pattern_type_variable(pattern_id);
+        }
+        hir::Pattern::Unit => {
+            ctx.add_pattern_requirements(
+                pattern_id,
+                TypeRequirements::MustBeType(ResolvedType::Unit),
+            );
+        }
+        hir::Pattern::Tuple(_) => {
+            // TODO: Handle tuple patterns
+            ctx.insert_pattern_type_variable(pattern_id);
+        }
     }
 }
 
@@ -427,15 +488,7 @@ fn unify(ctx: &InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
         })
         .clone();
 
-    // we can only have a single type annotation
-    let annotation = constraints.iter().find_map(|req| {
-        if let TypeRequirements::Annotated(path, ty_id) = req {
-            Some((path, ty_id))
-        } else {
-            None
-        }
-    });
-
+    // Priority 1: MustBeType constraints (most specific)
     let must_be_types = constraints
         .iter()
         .filter_map(|req| {
@@ -447,44 +500,80 @@ fn unify(ctx: &InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
         })
         .collect::<Vec<_>>();
 
-    match must_be_types.len() {
-        0 => {
-            // handled below
+    if !must_be_types.is_empty() {
+        if must_be_types.len() > 1 {
+            panic!("more than one 'MustBeType' constraint");
         }
-        1 => {
-            return must_be_types[0].clone();
-        }
-        _ => {
-            panic!("more than one 'MustBe' constraint");
+        return must_be_types[0].clone();
+    }
+
+    // Priority 2: Tuple constraints
+    if let Some(TypeRequirements::Tuple(inners)) = constraints
+        .iter()
+        .find(|c| matches!(c, TypeRequirements::Tuple(_)))
+    {
+        unsafe {
+            let inner_types = inners
+                .into_iter()
+                .map(|inner_id| unify(ctx, ExpressionOrPatternIdx::Expression(*inner_id)))
+                .collect();
+
+            return ResolvedType::Tuple(NonEmpty::new_unchecked(inner_types));
         }
     }
 
-    for constraint in &constraints {
-        match constraint {
-            TypeRequirements::MustBeType(ty) => {
-                // handled above
-            }
-            TypeRequirements::MustBeSameAs(other_id) => {
-                return unify(ctx, *other_id);
-            }
-            TypeRequirements::MustImplementTrait(_) => {
-                todo!("trait impl");
-            }
-            TypeRequirements::Annotated(_, _) => {
-                // handled above
-            }
-            TypeRequirements::Variable(_) => {
-                // todo!("variable {:?}\n", constraints);
-            }
-            TypeRequirements::Tuple(inners) => unsafe {
-                let inner_types = inners
-                    .into_iter()
-                    .map(|inner_id| unify(ctx, ExpressionOrPatternIdx::Expression(*inner_id)))
-                    .collect();
+    // Priority 3: Lambda constraints
+    if let Some(TypeRequirements::Lambda { args, body }) = constraints
+        .iter()
+        .find(|c| matches!(c, TypeRequirements::Lambda { .. }))
+    {
+        // Build curried lambda type: arg1 -> (arg2 -> (... -> body_type))
+        let body_type = unify(ctx, ExpressionOrPatternIdx::Expression(*body));
 
-                return ResolvedType::Tuple(NonEmpty::new_unchecked(inner_types));
-            },
+        // Work backwards through arguments to build nested lambda types
+        let mut result_type = body_type;
+        for arg in args.iter().rev() {
+            let arg_type = unify(ctx, ExpressionOrPatternIdx::Pattern(*arg));
+            result_type = ResolvedType::Lambda {
+                arg_type: Box::new(arg_type),
+                return_type: Box::new(result_type),
+            };
         }
+
+        return result_type;
+    }
+
+    // Priority 4: MustBeSameAs constraints (follow references)
+    if let Some(TypeRequirements::MustBeSameAs(other_id)) = constraints
+        .iter()
+        .find(|c| matches!(c, TypeRequirements::MustBeSameAs(_)))
+    {
+        return unify(ctx, *other_id);
+    }
+
+    // Priority 5: Type annotations
+    if let Some(TypeRequirements::Annotated(_, _)) = constraints
+        .iter()
+        .find(|c| matches!(c, TypeRequirements::Annotated(_, _)))
+    {
+        // TODO: Handle type annotations
+        // For now, fall through to TypeVar
+    }
+
+    // Priority 6: Trait constraints
+    if let Some(TypeRequirements::MustImplementTrait(_)) = constraints
+        .iter()
+        .find(|c| matches!(c, TypeRequirements::MustImplementTrait(_)))
+    {
+        todo!("trait impl");
+    }
+
+    // Priority 7: Variables (least specific - only if nothing else constrains it)
+    if let Some(TypeRequirements::Variable(var_id)) = constraints
+        .iter()
+        .find(|c| matches!(c, TypeRequirements::Variable(_)))
+    {
+        return ResolvedType::TypeVar(*var_id);
     }
 
     ResolvedType::Unknown

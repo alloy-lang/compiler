@@ -49,7 +49,7 @@ pub struct TypeResolutionResult {
 /// during full compilation, we will want to generate errors and warnings for all modules
 #[salsa::tracked]
 pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedModule {
-    HirTypedModule::empty()
+    infer_types(db, module_id)
 }
 
 /// find an expression's type in a module
@@ -100,37 +100,9 @@ pub fn find_pattern_type(
     todo!()
 }
 
-// #[salsa::tracked]
-// pub fn infer_type(db: &dyn HirTyDatabase, expression: hir::Expression) -> ResolvedType {
-//     // let type_annotation = hir::type_annotation(db, &expression); // optional
-//
-//     let inferred_type = match expression {
-//         hir::Expression::Missing => ResolvedType::Unknown,
-//         hir::Expression::Literal(_) => todo!(),
-//         hir::Expression::VariableRef { .. } => todo!(),
-//         hir::Expression::Binary { .. } => todo!(),
-//         hir::Expression::Unit => todo!(),
-//         hir::Expression::IfThenElse { .. } => todo!(),
-//         hir::Expression::Tuple(_) => todo!(),
-//         hir::Expression::Unary { .. } => todo!(),
-//         hir::Expression::Lambda { .. } => todo!(),
-//         hir::Expression::FunctionCall { .. } => todo!(),
-//         hir::Expression::Match { .. } => todo!(),
-//     };
-//
-//     // if let Some(ta) = type_annotation {
-//     //     let resolved_ta = to_resolved(ta);
-//     //     if inferred_type != resolved_ta {
-//     //         todo!("type mis-match");
-//     return ResolvedType::Unknown;
-//     // }
-//     // }
-//
-//     return inferred_type;
-// }
-
 #[cfg(test)]
 mod small_tests {
+    use crate::diagnostics::TypeInferenceError;
     use crate::hir_ty::ResolvedType;
     use crate::tests::TestHirTyDatabase;
     use alloy_ast as ast;
@@ -172,14 +144,14 @@ mod small_tests {
         );
 
         let (hir_module, parse_errors) = hir::lower_file(&db, module_id);
-        let ctx = crate::infer_types(&db, module_id);
+        let ctx = crate::type_check_module(&db, module_id);
 
         assert_eq!(parse_errors, &[]);
 
         let actual = expected
-            .iter()
+            .into_iter()
             .map(|(name, scope, _ty)| {
-                let (expression_id, expression) = hir_module
+                let (expression_id, _expression) = hir_module
                     .get_expression_by_name(
                         &hir::Name::new(*name),
                         ScopeIdx::from_raw(RawIdx::from(*scope)),
@@ -190,6 +162,22 @@ mod small_tests {
             .collect::<Vec<_>>();
 
         assert_eq!(actual, expected);
+    }
+
+    fn check_error(input: &str, expected: &[TypeInferenceError]) {
+        let mut db = TestHirTyDatabase::default();
+        let module_id = db.add_module(
+            "test_data",
+            camino::Utf8Path::new("./test/test_data.alloy"),
+            input,
+        );
+
+        let (_, parse_errors) = hir::lower_file(&db, module_id);
+        let ctx = crate::type_check_module(&db, module_id);
+
+        assert_eq!(parse_errors, &[]);
+
+        assert_eq!(ctx.errors, expected);
     }
 
     #[test]
@@ -245,17 +233,34 @@ mod small_tests {
     #[test]
     fn infer_variable_ref_unused_lambda() {
         check_named(
-            "let x = |a, b| => a + b",
+            "let x = |a, b| -> a + b",
             &[(
                 "x",
                 0,
                 ResolvedType::Lambda {
-                    arg_type: Box::new(ResolvedType::TypeVar(0)),
+                    arg_type: Box::new(ResolvedType::TypeVar(1)),
                     return_type: Box::new(ResolvedType::Lambda {
-                        arg_type: Box::new(ResolvedType::TypeVar(1)),
-                        return_type: Box::new(ResolvedType::TypeVar(2)),
+                        arg_type: Box::new(ResolvedType::TypeVar(6)),
+                        return_type: Box::new(ResolvedType::TypeVar(5)),
                     }),
                 },
+            )],
+        );
+    }
+
+    #[test]
+    fn conflicting_type_annotation() {
+        check_error(
+            r#"
+                typeof x : String
+                let x = 1
+            "#,
+            &[TypeInferenceError::new(
+                crate::diagnostics::TypeInferenceErrorKind::ConflictingTypeAnnotation {
+                    expected: ResolvedType::BuiltIn(hir::BuiltInType::String),
+                    found: ResolvedType::BuiltIn(hir::BuiltInType::Int),
+                },
+                Default::default(),
             )],
         );
     }

@@ -1,3 +1,4 @@
+use crate::hir_ty::ResolvedType;
 use text_size::TextRange;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
@@ -15,7 +16,10 @@ impl TypeInferenceError {
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum TypeInferenceErrorKind {
-    // TODO
+    ConflictingTypeAnnotation {
+        expected: ResolvedType,
+        found: ResolvedType,
+    },
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
