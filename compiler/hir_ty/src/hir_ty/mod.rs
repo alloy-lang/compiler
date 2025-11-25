@@ -3,7 +3,6 @@ use alloy_hir as hir;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
-use std::collections::HashSet;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum ResolvedType {
@@ -28,7 +27,7 @@ pub enum ResolvedType {
 
 #[derive(Debug)]
 pub struct InferenceContext {
-    type_requirements: FxHashMap<ExpressionOrPatternIdx, HashSet<TypeRequirements>>,
+    type_requirements: FxHashMap<ExpressionOrPatternIdx, Vec<TypeRequirements>>,
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -137,10 +136,15 @@ impl InferenceContext {
         expression_id: hir::ExpressionIdx,
         constraint: TypeRequirements,
     ) {
-        self.type_requirements
+        let constraints = self
+            .type_requirements
             .entry(ExpressionOrPatternIdx::Expression(expression_id))
-            .or_insert_with(HashSet::new)
-            .insert(constraint);
+            .or_insert_with(Vec::new);
+
+        // Only add if not already present
+        if !constraints.contains(&constraint) {
+            constraints.push(constraint);
+        }
     }
 
     fn add_pattern_requirements(
@@ -148,10 +152,15 @@ impl InferenceContext {
         pattern_id: hir::PatternIdx,
         constraint: TypeRequirements,
     ) {
-        self.type_requirements
+        let constraints = self
+            .type_requirements
             .entry(ExpressionOrPatternIdx::Pattern(pattern_id))
-            .or_insert_with(HashSet::new)
-            .insert(constraint);
+            .or_insert_with(Vec::new);
+
+        // Only add if not already present
+        if !constraints.contains(&constraint) {
+            constraints.push(constraint);
+        }
     }
 }
 
