@@ -83,45 +83,17 @@ impl InferenceContext {
         expression_id: hir::ExpressionIdx,
         lit: &hir::Literal,
     ) {
-        match lit {
-            hir::Literal::Int(_) => self.add_expr_requirements(
-                expression_id,
-                TypeRequirements::MustBeType(ResolvedType::BuiltIn(hir::BuiltInType::Int)),
-            ),
-            hir::Literal::Fraction(_) => self.add_expr_requirements(
-                expression_id,
-                TypeRequirements::MustBeType(ResolvedType::BuiltIn(hir::BuiltInType::Fraction)),
-            ),
-            hir::Literal::String(_) => self.add_expr_requirements(
-                expression_id,
-                TypeRequirements::MustBeType(ResolvedType::BuiltIn(hir::BuiltInType::String)),
-            ),
-            hir::Literal::Char(_) => self.add_expr_requirements(
-                expression_id,
-                TypeRequirements::MustBeType(ResolvedType::BuiltIn(hir::BuiltInType::Char)),
-            ),
-        }
+        self.add_expr_requirements(
+            expression_id,
+            TypeRequirements::MustBeType(ResolvedType::BuiltIn(hir::BuiltInType::from(lit))),
+        )
     }
 
     fn insert_pattern_literal_type(&mut self, pattern_id: hir::PatternIdx, lit: &hir::Literal) {
-        match lit {
-            hir::Literal::Int(_) => self.add_pattern_requirements(
-                pattern_id,
-                TypeRequirements::MustBeType(ResolvedType::BuiltIn(hir::BuiltInType::Int)),
-            ),
-            hir::Literal::Fraction(_) => self.add_pattern_requirements(
-                pattern_id,
-                TypeRequirements::MustBeType(ResolvedType::BuiltIn(hir::BuiltInType::Fraction)),
-            ),
-            hir::Literal::String(_) => self.add_pattern_requirements(
-                pattern_id,
-                TypeRequirements::MustBeType(ResolvedType::BuiltIn(hir::BuiltInType::String)),
-            ),
-            hir::Literal::Char(_) => self.add_pattern_requirements(
-                pattern_id,
-                TypeRequirements::MustBeType(ResolvedType::BuiltIn(hir::BuiltInType::Char)),
-            ),
-        }
+        self.add_pattern_requirements(
+            pattern_id,
+            TypeRequirements::MustBeType(ResolvedType::BuiltIn(hir::BuiltInType::from(lit))),
+        )
     }
 
     fn insert_expr_type_named(

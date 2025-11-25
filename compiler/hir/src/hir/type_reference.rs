@@ -11,6 +11,17 @@ pub enum BuiltInType {
     Bool,
 }
 
+impl From<&Literal> for BuiltInType {
+    fn from(lit: &Literal) -> Self {
+        match lit {
+            Literal::Int(_) => Self::Int,
+            Literal::Fraction(_) => Self::Fraction,
+            Literal::String(_) => Self::String,
+            Literal::Char(_) => Self::Char,
+        }
+    }
+}
+
 impl TryFrom<&ast::Path> for BuiltInType {
     type Error = ();
 
