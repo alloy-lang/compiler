@@ -2,7 +2,6 @@ use std::path::Path;
 
 use alloy_ast as ast;
 use alloy_hir as hir;
-use alloy_parser::ParseError;
 use alloy_workspace::{ModuleId, SourceFile, Workspace, WorkspaceDatabase};
 
 #[salsa::db]
@@ -16,7 +15,7 @@ pub(crate) struct TestHirTyDatabase {
 impl salsa::Database for TestHirTyDatabase {}
 
 #[salsa::db]
-impl alloy_workspace::WorkspaceDatabase for TestHirTyDatabase {
+impl WorkspaceDatabase for TestHirTyDatabase {
     fn add_module(&mut self, slug: &str, path: &camino::Utf8Path, contents: &str) -> ModuleId {
         let prepared = alloy_workspace::prepare_module(self, slug, path, contents);
         self.workspace.insert_prepared_module(prepared)
@@ -85,7 +84,7 @@ fn run_hir_ty_test(
     );
     let test_module_id = db.add_module("main", camino::Utf8Path::new("./test/main.alloy"), input);
 
-    let type_map = crate::infer_types(&db, test_module_id);
+    let type_map = crate::type_check_module(&db, test_module_id);
 
     let file_name = path.to_str().expect("Expected filename");
     if expect_parse_errors {
