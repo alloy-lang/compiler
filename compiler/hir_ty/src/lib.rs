@@ -250,10 +250,34 @@ mod small_tests {
                     arg_type: Box::new(ResolvedType::TypeVar(1)),
                     return_type: Box::new(ResolvedType::Lambda {
                         arg_type: Box::new(ResolvedType::TypeVar(3)),
-                        return_type: Box::new(ResolvedType::TypeVar(4)),
+                        return_type: Box::new(ResolvedType::TypeVar(1)),
                     }),
                 },
             )],
+        );
+    }
+
+    #[test]
+    fn infer_lambda_based_on_usage() {
+        check_named(
+            r#"
+            let x = |a, b| -> a + b
+            let y = x(1, 2)
+            "#,
+            &[
+                (
+                    "x",
+                    0,
+                    ResolvedType::Lambda {
+                        arg_type: Box::new(ResolvedType::BuiltIn(hir::BuiltInType::Int)),
+                        return_type: Box::new(ResolvedType::Lambda {
+                            arg_type: Box::new(ResolvedType::BuiltIn(hir::BuiltInType::Int)),
+                            return_type: Box::new(ResolvedType::BuiltIn(hir::BuiltInType::Int)),
+                        }),
+                    },
+                ),
+                ("y", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int)),
+            ],
         );
     }
 

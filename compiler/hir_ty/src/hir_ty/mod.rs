@@ -45,6 +45,10 @@ enum TypeRequirements {
         args: Vec<hir::PatternIdx>,
         body: hir::ExpressionIdx,
     },
+    FunctionCall {
+        func: ExpressionOrPatternIdx,
+        args: Vec<hir::ExpressionIdx>,
+    },
 }
 
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
@@ -367,31 +371,21 @@ fn collect_expr_type(
             }
         }
         hir::Expression::Binary { op, lhs, rhs } => {
-            // todo: add "behavior impl" constraints based on the operator
-            // match op {
-            //     hir::BinaryOp::Add => {
-            //         ctx.insert(expression_id, ResolvedType::BuiltIn(hir::BuiltInType::Int));
-            //     }
-            //     hir::BinaryOp::Sub => {
-            //         ctx.insert(expression_id, ResolvedType::BuiltIn(hir::BuiltInType::Int));
-            //     }
-            //     hir::BinaryOp::Mul => {
-            //         ctx.insert(expression_id, ResolvedType::BuiltIn(hir::BuiltInType::Int));
-            //     }
-            //     hir::BinaryOp::Div => {
-            //         ctx.insert(expression_id, ResolvedType::BuiltIn(hir::BuiltInType::Int));
-            //     }
-            //     hir::BinaryOp::Custom(_) => {
-            //         todo!("custom binary op");
-            //     }
-            //     hir::BinaryOp::Missing => {
-            //         todo!("missing binary op");
-            //     }
-            // }
             ctx.insert_expr_type_variable(expression_id);
 
             collect_expr_type(ctx, hir_module, *lhs, hir_module.get_expression(*lhs));
             collect_expr_type(ctx, hir_module, *rhs, hir_module.get_expression(*rhs));
+
+            // For now, assume binary operations preserve types (lhs, rhs, and result are all the same type)
+            // TODO: Add proper "behavior impl" constraints based on the operator
+            ctx.add_expr_requirements(
+                expression_id,
+                TypeRequirements::MustBeSameAs(ExpressionOrPatternIdx::Expression(*lhs)),
+            );
+            ctx.add_expr_requirements(
+                expression_id,
+                TypeRequirements::MustBeSameAs(ExpressionOrPatternIdx::Expression(*rhs)),
+            );
         }
         hir::Expression::Unit => {
             ctx.insert_type(expression_id, ResolvedType::Unit);
@@ -442,8 +436,80 @@ fn collect_expr_type(
                 },
             );
         }
-        hir::Expression::FunctionCall { .. } => {
-            todo!("function call")
+        hir::Expression::FunctionCall { target, scope, args } => {
+            ctx.insert_expr_type_variable(expression_id);
+
+            // Collect types for all arguments
+            for arg in args {
+                collect_expr_type(ctx, hir_module, *arg, hir_module.get_expression(*arg));
+            }
+
+            // Look up the function being called
+            match target {
+                hir::Path::ThisModule(this_path) => {
+                    // Try to find the function as an expression (lambda or function reference)
+                    if let Some((func_id, func_expr)) = hir_module.get_expression_by_name(this_path.first(), *scope) {
+                        collect_expr_type(ctx, hir_module, func_id, func_expr);
+
+                        // If the function is a lambda, create bidirectional constraints
+                        if let hir::Expression::Lambda { args: lambda_args, .. } = func_expr {
+                            // Link each call argument to the corresponding lambda parameter (bidirectional)
+                            for (call_arg, lambda_param) in args.iter().zip(lambda_args.iter()) {
+                                ctx.add_expr_requirements(
+                                    *call_arg,
+                                    TypeRequirements::MustBeSameAs(ExpressionOrPatternIdx::Pattern(*lambda_param)),
+                                );
+                                ctx.add_pattern_requirements(
+                                    *lambda_param,
+                                    TypeRequirements::MustBeSameAs(ExpressionOrPatternIdx::Expression(*call_arg)),
+                                );
+                            }
+                        }
+
+                        // Add a FunctionCall constraint that will be resolved during unification
+                        ctx.add_expr_requirements(
+                            expression_id,
+                            TypeRequirements::FunctionCall {
+                                func: ExpressionOrPatternIdx::Expression(func_id),
+                                args: args.clone(),
+                            },
+                        );
+                    } else if let Some((pattern_id, _)) = hir_module.get_pattern_by_name(this_path.first(), *scope) {
+                        collect_pattern_type(ctx, hir_module, pattern_id, hir_module.get_pattern(pattern_id));
+
+                        // Try to find what expression this pattern is bound to
+                        // For "let x = |a, b| -> ...", we need to find the lambda
+                        if let Some((bound_expr_id, bound_expr)) = hir_module.get_expression_by_name(this_path.first(), *scope) {
+                            if let hir::Expression::Lambda { args: lambda_args, .. } = bound_expr {
+                                // Link each call argument to the corresponding lambda parameter (bidirectional)
+                                for (call_arg, lambda_param) in args.iter().zip(lambda_args.iter()) {
+                                    ctx.add_expr_requirements(
+                                        *call_arg,
+                                        TypeRequirements::MustBeSameAs(ExpressionOrPatternIdx::Pattern(*lambda_param)),
+                                    );
+                                    ctx.add_pattern_requirements(
+                                        *lambda_param,
+                                        TypeRequirements::MustBeSameAs(ExpressionOrPatternIdx::Expression(*call_arg)),
+                                    );
+                                }
+                            }
+                        }
+
+                        // The pattern might be bound to a lambda
+                        ctx.add_expr_requirements(
+                            expression_id,
+                            TypeRequirements::FunctionCall {
+                                func: ExpressionOrPatternIdx::Pattern(pattern_id),
+                                args: args.clone(),
+                            },
+                        );
+                    }
+                }
+                hir::Path::OtherModule(_) => todo!("function call to other module"),
+                hir::Path::Unknown(_) => {
+                    // Unknown function - just give it a type variable
+                }
+            }
         }
         hir::Expression::Match { .. } => {
             todo!("match")
@@ -639,6 +705,36 @@ fn unify(ctx: &InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
         }
 
         return result_type;
+    }
+
+    // Priority 3.5: FunctionCall constraints (bidirectional type inference)
+    if let Some(TypeRequirements::FunctionCall { func, args }) = constraints
+        .iter()
+        .find(|c| matches!(c, TypeRequirements::FunctionCall { .. }))
+    {
+        // Get the function's type (works for both expressions and patterns)
+        let mut func_type = unify(ctx, *func);
+
+        // Apply each argument to unwrap the curried lambda type
+        for arg in args {
+            match func_type {
+                ResolvedType::Lambda { arg_type: _, return_type } => {
+                    // The argument type must match the parameter type (bidirectional constraint)
+                    // This happens automatically through unification
+                    let _arg_ty = unify(ctx, ExpressionOrPatternIdx::Expression(*arg));
+
+                    // Move to the return type for the next argument
+                    func_type = *return_type;
+                }
+                _ => {
+                    // If we don't have a lambda type, we can't determine the return type
+                    // This might happen if the function type hasn't been fully inferred yet
+                    break;
+                }
+            }
+        }
+
+        return func_type;
     }
 
     // Priority 4: MustBeSameAs constraints (follow references)
