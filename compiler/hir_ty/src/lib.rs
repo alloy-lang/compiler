@@ -2,7 +2,7 @@ use alloy_hir as hir;
 use alloy_hir::{Expression, Pattern};
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
-use std::os::unix::raw::mode_t;
+use text_size::TextRange;
 
 mod hir_ty;
 use hir_ty::*;
@@ -33,6 +33,14 @@ impl HirTypedModule {
             warnings: Vec::new(),
             errors: Vec::new(),
         }
+    }
+
+    fn warning(&mut self, kind: TypeInferenceWarningKind, range: TextRange) {
+        self.warnings.push(TypeInferenceWarning::new(kind, range));
+    }
+
+    fn error(&mut self, kind: TypeInferenceErrorKind, range: TextRange) {
+        self.errors.push(TypeInferenceError::new(kind, range));
     }
 }
 
@@ -112,6 +120,7 @@ mod small_tests {
     use alloy_workspace::WorkspaceDatabase;
     use la_arena::RawIdx;
     use non_empty_vec::NonEmpty;
+    use text_size::{TextRange, TextSize};
 
     fn check(input: &str, expected: &[(u32, ResolvedType)]) {
         let (_, parse_errors) = ast::source_file(input);
@@ -260,7 +269,7 @@ mod small_tests {
                     expected: ResolvedType::BuiltIn(hir::BuiltInType::String),
                     found: ResolvedType::BuiltIn(hir::BuiltInType::Int),
                 },
-                Default::default(),
+                TextRange::new(TextSize::from(51), TextSize::from(73)),
             )],
         );
     }
