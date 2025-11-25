@@ -1,0 +1,18 @@
+typedef Type1 = Thing
+
+trait TestTrait1 where
+    -- empty
+end
+
+behavior TestTrait1 for Type1 where
+    -- empty
+end
+behavior TestTrait1 for Type1 where
+    -- empty
+end
+===
+HirTypedModule {
+    warnings: [],
+    errors: [],
+}
+[]
