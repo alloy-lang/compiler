@@ -1,7 +1,7 @@
 use crate::hir_ty::ResolvedType;
 use text_size::TextRange;
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct TypeInferenceError {
     kind: TypeInferenceErrorKind,
     range: TextRange,
@@ -14,7 +14,7 @@ impl TypeInferenceError {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TypeInferenceErrorKind {
     ConflictingTypeAnnotation {
         expected: ResolvedType,
@@ -22,7 +22,7 @@ pub enum TypeInferenceErrorKind {
     },
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct TypeInferenceWarning {
     kind: TypeInferenceWarningKind,
     range: TextRange,
@@ -35,7 +35,7 @@ impl TypeInferenceWarning {
     }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TypeInferenceWarningKind {
     // TODO
 }
