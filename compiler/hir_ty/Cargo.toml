@@ -14,6 +14,7 @@ la-arena = { workspace = true }
 rustc-hash = { workspace = true }
 non-empty-vec = { workspace = true }
 salsa = { workspace = true }
+text-size = { workspace = true }
 
 [dev-dependencies]
 alloy_parser = {path = "../parser"}

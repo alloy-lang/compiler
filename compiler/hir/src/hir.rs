@@ -96,7 +96,6 @@ impl ModuleExports {
     }
 }
 
-#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq)]
 pub struct HirModule {
     imports: Index<Import>,

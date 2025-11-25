@@ -203,6 +203,7 @@ pub enum ResolvedSymbol {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::tests::TestHirTyDatabase;
     use alloy_hir as hir;
     use alloy_workspace::{ModuleId, WorkspaceDatabase};
@@ -249,11 +250,11 @@ mod tests {
                 "#,
         );
 
-        let resolved_imports = crate::resolve_imports(&db, main_module_id)
+        let resolved_imports = resolve_imports(&db, main_module_id)
             .into_iter()
             .collect::<HashMap<_, _>>();
         let expected = hashmap! {
-            hir::Name::new("types") => crate::ResolvedImport::Module(types_module_id),
+            hir::Name::new("types") => ResolvedImport::Module(types_module_id),
         };
 
         assert_eq!(
@@ -277,14 +278,14 @@ mod tests {
                 "#,
         );
 
-        let resolved_imports = crate::resolve_imports(&db, main_module_id)
+        let resolved_imports = resolve_imports(&db, main_module_id)
             .into_iter()
             .collect::<HashMap<_, _>>();
         let expected = hashmap! {
-            hir::Name::new("Point") => crate::ResolvedImport::Symbol {
+            hir::Name::new("Point") => ResolvedImport::Symbol {
                 module_id: types_module_id,
                 symbol_name: hir::Name::new("Point"),
-                symbol: crate::ResolvedSymbol::Type {
+                symbol: ResolvedSymbol::Type {
                     module: types_module_id,
                     idx: hir::TypeDefinitionIdx::from_raw(RawIdx::from_u32(0)),
                 }
@@ -312,14 +313,14 @@ mod tests {
                 "#,
         );
 
-        let resolved_imports = crate::resolve_imports(&db, main_module_id)
+        let resolved_imports = resolve_imports(&db, main_module_id)
             .into_iter()
             .collect::<HashMap<_, _>>();
         let expected = hashmap! {
-            hir::Name::new("origin") => crate::ResolvedImport::Symbol {
+            hir::Name::new("origin") => ResolvedImport::Symbol {
                 module_id: types_module_id,
                 symbol_name: hir::Name::new("origin"),
-                symbol: crate::ResolvedSymbol::Expression {
+                symbol: ResolvedSymbol::Expression {
                     module: types_module_id,
                     idx: hir::ExpressionIdx::from_raw(RawIdx::from_u32(3)),
                 }
@@ -345,14 +346,14 @@ mod tests {
                 "#,
         );
 
-        let resolved_imports = crate::resolve_imports(&db, main_module_id)
+        let resolved_imports = resolve_imports(&db, main_module_id)
             .into_iter()
             .collect::<HashMap<_, _>>();
         let expected = hashmap! {
-            hir::Name::new("TestTrait1") => crate::ResolvedImport::Symbol {
+            hir::Name::new("TestTrait1") => ResolvedImport::Symbol {
                 module_id: types_module_id,
                 symbol_name: hir::Name::new("TestTrait1"),
-                symbol: crate::ResolvedSymbol::Trait {
+                symbol: ResolvedSymbol::Trait {
                     module: types_module_id,
                     idx: hir::TraitIdx::from_raw(RawIdx::from_u32(0)),
                 }
