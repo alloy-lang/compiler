@@ -28,6 +28,13 @@ pub struct TypeInferenceWarning {
     range: TextRange,
 }
 
+impl TypeInferenceWarning {
+    #[must_use]
+    pub fn new(kind: TypeInferenceWarningKind, range: TextRange) -> Self {
+        Self { kind, range }
+    }
+}
+
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum TypeInferenceWarningKind {
     // TODO
