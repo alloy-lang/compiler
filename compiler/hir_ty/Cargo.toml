@@ -15,6 +15,7 @@ rustc-hash = { workspace = true }
 non-empty-vec = { workspace = true }
 salsa = { workspace = true }
 text-size = { workspace = true }
+itertools = { workspace = true }
 
 [dev-dependencies]
 alloy_parser = {path = "../parser"}
