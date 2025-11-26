@@ -132,7 +132,7 @@ impl Workspace {
         result
     }
 
-    pub fn get_source(&self, module_id: ModuleId) -> SourceFile {
+    pub fn get_source(&'_ self, module_id: ModuleId) -> SourceFile<'_> {
         self.raw_files
             .get(&module_id)
             .map(SourceFile::Raw)
