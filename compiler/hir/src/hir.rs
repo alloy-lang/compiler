@@ -1,7 +1,6 @@
 use super::{Fqn, HirDatabase, Name};
 use crate::ast_glossary::AstGlossary;
 use crate::index::{Index, IndexItem};
-use std::any::Any;
 
 use alloy_ast as ast;
 use alloy_scope::{ScopeIdx, Scopes};
@@ -30,7 +29,7 @@ pub use import::*;
 
 mod module;
 
-pub use module::*;
+use module::*;
 
 mod path;
 
@@ -42,8 +41,6 @@ pub use pattern::*;
 
 mod source_file;
 
-pub use source_file::*;
-
 mod r#trait;
 
 pub use r#trait::*;
@@ -54,7 +51,7 @@ pub use type_reference::*;
 
 mod type_annotation;
 
-pub use type_annotation::*;
+use type_annotation::*;
 
 mod type_variable;
 
@@ -66,7 +63,7 @@ pub use type_definition::*;
 
 mod value;
 
-pub use value::*;
+use value::*;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum HirReferenceType {
