@@ -43,7 +43,6 @@ impl InfixExpr {
 pub struct BinaryOp(SyntaxToken);
 
 impl AstElement for BinaryOp {
-    #[must_use]
     fn cast<E: Into<SyntaxElement>>(element: E) -> Option<Self> {
         let element = element.into();
 
