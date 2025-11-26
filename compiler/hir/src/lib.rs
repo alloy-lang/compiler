@@ -68,9 +68,9 @@ impl From<&String> for Name {
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct Fqn {
     // todo: consider replacing module path with the module id
-    module: NonEmpty<Name>,
-    name: Name,
-    sub_path: Vec<Name>,
+    pub module: NonEmpty<Name>,
+    pub name: Name,
+    pub sub_path: Vec<Name>,
 }
 
 impl Fqn {
