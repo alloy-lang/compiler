@@ -59,8 +59,7 @@
 
 use crate::HirTyDatabase;
 use alloy_hir as hir;
-use alloy_hir::HirDatabase;
-use alloy_workspace::{ModuleId, RawSourceFile, SourceFile, Workspace};
+use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
 
 /// Represents the result of resolving an import statement
