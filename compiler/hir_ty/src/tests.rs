@@ -1,3 +1,4 @@
+use std::env;
 use std::path::Path;
 
 use alloy_ast as ast;
@@ -62,6 +63,31 @@ fn repl_line_parse_errors() {
     alloy_test_harness::run_test_dir("repl_line_parse_errors", |path, input| {
         run_hir_ty_test(path, input, true, false)
     });
+}
+
+#[test]
+fn on_demand_test() {
+    for arg in env::args() {
+        if arg.contains("--test-case") {
+            let test_case = arg.split("--test-case=").nth(1).unwrap();
+
+            let tests_path = {
+                let current_dir = env::current_dir().unwrap();
+                current_dir.join(format!("src/tests/{test_case}"))
+            };
+
+            let did_panic = std::panic::catch_unwind(|| {
+                alloy_test_harness::run_test_case(tests_path, |path, input| {
+                    run_hir_ty_test(path, input, false, false)
+                });
+            })
+            .is_err();
+
+            assert!(!did_panic, "{} test failed", test_case,);
+
+            break;
+        }
+    }
 }
 
 #[track_caller]
