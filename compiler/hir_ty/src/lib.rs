@@ -57,7 +57,7 @@ pub struct TypeResolutionResult {
 /// during full compilation, we will want to generate errors and warnings for all modules
 #[salsa::tracked]
 pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedModule {
-    infer_types(db, module_id)
+    hir_ty::infer_types_hm(db, module_id)
 }
 
 /// find an expression's type in a module
