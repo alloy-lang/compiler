@@ -79,16 +79,16 @@ fn resolve_path(
 ) -> Option<(ModuleId, hir::TypeIdx)> {
     match path {
         hir::Path::ThisModule(this_path) => {
-            get_type_reference_by_name(db, current_module_id, this_path.last(), scope)
-                .map(|type_idx| (current_module_id, type_idx))
+            let type_idx =
+                get_type_reference_by_name(db, current_module_id, this_path.first(), scope)?;
+            Some((current_module_id, type_idx))
         }
         hir::Path::OtherModule(fqn) => {
             let module_slug = fqn.module.iter().map(|n| n.as_str()).join("::");
-            let other_module_id = db
-                .find_module_by_slug(&*module_slug)
-                .expect("somehow, we couldn't find the module");
-            get_type_reference_by_name(db, other_module_id, fqn.module.last(), Scopes::ROOT)
-                .map(|type_idx| (other_module_id, type_idx))
+            let other_module_id = db.find_module_by_slug(&*module_slug)?;
+            let type_idx =
+                get_type_reference_by_name(db, other_module_id, fqn.module.first(), Scopes::ROOT)?;
+            Some((other_module_id, type_idx))
         }
         hir::Path::Unknown(_) => None,
     }

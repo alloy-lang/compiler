@@ -66,6 +66,7 @@ pub enum ResolvedType {
 struct InferenceContext<'db> {
     db: &'db dyn HirTyDatabase,
     type_requirements: FxHashMap<ExpressionOrPatternIdx, Vec<TypeRequirements>>,
+    resolved_types: FxHashMap<ExpressionOrPatternIdx, ResolvedType>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -97,6 +98,7 @@ impl<'db> InferenceContext<'db> {
         Self {
             db,
             type_requirements: FxHashMap::default(),
+            resolved_types: FxHashMap::default(),
         }
     }
 
@@ -204,7 +206,7 @@ pub fn infer_types(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedModul
     for (expression_id, _expression, range, name_op) in hir_module.expressions() {
         let idx = ExpressionOrPatternIdx::Expression(Fql::new(module_id, expression_id));
         if ctx.type_requirements.contains_key(&idx) {
-            let resolved_type = unify(&ctx, idx);
+            let resolved_type = unify(&mut ctx, idx);
             result
                 .expression_types
                 .insert(expression_id, resolved_type.clone());
@@ -217,7 +219,7 @@ pub fn infer_types(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedModul
     for (pattern_id, _pattern, range, name_op) in hir_module.patterns() {
         let idx = ExpressionOrPatternIdx::Pattern(Fql::new(module_id, pattern_id));
         if ctx.type_requirements.contains_key(&idx) {
-            let resolved_type = unify(&ctx, idx);
+            let resolved_type = unify(&mut ctx, idx);
             result
                 .pattern_types
                 .insert(pattern_id, resolved_type.clone());
@@ -245,7 +247,7 @@ fn check_type_annotation(
             &hir::Path::ThisModule(NonEmpty::new(name.clone())),
             scope,
         );
-        if expected_type != resolved_type {
+        if expected_type != ResolvedType::Unknown && expected_type != resolved_type {
             result.error(
                 crate::diagnostics::TypeInferenceErrorKind::ConflictingTypeAnnotation {
                     expected: expected_type,
@@ -257,7 +259,20 @@ fn check_type_annotation(
     }
 }
 
-fn unify(ctx: &InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
+fn unify(ctx: &mut InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
+    ctx.resolved_types
+        .get(&id)
+        .filter(|ty| **ty != ResolvedType::Unknown)
+        .cloned()
+        .unwrap_or_else(|| {
+            let ty = unify_inner(ctx, id.clone());
+            println!("Unified {id:?} as type: {ty:?}");
+            ctx.resolved_types.insert(id.clone(), ty.clone());
+            ty
+        })
+}
+
+fn unify_inner(ctx: &mut InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
     let constraints = ctx
         .type_requirements
         .get(&id)
@@ -268,6 +283,8 @@ fn unify(ctx: &InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
             )
         })
         .clone();
+
+    println!("Unifying {id:?} with constraints: {constraints:?}");
 
     // Priority 1: MustBeType constraints (most specific)
     let must_be_types = constraints
@@ -362,6 +379,7 @@ fn unify(ctx: &InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
         .iter()
         .find(|c| matches!(c, TypeRequirements::MustBeSameAs(_)))
     {
+        println!("Unifying {id:?} must be same as {other_id:?}");
         return unify(ctx, other_id.clone());
     }
 

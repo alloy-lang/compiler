@@ -26,10 +26,10 @@ pub fn collect_expr_type(
     println!("Collecting expression type: {expression:?}. id: {expression_id:?}");
     match &expression {
         hir::Expression::Missing => todo!("Missing expression"),
-        hir::Expression::Literal(lit) => ctx.add_expr_requirements(
+        hir::Expression::Literal(lit) => ctx.insert_type(
             current_module_id,
             expression_id,
-            TypeRequirements::MustBeType(ResolvedType::BuiltIn(hir::BuiltInType::from(lit))),
+            ResolvedType::BuiltIn(hir::BuiltInType::from(lit)),
         ),
         hir::Expression::VariableRef { path, scope } => {
             collect_variable_ref(ctx, current_module_id, expression_id, path, scope);
@@ -245,14 +245,12 @@ pub fn resolve_path(
 ) -> Option<Fql<hir::Expression>> {
     match path {
         hir::Path::ThisModule(this_path) => {
-            get_expression_by_name(db, current_module_id, this_path.last(), scope)
+            get_expression_by_name(db, current_module_id, this_path.first(), scope)
         }
         hir::Path::OtherModule(fqn) => {
             let module_slug = fqn.module.iter().map(|n| n.as_str()).join("::");
-            let other_module_id = db
-                .find_module_by_slug(&*module_slug)
-                .expect("somehow, we couldn't find the module");
-            get_expression_by_name(db, other_module_id, fqn.module.last(), Scopes::ROOT)
+            let other_module_id = db.find_module_by_slug(&*module_slug)?;
+            get_expression_by_name(db, other_module_id, fqn.module.first(), Scopes::ROOT)
         }
         hir::Path::Unknown(_) => None,
     }
