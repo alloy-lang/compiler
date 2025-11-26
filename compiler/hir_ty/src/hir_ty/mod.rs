@@ -67,6 +67,7 @@ struct InferenceContext<'db> {
     db: &'db dyn HirTyDatabase,
     type_requirements: FxHashMap<ExpressionOrPatternIdx, Vec<TypeRequirements>>,
     resolved_types: FxHashMap<ExpressionOrPatternIdx, ResolvedType>,
+    visited: FxHashMap<ExpressionOrPatternIdx, ()>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -99,6 +100,7 @@ impl<'db> InferenceContext<'db> {
             db,
             type_requirements: FxHashMap::default(),
             resolved_types: FxHashMap::default(),
+            visited: FxHashMap::default(),
         }
     }
 
@@ -273,6 +275,7 @@ fn unify(ctx: &mut InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType
 }
 
 fn unify_inner(ctx: &mut InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
+    ctx.visited.insert(id.clone(), ());
     let constraints = ctx
         .type_requirements
         .get(&id)
@@ -380,7 +383,10 @@ fn unify_inner(ctx: &mut InferenceContext, id: ExpressionOrPatternIdx) -> Resolv
         .find(|c| matches!(c, TypeRequirements::MustBeSameAs(_)))
     {
         println!("Unifying {id:?} must be same as {other_id:?}");
-        return unify(ctx, other_id.clone());
+        if !ctx.visited.contains_key(other_id) {
+            // Prevent infinite recursion on cycles
+            return unify(ctx, other_id.clone());
+        }
     }
 
     // Priority 5: Trait constraints
