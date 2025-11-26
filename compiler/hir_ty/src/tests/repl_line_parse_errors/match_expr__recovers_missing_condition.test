@@ -4,130 +4,28 @@ match when
   | True -> 0
   | False -> 1
 ===
-HirModule {
-    imports: Index::<Import> {
-        Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "std",
-                    "bool",
-                    "Bool",
-                ],
-                last: "True",
-            },
-            "name": "True",
-            "range": 0..39,
-            "scope_id": Idx::<Scope>(0),
-        },
-        Idx::<Import>(1): {
-            "item": Import {
-                segments: [
-                    "std",
-                    "bool",
-                    "Bool",
-                ],
-                last: "False",
-            },
-            "name": "False",
-            "range": 0..39,
-            "scope_id": Idx::<Scope>(0),
-        },
-    },
-    expressions: Index::<Expression> {
-        Idx::<Expression>(0): {
-            "item": Missing,
-            "range": 39..78,
-        },
-        Idx::<Expression>(1): {
-            "item": IntLiteral(
-                0,
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): Unknown,
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(4): Lambda {
+            arg_type: Unknown,
+            return_type: BuiltIn(
+                Int,
             ),
-            "range": 62..66,
         },
-        Idx::<Expression>(2): {
-            "item": IntLiteral(
-                1,
-            ),
-            "range": 77..78,
-        },
-        Idx::<Expression>(3): {
-            "item": Match {
-                condition: Idx::<Expression>(0),
-                targets: [
-                    (
-                        Idx::<Pattern>(0),
-                        Idx::<Expression>(1),
-                    ),
-                    (
-                        Idx::<Pattern>(1),
-                        Idx::<Expression>(2),
-                    ),
-                ],
-            },
-            "range": 39..78,
-        },
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
     },
-    patterns: Index::<Pattern> {
-        Idx::<Pattern>(0): {
-            "item": PatternRef {
-                path: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                "std",
-                                "bool",
-                                "Bool",
-                            ],
-                        ),
-                        name: "True",
-                        sub_path: [],
-                    },
-                ),
-                scope: Idx::<Scope>(1),
-            },
-            "range": 54..59,
-        },
-        Idx::<Pattern>(1): {
-            "item": PatternRef {
-                path: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                "std",
-                                "bool",
-                                "Bool",
-                            ],
-                        ),
-                        name: "False",
-                        sub_path: [],
-                    },
-                ),
-                scope: Idx::<Scope>(2),
-            },
-            "range": 68..74,
-        },
-    },
-    type_references: EmptyIndex::<TypeReference>,
-    type_definitions: EmptyIndex::<TypeDefinition>,
-    scopes: Scopes {
-        current_scope: Idx::<Scope>(0),
-        scopes: Arena {
-            len: 3,
-            data: [
-                Scope {
-                    parent: Idx::<Scope>(0),
-                    tag: "root",
-                },
-                Scope {
-                    parent: Idx::<Scope>(0),
-                    tag: "match expression arm",
-                },
-                Scope {
-                    parent: Idx::<Scope>(0),
-                    tag: "match expression arm",
-                },
-            ],
-        },
+    pattern_types: {
+        Idx::<Pattern>(0): Unknown,
+        Idx::<Pattern>(1): Unknown,
     },
     warnings: [],
     errors: [],
@@ -151,5 +49,24 @@ HirModule {
             offset: 45,
         },
         context: MatchExprArg,
+    },
+    ParseError {
+        expected: [
+            Backslash,
+        ],
+        kind: Unexpected {
+            found: Pipe,
+            range: 52..53,
+        },
+        context: MatchTargetPipe,
+    },
+    ParseError {
+        expected: [
+            Pipe,
+        ],
+        kind: Missing {
+            offset: 74,
+        },
+        context: LambdaArgPipe,
     },
 ]

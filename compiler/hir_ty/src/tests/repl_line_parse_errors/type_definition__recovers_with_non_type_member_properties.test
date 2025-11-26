@@ -3,9 +3,11 @@ typedef Test1 =
   | Thing2 "hi"
   | Thing3 String Int
 ===
-InferenceResult {
-    type_map: {},
-    resolved_imports: {},
+HirTypedModule {
+    expression_types: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 [
     ParseError {

@@ -2,12 +2,34 @@ let unknown = 1
 
 |unknown(a)| -> a + "a"
 ===
-{
-    Idx::<Expression>(0): BuiltIn(
-        Int,
-    ),
-    Idx::<Expression>(2): BuiltIn(
-        String,
-    ),
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(2): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(4): Lambda {
+            arg_type: Unknown,
+            return_type: BuiltIn(
+                String,
+            ),
+        },
+        Idx::<Expression>(1): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(3): BuiltIn(
+            String,
+        ),
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): BuiltIn(
+            String,
+        ),
+        Idx::<Pattern>(1): Unknown,
+    },
+    warnings: [],
+    errors: [],
 }
 []

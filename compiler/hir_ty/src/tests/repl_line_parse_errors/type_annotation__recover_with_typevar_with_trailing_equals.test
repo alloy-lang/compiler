@@ -4,22 +4,11 @@ typeof test : t1 -> t2 -> Test where
     typevar t1 =
     typevar t2
 ===
-InferenceResult {
-    type_map: {},
-    resolved_imports: {
-        "Test": Symbol {
-            module_id: ModuleId(
-                Id(0),
-            ),
-            symbol_name: "Test",
-            symbol: Type {
-                module: ModuleId(
-                    Id(0),
-                ),
-                idx: Idx::<TypeDefinition>(1),
-            },
-        },
-    },
+HirTypedModule {
+    expression_types: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 [
     ParseError {

@@ -1,72 +1,22 @@
 if test then 2 else 3
 ===
-HirModule {
-    imports: EmptyIndex::<Import>,
-    expressions: Index::<Expression> {
-        Idx::<Expression>(0): {
-            "item": VariableRef {
-                path: Unknown(
-                    NonEmpty(
-                        [
-                            "test",
-                        ],
-                    ),
-                ),
-                scope: Idx::<Scope>(0),
-            },
-            "range": 3..8,
-        },
-        Idx::<Expression>(1): {
-            "item": IntLiteral(
-                2,
-            ),
-            "range": 13..15,
-        },
-        Idx::<Expression>(2): {
-            "item": IntLiteral(
-                3,
-            ),
-            "range": 20..21,
-        },
-        Idx::<Expression>(3): {
-            "item": IfThenElse {
-                condition: Idx::<Expression>(0),
-                then: Idx::<Expression>(1),
-                else_: Idx::<Expression>(2),
-            },
-            "range": 0..21,
-        },
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Bool,
+        ),
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
     },
-    patterns: EmptyIndex::<Pattern>,
-    type_references: EmptyIndex::<TypeReference>,
-    type_definitions: EmptyIndex::<TypeDefinition>,
-    scopes: Scopes {
-        current_scope: Idx::<Scope>(0),
-        scopes: Arena {
-            len: 1,
-            data: [
-                Scope {
-                    parent: Idx::<Scope>(0),
-                    tag: "root",
-                },
-            ],
-        },
-    },
+    pattern_types: {},
     warnings: [],
-    errors: [
-        LoweringError {
-            kind: UnknownReference {
-                reference: "test",
-                reference_type: Expression,
-                path: NonEmpty(
-                    [
-                        "test",
-                    ],
-                ),
-                current_scope: Idx::<Scope>(0),
-            },
-            range: 3..8,
-        },
-    ],
+    errors: [],
 }
 []

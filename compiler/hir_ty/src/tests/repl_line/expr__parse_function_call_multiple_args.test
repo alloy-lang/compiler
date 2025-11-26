@@ -6,15 +6,75 @@ let funky = |x1, y1, z1| -> x1 + y1 + z1
 
 funky(x, y, z)
 ===
-{
-    Idx::<Expression>(0): BuiltIn(
-        Int,
-    ),
-    Idx::<Expression>(1): BuiltIn(
-        Int,
-    ),
-    Idx::<Expression>(2): BuiltIn(
-        Int,
-    ),
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(10): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(7): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(4): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(11): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(8): Lambda {
+            arg_type: BuiltIn(
+                Int,
+            ),
+            return_type: Lambda {
+                arg_type: BuiltIn(
+                    Int,
+                ),
+                return_type: Lambda {
+                    arg_type: BuiltIn(
+                        Int,
+                    ),
+                    return_type: BuiltIn(
+                        Int,
+                    ),
+                },
+            },
+        },
+        Idx::<Expression>(5): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(12): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(9): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(6): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Pattern>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Pattern>(2): BuiltIn(
+            Int,
+        ),
+    },
+    warnings: [],
+    errors: [],
 }
 []

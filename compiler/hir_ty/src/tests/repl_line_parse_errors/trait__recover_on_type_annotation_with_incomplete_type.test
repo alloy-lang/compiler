@@ -3,9 +3,11 @@ trait TestTrait1 where
     typeof test2 : self -> String -> Int
 end
 ===
-InferenceResult {
-    type_map: {},
-    resolved_imports: {},
+HirTypedModule {
+    expression_types: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 [
     ParseError {

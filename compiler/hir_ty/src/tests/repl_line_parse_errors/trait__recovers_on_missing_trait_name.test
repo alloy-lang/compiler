@@ -8,9 +8,11 @@ trait TestTrait2 where
     typevar t1
 end
 ===
-InferenceResult {
-    type_map: {},
-    resolved_imports: {},
+HirTypedModule {
+    expression_types: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 [
     ParseError {

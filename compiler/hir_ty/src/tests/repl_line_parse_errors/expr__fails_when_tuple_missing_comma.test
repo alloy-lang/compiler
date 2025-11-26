@@ -1,7 +1,7 @@
 (1 2)
 ===
-InferenceResult {
-    type_map: {
+HirTypedModule {
+    expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
@@ -21,7 +21,9 @@ InferenceResult {
             ),
         ),
     },
-    resolved_imports: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 [
     ParseError {

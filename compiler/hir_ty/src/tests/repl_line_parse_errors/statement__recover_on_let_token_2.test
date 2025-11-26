@@ -1,13 +1,15 @@
 let 1
 let b = 2
 ===
-InferenceResult {
-    type_map: {
+HirTypedModule {
+    expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
     },
-    resolved_imports: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 [
     ParseError {

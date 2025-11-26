@@ -3,9 +3,11 @@ import test_data::ResultThing
 typeof test1 : String -> ResultThing::
 typeof test2 : String -> ResultThing::More
 ===
-InferenceResult {
-    type_map: {},
-    resolved_imports: {},
+HirTypedModule {
+    expression_types: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 [
     ParseError {

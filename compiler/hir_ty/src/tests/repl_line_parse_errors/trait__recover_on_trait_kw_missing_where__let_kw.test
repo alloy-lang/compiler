@@ -2,13 +2,15 @@ trait TestTrait1
     let a = 1
 end
 ===
-InferenceResult {
-    type_map: {
+HirTypedModule {
+    expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
     },
-    resolved_imports: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 [
     ParseError {

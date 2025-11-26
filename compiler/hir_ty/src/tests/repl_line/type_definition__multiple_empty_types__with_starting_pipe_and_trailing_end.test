@@ -3,8 +3,10 @@ typedef Test =
   | Empty2
 end
 ===
-InferenceResult {
-    type_map: {},
-    resolved_imports: {},
+HirTypedModule {
+    expression_types: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 []

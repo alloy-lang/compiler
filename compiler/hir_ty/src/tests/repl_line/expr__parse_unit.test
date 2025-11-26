@@ -1,9 +1,11 @@
 ()
 ===
-InferenceResult {
-    type_map: {
+HirTypedModule {
+    expression_types: {
         Idx::<Expression>(0): Unit,
     },
-    resolved_imports: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 []

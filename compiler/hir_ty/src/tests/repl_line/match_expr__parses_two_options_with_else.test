@@ -3,132 +3,26 @@ import std::bool::True
 let test = True
 
 match test when
-  | True -> 0
-  | _    -> 1
+  \ True -> 0
+  \ _    -> 1
 ===
-HirModule {
-    imports: Index::<Import> {
-        Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "std",
-                    "bool",
-                ],
-                last: "True",
-            },
-            "name": "True",
-            "range": 0..24,
-            "scope_id": Idx::<Scope>(0),
-        },
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): Unknown,
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(4): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): Unknown,
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
     },
-    expressions: Index::<Expression> {
-        Idx::<Expression>(0): {
-            "item": VariableRef {
-                path: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                "std",
-                                "bool",
-                            ],
-                        ),
-                        name: "True",
-                        sub_path: [],
-                    },
-                ),
-                scope: Idx::<Scope>(0),
-            },
-            "name": "test",
-            "range": 24..41,
-            "scope_id": Idx::<Scope>(0),
-        },
-        Idx::<Expression>(1): {
-            "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
-                        [
-                            "test",
-                        ],
-                    ),
-                ),
-                scope: Idx::<Scope>(0),
-            },
-            "range": 47..52,
-        },
-        Idx::<Expression>(2): {
-            "item": IntLiteral(
-                0,
-            ),
-            "range": 69..73,
-        },
-        Idx::<Expression>(3): {
-            "item": IntLiteral(
-                1,
-            ),
-            "range": 83..84,
-        },
-        Idx::<Expression>(4): {
-            "item": Match {
-                condition: Idx::<Expression>(1),
-                targets: [
-                    (
-                        Idx::<Pattern>(0),
-                        Idx::<Expression>(2),
-                    ),
-                    (
-                        Idx::<Pattern>(1),
-                        Idx::<Expression>(3),
-                    ),
-                ],
-            },
-            "range": 41..84,
-        },
-    },
-    patterns: Index::<Pattern> {
-        Idx::<Pattern>(0): {
-            "item": PatternRef {
-                path: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                "std",
-                                "bool",
-                            ],
-                        ),
-                        name: "True",
-                        sub_path: [],
-                    },
-                ),
-                scope: Idx::<Scope>(1),
-            },
-            "range": 61..66,
-        },
-        Idx::<Pattern>(1): {
-            "item": Nil,
-            "range": 75..76,
-        },
-    },
-    type_references: EmptyIndex::<TypeReference>,
-    type_definitions: EmptyIndex::<TypeDefinition>,
-    scopes: Scopes {
-        current_scope: Idx::<Scope>(0),
-        scopes: Arena {
-            len: 3,
-            data: [
-                Scope {
-                    parent: Idx::<Scope>(0),
-                    tag: "root",
-                },
-                Scope {
-                    parent: Idx::<Scope>(0),
-                    tag: "match expression arm",
-                },
-                Scope {
-                    parent: Idx::<Scope>(0),
-                    tag: "match expression arm",
-                },
-            ],
-        },
+    pattern_types: {
+        Idx::<Pattern>(0): Unknown,
+        Idx::<Pattern>(1): Unknown,
     },
     warnings: [],
     errors: [],

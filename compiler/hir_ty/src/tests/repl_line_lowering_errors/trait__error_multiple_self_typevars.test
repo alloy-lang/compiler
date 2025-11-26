@@ -5,8 +5,10 @@ trait TestTrait1 where
     self = debug::Debug
 end
 ===
-InferenceResult {
-    type_map: {},
-    resolved_imports: {},
+HirTypedModule {
+    expression_types: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 []

@@ -1,12 +1,16 @@
 - 10
 ===
-InferenceResult {
-    type_map: {
+HirTypedModule {
+    expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(1): Unknown,
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
     },
-    resolved_imports: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 []

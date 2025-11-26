@@ -1,4 +1,23 @@
 let add = |a, b| -> a + b
 ===
-{}
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): Unknown,
+        Idx::<Expression>(2): Unknown,
+        Idx::<Expression>(1): Unknown,
+        Idx::<Expression>(3): Lambda {
+            arg_type: Unknown,
+            return_type: Lambda {
+                arg_type: Unknown,
+                return_type: Unknown,
+            },
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Unknown,
+        Idx::<Pattern>(1): Unknown,
+    },
+    warnings: [],
+    errors: [],
+}
 []

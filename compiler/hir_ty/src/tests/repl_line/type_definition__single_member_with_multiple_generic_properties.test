@@ -1,7 +1,9 @@
 typedef Test[t1, t2] = Thing t1 t2
 ===
-InferenceResult {
-    type_map: {},
-    resolved_imports: {},
+HirTypedModule {
+    expression_types: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 []

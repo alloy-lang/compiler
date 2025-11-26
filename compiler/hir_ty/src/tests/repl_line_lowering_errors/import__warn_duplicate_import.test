@@ -3,68 +3,12 @@ import std::functor::map
 
 let thing = map
 ===
-HirModule {
-    imports: Index::<Import> {
-        Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "std",
-                    "functor",
-                ],
-                last: "map",
-            },
-            "name": "map",
-            "range": 0..25,
-            "scope_id": Idx::<Scope>(0),
-        },
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): Unknown,
     },
-    expressions: Index::<Expression> {
-        Idx::<Expression>(0): {
-            "item": VariableRef {
-                path: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                "std",
-                                "functor",
-                            ],
-                        ),
-                        name: "map",
-                        sub_path: [],
-                    },
-                ),
-                scope: Idx::<Scope>(0),
-            },
-            "name": "thing",
-            "range": 51..66,
-            "scope_id": Idx::<Scope>(0),
-        },
-    },
-    patterns: EmptyIndex::<Pattern>,
-    type_references: EmptyIndex::<TypeReference>,
-    type_definitions: EmptyIndex::<TypeDefinition>,
-    scopes: Scopes {
-        current_scope: Idx::<Scope>(0),
-        scopes: Arena {
-            len: 1,
-            data: [
-                Scope {
-                    parent: Idx::<Scope>(0),
-                    tag: "root",
-                },
-            ],
-        },
-    },
-    warnings: [
-        LoweringWarning {
-            kind: DuplicateImport {
-                name: "map",
-                first: 0..25,
-                second: 25..51,
-            },
-            range: 25..51,
-        },
-    ],
+    pattern_types: {},
+    warnings: [],
     errors: [],
 }
 []

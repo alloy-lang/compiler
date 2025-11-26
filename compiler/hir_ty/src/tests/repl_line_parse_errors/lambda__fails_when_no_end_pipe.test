@@ -1,11 +1,26 @@
 |arg1, arg2 -> 8
 ===
-InferenceContext {
-    type_map: {
+HirTypedModule {
+    expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
+        Idx::<Expression>(1): Lambda {
+            arg_type: Unknown,
+            return_type: Lambda {
+                arg_type: Unknown,
+                return_type: BuiltIn(
+                    Int,
+                ),
+            },
+        },
     },
+    pattern_types: {
+        Idx::<Pattern>(0): Unknown,
+        Idx::<Pattern>(1): Unknown,
+    },
+    warnings: [],
+    errors: [],
 }
 [
     ParseError {

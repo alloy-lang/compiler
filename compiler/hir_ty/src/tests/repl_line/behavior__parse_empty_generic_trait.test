@@ -10,8 +10,10 @@ behavior Trait1[t1, t2] for Type1 where
     -- TODO: I don't think these cases make sense?
 end
 ===
-InferenceResult {
-    type_map: {},
-    resolved_imports: {},
+HirTypedModule {
+    expression_types: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 []

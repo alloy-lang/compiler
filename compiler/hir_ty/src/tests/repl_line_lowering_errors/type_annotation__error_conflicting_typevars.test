@@ -2,8 +2,10 @@ typeof test : t1 -> Int -> String where
     typevar t1
     typevar t1
 ===
-InferenceResult {
-    type_map: {},
-    resolved_imports: {},
+HirTypedModule {
+    expression_types: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 []

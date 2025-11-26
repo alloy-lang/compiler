@@ -4,8 +4,10 @@ typeof apply : Option[(t1 -> t2)] -> Option[t1] -> Option[t2] where
     typevar t1
     typevar t2
 ===
-InferenceResult {
-    type_map: {},
-    resolved_imports: {},
+HirTypedModule {
+    expression_types: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 []

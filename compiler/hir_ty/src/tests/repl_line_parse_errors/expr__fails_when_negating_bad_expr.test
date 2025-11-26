@@ -1,28 +1,10 @@
 -where
 ===
-HirModule {
-    imports: EmptyIndex::<Import>,
-    expressions: Index::<Expression> {
-        Idx::<Expression>(0): {
-            "item": Missing,
-            "range": 0..6,
-        },
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): Unknown,
     },
-    patterns: EmptyIndex::<Pattern>,
-    type_references: EmptyIndex::<TypeReference>,
-    type_definitions: EmptyIndex::<TypeDefinition>,
-    scopes: Scopes {
-        current_scope: Idx::<Scope>(0),
-        scopes: Arena {
-            len: 1,
-            data: [
-                Scope {
-                    parent: Idx::<Scope>(0),
-                    tag: "root",
-                },
-            ],
-        },
-    },
+    pattern_types: {},
     warnings: [],
     errors: [],
 }

@@ -2,7 +2,19 @@ import std::option::Option
 
 |Option::Some(x)| -> x
 ===
-InferenceContext {
-    type_map: {},
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): Unknown,
+        Idx::<Expression>(1): Lambda {
+            arg_type: Unknown,
+            return_type: Unknown,
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Unknown,
+        Idx::<Pattern>(1): Unknown,
+    },
+    warnings: [],
+    errors: [],
 }
 []

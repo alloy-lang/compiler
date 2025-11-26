@@ -1,18 +1,24 @@
 let a (1 + 2)
 let b = a
 ===
-InferenceResult {
-    type_map: {
+HirTypedModule {
+    expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(2): Unknown,
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
         Idx::<Expression>(1): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(3): Unknown,
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
     },
-    resolved_imports: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 [
     ParseError {

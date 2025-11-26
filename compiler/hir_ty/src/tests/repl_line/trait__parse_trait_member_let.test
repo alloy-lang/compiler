@@ -4,10 +4,12 @@ trait TestTrait1 where
     let thing = test
 end
 ===
-InferenceResult {
-    type_map: {
+HirTypedModule {
+    expression_types: {
         Idx::<Expression>(0): Unknown,
     },
-    resolved_imports: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 []

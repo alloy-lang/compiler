@@ -2,9 +2,11 @@ module where
     import really::really::real::Thing1
     import really::real::other::Thing2
 ===
-InferenceResult {
-    type_map: {},
-    resolved_imports: {},
+HirTypedModule {
+    expression_types: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
 }
 [
     ParseError {

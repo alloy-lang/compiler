@@ -1,11 +1,38 @@
 |arg1 1001 'c'| -> 8
 ===
-InferenceContext {
-    type_map: {
+HirTypedModule {
+    expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
+        Idx::<Expression>(1): Lambda {
+            arg_type: Unknown,
+            return_type: Lambda {
+                arg_type: BuiltIn(
+                    Int,
+                ),
+                return_type: Lambda {
+                    arg_type: BuiltIn(
+                        Char,
+                    ),
+                    return_type: BuiltIn(
+                        Int,
+                    ),
+                },
+            },
+        },
     },
+    pattern_types: {
+        Idx::<Pattern>(0): Unknown,
+        Idx::<Pattern>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Pattern>(2): BuiltIn(
+            Char,
+        ),
+    },
+    warnings: [],
+    errors: [],
 }
 [
     ParseError {

@@ -1,4 +1,35 @@
 |(a, b)| -> a + b
 ===
-{}
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): Unknown,
+        Idx::<Expression>(2): Unknown,
+        Idx::<Expression>(1): Unknown,
+        Idx::<Expression>(3): Lambda {
+            arg_type: Tuple(
+                NonEmpty(
+                    [
+                        Unknown,
+                        Unknown,
+                    ],
+                ),
+            ),
+            return_type: Unknown,
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Unknown,
+        Idx::<Pattern>(1): Unknown,
+        Idx::<Pattern>(2): Tuple(
+            NonEmpty(
+                [
+                    Unknown,
+                    Unknown,
+                ],
+            ),
+        ),
+    },
+    warnings: [],
+    errors: [],
+}
 []
