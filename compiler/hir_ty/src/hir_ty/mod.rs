@@ -11,7 +11,7 @@ use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
 use la_arena::Idx;
 use non_empty_vec::NonEmpty;
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxHashMap, FxHashSet};
 use std::hash::Hash;
 use text_size::TextRange;
 
@@ -67,7 +67,6 @@ struct InferenceContext<'db> {
     db: &'db dyn HirTyDatabase,
     type_requirements: FxHashMap<ExpressionOrPatternIdx, Vec<TypeRequirements>>,
     resolved_types: FxHashMap<ExpressionOrPatternIdx, ResolvedType>,
-    visited: FxHashMap<ExpressionOrPatternIdx, ()>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -100,7 +99,6 @@ impl<'db> InferenceContext<'db> {
             db,
             type_requirements: FxHashMap::default(),
             resolved_types: FxHashMap::default(),
-            visited: FxHashMap::default(),
         }
     }
 
@@ -262,20 +260,29 @@ fn check_type_annotation(
 }
 
 fn unify(ctx: &mut InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
-    ctx.resolved_types
-        .get(&id)
-        .filter(|ty| **ty != ResolvedType::Unknown)
-        .cloned()
-        .unwrap_or_else(|| {
-            let ty = unify_inner(ctx, id.clone());
-            println!("Unified {id:?} as type: {ty:?}");
-            ctx.resolved_types.insert(id.clone(), ty.clone());
-            ty
-        })
+    let mut visited = FxHashSet::default();
+    unify_with_visited(ctx, id, &mut visited)
 }
 
-fn unify_inner(ctx: &mut InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
-    ctx.visited.insert(id.clone(), ());
+fn unify_with_visited(
+    ctx: &mut InferenceContext,
+    id: ExpressionOrPatternIdx,
+    visited: &mut FxHashSet<ExpressionOrPatternIdx>,
+) -> ResolvedType {
+    // Check cache first
+    if let Some(ty) = ctx.resolved_types.get(&id) {
+        if *ty != ResolvedType::Unknown {
+            return ty.clone();
+        }
+    }
+
+    // Check for cycles
+    if visited.contains(&id) {
+        println!("Cycle detected for {id:?}, returning Unknown");
+        return ResolvedType::Unknown;
+    }
+    visited.insert(id.clone());
+
     let constraints = ctx
         .type_requirements
         .get(&id)
@@ -289,6 +296,25 @@ fn unify_inner(ctx: &mut InferenceContext, id: ExpressionOrPatternIdx) -> Resolv
 
     println!("Unifying {id:?} with constraints: {constraints:?}");
 
+    // Compute the resolved type based on constraints
+    let resolved_type = compute_type(ctx, &id, &constraints, visited);
+
+    println!("Unified {id:?} as type: {resolved_type:?}");
+
+    // Cache non-Unknown results
+    if resolved_type != ResolvedType::Unknown {
+        ctx.resolved_types.insert(id, resolved_type.clone());
+    }
+
+    resolved_type
+}
+
+fn compute_type(
+    ctx: &mut InferenceContext,
+    id: &ExpressionOrPatternIdx,
+    constraints: &[TypeRequirements],
+    visited: &mut FxHashSet<ExpressionOrPatternIdx>,
+) -> ResolvedType {
     // Priority 1: MustBeType constraints (most specific)
     let must_be_types = constraints
         .iter()
@@ -316,7 +342,7 @@ fn unify_inner(ctx: &mut InferenceContext, id: ExpressionOrPatternIdx) -> Resolv
         unsafe {
             let inner_types = inners
                 .into_iter()
-                .map(|inner_id| unify(ctx, ExpressionOrPatternIdx::Expression(inner_id.clone())))
+                .map(|inner_id| unify_with_visited(ctx, ExpressionOrPatternIdx::Expression(inner_id.clone()), visited))
                 .collect();
 
             return ResolvedType::Tuple(NonEmpty::new_unchecked(inner_types));
@@ -329,12 +355,12 @@ fn unify_inner(ctx: &mut InferenceContext, id: ExpressionOrPatternIdx) -> Resolv
         .find(|c| matches!(c, TypeRequirements::Lambda { .. }))
     {
         // Build curried lambda type: arg1 -> (arg2 -> (... -> body_type))
-        let body_type = unify(ctx, ExpressionOrPatternIdx::Expression(body.clone()));
+        let body_type = unify_with_visited(ctx, ExpressionOrPatternIdx::Expression(body.clone()), visited);
 
         // Work backwards through arguments to build nested lambda types
         let mut result_type = body_type;
         for arg in args.iter().rev() {
-            let arg_type = unify(ctx, ExpressionOrPatternIdx::Pattern(arg.clone()));
+            let arg_type = unify_with_visited(ctx, ExpressionOrPatternIdx::Pattern(arg.clone()), visited);
             result_type = ResolvedType::Lambda {
                 arg_type: Box::new(arg_type),
                 return_type: Box::new(result_type),
@@ -350,7 +376,7 @@ fn unify_inner(ctx: &mut InferenceContext, id: ExpressionOrPatternIdx) -> Resolv
         .find(|c| matches!(c, TypeRequirements::FunctionCall { .. }))
     {
         // Get the function's type (works for both expressions and patterns)
-        let mut func_type = unify(ctx, func.clone());
+        let mut func_type = unify_with_visited(ctx, func.clone(), visited);
 
         // Apply each argument to unwrap the curried lambda type
         for arg in args {
@@ -361,7 +387,7 @@ fn unify_inner(ctx: &mut InferenceContext, id: ExpressionOrPatternIdx) -> Resolv
                 } => {
                     // The argument type must match the parameter type (bidirectional constraint)
                     // This happens automatically through unification
-                    let _arg_ty = unify(ctx, ExpressionOrPatternIdx::Expression(arg.clone()));
+                    let _arg_ty = unify_with_visited(ctx, ExpressionOrPatternIdx::Expression(arg.clone()), visited);
 
                     // Move to the return type for the next argument
                     func_type = *return_type;
@@ -383,10 +409,8 @@ fn unify_inner(ctx: &mut InferenceContext, id: ExpressionOrPatternIdx) -> Resolv
         .find(|c| matches!(c, TypeRequirements::MustBeSameAs(_)))
     {
         println!("Unifying {id:?} must be same as {other_id:?}");
-        if !ctx.visited.contains_key(other_id) {
-            // Prevent infinite recursion on cycles
-            return unify(ctx, other_id.clone());
-        }
+        // The cycle check happens at the top of unify_with_visited
+        return unify_with_visited(ctx, other_id.clone(), visited);
     }
 
     // Priority 5: Trait constraints
