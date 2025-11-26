@@ -176,18 +176,16 @@ fn collect_variable_ref(
 ) {
     ctx.insert_expr_type_variable(current_module_id, expression_id);
 
-    match type_reference::resolve_path(ctx.db, current_module_id, path, *scope) {
-        None => {
-            println!("No type annotation for expression id: {expression_id:?}. path: {path:?}");
-        }
-        Some(fql_type_id) => {
-            ctx.add_expr_requirements(
-                current_module_id,
-                expression_id,
-                TypeRequirements::Annotated(fql_type_id),
-            );
-        }
-    };
+    let type_reference =
+        type_reference::type_reference_to_resolved(ctx.db, current_module_id, path, *scope);
+    if let ResolvedType::Unknown = type_reference {
+    } else {
+        ctx.add_expr_requirements(
+            current_module_id,
+            expression_id,
+            TypeRequirements::MustBeType(type_reference),
+        )
+    }
 
     let other_fql = pattern::resolve_path(ctx.db, current_module_id, path, *scope)
         .map(|pattern_fql| {

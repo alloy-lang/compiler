@@ -73,7 +73,6 @@ enum TypeRequirements {
     MustBeType(ResolvedType),
     MustBeSameAs(ExpressionOrPatternIdx),
     MustImplementTrait(Fql<hir::Trait>),
-    Annotated(Fql<hir::TypeReference>),
     Tuple(NonEmpty<Fql<hir::Expression>>),
     Variable(usize),
     Lambda {
@@ -203,42 +202,27 @@ pub fn infer_types(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedModul
 
     // Unify and resolve types for all expressions
     for (expression_id, _expression, range, name_op) in hir_module.expressions() {
-        if ctx
-            .type_requirements
-            .contains_key(&ExpressionOrPatternIdx::Expression(Fql::new(
-                module_id,
-                expression_id,
-            )))
-        {
-            let resolved_type = unify(
-                &ctx,
-                ExpressionOrPatternIdx::Expression(Fql::new(module_id, expression_id)),
-            );
+        let idx = ExpressionOrPatternIdx::Expression(Fql::new(module_id, expression_id));
+        if ctx.type_requirements.contains_key(&idx) {
+            let resolved_type = unify(&ctx, idx);
             result
                 .expression_types
                 .insert(expression_id, resolved_type.clone());
 
-            check_type_annotation(&mut result, &hir_module, range, name_op, resolved_type);
+            check_type_annotation(db, &mut result, module_id, range, name_op, resolved_type);
         }
     }
 
     // Unify and resolve types for all patterns
     for (pattern_id, _pattern, range, name_op) in hir_module.patterns() {
-        if ctx
-            .type_requirements
-            .contains_key(&ExpressionOrPatternIdx::Pattern(Fql::new(
-                module_id, pattern_id,
-            )))
-        {
-            let resolved_type = unify(
-                &ctx,
-                ExpressionOrPatternIdx::Pattern(Fql::new(module_id, pattern_id)),
-            );
+        let idx = ExpressionOrPatternIdx::Pattern(Fql::new(module_id, pattern_id));
+        if ctx.type_requirements.contains_key(&idx) {
+            let resolved_type = unify(&ctx, idx);
             result
                 .pattern_types
                 .insert(pattern_id, resolved_type.clone());
 
-            check_type_annotation(&mut result, &hir_module, range, name_op, resolved_type);
+            check_type_annotation(db, &mut result, module_id, range, name_op, resolved_type);
         }
     }
 
@@ -246,108 +230,32 @@ pub fn infer_types(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedModul
 }
 
 fn check_type_annotation(
+    db: &dyn HirTyDatabase,
     result: &mut HirTypedModule,
-    hir_module: &hir::HirModule,
+    current_module_id: ModuleId,
     range: TextRange,
     name_op: Option<(Name, ScopeIdx)>,
     resolved_type: ResolvedType,
 ) {
     // Check for type annotation conflicts
     if let Some((name, scope)) = name_op {
-        if let Some((_type_idx, type_ref)) = hir_module.get_type_reference_by_name(&name, scope) {
-            let expected_type = type_reference_to_resolved(&hir_module, type_ref);
-            if expected_type != resolved_type {
-                result.error(
-                    crate::diagnostics::TypeInferenceErrorKind::ConflictingTypeAnnotation {
-                        expected: expected_type,
-                        found: resolved_type,
-                    },
-                    range,
-                );
-            }
+        let expected_type = type_reference::type_reference_to_resolved(
+            db,
+            current_module_id,
+            &hir::Path::ThisModule(NonEmpty::new(name.clone())),
+            scope,
+        );
+        if expected_type != resolved_type {
+            result.error(
+                crate::diagnostics::TypeInferenceErrorKind::ConflictingTypeAnnotation {
+                    expected: expected_type,
+                    found: resolved_type,
+                },
+                range,
+            );
         }
     }
 }
-
-/// Convert a HIR TypeReference to a ResolvedType
-fn type_reference_to_resolved(
-    hir_module: &hir::HirModule,
-    type_ref: &hir::TypeReference,
-) -> ResolvedType {
-    match type_ref {
-        hir::TypeReference::Unconstrained => ResolvedType::Unknown,
-        hir::TypeReference::Missing => ResolvedType::Unknown,
-        hir::TypeReference::SelfRef => ResolvedType::Unknown, // TODO: Handle self type
-        hir::TypeReference::Unit => ResolvedType::Unit,
-        hir::TypeReference::Named(_) => {
-            todo!("Resolve named types properly")
-        }
-        hir::TypeReference::BuiltIn(built_in) => ResolvedType::BuiltIn(*built_in),
-        hir::TypeReference::Lambda {
-            arg_type,
-            return_type,
-        } => {
-            let arg =
-                type_reference_to_resolved(hir_module, hir_module.get_type_reference(*arg_type));
-            let ret =
-                type_reference_to_resolved(hir_module, hir_module.get_type_reference(*return_type));
-            ResolvedType::Lambda {
-                arg_type: Box::new(arg),
-                return_type: Box::new(ret),
-            }
-        }
-        hir::TypeReference::Tuple(types) => {
-            if types.is_empty() {
-                ResolvedType::Unit
-            } else {
-                unsafe {
-                    let inner_types: Vec<_> = types
-                        .iter()
-                        .map(|t| {
-                            type_reference_to_resolved(
-                                hir_module,
-                                hir_module.get_type_reference(*t),
-                            )
-                        })
-                        .collect();
-                    ResolvedType::Tuple(NonEmpty::new_unchecked(inner_types))
-                }
-            }
-        }
-        hir::TypeReference::ParenthesizedType(inner) => {
-            type_reference_to_resolved(hir_module, hir_module.get_type_reference(*inner))
-        }
-        hir::TypeReference::Bounded { base: _, args: _ } => {
-            todo!("Handle bounded types properly")
-        }
-    }
-}
-
-// fn generate_type_equations(
-//     ctx: &InferenceContext,
-//     hir_module: &hir::HirModule,
-//     expression: &hir::Expression,
-// ) -> Vec<(hir::ExpressionIdx, ResolvedType, ResolvedType)> {
-//     let mut equations = Vec::new();
-//
-//     for (expression_id, expression, _range, _name_op) in hir_module.expressions() {
-//         match expression {
-//             hir::Expression::Missing => todo!("Missing expression"),
-//             hir::Expression::Literal(_) => {}
-//             hir::Expression::VariableRef { .. } => {}
-//             hir::Expression::Binary { .. } => {}
-//             hir::Expression::Unit => {}
-//             hir::Expression::IfThenElse { .. } => {}
-//             hir::Expression::Tuple(_) => {}
-//             hir::Expression::Unary { .. } => {}
-//             hir::Expression::Lambda { .. } => {}
-//             hir::Expression::FunctionCall { .. } => {}
-//             hir::Expression::Match { .. } => {}
-//         }
-//     }
-//
-//     equations
-// }
 
 fn unify(ctx: &InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
     let constraints = ctx
@@ -457,15 +365,7 @@ fn unify(ctx: &InferenceContext, id: ExpressionOrPatternIdx) -> ResolvedType {
         return unify(ctx, other_id.clone());
     }
 
-    // Priority 5: Type annotations
-    if let Some(TypeRequirements::Annotated(_)) = constraints
-        .iter()
-        .find(|c| matches!(c, TypeRequirements::Annotated(_)))
-    {
-        todo!("Handle type annotations");
-    }
-
-    // Priority 6: Trait constraints
+    // Priority 5: Trait constraints
     if let Some(TypeRequirements::MustImplementTrait(_)) = constraints
         .iter()
         .find(|c| matches!(c, TypeRequirements::MustImplementTrait(_)))

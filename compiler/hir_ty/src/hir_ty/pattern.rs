@@ -1,3 +1,4 @@
+use crate::hir_ty::expr::collect_expr_type_fql;
 use crate::hir_ty::{
     expr, type_reference, ExpressionOrPatternIdx, Fql, InferenceContext, ResolvedType,
     TypeRequirements,
@@ -33,47 +34,35 @@ pub fn collect_pattern_type(
         hir::Pattern::PatternRef { path, scope } => {
             ctx.insert_pattern_type_variable(current_module_id, pattern_id);
 
-            match type_reference::resolve_path(ctx.db, current_module_id, path, *scope) {
-                None => {
-                    println!("No type annotation for pattern: {pattern:?}. id: {pattern_id:?}. path: {path:?}");
-                }
-                Some(fql_type_id) => {
-                    ctx.add_pattern_requirements(
-                        current_module_id,
-                        pattern_id,
-                        TypeRequirements::Annotated(fql_type_id),
-                    );
-                }
+            let type_reference =
+                type_reference::type_reference_to_resolved(ctx.db, current_module_id, path, *scope);
+            if let ResolvedType::Unknown = type_reference {
+            } else {
+                ctx.add_pattern_requirements(
+                    current_module_id,
+                    pattern_id,
+                    TypeRequirements::MustBeType(type_reference),
+                )
             }
-            match expr::resolve_path(ctx.db, current_module_id, path, *scope) {
-                None => {
-                    match resolve_path(ctx.db, current_module_id, path, *scope) {
-                        None => {
-                            println!("No expression or pattern for path: {pattern:?}. id: {pattern_id:?}. path: {path:?}");
-                        }
-                        Some(pattern_fql) => {
-                            collect_pattern_type(ctx, pattern_fql.module_id, pattern_fql.local_id);
-                            ctx.add_pattern_requirements(
-                                current_module_id,
-                                pattern_id,
-                                TypeRequirements::MustBeSameAs(ExpressionOrPatternIdx::Pattern(
-                                    pattern_fql,
-                                )),
-                            );
-                        }
-                    };
-                }
-                Some(expr_fql) => {
-                    expr::collect_expr_type(ctx, expr_fql.module_id, expr_fql.local_id);
-                    ctx.add_pattern_requirements(
-                        expr_fql.module_id,
-                        pattern_id,
-                        TypeRequirements::MustBeSameAs(ExpressionOrPatternIdx::Expression(
-                            expr_fql,
-                        )),
-                    );
-                }
-            };
+
+            let other_fql = expr::resolve_path(ctx.db, current_module_id, path, *scope)
+                .map(|expr_fql| {
+                    collect_expr_type_fql(ctx, &expr_fql);
+                    ExpressionOrPatternIdx::Expression(expr_fql)
+                })
+                .or_else(|| {
+                    resolve_path(ctx.db, current_module_id, path, *scope).map(|pattern_fql| {
+                        collect_pattern_type_fql(ctx, &pattern_fql);
+                        ExpressionOrPatternIdx::Pattern(pattern_fql)
+                    })
+                });
+            if let Some(other_fql) = other_fql {
+                ctx.add_pattern_requirements(
+                    current_module_id,
+                    pattern_id,
+                    TypeRequirements::MustBeSameAs(other_fql),
+                );
+            }
         }
         hir::Pattern::VariableDeclaration { .. } => {
             ctx.insert_pattern_type_variable(current_module_id, pattern_id);
