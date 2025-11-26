@@ -25,7 +25,7 @@ impl<'t, 'input> Source<'t, 'input> {
         self.peek_kind_raw(skip)
     }
 
-    pub(crate) fn peek_nth_token(&mut self, skip: usize) -> Option<&Token> {
+    pub(crate) fn peek_nth_token(&'_ mut self, skip: usize) -> Option<&'_ Token<'_>> {
         self.peek_token_raw(skip)
     }
 
@@ -37,7 +37,7 @@ impl<'t, 'input> Source<'t, 'input> {
         self.peek_token_raw(skip).map(|Token { kind, .. }| *kind)
     }
 
-    fn peek_token_raw(&mut self, skip: usize) -> Option<&Token> {
+    fn peek_token_raw(&'_ mut self, skip: usize) -> Option<&'_ Token<'_>> {
         self.eat_trivia();
 
         let mut cursor = self.cursor;
