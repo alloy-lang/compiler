@@ -12,12 +12,13 @@ pub fn type_reference_to_resolved(
     path: &hir::Path,
     scope: ScopeIdx,
 ) -> ResolvedType {
-    let Some((resolved_module_id, type_idx)) = resolve_path(db, current_module_id, path, scope)
-    else {
-        return ResolvedType::Unknown;
+    if let Some((resolved_module_id, type_idx)) =
+        resolve_type_reference_path(db, current_module_id, path, scope)
+    {
+        return resolve_type_reference(db, resolved_module_id, type_idx, scope);
     };
 
-    resolve_type_reference(db, resolved_module_id, type_idx, scope)
+    ResolvedType::Unknown
 }
 
 fn resolve_type_reference(
@@ -34,9 +35,16 @@ fn resolve_type_reference(
         hir::TypeReference::Missing => ResolvedType::Unknown,
         hir::TypeReference::SelfRef => ResolvedType::Unknown, // TODO: Handle self type
         hir::TypeReference::Unit => ResolvedType::Unit,
-        hir::TypeReference::Named(path) => {
-            type_reference_to_resolved(db, current_module_id, path, scope)
-        }
+        hir::TypeReference::Named(path) => Some(type_reference_to_resolved(
+            db,
+            current_module_id,
+            path,
+            scope,
+        ))
+        .filter(|t| *t != ResolvedType::Unknown)
+        .unwrap_or_else(|| {
+            super::type_definition::type_definition_to_resolved(db, current_module_id, path, scope)
+        }),
         hir::TypeReference::BuiltIn(built_in) => ResolvedType::BuiltIn(*built_in),
         hir::TypeReference::Lambda {
             arg_type,
@@ -71,7 +79,7 @@ fn resolve_type_reference(
     }
 }
 
-fn resolve_path(
+fn resolve_type_reference_path(
     db: &dyn HirTyDatabase,
     current_module_id: ModuleId,
     path: &hir::Path,

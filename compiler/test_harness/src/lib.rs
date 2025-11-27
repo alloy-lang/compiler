@@ -74,11 +74,17 @@ pub fn run_test_dir(
 /// # Panics
 ///
 /// Will panic if tests fail.
+///
+/// init takes all module files and returns C, which can be used to initialize state for the test function.
 #[track_caller]
-pub fn run_std_lib_tests(test_fn: impl Fn(&ModuleFile) + RefUnwindSafe + UnwindSafe) {
+pub fn run_std_lib_tests<C: RefUnwindSafe>(
+    init: impl Fn(&[&ModuleFile]) -> C + RefUnwindSafe + UnwindSafe,
+    test_fn: impl Fn(&C, &ModuleFile) + RefUnwindSafe + UnwindSafe,
+) {
     let project = Project::new("../../std").expect("expected project to be created");
 
     let mut failed_tests = vec![];
+    let context = init(&project.modules().collect::<Vec<_>>());
     for module_file in project.modules() {
         let path = module_file.path();
 
@@ -88,7 +94,7 @@ pub fn run_std_lib_tests(test_fn: impl Fn(&ModuleFile) + RefUnwindSafe + UnwindS
         );
 
         let did_panic = std::panic::catch_unwind(|| {
-            test_fn(module_file);
+            test_fn(&context, module_file);
         })
         .is_err();
 

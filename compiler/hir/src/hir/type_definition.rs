@@ -5,8 +5,8 @@ pub type TypeDefinitionIdx = Idx<TypeDefinition>;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeDefinition {
-    pub(crate) name: Name,
-    pub(crate) kind: TypeDefinitionKind,
+    pub name: Name,
+    pub kind: TypeDefinitionKind,
 }
 
 #[derive(Debug, Clone, PartialEq)]

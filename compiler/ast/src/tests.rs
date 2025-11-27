@@ -38,18 +38,21 @@ fn run_ast_test<T: fmt::Debug>(path: &Path, input: &str, thing_fn: fn(&SourceFil
 
 #[test]
 fn test_std_lib() {
-    alloy_test_harness::run_std_lib_tests(|module_file| {
-        let path = module_file.path();
-        let source = module_file.contents();
+    alloy_test_harness::run_std_lib_tests(
+        |_module_files| "empty",
+        |ctx, module_file| {
+            let path = module_file.path();
+            let source = module_file.contents();
 
-        let actual = alloy_parser::parse_source_file(source);
+            let actual = alloy_parser::parse_source_file(source);
 
-        let did_panic = std::panic::catch_unwind(|| {
-            let syntax = actual.syntax();
-            let _ = SourceFile::cast(syntax).unwrap();
-        })
-        .is_err();
+            let did_panic = std::panic::catch_unwind(|| {
+                let syntax = actual.syntax();
+                let _ = SourceFile::cast(syntax).unwrap();
+            })
+            .is_err();
 
-        assert!(!did_panic, "file '{path}' failed to parse as a SourceFile",);
-    });
+            assert!(!did_panic, "file '{path}' failed to parse as a SourceFile");
+        },
+    );
 }

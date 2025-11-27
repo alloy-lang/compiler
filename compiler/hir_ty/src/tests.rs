@@ -143,31 +143,43 @@ fn run_hir_ty_test(
     format!("{type_map:#?}\n{parse_errors:#?}")
 }
 
-
 // TODO: continue fixing lowering errors in std lib
 // #[test]
 fn test_std_lib() {
-    alloy_test_harness::run_std_lib_tests(|module_file| {
-        let path = module_file.path();
-        let source = module_file.contents();
+    alloy_test_harness::run_std_lib_tests(
+        |module_files| {
+            let mut db = TestHirTyDatabase::default();
 
-        let mut db = TestHirTyDatabase::default();
-        let test_module_id = db.add_module("main", path, source);
+            module_files.iter().for_each(|module_file| {
+                db.add_module(
+                    module_file.slug(),
+                    module_file.path(),
+                    module_file.contents(),
+                );
+            });
 
-        let type_map = crate::type_check_module(&db, test_module_id);
+            db
+        },
+        |db, module_file| {
+            let path = module_file.path();
 
-        let type_inference_warnings = type_map.warnings();
-        let type_inference_errors = type_map.errors();
+            let test_module_id = db.find_module_by_slug(module_file.slug()).expect("");
 
-        assert!(
-            type_inference_warnings.is_empty(),
-            "file '{path}' contained type inference warnings: {:#?}",
-            type_inference_warnings,
-        );
-        assert!(
-            type_inference_errors.is_empty(),
-            "file '{path}' contained type inference errors: {:#?}",
-            type_inference_errors,
-        );
-    });
+            let type_map = crate::type_check_module(db, test_module_id);
+
+            let type_inference_warnings = type_map.warnings();
+            let type_inference_errors = type_map.errors();
+
+            assert!(
+                type_inference_warnings.is_empty(),
+                "file '{path}' contained type inference warnings: {:#?}",
+                type_inference_warnings,
+            );
+            assert!(
+                type_inference_errors.is_empty(),
+                "file '{path}' contained type inference errors: {:#?}",
+                type_inference_errors,
+            );
+        },
+    );
 }

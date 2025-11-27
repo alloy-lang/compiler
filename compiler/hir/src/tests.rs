@@ -142,29 +142,31 @@ fn run_hir_test(
 // TODO: continue fixing lowering errors in std lib
 // #[test]
 fn test_std_lib() {
-    alloy_test_harness::run_std_lib_tests(|module_file| {
-        let path = module_file.path();
-        let source = module_file.contents();
+    alloy_test_harness::run_std_lib_tests(
+        |_module_files| TestHirDatabase::default(),
+        |db, module_file| {
+            let path = module_file.path();
+            let source = module_file.contents();
 
-        let db = TestHirDatabase::default();
-        let (module, parse_errors) = lower_source_file(&db, source);
-        let lowering_warnings = module.warnings();
-        let lowering_errors = module.errors();
+            let (module, parse_errors) = lower_source_file(db, source);
+            let lowering_warnings = module.warnings();
+            let lowering_errors = module.errors();
 
-        assert!(
-            parse_errors.is_empty(),
-            "file '{path}' contained parse errors: {:#?}",
-            parse_errors,
-        );
-        assert!(
-            lowering_warnings.is_empty(),
-            "file '{path}' contained lowering warnings: {:#?}",
-            lowering_warnings,
-        );
-        assert!(
-            lowering_errors.is_empty(),
-            "file '{path}' contained lowering errors: {:#?}",
-            lowering_errors,
-        );
-    });
+            assert!(
+                parse_errors.is_empty(),
+                "file '{path}' contained parse errors: {:#?}",
+                parse_errors,
+            );
+            assert!(
+                lowering_warnings.is_empty(),
+                "file '{path}' contained lowering warnings: {:#?}",
+                lowering_warnings,
+            );
+            assert!(
+                lowering_errors.is_empty(),
+                "file '{path}' contained lowering errors: {:#?}",
+                lowering_errors,
+            );
+        },
+    );
 }
