@@ -143,6 +143,7 @@ mod small_tests {
         let ctx = crate::type_check_module(&db, module_id);
 
         assert_eq!(parse_errors, &[]);
+        assert_eq!(ctx.errors, &[]);
 
         let expected = expected
             .into_iter()
@@ -164,6 +165,7 @@ mod small_tests {
         let ctx = crate::type_check_module(&db, module_id);
 
         assert_eq!(parse_errors, &[]);
+        assert_eq!(ctx.errors, &[]);
 
         let actual = expected
             .into_iter()
