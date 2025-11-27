@@ -142,8 +142,9 @@ fn run_hir_test(
 // TODO: continue fixing lowering errors in std lib
 // #[test]
 fn test_std_lib() {
-    alloy_test_harness::run_std_lib_tests(|path, source| {
-        let file_name = path.to_str().expect("Expected filename");
+    alloy_test_harness::run_std_lib_tests(|module_file| {
+        let path = module_file.path();
+        let source = module_file.contents();
 
         let db = TestHirDatabase::default();
         let (module, parse_errors) = lower_source_file(&db, source);
@@ -152,20 +153,17 @@ fn test_std_lib() {
 
         assert!(
             parse_errors.is_empty(),
-            "file '{}' contained parse errors: {:#?}",
-            file_name,
+            "file '{path}' contained parse errors: {:#?}",
             parse_errors,
         );
         assert!(
             lowering_warnings.is_empty(),
-            "file '{}' contained lowering warnings: {:#?}",
-            file_name,
+            "file '{path}' contained lowering warnings: {:#?}",
             lowering_warnings,
         );
         assert!(
             lowering_errors.is_empty(),
-            "file '{}' contained lowering errors: {:#?}",
-            file_name,
+            "file '{path}' contained lowering errors: {:#?}",
             lowering_errors,
         );
     });

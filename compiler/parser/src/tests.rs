@@ -48,15 +48,15 @@ fn run_parser_test(input: &str, parsing_fn: fn(&str) -> Parse) -> String {
 
 #[test]
 fn test_std_lib() {
-    alloy_test_harness::run_std_lib_tests(|path, source| {
-        let file_name = path.to_str().expect("Expected filename");
+    alloy_test_harness::run_std_lib_tests(|module_file| {
+        let path = module_file.path();
+        let source = module_file.contents();
 
         let actual = crate::parse_source_file(source);
 
         assert!(
             actual.errors.is_empty(),
-            "file '{}' contained: {}",
-            file_name,
+            "file '{path}' contained: {}",
             actual.debug_tree(),
         );
     });

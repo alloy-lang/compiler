@@ -1,4 +1,4 @@
-use alloy_project::Project;
+use alloy_project::{ModuleFile, Project};
 use expect_test::expect_file;
 use std::panic::{RefUnwindSafe, UnwindSafe};
 use std::path::{Path, PathBuf};
@@ -75,7 +75,7 @@ pub fn run_test_dir(
 ///
 /// Will panic if tests fail.
 #[track_caller]
-pub fn run_std_lib_tests(test_fn: impl Fn(&Path, &str) + RefUnwindSafe + UnwindSafe) {
+pub fn run_std_lib_tests(test_fn: impl Fn(&ModuleFile) + RefUnwindSafe + UnwindSafe) {
     let project = Project::new("../../std").expect("expected project to be created");
 
     let mut failed_tests = vec![];
@@ -88,12 +88,12 @@ pub fn run_std_lib_tests(test_fn: impl Fn(&Path, &str) + RefUnwindSafe + UnwindS
         );
 
         let did_panic = std::panic::catch_unwind(|| {
-            test_fn(path.as_std_path(), module_file.contents());
+            test_fn(module_file);
         })
         .is_err();
 
         if did_panic {
-            failed_tests.push(path.as_std_path());
+            failed_tests.push(path);
         }
     }
 

@@ -143,32 +143,31 @@ fn run_hir_ty_test(
     format!("{type_map:#?}\n{parse_errors:#?}")
 }
 
+
+// TODO: continue fixing lowering errors in std lib
 // #[test]
-// fn test_std_lib() {
-//     alloy_test_harness::run_std_lib_tests(|path, source| {
-//         let file_name = path.to_str().expect("Expected filename");
-//
-//         let (module, parse_errors) = lower_source_file(source);
-//         let lowering_warnings = module.warnings();
-//         let lowering_errors = module.errors();
-//
-//         assert!(
-//             parse_errors.is_empty(),
-//             "file '{}' contained parse errors: {:#?}",
-//             file_name,
-//             parse_errors,
-//         );
-//         assert!(
-//             lowering_warnings.is_empty(),
-//             "file '{}' contained lowering warnings: {:#?}",
-//             file_name,
-//             lowering_warnings,
-//         );
-//         assert!(
-//             lowering_errors.is_empty(),
-//             "file '{}' contained lowering errors: {:#?}",
-//             file_name,
-//             lowering_errors,
-//         );
-//     });
-// }
+fn test_std_lib() {
+    alloy_test_harness::run_std_lib_tests(|module_file| {
+        let path = module_file.path();
+        let source = module_file.contents();
+
+        let mut db = TestHirTyDatabase::default();
+        let test_module_id = db.add_module("main", path, source);
+
+        let type_map = crate::type_check_module(&db, test_module_id);
+
+        let type_inference_warnings = type_map.warnings();
+        let type_inference_errors = type_map.errors();
+
+        assert!(
+            type_inference_warnings.is_empty(),
+            "file '{path}' contained type inference warnings: {:#?}",
+            type_inference_warnings,
+        );
+        assert!(
+            type_inference_errors.is_empty(),
+            "file '{path}' contained type inference errors: {:#?}",
+            type_inference_errors,
+        );
+    });
+}

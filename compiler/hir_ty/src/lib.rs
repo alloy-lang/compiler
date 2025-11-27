@@ -42,6 +42,14 @@ impl HirTypedModule {
     fn error(&mut self, kind: TypeInferenceErrorKind, range: TextRange) {
         self.errors.push(TypeInferenceError::new(kind, range));
     }
+
+    fn warnings(&self) -> &[TypeInferenceWarning] {
+        &self.warnings
+    }
+
+    fn errors(&self) -> &[TypeInferenceError] {
+        &self.errors
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]

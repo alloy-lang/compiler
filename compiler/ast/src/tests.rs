@@ -38,8 +38,9 @@ fn run_ast_test<T: fmt::Debug>(path: &Path, input: &str, thing_fn: fn(&SourceFil
 
 #[test]
 fn test_std_lib() {
-    alloy_test_harness::run_std_lib_tests(|path, source| {
-        let file_name = path.to_str().expect("Expected filename");
+    alloy_test_harness::run_std_lib_tests(|module_file| {
+        let path = module_file.path();
+        let source = module_file.contents();
 
         let actual = alloy_parser::parse_source_file(source);
 
@@ -49,10 +50,6 @@ fn test_std_lib() {
         })
         .is_err();
 
-        assert!(
-            !did_panic,
-            "file '{}' failed to parse as a SourceFile",
-            file_name,
-        );
+        assert!(!did_panic, "file '{path}' failed to parse as a SourceFile",);
     });
 }
