@@ -5,8 +5,8 @@ HirTypedModule {
         Idx::<Expression>(0): Generic(
             0,
         ),
-        Idx::<Expression>(7): Generic(
-            5,
+        Idx::<Expression>(2): Generic(
+            2,
         ),
         Idx::<Expression>(4): Lambda {
             arg_type: Generic(
@@ -41,60 +41,6 @@ HirTypedModule {
         Idx::<Expression>(1): Generic(
             1,
         ),
-        Idx::<Expression>(8): Tuple(
-            NonEmpty(
-                [
-                    Generic(
-                        3,
-                    ),
-                    Generic(
-                        4,
-                    ),
-                    Generic(
-                        5,
-                    ),
-                ],
-            ),
-        ),
-        Idx::<Expression>(5): Generic(
-            3,
-        ),
-        Idx::<Expression>(2): Generic(
-            2,
-        ),
-        Idx::<Expression>(9): Lambda {
-            arg_type: Generic(
-                3,
-            ),
-            return_type: Lambda {
-                arg_type: Generic(
-                    4,
-                ),
-                return_type: Lambda {
-                    arg_type: Generic(
-                        5,
-                    ),
-                    return_type: Tuple(
-                        NonEmpty(
-                            [
-                                Generic(
-                                    3,
-                                ),
-                                Generic(
-                                    4,
-                                ),
-                                Generic(
-                                    5,
-                                ),
-                            ],
-                        ),
-                    ),
-                },
-            },
-        },
-        Idx::<Expression>(6): Generic(
-            4,
-        ),
         Idx::<Expression>(3): Tuple(
             NonEmpty(
                 [
@@ -115,20 +61,11 @@ HirTypedModule {
         Idx::<Pattern>(0): Generic(
             0,
         ),
-        Idx::<Pattern>(5): Generic(
-            5,
-        ),
-        Idx::<Pattern>(2): Generic(
-            2,
-        ),
-        Idx::<Pattern>(4): Generic(
-            4,
-        ),
         Idx::<Pattern>(1): Generic(
             1,
         ),
-        Idx::<Pattern>(3): Generic(
-            3,
+        Idx::<Pattern>(2): Generic(
+            2,
         ),
     },
     warnings: [],
