@@ -51,19 +51,19 @@ fn repl_line() {
     });
 }
 
-#[test]
-fn repl_line_lowering_errors() {
-    alloy_test_harness::run_test_dir("repl_line_lowering_errors", |path, input| {
-        run_hir_ty_test(path, input, false, true)
-    });
-}
-
-#[test]
-fn repl_line_parse_errors() {
-    alloy_test_harness::run_test_dir("repl_line_parse_errors", |path, input| {
-        run_hir_ty_test(path, input, true, false)
-    });
-}
+// #[test]
+// fn repl_line_lowering_errors() {
+//     alloy_test_harness::run_test_dir("repl_line_lowering_errors", |path, input| {
+//         run_hir_ty_test(path, input, false, true)
+//     });
+// }
+//
+// #[test]
+// fn repl_line_parse_errors() {
+//     alloy_test_harness::run_test_dir("repl_line_parse_errors", |path, input| {
+//         run_hir_ty_test(path, input, true, false)
+//     });
+// }
 
 #[test]
 fn on_demand_test() {

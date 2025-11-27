@@ -78,8 +78,10 @@ fn resolve_type_definition(
                 }
             }
         }
-        hir::TypeDefinitionKind::Single(_) => todo!("Handle single type definitions"),
-        hir::TypeDefinitionKind::Union(_) => todo!("Handle union type definitions"),
+        hir::TypeDefinitionKind::Single(_) | hir::TypeDefinitionKind::Union(_) => {
+            // Return a TypeDef pointing to this type definition
+            ResolvedType::TypeDef(Fql::new(current_module_id, type_idx))
+        }
     }
 }
 

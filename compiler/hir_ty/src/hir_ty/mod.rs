@@ -68,7 +68,9 @@ pub(super) enum ExpressionOrPatternIdx {
 pub enum ResolvedType {
     Unknown,
     Unit,
-    Named(Fql<hir::TypeReference>),
+    /// User-defined type (nominal typing)
+    /// Two TypeDefs are equal iff they point to the same type definition
+    TypeDef(Fql<hir::TypeDefinition>),
     BuiltIn(hir::BuiltInType),
     Lambda {
         arg_type: Box<ResolvedType>,

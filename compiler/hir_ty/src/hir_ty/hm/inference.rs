@@ -151,11 +151,12 @@ fn mono_to_resolved_with_map(
             }
         }
         MonoType::App {
-            constructor,
+            constructor: _,
             args: _,
         } => {
-            // For now, convert to Named type
-            ResolvedType::Named(constructor.clone())
+            // TODO: Implement proper type application handling
+            // For now, return Unknown since this variant isn't used yet
+            ResolvedType::Unknown
         }
         MonoType::Unit => ResolvedType::Unit,
     }
