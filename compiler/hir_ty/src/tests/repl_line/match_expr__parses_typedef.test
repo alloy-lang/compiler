@@ -11,16 +11,32 @@ match test when
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Unknown,
-        Idx::<Expression>(2): Unknown,
-        Idx::<Expression>(1): Unknown,
-        Idx::<Expression>(3): Unknown,
+        Idx::<Expression>(0): Generic(
+            0,
+        ),
+        Idx::<Expression>(2): Generic(
+            1,
+        ),
+        Idx::<Expression>(1): Generic(
+            1,
+        ),
+        Idx::<Expression>(3): Generic(
+            1,
+        ),
     },
     pattern_types: {
-        Idx::<Pattern>(0): Unknown,
-        Idx::<Pattern>(2): Unknown,
-        Idx::<Pattern>(1): Unknown,
-        Idx::<Pattern>(3): Unknown,
+        Idx::<Pattern>(0): Generic(
+            1,
+        ),
+        Idx::<Pattern>(2): Generic(
+            1,
+        ),
+        Idx::<Pattern>(1): Generic(
+            0,
+        ),
+        Idx::<Pattern>(3): Generic(
+            0,
+        ),
     },
     warnings: [],
     errors: [],

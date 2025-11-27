@@ -72,6 +72,9 @@ pub enum ResolvedType {
         base: Fql<hir::TypeReference>,
         args: Vec<Fql<hir::TypeReference>>,
     },
+    /// Generic type variable (for polymorphic types)
+    /// The usize represents a canonical type variable ID
+    Generic(usize),
 }
 
 struct InferenceContext<'db> {

@@ -11,7 +11,9 @@ HirTypedModule {
             String,
         ),
         Idx::<Expression>(4): Lambda {
-            arg_type: Unknown,
+            arg_type: Generic(
+                0,
+            ),
             return_type: BuiltIn(
                 String,
             ),
@@ -27,7 +29,9 @@ HirTypedModule {
         Idx::<Pattern>(0): BuiltIn(
             String,
         ),
-        Idx::<Pattern>(1): Unknown,
+        Idx::<Pattern>(1): Generic(
+            0,
+        ),
     },
     warnings: [],
     errors: [],

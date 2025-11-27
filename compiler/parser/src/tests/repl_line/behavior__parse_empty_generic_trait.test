@@ -2,8 +2,8 @@ behavior Trait1[t1, t2] for Type1 where
     -- TODO: I don't think these cases make sense?
 end
 ===
-SourceFile@0..78
-  BehaviorDef@0..78
+SourceFile@0..94
+  BehaviorDef@0..94
     BehaviorKw@0..8 "behavior"
     Whitespace@8..9 " "
     BehaviorTraitName@9..24
@@ -34,6 +34,6 @@ SourceFile@0..78
           Whitespace@33..34 " "
     WhereKw@34..39 "where"
     Whitespace@39..44 "\n    "
-    Comment@44..74 "-- imagine all the th ..."
-    Whitespace@74..75 "\n"
-    EndKw@75..78 "end"
+    Comment@44..90 "-- TODO: I don't thin ..."
+    Whitespace@90..91 "\n"
+    EndKw@91..94 "end"

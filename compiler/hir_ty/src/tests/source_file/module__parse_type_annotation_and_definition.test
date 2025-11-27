@@ -11,53 +11,89 @@ HirTypedModule {
         Idx::<Expression>(0): Tuple(
             NonEmpty(
                 [
-                    Unknown,
-                    Unknown,
+                    Generic(
+                        0,
+                    ),
+                    Generic(
+                        1,
+                    ),
                 ],
             ),
         ),
         Idx::<Expression>(7): Lambda {
-            arg_type: Unknown,
+            arg_type: Generic(
+                4,
+            ),
             return_type: Lambda {
-                arg_type: Unknown,
+                arg_type: Generic(
+                    2,
+                ),
                 return_type: Lambda {
-                    arg_type: Unknown,
+                    arg_type: Generic(
+                        3,
+                    ),
                     return_type: Tuple(
                         NonEmpty(
                             [
-                                Unknown,
-                                Unknown,
+                                Generic(
+                                    0,
+                                ),
+                                Generic(
+                                    1,
+                                ),
                             ],
                         ),
                     ),
                 },
             },
         },
-        Idx::<Expression>(4): Unknown,
-        Idx::<Expression>(1): Unknown,
+        Idx::<Expression>(4): Generic(
+            1,
+        ),
+        Idx::<Expression>(1): Generic(
+            2,
+        ),
         Idx::<Expression>(5): Tuple(
             NonEmpty(
                 [
-                    Unknown,
-                    Unknown,
+                    Generic(
+                        0,
+                    ),
+                    Generic(
+                        1,
+                    ),
                 ],
             ),
         ),
-        Idx::<Expression>(2): Unknown,
+        Idx::<Expression>(2): Generic(
+            0,
+        ),
         Idx::<Expression>(6): Tuple(
             NonEmpty(
                 [
-                    Unknown,
-                    Unknown,
+                    Generic(
+                        0,
+                    ),
+                    Generic(
+                        1,
+                    ),
                 ],
             ),
         ),
-        Idx::<Expression>(3): Unknown,
+        Idx::<Expression>(3): Generic(
+            3,
+        ),
     },
     pattern_types: {
-        Idx::<Pattern>(0): Unknown,
-        Idx::<Pattern>(1): Unknown,
-        Idx::<Pattern>(2): Unknown,
+        Idx::<Pattern>(0): Generic(
+            4,
+        ),
+        Idx::<Pattern>(1): Generic(
+            2,
+        ),
+        Idx::<Pattern>(2): Generic(
+            3,
+        ),
     },
     warnings: [],
     errors: [
@@ -77,16 +113,26 @@ HirTypedModule {
                     },
                 },
                 found: Lambda {
-                    arg_type: Unknown,
+                    arg_type: Generic(
+                        4,
+                    ),
                     return_type: Lambda {
-                        arg_type: Unknown,
+                        arg_type: Generic(
+                            2,
+                        ),
                         return_type: Lambda {
-                            arg_type: Unknown,
+                            arg_type: Generic(
+                                3,
+                            ),
                             return_type: Tuple(
                                 NonEmpty(
                                     [
-                                        Unknown,
-                                        Unknown,
+                                        Generic(
+                                            0,
+                                        ),
+                                        Generic(
+                                            1,
+                                        ),
                                     ],
                                 ),
                             ),

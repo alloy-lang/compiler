@@ -7,18 +7,30 @@ let (|>) = |x, f| -> fakeStuff
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Unknown,
+        Idx::<Expression>(0): Generic(
+            0,
+        ),
         Idx::<Expression>(1): Lambda {
-            arg_type: Unknown,
+            arg_type: Generic(
+                1,
+            ),
             return_type: Lambda {
-                arg_type: Unknown,
-                return_type: Unknown,
+                arg_type: Generic(
+                    2,
+                ),
+                return_type: Generic(
+                    0,
+                ),
             },
         },
     },
     pattern_types: {
-        Idx::<Pattern>(0): Unknown,
-        Idx::<Pattern>(1): Unknown,
+        Idx::<Pattern>(0): Generic(
+            1,
+        ),
+        Idx::<Pattern>(1): Generic(
+            2,
+        ),
     },
     warnings: [],
     errors: [
@@ -35,10 +47,16 @@ HirTypedModule {
                     },
                 },
                 found: Lambda {
-                    arg_type: Unknown,
+                    arg_type: Generic(
+                        1,
+                    ),
                     return_type: Lambda {
-                        arg_type: Unknown,
-                        return_type: Unknown,
+                        arg_type: Generic(
+                            2,
+                        ),
+                        return_type: Generic(
+                            0,
+                        ),
                     },
                 },
             },

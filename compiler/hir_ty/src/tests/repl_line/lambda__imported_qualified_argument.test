@@ -8,14 +8,18 @@ HirTypedModule {
             Int,
         ),
         Idx::<Expression>(1): Lambda {
-            arg_type: Unknown,
+            arg_type: Generic(
+                0,
+            ),
             return_type: BuiltIn(
                 Int,
             ),
         },
     },
     pattern_types: {
-        Idx::<Pattern>(0): Unknown,
+        Idx::<Pattern>(0): Generic(
+            0,
+        ),
     },
     warnings: [],
     errors: [],

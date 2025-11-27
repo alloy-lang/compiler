@@ -5,7 +5,9 @@ let thing = map
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Unknown,
+        Idx::<Expression>(0): Generic(
+            0,
+        ),
     },
     pattern_types: {},
     warnings: [],

@@ -33,13 +33,24 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
             // Phase 3: Apply the substitution to all types in the environment
             let mut result = HirTypedModule::empty();
 
+            // Create a shared type variable mapping for the entire module
+            // This ensures that the same TypeVarId gets the same Generic ID everywhere
+            use super::TypeVarId;
+            use rustc_hash::FxHashMap;
+            let mut type_var_map: FxHashMap<TypeVarId, usize> = FxHashMap::default();
+            let mut next_generic_id = 0;
+
             for (expression_id, _expression, range, name_op) in hir_module.expressions() {
                 let fql = Fql::new(module_id, expression_id);
                 let idx = ExpressionOrPatternIdx::Expression(fql);
 
                 if let Some(mono_ty) = ctx.type_env.get(&idx) {
                     let resolved_mono = substitution.apply(mono_ty);
-                    let resolved_type = mono_to_resolved(&resolved_mono);
+                    let resolved_type = mono_to_resolved_with_map(
+                        &resolved_mono,
+                        &mut type_var_map,
+                        &mut next_generic_id,
+                    );
                     result
                         .expression_types
                         .insert(expression_id, resolved_type.clone());
@@ -62,7 +73,11 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
 
                 if let Some(mono_ty) = ctx.type_env.get(&idx) {
                     let resolved_mono = substitution.apply(mono_ty);
-                    let resolved_type = mono_to_resolved(&resolved_mono);
+                    let resolved_type = mono_to_resolved_with_map(
+                        &resolved_mono,
+                        &mut type_var_map,
+                        &mut next_generic_id,
+                    );
                     result
                         .pattern_types
                         .insert(pattern_id, resolved_type.clone());
@@ -89,17 +104,42 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
     }
 }
 
-/// Convert a MonoType to a ResolvedType (for compatibility with old system)
-fn mono_to_resolved(mono: &MonoType) -> ResolvedType {
+/// Convert a MonoType to a ResolvedType with a shared type variable mapping
+/// This ensures that the same TypeVarId gets the same Generic ID across all
+/// expressions and patterns in a module, preserving polymorphic type structure
+fn mono_to_resolved_with_map(
+    mono: &MonoType,
+    type_var_map: &mut rustc_hash::FxHashMap<super::TypeVarId, usize>,
+    next_generic_id: &mut usize,
+) -> ResolvedType {
     match mono {
-        MonoType::Var(_) => ResolvedType::Unknown,
+        MonoType::Var(var_id) => {
+            // Get or assign a canonical ID for this type variable
+            let generic_id = *type_var_map.entry(*var_id).or_insert_with(|| {
+                let id = *next_generic_id;
+                *next_generic_id += 1;
+                id
+            });
+            ResolvedType::Generic(generic_id)
+        }
         MonoType::Concrete(builtin) => ResolvedType::BuiltIn(*builtin),
         MonoType::Function(arg, ret) => ResolvedType::Lambda {
-            arg_type: Box::new(mono_to_resolved(arg)),
-            return_type: Box::new(mono_to_resolved(ret)),
+            arg_type: Box::new(mono_to_resolved_with_map(
+                arg,
+                type_var_map,
+                next_generic_id,
+            )),
+            return_type: Box::new(mono_to_resolved_with_map(
+                ret,
+                type_var_map,
+                next_generic_id,
+            )),
         },
         MonoType::Tuple(elements) => {
-            let resolved_elements: Vec<_> = elements.iter().map(mono_to_resolved).collect();
+            let resolved_elements: Vec<_> = elements
+                .iter()
+                .map(|e| mono_to_resolved_with_map(e, type_var_map, next_generic_id))
+                .collect();
             if resolved_elements.is_empty() {
                 ResolvedType::Unknown
             } else {

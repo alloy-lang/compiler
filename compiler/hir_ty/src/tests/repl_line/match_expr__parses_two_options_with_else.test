@@ -8,21 +8,29 @@ match test when
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Unknown,
+        Idx::<Expression>(0): Generic(
+            0,
+        ),
         Idx::<Expression>(2): BuiltIn(
             Int,
         ),
         Idx::<Expression>(4): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(1): Unknown,
+        Idx::<Expression>(1): Generic(
+            0,
+        ),
         Idx::<Expression>(3): BuiltIn(
             Int,
         ),
     },
     pattern_types: {
-        Idx::<Pattern>(0): Unknown,
-        Idx::<Pattern>(1): Unknown,
+        Idx::<Pattern>(0): Generic(
+            0,
+        ),
+        Idx::<Pattern>(1): Generic(
+            0,
+        ),
     },
     warnings: [],
     errors: [],

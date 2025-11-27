@@ -7,7 +7,7 @@ trait TestTrait1 where
     -- imagine all the things here
 end
 ===
-SourceFile@0..148
+SourceFile@0..156
   TypeDefinition@0..23
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
@@ -18,33 +18,33 @@ SourceFile@0..148
     TypeDefinitionMember@16..23
       Ident@16..21 "Thing"
       Whitespace@21..23 "\n\n"
-  BehaviorDef@23..91
+  BehaviorDef@23..95
     BehaviorKw@23..31 "behavior"
     Whitespace@31..32 " "
-    BehaviorTraitName@32..39
-      TypeIdentifier@32..39
-        Path@32..39
-          Ident@32..38 "Trait1"
-          Whitespace@38..39 " "
-    ForKw@39..42 "for"
-    Whitespace@42..43 " "
-    BehaviorTypeName@43..49
-      TypeIdentifier@43..49
-        Path@43..49
-          Ident@43..48 "Type1"
-          Whitespace@48..49 " "
-    WhereKw@49..54 "where"
-    Whitespace@54..59 "\n    "
-    Comment@59..89 "-- imagine all the th ..."
-    Whitespace@89..91 "\n\n"
-  TraitDef@91..148
-    TraitKw@91..96 "trait"
-    Whitespace@96..97 " "
-    Ident@97..103 "Trait1"
-    Whitespace@103..104 " "
-    WhereKw@104..109 "where"
-    Whitespace@109..114 "\n    "
-    Comment@114..144 "-- imagine all the th ..."
-    Whitespace@144..145 "\n"
-    EndKw@145..148 "end"
-error at position 91 while parsing the `end` keyword after a behavior definition. Missing expected ‘end‘
+    BehaviorTraitName@32..43
+      TypeIdentifier@32..43
+        Path@32..43
+          Ident@32..42 "TestTrait1"
+          Whitespace@42..43 " "
+    ForKw@43..46 "for"
+    Whitespace@46..47 " "
+    BehaviorTypeName@47..53
+      TypeIdentifier@47..53
+        Path@47..53
+          Ident@47..52 "Type1"
+          Whitespace@52..53 " "
+    WhereKw@53..58 "where"
+    Whitespace@58..63 "\n    "
+    Comment@63..93 "-- imagine all the th ..."
+    Whitespace@93..95 "\n\n"
+  TraitDef@95..156
+    TraitKw@95..100 "trait"
+    Whitespace@100..101 " "
+    Ident@101..111 "TestTrait1"
+    Whitespace@111..112 " "
+    WhereKw@112..117 "where"
+    Whitespace@117..122 "\n    "
+    Comment@122..152 "-- imagine all the th ..."
+    Whitespace@152..153 "\n"
+    EndKw@153..156 "end"
+error at position 95 while parsing the `end` keyword after a behavior definition. Missing expected ‘end‘

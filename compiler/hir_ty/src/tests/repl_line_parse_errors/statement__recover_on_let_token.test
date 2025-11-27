@@ -3,8 +3,12 @@ let b = a
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Unknown,
-        Idx::<Expression>(1): Unknown,
+        Idx::<Expression>(0): Generic(
+            0,
+        ),
+        Idx::<Expression>(1): Generic(
+            0,
+        ),
     },
     pattern_types: {},
     warnings: [],

@@ -2,29 +2,49 @@
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Unknown,
-        Idx::<Expression>(2): Unknown,
-        Idx::<Expression>(1): Unknown,
+        Idx::<Expression>(0): Generic(
+            0,
+        ),
+        Idx::<Expression>(2): Generic(
+            0,
+        ),
+        Idx::<Expression>(1): Generic(
+            0,
+        ),
         Idx::<Expression>(3): Lambda {
             arg_type: Tuple(
                 NonEmpty(
                     [
-                        Unknown,
-                        Unknown,
+                        Generic(
+                            0,
+                        ),
+                        Generic(
+                            0,
+                        ),
                     ],
                 ),
             ),
-            return_type: Unknown,
+            return_type: Generic(
+                0,
+            ),
         },
     },
     pattern_types: {
-        Idx::<Pattern>(0): Unknown,
-        Idx::<Pattern>(1): Unknown,
+        Idx::<Pattern>(0): Generic(
+            0,
+        ),
+        Idx::<Pattern>(1): Generic(
+            0,
+        ),
         Idx::<Pattern>(2): Tuple(
             NonEmpty(
                 [
-                    Unknown,
-                    Unknown,
+                    Generic(
+                        0,
+                    ),
+                    Generic(
+                        0,
+                    ),
                 ],
             ),
         ),
