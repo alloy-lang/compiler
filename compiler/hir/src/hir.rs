@@ -156,6 +156,12 @@ impl HirModule {
         self.traits.iter()
     }
 
+    pub fn behaviors(
+        &'_ self,
+    ) -> impl Iterator<Item = IndexItem<'_, Behavior, (TypeIdx, TypeIdx)>> {
+        self.behaviors.iter()
+    }
+
     // Lookup methods by name and scope
     pub fn get_type_definition_by_name(
         &self,

@@ -1,15 +1,15 @@
+mod type_annotation_check;
 mod type_definition;
 mod type_reference;
 
-use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir as hir;
-use alloy_hir::Name;
-use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
 use la_arena::Idx;
 use non_empty_vec::NonEmpty;
 use std::hash::Hash;
-use text_size::TextRange;
+
+// Re-export type annotation checking function for use by other modules
+pub(super) use type_annotation_check::check_type_annotation;
 
 /// Fully Qualified Location - represents an index within a specific module
 #[derive(Debug, Clone, Copy)]
@@ -91,35 +91,4 @@ pub enum ResolvedType {
         id: usize,
         constraints: NonEmpty<Fql<hir::Trait>>,
     },
-}
-
-pub(super) fn check_type_annotation(
-    db: &dyn HirTyDatabase,
-    result: &mut HirTypedModule,
-    current_module_id: ModuleId,
-    range: TextRange,
-    name_op: Option<(Name, ScopeIdx)>,
-    resolved_type: ResolvedType,
-) {
-    // Check for type annotation conflicts
-    if let Some((name, scope)) = name_op {
-        let expected_type = type_reference::type_reference_to_resolved(
-            db,
-            current_module_id,
-            &hir::Path::ThisModule {
-                path: NonEmpty::new(name.clone()),
-                scope,
-            },
-            scope,
-        );
-        if expected_type != ResolvedType::Unknown && expected_type != resolved_type {
-            result.error(
-                crate::diagnostics::TypeInferenceErrorKind::ConflictingTypeAnnotation {
-                    expected: expected_type,
-                    found: resolved_type,
-                },
-                range,
-            );
-        }
-    }
 }

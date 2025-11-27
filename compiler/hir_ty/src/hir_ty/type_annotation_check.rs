@@ -1,0 +1,294 @@
+//! Type annotation checking and compatibility validation
+//!
+//! This module handles checking that inferred types are compatible with their
+//! type annotations, including trait constraint verification.
+
+use crate::hir_ty::{Fql, ResolvedType};
+use crate::{HirTyDatabase, HirTypedModule};
+use alloy_hir as hir;
+use alloy_scope::ScopeIdx;
+use alloy_workspace::ModuleId;
+use non_empty_vec::NonEmpty;
+use text_size::TextRange;
+
+pub fn check_type_annotation(
+    db: &dyn HirTyDatabase,
+    result: &mut HirTypedModule,
+    current_module_id: ModuleId,
+    range: TextRange,
+    name_op: Option<(hir::Name, ScopeIdx)>,
+    resolved_type: ResolvedType,
+) {
+    // Check for type annotation conflicts
+    if let Some((name, scope)) = name_op {
+        let expected_type = super::type_reference::type_reference_to_resolved(
+            db,
+            current_module_id,
+            &hir::Path::ThisModule {
+                path: NonEmpty::new(name.clone()),
+                scope,
+            },
+            scope,
+        );
+
+        // Skip check if the expected type is Unknown (no annotation)
+        if expected_type == ResolvedType::Unknown {
+            return;
+        }
+
+        // Check if the inferred type is compatible with the expected type
+        if let Err(_error) = check_type_compatibility(db, &expected_type, &resolved_type) {
+            result.error(
+                crate::diagnostics::TypeInferenceErrorKind::ConflictingTypeAnnotation {
+                    expected: expected_type,
+                    found: resolved_type,
+                },
+                range,
+            );
+        }
+    }
+}
+
+/// Check if the `found` type is compatible with the `expected` type.
+/// This is more permissive than equality - it allows:
+/// - Generic type variables to match (even with different IDs)
+/// - Checking that trait constraints are satisfied
+/// - Subtyping relationships (in the future)
+fn check_type_compatibility(
+    db: &dyn HirTyDatabase,
+    expected: &ResolvedType,
+    found: &ResolvedType,
+) -> Result<(), TypeError> {
+    match (expected, found) {
+        // Exact matches
+        (ResolvedType::Unknown, _) | (_, ResolvedType::Unknown) => Ok(()),
+        (ResolvedType::Unit, ResolvedType::Unit) => Ok(()),
+        (ResolvedType::BuiltIn(a), ResolvedType::BuiltIn(b)) if a == b => Ok(()),
+        (ResolvedType::TypeDef(a), ResolvedType::TypeDef(b)) if a == b => Ok(()),
+
+        // Generic type variables
+        // TODO: Track generic type variable assignments to ensure consistency
+        (ResolvedType::Generic(_), ResolvedType::Generic(_)) => Ok(()),
+
+        // Constrained generics - the found type must satisfy the constraints
+        (ResolvedType::ConstrainedGeneric { id: _, constraints }, found_ty) => {
+            check_trait_constraints(db, found_ty, constraints)
+        }
+
+        // A generic can match a constrained generic if we're checking from found -> expected
+        // (this allows inference to be more general than the annotation)
+        (ResolvedType::Generic(_), ResolvedType::ConstrainedGeneric { .. }) => {
+            // TODO: We might want to track that this generic has constraints
+            Ok(())
+        }
+
+        // Lambda types - check arguments and return types recursively
+        (
+            ResolvedType::Lambda {
+                arg_type: exp_arg,
+                return_type: exp_ret,
+            },
+            ResolvedType::Lambda {
+                arg_type: found_arg,
+                return_type: found_ret,
+            },
+        ) => {
+            check_type_compatibility(db, exp_arg, found_arg)?;
+            check_type_compatibility(db, exp_ret, found_ret)?;
+            Ok(())
+        }
+
+        // Tuple types - check all elements
+        (ResolvedType::Tuple(exp_elems), ResolvedType::Tuple(found_elems)) => {
+            if exp_elems.len() != found_elems.len() {
+                return Err(TypeError::TupleLengthMismatch);
+            }
+            for (exp_elem, found_elem) in exp_elems.iter().zip(found_elems.iter()) {
+                check_type_compatibility(db, exp_elem, found_elem)?;
+            }
+            Ok(())
+        }
+
+        // Everything else is incompatible
+        _ => Err(TypeError::Incompatible),
+    }
+}
+
+/// Check if a type satisfies the given trait constraints
+fn check_trait_constraints(
+    db: &dyn HirTyDatabase,
+    ty: &ResolvedType,
+    constraints: &NonEmpty<Fql<hir::Trait>>,
+) -> Result<(), TypeError> {
+    match ty {
+        // For concrete user-defined types, check if they have behavior implementations
+        ResolvedType::TypeDef(type_fql) => {
+            // Check each required trait
+            for required_trait in constraints.iter() {
+                if !has_behavior_for_trait(db, type_fql, required_trait) {
+                    return Err(TypeError::ConstraintNotSatisfied);
+                }
+            }
+            Ok(())
+        }
+        // Generic types can't be checked at compile time
+        // They'll be checked when instantiated with concrete types
+        ResolvedType::Generic(_) | ResolvedType::ConstrainedGeneric { .. } => Ok(()),
+        // For other types (BuiltIn, Lambda, Tuple), we accept them for now
+        // TODO: Implement constraint checking for built-in types, lambdas, etc.
+        _ => Ok(()),
+    }
+}
+
+/// Check if a type has a behavior implementation for the required trait
+fn has_behavior_for_trait(
+    db: &dyn HirTyDatabase,
+    type_fql: &Fql<hir::TypeDefinition>,
+    required_trait: &Fql<hir::Trait>,
+) -> bool {
+    let (hir_module, _) = hir::lower_file(db, type_fql.module_id);
+
+    // Search through all behaviors in the type's module
+    for (_behavior_idx, behavior, _range, _name) in hir_module.behaviors() {
+        if does_behavior_match(db, type_fql.module_id, behavior, type_fql, required_trait) {
+            return true;
+        }
+    }
+
+    false
+}
+
+/// Check if a behavior implements the required trait for the given type
+fn does_behavior_match(
+    db: &dyn HirTyDatabase,
+    behavior_module_id: ModuleId,
+    behavior: &hir::Behavior,
+    type_fql: &Fql<hir::TypeDefinition>,
+    required_trait: &Fql<hir::Trait>,
+) -> bool {
+    let (hir_module, _) = hir::lower_file(db, behavior_module_id);
+
+    // Get the type and trait references that this behavior is attached to
+    let attached_type_ref = hir_module.get_type_reference(behavior.attached_type);
+    let attached_trait_ref = hir_module.get_type_reference(behavior.attached_trait);
+
+    // Check if the attached type resolves to our type definition
+    let type_matches =
+        type_reference_matches_typedef(db, behavior_module_id, attached_type_ref, type_fql);
+
+    // Check if the attached trait resolves to our required trait
+    let trait_matches =
+        type_reference_matches_trait(db, behavior_module_id, attached_trait_ref, required_trait);
+
+    type_matches && trait_matches
+}
+
+/// Check if a type reference resolves to the given type definition
+fn type_reference_matches_typedef(
+    db: &dyn HirTyDatabase,
+    current_module_id: ModuleId,
+    type_ref: &hir::TypeReference,
+    expected_type_fql: &Fql<hir::TypeDefinition>,
+) -> bool {
+    // Extract the path from the type reference
+    let path = match type_ref {
+        hir::TypeReference::Named(path) => path,
+        _ => return false,
+    };
+
+    // Resolve the path to see if it points to the expected type definition
+    match path {
+        hir::Path::ThisModule {
+            path: this_path,
+            scope,
+        } => {
+            // Try to resolve in the current module
+            let (hir_module, _) = hir::lower_file(db, current_module_id);
+            if let Some((type_idx, _)) =
+                hir_module.get_type_definition_by_name(this_path.first(), *scope)
+            {
+                // Check if this type definition matches our expected one
+                current_module_id == expected_type_fql.module_id
+                    && type_idx == expected_type_fql.local_id
+            } else {
+                false
+            }
+        }
+        hir::Path::OtherModule(fqn) => {
+            // Resolve the module
+            use itertools::Itertools;
+            let module_slug = fqn.module.iter().map(|n| n.as_str()).join("::");
+            if let Some(other_module_id) = db.find_module_by_slug(&*module_slug) {
+                let (hir_module, _) = hir::lower_file(db, other_module_id);
+                if let Some((type_idx, _)) =
+                    hir_module.get_type_definition_by_name(&fqn.name, alloy_scope::Scopes::ROOT)
+                {
+                    // Check if this type definition matches our expected one
+                    other_module_id == expected_type_fql.module_id
+                        && type_idx == expected_type_fql.local_id
+                } else {
+                    false
+                }
+            } else {
+                false
+            }
+        }
+        hir::Path::Unknown(_) => false,
+    }
+}
+
+/// Check if a type reference resolves to the given trait
+fn type_reference_matches_trait(
+    db: &dyn HirTyDatabase,
+    current_module_id: ModuleId,
+    type_ref: &hir::TypeReference,
+    expected_trait_fql: &Fql<hir::Trait>,
+) -> bool {
+    // Extract the path from the type reference
+    let path = match type_ref {
+        hir::TypeReference::Named(path) => path,
+        _ => return false,
+    };
+
+    // Resolve the path to see if it points to the expected trait
+    match path {
+        hir::Path::ThisModule {
+            path: this_path, ..
+        } => {
+            // Try to resolve in the current module
+            let (hir_module, _) = hir::lower_file(db, current_module_id);
+            if let Some((trait_idx, _)) = hir_module.get_trait_by_name(this_path.first()) {
+                // Check if this trait matches our expected one
+                current_module_id == expected_trait_fql.module_id
+                    && trait_idx == expected_trait_fql.local_id
+            } else {
+                false
+            }
+        }
+        hir::Path::OtherModule(fqn) => {
+            // Resolve the module
+            use itertools::Itertools;
+            let module_slug = fqn.module.iter().map(|n| n.as_str()).join("::");
+            if let Some(other_module_id) = db.find_module_by_slug(&*module_slug) {
+                let (hir_module, _) = hir::lower_file(db, other_module_id);
+                if let Some((trait_idx, _)) = hir_module.get_trait_by_name(&fqn.name) {
+                    // Check if this trait matches our expected one
+                    other_module_id == expected_trait_fql.module_id
+                        && trait_idx == expected_trait_fql.local_id
+                } else {
+                    false
+                }
+            } else {
+                false
+            }
+        }
+        hir::Path::Unknown(_) => false,
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+enum TypeError {
+    Incompatible,
+    TupleLengthMismatch,
+    ConstraintNotSatisfied,
+}

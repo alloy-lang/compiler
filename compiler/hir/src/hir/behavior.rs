@@ -4,8 +4,8 @@ use rustc_hash::FxHashMap;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Behavior {
-    pub(crate) attached_trait: TypeIdx,
-    pub(crate) attached_type: TypeIdx,
+    pub attached_trait: TypeIdx,
+    pub attached_type: TypeIdx,
     named_type_variables: FxHashMap<Name, TypeDefinitionIdx>,
     type_annotations: FxHashMap<Name, TypeIdx>,
     values: FxHashMap<Name, ExpressionIdx>,
