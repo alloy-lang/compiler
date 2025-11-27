@@ -120,6 +120,8 @@ fn mono_to_resolved_with_map(
                 *next_generic_id += 1;
                 id
             });
+            // TODO: If the type variable has trait constraints in the inference context,
+            // create a ConstrainedGeneric instead
             ResolvedType::Generic(generic_id)
         }
         MonoType::Concrete(builtin) => ResolvedType::BuiltIn(*builtin),

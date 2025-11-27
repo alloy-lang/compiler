@@ -188,11 +188,13 @@ impl<T, N: Eq + Hash + Clone + fmt::Debug> Index<T, N> {
         self.item_ranges[id]
     }
 
-    pub fn get_id(&self, name: &N, scopes: &Scopes) -> Option<Idx<T>> {
-        scopes
-            .iter()
-            .find_map(|scope| self.item_names.get(&(name.clone(), scope)))
-            .copied()
+    pub fn get_id(&self, name: &N, scopes: &Scopes) -> Option<(Idx<T>, ScopeIdx)> {
+        scopes.iter().find_map(|scope| {
+            self.item_names
+                .get(&(name.clone(), scope))
+                .copied()
+                .map(|idx| (idx, scope))
+        })
     }
 
     fn get_id_scoped(&self, name: &N, scope: ScopeIdx) -> Option<Idx<T>> {
@@ -201,7 +203,7 @@ impl<T, N: Eq + Hash + Clone + fmt::Debug> Index<T, N> {
 
     #[cfg(test)]
     pub fn get_by_name(&self, name: &N, scopes: &Scopes) -> Option<(Idx<T>, &T)> {
-        self.get_id(name, scopes).map(|id| (id, self.get(id)))
+        self.get_id(name, scopes).map(|(id, _)| (id, self.get(id)))
     }
 
     pub fn get_by_scoped_name(&self, name: &N, scope: ScopeIdx) -> Option<(Idx<T>, &T)> {
@@ -230,7 +232,10 @@ mod tests {
 
         assert_eq!(index.get(idx), &thing);
         assert_eq!(index.get_range(idx), range);
-        assert_eq!(index.get_id(&name, &scopes), Some(idx));
+        assert_eq!(
+            index.get_id(&name, &scopes),
+            Some((idx, scopes.current_scope()))
+        );
         assert_eq!(index.get_by_name(&name, &scopes), Some((idx, &thing)));
     }
 
@@ -250,7 +255,10 @@ mod tests {
 
         assert_eq!(index.get(idx), &thing);
         assert_eq!(index.get_range(idx), range);
-        assert_eq!(index.get_id(&lookup_name, &scopes), Some(idx));
+        assert_eq!(
+            index.get_id(&lookup_name, &scopes),
+            Some((idx, scopes.current_scope()))
+        );
         assert_eq!(
             index.get_by_name(&lookup_name, &scopes),
             Some((idx, &thing))
@@ -272,7 +280,10 @@ mod tests {
 
         scopes.push_scope("testing 1");
 
-        assert_eq!(index.get_id(&name, &scopes), Some(idx));
+        assert_eq!(
+            index.get_id(&name, &scopes),
+            Some((idx, scopes.parent_scope(scopes.current_scope())))
+        );
         assert_eq!(index.get_by_name(&name, &scopes), Some((idx, &thing)));
     }
 

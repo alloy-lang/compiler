@@ -79,7 +79,11 @@ fn infer_variable_ref(
 
     // Extract the last name from the path
     let name = match path {
-        hir::Path::ThisModule(names) | hir::Path::Unknown(names) => names.last(),
+        hir::Path::ThisModule {
+            path: names,
+            scope: _,
+        }
+        | hir::Path::Unknown(names) => names.last(),
         hir::Path::OtherModule(_) => {
             // For now, use a fresh type variable for cross-module references
             let ty = ctx.fresh_type_var();
@@ -181,7 +185,11 @@ fn infer_function_call(
 
     // Extract the last name from the path
     let name = match target {
-        hir::Path::ThisModule(names) | hir::Path::Unknown(names) => names.last(),
+        hir::Path::ThisModule {
+            path: names,
+            scope: _,
+        }
+        | hir::Path::Unknown(names) => names.last(),
         hir::Path::OtherModule(_) => {
             // For cross-module references, create a fresh function type
             let (hir_module, _) = hir::lower_file(ctx.db, module_id);
@@ -431,7 +439,11 @@ fn infer_pattern_ref(
 
     // Extract the last name from the path
     let name = match path {
-        hir::Path::ThisModule(names) | hir::Path::Unknown(names) => names.last(),
+        hir::Path::ThisModule {
+            path: names,
+            scope: _,
+        }
+        | hir::Path::Unknown(names) => names.last(),
         hir::Path::OtherModule(_) => {
             // For now, use a fresh type variable for cross-module references
             let ty = ctx.fresh_type_var();

@@ -79,9 +79,16 @@ pub enum ResolvedType {
         base: Box<ResolvedType>,
         args: Vec<ResolvedType>,
     },
-    /// Generic type variable (for polymorphic types)
+    /// Unconstrained generic type variable (for unbounded polymorphism)
     /// The usize represents a canonical type variable ID
     Generic(usize),
+    /// Generic type variable with trait constraints (for bounded polymorphism)
+    /// The usize represents a canonical type variable ID
+    /// The NonEmpty contains trait constraints this generic must satisfy
+    ConstrainedGeneric {
+        id: usize,
+        constraints: NonEmpty<Fql<hir::Trait>>,
+    },
 }
 
 pub(super) fn check_type_annotation(
@@ -97,7 +104,10 @@ pub(super) fn check_type_annotation(
         let expected_type = type_reference::type_reference_to_resolved(
             db,
             current_module_id,
-            &hir::Path::ThisModule(NonEmpty::new(name.clone())),
+            &hir::Path::ThisModule {
+                path: NonEmpty::new(name.clone()),
+                scope,
+            },
             scope,
         );
         if expected_type != ResolvedType::Unknown && expected_type != resolved_type {

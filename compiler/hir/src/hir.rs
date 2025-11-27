@@ -189,8 +189,8 @@ impl HirModule {
         self.type_references.get_by_scoped_name(name, scope)
     }
 
-    pub fn get_trait_by_name(&self, name: &Name, scope: ScopeIdx) -> Option<(TraitIdx, &Trait)> {
-        self.traits.get_by_scoped_name(name, scope)
+    pub fn get_trait_by_name(&self, name: &Name) -> Option<(TraitIdx, &Trait)> {
+        self.traits.get_by_scoped_name(name, Scopes::ROOT)
     }
 
     // Get methods by index
@@ -441,19 +441,19 @@ impl<'db> LoweringCtx<'db> {
         if let [first, rest @ ..] = path_segments {
             let local_name = Name::new(first);
 
-            if let Some(_tid) = self.traits.get_id(&local_name, &self.scopes) {
-                return Some(Path::this_module(rest, first));
+            if let Some((_tid, scope)) = self.traits.get_id(&local_name, &self.scopes) {
+                return Some(Path::this_module(rest, first, scope));
             }
-            if let Some(_tid) = self.type_definitions.get_id(&local_name, &self.scopes) {
-                return Some(Path::this_module(rest, first));
+            if let Some((_tid, scope)) = self.type_definitions.get_id(&local_name, &self.scopes) {
+                return Some(Path::this_module(rest, first, scope));
             }
-            if let Some(_tid) = self.type_references.get_id(&local_name, &self.scopes) {
-                return Some(Path::this_module(rest, first));
+            if let Some((_tid, scope)) = self.type_references.get_id(&local_name, &self.scopes) {
+                return Some(Path::this_module(rest, first, scope));
             }
             if let Some(_ast) = self.glossary.get_type_definition_by_name(first) {
-                return Some(Path::this_module(rest, first));
+                return Some(Path::this_module(rest, first, Scopes::ROOT));
             }
-            if let Some(import_id) = self.imports.get_id(&local_name, &self.scopes) {
+            if let Some((import_id, _)) = self.imports.get_id(&local_name, &self.scopes) {
                 self.used_imports.insert(import_id);
 
                 let import = self.imports.get(import_id);
@@ -509,14 +509,14 @@ impl<'db> LoweringCtx<'db> {
         if let [first, rest @ ..] = path_segments {
             let local_name = Name::new(first);
 
-            if let Some(_pid) = self.patterns.get_id(&local_name, &self.scopes) {
-                return Some(Path::this_module(rest, first));
+            if let Some((_pid, scope)) = self.patterns.get_id(&local_name, &self.scopes) {
+                return Some(Path::this_module(rest, first, scope));
             }
-            if let Some(_eid) = self.expressions.get_id(&local_name, &self.scopes) {
-                return Some(Path::this_module(rest, first));
+            if let Some((_eid, scope)) = self.expressions.get_id(&local_name, &self.scopes) {
+                return Some(Path::this_module(rest, first, scope));
             }
             if let Some(_ast) = self.glossary.get_value_by_name(first) {
-                return Some(Path::this_module(rest, first));
+                return Some(Path::this_module(rest, first, Scopes::ROOT));
             }
             return self.resolve_type_reference(path_segments, path_range, reference_type);
         }
@@ -732,7 +732,7 @@ impl<'db> LoweringCtx<'db> {
         let new_import = Import::new(segments);
         let last = segments.last();
 
-        if let Some(existing_id) = self.imports.get_id(last, &self.scopes) {
+        if let Some((existing_id, _)) = self.imports.get_id(last, &self.scopes) {
             let existing_import = self.imports.get(existing_id);
             let existing_import_range = self.imports.get_range(existing_id);
 

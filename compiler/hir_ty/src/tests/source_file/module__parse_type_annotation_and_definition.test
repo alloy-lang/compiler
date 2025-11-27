@@ -101,13 +101,21 @@ HirTypedModule {
             kind: ConflictingTypeAnnotation {
                 expected: Lambda {
                     arg_type: Lambda {
-                        arg_type: Unknown,
-                        return_type: Unknown,
+                        arg_type: Generic(
+                            0,
+                        ),
+                        return_type: Generic(
+                            1,
+                        ),
                     },
                     return_type: Lambda {
-                        arg_type: Unknown,
+                        arg_type: Generic(
+                            0,
+                        ),
                         return_type: Lambda {
-                            arg_type: Unknown,
+                            arg_type: Generic(
+                                0,
+                            ),
                             return_type: Unknown,
                         },
                     },

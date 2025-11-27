@@ -42,9 +42,23 @@ HirTypedModule {
         TypeInferenceError {
             kind: ConflictingTypeAnnotation {
                 expected: Lambda {
-                    arg_type: Unknown,
+                    arg_type: ConstrainedGeneric {
+                        id: 0,
+                        constraints: NonEmpty(
+                            [
+                                Fql {
+                                    module_id: ModuleId(
+                                        Id(1),
+                                    ),
+                                    local_id: Idx::<Trait>(0),
+                                },
+                            ],
+                        ),
+                    },
                     return_type: Lambda {
-                        arg_type: Unknown,
+                        arg_type: Generic(
+                            1,
+                        ),
                         return_type: Unknown,
                     },
                 },
