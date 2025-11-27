@@ -56,6 +56,7 @@ fn resolve_type_definition(
                             }
                             hir::TypeVariableConstraint::Kind(_) => {
                                 // Kind constraints aren't trait constraints
+                                // todo: kind checking, check against the number of type parameters on the type definition
                                 None
                             }
                         })
@@ -82,6 +83,7 @@ fn resolve_type_definition(
     }
 }
 
+// todo: make this return a Fql<hir::Trait>
 fn resolve_trait_path(
     db: &dyn HirTyDatabase,
     current_module_id: ModuleId,
@@ -98,7 +100,7 @@ fn resolve_trait_path(
         hir::Path::OtherModule(fqn) => {
             let module_slug = fqn.module.iter().map(|n| n.as_str()).join("::");
             let other_module_id = db.find_module_by_slug(&*module_slug)?;
-            let trait_idx = get_trait_by_name(db, other_module_id, fqn.module.first())?;
+            let trait_idx = get_trait_by_name(db, other_module_id, &fqn.name)?;
             Some((other_module_id, trait_idx))
         }
         hir::Path::Unknown(_) => None,
@@ -137,7 +139,7 @@ fn resolve_type_definition_path(
             let module_slug = fqn.module.iter().map(|n| n.as_str()).join("::");
             let other_module_id = db.find_module_by_slug(&*module_slug)?;
             let type_idx =
-                get_type_definition_by_name(db, other_module_id, fqn.module.first(), Scopes::ROOT)?;
+                get_type_definition_by_name(db, other_module_id, &fqn.name, Scopes::ROOT)?;
             Some((other_module_id, type_idx))
         }
         hir::Path::Unknown(_) => None,

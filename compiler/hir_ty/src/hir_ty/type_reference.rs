@@ -147,7 +147,7 @@ fn resolve_type_reference_path(
             let module_slug = fqn.module.iter().map(|n| n.as_str()).join("::");
             let other_module_id = db.find_module_by_slug(&*module_slug)?;
             let type_idx =
-                get_type_reference_by_name(db, other_module_id, fqn.module.first(), Scopes::ROOT)?;
+                get_type_reference_by_name(db, other_module_id, &fqn.name, Scopes::ROOT)?;
             Some((other_module_id, type_idx))
         }
         hir::Path::Unknown(_) => None,
