@@ -27,6 +27,41 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
         infer_expr_hm(&mut ctx, module_id, expression_id, expression);
     }
 
+    // Phase 1.5: Add type annotation constraints
+    // For expressions with type annotations, add equations to unify the inferred type
+    // with the annotated type. This allows annotations to guide/constrain inference.
+    for (expression_id, _expression, _range, name_op) in hir_module.expressions() {
+        if let Some((name, scope)) = name_op {
+            let fql = Fql::new(module_id, expression_id);
+            let idx = ExpressionOrPatternIdx::Expression(fql);
+
+            // Get the inferred type for this expression
+            if let Some(inferred_mono_ty) = ctx.type_env.get(&idx).cloned() {
+                // Resolve the type annotation to a ResolvedType
+                let annotated_resolved = super::super::type_reference::type_reference_to_resolved(
+                    db,
+                    module_id,
+                    &hir::Path::ThisModule {
+                        path: NonEmpty::new(name),
+                        scope,
+                    },
+                    scope,
+                );
+
+                // Convert the annotation to MonoType and add unification constraint
+                if annotated_resolved != ResolvedType::Unknown {
+                    if let Some(annotated_mono) = resolved_to_mono(&annotated_resolved, &mut ctx) {
+                        ctx.equations.push(super::TypeEquation {
+                            left: inferred_mono_ty,
+                            right: annotated_mono,
+                            source: idx,
+                        });
+                    }
+                }
+            }
+        }
+    }
+
     // Phase 2: Solve all accumulated type equations
     match solve_equations(ctx.equations.clone()) {
         Ok(substitution) => {
@@ -97,10 +132,121 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
             result
         }
         Err(_unification_error) => {
-            // If unification fails, return an empty result with errors
-            // TODO: Convert unification errors to proper type inference errors
-            HirTypedModule::empty()
+            // If unification fails, it's likely due to type annotation conflicts
+            // Check for conflicting type annotations and report them
+            let mut result = HirTypedModule::empty();
+
+            for (expression_id, _expression, range, name_op) in hir_module.expressions() {
+                if let Some((name, scope)) = name_op {
+                    let fql = Fql::new(module_id, expression_id);
+                    let idx = ExpressionOrPatternIdx::Expression(fql);
+
+                    // Get the inferred type for this expression (before unification)
+                    if let Some(inferred_mono_ty) = ctx.type_env.get(&idx) {
+                        // Resolve the type annotation
+                        let expected_type = super::super::type_reference::type_reference_to_resolved(
+                            db,
+                            module_id,
+                            &hir::Path::ThisModule {
+                                path: NonEmpty::new(name),
+                                scope,
+                            },
+                            scope,
+                        );
+
+                        // Skip if no annotation
+                        if expected_type == ResolvedType::Unknown {
+                            continue;
+                        }
+
+                        // Convert the inferred MonoType to ResolvedType (without substitution)
+                        let mut dummy_map = rustc_hash::FxHashMap::default();
+                        let mut dummy_id = 0;
+                        let found_type = mono_to_resolved_with_map(
+                            inferred_mono_ty,
+                            &mut dummy_map,
+                            &mut dummy_id,
+                        );
+
+                        // If types don't match, report an error
+                        // We do a simple check here since unification already failed
+                        if !types_could_unify(&expected_type, &found_type) {
+                            result.error(
+                                crate::diagnostics::TypeInferenceErrorKind::ConflictingTypeAnnotation {
+                                    expected: expected_type,
+                                    found: found_type,
+                                },
+                                range,
+                            );
+                        }
+                    }
+                }
+            }
+
+            result
         }
+    }
+}
+
+/// Simple check if two types could potentially unify
+/// This is used for error reporting when unification fails
+fn types_could_unify(expected: &ResolvedType, found: &ResolvedType) -> bool {
+    match (expected, found) {
+        // Unknown can unify with anything
+        (ResolvedType::Unknown, _) | (_, ResolvedType::Unknown) => true,
+        // Generics can unify with anything
+        (ResolvedType::Generic(_), _) | (_, ResolvedType::Generic(_)) => true,
+        (ResolvedType::ConstrainedGeneric { .. }, _) | (_, ResolvedType::ConstrainedGeneric { .. }) => true,
+        // Same types can unify
+        (ResolvedType::Unit, ResolvedType::Unit) => true,
+        (ResolvedType::BuiltIn(a), ResolvedType::BuiltIn(b)) => a == b,
+        (ResolvedType::TypeDef(a), ResolvedType::TypeDef(b)) => a == b,
+        // Structural types: check recursively
+        (
+            ResolvedType::Lambda { arg_type: a1, return_type: r1 },
+            ResolvedType::Lambda { arg_type: a2, return_type: r2 },
+        ) => types_could_unify(a1, a2) && types_could_unify(r1, r2),
+        (ResolvedType::Tuple(e1), ResolvedType::Tuple(e2)) => {
+            e1.len() == e2.len() && e1.iter().zip(e2.iter()).all(|(t1, t2)| types_could_unify(t1, t2))
+        }
+        // Everything else can't unify
+        _ => false,
+    }
+}
+
+/// Convert a ResolvedType to a MonoType for use in constraint generation
+/// This allows type annotations to be converted into constraints that guide inference
+fn resolved_to_mono(
+    resolved: &ResolvedType,
+    ctx: &mut HMInferenceContext,
+) -> Option<MonoType> {
+    match resolved {
+        ResolvedType::Unknown => None,
+        ResolvedType::Unit => Some(MonoType::Unit),
+        ResolvedType::BuiltIn(builtin) => Some(MonoType::Concrete(*builtin)),
+        ResolvedType::Lambda { arg_type, return_type } => {
+            let arg_mono = resolved_to_mono(arg_type, ctx)?;
+            let ret_mono = resolved_to_mono(return_type, ctx)?;
+            Some(MonoType::Function(Box::new(arg_mono), Box::new(ret_mono)))
+        }
+        ResolvedType::Tuple(elements) => {
+            let mono_elements: Option<Vec<_>> = elements
+                .iter()
+                .map(|e| resolved_to_mono(e, ctx))
+                .collect();
+            mono_elements.map(MonoType::Tuple)
+        }
+        // For Generic types in annotations, create fresh type variables
+        // This allows generic annotations to work properly
+        ResolvedType::Generic(_) => Some(ctx.fresh_type_var()),
+        // For constrained generics, create a fresh type variable
+        // TODO: Track the constraints and enforce them during solving
+        ResolvedType::ConstrainedGeneric { .. } => Some(ctx.fresh_type_var()),
+        // For TypeDef, we don't have a good representation in MonoType yet
+        // TODO: Implement proper type definition support
+        ResolvedType::TypeDef(_) => None,
+        // For Bounded types, not yet implemented
+        ResolvedType::Bounded { .. } => None,
     }
 }
 
