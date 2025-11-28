@@ -211,6 +211,8 @@ mod small_tests {
             &[(0, ResolvedType::BuiltIn(hir::BuiltInType::String))],
         );
         check("'c'", &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Char))]);
+        check("True", &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Bool))]);
+        check("False", &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Bool))]);
     }
 
     #[test]
@@ -305,6 +307,24 @@ mod small_tests {
                 },
                 TextRange::new(TextSize::from(51), TextSize::from(73)),
             )],
+        );
+    }
+
+    #[test]
+    fn type_annotation_hint_at_generic_refinement() {
+        check_named(
+            r#"
+                typeof x : String -> String
+                let x = |s| -> ""
+            "#,
+            &[(
+                "x",
+                0,
+                ResolvedType::Lambda {
+                    arg_type: Box::new(ResolvedType::BuiltIn(hir::BuiltInType::String)),
+                    return_type: Box::new(ResolvedType::BuiltIn(hir::BuiltInType::String)),
+                },
+            )]
         );
     }
 }

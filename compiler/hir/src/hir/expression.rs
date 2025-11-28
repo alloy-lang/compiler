@@ -10,6 +10,7 @@ pub enum Literal {
     Fraction(NotNan<f64>),
     String(String),
     Char(char),
+    Bool(bool),
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -164,6 +165,12 @@ fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Expressi
     let Some(path) = ctx.resolve_reference_path(&ast_path, HirReferenceType::Expression) else {
         unreachable!("parsing error")
     };
+    
+    if ast_path.text() == "True" {
+        return Expression::Literal(Literal::Bool(true));
+    } else if ast_path.text() == "False" {
+        return Expression::Literal(Literal::Bool(false));
+    }
 
     Expression::VariableRef {
         path,

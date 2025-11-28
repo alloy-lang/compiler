@@ -52,12 +52,7 @@ fn infer_literal(
     idx: ExpressionOrPatternIdx,
     lit: &hir::Literal,
 ) -> MonoType {
-    let ty = match lit {
-        hir::Literal::Int(_) => MonoType::Concrete(hir::BuiltInType::Int),
-        hir::Literal::Fraction(_) => MonoType::Concrete(hir::BuiltInType::Fraction),
-        hir::Literal::String(_) => MonoType::Concrete(hir::BuiltInType::String),
-        hir::Literal::Char(_) => MonoType::Concrete(hir::BuiltInType::Char),
-    };
+    let ty = MonoType::Concrete(hir::BuiltInType::from(lit));
     ctx.assign_type(idx, ty.clone());
     ty
 }

@@ -18,6 +18,7 @@ impl From<&Literal> for BuiltInType {
             Literal::Fraction(_) => Self::Fraction,
             Literal::String(_) => Self::String,
             Literal::Char(_) => Self::Char,
+            Literal::Bool(_) => Self::Bool,
         }
     }
 }
