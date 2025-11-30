@@ -211,8 +211,14 @@ mod small_tests {
             &[(0, ResolvedType::BuiltIn(hir::BuiltInType::String))],
         );
         check("'c'", &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Char))]);
-        check("True", &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Bool))]);
-        check("False", &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Bool))]);
+        check(
+            "True",
+            &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Bool))],
+        );
+        check(
+            "False",
+            &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Bool))],
+        );
     }
 
     #[test]
@@ -324,7 +330,7 @@ mod small_tests {
                     arg_type: Box::new(ResolvedType::BuiltIn(hir::BuiltInType::String)),
                     return_type: Box::new(ResolvedType::BuiltIn(hir::BuiltInType::String)),
                 },
-            )]
+            )],
         );
     }
 }
