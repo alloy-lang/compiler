@@ -1,0 +1,17 @@
+typedef TestType1[t] = Things t
+
+trait TestTrait1 where
+    self = #Type[_, _, _,_,_,   _,  ]
+end
+
+behavior TestTrait1 for TestType1[t] where
+    typevar t
+end
+===
+HirTypedModule {
+    expression_types: {},
+    pattern_types: {},
+    warnings: [],
+    errors: [],
+}
+[]

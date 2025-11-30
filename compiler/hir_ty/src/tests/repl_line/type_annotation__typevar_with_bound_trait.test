@@ -1,5 +1,4 @@
 import test_data::{Test, test}
-import std::functor
 
 trait TestTrait1 where
     self = #Type[_]

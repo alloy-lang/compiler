@@ -1,7 +1,6 @@
 use std::env;
 use std::path::Path;
 
-use alloy_ast as ast;
 use alloy_hir as hir;
 use alloy_workspace::{ModuleId, SourceFile, Workspace, WorkspaceDatabase};
 
@@ -40,30 +39,37 @@ impl crate::HirTyDatabase for TestHirTyDatabase {}
 #[test]
 fn source_file() {
     alloy_test_harness::run_test_dir("source_file", |path, input| {
-        run_hir_ty_test(path, input, false, false)
+        run_hir_ty_test(path, input, false, false, false)
     });
 }
 
 #[test]
 fn repl_line() {
     alloy_test_harness::run_test_dir("repl_line", |path, input| {
-        run_hir_ty_test(path, input, false, false)
+        run_hir_ty_test(path, input, false, false, false)
     });
 }
 
 // #[test]
 // fn repl_line_lowering_errors() {
 //     alloy_test_harness::run_test_dir("repl_line_lowering_errors", |path, input| {
-//         run_hir_ty_test(path, input, false, true)
+//         run_hir_ty_test(path, input, false, true, false)
 //     });
 // }
 //
 // #[test]
 // fn repl_line_parse_errors() {
 //     alloy_test_harness::run_test_dir("repl_line_parse_errors", |path, input| {
-//         run_hir_ty_test(path, input, true, false)
+//         run_hir_ty_test(path, input, true, false, false)
 //     });
 // }
+
+#[test]
+fn repl_line_type_checking_errors() {
+    alloy_test_harness::run_test_dir("repl_line_type_checking_errors", |path, input| {
+        run_hir_ty_test(path, input, false, false, true)
+    });
+}
 
 #[test]
 fn on_demand_test() {
@@ -78,7 +84,7 @@ fn on_demand_test() {
 
             let did_panic = std::panic::catch_unwind(|| {
                 alloy_test_harness::run_test_case(tests_path, |path, input| {
-                    run_hir_ty_test(path, input, false, false)
+                    run_hir_ty_test(path, input, false, false, false)
                 });
             })
             .is_err();
@@ -95,10 +101,9 @@ fn run_hir_ty_test(
     path: &Path,
     input: &str,
     expect_parse_errors: bool,
-    _expect_lowering_errors: bool,
+    expect_lowering_errors: bool,
+    expect_type_checking_errors: bool,
 ) -> String {
-    let (_, parse_errors) = ast::source_file(input);
-
     let mut db = TestHirTyDatabase::default();
     db.add_module(
         "test_data",
@@ -110,7 +115,8 @@ fn run_hir_ty_test(
     );
     let test_module_id = db.add_module("main", camino::Utf8Path::new("./test/main.alloy"), input);
 
-    let type_map = crate::type_check_module(&db, test_module_id);
+    let (hir_module, parse_errors) = hir::lower_file(&db, test_module_id);
+    let typed_module = crate::type_check_module(&db, test_module_id);
 
     let file_name = path.to_str().expect("Expected filename");
     if expect_parse_errors {
@@ -126,21 +132,46 @@ fn run_hir_ty_test(
             file_name
         );
     }
-    // if expect_lowering_errors {
-    //     assert!(
-    //         !module.errors().is_empty() || !module.warnings().is_empty(),
-    //         "file '{}' did not contain lowering errors or warnings",
-    //         file_name
-    //     );
-    // } else {
-    //     assert!(
-    //         module.errors().is_empty(),
-    //         "file '{file_name}' contained lowering errors: {:?}",
-    //         module.errors(),
-    //     );
-    // }
+    if expect_lowering_errors {
+        assert!(
+            !hir_module.errors().is_empty() || !hir_module.warnings().is_empty(),
+            "file '{}' did not contain lowering errors or warnings",
+            file_name
+        );
+    } else {
+        assert!(
+            hir_module.errors().is_empty(),
+            "file '{file_name}' contained lowering errors: {:?}",
+            hir_module.errors(),
+        );
+        // TODO: decide if we want to fail tests on warnings
+        // assert!(
+        //     hir_module.warnings().is_empty(),
+        //     "file '{file_name}' contained lowering warnings: {:?}",
+        //     hir_module.warnings(),
+        // );
+    }
+    if expect_type_checking_errors {
+        assert!(
+            !typed_module.errors().is_empty() || !typed_module.warnings().is_empty(),
+            "file '{}' did not contain lowering errors or warnings",
+            file_name
+        );
+    } else {
+        assert!(
+            typed_module.errors().is_empty(),
+            "file '{file_name}' contained type checking errors: {:?}",
+            typed_module.errors(),
+        );
+        // TODO: decide if we want to fail tests on warnings
+        // assert!(
+        //     typed_module.warnings().is_empty(),
+        //     "file '{file_name}' contained type checking warnings: {:?}",
+        //     typed_module.warnings(),
+        // );
+    }
 
-    format!("{type_map:#?}\n{parse_errors:#?}")
+    format!("{typed_module:#?}\n{parse_errors:#?}")
 }
 
 // TODO: continue fixing lowering errors in std lib
