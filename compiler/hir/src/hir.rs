@@ -351,6 +351,7 @@ pub enum LoweringWarningKind {
 }
 
 struct LoweringCtx<'db> {
+    #[allow(dead_code)]
     db: &'db dyn HirDatabase,
     glossary: AstGlossary,
     imports: Index<Import>,
