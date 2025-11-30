@@ -122,8 +122,20 @@ fn resolve_type_reference(
         hir::TypeReference::ParenthesizedType(inner) => {
             resolve_type_reference(db, current_module_id, *inner, scope, ctx)
         }
-        hir::TypeReference::Bounded { base: _, args: _ } => {
-            todo!("Handle bounded types properly")
+        hir::TypeReference::Bounded { base, args } => {
+            // Resolve the base type (e.g., List, Option, Test)
+            let base_resolved = resolve_type_reference(db, current_module_id, *base, scope, ctx);
+
+            // Resolve each type argument
+            let args_resolved: Vec<_> = args
+                .iter()
+                .map(|arg| resolve_type_reference(db, current_module_id, *arg, scope, ctx))
+                .collect();
+
+            ResolvedType::Bounded {
+                base: Box::new(base_resolved),
+                args: args_resolved,
+            }
         }
     }
 }

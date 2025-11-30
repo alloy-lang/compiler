@@ -109,6 +109,33 @@ fn check_type_compatibility(
             Ok(())
         }
 
+        // Bounded types - check base type and all arguments
+        (
+            ResolvedType::Bounded {
+                base: exp_base,
+                args: exp_args,
+            },
+            ResolvedType::Bounded {
+                base: found_base,
+                args: found_args,
+            },
+        ) => {
+            // Check that bases are compatible
+            check_type_compatibility(db, exp_base, found_base)?;
+
+            // Check argument counts match
+            if exp_args.len() != found_args.len() {
+                return Err(TypeError::Incompatible);
+            }
+
+            // Check all type arguments are compatible
+            for (exp_arg, found_arg) in exp_args.iter().zip(found_args.iter()) {
+                check_type_compatibility(db, exp_arg, found_arg)?;
+            }
+
+            Ok(())
+        }
+
         // Everything else is incompatible
         _ => Err(TypeError::Incompatible),
     }

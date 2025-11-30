@@ -221,6 +221,18 @@ fn types_could_unify(expected: &ResolvedType, found: &ResolvedType) -> bool {
                     .zip(e2.iter())
                     .all(|(t1, t2)| types_could_unify(t1, t2))
         }
+        // Bounded types: check base and args
+        (
+            ResolvedType::Bounded { base: b1, args: a1 },
+            ResolvedType::Bounded { base: b2, args: a2 },
+        ) => {
+            types_could_unify(b1, b2)
+                && a1.len() == a2.len()
+                && a1
+                    .iter()
+                    .zip(a2.iter())
+                    .all(|(t1, t2)| types_could_unify(t1, t2))
+        }
         // Everything else can't unify
         _ => false,
     }
@@ -255,8 +267,24 @@ fn resolved_to_mono(resolved: &ResolvedType, ctx: &mut HMInferenceContext) -> Op
         // For TypeDef, we don't have a good representation in MonoType yet
         // TODO: Implement proper type definition support
         ResolvedType::TypeDef(_) => None,
-        // For Bounded types, not yet implemented
-        ResolvedType::Bounded { .. } => None,
+        // For Bounded types, we need to convert the base and args
+        ResolvedType::Bounded { base, args } => {
+            // Try to resolve the base to a type constructor reference
+            // For now, we'll handle the case where base is a TypeDef
+            if let ResolvedType::TypeDef(type_fql) = base.as_ref() {
+                // Convert the base TypeDef to a type reference Fql
+                let (hir_module, _) = hir::lower_file(ctx.db, type_fql.module_id);
+                let type_def = hir_module.get_type_definition(type_fql.local_id);
+
+                // Try to find the type reference for this type definition
+                // This is a bit tricky - we need to construct an Fql<hir::TypeReference>
+                // For now, we'll return None and handle this case later
+                // TODO: Improve bounded type handling in MonoType conversion
+                None
+            } else {
+                None
+            }
+        }
     }
 }
 

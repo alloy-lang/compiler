@@ -134,6 +134,11 @@ fn run_hir_test(
             "file '{file_name}' contained lowering errors: {:#?}",
             module.errors(),
         );
+        assert!(
+            module.warnings().is_empty(),
+            "file '{file_name}' contained lowering warnings: {:#?}",
+            module.warnings(),
+        );
     }
 
     format!("{:#?}\n{parse_errors:#?}", module)
