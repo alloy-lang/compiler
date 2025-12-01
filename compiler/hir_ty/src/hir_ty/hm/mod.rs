@@ -42,13 +42,16 @@ pub enum MonoType {
     Var(TypeVarId),
     /// Built-in concrete type (e.g., `Int`, `String`)
     Concrete(hir::BuiltInType),
+    /// User-defined type constructor (e.g., `List`, `Option`, `MyType`)
+    TypeDef(Fql<hir::TypeDefinition>),
     /// Function type (e.g., `a -> b`)
     Function(Box<MonoType>, Box<MonoType>),
     /// Tuple type (e.g., `(a, b, c)`)
     Tuple(Vec<MonoType>),
-    /// Type application (e.g., `List a`, `Option Int`)
+    /// Type application (e.g., `List[Int]`, `Option[String]`)
+    /// The constructor is typically a TypeDef, but can be any MonoType
     App {
-        constructor: Fql<hir::TypeReference>,
+        constructor: Box<MonoType>,
         args: Vec<MonoType>,
     },
     /// Unit type
@@ -62,6 +65,9 @@ impl std::fmt::Display for MonoType {
             MonoType::Missing => write!(f, "<missing>"),
             MonoType::Var(var) => write!(f, "t{}", var.0),
             MonoType::Concrete(builtin) => write!(f, "{builtin:?}"),
+            MonoType::TypeDef(type_fql) => {
+                write!(f, "TypeDef({})", type_fql.local_id.into_raw())
+            }
             MonoType::Function(arg, ret) => {
                 // Add parentheses if arg is also a function
                 match arg.as_ref() {
@@ -80,7 +86,7 @@ impl std::fmt::Display for MonoType {
                 write!(f, ")")
             }
             MonoType::App { constructor, args } => {
-                write!(f, "TypeRef({})", constructor.local_id.into_raw())?;
+                write!(f, "{}", constructor)?;
                 if !args.is_empty() {
                     write!(f, "[")?;
                     for (i, arg) in args.iter().enumerate() {
@@ -168,12 +174,13 @@ fn collect_free_vars(ty: &MonoType, vars: &mut rustc_hash::FxHashSet<TypeVarId>)
                 collect_free_vars(t, vars);
             }
         }
-        MonoType::App { args, .. } => {
+        MonoType::App { constructor, args } => {
+            collect_free_vars(constructor, vars);
             for t in args {
                 collect_free_vars(t, vars);
             }
         }
-        MonoType::Concrete(_) | MonoType::Unit => {}
+        MonoType::Concrete(_) | MonoType::TypeDef(_) | MonoType::Unit => {}
     }
 }
 

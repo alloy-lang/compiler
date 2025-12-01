@@ -46,10 +46,10 @@ impl Substitution {
             }
             MonoType::Tuple(tys) => MonoType::Tuple(tys.iter().map(|t| self.apply(t)).collect()),
             MonoType::App { constructor, args } => MonoType::App {
-                constructor: constructor.clone(),
+                constructor: Box::new(self.apply(constructor)),
                 args: args.iter().map(|t| self.apply(t)).collect(),
             },
-            MonoType::Concrete(_) | MonoType::Unit => ty.clone(),
+            MonoType::Concrete(_) | MonoType::TypeDef(_) | MonoType::Unit => ty.clone(),
         }
     }
 
@@ -123,8 +123,10 @@ fn unify_types(t1: &MonoType, t2: &MonoType) -> Result<Substitution, Unification
                 constructor: c2,
                 args: args2,
             },
-        ) if c1 == c2 && args1.len() == args2.len() => {
-            let mut subst = Substitution::new();
+        ) if args1.len() == args2.len() => {
+            // First unify the constructors
+            let mut subst = unify_types(c1, c2)?;
+            // Then unify the arguments
             for (t1, t2) in args1.iter().zip(args2.iter()) {
                 let t1_subst = subst.apply(t1);
                 let t2_subst = subst.apply(t2);
@@ -132,6 +134,11 @@ fn unify_types(t1: &MonoType, t2: &MonoType) -> Result<Substitution, Unification
                 subst = subst.compose(&new_subst);
             }
             Ok(subst)
+        }
+
+        // Type definitions
+        (MonoType::TypeDef(fql1), MonoType::TypeDef(fql2)) if fql1 == fql2 => {
+            Ok(Substitution::new())
         }
 
         // Concrete types
@@ -153,8 +160,10 @@ fn occurs(var: TypeVarId, ty: &MonoType) -> bool {
         MonoType::Var(v) => *v == var,
         MonoType::Function(arg, ret) => occurs(var, arg) || occurs(var, ret),
         MonoType::Tuple(tys) => tys.iter().any(|t| occurs(var, t)),
-        MonoType::App { args, .. } => args.iter().any(|t| occurs(var, t)),
-        MonoType::Concrete(_) | MonoType::Unit => false,
+        MonoType::App { constructor, args } => {
+            occurs(var, constructor) || args.iter().any(|t| occurs(var, t))
+        }
+        MonoType::Concrete(_) | MonoType::TypeDef(_) | MonoType::Unit => false,
     }
 }
 

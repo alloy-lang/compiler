@@ -5,7 +5,6 @@ use alloy_hir as hir;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
-use text_size::TextRange;
 
 use super::super::{check_type_annotation, ExpressionOrPatternIdx, Fql, ResolvedType};
 use super::constraint_gen::infer_expr_hm;
@@ -139,26 +138,17 @@ fn resolved_to_mono(resolved: &ResolvedType, ctx: &mut HMInferenceContext) -> Op
         // For constrained generics, create a fresh type variable
         // TODO: Track the constraints and enforce them during solving
         ResolvedType::ConstrainedGeneric { .. } => Some(ctx.fresh_type_var()),
-        // For TypeDef, we don't have a good representation in MonoType yet
-        // TODO: Implement proper type definition support
-        ResolvedType::TypeDef(_) => None,
-        // For Bounded types, we need to convert the base and args
+        // Convert TypeDef to MonoType::TypeDef
+        ResolvedType::TypeDef(type_fql) => Some(MonoType::TypeDef(type_fql.clone())),
+        // For Bounded types, convert to MonoType::App
         ResolvedType::Bounded { base, args } => {
-            // Try to resolve the base to a type constructor reference
-            // For now, we'll handle the case where base is a TypeDef
-            if let ResolvedType::TypeDef(type_fql) = base.as_ref() {
-                // Convert the base TypeDef to a type reference Fql
-                let (hir_module, _) = hir::lower_file(ctx.db, type_fql.module_id);
-                let type_def = hir_module.get_type_definition(type_fql.local_id);
-
-                // Try to find the type reference for this type definition
-                // This is a bit tricky - we need to construct an Fql<hir::TypeReference>
-                // For now, we'll return None and handle this case later
-                // TODO: Improve bounded type handling in MonoType conversion
-                None
-            } else {
-                None
-            }
+            let base_mono = resolved_to_mono(base, ctx)?;
+            let args_mono: Option<Vec<_>> = args.iter().map(|a| resolved_to_mono(a, ctx)).collect();
+            let args_mono = args_mono?;
+            Some(MonoType::App {
+                constructor: Box::new(base_mono),
+                args: args_mono,
+            })
         }
     }
 }
@@ -211,12 +201,17 @@ fn mono_to_resolved_with_map(
                 ResolvedType::Tuple(NonEmpty::from((first, rest)))
             }
         }
-        MonoType::App {
-            constructor: _,
-            args: _,
-        } => {
-            // TODO: Implement proper type application handling
-            ResolvedType::TODO
+        MonoType::TypeDef(type_fql) => ResolvedType::TypeDef(type_fql.clone()),
+        MonoType::App { constructor, args } => {
+            let base = mono_to_resolved_with_map(constructor, type_var_map, next_generic_id);
+            let resolved_args: Vec<_> = args
+                .iter()
+                .map(|a| mono_to_resolved_with_map(a, type_var_map, next_generic_id))
+                .collect();
+            ResolvedType::Bounded {
+                base: Box::new(base),
+                args: resolved_args,
+            }
         }
         MonoType::Unit => ResolvedType::Unit,
     }
