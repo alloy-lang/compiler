@@ -82,7 +82,7 @@ HirTypedModule {
                     },
                 },
             },
-            range: 185..215,
+            range: 165..195,
         },
     ],
 }

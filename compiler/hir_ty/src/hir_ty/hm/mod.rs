@@ -13,7 +13,7 @@ use super::{ExpressionOrPatternIdx, Fql};
 
 mod constraint_gen;
 mod inference;
-mod unification;
+pub mod unification;
 
 pub use inference::infer_types_hm;
 
@@ -30,6 +30,8 @@ impl TypeVarId {
 /// Monomorphic types (no quantification)
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MonoType {
+    Unconstrained,
+    Missing,
     /// Type variable (e.g., `a`, `b`)
     Var(TypeVarId),
     /// Built-in concrete type (e.g., `Int`, `String`)
@@ -103,6 +105,8 @@ pub(super) fn free_type_vars(ty: &MonoType) -> Vec<TypeVarId> {
 
 fn collect_free_vars(ty: &MonoType, vars: &mut rustc_hash::FxHashSet<TypeVarId>) {
     match ty {
+        MonoType::Unconstrained => {}
+        MonoType::Missing => {}
         MonoType::Var(v) => {
             vars.insert(*v);
         }
@@ -187,6 +191,7 @@ impl<'db> HMInferenceContext<'db> {
 
     /// Assign a type to an expression or pattern
     pub(super) fn assign_type(&mut self, id: ExpressionOrPatternIdx, ty: MonoType) {
+        println!("Assigning type {:?} to {:?}", ty, id);
         self.type_env.insert(id, ty);
     }
 
@@ -197,6 +202,7 @@ impl<'db> HMInferenceContext<'db> {
         right: MonoType,
         source: ExpressionOrPatternIdx,
     ) {
+        println!("Adding equation {:?} = {:?} at {:?}", left, right, source);
         self.equations.push(TypeEquation {
             left,
             right,

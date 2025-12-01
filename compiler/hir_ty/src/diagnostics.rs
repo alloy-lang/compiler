@@ -20,6 +20,7 @@ pub enum TypeInferenceErrorKind {
         expected: ResolvedType,
         found: ResolvedType,
     },
+    UnificationError(crate::hir_ty::UnificationError),
 }
 
 #[derive(Debug, Clone, PartialEq)]

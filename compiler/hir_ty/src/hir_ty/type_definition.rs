@@ -12,14 +12,10 @@ pub fn type_definition_to_resolved(
     path: &hir::Path,
     scope: ScopeIdx,
     ctx: &mut super::type_reference::TypeResolutionContext,
-) -> ResolvedType {
-    if let Some((resolved_module_id, type_idx)) =
-        resolve_type_definition_path(db, current_module_id, path, scope)
-    {
-        return resolve_type_definition(db, resolved_module_id, type_idx, ctx);
-    };
-
-    ResolvedType::Unknown
+) -> Option<ResolvedType> {
+    let (resolved_module_id, type_idx) =
+        resolve_type_definition_path(db, current_module_id, path, scope)?;
+    resolve_type_definition(db, resolved_module_id, type_idx, ctx)
 }
 
 fn resolve_type_definition(
@@ -27,12 +23,12 @@ fn resolve_type_definition(
     current_module_id: ModuleId,
     type_idx: hir::TypeDefinitionIdx,
     ctx: &mut super::type_reference::TypeResolutionContext,
-) -> ResolvedType {
+) -> Option<ResolvedType> {
     let (hir_module, _) = hir::lower_file(db, current_module_id);
     let hir::TypeDefinition { name: _, kind } = hir_module.get_type_definition(type_idx);
 
-    match kind {
-        hir::TypeDefinitionKind::Missing => ResolvedType::Unknown,
+    let ty = match kind {
+        hir::TypeDefinitionKind::Missing => ResolvedType::Missing,
         hir::TypeDefinitionKind::TypeVariable(type_var) => {
             // Assign a consistent Generic ID for this type variable
             let generic_id = ctx.get_or_assign_id(type_idx);
@@ -82,7 +78,9 @@ fn resolve_type_definition(
             // Return a TypeDef pointing to this type definition
             ResolvedType::TypeDef(Fql::new(current_module_id, type_idx))
         }
-    }
+    };
+
+    Some(ty)
 }
 
 // todo: make this return a Fql<hir::Trait>

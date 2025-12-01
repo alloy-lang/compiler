@@ -208,8 +208,16 @@ impl HirModule {
         self.expressions.get(idx)
     }
 
+    pub fn get_expression_range(&self, idx: ExpressionIdx) -> TextRange {
+        self.expressions.get_range(idx)
+    }
+
     pub fn get_pattern(&self, idx: PatternIdx) -> &Pattern {
         self.patterns.get(idx)
+    }
+
+    pub fn get_pattern_range(&self, idx: PatternIdx) -> TextRange {
+        self.patterns.get_range(idx)
     }
 
     pub fn get_type_reference(&self, idx: TypeIdx) -> &TypeReference {

@@ -96,60 +96,6 @@ HirTypedModule {
         ),
     },
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: ConflictingTypeAnnotation {
-                expected: Lambda {
-                    arg_type: Lambda {
-                        arg_type: Generic(
-                            0,
-                        ),
-                        return_type: Generic(
-                            1,
-                        ),
-                    },
-                    return_type: Lambda {
-                        arg_type: Generic(
-                            0,
-                        ),
-                        return_type: Lambda {
-                            arg_type: Generic(
-                                0,
-                            ),
-                            return_type: Unknown,
-                        },
-                    },
-                },
-                found: Lambda {
-                    arg_type: Generic(
-                        4,
-                    ),
-                    return_type: Lambda {
-                        arg_type: Generic(
-                            2,
-                        ),
-                        return_type: Lambda {
-                            arg_type: Generic(
-                                3,
-                            ),
-                            return_type: Tuple(
-                                NonEmpty(
-                                    [
-                                        Generic(
-                                            0,
-                                        ),
-                                        Generic(
-                                            1,
-                                        ),
-                                    ],
-                                ),
-                            ),
-                        },
-                    },
-                },
-            },
-            range: 198..268,
-        },
-    ],
+    errors: [],
 }
 []

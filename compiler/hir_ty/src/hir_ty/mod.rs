@@ -7,6 +7,9 @@ use alloy_workspace::ModuleId;
 use la_arena::Idx;
 use non_empty_vec::NonEmpty;
 use std::hash::Hash;
+mod hm;
+pub use hm::infer_types_hm;
+pub(super) use hm::unification::UnificationError;
 
 // Re-export type annotation checking function for use by other modules
 pub(super) use type_annotation_check::check_type_annotation;
@@ -43,13 +46,6 @@ impl<T> Hash for Fql<T> {
 }
 
 // ============================================================================
-// Hindley-Milner Type System
-// ============================================================================
-
-mod hm;
-pub use hm::infer_types_hm;
-
-// ============================================================================
 // Shared Types
 // ============================================================================
 
@@ -60,13 +56,30 @@ pub(super) enum ExpressionOrPatternIdx {
     Pattern(Fql<hir::Pattern>),
 }
 
+impl ExpressionOrPatternIdx {
+    pub fn module_id(&self) -> ModuleId {
+        match self {
+            ExpressionOrPatternIdx::Expression(fql) => fql.module_id,
+            ExpressionOrPatternIdx::Pattern(fql) => fql.module_id,
+        }
+    }
+}
+
 // ============================================================================
 // Type Resolution and Checking
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ResolvedType {
-    Unknown,
+    /// Used when no type annotation is present (sentinel value)
+    /// This allows type checking to be skipped for unannotated expressions
+    UnknownReference(Fql<hir::TypeReference>),
+    /// Explicitly unconstrained type - can match anything (from TypeReference::Unconstrained)
+    /// This is used in the AST when a type annotation explicitly says "any type is fine"
+    Unconstrained,
+    /// Missing type - indicates a syntax error or missing type definition
+    /// Used when TypeReference::Missing or TypeDefinitionKind::Missing is encountered
+    Missing,
     Unit,
     /// User-defined type (nominal typing)
     /// Two TypeDefs are equal iff they point to the same type definition
@@ -91,4 +104,7 @@ pub enum ResolvedType {
         id: usize,
         constraints: NonEmpty<Fql<hir::Trait>>,
     },
+    /// Placeholder for unimplemented type system features
+    /// Used for TypeReference::SelfRef, MonoType::App, and other TODO cases
+    TODO,
 }

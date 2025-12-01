@@ -2,25 +2,17 @@ import test_data::test
 import std::bool::Bool::{True, False}
 
 match test when
-  | True 0
-  | False -> 1
+  \ True 0
+  \ False -> 1
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Generic(
-            0,
+        Idx::<Expression>(0): BuiltIn(
+            Bool,
         ),
         Idx::<Expression>(2): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(4): Lambda {
-            arg_type: Generic(
-                1,
-            ),
-            return_type: BuiltIn(
-                Int,
-            ),
-        },
         Idx::<Expression>(1): BuiltIn(
             Int,
         ),
@@ -29,11 +21,11 @@ HirTypedModule {
         ),
     },
     pattern_types: {
-        Idx::<Pattern>(0): Generic(
-            0,
+        Idx::<Pattern>(0): BuiltIn(
+            Bool,
         ),
-        Idx::<Pattern>(1): Generic(
-            1,
+        Idx::<Pattern>(1): BuiltIn(
+            Bool,
         ),
     },
     warnings: [],
@@ -42,30 +34,11 @@ HirTypedModule {
 [
     ParseError {
         expected: [
-            Backslash,
-        ],
-        kind: Unexpected {
-            found: Pipe,
-            range: 80..81,
-        },
-        context: MatchTargetPipe,
-    },
-    ParseError {
-        expected: [
             RightArrow,
         ],
         kind: Missing {
             offset: 87,
         },
         context: MatchTargetRightArrow,
-    },
-    ParseError {
-        expected: [
-            Pipe,
-        ],
-        kind: Missing {
-            offset: 99,
-        },
-        context: LambdaArgPipe,
     },
 ]

@@ -43,6 +43,10 @@ impl HirTypedModule {
         self.errors.push(TypeInferenceError::new(kind, range));
     }
 
+    fn push_error(&mut self, err: TypeInferenceError) {
+        self.errors.push(err);
+    }
+
     fn warnings(&self) -> &[TypeInferenceWarning] {
         &self.warnings
     }
@@ -217,6 +221,10 @@ mod small_tests {
         );
         check(
             "False",
+            &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Bool))],
+        );
+        check(
+            "let test = True",
             &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Bool))],
         );
     }

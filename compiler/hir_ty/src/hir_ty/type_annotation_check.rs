@@ -21,7 +21,7 @@ pub fn check_type_annotation(
 ) {
     // Check for type annotation conflicts
     if let Some((name, scope)) = name_op {
-        let expected_type = super::type_reference::type_reference_to_resolved(
+        let Some(expected_type) = super::type_reference::type_reference_to_resolved(
             db,
             current_module_id,
             &hir::Path::ThisModule {
@@ -29,12 +29,10 @@ pub fn check_type_annotation(
                 scope,
             },
             scope,
-        );
-
-        // Skip check if the expected type is Unknown (no annotation)
-        if expected_type == ResolvedType::Unknown {
+        ) else {
+            // Unable to resolve type annotation - skip check
             return;
-        }
+        };
 
         // Check if the inferred type is compatible with the expected type
         if let Err(_error) = check_type_compatibility(db, &expected_type, &resolved_type) {
@@ -61,7 +59,10 @@ fn check_type_compatibility(
 ) -> Result<(), TypeError> {
     match (expected, found) {
         // Exact matches
-        (ResolvedType::Unknown, _) | (_, ResolvedType::Unknown) => Ok(()),
+        (ResolvedType::UnknownReference(_), _) | (_, ResolvedType::UnknownReference(_)) => Ok(()),
+        (ResolvedType::Unconstrained, _) | (_, ResolvedType::Unconstrained) => Ok(()),
+        (ResolvedType::Missing, _) | (_, ResolvedType::Missing) => Err(TypeError::Incompatible),
+        (ResolvedType::TODO, _) | (_, ResolvedType::TODO) => Err(TypeError::Incompatible),
         (ResolvedType::Unit, ResolvedType::Unit) => Ok(()),
         (ResolvedType::BuiltIn(a), ResolvedType::BuiltIn(b)) if a == b => Ok(()),
         (ResolvedType::TypeDef(a), ResolvedType::TypeDef(b)) if a == b => Ok(()),

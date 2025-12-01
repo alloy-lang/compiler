@@ -1,8 +1,11 @@
 //! Type unification algorithm with occurs check
 
-use rustc_hash::FxHashMap;
-
 use super::{MonoType, TypeEquation, TypeVarId};
+use crate::diagnostics::TypeInferenceError;
+use crate::{diagnostics, HirTyDatabase};
+use alloy_hir as hir;
+use diagnostics::TypeInferenceErrorKind;
+use rustc_hash::FxHashMap;
 
 /// Substitution mapping type variables to types
 #[derive(Debug, Clone)]
@@ -26,7 +29,10 @@ impl Substitution {
     }
 
     pub(super) fn apply(&self, ty: &MonoType) -> MonoType {
+        println!("Applying substitution to {:?}", ty);
         match ty {
+            MonoType::Unconstrained => MonoType::Unconstrained,
+            MonoType::Missing => MonoType::Missing,
             MonoType::Var(v) => {
                 if let Some(substituted) = self.get(*v) {
                     // Recursively apply in case the substitution contains more variables
@@ -69,8 +75,10 @@ impl Substitution {
 
 /// Unification algorithm with occurs check
 fn unify_types(t1: &MonoType, t2: &MonoType) -> Result<Substitution, UnificationError> {
+    println!("Unifying {:?} with {:?}", t1, t2);
     match (t1, t2) {
         // Same type variable
+        (MonoType::Unconstrained, _) | (_, MonoType::Unconstrained) => Ok(Substitution::new()),
         (MonoType::Var(v1), MonoType::Var(v2)) if v1 == v2 => Ok(Substitution::new()),
 
         // Bind type variable to type
@@ -140,6 +148,8 @@ fn unify_types(t1: &MonoType, t2: &MonoType) -> Result<Substitution, Unification
 /// Check if a type variable occurs in a type (prevents infinite types)
 fn occurs(var: TypeVarId, ty: &MonoType) -> bool {
     match ty {
+        MonoType::Unconstrained => false,
+        MonoType::Missing => false,
         MonoType::Var(v) => *v == var,
         MonoType::Function(arg, ret) => occurs(var, arg) || occurs(var, ret),
         MonoType::Tuple(tys) => tys.iter().any(|t| occurs(var, t)),
@@ -158,16 +168,37 @@ pub enum UnificationError {
 
 /// Solve a list of type equations
 pub(super) fn solve_equations(
+    db: &dyn HirTyDatabase,
     equations: Vec<TypeEquation>,
-) -> Result<Substitution, UnificationError> {
+) -> (Substitution, Vec<TypeInferenceError>) {
     let mut subst = Substitution::new();
+    let mut unification_errors = Vec::new();
 
     for equation in equations {
         let left = subst.apply(&equation.left);
         let right = subst.apply(&equation.right);
-        let new_subst = unify_types(&left, &right)?;
-        subst = subst.compose(&new_subst);
+        match unify_types(&left, &right) {
+            Ok(new_subst) => {
+                subst = subst.compose(&new_subst);
+            }
+            Err(err) => {
+                let (hir_module, _) = hir::lower_file(db, equation.source.module_id());
+                let range = match equation.source {
+                    super::ExpressionOrPatternIdx::Expression(fql) => {
+                        hir_module.get_expression_range(fql.local_id)
+                    }
+                    super::ExpressionOrPatternIdx::Pattern(fql) => {
+                        hir_module.get_pattern_range(fql.local_id)
+                    }
+                };
+
+                unification_errors.push(TypeInferenceError::new(
+                    TypeInferenceErrorKind::UnificationError(err),
+                    range,
+                ));
+            }
+        };
     }
 
-    Ok(subst)
+    (subst, unification_errors)
 }

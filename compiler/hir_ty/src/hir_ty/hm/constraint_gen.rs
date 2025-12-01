@@ -52,12 +52,14 @@ fn infer_literal(
     idx: ExpressionOrPatternIdx,
     lit: &hir::Literal,
 ) -> MonoType {
+    println!("infer_literal");
     let ty = MonoType::Concrete(hir::BuiltInType::from(lit));
     ctx.assign_type(idx, ty.clone());
     ty
 }
 
 fn infer_unit(ctx: &mut HMInferenceContext, idx: ExpressionOrPatternIdx) -> MonoType {
+    println!("infer_unit");
     let ty = MonoType::Unit;
     ctx.assign_type(idx, ty.clone());
     ty
@@ -70,6 +72,7 @@ fn infer_variable_ref(
     path: &hir::Path,
     scope: ScopeIdx,
 ) -> MonoType {
+    println!("infer_variable_ref");
     let (hir_module, _) = hir::lower_file(ctx.db, module_id);
 
     // Extract the last name from the path
@@ -77,14 +80,14 @@ fn infer_variable_ref(
         hir::Path::ThisModule {
             path: names,
             scope: _,
-        }
-        | hir::Path::Unknown(names) => names.last(),
+        } => names.last(),
         hir::Path::OtherModule(_) => {
-            // For now, use a fresh type variable for cross-module references
+            // TODO: For now, use a fresh type variable for cross-module references
             let ty = ctx.fresh_type_var();
             ctx.assign_type(idx, ty.clone());
             return ty;
         }
+        hir::Path::Unknown(_) => return infer_missing_expr(ctx, idx),
     };
 
     // Try to find as an expression first
@@ -132,6 +135,7 @@ fn infer_variable_ref(
         // Variable not found in scope, create fresh type variable
         let ty = ctx.fresh_type_var();
         ctx.assign_type(idx, ty.clone());
+        panic!("variable ref {:?} not found in scope", name);
         ty
     }
 }
@@ -143,6 +147,7 @@ fn infer_lambda(
     args: &[hir::PatternIdx],
     body: hir::ExpressionIdx,
 ) -> MonoType {
+    println!("infer_lambda");
     // Each lambda parameter gets a fresh type variable
     let (hir_module, _) = hir::lower_file(ctx.db, module_id);
 
@@ -175,6 +180,7 @@ fn infer_function_call(
     scope: ScopeIdx,
     args: &[hir::ExpressionIdx],
 ) -> MonoType {
+    println!("infer_function_call");
     // Infer the target function
     let (hir_module, _) = hir::lower_file(ctx.db, module_id);
 
@@ -183,8 +189,7 @@ fn infer_function_call(
         hir::Path::ThisModule {
             path: names,
             scope: _,
-        }
-        | hir::Path::Unknown(names) => names.last(),
+        } => names.last(),
         hir::Path::OtherModule(_) => {
             // For cross-module references, create a fresh function type
             let (hir_module, _) = hir::lower_file(ctx.db, module_id);
@@ -200,6 +205,7 @@ fn infer_function_call(
             ctx.assign_type(idx, result_ty.clone());
             return result_ty;
         }
+        hir::Path::Unknown(_) => return MonoType::Missing,
     };
 
     let func_ty = if let Some((func_id, _)) = hir_module.get_expression_by_name(name, scope) {
@@ -238,6 +244,7 @@ fn infer_binary(
     lhs: hir::ExpressionIdx,
     rhs: hir::ExpressionIdx,
 ) -> MonoType {
+    println!("infer_binary");
     let (hir_module, _) = hir::lower_file(ctx.db, module_id);
 
     let lhs_expr = hir_module.get_expression(lhs);
@@ -260,6 +267,7 @@ fn infer_tuple_expr(
     idx: ExpressionOrPatternIdx,
     elements: &non_empty_vec::NonEmpty<hir::ExpressionIdx>,
 ) -> MonoType {
+    println!("infer_tuple_expr");
     let (hir_module, _) = hir::lower_file(ctx.db, module_id);
 
     let mut element_types = Vec::new();
@@ -282,6 +290,7 @@ fn infer_if_then_else(
     then_branch: hir::ExpressionIdx,
     else_branch: hir::ExpressionIdx,
 ) -> MonoType {
+    println!("infer_if_then_else");
     let (hir_module, _) = hir::lower_file(ctx.db, module_id);
 
     // Infer condition type and constrain it to Bool
@@ -314,6 +323,7 @@ fn infer_unary(
     idx: ExpressionOrPatternIdx,
     expression: hir::ExpressionIdx,
 ) -> MonoType {
+    println!("infer_unary");
     let (hir_module, _) = hir::lower_file(ctx.db, module_id);
 
     // For unary operations, infer the inner expression type
@@ -332,6 +342,7 @@ fn infer_match(
     condition: hir::ExpressionIdx,
     targets: &[(hir::PatternIdx, hir::ExpressionIdx)],
 ) -> MonoType {
+    println!("infer_match");
     let (hir_module, _) = hir::lower_file(ctx.db, module_id);
 
     // Infer the scrutinee type
@@ -345,12 +356,20 @@ fn infer_match(
         // Pattern must match the scrutinee type
         let pattern = hir_module.get_pattern(*pattern_id);
         let pattern_ty = infer_pattern_hm(ctx, module_id, *pattern_id, pattern);
-        ctx.add_equation(pattern_ty, value_ty.clone(), idx.clone());
+        ctx.add_equation(
+            pattern_ty,
+            value_ty.clone(),
+            ExpressionOrPatternIdx::Pattern(Fql::new(module_id, *pattern_id)),
+        );
 
         // Body must have the same type as other arms
         let body_expr = hir_module.get_expression(*body_id);
         let body_ty = infer_expr_hm(ctx, module_id, *body_id, body_expr);
-        ctx.add_equation(body_ty, result_ty.clone(), idx.clone());
+        ctx.add_equation(
+            body_ty,
+            result_ty.clone(),
+            ExpressionOrPatternIdx::Expression(Fql::new(module_id, *body_id)),
+        );
     }
 
     ctx.assign_type(idx, result_ty.clone());
@@ -358,6 +377,7 @@ fn infer_match(
 }
 
 fn infer_missing_expr(ctx: &mut HMInferenceContext, idx: ExpressionOrPatternIdx) -> MonoType {
+    println!("infer_missing_expr");
     // Missing expressions get a fresh type variable
     let ty = ctx.fresh_type_var();
     ctx.assign_type(idx, ty.clone());
@@ -371,6 +391,7 @@ pub(super) fn infer_pattern_hm(
     pattern_id: hir::PatternIdx,
     pattern: &hir::Pattern,
 ) -> MonoType {
+    println!("infer_pattern_hm");
     let fql = Fql::new(module_id, pattern_id);
     let idx = ExpressionOrPatternIdx::Pattern(fql);
 
@@ -396,6 +417,7 @@ fn infer_variable_declaration(
     ctx: &mut HMInferenceContext,
     idx: ExpressionOrPatternIdx,
 ) -> MonoType {
+    println!("infer_variable_declaration");
     // Fresh type variable for the bound variable
     let ty = ctx.fresh_type_var();
     ctx.assign_type(idx, ty.clone());
@@ -408,6 +430,7 @@ fn infer_tuple_pattern(
     idx: ExpressionOrPatternIdx,
     elements: &non_empty_vec::NonEmpty<hir::PatternIdx>,
 ) -> MonoType {
+    println!("infer_tuple_pattern");
     let (hir_module, _) = hir::lower_file(ctx.db, module_id);
 
     let mut element_types = Vec::new();
@@ -429,6 +452,7 @@ fn infer_pattern_ref(
     path: &hir::Path,
     scope: ScopeIdx,
 ) -> MonoType {
+    println!("infer_pattern_ref");
     // Look up the pattern in the environment
     let (hir_module, _) = hir::lower_file(ctx.db, module_id);
 
@@ -478,6 +502,7 @@ fn infer_destructure(
     _scope: ScopeIdx,
     args: &[hir::PatternIdx],
 ) -> MonoType {
+    println!("infer_destructure");
     let (hir_module, _) = hir::lower_file(ctx.db, module_id);
 
     // Infer types for all fields
@@ -496,17 +521,19 @@ fn infer_destructure(
 }
 
 fn infer_nil(ctx: &mut HMInferenceContext, idx: ExpressionOrPatternIdx) -> MonoType {
+    println!("infer_nil");
     // Nil pattern represents an empty list
     // In a full implementation, this would be List[a] where a is fresh
     // For now, just use a fresh type variable
-    let ty = ctx.fresh_type_var();
+    let ty = MonoType::Unconstrained;
     ctx.assign_type(idx, ty.clone());
     ty
 }
 
 fn infer_missing_pattern(ctx: &mut HMInferenceContext, idx: ExpressionOrPatternIdx) -> MonoType {
+    println!("infer_missing_pattern");
     // Missing patterns get a fresh type variable
-    let ty = ctx.fresh_type_var();
+    let ty = MonoType::Missing;
     ctx.assign_type(idx, ty.clone());
     ty
 }
