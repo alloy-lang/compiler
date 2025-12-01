@@ -2,6 +2,7 @@
 members = [
     "compiler",
     "compiler/ast",
+     "compiler/diagnostics",
      "compiler/hir",
     # "compiler/hir_index",  # Temporarily disabled due to API changes
      "compiler/hir_ty",
@@ -16,6 +17,7 @@ members = [
 ]
 
 [workspace.dependencies]
+ariadne = "0.4"
 camino = "1.1.6"
 expect-test = "1.5"
 itertools = "0.13"

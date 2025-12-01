@@ -6,8 +6,8 @@ authors = ["theochupp <tclchiam@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-alloy_syntax = { path = "../syntax" }
-ordered-float = { workspace = true }
+alloy_workspace = { path = "../workspace" }
+ariadne = { workspace = true }
 text-size = { workspace = true }
 
 [dev-dependencies]
