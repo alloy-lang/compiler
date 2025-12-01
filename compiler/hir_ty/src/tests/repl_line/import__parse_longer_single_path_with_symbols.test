@@ -1,9 +1,0 @@
-import std::function::(<|)
-===
-HirTypedModule {
-    expression_types: {},
-    pattern_types: {},
-    warnings: [],
-    errors: [],
-}
-[]

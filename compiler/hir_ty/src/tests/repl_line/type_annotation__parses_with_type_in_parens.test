@@ -1,6 +1,4 @@
-import test_data::Test
-
-typeof test : Test -> (String)
+typeof test : Int -> (String)
 ===
 HirTypedModule {
     expression_types: {},
