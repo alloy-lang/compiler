@@ -58,10 +58,7 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
             };
             Pattern::Literal(Literal::Char(value))
         }
-        ast::Pattern::PatternRef(var) => Pattern::PatternRef {
-            path: lower_pattern_ref(ctx, var),
-            scope: ctx.scopes.current_scope(),
-        },
+        ast::Pattern::PatternRef(var) => lower_pattern_ref(ctx, var),
         ast::Pattern::VariableDeclaration(var) => Pattern::VariableDeclaration {
             name: lower_variable_declaration(var),
         },
@@ -96,13 +93,19 @@ fn lower_destructure(ctx: &mut LoweringCtx, destructure: &ast::Destructure) -> P
         unreachable!("parsing error")
     };
 
+    let Some(ast_path) = ast_target.name() else {
+        unreachable!("parsing error")
+    };
+
+    let Some(target) = ctx.resolve_reference_path(&ast_path, HirReferenceType::Pattern) else {
+        unreachable!("parsing error")
+    };
+
     let args = destructure
         .args()
         .iter()
         .map(|arg| lower_pattern(ctx, arg))
         .collect::<Vec<_>>();
-
-    let target = lower_pattern_ref(ctx, &ast_target);
 
     Pattern::Destructure {
         target,
@@ -119,14 +122,27 @@ pub(super) fn lower_variable_declaration(var: &ast::VariableDeclaration) -> Name
     Name::new(name.text())
 }
 
-fn lower_pattern_ref(ctx: &mut LoweringCtx, var: &ast::PatternRef) -> Path {
+fn lower_pattern_ref(ctx: &mut LoweringCtx, var: &ast::PatternRef) -> Pattern {
     let Some(ast_path) = var.name() else {
         unreachable!("parsing error")
     };
+
+    match ast_path.segments().join("::").as_str() {
+        "True" => {
+            return Pattern::Literal(Literal::Bool(true));
+        }
+        "False" => {
+            return Pattern::Literal(Literal::Bool(false));
+        }
+        _ => {}
+    }
 
     let Some(path) = ctx.resolve_reference_path(&ast_path, HirReferenceType::Pattern) else {
         unreachable!("parsing error")
     };
 
-    path
+    Pattern::PatternRef {
+        path,
+        scope: ctx.scopes.current_scope(),
+    }
 }

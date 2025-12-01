@@ -162,15 +162,19 @@ fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Expressi
         unreachable!("parsing error")
     };
 
+    match ast_path.segments().join("::").as_str() {
+        "True" => {
+            return Expression::Literal(Literal::Bool(true));
+        }
+        "False" => {
+            return Expression::Literal(Literal::Bool(false));
+        }
+        _ => {}
+    }
+
     let Some(path) = ctx.resolve_reference_path(&ast_path, HirReferenceType::Expression) else {
         unreachable!("parsing error")
     };
-
-    if ast_path.text() == "True" {
-        return Expression::Literal(Literal::Bool(true));
-    } else if ast_path.text() == "False" {
-        return Expression::Literal(Literal::Bool(false));
-    }
 
     Expression::VariableRef {
         path,
