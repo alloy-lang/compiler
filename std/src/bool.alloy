@@ -7,17 +7,13 @@ import std::order::Ordering
 import std::debug::Debug
 
 
-typedef Bool =
-  | False
-  | True
-end
 
 --! Boolean 'not'
 typeof not : Bool -> Bool
 let not = |x| ->
   if x
-  then Bool::False
-  else Bool::True
+  then False
+  else True
 
 
 --! Boolean 'exclusive or'
@@ -39,10 +35,10 @@ end
 behavior Ord for Bool where
   let compare = |left, right| ->
     match (left, right) when
-      \ (Bool::True,  Bool::True)  -> Ordering::EQ
-      \ (Bool::False, Bool::False) -> Ordering::EQ
-      \ (Bool::True,  Bool::False) -> Ordering::GT
-      \ (Bool::False, Bool::True)  -> Ordering::LT
+      \ (True,  True)  -> Ordering::EQ
+      \ (False, False) -> Ordering::EQ
+      \ (True,  False) -> Ordering::GT
+      \ (False, True)  -> Ordering::LT
 end
 
 
