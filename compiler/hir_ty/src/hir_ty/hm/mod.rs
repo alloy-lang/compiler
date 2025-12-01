@@ -27,6 +27,12 @@ impl TypeVarId {
     }
 }
 
+impl std::fmt::Display for TypeVarId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "t{}", self.0)
+    }
+}
+
 /// Monomorphic types (no quantification)
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MonoType {
@@ -47,6 +53,49 @@ pub enum MonoType {
     },
     /// Unit type
     Unit,
+}
+
+impl std::fmt::Display for MonoType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MonoType::Unconstrained => write!(f, "_"),
+            MonoType::Missing => write!(f, "<missing>"),
+            MonoType::Var(var) => write!(f, "t{}", var.0),
+            MonoType::Concrete(builtin) => write!(f, "{builtin:?}"),
+            MonoType::Function(arg, ret) => {
+                // Add parentheses if arg is also a function
+                match arg.as_ref() {
+                    MonoType::Function(_, _) => write!(f, "({arg}) -> {ret}"),
+                    _ => write!(f, "{arg} -> {ret}"),
+                }
+            }
+            MonoType::Tuple(elements) => {
+                write!(f, "(")?;
+                for (i, elem) in elements.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+                    write!(f, "{elem}")?;
+                }
+                write!(f, ")")
+            }
+            MonoType::App { constructor, args } => {
+                write!(f, "TypeRef({})", constructor.local_id.into_raw())?;
+                if !args.is_empty() {
+                    write!(f, "[")?;
+                    for (i, arg) in args.iter().enumerate() {
+                        if i > 0 {
+                            write!(f, ", ")?;
+                        }
+                        write!(f, "{arg}")?;
+                    }
+                    write!(f, "]")?;
+                }
+                Ok(())
+            }
+            MonoType::Unit => write!(f, "()"),
+        }
+    }
 }
 
 /// Polymorphic type scheme (with quantification)

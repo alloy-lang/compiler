@@ -9,7 +9,7 @@ use non_empty_vec::NonEmpty;
 use std::hash::Hash;
 mod hm;
 pub use hm::infer_types_hm;
-pub(super) use hm::unification::UnificationError;
+pub use hm::unification::UnificationError;
 
 // Re-export type annotation checking function for use by other modules
 pub(super) use type_annotation_check::check_type_annotation;
@@ -107,4 +107,62 @@ pub enum ResolvedType {
     /// Placeholder for unimplemented type system features
     /// Used for TypeReference::SelfRef, MonoType::App, and other TODO cases
     TODO,
+}
+
+impl std::fmt::Display for ResolvedType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ResolvedType::UnknownReference(_) => write!(f, "<unknown>"),
+            ResolvedType::Unconstrained => write!(f, "_"),
+            ResolvedType::Missing => write!(f, "<missing>"),
+            ResolvedType::Unit => write!(f, "()"),
+            ResolvedType::TypeDef(fql) => write!(f, "TypeDef({})", fql.local_id.into_raw()),
+            ResolvedType::BuiltIn(builtin) => write!(f, "{builtin:?}"),
+            ResolvedType::Lambda {
+                arg_type,
+                return_type,
+            } => {
+                // Add parentheses if arg_type is also a lambda
+                match arg_type.as_ref() {
+                    ResolvedType::Lambda { .. } => write!(f, "({arg_type}) -> {return_type}"),
+                    _ => write!(f, "{arg_type} -> {return_type}"),
+                }
+            }
+            ResolvedType::Tuple(elements) => {
+                write!(f, "(")?;
+                for (i, elem) in elements.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+                    write!(f, "{elem}")?;
+                }
+                write!(f, ")")
+            }
+            ResolvedType::Bounded { base, args } => {
+                write!(f, "{base}[")?;
+                for (i, arg) in args.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+                    write!(f, "{arg}")?;
+                }
+                write!(f, "]")
+            }
+            ResolvedType::Generic(id) => write!(f, "t{id}"),
+            ResolvedType::ConstrainedGeneric { id, constraints } => {
+                write!(f, "t{id}")?;
+                if !constraints.is_empty() {
+                    write!(f, " : ")?;
+                    for (i, constraint) in constraints.iter().enumerate() {
+                        if i > 0 {
+                            write!(f, " + ")?;
+                        }
+                        write!(f, "Trait({})", constraint.local_id.into_raw())?;
+                    }
+                }
+                Ok(())
+            }
+            ResolvedType::TODO => write!(f, "<TODO>"),
+        }
+    }
 }

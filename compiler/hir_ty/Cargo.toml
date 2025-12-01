@@ -7,6 +7,7 @@ edition = "2018"
 
 [dependencies]
 alloy_ast = { path = "../ast" }
+alloy_diagnostics = { path = "../diagnostics" }
 alloy_hir = {path = "../hir"}
 alloy_workspace = {path = "../workspace"}
 alloy_scope = { path = "../scope" }
@@ -18,7 +19,6 @@ text-size = { workspace = true }
 itertools = { workspace = true }
 
 [dev-dependencies]
-alloy_parser = {path = "../parser"}
 alloy_test_harness = {path = "../test_harness"}
 alloy_workspace = {path = "../workspace"}
 camino = { workspace = true }
