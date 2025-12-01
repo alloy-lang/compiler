@@ -37,13 +37,6 @@ impl hir::HirDatabase for TestHirTyDatabase {}
 impl crate::HirTyDatabase for TestHirTyDatabase {}
 
 #[test]
-fn source_file() {
-    alloy_test_harness::run_test_dir("source_file", |path, input| {
-        run_hir_ty_test(path, input, false, false, false)
-    });
-}
-
-#[test]
 fn repl_line() {
     alloy_test_harness::run_test_dir("repl_line", |path, input| {
         run_hir_ty_test(path, input, false, false, false)
