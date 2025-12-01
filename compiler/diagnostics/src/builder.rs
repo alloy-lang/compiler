@@ -84,16 +84,14 @@ impl<'a> DiagnosticBuilder<'a> {
 
         // Add labels
         for label in self.labels {
-            let label_range =
-                usize::from(label.range.start())..usize::from(label.range.end());
-            let mut ariadne_label = Label::new((source_id.clone(), label_range))
-                .with_message(label.message);
+            let label_range = usize::from(label.range.start())..usize::from(label.range.end());
+            let mut ariadne_label =
+                Label::new((source_id.clone(), label_range)).with_message(label.message);
 
             if let Some(color) = label.color {
                 ariadne_label = ariadne_label.with_color(color);
             } else {
-                ariadne_label =
-                    ariadne_label.with_color(self.diagnostic.severity().color());
+                ariadne_label = ariadne_label.with_color(self.diagnostic.severity().color());
             }
 
             report = report.with_label(ariadne_label);

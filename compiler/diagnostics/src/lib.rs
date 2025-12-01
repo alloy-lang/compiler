@@ -58,8 +58,8 @@ pub use reporter::DiagnosticsReporter;
 
 #[cfg(test)]
 mod tests {
-    use ariadne::Source;
     use super::*;
+    use ariadne::Source;
     use text_size::TextRange;
 
     #[derive(Debug)]
