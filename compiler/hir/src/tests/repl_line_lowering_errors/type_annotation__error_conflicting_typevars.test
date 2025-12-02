@@ -9,13 +9,14 @@ HirModule {
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "t1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
             ),
             "range": 14..17,
         },

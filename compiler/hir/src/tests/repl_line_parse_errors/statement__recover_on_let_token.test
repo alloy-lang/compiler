@@ -12,13 +12,14 @@ HirModule {
         },
         Idx::<Expression>(1): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "a",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
                 scope: Idx::<Scope>(0),
             },
             "name": "b",

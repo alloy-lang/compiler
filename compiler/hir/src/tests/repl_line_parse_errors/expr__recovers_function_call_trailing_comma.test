@@ -7,26 +7,28 @@ HirModule {
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "a",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
                 scope: Idx::<Scope>(1),
             },
             "range": 22..24,
         },
         Idx::<Expression>(1): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "b",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
                 scope: Idx::<Scope>(1),
             },
             "range": 26..29,
@@ -73,13 +75,14 @@ HirModule {
         },
         Idx::<Expression>(7): {
             "item": FunctionCall {
-                target: ThisModule(
-                    NonEmpty(
+                target: ThisModule {
+                    path: NonEmpty(
                         [
                             "funky",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
                 scope: Idx::<Scope>(0),
                 args: [
                     Idx::<Expression>(6),

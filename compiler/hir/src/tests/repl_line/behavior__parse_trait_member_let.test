@@ -16,13 +16,14 @@ HirModule {
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "test",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(2),
+                },
                 scope: Idx::<Scope>(2),
             },
             "name": "thing",
@@ -52,25 +53,27 @@ HirModule {
         },
         Idx::<TypeReference>(1): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "Trait1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
             ),
             "range": 100..107,
         },
         Idx::<TypeReference>(2): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "Type1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
             ),
             "range": 111..117,
         },

@@ -51,26 +51,28 @@ HirModule {
         },
         Idx::<Expression>(1): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "x",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
                 scope: Idx::<Scope>(1),
             },
             "range": 91..95,
         },
         Idx::<Expression>(2): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "x",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(2),
+                },
                 scope: Idx::<Scope>(2),
             },
             "range": 117..118,

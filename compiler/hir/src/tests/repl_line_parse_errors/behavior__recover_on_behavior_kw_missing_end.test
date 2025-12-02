@@ -26,49 +26,53 @@ HirModule {
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "TestTrait1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
             ),
             "range": 114..125,
         },
         Idx::<TypeReference>(1): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "Type1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
             ),
             "range": 129..135,
         },
         Idx::<TypeReference>(2): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "TestTrait2",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
             ),
             "range": 202..213,
         },
         Idx::<TypeReference>(3): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "Type1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
             ),
             "range": 217..223,
         },

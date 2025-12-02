@@ -39,25 +39,27 @@ HirModule {
         },
         Idx::<TypeReference>(1): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "t1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
             ),
             "range": 44..47,
         },
         Idx::<TypeReference>(2): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "t2",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
             ),
             "range": 47..49,
         },

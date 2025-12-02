@@ -73,41 +73,19 @@ HirModule {
     },
     patterns: Index::<Pattern> {
         Idx::<Pattern>(0): {
-            "item": PatternRef {
-                path: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                "std",
-                                "bool",
-                                "Bool",
-                            ],
-                        ),
-                        name: "True",
-                        sub_path: [],
-                    },
+            "item": Literal(
+                Bool(
+                    true,
                 ),
-                scope: Idx::<Scope>(1),
-            },
+            ),
             "range": 54..59,
         },
         Idx::<Pattern>(1): {
-            "item": PatternRef {
-                path: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                "std",
-                                "bool",
-                                "Bool",
-                            ],
-                        ),
-                        name: "False",
-                        sub_path: [],
-                    },
+            "item": Literal(
+                Bool(
+                    false,
                 ),
-                scope: Idx::<Scope>(2),
-            },
+            ),
             "range": 68..74,
         },
     },
@@ -135,7 +113,34 @@ HirModule {
             ],
         },
     },
-    warnings: [],
+    warnings: [
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "std",
+                        "bool",
+                        "Bool",
+                    ],
+                    last: "True",
+                },
+            },
+            range: 0..39,
+        },
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "std",
+                        "bool",
+                        "Bool",
+                    ],
+                    last: "False",
+                },
+            },
+            range: 0..39,
+        },
+    ],
     errors: [],
 }
 [

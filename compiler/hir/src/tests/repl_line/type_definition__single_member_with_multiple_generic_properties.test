@@ -7,25 +7,27 @@ HirModule {
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "t1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
             ),
             "range": 29..32,
         },
         Idx::<TypeReference>(1): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "t2",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
             ),
             "range": 32..34,
         },

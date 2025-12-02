@@ -10,26 +10,28 @@ HirModule {
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "x1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
                 scope: Idx::<Scope>(1),
             },
             "range": 28..31,
         },
         Idx::<Expression>(1): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "y1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
                 scope: Idx::<Scope>(1),
             },
             "range": 33..36,
@@ -44,13 +46,14 @@ HirModule {
         },
         Idx::<Expression>(3): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "z1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
                 scope: Idx::<Scope>(1),
             },
             "range": 38..42,
@@ -108,52 +111,56 @@ HirModule {
         },
         Idx::<Expression>(9): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "x",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
                 scope: Idx::<Scope>(0),
             },
             "range": 78..80,
         },
         Idx::<Expression>(10): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "y",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
                 scope: Idx::<Scope>(0),
             },
             "range": 80..82,
         },
         Idx::<Expression>(11): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "z",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
                 scope: Idx::<Scope>(0),
             },
             "range": 82..83,
         },
         Idx::<Expression>(12): {
             "item": FunctionCall {
-                target: ThisModule(
-                    NonEmpty(
+                target: ThisModule {
+                    path: NonEmpty(
                         [
                             "funky",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
                 scope: Idx::<Scope>(0),
                 args: [
                     Idx::<Expression>(9),

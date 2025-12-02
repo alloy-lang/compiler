@@ -5,13 +5,14 @@ HirModule {
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "a",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
                 scope: Idx::<Scope>(1),
             },
             "range": 9..11,

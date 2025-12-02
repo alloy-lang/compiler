@@ -41,25 +41,27 @@ HirModule {
         },
         Idx::<TypeReference>(1): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "t1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
             ),
             "range": 51..54,
         },
         Idx::<TypeReference>(2): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "t2",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
             ),
             "range": 57..59,
         },
@@ -104,13 +106,14 @@ HirModule {
         },
         Idx::<TypeReference>(7): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "t1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
             ),
             "range": 72..74,
         },
@@ -142,13 +145,14 @@ HirModule {
         },
         Idx::<TypeReference>(10): {
             "item": Named(
-                ThisModule(
-                    NonEmpty(
+                ThisModule {
+                    path: NonEmpty(
                         [
                             "t2",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
             ),
             "range": 86..88,
         },

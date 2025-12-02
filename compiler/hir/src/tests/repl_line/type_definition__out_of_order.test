@@ -10,14 +10,15 @@ HirModule {
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "Things",
                             "ThingA",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
                 scope: Idx::<Scope>(0),
             },
             "name": "example",

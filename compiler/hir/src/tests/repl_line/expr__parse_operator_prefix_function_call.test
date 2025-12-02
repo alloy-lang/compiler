@@ -30,26 +30,28 @@ HirModule {
         },
         Idx::<Expression>(2): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "f1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
                 scope: Idx::<Scope>(1),
             },
             "range": 53..55,
         },
         Idx::<Expression>(3): {
             "item": FunctionCall {
-                target: ThisModule(
-                    NonEmpty(
+                target: ThisModule {
+                    path: NonEmpty(
                         [
                             "f2",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(1),
+                },
                 scope: Idx::<Scope>(1),
                 args: [
                     Idx::<Expression>(2),
@@ -71,39 +73,42 @@ HirModule {
         },
         Idx::<Expression>(5): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "func1",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
                 scope: Idx::<Scope>(0),
             },
             "range": 74..79,
         },
         Idx::<Expression>(6): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "func2",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
                 scope: Idx::<Scope>(0),
             },
             "range": 81..86,
         },
         Idx::<Expression>(7): {
             "item": FunctionCall {
-                target: ThisModule(
-                    NonEmpty(
+                target: ThisModule {
+                    path: NonEmpty(
                         [
                             ">>",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
                 scope: Idx::<Scope>(0),
                 args: [
                     Idx::<Expression>(5),

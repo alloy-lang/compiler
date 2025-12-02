@@ -23,34 +23,25 @@ HirModule {
     },
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
-            "item": VariableRef {
-                path: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                "std",
-                                "bool",
-                            ],
-                        ),
-                        name: "True",
-                        sub_path: [],
-                    },
+            "item": Literal(
+                Bool(
+                    true,
                 ),
-                scope: Idx::<Scope>(0),
-            },
+            ),
             "name": "test",
             "range": 24..41,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(1): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "test",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(0),
+                },
                 scope: Idx::<Scope>(0),
             },
             "range": 47..52,
@@ -90,21 +81,11 @@ HirModule {
     },
     patterns: Index::<Pattern> {
         Idx::<Pattern>(0): {
-            "item": PatternRef {
-                path: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                "std",
-                                "bool",
-                            ],
-                        ),
-                        name: "True",
-                        sub_path: [],
-                    },
+            "item": Literal(
+                Bool(
+                    true,
                 ),
-                scope: Idx::<Scope>(1),
-            },
+            ),
             "range": 61..66,
         },
         Idx::<Pattern>(1): {
@@ -136,7 +117,20 @@ HirModule {
             ],
         },
     },
-    warnings: [],
+    warnings: [
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "std",
+                        "bool",
+                    ],
+                    last: "True",
+                },
+            },
+            range: 0..24,
+        },
+    ],
     errors: [],
 }
 []

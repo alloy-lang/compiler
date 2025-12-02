@@ -43,39 +43,42 @@ HirModule {
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "left",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(3),
+                },
                 scope: Idx::<Scope>(3),
             },
             "range": 143..152,
         },
         Idx::<Expression>(1): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "right",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(3),
+                },
                 scope: Idx::<Scope>(3),
             },
             "range": 157..167,
         },
         Idx::<Expression>(2): {
             "item": VariableRef {
-                path: ThisModule(
-                    NonEmpty(
+                path: ThisModule {
+                    path: NonEmpty(
                         [
                             "right",
                         ],
                     ),
-                ),
+                    scope: Idx::<Scope>(3),
+                },
                 scope: Idx::<Scope>(3),
             },
             "range": 176..181,

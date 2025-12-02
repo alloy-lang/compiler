@@ -102,22 +102,11 @@ HirModule {
             "range": 80..89,
         },
         Idx::<Pattern>(1): {
-            "item": PatternRef {
-                path: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                "std",
-                                "bool",
-                                "Bool",
-                            ],
-                        ),
-                        name: "False",
-                        sub_path: [],
-                    },
+            "item": Literal(
+                Bool(
+                    false,
                 ),
-                scope: Idx::<Scope>(2),
-            },
+            ),
             "range": 91..97,
         },
     },
@@ -155,6 +144,19 @@ HirModule {
                         "Bool",
                     ],
                     last: "True",
+                },
+            },
+            range: 23..62,
+        },
+        LoweringWarning {
+            kind: UnusedImport {
+                import: Import {
+                    segments: [
+                        "std",
+                        "bool",
+                        "Bool",
+                    ],
+                    last: "False",
                 },
             },
             range: 23..62,
