@@ -1,9 +1,0 @@
-typeof test : Int -> String -> ()
-===
-IndexedModule {
-    imports: {},
-    values: {},
-    warnings: [],
-    errors: [],
-}
-[]

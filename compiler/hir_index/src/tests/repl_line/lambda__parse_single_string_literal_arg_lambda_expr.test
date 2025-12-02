@@ -1,9 +1,0 @@
-|"hello"| -> 5
-===
-IndexedModule {
-    imports: {},
-    values: {},
-    warnings: [],
-    errors: [],
-}
-[]

@@ -1,9 +1,0 @@
-|Option::Some(x)| -> x
-===
-IndexedModule {
-    imports: {},
-    values: {},
-    warnings: [],
-    errors: [],
-}
-[]

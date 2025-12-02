@@ -1,9 +1,0 @@
-if test then 2 else 3
-===
-IndexedModule {
-    imports: {},
-    values: {},
-    warnings: [],
-    errors: [],
-}
-[]

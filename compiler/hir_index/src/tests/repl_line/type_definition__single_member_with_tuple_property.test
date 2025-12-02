@@ -1,9 +1,0 @@
-typedef Test = Thing (Int, String)
-===
-IndexedModule {
-    imports: {},
-    values: {},
-    warnings: [],
-    errors: [],
-}
-[]
