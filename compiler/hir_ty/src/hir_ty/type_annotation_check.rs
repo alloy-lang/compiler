@@ -244,8 +244,7 @@ fn type_reference_matches_typedef(
         }
         hir::Path::OtherModule(fqn) => {
             // Resolve the module
-            use itertools::Itertools;
-            let module_slug = fqn.module.iter().map(|n| n.as_str()).join("::");
+            let module_slug = fqn.module_slug();
             if let Some(other_module_id) = db.find_module_by_slug(&*module_slug) {
                 let (hir_module, _) = hir::lower_file(db, other_module_id);
                 if let Some((type_idx, _)) =
@@ -295,8 +294,7 @@ fn type_reference_matches_trait(
         }
         hir::Path::OtherModule(fqn) => {
             // Resolve the module
-            use itertools::Itertools;
-            let module_slug = fqn.module.iter().map(|n| n.as_str()).join("::");
+            let module_slug = fqn.module_slug();
             if let Some(other_module_id) = db.find_module_by_slug(&*module_slug) {
                 let (hir_module, _) = hir::lower_file(db, other_module_id);
                 if let Some((trait_idx, _)) = hir_module.get_trait_by_name(&fqn.name) {

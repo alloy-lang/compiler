@@ -3,7 +3,6 @@ use crate::HirTyDatabase;
 use alloy_hir as hir;
 use alloy_scope::{ScopeIdx, Scopes};
 use alloy_workspace::ModuleId;
-use itertools::Itertools;
 use non_empty_vec::NonEmpty;
 
 pub fn type_definition_to_resolved(
@@ -98,7 +97,7 @@ fn resolve_trait_path(
             Some((current_module_id, trait_idx))
         }
         hir::Path::OtherModule(fqn) => {
-            let module_slug = fqn.module.iter().map(|n| n.as_str()).join("::");
+            let module_slug = fqn.module_slug();
             let other_module_id = db.find_module_by_slug(&*module_slug)?;
             let trait_idx = get_trait_by_name(db, other_module_id, &fqn.name)?;
             Some((other_module_id, trait_idx))
@@ -136,7 +135,7 @@ fn resolve_type_definition_path(
             Some((current_module_id, type_idx))
         }
         hir::Path::OtherModule(fqn) => {
-            let module_slug = fqn.module.iter().map(|n| n.as_str()).join("::");
+            let module_slug = fqn.module_slug();
             let other_module_id = db.find_module_by_slug(&*module_slug)?;
             let type_idx =
                 get_type_definition_by_name(db, other_module_id, &fqn.name, Scopes::ROOT)?;

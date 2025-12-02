@@ -88,4 +88,12 @@ impl Fqn {
             }
         }
     }
+
+    pub fn module_slug(&self) -> String {
+        self.module
+            .iter()
+            .map(|n| n.as_str())
+            .collect::<Vec<_>>()
+            .join("::")
+    }
 }
