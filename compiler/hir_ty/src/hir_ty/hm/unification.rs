@@ -191,10 +191,10 @@ pub(super) fn solve_equations(
             Err(err) => {
                 let (hir_module, _) = hir::lower_file(db, equation.source.module_id());
                 let range = match equation.source {
-                    super::ExpressionOrPatternIdx::Expression(fql) => {
+                    super::ExpressionOrPatternFql::Expression(fql) => {
                         hir_module.get_expression_range(fql.local_id)
                     }
-                    super::ExpressionOrPatternIdx::Pattern(fql) => {
+                    super::ExpressionOrPatternFql::Pattern(fql) => {
                         hir_module.get_pattern_range(fql.local_id)
                     }
                 };

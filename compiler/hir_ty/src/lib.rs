@@ -1,5 +1,4 @@
 use alloy_hir as hir;
-use alloy_hir::{Expression, Pattern};
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
 use text_size::TextRange;
@@ -47,11 +46,11 @@ impl HirTypedModule {
         self.errors.push(err);
     }
 
-    fn warnings(&self) -> &[TypeInferenceWarning] {
+    pub fn warnings(&self) -> &[TypeInferenceWarning] {
         &self.warnings
     }
 
-    fn errors(&self) -> &[TypeInferenceError] {
+    pub fn errors(&self) -> &[TypeInferenceError] {
         &self.errors
     }
 }
@@ -69,55 +68,7 @@ pub struct TypeResolutionResult {
 /// during full compilation, we will want to generate errors and warnings for all modules
 #[salsa::tracked]
 pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedModule {
-    hir_ty::infer_types_hm(db, module_id)
-}
-
-/// find an expression's type in a module
-#[salsa::tracked]
-pub fn find_expression_type(
-    db: &dyn HirTyDatabase,
-    module_id: ModuleId,
-    expression_id: hir::ExpressionIdx,
-) -> TypeResolutionResult {
-    let (hir_module, _) = hir::lower_file(db, module_id);
-    let expression = hir_module.get_expression(expression_id);
-    match expression {
-        Expression::Missing => {}
-        Expression::Literal(_) => {}
-        Expression::VariableRef { .. } => {}
-        Expression::Binary { .. } => {}
-        Expression::Unit => {}
-        Expression::IfThenElse { .. } => {}
-        Expression::Tuple(_) => {}
-        Expression::Unary { .. } => {}
-        Expression::Lambda { .. } => {}
-        Expression::FunctionCall { .. } => {}
-        Expression::Match { .. } => {}
-    }
-
-    todo!()
-}
-
-#[salsa::tracked]
-pub fn find_pattern_type(
-    db: &dyn HirTyDatabase,
-    module_id: ModuleId,
-    pattern_id: hir::PatternIdx,
-) -> TypeResolutionResult {
-    let (hir_module, _) = hir::lower_file(db, module_id);
-    let pattern = hir_module.get_pattern(pattern_id);
-    match pattern {
-        Pattern::Missing => {}
-        Pattern::Literal(_) => {}
-        Pattern::PatternRef { .. } => {}
-        Pattern::VariableDeclaration { .. } => {}
-        Pattern::Nil => {}
-        Pattern::Destructure { .. } => {}
-        Pattern::Unit => {}
-        Pattern::Tuple(_) => {}
-    }
-
-    todo!()
+    infer_types_hm(db, module_id)
 }
 
 #[cfg(test)]

@@ -51,17 +51,29 @@ impl<T> Hash for Fql<T> {
 
 /// A fully qualified reference to an expression or pattern within a specific module
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub(super) enum ExpressionOrPatternIdx {
+pub(super) enum ExpressionOrPatternFql {
     Expression(Fql<hir::Expression>),
     Pattern(Fql<hir::Pattern>),
 }
 
-impl ExpressionOrPatternIdx {
+impl ExpressionOrPatternFql {
     pub fn module_id(&self) -> ModuleId {
         match self {
-            ExpressionOrPatternIdx::Expression(fql) => fql.module_id,
-            ExpressionOrPatternIdx::Pattern(fql) => fql.module_id,
+            ExpressionOrPatternFql::Expression(fql) => fql.module_id,
+            ExpressionOrPatternFql::Pattern(fql) => fql.module_id,
         }
+    }
+}
+
+impl Into<ExpressionOrPatternFql> for Fql<hir::Expression> {
+    fn into(self) -> ExpressionOrPatternFql {
+        ExpressionOrPatternFql::Expression(self)
+    }
+}
+
+impl Into<ExpressionOrPatternFql> for Fql<hir::Pattern> {
+    fn into(self) -> ExpressionOrPatternFql {
+        ExpressionOrPatternFql::Pattern(self)
     }
 }
 

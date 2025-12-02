@@ -6,7 +6,7 @@ use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
 
-use super::super::{check_type_annotation, ExpressionOrPatternIdx, Fql, ResolvedType};
+use super::super::{check_type_annotation, ExpressionOrPatternFql, Fql, ResolvedType};
 use super::constraint_gen::infer_expr_hm;
 use super::unification::solve_equations;
 use super::TypeVarId;
@@ -22,16 +22,16 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
     let mut ctx = HMInferenceContext::new(db);
     let (hir_module, _) = hir::lower_file(db, module_id);
 
-    for (expression_id, expression, _range, name_op) in hir_module.expressions() {
+    for (expression_id, _expression, _range, name_op) in hir_module.expressions() {
         // Phase 1: Generate constraints for all top-level expressions
-        infer_expr_hm(&mut ctx, module_id, expression_id, expression);
+        infer_expr_hm(&mut ctx, module_id, expression_id);
 
         // Phase 1.5: Add type annotation constraints
         // For expressions with type annotations, add equations to unify the inferred type
         // with the annotated type. This allows annotations to guide/constrain inference.
         if let Some((name, scope)) = name_op {
             let fql = Fql::new(module_id, expression_id);
-            let idx = ExpressionOrPatternIdx::Expression(fql);
+            let idx = ExpressionOrPatternFql::Expression(fql);
 
             // Get the inferred type for this expression
             if let Some(inferred_mono_ty) = ctx.type_env.get(&idx).cloned() {
@@ -70,7 +70,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
 
     for (expression_id, _expression, range, name_op) in hir_module.expressions() {
         let fql = Fql::new(module_id, expression_id);
-        let idx = ExpressionOrPatternIdx::Expression(fql);
+        let idx = ExpressionOrPatternFql::Expression(fql);
 
         if let Some(mono_ty) = ctx.type_env.get(&idx) {
             let resolved_mono = substitution.apply(mono_ty);
@@ -87,7 +87,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
 
     for (pattern_id, _pattern, range, name_op) in hir_module.patterns() {
         let fql = Fql::new(module_id, pattern_id);
-        let idx = ExpressionOrPatternIdx::Pattern(fql);
+        let idx = ExpressionOrPatternFql::Pattern(fql);
 
         if let Some(mono_ty) = ctx.type_env.get(&idx) {
             let resolved_mono = substitution.apply(mono_ty);
