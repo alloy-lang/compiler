@@ -245,9 +245,17 @@ impl<'db> HMInferenceContext<'db> {
         MonoType::Var(self.type_var_gen.fresh())
     }
 
+    pub(super) fn unknown_reference(&mut self, idx: ExpressionOrPatternIdx) -> MonoType {
+        // TODO: report an error when we can't find a reference by name
+        let ty = self.fresh_type_var();
+        self.assign_type(idx, ty)
+    }
+
+    #[must_use]
     /// Assign a type to an expression or pattern
-    pub(super) fn assign_type(&mut self, id: ExpressionOrPatternIdx, ty: MonoType) {
-        self.type_env.insert(id, ty);
+    fn assign_type(&mut self, id: ExpressionOrPatternIdx, ty: MonoType) -> MonoType {
+        self.type_env.insert(id, ty.clone());
+        ty
     }
 
     /// Add a type equation
