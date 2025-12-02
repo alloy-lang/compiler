@@ -90,8 +90,27 @@ fn infer_variable_ref(
             path: names,
             scope: _,
         } => names.last(),
-        hir::Path::OtherModule(_) => {
-            // TODO: For now, use a fresh type variable for cross-module references
+        hir::Path::OtherModule(fqn) => {
+            // Resolve cross-module reference
+            if let Some((other_module_id, expr_id)) = resolve_cross_module_expression(ctx, fqn) {
+                let var_fql = Fql::new(other_module_id, expr_id);
+                let var_idx = ExpressionOrPatternIdx::Expression(var_fql);
+
+                // Check if we have a polymorphic type for this variable
+                if let Some(poly_ty) = ctx.poly_env.get(&var_idx) {
+                    // Instantiate with fresh type variables
+                    let ty = poly_ty.instantiate(&mut ctx.type_var_gen);
+                    ctx.assign_type(idx, ty.clone());
+                    return ty;
+                } else if let Some(mono_ty) = ctx.type_env.get(&var_idx).cloned() {
+                    // Create a fresh type variable for this reference and add an equation
+                    let ref_ty = ctx.fresh_type_var();
+                    ctx.add_equation(ref_ty.clone(), mono_ty, idx.clone());
+                    ctx.assign_type(idx, ref_ty.clone());
+                    return ref_ty;
+                }
+            }
+            // If resolution fails, use a fresh type variable
             let ty = ctx.fresh_type_var();
             ctx.assign_type(idx, ty.clone());
             return ty;
@@ -198,10 +217,28 @@ fn infer_function_call(
             path: names,
             scope: _,
         } => names.last(),
-        hir::Path::OtherModule(_) => {
-            // For cross-module references, create a fresh function type
-            let (hir_module, _) = hir::lower_file(ctx.db, module_id);
+        hir::Path::OtherModule(fqn) => {
+            // Resolve cross-module function reference
+            let func_ty = if let Some((other_module_id, func_id)) =
+                resolve_cross_module_expression(ctx, fqn)
+            {
+                let func_fql = Fql::new(other_module_id, func_id);
+                let func_idx = ExpressionOrPatternIdx::Expression(func_fql);
 
+                // Check if we have a polymorphic type for this function
+                if let Some(poly_ty) = ctx.poly_env.get(&func_idx) {
+                    // Instantiate with fresh type variables
+                    poly_ty.instantiate(&mut ctx.type_var_gen)
+                } else if let Some(mono_ty) = ctx.type_env.get(&func_idx).cloned() {
+                    mono_ty
+                } else {
+                    ctx.fresh_type_var()
+                }
+            } else {
+                ctx.fresh_type_var()
+            };
+
+            // Infer argument types
             let mut arg_types = Vec::new();
             for arg_id in args {
                 let arg_expr = hir_module.get_expression(*arg_id);
@@ -209,7 +246,16 @@ fn infer_function_call(
                 arg_types.push(arg_ty);
             }
 
+            // Build expected function type: arg1 -> (arg2 -> (... -> result))
             let result_ty = ctx.fresh_type_var();
+            let mut expected_func_ty = result_ty.clone();
+            for arg_ty in arg_types.into_iter().rev() {
+                expected_func_ty = MonoType::Function(Box::new(arg_ty), Box::new(expected_func_ty));
+            }
+
+            // Add equation: func_ty = arg1 -> ... -> result
+            ctx.add_equation(func_ty, expected_func_ty, idx.clone());
+
             ctx.assign_type(idx, result_ty.clone());
             return result_ty;
         }
@@ -461,8 +507,19 @@ fn infer_pattern_ref(
             scope: _,
         }
         | hir::Path::Unknown(names) => names.last(),
-        hir::Path::OtherModule(_) => {
-            // For now, use a fresh type variable for cross-module references
+        hir::Path::OtherModule(fqn) => {
+            // Resolve cross-module pattern reference
+            if let Some((other_module_id, pat_id)) = resolve_cross_module_pattern(ctx, fqn) {
+                let pat_fql = Fql::new(other_module_id, pat_id);
+                let pat_idx = ExpressionOrPatternIdx::Pattern(pat_fql);
+
+                // Check if we have a type for this pattern
+                if let Some(mono_ty) = ctx.type_env.get(&pat_idx).cloned() {
+                    ctx.assign_type(idx, mono_ty.clone());
+                    return mono_ty;
+                }
+            }
+            // If resolution fails, use a fresh type variable
             let ty = ctx.fresh_type_var();
             ctx.assign_type(idx, ty.clone());
             return ty;
@@ -531,4 +588,32 @@ fn infer_missing_pattern(ctx: &mut HMInferenceContext, idx: ExpressionOrPatternI
     let ty = MonoType::Missing;
     ctx.assign_type(idx, ty.clone());
     ty
+}
+
+/// Helper function to resolve a cross-module expression reference
+fn resolve_cross_module_expression(
+    ctx: &HMInferenceContext,
+    fqn: &hir::Fqn,
+) -> Option<(ModuleId, hir::ExpressionIdx)> {
+    use itertools::Itertools;
+
+    let module_slug = fqn.module.iter().map(|n| n.as_str()).join("::");
+    let other_module_id = ctx.db.find_module_by_slug(&*module_slug)?;
+    let (hir_module, _) = hir::lower_file(ctx.db, other_module_id);
+    let (expr_id, _) = hir_module.get_expression_by_name(&fqn.name, alloy_scope::Scopes::ROOT)?;
+    Some((other_module_id, expr_id))
+}
+
+/// Helper function to resolve a cross-module pattern reference
+fn resolve_cross_module_pattern(
+    ctx: &HMInferenceContext,
+    fqn: &hir::Fqn,
+) -> Option<(ModuleId, hir::PatternIdx)> {
+    use itertools::Itertools;
+
+    let module_slug = fqn.module.iter().map(|n| n.as_str()).join("::");
+    let other_module_id = ctx.db.find_module_by_slug(&*module_slug)?;
+    let (hir_module, _) = hir::lower_file(ctx.db, other_module_id);
+    let (pat_id, _) = hir_module.get_pattern_by_name(&fqn.name, alloy_scope::Scopes::ROOT)?;
+    Some((other_module_id, pat_id))
 }
