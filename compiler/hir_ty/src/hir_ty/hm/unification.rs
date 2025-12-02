@@ -29,7 +29,6 @@ impl Substitution {
     }
 
     pub(super) fn apply(&self, ty: &MonoType) -> MonoType {
-        println!("Applying substitution to {:?}", ty);
         match ty {
             MonoType::Unconstrained => MonoType::Unconstrained,
             MonoType::Missing => MonoType::Missing,
@@ -75,7 +74,6 @@ impl Substitution {
 
 /// Unification algorithm with occurs check
 fn unify_types(t1: &MonoType, t2: &MonoType) -> Result<Substitution, UnificationError> {
-    println!("Unifying {:?} with {:?}", t1, t2);
     match (t1, t2) {
         // Same type variable
         (MonoType::Unconstrained, _) | (_, MonoType::Unconstrained) => Ok(Substitution::new()),

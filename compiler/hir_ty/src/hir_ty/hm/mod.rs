@@ -247,7 +247,6 @@ impl<'db> HMInferenceContext<'db> {
 
     /// Assign a type to an expression or pattern
     pub(super) fn assign_type(&mut self, id: ExpressionOrPatternIdx, ty: MonoType) {
-        println!("Assigning type {:?} to {:?}", ty, id);
         self.type_env.insert(id, ty);
     }
 
@@ -258,7 +257,6 @@ impl<'db> HMInferenceContext<'db> {
         right: MonoType,
         source: ExpressionOrPatternIdx,
     ) {
-        println!("Adding equation {:?} = {:?} at {:?}", left, right, source);
         self.equations.push(TypeEquation {
             left,
             right,

@@ -89,25 +89,6 @@ fn on_demand_test() {
     }
 }
 
-#[test]
-fn match_expr__parses_two_options_with_else() {
-    let test_case = "repl_line/match_expr__parses_two_options_with_else.test";
-
-    let tests_path = {
-        let current_dir = env::current_dir().unwrap();
-        current_dir.join(format!("src/tests/{test_case}"))
-    };
-
-    let did_panic = std::panic::catch_unwind(|| {
-        alloy_test_harness::run_test_case(tests_path, |path, input| {
-            run_hir_ty_test(path, input, false, false, false)
-        });
-    })
-    .is_err();
-
-    assert!(!did_panic, "{} test failed", test_case,);
-}
-
 #[track_caller]
 fn run_hir_ty_test(
     path: &Path,
