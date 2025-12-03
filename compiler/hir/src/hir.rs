@@ -168,7 +168,8 @@ impl HirModule {
         name: &Name,
         scope: ScopeIdx,
     ) -> Option<(TypeDefinitionIdx, &TypeDefinition)> {
-        self.type_definitions.get_by_scoped_name(name, scope)
+        self.type_definitions
+            .get_by_scoped_name(name, scope, &self.scopes)
     }
 
     pub fn get_expression_by_name(
@@ -176,7 +177,8 @@ impl HirModule {
         name: &Name,
         scope: ScopeIdx,
     ) -> Option<(ExpressionIdx, &Expression)> {
-        self.expressions.get_by_scoped_name(name, scope)
+        self.expressions
+            .get_by_scoped_name(name, scope, &self.scopes)
     }
 
     pub fn get_pattern_by_name(
@@ -184,7 +186,7 @@ impl HirModule {
         name: &Name,
         scope: ScopeIdx,
     ) -> Option<(PatternIdx, &Pattern)> {
-        self.patterns.get_by_scoped_name(name, scope)
+        self.patterns.get_by_scoped_name(name, scope, &self.scopes)
     }
 
     pub fn get_type_reference_by_name(
@@ -192,11 +194,13 @@ impl HirModule {
         name: &Name,
         scope: ScopeIdx,
     ) -> Option<(TypeIdx, &TypeReference)> {
-        self.type_references.get_by_scoped_name(name, scope)
+        self.type_references
+            .get_by_scoped_name(name, scope, &self.scopes)
     }
 
     pub fn get_trait_by_name(&self, name: &Name) -> Option<(TraitIdx, &Trait)> {
-        self.traits.get_by_scoped_name(name, Scopes::ROOT)
+        self.traits
+            .get_by_scoped_name(name, Scopes::ROOT, &self.scopes)
     }
 
     // Get methods by index

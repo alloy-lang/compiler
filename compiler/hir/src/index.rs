@@ -206,8 +206,26 @@ impl<T, N: Eq + Hash + Clone + fmt::Debug> Index<T, N> {
         self.get_id(name, scopes).map(|(id, _)| (id, self.get(id)))
     }
 
-    pub fn get_by_scoped_name(&self, name: &N, scope: ScopeIdx) -> Option<(Idx<T>, &T)> {
-        self.get_id_scoped(name, scope).map(|id| (id, self.get(id)))
+    pub fn get_by_scoped_name(
+        &self,
+        name: &N,
+        scope: ScopeIdx,
+        scopes: &Scopes,
+    ) -> Option<(Idx<T>, &T)> {
+        let mut current_scope = scope;
+        loop {
+            if let Some(id) = self.get_id_scoped(name, current_scope) {
+                return Some((id, self.get(id)));
+            }
+
+            if current_scope == scopes.parent_scope(current_scope) {
+                break;
+            }
+
+            current_scope = scopes.parent_scope(current_scope);
+        }
+
+        None
     }
 }
 
@@ -266,7 +284,7 @@ mod tests {
     }
 
     #[test]
-    fn retrieval_checks_parent_scopes() {
+    fn retrieval_by_name_checks_parent_scopes() {
         let mut scopes = Scopes::default();
         let mut index = Index::new();
 
@@ -285,6 +303,31 @@ mod tests {
             Some((idx, scopes.parent_scope(scopes.current_scope())))
         );
         assert_eq!(index.get_by_name(&name, &scopes), Some((idx, &thing)));
+    }
+
+    #[test]
+    fn retrieval_by_scoped_name_checks_parent_scopes() {
+        let mut scopes = Scopes::default();
+        let mut index = Index::new();
+
+        let thing = 1;
+        let name = Name::new("hello");
+        let range = TextRange::new(TextSize::from(5), TextSize::from(6));
+
+        let _idx = index
+            .insert_named(name.clone(), thing, range, &scopes)
+            .expect("testing");
+
+        scopes.push_scope("testing 1");
+
+        let child_scope = scopes.current_scope();
+        let by_name = index.get_by_name(&name, &scopes);
+
+        scopes.pop_scope();
+        assert_eq!(
+            index.get_by_scoped_name(&name, child_scope, &scopes),
+            by_name
+        );
     }
 
     #[test]
