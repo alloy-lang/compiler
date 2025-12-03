@@ -1,16 +1,15 @@
 //! Main type inference loop and result conversion
 
+use super::super::{check_type_annotation, Fql, ResolvedType};
+use super::constraint_gen::infer_expr_hm;
+use super::unification::solve_equations;
+use super::TypeVarId;
+use super::{HMInferenceContext, MonoType};
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir as hir;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
-
-use super::super::{check_type_annotation, ExpressionOrPatternFql, Fql, ResolvedType};
-use super::constraint_gen::infer_expr_hm;
-use super::unification::solve_equations;
-use super::TypeVarId;
-use super::{HMInferenceContext, MonoType};
 
 /// Main Hindley-Milner type inference function for a module
 ///
@@ -24,17 +23,17 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
 
     for (expression_id, _expression, _range, name_op) in hir_module.expressions() {
         // Phase 1: Generate constraints for all top-level expressions
-        infer_expr_hm(&mut ctx, module_id, expression_id);
+        let expr_fql = Fql::new(module_id, expression_id);
+        infer_expr_hm(&mut ctx, expr_fql.clone());
 
         // Phase 1.5: Add type annotation constraints
         // For expressions with type annotations, add equations to unify the inferred type
         // with the annotated type. This allows annotations to guide/constrain inference.
         if let Some((name, scope)) = name_op {
-            let fql = Fql::new(module_id, expression_id);
-            let idx = ExpressionOrPatternFql::Expression(fql);
+            let fql = expr_fql;
 
             // Get the inferred type for this expression
-            if let Some(inferred_mono_ty) = ctx.type_env.get(&idx).cloned() {
+            if let Some(inferred_mono_ty) = ctx.maybe_find_type(&fql) {
                 // Resolve the type annotation to a ResolvedType
                 let Some(annotated_resolved) =
                     super::super::type_reference::type_reference_to_resolved(
@@ -52,7 +51,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
 
                 // Convert the annotation to MonoType and add unification constraint
                 if let Some(annotated_mono) = resolved_to_mono(&annotated_resolved, &mut ctx) {
-                    ctx.add_equation(inferred_mono_ty, annotated_mono, idx);
+                    ctx.add_equation(inferred_mono_ty, annotated_mono, fql);
                 }
             }
         }
@@ -70,10 +69,9 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
 
     for (expression_id, _expression, range, name_op) in hir_module.expressions() {
         let fql = Fql::new(module_id, expression_id);
-        let idx = ExpressionOrPatternFql::Expression(fql);
 
-        if let Some(mono_ty) = ctx.type_env.get(&idx) {
-            let resolved_mono = substitution.apply(mono_ty);
+        if let Some(mono_ty) = ctx.maybe_find_type(&fql) {
+            let resolved_mono = substitution.apply(&mono_ty);
             let resolved_type =
                 mono_to_resolved_with_map(&resolved_mono, &mut type_var_map, &mut next_generic_id);
             result
@@ -87,10 +85,9 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
 
     for (pattern_id, _pattern, range, name_op) in hir_module.patterns() {
         let fql = Fql::new(module_id, pattern_id);
-        let idx = ExpressionOrPatternFql::Pattern(fql);
 
-        if let Some(mono_ty) = ctx.type_env.get(&idx) {
-            let resolved_mono = substitution.apply(mono_ty);
+        if let Some(mono_ty) = ctx.maybe_find_type(&fql) {
+            let resolved_mono = substitution.apply(&mono_ty);
             let resolved_type =
                 mono_to_resolved_with_map(&resolved_mono, &mut type_var_map, &mut next_generic_id);
             result

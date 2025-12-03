@@ -3,79 +3,16 @@ mod type_definition;
 mod type_reference;
 
 use alloy_hir as hir;
-use alloy_workspace::ModuleId;
-use la_arena::Idx;
+use alloy_hir_resolved::Fql;
 use non_empty_vec::NonEmpty;
 use std::hash::Hash;
+
 mod hm;
 pub use hm::infer_types_hm;
 pub use hm::unification::UnificationError;
 
 // Re-export type annotation checking function for use by other modules
 pub(super) use type_annotation_check::check_type_annotation;
-
-/// Fully Qualified Location - represents an index within a specific module
-#[derive(Debug, Clone, Copy)]
-pub struct Fql<T> {
-    pub module_id: ModuleId,
-    pub local_id: Idx<T>,
-}
-
-impl<T> Fql<T> {
-    pub fn new(module_id: ModuleId, local_id: impl Into<Idx<T>>) -> Self {
-        Self {
-            module_id,
-            local_id: local_id.into(),
-        }
-    }
-}
-
-impl<T> PartialEq for Fql<T> {
-    fn eq(&self, other: &Self) -> bool {
-        self.module_id == other.module_id && self.local_id == other.local_id
-    }
-}
-
-impl<T> Eq for Fql<T> {}
-
-impl<T> Hash for Fql<T> {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.module_id.hash(state);
-        self.local_id.hash(state);
-    }
-}
-
-// ============================================================================
-// Shared Types
-// ============================================================================
-
-/// A fully qualified reference to an expression or pattern within a specific module
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub(super) enum ExpressionOrPatternFql {
-    Expression(Fql<hir::Expression>),
-    Pattern(Fql<hir::Pattern>),
-}
-
-impl ExpressionOrPatternFql {
-    pub fn module_id(&self) -> ModuleId {
-        match self {
-            ExpressionOrPatternFql::Expression(fql) => fql.module_id,
-            ExpressionOrPatternFql::Pattern(fql) => fql.module_id,
-        }
-    }
-}
-
-impl Into<ExpressionOrPatternFql> for Fql<hir::Expression> {
-    fn into(self) -> ExpressionOrPatternFql {
-        ExpressionOrPatternFql::Expression(self)
-    }
-}
-
-impl Into<ExpressionOrPatternFql> for Fql<hir::Pattern> {
-    fn into(self) -> ExpressionOrPatternFql {
-        ExpressionOrPatternFql::Pattern(self)
-    }
-}
 
 // ============================================================================
 // Type Resolution and Checking

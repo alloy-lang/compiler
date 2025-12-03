@@ -6,10 +6,10 @@
 //! - Type equations and constraint solving
 //! - Support for type class constraints (infrastructure, not yet enforced)
 
+use super::Fql;
 use alloy_hir as hir;
+use alloy_hir_resolved::EPFql;
 use rustc_hash::FxHashMap;
-
-use super::{ExpressionOrPatternFql, Fql};
 
 mod constraint_gen;
 mod inference;
@@ -130,7 +130,7 @@ pub struct TypeEquation {
     pub(super) left: MonoType,
     pub(super) right: MonoType,
     /// Source location for error reporting
-    pub(super) source: ExpressionOrPatternFql,
+    pub(super) source: EPFql,
 }
 
 /// Context for generating fresh type variables
@@ -224,9 +224,9 @@ pub(super) struct HMInferenceContext<'db> {
     /// Type equations to be solved
     pub(super) equations: Vec<TypeEquation>,
     /// Type environment (maps expressions/patterns to their types)
-    pub(super) type_env: FxHashMap<ExpressionOrPatternFql, MonoType>,
+    pub(super) type_env: FxHashMap<EPFql, MonoType>,
     /// Polymorphic type schemes for let-bound variables
-    pub(super) poly_env: FxHashMap<ExpressionOrPatternFql, PolyType>,
+    pub(super) poly_env: FxHashMap<EPFql, PolyType>,
 }
 
 impl<'db> HMInferenceContext<'db> {
@@ -240,19 +240,15 @@ impl<'db> HMInferenceContext<'db> {
         }
     }
 
-    fn find_type(&mut self, fql: impl Into<ExpressionOrPatternFql>) -> MonoType {
+    fn maybe_find_type(&mut self, fql: impl Into<EPFql>) -> Option<MonoType> {
         let fql = fql.into();
-
-        // Check if we have a polymorphic type for this function
         if let Some(poly_ty) = self.poly_env.get(&fql).cloned() {
             // Instantiate with fresh type variables
-            poly_ty.instantiate(&mut self.type_var_gen)
+            Some(poly_ty.instantiate(&mut self.type_var_gen))
         } else if let Some(mono_ty) = self.type_env.get(&fql).cloned() {
-            let ref_ty = self.fresh_type_var();
-            self.add_equation(ref_ty.clone(), mono_ty, fql.clone());
-            ref_ty
+            Some(mono_ty)
         } else {
-            self.fresh_type_var()
+            None
         }
     }
 
@@ -261,25 +257,20 @@ impl<'db> HMInferenceContext<'db> {
         MonoType::Var(self.type_var_gen.fresh())
     }
 
-    pub(super) fn unknown_reference(&mut self, fql: impl Into<ExpressionOrPatternFql>) -> MonoType {
+    pub(super) fn unknown_reference(&mut self, fql: impl Into<EPFql>) -> MonoType {
         // TODO: report an error when we can't find a reference by name
         let ty = self.fresh_type_var();
         self.assign_type(fql.into(), ty)
     }
 
     #[must_use]
-    fn assign_type(&mut self, fql: impl Into<ExpressionOrPatternFql>, ty: MonoType) -> MonoType {
+    fn assign_type(&mut self, fql: impl Into<EPFql>, ty: MonoType) -> MonoType {
         self.type_env.insert(fql.into(), ty.clone());
         ty
     }
 
     /// Add a type equation
-    pub(super) fn add_equation(
-        &mut self,
-        left: MonoType,
-        right: MonoType,
-        fql: impl Into<ExpressionOrPatternFql>,
-    ) {
+    pub(super) fn add_equation(&mut self, left: MonoType, right: MonoType, fql: impl Into<EPFql>) {
         self.equations.push(TypeEquation {
             left,
             right,

@@ -1,3 +1,5 @@
+import std::functor
+
 behavior TestTrait1 for Type1 where
     typevar t1 = functor::Functor
 end

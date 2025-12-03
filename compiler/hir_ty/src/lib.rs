@@ -7,7 +7,6 @@ mod hir_ty;
 use hir_ty::*;
 
 mod diagnostics;
-mod resolution;
 use diagnostics::*;
 
 #[cfg(test)]

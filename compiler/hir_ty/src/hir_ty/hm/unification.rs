@@ -1,6 +1,6 @@
 //! Type unification algorithm with occurs check
 
-use super::{MonoType, TypeEquation, TypeVarId};
+use super::{EPFql, MonoType, TypeEquation, TypeVarId};
 use crate::diagnostics::TypeInferenceError;
 use crate::{diagnostics, HirTyDatabase};
 use alloy_hir as hir;
@@ -191,12 +191,8 @@ pub(super) fn solve_equations(
             Err(err) => {
                 let (hir_module, _) = hir::lower_file(db, equation.source.module_id());
                 let range = match equation.source {
-                    super::ExpressionOrPatternFql::Expression(fql) => {
-                        hir_module.get_expression_range(fql.local_id)
-                    }
-                    super::ExpressionOrPatternFql::Pattern(fql) => {
-                        hir_module.get_pattern_range(fql.local_id)
-                    }
+                    EPFql::Expression(fql) => hir_module.get_expression_range(fql.local_id),
+                    EPFql::Pattern(fql) => hir_module.get_pattern_range(fql.local_id),
                 };
 
                 unification_errors.push(TypeInferenceError::new(

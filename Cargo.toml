@@ -2,10 +2,10 @@
 members = [
     "compiler",
     "compiler/ast",
-     "compiler/diagnostics",
-     "compiler/hir",
-    # "compiler/hir_index",  # Temporarily disabled due to API changes
-     "compiler/hir_ty",
+    "compiler/diagnostics",
+    "compiler/hir",
+    "compiler/hir_resolved",
+    "compiler/hir_ty",
     "compiler/lexer",
     "compiler/parser",
     "compiler/project",
