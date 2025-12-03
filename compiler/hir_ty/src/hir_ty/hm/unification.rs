@@ -31,7 +31,6 @@ impl Substitution {
     pub(super) fn apply(&self, ty: &MonoType) -> MonoType {
         match ty {
             MonoType::Unconstrained => MonoType::Unconstrained,
-            MonoType::Missing => MonoType::Missing,
             MonoType::Var(v) => {
                 if let Some(substituted) = self.get(*v) {
                     // Recursively apply in case the substitution contains more variables
@@ -154,7 +153,6 @@ fn unify_types(t1: &MonoType, t2: &MonoType) -> Result<Substitution, Unification
 fn occurs(var: TypeVarId, ty: &MonoType) -> bool {
     match ty {
         MonoType::Unconstrained => false,
-        MonoType::Missing => false,
         MonoType::Var(v) => *v == var,
         MonoType::Function(arg, ret) => occurs(var, arg) || occurs(var, ret),
         MonoType::Tuple(tys) => tys.iter().any(|t| occurs(var, t)),

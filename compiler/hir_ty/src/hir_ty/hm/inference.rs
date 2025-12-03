@@ -160,7 +160,6 @@ fn mono_to_resolved_with_map(
 ) -> ResolvedType {
     match mono {
         MonoType::Unconstrained => ResolvedType::Unconstrained,
-        MonoType::Missing => ResolvedType::Missing,
         MonoType::Var(var_id) => {
             // Get or assign a canonical ID for this type variable
             let generic_id = *type_var_map.entry(*var_id).or_insert_with(|| {

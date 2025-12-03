@@ -37,7 +37,6 @@ impl std::fmt::Display for TypeVarId {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MonoType {
     Unconstrained,
-    Missing,
     /// Type variable (e.g., `a`, `b`)
     Var(TypeVarId),
     /// Built-in concrete type (e.g., `Int`, `String`)
@@ -62,7 +61,6 @@ impl std::fmt::Display for MonoType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             MonoType::Unconstrained => write!(f, "_"),
-            MonoType::Missing => write!(f, "<missing>"),
             MonoType::Var(var) => write!(f, "t{}", var.0),
             MonoType::Concrete(builtin) => write!(f, "{builtin:?}"),
             MonoType::TypeDef(type_fql) => {
@@ -161,7 +159,6 @@ pub(super) fn free_type_vars(ty: &MonoType) -> Vec<TypeVarId> {
 fn collect_free_vars(ty: &MonoType, vars: &mut rustc_hash::FxHashSet<TypeVarId>) {
     match ty {
         MonoType::Unconstrained => {}
-        MonoType::Missing => {}
         MonoType::Var(v) => {
             vars.insert(*v);
         }
