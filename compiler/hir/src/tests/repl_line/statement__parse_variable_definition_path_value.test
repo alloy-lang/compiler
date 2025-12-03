@@ -1,18 +1,16 @@
-import fake::ResultThing
+import std
 
-let foo = ResultThing::More::Stuff::here
+let foo = std::option::Option::None
 ===
 HirModule {
     imports: Index::<Import> {
         Idx::<Import>(0): {
             "item": Import {
-                segments: [
-                    "fake",
-                ],
-                last: "ResultThing",
+                segments: [],
+                last: "std",
             },
-            "name": "ResultThing",
-            "range": 0..26,
+            "name": "std",
+            "range": 0..12,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -22,22 +20,20 @@ HirModule {
                 path: OtherModule(
                     Fqn {
                         module: NonEmpty(
-                            [
-                                "fake",
-                            ],
+                            [],
                         ),
-                        name: "ResultThing",
+                        name: "std",
                         sub_path: [
-                            "More",
-                            "Stuff",
-                            "here",
+                            "option",
+                            "Option",
+                            "None",
                         ],
                     },
                 ),
                 scope: Idx::<Scope>(0),
             },
             "name": "foo",
-            "range": 26..66,
+            "range": 12..47,
             "scope_id": Idx::<Scope>(0),
         },
     },

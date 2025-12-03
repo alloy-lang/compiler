@@ -1,4 +1,4 @@
-let foo = ResultThing::More::Stuff::here
+let foo = std::option::Option::None
 ===
 [
     ValueDef(
@@ -16,10 +16,10 @@ let foo = ResultThing::More::Stuff::here
                         name: Some(
                             Path {
                                 segments: [
-                                    "ResultThing",
-                                    "More",
-                                    "Stuff",
-                                    "here",
+                                    "std",
+                                    "option",
+                                    "Option",
+                                    "None",
                                 ],
                             },
                         ),
