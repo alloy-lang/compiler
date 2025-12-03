@@ -1,6 +1,6 @@
-import test_data::ResultThing
+import std
 
-let foo = ResultThing:More:Stuff:here
+let foo = std:option:Option:None
 ===
 HirTypedModule {
     expression_types: {
@@ -10,17 +10,7 @@ HirTypedModule {
     },
     pattern_types: {},
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: UnresolvedReference {
-                name: "test_data::ResultThing::More::Stuff::here",
-                module_id: ModuleId(
-                    Id(1),
-                ),
-            },
-            range: 31..68,
-        },
-    ],
+    errors: [],
 }
 [
     ParseError {
@@ -29,7 +19,7 @@ HirTypedModule {
         ],
         kind: Unexpected {
             found: Colon,
-            range: 52..53,
+            range: 25..26,
         },
         context: VariableRef,
     },
@@ -39,7 +29,7 @@ HirTypedModule {
         ],
         kind: Unexpected {
             found: Colon,
-            range: 57..58,
+            range: 32..33,
         },
         context: VariableRef,
     },
@@ -49,7 +39,7 @@ HirTypedModule {
         ],
         kind: Unexpected {
             found: Colon,
-            range: 63..64,
+            range: 39..40,
         },
         context: VariableRef,
     },

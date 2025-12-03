@@ -1,20 +1,20 @@
-import fake::fakeStuff
+import test_data::Test
 
 typeof (|>) : t1 -> (t1 -> t2) -> t2 where
     typevar t1
     typevar t2
-let (|>) = |x, f| -> fakeStuff
+let (|>) = |x, f| -> Test::Thing
 ===
 HirModule {
     imports: Index::<Import> {
         Idx::<Import>(0): {
             "item": Import {
                 segments: [
-                    "fake",
+                    "test_data",
                 ],
-                last: "fakeStuff",
+                last: "Test",
             },
-            "name": "fakeStuff",
+            "name": "Test",
             "range": 0..24,
             "scope_id": Idx::<Scope>(0),
         },
@@ -26,16 +26,18 @@ HirModule {
                     Fqn {
                         module: NonEmpty(
                             [
-                                "fake",
+                                "test_data",
                             ],
                         ),
-                        name: "fakeStuff",
-                        sub_path: [],
+                        name: "Test",
+                        sub_path: [
+                            "Thing",
+                        ],
                     },
                 ),
                 scope: Idx::<Scope>(2),
             },
-            "range": 118..127,
+            "range": 118..129,
         },
         Idx::<Expression>(1): {
             "item": Lambda {
@@ -46,7 +48,7 @@ HirModule {
                 body: Idx::<Expression>(0),
             },
             "name": "|>",
-            "range": 97..127,
+            "range": 97..129,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -72,11 +74,8 @@ HirModule {
         Idx::<TypeReference>(0): {
             "item": Named(
                 ThisModule {
-                    path: NonEmpty(
-                        [
-                            "t1",
-                        ],
-                    ),
+                    name: "t1",
+                    subname: None,
                     scope: Idx::<Scope>(1),
                 },
             ),
@@ -85,11 +84,8 @@ HirModule {
         Idx::<TypeReference>(1): {
             "item": Named(
                 ThisModule {
-                    path: NonEmpty(
-                        [
-                            "t1",
-                        ],
-                    ),
+                    name: "t1",
+                    subname: None,
                     scope: Idx::<Scope>(1),
                 },
             ),
@@ -98,11 +94,8 @@ HirModule {
         Idx::<TypeReference>(2): {
             "item": Named(
                 ThisModule {
-                    path: NonEmpty(
-                        [
-                            "t2",
-                        ],
-                    ),
+                    name: "t2",
+                    subname: None,
                     scope: Idx::<Scope>(1),
                 },
             ),
@@ -124,11 +117,8 @@ HirModule {
         Idx::<TypeReference>(5): {
             "item": Named(
                 ThisModule {
-                    path: NonEmpty(
-                        [
-                            "t2",
-                        ],
-                    ),
+                    name: "t2",
+                    subname: None,
                     scope: Idx::<Scope>(1),
                 },
             ),

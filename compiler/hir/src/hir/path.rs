@@ -4,7 +4,8 @@ use super::*;
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum Path {
     ThisModule {
-        path: NonEmpty<Name>,
+        name: Name,
+        subname: Option<Name>,
         scope: ScopeIdx,
     },
     OtherModule(Fqn),
@@ -18,7 +19,8 @@ impl Path {
         scope: ScopeIdx,
     ) -> Self {
         Self::ThisModule {
-            path: NonEmpty::from((first.into(), rest.into_iter().map(Into::into).collect())),
+            name: first.into(),
+            subname: rest.into_iter().next().map(Into::into),
             scope,
         }
     }

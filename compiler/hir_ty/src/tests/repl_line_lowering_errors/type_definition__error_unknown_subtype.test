@@ -18,7 +18,7 @@ HirTypedModule {
             kind: UnresolvedReference {
                 name: "Either::Nothing",
                 module_id: ModuleId(
-                    Id(1),
+                    Id(4),
                 ),
             },
             range: 37..67,

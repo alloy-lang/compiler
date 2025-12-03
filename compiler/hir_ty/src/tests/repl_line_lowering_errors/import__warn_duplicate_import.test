@@ -16,7 +16,7 @@ HirTypedModule {
             kind: UnresolvedReference {
                 name: "std::functor::map",
                 module_id: ModuleId(
-                    Id(1),
+                    Id(4),
                 ),
             },
             range: 51..66,

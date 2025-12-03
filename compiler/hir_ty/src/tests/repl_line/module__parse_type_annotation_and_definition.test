@@ -1,120 +1,256 @@
 module TestModule1 where
-    import test_data::{TestType, ResultThing, Thing, (<|)}
+    import test_data
+    import test_data::Test
+    import std::function::(<|)
 
-    typeof testThing : (t2 -> t1) -> t2 -> t2 -> ResultThing where
-      typevar t1 = Thing
+    typeof testThing : (t2 -> t1) -> t2 -> t2 -> Test[(t1, t1)] where
+      typevar t1
       typevar t2
-    let testThing = |funky, x, y| -> TestType::new <| (funky(x), funky(y))
+    let testThing = |funky, x, y| -> test_data::new <| (funky(x), funky(y))
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Tuple(
-            NonEmpty(
-                [
-                    Generic(
-                        0,
-                    ),
-                    Generic(
-                        0,
-                    ),
-                ],
+        Idx::<Expression>(0): Lambda {
+            arg_type: Generic(
+                0,
             ),
-        ),
+            return_type: Generic(
+                1,
+            ),
+        },
         Idx::<Expression>(7): Lambda {
             arg_type: Lambda {
                 arg_type: Generic(
-                    1,
+                    2,
                 ),
                 return_type: Generic(
-                    0,
+                    3,
                 ),
             },
             return_type: Lambda {
                 arg_type: Generic(
-                    1,
+                    2,
                 ),
                 return_type: Lambda {
                     arg_type: Generic(
-                        1,
+                        2,
                     ),
-                    return_type: Tuple(
-                        NonEmpty(
-                            [
-                                Generic(
-                                    0,
-                                ),
-                                Generic(
-                                    0,
-                                ),
-                            ],
+                    return_type: Lambda {
+                        arg_type: Generic(
+                            0,
                         ),
-                    ),
+                        return_type: Generic(
+                            1,
+                        ),
+                    },
                 },
             },
         },
         Idx::<Expression>(4): Generic(
-            0,
+            3,
         ),
         Idx::<Expression>(1): Generic(
-            1,
+            2,
         ),
         Idx::<Expression>(5): Tuple(
             NonEmpty(
                 [
                     Generic(
-                        0,
+                        3,
                     ),
                     Generic(
-                        0,
+                        3,
                     ),
                 ],
             ),
         ),
         Idx::<Expression>(2): Generic(
-            0,
+            3,
         ),
-        Idx::<Expression>(6): Tuple(
-            NonEmpty(
-                [
-                    Generic(
-                        0,
-                    ),
-                    Generic(
-                        0,
-                    ),
-                ],
+        Idx::<Expression>(6): Lambda {
+            arg_type: Generic(
+                0,
             ),
-        ),
+            return_type: Generic(
+                1,
+            ),
+        },
         Idx::<Expression>(3): Generic(
-            1,
+            2,
         ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Lambda {
             arg_type: Generic(
-                1,
+                2,
             ),
             return_type: Generic(
-                0,
+                3,
             ),
         },
         Idx::<Pattern>(1): Generic(
-            1,
+            2,
         ),
         Idx::<Pattern>(2): Generic(
-            1,
+            2,
         ),
     },
     warnings: [],
     errors: [
         TypeInferenceError {
-            kind: UnresolvedReference {
-                name: "test_data::TestType::new",
-                module_id: ModuleId(
-                    Id(1),
-                ),
+            kind: ConflictingTypeAnnotation {
+                expected: Lambda {
+                    arg_type: Lambda {
+                        arg_type: Generic(
+                            0,
+                        ),
+                        return_type: Generic(
+                            1,
+                        ),
+                    },
+                    return_type: Lambda {
+                        arg_type: Generic(
+                            0,
+                        ),
+                        return_type: Lambda {
+                            arg_type: Generic(
+                                0,
+                            ),
+                            return_type: Bounded {
+                                base: TypeDef(
+                                    Fql {
+                                        module_id: ModuleId(
+                                            Id(0),
+                                        ),
+                                        local_id: Idx::<TypeDefinition>(1),
+                                    },
+                                ),
+                                args: [
+                                    Tuple(
+                                        NonEmpty(
+                                            [
+                                                Generic(
+                                                    1,
+                                                ),
+                                                Generic(
+                                                    1,
+                                                ),
+                                            ],
+                                        ),
+                                    ),
+                                ],
+                            },
+                        },
+                    },
+                },
+                found: Lambda {
+                    arg_type: Lambda {
+                        arg_type: Generic(
+                            2,
+                        ),
+                        return_type: Generic(
+                            3,
+                        ),
+                    },
+                    return_type: Lambda {
+                        arg_type: Generic(
+                            2,
+                        ),
+                        return_type: Lambda {
+                            arg_type: Generic(
+                                2,
+                            ),
+                            return_type: Lambda {
+                                arg_type: Generic(
+                                    0,
+                                ),
+                                return_type: Generic(
+                                    1,
+                                ),
+                            },
+                        },
+                    },
+                },
             },
-            range: 231..245,
+            range: 213..284,
+        },
+        TypeInferenceError {
+            kind: UnificationError(
+                TypeMismatch(
+                    Function(
+                        Var(
+                            TypeVarId(
+                                0,
+                            ),
+                        ),
+                        Var(
+                            TypeVarId(
+                                1,
+                            ),
+                        ),
+                    ),
+                    Tuple(
+                        [
+                            Var(
+                                TypeVarId(
+                                    6,
+                                ),
+                            ),
+                            Var(
+                                TypeVarId(
+                                    6,
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+            ),
+            range: 246..284,
+        },
+        TypeInferenceError {
+            kind: UnificationError(
+                TypeMismatch(
+                    Function(
+                        Var(
+                            TypeVarId(
+                                0,
+                            ),
+                        ),
+                        Var(
+                            TypeVarId(
+                                1,
+                            ),
+                        ),
+                    ),
+                    App {
+                        constructor: TypeDef(
+                            Fql {
+                                module_id: ModuleId(
+                                    Id(0),
+                                ),
+                                local_id: Idx::<TypeDefinition>(1),
+                            },
+                        ),
+                        args: [
+                            Tuple(
+                                [
+                                    Var(
+                                        TypeVarId(
+                                            11,
+                                        ),
+                                    ),
+                                    Var(
+                                        TypeVarId(
+                                            12,
+                                        ),
+                                    ),
+                                ],
+                            ),
+                        ],
+                    },
+                ),
+            ),
+            range: 213..284,
         },
     ],
 }

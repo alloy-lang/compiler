@@ -28,17 +28,7 @@ HirTypedModule {
         ),
     },
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: UnresolvedReference {
-                name: "Test::Thing",
-                module_id: ModuleId(
-                    Id(0),
-                ),
-            },
-            range: 30..37,
-        },
-    ],
+    errors: [],
 }
 [
     ParseError {

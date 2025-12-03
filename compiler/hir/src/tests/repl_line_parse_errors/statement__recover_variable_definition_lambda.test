@@ -23,11 +23,8 @@ HirModule {
         Idx::<Expression>(2): {
             "item": VariableRef {
                 path: ThisModule {
-                    path: NonEmpty(
-                        [
-                            "a",
-                        ],
-                    ),
+                    name: "a",
+                    subname: None,
                     scope: Idx::<Scope>(2),
                 },
                 scope: Idx::<Scope>(2),
@@ -37,11 +34,8 @@ HirModule {
         Idx::<Expression>(3): {
             "item": VariableRef {
                 path: ThisModule {
-                    path: NonEmpty(
-                        [
-                            "b",
-                        ],
-                    ),
+                    name: "b",
+                    subname: None,
                     scope: Idx::<Scope>(2),
                 },
                 scope: Idx::<Scope>(2),

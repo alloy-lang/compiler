@@ -1,9 +1,9 @@
-import fake::fakeStuff
+import test_data::Test
 
 typeof (|>) : t1 -> (t1 -> t2) -> t2 where
     typevar t1
     typevar t2
-let (|>) = |x, f| -> fakeStuff
+let (|>) = |x, f| -> Test::Thing
 ===
 HirTypedModule {
     expression_types: {
@@ -43,16 +43,6 @@ HirTypedModule {
         },
     },
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: UnresolvedReference {
-                name: "fake::fakeStuff",
-                module_id: ModuleId(
-                    Id(1),
-                ),
-            },
-            range: 118..127,
-        },
-    ],
+    errors: [],
 }
 []

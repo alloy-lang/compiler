@@ -1,6 +1,6 @@
-import fake::ResultThing
+import std
 
-let foo = ResultThing::More::Stuff::here
+let foo = std::option::Option::None
 ===
 HirTypedModule {
     expression_types: {
@@ -10,16 +10,6 @@ HirTypedModule {
     },
     pattern_types: {},
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: UnresolvedReference {
-                name: "fake::ResultThing::More::Stuff::here",
-                module_id: ModuleId(
-                    Id(1),
-                ),
-            },
-            range: 26..66,
-        },
-    ],
+    errors: [],
 }
 []

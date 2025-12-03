@@ -28,7 +28,7 @@ HirTypedModule {
             kind: UnresolvedReference {
                 name: "Option::Some",
                 module_id: ModuleId(
-                    Id(1),
+                    Id(4),
                 ),
             },
             range: 1..16,

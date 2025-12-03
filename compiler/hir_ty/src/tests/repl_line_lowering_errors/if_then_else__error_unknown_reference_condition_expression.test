@@ -22,7 +22,7 @@ HirTypedModule {
             kind: UnresolvedReference {
                 name: "test",
                 module_id: ModuleId(
-                    Id(1),
+                    Id(4),
                 ),
             },
             range: 3..8,

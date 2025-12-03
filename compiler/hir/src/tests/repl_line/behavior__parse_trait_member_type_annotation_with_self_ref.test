@@ -86,11 +86,8 @@ HirModule {
         Idx::<TypeReference>(5): {
             "item": Named(
                 ThisModule {
-                    path: NonEmpty(
-                        [
-                            "Trait1",
-                        ],
-                    ),
+                    name: "Trait1",
+                    subname: None,
                     scope: Idx::<Scope>(0),
                 },
             ),
@@ -99,11 +96,8 @@ HirModule {
         Idx::<TypeReference>(6): {
             "item": Named(
                 ThisModule {
-                    path: NonEmpty(
-                        [
-                            "Type1",
-                        ],
-                    ),
+                    name: "Type1",
+                    subname: None,
                     scope: Idx::<Scope>(0),
                 },
             ),

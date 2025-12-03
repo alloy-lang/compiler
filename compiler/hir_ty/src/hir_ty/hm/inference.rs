@@ -43,10 +43,10 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
                         db,
                         module_id,
                         &hir::Path::ThisModule {
-                            path: NonEmpty::new(name),
+                            name: name.clone(),
+                            subname: None,
                             scope,
                         },
-                        scope,
                     )
                 else {
                     continue;
@@ -97,6 +97,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
                 .pattern_types
                 .insert(pattern_id, resolved_type.clone());
 
+            // TODO: patterns cannot have type annotations, however pattern types can be specified BY type annotations on expressions
             // Check for type annotation conflicts
             check_type_annotation(db, &mut result, module_id, range, name_op, resolved_type);
         }

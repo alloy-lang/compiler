@@ -1,9 +1,9 @@
-use super::resolve_cross_module_expression;
+use super::{resolve_cross_module_expression, resolve_cross_module_type_definition};
 use crate::{EPFql, Fql};
 use alloy_hir as hir;
-use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
-use non_empty_vec::NonEmpty;
+use non_empty_vec::{ne_vec, NonEmpty};
+use std::convert::TryFrom;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Expression {
@@ -43,6 +43,11 @@ pub enum Expression {
         condition: Fql<hir::Expression>,
         targets: Vec<(Fql<hir::Pattern>, Fql<hir::Expression>)>,
     },
+    /// Reference to a variant constructor (e.g., Option::None or Option::Some)
+    VariantConstructor {
+        type_def: Fql<hir::TypeDefinition>,
+        variant_name: hir::Name,
+    },
 }
 
 pub fn resolve_expression(
@@ -57,8 +62,8 @@ pub fn resolve_expression(
     match expr {
         hir::Expression::Literal(lit) => Expression::Literal(lit.clone()),
         hir::Expression::Unit => Expression::Unit,
-        hir::Expression::VariableRef { path, scope } => {
-            resolve_variable_ref(db, source_ref, module_id, path, *scope)
+        hir::Expression::VariableRef { path, .. } => {
+            resolve_variable_ref(db, source_ref, module_id, path)
         }
         hir::Expression::Lambda { args, body } => {
             let fql_args = args
@@ -70,11 +75,9 @@ pub fn resolve_expression(
                 body: Fql::new(module_id, *body),
             }
         }
-        hir::Expression::FunctionCall {
-            target,
-            scope,
-            args,
-        } => resolve_function_call(db, source_ref, module_id, target, scope, args),
+        hir::Expression::FunctionCall { target, args, .. } => {
+            resolve_function_call(db, source_ref, module_id, target, args)
+        }
         hir::Expression::Binary { op, lhs, rhs } => Expression::Binary {
             op: op.clone(),
             lhs: Fql::new(module_id, *lhs),
@@ -113,38 +116,75 @@ fn resolve_variable_ref(
     source_ref: Fql<hir::Expression>,
     module_id: ModuleId,
     path: &hir::Path,
-    scope: ScopeIdx,
 ) -> Expression {
     match path {
         hir::Path::ThisModule {
-            path: names,
-            scope: _, // check to see if the scope is the same as the expression's scope
+            name,
+            subname,
+            scope: this_scope,
         } => {
             let (hir_module, _) = hir::lower_file(db, module_id);
-            if let Some((var_id, _)) = hir_module.get_expression_by_name(names.last(), scope) {
+
+            // First try to resolve as a variable (expression or pattern)
+            if let Some((var_id, _)) = hir_module.get_expression_by_name(name, *this_scope) {
                 let var_fql = Fql::new(module_id, var_id);
-                Expression::VariableRef(var_fql.into())
-            } else if let Some((pat_id, _)) = hir_module.get_pattern_by_name(names.last(), scope) {
+                return Expression::VariableRef(var_fql.into());
+            }
+            if let Some((pat_id, _)) = hir_module.get_pattern_by_name(name, *this_scope) {
                 let pat_fql = Fql::new(module_id, pat_id);
-                Expression::VariableRef(pat_fql.into())
-            } else {
-                Expression::UnknownReference {
-                    source_ref,
-                    module_id,
-                    path: names.clone(),
+                return Expression::VariableRef(pat_fql.into());
+            }
+
+            // Check if this is a qualified variant constructor (e.g., Option::None)
+            if let Some(subname) = subname {
+                let type_name = name;
+                let variant_name = subname;
+
+                if let Some((type_def_id, type_def)) =
+                    hir_module.get_type_definition_by_name(type_name, *this_scope)
+                {
+                    return if type_def.kind.has_variant(variant_name) {
+                        Expression::VariantConstructor {
+                            type_def: Fql::new(module_id, type_def_id),
+                            variant_name: variant_name.clone(),
+                        }
+                    } else {
+                        Expression::UnknownReference {
+                            source_ref,
+                            module_id,
+                            path: ne_vec![type_name.clone(), variant_name.clone()],
+                        }
+                    };
                 }
+            }
+
+            Expression::UnknownReference {
+                source_ref,
+                module_id,
+                path: ne_vec![name.clone()],
             }
         }
         hir::Path::OtherModule(fqn) => {
+            // Try to resolve as a regular expression reference
             if let Some(var_fql) = resolve_cross_module_expression(db, &fqn) {
-                Expression::VariableRef(var_fql.into())
-            } else {
-                // If resolution fails, use a fresh type variable
-                Expression::UnknownReference {
-                    source_ref,
-                    module_id,
-                    path: fqn.segments(),
+                return Expression::VariableRef(var_fql.into());
+            }
+
+            // Try to resolve as a variant constructor
+            if let Ok(sub_path) = NonEmpty::try_from(fqn.sub_path.clone()) {
+                if let Some(type_def_fql) = resolve_cross_module_type_definition(db, &fqn) {
+                    let variant_name = sub_path.last().clone();
+                    return Expression::VariantConstructor {
+                        type_def: type_def_fql,
+                        variant_name,
+                    };
                 }
+            }
+
+            Expression::UnknownReference {
+                source_ref,
+                module_id,
+                path: fqn.segments(),
             }
         }
         hir::Path::Unknown(names) => Expression::UnknownReference {
@@ -160,26 +200,26 @@ fn resolve_function_call(
     source_ref: Fql<hir::Expression>,
     module_id: ModuleId,
     target: &hir::Path,
-    scope: &ScopeIdx,
     args: &Vec<hir::ExpressionIdx>,
 ) -> Expression {
     let fql = match target {
         hir::Path::ThisModule {
-            path: names,
-            scope: _, // check to see if the scope is the same as the expression's scope
+            name,
+            scope: this_scope,
+            ..
         } => {
             let (hir_module, _) = hir::lower_file(db, module_id);
-            if let Some((expr_id, _)) = hir_module.get_expression_by_name(names.last(), *scope) {
+            if let Some((expr_id, _)) = hir_module.get_expression_by_name(name, *this_scope) {
                 let expr_fql = Fql::new(module_id, expr_id);
                 EPFql::Expression(expr_fql)
-            } else if let Some((pat_id, _)) = hir_module.get_pattern_by_name(names.last(), *scope) {
+            } else if let Some((pat_id, _)) = hir_module.get_pattern_by_name(name, *this_scope) {
                 let pat_fql = Fql::new(module_id, pat_id);
                 EPFql::Pattern(pat_fql)
             } else {
                 return Expression::UnknownReference {
                     source_ref,
                     module_id,
-                    path: names.clone(),
+                    path: ne_vec![name.clone()],
                 };
             }
         }

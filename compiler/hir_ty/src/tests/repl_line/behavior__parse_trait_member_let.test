@@ -1,13 +1,23 @@
-behavior TestTrait1 for Type1 where
+typedef Type1 = Thing
+
+trait Trait1 where
     typeof test : Int
 
     let thing = test
+end
+
+behavior Trait1 for Type1 where
+    typeof test : Int
+    let test = 0
 end
 ===
 HirTypedModule {
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
         ),
     },
     pattern_types: {},
@@ -17,10 +27,10 @@ HirTypedModule {
             kind: UnresolvedReference {
                 name: "test",
                 module_id: ModuleId(
-                    Id(1),
+                    Id(4),
                 ),
             },
-            range: 63..80,
+            range: 69..86,
         },
     ],
 }

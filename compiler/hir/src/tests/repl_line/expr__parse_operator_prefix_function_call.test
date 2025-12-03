@@ -40,11 +40,8 @@ HirModule {
         Idx::<Expression>(3): {
             "item": VariableRef {
                 path: ThisModule {
-                    path: NonEmpty(
-                        [
-                            "f1",
-                        ],
-                    ),
+                    name: "f1",
+                    subname: None,
                     scope: Idx::<Scope>(2),
                 },
                 scope: Idx::<Scope>(2),
@@ -54,11 +51,8 @@ HirModule {
         Idx::<Expression>(4): {
             "item": FunctionCall {
                 target: ThisModule {
-                    path: NonEmpty(
-                        [
-                            "f2",
-                        ],
-                    ),
+                    name: "f2",
+                    subname: None,
                     scope: Idx::<Scope>(2),
                 },
                 scope: Idx::<Scope>(2),
@@ -83,11 +77,8 @@ HirModule {
         Idx::<Expression>(6): {
             "item": VariableRef {
                 path: ThisModule {
-                    path: NonEmpty(
-                        [
-                            "func1",
-                        ],
-                    ),
+                    name: "func1",
+                    subname: None,
                     scope: Idx::<Scope>(0),
                 },
                 scope: Idx::<Scope>(0),
@@ -97,11 +88,8 @@ HirModule {
         Idx::<Expression>(7): {
             "item": VariableRef {
                 path: ThisModule {
-                    path: NonEmpty(
-                        [
-                            "func2",
-                        ],
-                    ),
+                    name: "func2",
+                    subname: None,
                     scope: Idx::<Scope>(0),
                 },
                 scope: Idx::<Scope>(0),
@@ -111,11 +99,8 @@ HirModule {
         Idx::<Expression>(8): {
             "item": FunctionCall {
                 target: ThisModule {
-                    path: NonEmpty(
-                        [
-                            ">>",
-                        ],
-                    ),
+                    name: ">>",
+                    subname: None,
                     scope: Idx::<Scope>(0),
                 },
                 scope: Idx::<Scope>(0),

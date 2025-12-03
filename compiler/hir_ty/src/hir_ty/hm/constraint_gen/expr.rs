@@ -37,6 +37,14 @@ pub(crate) fn infer_expr_hm(
         res::Expression::Match { condition, targets } => {
             infer_match(ctx, source_fql, condition, &targets)
         }
+        res::Expression::VariantConstructor {
+            type_def,
+            variant_name: _,
+        } => {
+            // For now, give variant constructors a fresh type variable
+            // TODO: Look up the actual type of the variant from the type definition
+            infer_variant_constructor(ctx, source_fql, type_def)
+        }
         res::Expression::Missing => infer_missing_expr(ctx, source_fql),
         res::Expression::UnknownReference {
             source_ref,
@@ -212,6 +220,17 @@ pub(super) fn infer_missing_expr(
     source_fql: Fql<hir::Expression>,
 ) -> MonoType {
     // Missing expressions get a fresh type variable
+    let ty = ctx.fresh_type_var();
+    ctx.assign_type(source_fql, ty)
+}
+
+fn infer_variant_constructor(
+    ctx: &mut HMInferenceContext,
+    source_fql: Fql<hir::Expression>,
+    _type_def: Fql<hir::TypeDefinition>,
+) -> MonoType {
+    // TODO: Look up the actual type of the variant from the type definition
+    // For now, just use a fresh type variable
     let ty = ctx.fresh_type_var();
     ctx.assign_type(source_fql, ty)
 }

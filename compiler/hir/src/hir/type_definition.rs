@@ -17,10 +17,31 @@ pub enum TypeDefinitionKind {
     Union(Vec<TypeDefinitionMember>),
 }
 
+impl TypeDefinitionKind {
+    /// Check if this type definition has a variant with the given name
+    pub fn has_variant(&self, variant_name: &Name) -> bool {
+        match self {
+            TypeDefinitionKind::Single(member) => member.name() == variant_name,
+            TypeDefinitionKind::Union(members) => members.iter().any(|m| m.name() == variant_name),
+            TypeDefinitionKind::Missing | TypeDefinitionKind::TypeVariable(_) => false,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeDefinitionMember {
     name: Name,
     properties: Vec<TypeIdx>,
+}
+
+impl TypeDefinitionMember {
+    pub fn name(&self) -> &Name {
+        &self.name
+    }
+
+    pub fn properties(&self) -> &[TypeIdx] {
+        &self.properties
+    }
 }
 
 pub(super) fn lower_type_definition(ctx: &mut LoweringCtx, ast: &ast::TypeDefinition) {

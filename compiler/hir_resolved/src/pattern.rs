@@ -1,8 +1,7 @@
 use crate::{resolve_cross_module_pattern, resolve_cross_module_type_definition, Fql};
 use alloy_hir as hir;
-use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
-use non_empty_vec::NonEmpty;
+use non_empty_vec::{ne_vec, NonEmpty};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Pattern {
@@ -41,14 +40,12 @@ pub fn resolve_pattern(
             let fql_elements = elements.iter().map(|e| Fql::new(module_id, *e)).collect();
             unsafe { Pattern::Tuple(NonEmpty::new_unchecked(fql_elements)) }
         }
-        hir::Pattern::PatternRef { path, scope } => {
-            resolve_pattern_ref(db, source_ref, module_id, path, *scope)
+        hir::Pattern::PatternRef { path, .. } => {
+            resolve_pattern_ref(db, source_ref, module_id, path)
         }
-        hir::Pattern::Destructure {
-            target,
-            scope,
-            args,
-        } => resolve_destructure(db, source_ref, module_id, target, *scope, args.clone()),
+        hir::Pattern::Destructure { target, args, .. } => {
+            resolve_destructure(db, source_ref, module_id, target, args.clone())
+        }
         hir::Pattern::Nil => Pattern::Nil,
         hir::Pattern::Missing => Pattern::Missing,
     }
@@ -59,26 +56,63 @@ fn resolve_pattern_ref(
     source_ref: Fql<hir::Pattern>,
     module_id: ModuleId,
     path: &hir::Path,
-    scope: ScopeIdx,
 ) -> Pattern {
     match path {
         hir::Path::ThisModule {
-            path: names,
-            scope: _, // check to see if the scope is the same as the expression's scope
+            name,
+            subname,
+            scope: this_scope,
         } => {
             let (hir_module, _) = hir::lower_file(db, module_id);
-            if let Some((pat_id, _)) = hir_module.get_pattern_by_name(names.last(), scope) {
+
+            // First check if this is a qualified variant reference (e.g., Option::None)
+            if let Some(subname) = subname {
+                let type_name = name;
+                let variant_name = subname;
+
+                // Try to find the type definition, starting from the current scope
+                // and falling back to the root scope
+                let type_def_result =
+                    hir_module.get_type_definition_by_name(type_name, *this_scope);
+
+                if let Some((type_def_id, type_def)) = type_def_result {
+                    // Check if this type definition has the requested variant
+                    if type_def.kind.has_variant(variant_name) {
+                        return Pattern::Destructure {
+                            target: Fql::new(module_id, type_def_id),
+                            args: vec![],
+                        };
+                    }
+                }
+            }
+
+            // Fall back to looking up as a pattern reference
+            if let Some((pat_id, _)) = hir_module.get_pattern_by_name(name, *this_scope) {
                 let pat_fql = Fql::new(module_id, pat_id);
                 Pattern::PatternRef(pat_fql)
             } else {
                 Pattern::UnknownReference {
                     source_ref,
                     module_id,
-                    path: names.clone(),
+                    path: ne_vec![name.clone()],
                 }
             }
         }
         hir::Path::OtherModule(fqn) => {
+            // Check if this is a qualified variant
+            // Case 1: import Option, then Option::None (sub_path: ["None"])
+            // Case 2: import option, then option::Option::None (sub_path: ["Option", "None"])
+            if !fqn.sub_path.is_empty() {
+                // Try to resolve as a qualified variant
+                if let Some(type_def_fql) = resolve_cross_module_type_definition(db, &fqn) {
+                    return Pattern::Destructure {
+                        target: type_def_fql,
+                        args: vec![],
+                    };
+                }
+            }
+
+            // Fall back to pattern reference lookup
             if let Some(pat_fql) = resolve_cross_module_pattern(db, &fqn) {
                 Pattern::PatternRef(pat_fql)
             } else {
@@ -102,7 +136,6 @@ fn resolve_destructure(
     source_ref: Fql<hir::Pattern>,
     module_id: ModuleId,
     target: &hir::Path,
-    scope: ScopeIdx,
     args: Vec<hir::PatternIdx>,
 ) -> Pattern {
     let fql_args = args
@@ -112,25 +145,37 @@ fn resolve_destructure(
 
     let target = match target {
         hir::Path::ThisModule {
-            path: names,
-            scope: _, // check to see if the scope is the same as the expression's scope
+            name: type_name,
+            subname,
+            scope: target_scope,
         } => {
             let (hir_module, _) = hir::lower_file(db, module_id);
-            if let Some((type_def_id, _)) =
-                hir_module.get_type_definition_by_name(names.last(), scope)
+
+            if let Some((type_def_id, type_def)) =
+                hir_module.get_type_definition_by_name(type_name, *target_scope)
             {
+                // Check if this is a qualified variant (e.g., Option::Some)
+                if let Some(variant_name) = subname {
+                    if !type_def.kind.has_variant(variant_name) {
+                        return Pattern::UnknownReference {
+                            source_ref,
+                            module_id,
+                            path: ne_vec![type_name.clone(), variant_name.clone()],
+                        };
+                    }
+                }
                 Fql::new(module_id, type_def_id)
             } else {
                 return Pattern::UnknownReference {
                     source_ref,
                     module_id,
-                    path: names.clone(),
+                    path: ne_vec![type_name.clone()],
                 };
             }
         }
         hir::Path::OtherModule(fqn) => {
-            if let Some(expr_fql) = resolve_cross_module_type_definition(db, &fqn) {
-                expr_fql
+            if let Some(type_fql) = resolve_cross_module_type_definition(db, &fqn) {
+                type_fql
             } else {
                 return Pattern::UnknownReference {
                     source_ref,

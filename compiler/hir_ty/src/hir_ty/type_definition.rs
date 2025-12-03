@@ -9,11 +9,9 @@ pub fn type_definition_to_resolved(
     db: &dyn HirTyDatabase,
     current_module_id: ModuleId,
     path: &hir::Path,
-    scope: ScopeIdx,
     ctx: &mut super::type_reference::TypeResolutionContext,
 ) -> Option<ResolvedType> {
-    let (resolved_module_id, type_idx) =
-        resolve_type_definition_path(db, current_module_id, path, scope)?;
+    let (resolved_module_id, type_idx) = resolve_type_definition_path(db, current_module_id, path)?;
     resolve_type_definition(db, resolved_module_id, type_idx, ctx)
 }
 
@@ -40,14 +38,7 @@ fn resolve_type_definition(
                         .iter()
                         .filter_map(|constraint| match constraint {
                             hir::TypeVariableConstraint::Trait(path) => {
-                                // Resolve the trait path to get the trait index
-                                if let Some((trait_module_id, trait_idx)) =
-                                    resolve_trait_path(db, current_module_id, path)
-                                {
-                                    Some(Fql::new(trait_module_id, trait_idx))
-                                } else {
-                                    None
-                                }
+                                resolve_trait_path(db, current_module_id, path)
                             }
                             hir::TypeVariableConstraint::Kind(_) => {
                                 // Kind constraints aren't trait constraints
@@ -82,25 +73,21 @@ fn resolve_type_definition(
     Some(ty)
 }
 
-// todo: make this return a Fql<hir::Trait>
 fn resolve_trait_path(
     db: &dyn HirTyDatabase,
     current_module_id: ModuleId,
     path: &hir::Path,
-) -> Option<(ModuleId, hir::TraitIdx)> {
+) -> Option<Fql<hir::Trait>> {
     match path {
-        hir::Path::ThisModule {
-            path: this_path,
-            scope: _,
-        } => {
-            let trait_idx = get_trait_by_name(db, current_module_id, this_path.first())?;
-            Some((current_module_id, trait_idx))
+        hir::Path::ThisModule { name, .. } => {
+            let trait_idx = get_trait_by_name(db, current_module_id, name)?;
+            Some(Fql::new(current_module_id, trait_idx))
         }
         hir::Path::OtherModule(fqn) => {
             let module_slug = fqn.module_slug();
             let other_module_id = db.find_module_by_slug(&*module_slug)?;
             let trait_idx = get_trait_by_name(db, other_module_id, &fqn.name)?;
-            Some((other_module_id, trait_idx))
+            Some(Fql::new(other_module_id, trait_idx))
         }
         hir::Path::Unknown(_) => None,
     }
@@ -123,15 +110,14 @@ fn resolve_type_definition_path(
     db: &dyn HirTyDatabase,
     current_module_id: ModuleId,
     path: &hir::Path,
-    _scope: ScopeIdx,
 ) -> Option<(ModuleId, hir::TypeDefinitionIdx)> {
     match path {
         hir::Path::ThisModule {
-            path: this_path,
-            scope,
+            name,
+            scope: target_scope,
+            ..
         } => {
-            let type_idx =
-                get_type_definition_by_name(db, current_module_id, this_path.first(), *scope)?;
+            let type_idx = get_type_definition_by_name(db, current_module_id, name, *target_scope)?;
             Some((current_module_id, type_idx))
         }
         hir::Path::OtherModule(fqn) => {

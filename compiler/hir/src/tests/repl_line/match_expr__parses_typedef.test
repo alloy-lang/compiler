@@ -44,11 +44,8 @@ HirModule {
         Idx::<Expression>(1): {
             "item": VariableRef {
                 path: ThisModule {
-                    path: NonEmpty(
-                        [
-                            "l",
-                        ],
-                    ),
+                    name: "l",
+                    subname: None,
                     scope: Idx::<Scope>(2),
                 },
                 scope: Idx::<Scope>(2),
@@ -58,11 +55,8 @@ HirModule {
         Idx::<Expression>(2): {
             "item": VariableRef {
                 path: ThisModule {
-                    path: NonEmpty(
-                        [
-                            "r",
-                        ],
-                    ),
+                    name: "r",
+                    subname: None,
                     scope: Idx::<Scope>(3),
                 },
                 scope: Idx::<Scope>(3),
@@ -98,11 +92,9 @@ HirModule {
         Idx::<Pattern>(1): {
             "item": Destructure {
                 target: ThisModule {
-                    path: NonEmpty(
-                        [
-                            "Either",
-                            "Left",
-                        ],
+                    name: "Either",
+                    subname: Some(
+                        "Left",
                     ),
                     scope: Idx::<Scope>(0),
                 },
@@ -124,11 +116,9 @@ HirModule {
         Idx::<Pattern>(3): {
             "item": Destructure {
                 target: ThisModule {
-                    path: NonEmpty(
-                        [
-                            "Either",
-                            "Right",
-                        ],
+                    name: "Either",
+                    subname: Some(
+                        "Right",
                     ),
                     scope: Idx::<Scope>(0),
                 },
@@ -144,11 +134,8 @@ HirModule {
         Idx::<TypeReference>(0): {
             "item": Named(
                 ThisModule {
-                    path: NonEmpty(
-                        [
-                            "l",
-                        ],
-                    ),
+                    name: "l",
+                    subname: None,
                     scope: Idx::<Scope>(1),
                 },
             ),
@@ -163,11 +150,8 @@ HirModule {
         Idx::<TypeReference>(2): {
             "item": Named(
                 ThisModule {
-                    path: NonEmpty(
-                        [
-                            "r",
-                        ],
-                    ),
+                    name: "r",
+                    subname: None,
                     scope: Idx::<Scope>(1),
                 },
             ),

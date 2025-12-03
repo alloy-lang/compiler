@@ -10,11 +10,8 @@ HirModule {
         Idx::<Expression>(0): {
             "item": VariableRef {
                 path: ThisModule {
-                    path: NonEmpty(
-                        [
-                            "test",
-                        ],
-                    ),
+                    name: "test",
+                    subname: None,
                     scope: Idx::<Scope>(1),
                 },
                 scope: Idx::<Scope>(1),

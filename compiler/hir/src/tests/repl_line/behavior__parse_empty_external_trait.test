@@ -40,11 +40,8 @@ HirModule {
         Idx::<TypeReference>(1): {
             "item": Named(
                 ThisModule {
-                    path: NonEmpty(
-                        [
-                            "Type1",
-                        ],
-                    ),
+                    name: "Type1",
+                    subname: None,
                     scope: Idx::<Scope>(0),
                 },
             ),

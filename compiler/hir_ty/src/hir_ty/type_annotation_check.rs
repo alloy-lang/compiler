@@ -25,10 +25,10 @@ pub fn check_type_annotation(
             db,
             current_module_id,
             &hir::Path::ThisModule {
-                path: NonEmpty::new(name.clone()),
+                name: name.clone(),
+                subname: None,
                 scope,
             },
-            scope,
         ) else {
             // Unable to resolve type annotation - skip check
             return;
@@ -226,15 +226,10 @@ fn type_reference_matches_typedef(
 
     // Resolve the path to see if it points to the expected type definition
     match path {
-        hir::Path::ThisModule {
-            path: this_path,
-            scope,
-        } => {
+        hir::Path::ThisModule { name, scope, .. } => {
             // Try to resolve in the current module
             let (hir_module, _) = hir::lower_file(db, current_module_id);
-            if let Some((type_idx, _)) =
-                hir_module.get_type_definition_by_name(this_path.first(), *scope)
-            {
+            if let Some((type_idx, _)) = hir_module.get_type_definition_by_name(name, *scope) {
                 // Check if this type definition matches our expected one
                 current_module_id == expected_type_fql.module_id
                     && type_idx == expected_type_fql.local_id
@@ -279,12 +274,10 @@ fn type_reference_matches_trait(
 
     // Resolve the path to see if it points to the expected trait
     match path {
-        hir::Path::ThisModule {
-            path: this_path, ..
-        } => {
+        hir::Path::ThisModule { name, .. } => {
             // Try to resolve in the current module
             let (hir_module, _) = hir::lower_file(db, current_module_id);
-            if let Some((trait_idx, _)) = hir_module.get_trait_by_name(this_path.first()) {
+            if let Some((trait_idx, _)) = hir_module.get_trait_by_name(name) {
                 // Check if this trait matches our expected one
                 current_module_id == expected_trait_fql.module_id
                     && trait_idx == expected_trait_fql.local_id
