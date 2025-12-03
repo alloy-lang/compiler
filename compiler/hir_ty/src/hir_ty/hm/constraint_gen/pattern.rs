@@ -34,9 +34,13 @@ pub(super) fn infer_pattern_hm(
         res::Pattern::Missing => infer_missing_pattern(ctx, source_fql),
         res::Pattern::UnknownReference {
             source_ref,
-            module_id: _module_id,
-            path: _path,
-        } => ctx.unknown_reference(source_ref),
+            module_id,
+            path,
+        } => {
+            // Report the resolution error
+            ctx.report_resolution_error(source_ref.clone(), path, module_id);
+            ctx.unknown_reference(source_ref)
+        }
     }
 }
 

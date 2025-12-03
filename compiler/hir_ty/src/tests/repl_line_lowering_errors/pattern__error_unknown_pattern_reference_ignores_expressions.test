@@ -34,6 +34,16 @@ HirTypedModule {
         ),
     },
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnresolvedReference {
+                name: "unknown",
+                module_id: ModuleId(
+                    Id(1),
+                ),
+            },
+            range: 18..28,
+        },
+    ],
 }
 []

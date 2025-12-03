@@ -103,7 +103,7 @@ fn run_hir_ty_test(
         camino::Utf8Path::new("./test/test_data.alloy"),
         r#"
     typedef Test[t] = Thing t
-    let test = Thing 0
+    let test = Test::Thing 0
     "#,
     );
     let test_module_id = db.add_module("main", camino::Utf8Path::new("./test/main.alloy"), input);

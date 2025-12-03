@@ -1,5 +1,4 @@
 import test_data::test
-import std::bool::Bool::{True, False}
 
 match test
   \ True -> 0
@@ -29,7 +28,17 @@ HirTypedModule {
         ),
     },
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnresolvedReference {
+                name: "Test::Thing",
+                module_id: ModuleId(
+                    Id(0),
+                ),
+            },
+            range: 30..37,
+        },
+    ],
 }
 [
     ParseError {
@@ -37,7 +46,7 @@ HirTypedModule {
             WhenKw,
         ],
         kind: Missing {
-            offset: 75,
+            offset: 37,
         },
         context: MatchExprWhenKw,
     },

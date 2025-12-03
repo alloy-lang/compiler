@@ -106,6 +106,16 @@ HirTypedModule {
         ),
     },
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnresolvedReference {
+                name: "test_data::TestType::new",
+                module_id: ModuleId(
+                    Id(1),
+                ),
+            },
+            range: 231..245,
+        },
+    ],
 }
 []

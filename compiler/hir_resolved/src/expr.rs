@@ -11,7 +11,7 @@ pub enum Expression {
     UnknownReference {
         source_ref: Fql<hir::Expression>,
         module_id: ModuleId,
-        path: hir::Path,
+        path: NonEmpty<hir::Name>,
     },
     Literal(hir::Literal),
     VariableRef(EPFql),
@@ -131,7 +131,7 @@ fn resolve_variable_ref(
                 Expression::UnknownReference {
                     source_ref,
                     module_id,
-                    path: path.clone(),
+                    path: names.clone(),
                 }
             }
         }
@@ -143,14 +143,14 @@ fn resolve_variable_ref(
                 Expression::UnknownReference {
                     source_ref,
                     module_id,
-                    path: path.clone(),
+                    path: fqn.segments(),
                 }
             }
         }
-        hir::Path::Unknown(_) => Expression::UnknownReference {
+        hir::Path::Unknown(names) => Expression::UnknownReference {
             source_ref,
             module_id,
-            path: path.clone(),
+            path: names.clone(),
         },
     }
 }
@@ -179,7 +179,7 @@ fn resolve_function_call(
                 return Expression::UnknownReference {
                     source_ref,
                     module_id,
-                    path: target.clone(),
+                    path: names.clone(),
                 };
             }
         }
@@ -190,15 +190,15 @@ fn resolve_function_call(
                 return Expression::UnknownReference {
                     source_ref,
                     module_id,
-                    path: target.clone(),
+                    path: fqn.segments(),
                 };
             }
         }
-        hir::Path::Unknown(_) => {
+        hir::Path::Unknown(names) => {
             return Expression::UnknownReference {
                 source_ref,
                 module_id,
-                path: target.clone(),
+                path: names.clone(),
             }
         }
     };

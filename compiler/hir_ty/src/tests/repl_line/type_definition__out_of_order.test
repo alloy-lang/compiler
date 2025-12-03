@@ -13,6 +13,16 @@ HirTypedModule {
     },
     pattern_types: {},
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnresolvedReference {
+                name: "Things::ThingA",
+                module_id: ModuleId(
+                    Id(1),
+                ),
+            },
+            range: 0..30,
+        },
+    ],
 }
 []

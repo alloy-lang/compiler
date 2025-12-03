@@ -34,6 +34,7 @@ impl Diagnostic for TypeInferenceError {
         match &self.kind {
             TypeInferenceErrorKind::ConflictingTypeAnnotation { .. } => Some("E001"),
             TypeInferenceErrorKind::UnificationError(_) => Some("E002"),
+            TypeInferenceErrorKind::UnresolvedReference { .. } => Some("E003"),
         }
     }
 
@@ -53,6 +54,12 @@ impl Diagnostic for TypeInferenceError {
                     format!("Infinite type detected: `{}` occurs in `{}`", var, ty)
                 }
             },
+            TypeInferenceErrorKind::UnresolvedReference { name, module_id } => {
+                format!(
+                    "Cannot resolve reference `{}` in module {:?}",
+                    name, module_id
+                )
+            }
         }
     }
 
@@ -84,6 +91,11 @@ impl Diagnostic for TypeInferenceError {
                     }
                 }
             }
+            TypeInferenceErrorKind::UnresolvedReference { name, module_id: _ } => {
+                builder
+                    .with_primary_label(format!("cannot find `{}` in this scope", name))
+                    .with_help("Make sure this name is defined and in scope")
+            }
         }
     }
 }
@@ -111,6 +123,10 @@ pub enum TypeInferenceErrorKind {
         found: ResolvedType,
     },
     UnificationError(crate::hir_ty::UnificationError),
+    UnresolvedReference {
+        name: String,
+        module_id: alloy_workspace::ModuleId,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq)]

@@ -40,9 +40,13 @@ pub(crate) fn infer_expr_hm(
         res::Expression::Missing => infer_missing_expr(ctx, source_fql),
         res::Expression::UnknownReference {
             source_ref,
-            module_id: _,
-            path: _,
-        } => ctx.unknown_reference(source_ref),
+            module_id,
+            path,
+        } => {
+            // Report the resolution error
+            ctx.report_resolution_error(source_ref.clone(), path, module_id);
+            ctx.unknown_reference(source_ref)
+        }
     }
 }
 

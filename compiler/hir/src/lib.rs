@@ -96,4 +96,16 @@ impl Fqn {
             .collect::<Vec<_>>()
             .join("::")
     }
+
+    pub fn segments(&self) -> NonEmpty<Name> {
+        let mut segments = unsafe { NonEmpty::new_unchecked(vec![]) };
+        for segment in self.module.iter() {
+            segments.push(segment.clone());
+        }
+        segments.push(self.name.clone());
+        for segment in &self.sub_path {
+            segments.push(segment.clone());
+        }
+        segments
+    }
 }

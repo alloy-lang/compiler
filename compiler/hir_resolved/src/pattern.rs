@@ -10,7 +10,7 @@ pub enum Pattern {
     UnknownReference {
         source_ref: Fql<hir::Pattern>,
         module_id: ModuleId,
-        path: hir::Path,
+        path: NonEmpty<hir::Name>,
     },
     Literal(hir::Literal),
     PatternRef(Fql<hir::Pattern>),
@@ -74,7 +74,7 @@ fn resolve_pattern_ref(
                 Pattern::UnknownReference {
                     source_ref,
                     module_id,
-                    path: path.clone(),
+                    path: names.clone(),
                 }
             }
         }
@@ -85,14 +85,14 @@ fn resolve_pattern_ref(
                 Pattern::UnknownReference {
                     source_ref,
                     module_id,
-                    path: path.clone(),
+                    path: fqn.segments(),
                 }
             }
         }
-        hir::Path::Unknown(_) => Pattern::UnknownReference {
+        hir::Path::Unknown(names) => Pattern::UnknownReference {
             source_ref,
             module_id,
-            path: path.clone(),
+            path: names.clone(),
         },
     }
 }
@@ -124,7 +124,7 @@ fn resolve_destructure(
                 return Pattern::UnknownReference {
                     source_ref,
                     module_id,
-                    path: target.clone(),
+                    path: names.clone(),
                 };
             }
         }
@@ -135,15 +135,15 @@ fn resolve_destructure(
                 return Pattern::UnknownReference {
                     source_ref,
                     module_id,
-                    path: target.clone(),
+                    path: fqn.segments(),
                 };
             }
         }
-        hir::Path::Unknown(_) => {
+        hir::Path::Unknown(names) => {
             return Pattern::UnknownReference {
                 source_ref,
                 module_id,
-                path: target.clone(),
+                path: names.clone(),
             }
         }
     };

@@ -11,6 +11,16 @@ HirTypedModule {
     },
     pattern_types: {},
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnresolvedReference {
+                name: "std::functor::map",
+                module_id: ModuleId(
+                    Id(1),
+                ),
+            },
+            range: 51..66,
+        },
+    ],
 }
 []

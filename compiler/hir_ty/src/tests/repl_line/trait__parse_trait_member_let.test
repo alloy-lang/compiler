@@ -12,6 +12,16 @@ HirTypedModule {
     },
     pattern_types: {},
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnresolvedReference {
+                name: "test",
+                module_id: ModuleId(
+                    Id(1),
+                ),
+            },
+            range: 50..67,
+        },
+    ],
 }
 []

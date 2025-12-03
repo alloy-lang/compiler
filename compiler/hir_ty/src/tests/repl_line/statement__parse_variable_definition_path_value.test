@@ -10,6 +10,16 @@ HirTypedModule {
     },
     pattern_types: {},
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnresolvedReference {
+                name: "fake::ResultThing::More::Stuff::here",
+                module_id: ModuleId(
+                    Id(1),
+                ),
+            },
+            range: 26..66,
+        },
+    ],
 }
 []

@@ -1,4 +1,7 @@
-import std::option::Option
+typedef Option[t] =
+    | None
+    | Some(t)
+end
 
 typeof apply : Option[(t1 -> t2)] -> Option[t1] -> Option[t2] where
     typevar t1

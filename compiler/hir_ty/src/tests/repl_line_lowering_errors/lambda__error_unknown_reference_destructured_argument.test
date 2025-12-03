@@ -23,6 +23,16 @@ HirTypedModule {
         ),
     },
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnresolvedReference {
+                name: "Option::Some",
+                module_id: ModuleId(
+                    Id(1),
+                ),
+            },
+            range: 1..16,
+        },
+    ],
 }
 []

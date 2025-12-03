@@ -1,5 +1,9 @@
-import std::either::Either
 import test_data::test
+
+typedef Either[l, r] =
+  | Left(l)
+  | Right(r)
+end
 
 match test when
   \ Either::Left(x)  -> x
@@ -35,6 +39,34 @@ HirTypedModule {
         ),
     },
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnresolvedReference {
+                name: "Test::Thing",
+                module_id: ModuleId(
+                    Id(0),
+                ),
+            },
+            range: 83..88,
+        },
+        TypeInferenceError {
+            kind: UnresolvedReference {
+                name: "Either::Left",
+                module_id: ModuleId(
+                    Id(1),
+                ),
+            },
+            range: 97..114,
+        },
+        TypeInferenceError {
+            kind: UnresolvedReference {
+                name: "Either::Right",
+                module_id: ModuleId(
+                    Id(1),
+                ),
+            },
+            range: 123..140,
+        },
+    ],
 }
 []

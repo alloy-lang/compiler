@@ -1,4 +1,7 @@
-import std::option::Option
+typedef Option[t] =
+    | None
+    | Some(t)
+end
 
 |Option::Some(x)| -> x
 ===
@@ -25,6 +28,16 @@ HirTypedModule {
         ),
     },
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnresolvedReference {
+                name: "Option::Some",
+                module_id: ModuleId(
+                    Id(1),
+                ),
+            },
+            range: 51..66,
+        },
+    ],
 }
 []

@@ -43,6 +43,16 @@ HirTypedModule {
         },
     },
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnresolvedReference {
+                name: "fake::fakeStuff",
+                module_id: ModuleId(
+                    Id(1),
+                ),
+            },
+            range: 118..127,
+        },
+    ],
 }
 []

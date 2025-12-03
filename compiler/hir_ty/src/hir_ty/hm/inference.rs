@@ -5,9 +5,12 @@ use super::constraint_gen::infer_expr_hm;
 use super::unification::solve_equations;
 use super::TypeVarId;
 use super::{HMInferenceContext, MonoType};
+use crate::diagnostics::TypeInferenceErrorKind;
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir as hir;
+use alloy_hir_resolved::EPFql;
 use alloy_workspace::ModuleId;
+use itertools::Itertools;
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
 
@@ -97,6 +100,21 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
             // Check for type annotation conflicts
             check_type_annotation(db, &mut result, module_id, range, name_op, resolved_type);
         }
+    }
+
+    // Convert resolution errors to diagnostics
+    for (epfql, name, module_id) in ctx.resolution_errors {
+        let range = match epfql {
+            EPFql::Expression(fql) => hir_module.get_expression_range(fql.local_id),
+            EPFql::Pattern(fql) => hir_module.get_pattern_range(fql.local_id),
+        };
+        result.error(
+            TypeInferenceErrorKind::UnresolvedReference {
+                name: name.iter().join("::"),
+                module_id,
+            },
+            range,
+        );
     }
 
     for err in unification_errors {
