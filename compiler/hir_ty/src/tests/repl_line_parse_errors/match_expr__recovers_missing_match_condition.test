@@ -7,7 +7,9 @@ match test when
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Missing,
+        Idx::<Expression>(0): BuiltIn(
+            Bool,
+        ),
         Idx::<Expression>(2): BuiltIn(
             Int,
         ),
@@ -19,25 +21,15 @@ HirTypedModule {
         ),
     },
     pattern_types: {
-        Idx::<Pattern>(0): Missing,
+        Idx::<Pattern>(0): BuiltIn(
+            Bool,
+        ),
         Idx::<Pattern>(1): BuiltIn(
             Bool,
         ),
     },
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: UnificationError(
-                TypeMismatch(
-                    Concrete(
-                        Bool,
-                    ),
-                    Missing,
-                ),
-            ),
-            range: 91..97,
-        },
-    ],
+    errors: [],
 }
 [
     ParseError {

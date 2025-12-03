@@ -88,6 +88,6 @@ fn infer_nil(ctx: &mut HMInferenceContext, fql: Fql<hir::Pattern>) -> MonoType {
 
 fn infer_missing_pattern(ctx: &mut HMInferenceContext, fql: Fql<hir::Pattern>) -> MonoType {
     // Missing patterns get a fresh type variable
-    let ty = MonoType::Missing;
+    let ty = ctx.fresh_type_var();
     ctx.assign_type(fql, ty)
 }

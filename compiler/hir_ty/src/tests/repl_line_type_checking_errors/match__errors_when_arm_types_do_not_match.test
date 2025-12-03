@@ -38,10 +38,10 @@ HirTypedModule {
             kind: UnificationError(
                 TypeMismatch(
                     Concrete(
-                        Int,
+                        String,
                     ),
                     Concrete(
-                        String,
+                        Int,
                     ),
                 ),
             ),

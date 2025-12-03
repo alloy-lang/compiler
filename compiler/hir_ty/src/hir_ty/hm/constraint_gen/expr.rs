@@ -193,11 +193,11 @@ fn infer_match(
     for (pattern_id, body_id) in targets {
         // Pattern must match the scrutinee type
         let pattern_ty = infer_pattern_hm(ctx, pattern_id.clone());
-        ctx.add_equation(pattern_ty, value_ty.clone(), pattern_id.clone());
+        ctx.add_equation(value_ty.clone(), pattern_ty, pattern_id.clone());
 
         // Body must have the same type as other arms
         let body_ty = infer_expr_hm(ctx, body_id.clone());
-        ctx.add_equation(body_ty, result_ty.clone(), body_id.clone());
+        ctx.add_equation(result_ty.clone(), body_ty, body_id.clone());
     }
 
     ctx.assign_type(source_fql, result_ty)
