@@ -22,15 +22,16 @@ match test when
                 targets: [
                     MatchTarget {
                         condition: Some(
-                            PatternRef(
-                                PatternRef {
-                                    name: Some(
+                            Destructure(
+                                Destructure {
+                                    target: Some(
                                         Path {
                                             segments: [
                                                 "True",
                                             ],
                                         },
                                     ),
+                                    args: [],
                                 },
                             ),
                         ),

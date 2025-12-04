@@ -10,15 +10,11 @@
                             Destructure(
                                 Destructure {
                                     target: Some(
-                                        PatternRef {
-                                            name: Some(
-                                                Path {
-                                                    segments: [
-                                                        "Option",
-                                                        "Some",
-                                                    ],
-                                                },
-                                            ),
+                                        Path {
+                                            segments: [
+                                                "Option",
+                                                "Some",
+                                            ],
                                         },
                                     ),
                                     args: [

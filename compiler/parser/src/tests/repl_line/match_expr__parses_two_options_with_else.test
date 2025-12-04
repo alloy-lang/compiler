@@ -17,10 +17,11 @@ SourceFile@0..43
       Backslash@18..19 "\\"
       Whitespace@19..20 " "
       MatchTargetCondition@20..25
-        PatternRef@20..25
-          Path@20..25
-            Ident@20..24 "True"
-            Whitespace@24..25 " "
+        Destructure@20..25
+          DestructureTarget@20..25
+            Path@20..25
+              Ident@20..24 "True"
+              Whitespace@24..25 " "
       RightArrow@25..27 "->"
       Whitespace@27..28 " "
       MatchTargetValue@28..32

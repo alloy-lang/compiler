@@ -53,7 +53,7 @@ fn resolve_cross_module_expression(
         let (hir_module, _) = hir::lower_file(db, other_module_id);
 
         // Try to find the type in this module
-        let Some((expr_id, type_def)) =
+        let Some((expr_id, _)) =
             hir_module.get_expression_by_name(type_name, alloy_scope::Scopes::ROOT)
         else {
             continue; // Try next split
@@ -63,19 +63,6 @@ fn resolve_cross_module_expression(
     }
 
     None
-}
-
-/// Helper function to resolve a cross-module pattern reference
-fn resolve_cross_module_pattern(
-    _db: &dyn hir::HirDatabase,
-    _fqn: &hir::Fqn,
-) -> Option<Fql<hir::Pattern>> {
-    unreachable!("There are no cases where we resolve pattern references across modules");
-    // let module_slug = fqn.module_slug();
-    // let other_module_id = db.find_module_by_slug(&*module_slug)?;
-    // let (hir_module, _) = hir::lower_file(db, other_module_id);
-    // let (pat_id, _) = hir_module.get_pattern_by_name(&fqn.name, alloy_scope::Scopes::ROOT)?;
-    // Some(Fql::new(other_module_id, pat_id))
 }
 
 /// Helper function to resolve a cross-module type definition reference

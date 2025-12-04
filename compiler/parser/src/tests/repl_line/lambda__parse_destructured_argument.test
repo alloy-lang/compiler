@@ -7,11 +7,10 @@ SourceFile@0..22
       LambdaExprArg@1..16
         Destructure@1..16
           DestructureTarget@1..13
-            PatternRef@1..13
-              Path@1..13
-                Ident@1..7 "Option"
-                DoubleColon@7..9 "::"
-                Ident@9..13 "Some"
+            Path@1..13
+              Ident@1..7 "Option"
+              DoubleColon@7..9 "::"
+              Ident@9..13 "Some"
           LParen@13..14 "("
           DestructureArg@14..15
             VariableDeclaration@14..15

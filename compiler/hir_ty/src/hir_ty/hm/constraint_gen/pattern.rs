@@ -23,10 +23,6 @@ pub(super) fn infer_pattern_hm(
         res::Pattern::Unit => super::infer_unit(ctx, source_fql),
         res::Pattern::VariableDeclaration => infer_variable_declaration(ctx, source_fql),
         res::Pattern::Tuple(elements) => infer_tuple_pattern(ctx, source_fql, elements),
-        res::Pattern::PatternRef(fql) => {
-            let ty = infer_pattern_hm(ctx, fql.clone());
-            ctx.assign_type(source_fql, ty.clone())
-        }
         res::Pattern::Destructure { target, args } => {
             infer_destructure(ctx, source_fql, target, &args)
         }

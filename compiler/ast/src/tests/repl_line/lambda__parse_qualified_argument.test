@@ -7,9 +7,9 @@
                 args: [
                     LambdaExprArg {
                         pattern: Some(
-                            PatternRef(
-                                PatternRef {
-                                    name: Some(
+                            Destructure(
+                                Destructure {
+                                    target: Some(
                                         Path {
                                             segments: [
                                                 "Option",
@@ -17,6 +17,7 @@
                                             ],
                                         },
                                     ),
+                                    args: [],
                                 },
                             ),
                         ),

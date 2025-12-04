@@ -8,7 +8,6 @@ ast_union_node!(Pattern, kinds: [
     FractionLiteral,
     StringLiteral,
     CharLiteral,
-    PatternRef,
     VariableDeclaration,
     NilIdentifier,
     Destructure,
@@ -59,15 +58,6 @@ impl CharLiteral {
     }
 }
 
-ast_node!(PatternRef, fields: [name]);
-
-impl PatternRef {
-    #[must_use]
-    pub fn name(&self) -> Option<Path> {
-        first_child(self)
-    }
-}
-
 ast_node!(VariableDeclaration, fields: [name]);
 
 impl VariableDeclaration {
@@ -81,7 +71,7 @@ ast_node!(Destructure, fields: [target, args]);
 
 impl Destructure {
     #[must_use]
-    pub fn target(&self) -> Option<PatternRef> {
+    pub fn target(&self) -> Option<Path> {
         first_matching_child(self, SyntaxKind::DestructureTarget)
     }
 

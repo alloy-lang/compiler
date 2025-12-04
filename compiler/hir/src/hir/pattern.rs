@@ -8,10 +8,6 @@ pub type PatternIdx = Idx<Pattern>;
 pub enum Pattern {
     Missing,
     Literal(Literal),
-    PatternRef {
-        path: Path,
-        scope: ScopeIdx,
-    },
     VariableDeclaration {
         name: Name,
     },
@@ -58,7 +54,6 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
             };
             Pattern::Literal(Literal::Char(value))
         }
-        ast::Pattern::PatternRef(var) => lower_pattern_ref(ctx, var),
         ast::Pattern::VariableDeclaration(var) => Pattern::VariableDeclaration {
             name: lower_variable_declaration(var),
         },
@@ -89,13 +84,19 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
 }
 
 fn lower_destructure(ctx: &mut LoweringCtx, destructure: &ast::Destructure) -> Pattern {
-    let Some(ast_target) = destructure.target() else {
+    let Some(ast_path) = destructure.target() else {
         unreachable!("parsing error")
     };
 
-    let Some(ast_path) = ast_target.name() else {
-        unreachable!("parsing error")
-    };
+    match ast_path.segments().join("::").as_str() {
+        "True" => {
+            return Pattern::Literal(Literal::Bool(true));
+        }
+        "False" => {
+            return Pattern::Literal(Literal::Bool(false));
+        }
+        _ => {}
+    }
 
     let Some(target) = ctx.resolve_reference_path(&ast_path, HirReferenceType::Pattern) else {
         unreachable!("parsing error")
@@ -120,29 +121,4 @@ pub(super) fn lower_variable_declaration(var: &ast::VariableDeclaration) -> Name
     };
 
     Name::new(name.text())
-}
-
-fn lower_pattern_ref(ctx: &mut LoweringCtx, var: &ast::PatternRef) -> Pattern {
-    let Some(ast_path) = var.name() else {
-        unreachable!("parsing error")
-    };
-
-    match ast_path.segments().join("::").as_str() {
-        "True" => {
-            return Pattern::Literal(Literal::Bool(true));
-        }
-        "False" => {
-            return Pattern::Literal(Literal::Bool(false));
-        }
-        _ => {}
-    }
-
-    let Some(path) = ctx.resolve_reference_path(&ast_path, HirReferenceType::Pattern) else {
-        unreachable!("parsing error")
-    };
-
-    Pattern::PatternRef {
-        path,
-        scope: ctx.scopes.current_scope(),
-    }
 }

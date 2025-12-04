@@ -101,15 +101,11 @@ match test when
                             Destructure(
                                 Destructure {
                                     target: Some(
-                                        PatternRef {
-                                            name: Some(
-                                                Path {
-                                                    segments: [
-                                                        "Either",
-                                                        "Left",
-                                                    ],
-                                                },
-                                            ),
+                                        Path {
+                                            segments: [
+                                                "Either",
+                                                "Left",
+                                            ],
                                         },
                                     ),
                                     args: [
@@ -145,15 +141,11 @@ match test when
                             Destructure(
                                 Destructure {
                                     target: Some(
-                                        PatternRef {
-                                            name: Some(
-                                                Path {
-                                                    segments: [
-                                                        "Either",
-                                                        "Right",
-                                                    ],
-                                                },
-                                            ),
+                                        Path {
+                                            segments: [
+                                                "Either",
+                                                "Right",
+                                            ],
                                         },
                                     ),
                                     args: [

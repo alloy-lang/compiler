@@ -38,8 +38,8 @@ HirModule {
     },
     patterns: Index::<Pattern> {
         Idx::<Pattern>(0): {
-            "item": PatternRef {
-                path: OtherModule(
+            "item": Destructure {
+                target: OtherModule(
                     Fqn {
                         module: NonEmpty(
                             [
@@ -54,6 +54,7 @@ HirModule {
                     },
                 ),
                 scope: Idx::<Scope>(1),
+                args: [],
             },
             "range": 29..41,
         },

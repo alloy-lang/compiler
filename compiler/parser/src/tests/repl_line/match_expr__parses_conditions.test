@@ -26,9 +26,8 @@ SourceFile@0..168
       MatchTargetCondition@20..28
         Destructure@20..28
           DestructureTarget@20..24
-            PatternRef@20..24
-              Path@20..24
-                Ident@20..24 "Some"
+            Path@20..24
+              Ident@20..24 "Some"
           LParen@24..25 "("
           DestructureArg@25..26
             VariableDeclaration@25..26
@@ -45,10 +44,11 @@ SourceFile@0..168
       Backslash@35..36 "\\"
       Whitespace@36..37 " "
       MatchTargetCondition@37..45
-        PatternRef@37..45
-          Path@37..45
-            Ident@37..41 "None"
-            Whitespace@41..45 "    "
+        Destructure@37..45
+          DestructureTarget@37..45
+            Path@37..45
+              Ident@37..41 "None"
+              Whitespace@41..45 "    "
       RightArrow@45..47 "->"
       Whitespace@47..48 " "
       MatchTargetValue@48..52
@@ -59,10 +59,11 @@ SourceFile@0..168
       Backslash@52..53 "\\"
       Whitespace@53..54 " "
       MatchTargetCondition@54..62
-        PatternRef@54..62
-          Path@54..62
-            Ident@54..58 "True"
-            Whitespace@58..62 "    "
+        Destructure@54..62
+          DestructureTarget@54..62
+            Path@54..62
+              Ident@54..58 "True"
+              Whitespace@58..62 "    "
       RightArrow@62..64 "->"
       Whitespace@64..65 " "
       MatchTargetValue@65..69
@@ -73,10 +74,11 @@ SourceFile@0..168
       Backslash@69..70 "\\"
       Whitespace@70..71 " "
       MatchTargetCondition@71..79
-        PatternRef@71..79
-          Path@71..79
-            Ident@71..76 "False"
-            Whitespace@76..79 "   "
+        Destructure@71..79
+          DestructureTarget@71..79
+            Path@71..79
+              Ident@71..76 "False"
+              Whitespace@76..79 "   "
       RightArrow@79..81 "->"
       Whitespace@81..82 " "
       MatchTargetValue@82..86
@@ -140,10 +142,11 @@ SourceFile@0..168
       Backslash@154..155 "\\"
       Whitespace@155..156 " "
       MatchTargetCondition@156..164
-        PatternRef@156..164
-          Path@156..164
-            Ident@156..157 "x"
-            Whitespace@157..164 "       "
+        Destructure@156..164
+          DestructureTarget@156..164
+            Path@156..164
+              Ident@156..157 "x"
+              Whitespace@157..164 "       "
       RightArrow@164..166 "->"
       Whitespace@166..167 " "
       MatchTargetValue@167..168

@@ -52,35 +52,31 @@ pub(crate) fn parse_argument(
     m.complete(p, kind)
 }
 
-fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
-    let cm = path::parse_path(
-        p,
-        ParseErrorContext::PatternRef,
-        ts![],
-        SyntaxKind::PatternRef,
-    );
-
-    maybe_parse_typedef_destructure(p, cm)
-}
-
 fn parse_variable_declaration(p: &mut Parser) -> CompletedMarker {
     let parent_m = p.start();
     p.expect(TokenKind::Ident, ParseErrorContext::VariableDeclaration);
     parent_m.complete(p, SyntaxKind::VariableDeclaration)
 }
 
-fn maybe_parse_typedef_destructure(p: &mut Parser, lhs: CompletedMarker) -> CompletedMarker {
-    if !p.maybe_at(TokenKind::LParen) {
-        return lhs;
-    }
+fn parse_variable_ref(p: &mut Parser) -> CompletedMarker {
+    let cm = path::parse_path(
+        p,
+        ParseErrorContext::DestructureTarget,
+        ts![],
+        SyntaxKind::DestructureTarget,
+    );
 
-    let cm = lhs.precede(p).complete(p, SyntaxKind::DestructureTarget);
+    // let cm = cm.precede(p).complete(p, SyntaxKind::DestructureTarget);
     parse_typedef_destructure_args(p);
 
     cm.precede(p).complete(p, SyntaxKind::Destructure)
 }
 
 fn parse_typedef_destructure_args(p: &mut Parser) {
+    if !p.maybe_at(TokenKind::LParen) {
+        return;
+    }
+
     fn should_stop(p: &mut Parser) -> bool {
         p.at_top_level_token_or_set(ts![TokenKind::RParen])
     }
