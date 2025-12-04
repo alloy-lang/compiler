@@ -29,6 +29,24 @@ HirModule {
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
             "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                            ],
+                        ),
+                        name: "functor",
+                        sub_path: [
+                            "Functor",
+                        ],
+                    },
+                ),
+            ),
+            "range": 130..147,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
                 ThisModule {
                     name: "Trait1",
                     subname: None,
@@ -37,7 +55,7 @@ HirModule {
             ),
             "range": 90..97,
         },
-        Idx::<TypeReference>(1): {
+        Idx::<TypeReference>(2): {
             "item": Named(
                 ThisModule {
                     name: "Type1",
@@ -68,23 +86,13 @@ HirModule {
                 name: "t1",
                 kind: TypeVariable(
                     Constrained(
-                        [
-                            Trait(
-                                OtherModule(
-                                    Fqn {
-                                        module: NonEmpty(
-                                            [
-                                                "std",
-                                            ],
-                                        ),
-                                        name: "functor",
-                                        sub_path: [
-                                            "Functor",
-                                        ],
-                                    },
+                        NonEmpty(
+                            [
+                                Trait(
+                                    Idx::<TypeReference>(0),
                                 ),
-                            ),
-                        ],
+                            ],
+                        ),
                     ),
                 ),
             },
@@ -99,8 +107,7 @@ HirModule {
                 name: "Trait1",
                 self_constraints: [],
                 named_type_variables: {},
-                type_annotations: {},
-                values: {},
+                members: [],
             },
             "name": "Trait1",
             "range": 44..81,
@@ -110,8 +117,8 @@ HirModule {
     behaviors: Index::<Behavior> {
         Idx::<Behavior>(0): {
             "item": Behavior {
-                attached_trait: Idx::<TypeReference>(0),
-                attached_type: Idx::<TypeReference>(1),
+                attached_trait: Idx::<TypeReference>(1),
+                attached_type: Idx::<TypeReference>(2),
                 named_type_variables: {
                     "t1": Idx::<TypeDefinition>(1),
                 },
@@ -119,8 +126,8 @@ HirModule {
                 values: {},
             },
             "name": (
+                Idx::<TypeReference>(2),
                 Idx::<TypeReference>(1),
-                Idx::<TypeReference>(0),
             ),
             "range": 81..150,
             "scope_id": Idx::<Scope>(0),

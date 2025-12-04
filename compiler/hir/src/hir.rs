@@ -228,12 +228,20 @@ impl HirModule {
         self.type_references.get(idx)
     }
 
+    pub fn get_type_reference_range(&self, idx: TypeIdx) -> TextRange {
+        self.type_references.get_range(idx)
+    }
+
     pub fn get_import(&self, idx: ImportIdx) -> &Import {
         self.imports.get(idx)
     }
 
     pub fn get_trait(&self, idx: TraitIdx) -> &Trait {
         self.traits.get(idx)
+    }
+
+    pub fn get_behavior(&self, idx: BehaviorIdx) -> &Behavior {
+        self.behaviors.get(idx)
     }
 
     /// Collect all exported symbols from this module

@@ -21,7 +21,25 @@ HirModule {
     },
     expressions: EmptyIndex::<Expression>,
     patterns: EmptyIndex::<Pattern>,
-    type_references: EmptyIndex::<TypeReference>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "functor",
+                            ],
+                        ),
+                        name: "Functor",
+                        sub_path: [],
+                    },
+                ),
+            ),
+            "range": 58..66,
+        },
+    },
     type_definitions: EmptyIndex::<TypeDefinition>,
     traits: Index::<Trait> {
         Idx::<Trait>(0): {
@@ -29,23 +47,11 @@ HirModule {
                 name: "TestTrait1",
                 self_constraints: [
                     Trait(
-                        OtherModule(
-                            Fqn {
-                                module: NonEmpty(
-                                    [
-                                        "std",
-                                        "functor",
-                                    ],
-                                ),
-                                name: "Functor",
-                                sub_path: [],
-                            },
-                        ),
+                        Idx::<TypeReference>(0),
                     ),
                 ],
                 named_type_variables: {},
-                type_annotations: {},
-                values: {},
+                members: [],
             },
             "name": "TestTrait1",
             "range": 30..69,

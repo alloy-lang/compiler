@@ -4,13 +4,13 @@ use super::*;
 #[derive(Debug, Clone, PartialEq)]
 pub enum TypeVariable {
     Unbound,
-    Constrained(Vec<TypeVariableConstraint>),
+    Constrained(NonEmpty<TypeVariableConstraint>),
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TypeVariableConstraint {
     Kind(usize),
-    Trait(Path),
+    Trait(TypeIdx),
 }
 
 pub(super) fn lower_named_type_variable(
@@ -27,7 +27,7 @@ pub(super) fn lower_named_type_variable(
     let type_variable = if constraints.is_empty() {
         TypeVariable::Unbound
     } else {
-        TypeVariable::Constrained(constraints)
+        TypeVariable::Constrained(unsafe { NonEmpty::new_unchecked(constraints) })
     };
 
     Some((
@@ -62,7 +62,9 @@ fn lower_type_variable_constraints(
                 else {
                     unreachable!("parsing error")
                 };
-                TypeVariableConstraint::Trait(path)
+                let type_reference =
+                    ctx.add_type_reference(TypeReference::Named(path.clone()), &ast_path.syntax());
+                TypeVariableConstraint::Trait(type_reference)
             }
         })
         .collect::<Vec<_>>()

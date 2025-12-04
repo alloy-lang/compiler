@@ -69,10 +69,12 @@ HirModule {
                 named_type_variables: {
                     "t1": Idx::<TypeDefinition>(0),
                 },
-                type_annotations: {
-                    "test1": Idx::<TypeReference>(5),
-                },
-                values: {},
+                members: [
+                    Abstract {
+                        name: "test1",
+                        type_annotation: Idx::<TypeReference>(5),
+                    },
+                ],
             },
             "name": "TestTrait1",
             "range": 0..87,

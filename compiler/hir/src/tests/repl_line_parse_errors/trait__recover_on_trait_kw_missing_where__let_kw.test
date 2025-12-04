@@ -25,10 +25,13 @@ HirModule {
                 name: "TestTrait1",
                 self_constraints: [],
                 named_type_variables: {},
-                type_annotations: {},
-                values: {
-                    "a": Idx::<Expression>(0),
-                },
+                members: [
+                    Concrete {
+                        name: "a",
+                        type_annotation: None,
+                        value: Idx::<Expression>(0),
+                    },
+                ],
             },
             "name": "TestTrait1",
             "range": 0..34,

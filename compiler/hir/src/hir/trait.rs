@@ -5,12 +5,26 @@ use rustc_hash::FxHashMap;
 pub type TraitIdx = Idx<Trait>;
 
 #[derive(Debug, Clone, PartialEq)]
+pub enum TraitMember {
+    /// A member with a type annotation but no implementation (abstract)
+    Abstract {
+        name: Name,
+        type_annotation: TypeIdx,
+    },
+    /// A member with an implementation (may also have a type annotation)
+    Concrete {
+        name: Name,
+        type_annotation: Option<TypeIdx>,
+        value: ExpressionIdx,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct Trait {
     pub(crate) name: Name,
     self_constraints: Vec<TypeVariableConstraint>,
     named_type_variables: FxHashMap<Name, TypeDefinitionIdx>,
-    type_annotations: FxHashMap<Name, TypeIdx>,
-    values: FxHashMap<Name, ExpressionIdx>,
+    members: Vec<TraitMember>,
 }
 
 pub(super) fn lower_trait(ctx: &mut LoweringCtx, ast: &ast::TraitDef) {
@@ -43,26 +57,91 @@ pub(super) fn lower_trait(ctx: &mut LoweringCtx, ast: &ast::TraitDef) {
             }
         };
 
-        let type_annotations = ast
+        let type_annotations: FxHashMap<Name, TypeIdx> = ast
             .type_annotations()
             .iter()
             .filter_map(|type_annotation| lower_type_annotation(ctx, type_annotation))
             .collect();
 
-        let values = ast
+        let values: FxHashMap<Name, ExpressionIdx> = ast
             .values()
             .iter()
             .filter_map(|value| lower_value(ctx, value))
             .collect();
 
+        // Build members from type_annotations and values
+        let mut members = Vec::new();
+        let mut processed_names = HashSet::new();
+
+        // Process type annotations
+        for (name, type_idx) in type_annotations {
+            processed_names.insert(name.clone());
+            if let Some(value_idx) = values.get(&name) {
+                // Has both type annotation and value -> Concrete with type
+                members.push(TraitMember::Concrete {
+                    name,
+                    type_annotation: Some(type_idx),
+                    value: *value_idx,
+                });
+            } else {
+                // Has type annotation but no value -> Abstract
+                members.push(TraitMember::Abstract {
+                    name,
+                    type_annotation: type_idx,
+                });
+            }
+        }
+
+        // Process values that don't have type annotations
+        for (name, value_idx) in values {
+            if !processed_names.contains(&name) {
+                // Has value but no type annotation -> Concrete without type
+                members.push(TraitMember::Concrete {
+                    name,
+                    type_annotation: None,
+                    value: value_idx,
+                });
+            }
+        }
+
         Trait {
             name: name.clone(),
             self_constraints,
             named_type_variables,
-            type_annotations,
-            values,
+            members,
         }
     });
 
     ctx.add_trait(trait_, &ast.syntax());
+}
+
+impl Trait {
+    /// Get all members of this trait
+    pub fn members(&self) -> &[TraitMember] {
+        &self.members
+    }
+
+    /// Get the name of this trait
+    pub fn name(&self) -> &Name {
+        &self.name
+    }
+
+    /// Get all abstract members (those with type annotations but no implementations)
+    pub fn abstract_members(&self) -> impl Iterator<Item = (&Name, TypeIdx)> {
+        self.members.iter().filter_map(|member| match member {
+            TraitMember::Abstract {
+                name,
+                type_annotation,
+            } => Some((name, *type_annotation)),
+            TraitMember::Concrete { .. } => None,
+        })
+    }
+
+    /// Get all concrete members (those with implementations)
+    pub fn concrete_members(&self) -> impl Iterator<Item = (&Name, ExpressionIdx)> {
+        self.members.iter().filter_map(|member| match member {
+            TraitMember::Concrete { name, value, .. } => Some((name, *value)),
+            TraitMember::Abstract { .. } => None,
+        })
+    }
 }

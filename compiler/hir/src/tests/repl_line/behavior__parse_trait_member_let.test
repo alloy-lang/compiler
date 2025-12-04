@@ -99,12 +99,17 @@ HirModule {
                 name: "Trait1",
                 self_constraints: [],
                 named_type_variables: {},
-                type_annotations: {
-                    "test": Idx::<TypeReference>(0),
-                },
-                values: {
-                    "thing": Idx::<Expression>(0),
-                },
+                members: [
+                    Abstract {
+                        name: "test",
+                        type_annotation: Idx::<TypeReference>(0),
+                    },
+                    Concrete {
+                        name: "thing",
+                        type_annotation: None,
+                        value: Idx::<Expression>(0),
+                    },
+                ],
             },
             "name": "Trait1",
             "range": 23..91,

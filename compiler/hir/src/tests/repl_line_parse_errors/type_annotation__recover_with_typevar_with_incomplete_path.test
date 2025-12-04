@@ -35,6 +35,22 @@ HirModule {
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
             "item": Named(
+                OtherModule(
+                    Fqn {
+                        module: NonEmpty(
+                            [
+                                "std",
+                            ],
+                        ),
+                        name: "functor",
+                        sub_path: [],
+                    },
+                ),
+            ),
+            "range": 98..112,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
                 ThisModule {
                     name: "t1",
                     subname: None,
@@ -43,7 +59,7 @@ HirModule {
             ),
             "range": 58..61,
         },
-        Idx::<TypeReference>(1): {
+        Idx::<TypeReference>(2): {
             "item": Named(
                 ThisModule {
                     name: "t2",
@@ -53,7 +69,7 @@ HirModule {
             ),
             "range": 64..67,
         },
-        Idx::<TypeReference>(2): {
+        Idx::<TypeReference>(3): {
             "item": Named(
                 OtherModule(
                     Fqn {
@@ -69,17 +85,17 @@ HirModule {
             ),
             "range": 70..75,
         },
-        Idx::<TypeReference>(3): {
+        Idx::<TypeReference>(4): {
             "item": Lambda {
-                arg_type: Idx::<TypeReference>(1),
-                return_type: Idx::<TypeReference>(2),
+                arg_type: Idx::<TypeReference>(2),
+                return_type: Idx::<TypeReference>(3),
             },
             "range": 64..75,
         },
-        Idx::<TypeReference>(4): {
+        Idx::<TypeReference>(5): {
             "item": Lambda {
-                arg_type: Idx::<TypeReference>(0),
-                return_type: Idx::<TypeReference>(3),
+                arg_type: Idx::<TypeReference>(1),
+                return_type: Idx::<TypeReference>(4),
             },
             "name": "test",
             "range": 58..75,
@@ -92,21 +108,13 @@ HirModule {
                 name: "t1",
                 kind: TypeVariable(
                     Constrained(
-                        [
-                            Trait(
-                                OtherModule(
-                                    Fqn {
-                                        module: NonEmpty(
-                                            [
-                                                "std",
-                                            ],
-                                        ),
-                                        name: "functor",
-                                        sub_path: [],
-                                    },
+                        NonEmpty(
+                            [
+                                Trait(
+                                    Idx::<TypeReference>(0),
                                 ),
-                            ),
-                        ],
+                            ],
+                        ),
                     ),
                 ),
             },

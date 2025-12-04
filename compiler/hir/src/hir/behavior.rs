@@ -1,6 +1,9 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 use rustc_hash::FxHashMap;
+use std::collections::hash_map::Iter;
+
+pub type BehaviorIdx = Idx<Behavior>;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Behavior {
@@ -9,6 +12,20 @@ pub struct Behavior {
     named_type_variables: FxHashMap<Name, TypeDefinitionIdx>,
     type_annotations: FxHashMap<Name, TypeIdx>,
     values: FxHashMap<Name, ExpressionIdx>,
+}
+
+impl Behavior {
+    pub fn named_type_variables(&'_ self) -> Iter<'_, Name, TypeDefinitionIdx> {
+        self.named_type_variables.iter()
+    }
+
+    pub fn type_annotations(&'_ self) -> Iter<'_, Name, TypeIdx> {
+        self.type_annotations.iter()
+    }
+
+    pub fn values(&'_ self) -> Iter<'_, Name, ExpressionIdx> {
+        self.values.iter()
+    }
 }
 
 pub(super) fn lower_behavior(ctx: &mut LoweringCtx, ast: &ast::BehaviorDef) {

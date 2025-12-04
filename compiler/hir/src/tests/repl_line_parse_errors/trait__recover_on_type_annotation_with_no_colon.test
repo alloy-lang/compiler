@@ -80,11 +80,16 @@ HirModule {
                 name: "TestTrait1",
                 self_constraints: [],
                 named_type_variables: {},
-                type_annotations: {
-                    "test2": Idx::<TypeReference>(9),
-                    "test1": Idx::<TypeReference>(4),
-                },
-                values: {},
+                members: [
+                    Abstract {
+                        name: "test2",
+                        type_annotation: Idx::<TypeReference>(9),
+                    },
+                    Abstract {
+                        name: "test1",
+                        type_annotation: Idx::<TypeReference>(4),
+                    },
+                ],
             },
             "name": "TestTrait1",
             "range": 0..108,

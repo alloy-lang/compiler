@@ -46,8 +46,7 @@ HirModule {
                 named_type_variables: {
                     "t1": Idx::<TypeDefinition>(0),
                 },
-                type_annotations: {},
-                values: {},
+                members: [],
             },
             "name": "TestTrait1",
             "range": 0..75,
@@ -60,8 +59,7 @@ HirModule {
                 named_type_variables: {
                     "t1": Idx::<TypeDefinition>(1),
                 },
-                type_annotations: {},
-                values: {},
+                members: [],
             },
             "name": "TestTrait2",
             "range": 75..152,

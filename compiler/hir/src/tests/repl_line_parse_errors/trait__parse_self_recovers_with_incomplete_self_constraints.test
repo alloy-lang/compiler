@@ -25,10 +25,12 @@ HirModule {
                 name: "TestTrait1",
                 self_constraints: [],
                 named_type_variables: {},
-                type_annotations: {
-                    "distraction": Idx::<TypeReference>(0),
-                },
-                values: {},
+                members: [
+                    Abstract {
+                        name: "distraction",
+                        type_annotation: Idx::<TypeReference>(0),
+                    },
+                ],
             },
             "name": "TestTrait1",
             "range": 0..68,
