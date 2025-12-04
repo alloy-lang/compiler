@@ -1,7 +1,6 @@
 module Eq
 where
 
-import std::bool::Bool
 import std::bool::not
 
 trait Eq where

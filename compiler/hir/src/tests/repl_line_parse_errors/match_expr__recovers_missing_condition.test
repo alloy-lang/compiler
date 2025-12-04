@@ -1,42 +1,14 @@
-import std::bool::Bool::{True, False}
 
 match when
   \ True -> 0
   \ False -> 1
 ===
 HirModule {
-    imports: Index::<Import> {
-        Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "std",
-                    "bool",
-                    "Bool",
-                ],
-                last: "True",
-            },
-            "name": "True",
-            "range": 0..39,
-            "scope_id": Idx::<Scope>(0),
-        },
-        Idx::<Import>(1): {
-            "item": Import {
-                segments: [
-                    "std",
-                    "bool",
-                    "Bool",
-                ],
-                last: "False",
-            },
-            "name": "False",
-            "range": 0..39,
-            "scope_id": Idx::<Scope>(0),
-        },
-    },
+    imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": Missing,
-            "range": 39..78,
+            "range": 1..40,
         },
         Idx::<Expression>(1): {
             "item": Literal(
@@ -44,7 +16,7 @@ HirModule {
                     0,
                 ),
             ),
-            "range": 62..66,
+            "range": 24..28,
         },
         Idx::<Expression>(2): {
             "item": Literal(
@@ -52,7 +24,7 @@ HirModule {
                     1,
                 ),
             ),
-            "range": 77..78,
+            "range": 39..40,
         },
         Idx::<Expression>(3): {
             "item": Match {
@@ -68,7 +40,7 @@ HirModule {
                     ),
                 ],
             },
-            "range": 39..78,
+            "range": 1..40,
         },
     },
     patterns: Index::<Pattern> {
@@ -78,7 +50,7 @@ HirModule {
                     true,
                 ),
             ),
-            "range": 54..59,
+            "range": 16..21,
         },
         Idx::<Pattern>(1): {
             "item": Literal(
@@ -86,7 +58,7 @@ HirModule {
                     false,
                 ),
             ),
-            "range": 68..74,
+            "range": 30..36,
         },
     },
     type_references: EmptyIndex::<TypeReference>,
@@ -113,34 +85,7 @@ HirModule {
             ],
         },
     },
-    warnings: [
-        LoweringWarning {
-            kind: UnusedImport {
-                import: Import {
-                    segments: [
-                        "std",
-                        "bool",
-                        "Bool",
-                    ],
-                    last: "True",
-                },
-            },
-            range: 0..39,
-        },
-        LoweringWarning {
-            kind: UnusedImport {
-                import: Import {
-                    segments: [
-                        "std",
-                        "bool",
-                        "Bool",
-                    ],
-                    last: "False",
-                },
-            },
-            range: 0..39,
-        },
-    ],
+    warnings: [],
     errors: [],
 }
 [
@@ -159,7 +104,7 @@ HirModule {
             Pipe,
         ],
         kind: Missing {
-            offset: 45,
+            offset: 7,
         },
         context: MatchExprArg,
     },
