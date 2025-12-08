@@ -1,3 +1,5 @@
+typedef Type1 = Thing
+
 behavior Trait1 Type1 where
     -- imagine all the things here
 end
@@ -18,7 +20,7 @@ HirTypedModule {
             ForKw,
         ],
         kind: Missing {
-            offset: 16,
+            offset: 39,
         },
         context: BehaviorFor,
     },

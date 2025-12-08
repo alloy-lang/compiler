@@ -1,6 +1,7 @@
+mod behavior_validation;
+mod type_annotation;
 mod type_annotation_check;
 mod type_definition;
-mod type_reference;
 
 use alloy_hir as hir;
 use alloy_hir_resolved::Fql;

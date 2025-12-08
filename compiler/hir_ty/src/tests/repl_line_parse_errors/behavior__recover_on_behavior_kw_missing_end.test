@@ -1,3 +1,12 @@
+typedef Type1 = Thing
+
+trait TestTrait1 where
+    -- imagine all the things here
+end
+trait TestTrait2 where
+    -- imagine all the things here
+end
+
 behavior TestTrait1 for Type1 where
     -- imagine all the things here
 
@@ -21,7 +30,7 @@ HirTypedModule {
             EndKw,
         ],
         kind: Missing {
-            offset: 88,
+            offset: 236,
         },
         context: BehaviorEnd,
     },

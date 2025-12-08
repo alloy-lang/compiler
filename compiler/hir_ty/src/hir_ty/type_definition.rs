@@ -1,25 +1,32 @@
 use crate::hir_ty::{Fql, ResolvedType};
 use crate::HirTyDatabase;
 use alloy_hir as hir;
-use alloy_scope::{ScopeIdx, Scopes};
+use alloy_hir_resolved as res;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 
 pub fn type_definition_to_resolved(
     db: &dyn HirTyDatabase,
+    ctx: &mut super::type_annotation::TypeResolutionContext,
     current_module_id: ModuleId,
     path: &hir::Path,
-    ctx: &mut super::type_reference::TypeResolutionContext,
+    source_ref: Fql<hir::TypeReference>,
 ) -> Option<ResolvedType> {
-    let (resolved_module_id, type_idx) = resolve_type_definition_path(db, current_module_id, path)?;
-    resolve_type_definition(db, resolved_module_id, type_idx, ctx)
+    let resolved_type_def_fql =
+        res::resolve_type_definition_by_path(db, current_module_id, path, source_ref).ok()?;
+    type_definition_to_resolved_type(
+        db,
+        resolved_type_def_fql.module_id,
+        resolved_type_def_fql.local_id,
+        ctx,
+    )
 }
 
-fn resolve_type_definition(
+fn type_definition_to_resolved_type(
     db: &dyn HirTyDatabase,
     current_module_id: ModuleId,
     type_idx: hir::TypeDefinitionIdx,
-    ctx: &mut super::type_reference::TypeResolutionContext,
+    ctx: &mut super::type_annotation::TypeResolutionContext,
 ) -> Option<ResolvedType> {
     let (hir_module, _) = hir::lower_file(db, current_module_id);
     let hir::TypeDefinition { name: _, kind } = hir_module.get_type_definition(type_idx);
@@ -37,8 +44,13 @@ fn resolve_type_definition(
                     let trait_constraints: Vec<_> = constraints
                         .iter()
                         .filter_map(|constraint| match constraint {
-                            hir::TypeVariableConstraint::Trait(path) => {
-                                resolve_trait_path(db, current_module_id, path)
+                            hir::TypeVariableConstraint::Trait(type_idx) => {
+                                alloy_hir_resolved::resolve_trait_by_ref_id(
+                                    db,
+                                    current_module_id,
+                                    *type_idx,
+                                )
+                                .ok()
                             }
                             hir::TypeVariableConstraint::Kind(_) => {
                                 // Kind constraints aren't trait constraints
@@ -71,76 +83,4 @@ fn resolve_type_definition(
     };
 
     Some(ty)
-}
-
-fn resolve_trait_path(
-    db: &dyn HirTyDatabase,
-    current_module_id: ModuleId,
-    path: &hir::Path,
-) -> Option<Fql<hir::Trait>> {
-    match path {
-        hir::Path::ThisModule { name, .. } => {
-            let trait_idx = get_trait_by_name(db, current_module_id, name)?;
-            Some(Fql::new(current_module_id, trait_idx))
-        }
-        hir::Path::OtherModule(fqn) => {
-            let module_slug = fqn.module_slug();
-            let other_module_id = db.find_module_by_slug(&*module_slug)?;
-            let trait_idx = get_trait_by_name(db, other_module_id, &fqn.name)?;
-            Some(Fql::new(other_module_id, trait_idx))
-        }
-        hir::Path::Unknown(_) => None,
-    }
-}
-
-fn get_trait_by_name(
-    db: &dyn HirTyDatabase,
-    module_id: ModuleId,
-    name: &hir::Name,
-) -> Option<hir::TraitIdx> {
-    let (hir_module, _) = hir::lower_file(db, module_id);
-    let Some((trait_idx, _)) = hir_module.get_trait_by_name(name) else {
-        return None;
-    };
-
-    Some(trait_idx)
-}
-
-fn resolve_type_definition_path(
-    db: &dyn HirTyDatabase,
-    current_module_id: ModuleId,
-    path: &hir::Path,
-) -> Option<(ModuleId, hir::TypeDefinitionIdx)> {
-    match path {
-        hir::Path::ThisModule {
-            name,
-            scope: target_scope,
-            ..
-        } => {
-            let type_idx = get_type_definition_by_name(db, current_module_id, name, *target_scope)?;
-            Some((current_module_id, type_idx))
-        }
-        hir::Path::OtherModule(fqn) => {
-            let module_slug = fqn.module_slug();
-            let other_module_id = db.find_module_by_slug(&*module_slug)?;
-            let type_idx =
-                get_type_definition_by_name(db, other_module_id, &fqn.name, Scopes::ROOT)?;
-            Some((other_module_id, type_idx))
-        }
-        hir::Path::Unknown(_) => None,
-    }
-}
-
-fn get_type_definition_by_name(
-    db: &dyn HirTyDatabase,
-    module_id: ModuleId,
-    name: &hir::Name,
-    scope: ScopeIdx,
-) -> Option<hir::TypeDefinitionIdx> {
-    let (hir_module, _) = hir::lower_file(db, module_id);
-    let Some((type_idx, _)) = hir_module.get_type_definition_by_name(name, scope) else {
-        return None;
-    };
-
-    Some(type_idx)
 }

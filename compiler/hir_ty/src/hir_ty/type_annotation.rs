@@ -1,7 +1,7 @@
 use crate::hir_ty::{Fql, ResolvedType};
 use crate::HirTyDatabase;
 use alloy_hir as hir;
-use alloy_scope::{ScopeIdx, Scopes};
+use alloy_hir_resolved as res;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
@@ -35,31 +35,37 @@ impl TypeResolutionContext {
     }
 }
 
-pub fn type_reference_to_resolved(
+pub fn type_annotation_to_resolved(
     db: &dyn HirTyDatabase,
     current_module_id: ModuleId,
     path: &hir::Path,
 ) -> Option<ResolvedType> {
     let mut ctx = TypeResolutionContext::new();
-    type_reference_to_resolved_with_ctx(db, current_module_id, path, &mut ctx)
+    type_annotation_to_resolved_with_ctx(db, current_module_id, path, &mut ctx)
 }
 
-fn type_reference_to_resolved_with_ctx(
+fn type_annotation_to_resolved_with_ctx(
     db: &dyn HirTyDatabase,
     current_module_id: ModuleId,
     path: &hir::Path,
     ctx: &mut TypeResolutionContext,
 ) -> Option<ResolvedType> {
-    let (resolved_module_id, type_idx) = resolve_type_reference_path(db, current_module_id, path)?;
-    resolve_type_reference(db, resolved_module_id, type_idx, ctx)
+    let resolved_type_fql = res::resolve_type_reference_by_path(db, current_module_id, path)?;
+    type_reference_to_resolved_type(
+        db,
+        resolved_type_fql.module_id,
+        resolved_type_fql.local_id,
+        ctx,
+    )
 }
 
-fn resolve_type_reference(
+fn type_reference_to_resolved_type(
     db: &dyn HirTyDatabase,
     current_module_id: ModuleId,
     type_idx: hir::TypeIdx,
     ctx: &mut TypeResolutionContext,
 ) -> Option<ResolvedType> {
+    let source_ref = Fql::new(current_module_id, type_idx);
     let (hir_module, _) = hir::lower_file(db, current_module_id);
     let type_ref = hir_module.get_type_reference(type_idx);
 
@@ -69,22 +75,25 @@ fn resolve_type_reference(
         hir::TypeReference::SelfRef => ResolvedType::TODO,
         hir::TypeReference::Unit => ResolvedType::Unit,
         hir::TypeReference::Named(path) => {
-            type_reference_to_resolved_with_ctx(db, current_module_id, path, ctx).or_else(|| {
-                super::type_definition::type_definition_to_resolved(
-                    db,
-                    current_module_id,
-                    path,
-                    ctx,
-                )
-            })?
+            type_annotation_to_resolved_with_ctx(db, current_module_id, path, ctx).or_else(
+                || {
+                    super::type_definition::type_definition_to_resolved(
+                        db,
+                        ctx,
+                        current_module_id,
+                        path,
+                        source_ref,
+                    )
+                },
+            )?
         }
         hir::TypeReference::BuiltIn(built_in) => ResolvedType::BuiltIn(*built_in),
         hir::TypeReference::Lambda {
             arg_type,
             return_type,
         } => {
-            let arg = resolve_type_reference(db, current_module_id, *arg_type, ctx);
-            let ret = resolve_type_reference(db, current_module_id, *return_type, ctx);
+            let arg = type_reference_to_resolved_type(db, current_module_id, *arg_type, ctx);
+            let ret = type_reference_to_resolved_type(db, current_module_id, *return_type, ctx);
             arg.zip(ret).map(|(a, r)| ResolvedType::Lambda {
                 arg_type: Box::new(a),
                 return_type: Box::new(r),
@@ -98,9 +107,11 @@ fn resolve_type_reference(
                     let inner_types: Vec<_> = types
                         .iter()
                         .map(|t| {
-                            resolve_type_reference(db, current_module_id, *t, ctx).unwrap_or(
-                                ResolvedType::UnknownReference(Fql::new(current_module_id, *t)),
-                            )
+                            type_reference_to_resolved_type(db, current_module_id, *t, ctx)
+                                .unwrap_or(ResolvedType::UnknownReference(Fql::new(
+                                    current_module_id,
+                                    *t,
+                                )))
                         })
                         .collect();
                     ResolvedType::Tuple(NonEmpty::new_unchecked(inner_types))
@@ -108,17 +119,17 @@ fn resolve_type_reference(
             }
         }
         hir::TypeReference::ParenthesizedType(inner) => {
-            resolve_type_reference(db, current_module_id, *inner, ctx)?
+            type_reference_to_resolved_type(db, current_module_id, *inner, ctx)?
         }
         hir::TypeReference::Bounded { base, args } => {
             // Resolve the base type (e.g., List, Option, Test)
-            let base_resolved = resolve_type_reference(db, current_module_id, *base, ctx)?;
+            let base_resolved = type_reference_to_resolved_type(db, current_module_id, *base, ctx)?;
 
             // Resolve each type argument
             let args_resolved: Vec<_> = args
                 .iter()
                 .map(|arg| {
-                    resolve_type_reference(db, current_module_id, *arg, ctx).unwrap_or(
+                    type_reference_to_resolved_type(db, current_module_id, *arg, ctx).unwrap_or(
                         ResolvedType::UnknownReference(Fql::new(current_module_id, *arg)),
                     )
                 })
@@ -132,43 +143,4 @@ fn resolve_type_reference(
     };
 
     Some(ty)
-}
-
-fn resolve_type_reference_path(
-    db: &dyn HirTyDatabase,
-    current_module_id: ModuleId,
-    path: &hir::Path,
-) -> Option<(ModuleId, hir::TypeIdx)> {
-    match path {
-        hir::Path::ThisModule {
-            name,
-            scope: target_scope,
-            ..
-        } => {
-            let type_idx = get_type_reference_by_name(db, current_module_id, name, *target_scope)?;
-            Some((current_module_id, type_idx))
-        }
-        hir::Path::OtherModule(fqn) => {
-            let module_slug = fqn.module_slug();
-            let other_module_id = db.find_module_by_slug(&*module_slug)?;
-            let type_idx =
-                get_type_reference_by_name(db, other_module_id, &fqn.name, Scopes::ROOT)?;
-            Some((other_module_id, type_idx))
-        }
-        hir::Path::Unknown(_) => None,
-    }
-}
-
-fn get_type_reference_by_name(
-    db: &dyn HirTyDatabase,
-    module_id: ModuleId,
-    name: &hir::Name,
-    scope: ScopeIdx,
-) -> Option<hir::TypeIdx> {
-    let (hir_module, _) = hir::lower_file(db, module_id);
-    let Some((type_idx, _)) = hir_module.get_type_reference_by_name(name, scope) else {
-        return None;
-    };
-
-    Some(type_idx)
 }

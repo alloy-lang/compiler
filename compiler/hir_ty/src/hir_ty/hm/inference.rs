@@ -8,9 +8,7 @@ use super::{HMInferenceContext, MonoType};
 use crate::diagnostics::TypeInferenceErrorKind;
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir as hir;
-use alloy_hir_resolved::EPFql;
 use alloy_workspace::ModuleId;
-use itertools::Itertools;
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
 
@@ -33,17 +31,15 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
         // For expressions with type annotations, add equations to unify the inferred type
         // with the annotated type. This allows annotations to guide/constrain inference.
         if let Some((name, scope)) = name_op {
-            let fql = expr_fql;
-
             // Get the inferred type for this expression
-            if let Some(inferred_mono_ty) = ctx.maybe_find_type(&fql) {
+            if let Some(inferred_mono_ty) = ctx.maybe_find_type(&expr_fql) {
                 // Resolve the type annotation to a ResolvedType
                 let Some(annotated_resolved) =
-                    super::super::type_reference::type_reference_to_resolved(
+                    super::super::type_annotation::type_annotation_to_resolved(
                         db,
                         module_id,
                         &hir::Path::ThisModule {
-                            name: name.clone(),
+                            name,
                             subname: None,
                             scope,
                         },
@@ -54,7 +50,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
 
                 // Convert the annotation to MonoType and add unification constraint
                 if let Some(annotated_mono) = resolved_to_mono(&annotated_resolved, &mut ctx) {
-                    ctx.add_equation(inferred_mono_ty, annotated_mono, fql);
+                    ctx.add_equation(inferred_mono_ty, annotated_mono, expr_fql);
                 }
             }
         }
@@ -104,23 +100,17 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
     }
 
     // Convert resolution errors to diagnostics
-    for (epfql, name, module_id) in ctx.resolution_errors {
-        let range = match epfql {
-            EPFql::Expression(fql) => hir_module.get_expression_range(fql.local_id),
-            EPFql::Pattern(fql) => hir_module.get_pattern_range(fql.local_id),
-        };
-        result.error(
-            TypeInferenceErrorKind::UnresolvedReference {
-                name: name.iter().join("::"),
-                module_id,
-            },
-            range,
-        );
+    for err in ctx.resolution_errors {
+        let range = err.get_range(db);
+        result.error(TypeInferenceErrorKind::TypeResolutionError(err), range);
     }
 
     for err in unification_errors {
         result.push_error(err);
     }
+
+    // Validate that all behaviors implement their trait's abstract members
+    super::super::behavior_validation::validate_behaviors(db, module_id, &mut result);
 
     result
 }

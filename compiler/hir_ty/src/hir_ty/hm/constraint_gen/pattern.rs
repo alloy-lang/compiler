@@ -1,9 +1,8 @@
+use super::{HMInferenceContext, MonoType};
 use alloy_hir as hir;
 use alloy_hir_resolved as res;
-use non_empty_vec::NonEmpty;
-
-use super::{HMInferenceContext, MonoType};
 use alloy_hir_resolved::Fql;
+use non_empty_vec::NonEmpty;
 
 /// Generate constraints for a pattern using HM inference
 pub(super) fn infer_pattern_hm(
@@ -15,8 +14,17 @@ pub(super) fn infer_pattern_hm(
         return existing_ty;
     }
 
-    let pattern =
-        alloy_hir_resolved::resolve_pattern(ctx.db, source_fql.module_id, source_fql.local_id);
+    let pattern = match alloy_hir_resolved::resolve_pattern_by_id(
+        ctx.db,
+        source_fql.module_id,
+        source_fql.local_id,
+    ) {
+        Ok(p) => p,
+        Err(err) => {
+            ctx.report_resolution_error(err);
+            return ctx.unknown_reference(source_fql);
+        }
+    };
 
     match pattern {
         res::Pattern::Literal(lit) => super::infer_literal(ctx, source_fql, lit.clone()),
@@ -28,15 +36,6 @@ pub(super) fn infer_pattern_hm(
         }
         res::Pattern::Nil => infer_nil(ctx, source_fql),
         res::Pattern::Missing => infer_missing_pattern(ctx, source_fql),
-        res::Pattern::UnknownReference {
-            source_ref,
-            module_id,
-            path,
-        } => {
-            // Report the resolution error
-            ctx.report_resolution_error(source_ref.clone(), path, module_id);
-            ctx.unknown_reference(source_ref)
-        }
     }
 }
 

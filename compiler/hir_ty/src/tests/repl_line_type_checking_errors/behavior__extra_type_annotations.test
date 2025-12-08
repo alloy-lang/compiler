@@ -5,7 +5,7 @@ trait TestTrait1 where
 end
 
 behavior TestTrait1 for Type1 where
-    typevar t1 =
+    typeof test1 : self -> String -> Int
 end
 ===
 HirTypedModule {
@@ -14,14 +14,4 @@ HirTypedModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Missing {
-            offset: 139,
-        },
-        context: TypeVariableConstraint,
-    },
-]
+[]

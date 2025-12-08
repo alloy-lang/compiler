@@ -1,15 +1,31 @@
+typedef Type1 = Thing
+
+trait TestTrait1 where
+    typeof test : Int
+
+    let thing = 1
+end
+
 behavior for Type1 where
     typevar t1
 end
 
-behavior TestTrait2 for Type1 where
+behavior TestTrait1 for Type1 where
     -- imagine all the things here
 
     typevar t1
+    let test = 0
 end
 ===
 HirTypedModule {
-    expression_types: {},
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+    },
     pattern_types: {},
     warnings: [],
     errors: [],
@@ -21,7 +37,7 @@ HirTypedModule {
             LParen,
         ],
         kind: Missing {
-            offset: 9,
+            offset: 101,
         },
         context: BehaviorTraitName,
     },

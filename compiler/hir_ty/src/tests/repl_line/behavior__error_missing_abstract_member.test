@@ -1,0 +1,36 @@
+typedef Type1 = Thing
+
+trait Trait1 where
+    typeof test : Int
+    typeof foo : String
+end
+
+behavior Trait1 for Type1 where
+    let test = 0
+end
+===
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: MissingTraitImplementation {
+                trait_name: "Trait1",
+                member_name: "foo",
+                type_fql: Fql {
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+            },
+            range: 93..145,
+        },
+    ],
+}
+[]

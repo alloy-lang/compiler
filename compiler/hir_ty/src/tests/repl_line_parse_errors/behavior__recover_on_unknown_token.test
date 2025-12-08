@@ -1,3 +1,9 @@
+typedef Type1 = Thing
+
+trait TestTrait1 where
+    -- imagine all the things here
+end
+
 behavior TestTrait1 for Type1 where
     unknown
 
@@ -19,7 +25,7 @@ HirTypedModule {
         ],
         kind: Unexpected {
             found: Ident,
-            range: 40..47,
+            range: 126..133,
         },
         context: BehaviorMemberFirst,
     },

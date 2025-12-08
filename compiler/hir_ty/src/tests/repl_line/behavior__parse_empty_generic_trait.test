@@ -14,6 +14,26 @@ HirTypedModule {
     expression_types: {},
     pattern_types: {},
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: TypeResolutionError(
+                BoundedTraitReference {
+                    source_ref: Fql {
+                        module_id: ModuleId(
+                            Id(4),
+                        ),
+                        local_id: Idx::<TypeReference>(3),
+                    },
+                    target_ref: Fql {
+                        module_id: ModuleId(
+                            Id(4),
+                        ),
+                        local_id: Idx::<TypeReference>(0),
+                    },
+                },
+            ),
+            range: 60..184,
+        },
+    ],
 }
 []

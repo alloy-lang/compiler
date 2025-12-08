@@ -1,5 +1,7 @@
 use crate::hir_ty::ResolvedType;
 use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, Severity};
+use alloy_hir as hir;
+use alloy_hir_resolved::{Fql, TypeResolutionError};
 use text_size::TextRange;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -34,7 +36,8 @@ impl Diagnostic for TypeInferenceError {
         match &self.kind {
             TypeInferenceErrorKind::ConflictingTypeAnnotation { .. } => Some("E001"),
             TypeInferenceErrorKind::UnificationError(_) => Some("E002"),
-            TypeInferenceErrorKind::UnresolvedReference { .. } => Some("E003"),
+            TypeInferenceErrorKind::TypeResolutionError { .. } => Some("E003"),
+            TypeInferenceErrorKind::MissingTraitImplementation { .. } => Some("E004"),
         }
     }
 
@@ -54,10 +57,17 @@ impl Diagnostic for TypeInferenceError {
                     format!("Infinite type detected: `{}` occurs in `{}`", var, ty)
                 }
             },
-            TypeInferenceErrorKind::UnresolvedReference { name, module_id } => {
+            TypeInferenceErrorKind::TypeResolutionError(err) => {
+                todo!("Type resolution error reporting not implemented yet")
+            }
+            TypeInferenceErrorKind::MissingTraitImplementation {
+                trait_name,
+                member_name,
+                ..
+            } => {
                 format!(
-                    "Cannot resolve reference `{}` in module {:?}",
-                    name, module_id
+                    "Behavior must implement abstract member `{}` from trait `{}`",
+                    member_name, trait_name
                 )
             }
         }
@@ -91,11 +101,22 @@ impl Diagnostic for TypeInferenceError {
                     }
                 }
             }
-            TypeInferenceErrorKind::UnresolvedReference { name, module_id: _ } => {
-                builder
-                    .with_primary_label(format!("cannot find `{}` in this scope", name))
-                    .with_help("Make sure this name is defined and in scope")
+            TypeInferenceErrorKind::TypeResolutionError(err) => {
+                todo!("Type resolution error reporting not implemented yet")
             }
+            TypeInferenceErrorKind::MissingTraitImplementation {
+                trait_name,
+                member_name,
+                type_fql,
+            } => builder
+                .with_primary_label(format!(
+                    "missing implementation of `{}`",
+                    member_name
+                ))
+                .with_help(format!(
+                    "Trait `{}` requires an implementation of `{}` for type `{:?}`",
+                    trait_name, member_name, type_fql
+                )),
         }
     }
 }
@@ -123,9 +144,11 @@ pub enum TypeInferenceErrorKind {
         found: ResolvedType,
     },
     UnificationError(crate::hir_ty::UnificationError),
-    UnresolvedReference {
-        name: String,
-        module_id: alloy_workspace::ModuleId,
+    TypeResolutionError(TypeResolutionError),
+    MissingTraitImplementation {
+        trait_name: String,
+        member_name: String,
+        type_fql: Fql<hir::TypeDefinition>,
     },
 }
 

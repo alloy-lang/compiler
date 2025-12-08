@@ -1,4 +1,5 @@
 use super::{resolve_cross_module_expression, resolve_cross_module_type_definition};
+use crate::diagnostics::TypeResolutionError;
 use crate::{EPFql, Fql};
 use alloy_hir as hir;
 use alloy_workspace::ModuleId;
@@ -8,11 +9,6 @@ use std::convert::TryFrom;
 #[derive(Debug, Clone, PartialEq)]
 pub enum Expression {
     Missing,
-    UnknownReference {
-        source_ref: Fql<hir::Expression>,
-        module_id: ModuleId,
-        path: NonEmpty<hir::Name>,
-    },
     Literal(hir::Literal),
     VariableRef(EPFql),
     Binary {
@@ -50,20 +46,20 @@ pub enum Expression {
     },
 }
 
-pub fn resolve_expression(
+pub fn resolve_expression_by_id(
     db: &dyn hir::HirDatabase,
     module_id: ModuleId,
     expr_id: hir::ExpressionIdx,
-) -> Expression {
+) -> Result<Expression, TypeResolutionError> {
     let source_ref = Fql::new(module_id, expr_id);
     let (hir_module, _) = hir::lower_file(db, module_id);
     let expr = hir_module.get_expression(expr_id);
 
-    match expr {
+    let expr = match expr {
         hir::Expression::Literal(lit) => Expression::Literal(lit.clone()),
         hir::Expression::Unit => Expression::Unit,
         hir::Expression::VariableRef { path, .. } => {
-            resolve_variable_ref(db, source_ref, module_id, path)
+            resolve_variable_ref(db, source_ref, module_id, path)?
         }
         hir::Expression::Lambda { args, body } => {
             let fql_args = args
@@ -76,7 +72,7 @@ pub fn resolve_expression(
             }
         }
         hir::Expression::FunctionCall { target, args, .. } => {
-            resolve_function_call(db, source_ref, module_id, target, args)
+            resolve_function_call(db, source_ref, module_id, target, args)?
         }
         hir::Expression::Binary { op, lhs, rhs } => Expression::Binary {
             op: op.clone(),
@@ -108,7 +104,9 @@ pub fn resolve_expression(
                 .collect(),
         },
         hir::Expression::Missing => Expression::Missing,
-    }
+    };
+
+    Ok(expr)
 }
 
 fn resolve_variable_ref(
@@ -116,7 +114,7 @@ fn resolve_variable_ref(
     source_ref: Fql<hir::Expression>,
     module_id: ModuleId,
     path: &hir::Path,
-) -> Expression {
+) -> Result<Expression, TypeResolutionError> {
     match path {
         hir::Path::ThisModule {
             name,
@@ -128,11 +126,11 @@ fn resolve_variable_ref(
             // First try to resolve as a variable (expression or pattern)
             if let Some((var_id, _)) = hir_module.get_expression_by_name(name, *this_scope) {
                 let var_fql = Fql::new(module_id, var_id);
-                return Expression::VariableRef(var_fql.into());
+                return Ok(Expression::VariableRef(var_fql.into()));
             }
             if let Some((pat_id, _)) = hir_module.get_pattern_by_name(name, *this_scope) {
                 let pat_fql = Fql::new(module_id, pat_id);
-                return Expression::VariableRef(pat_fql.into());
+                return Ok(Expression::VariableRef(pat_fql.into()));
             }
 
             // Check if this is a qualified variant constructor (e.g., Option::None)
@@ -144,54 +142,56 @@ fn resolve_variable_ref(
                     hir_module.get_type_definition_by_name(type_name, *this_scope)
                 {
                     return if type_def.kind.has_variant(variant_name) {
-                        Expression::VariantConstructor {
+                        Ok(Expression::VariantConstructor {
                             type_def: Fql::new(module_id, type_def_id),
                             variant_name: variant_name.clone(),
-                        }
+                        })
                     } else {
-                        Expression::UnknownReference {
+                        return Err(TypeResolutionError::UnknownExpressionReference {
                             source_ref,
                             module_id,
                             path: ne_vec![type_name.clone(), variant_name.clone()],
-                        }
+                        });
                     };
                 }
             }
 
-            Expression::UnknownReference {
+            Err(TypeResolutionError::UnknownExpressionReference {
                 source_ref,
                 module_id,
                 path: ne_vec![name.clone()],
-            }
+            })
         }
         hir::Path::OtherModule(fqn) => {
             // Try to resolve as a regular expression reference
-            if let Some(var_fql) = resolve_cross_module_expression(db, &fqn) {
-                return Expression::VariableRef(var_fql.into());
+            if let Ok(var_fql) = resolve_cross_module_expression(db, &fqn, source_ref.clone()) {
+                return Ok(Expression::VariableRef(var_fql.into()));
             }
 
             // Try to resolve as a variant constructor
             if let Ok(sub_path) = NonEmpty::try_from(fqn.sub_path.clone()) {
-                if let Some(type_def_fql) = resolve_cross_module_type_definition(db, &fqn) {
+                if let Ok(type_def_fql) =
+                    resolve_cross_module_type_definition(db, &fqn, source_ref.clone().into())
+                {
                     let variant_name = sub_path.last().clone();
-                    return Expression::VariantConstructor {
+                    return Ok(Expression::VariantConstructor {
                         type_def: type_def_fql,
                         variant_name,
-                    };
+                    });
                 }
             }
 
-            Expression::UnknownReference {
+            Err(TypeResolutionError::UnknownExpressionReference {
                 source_ref,
                 module_id,
                 path: fqn.segments(),
-            }
+            })
         }
-        hir::Path::Unknown(names) => Expression::UnknownReference {
+        hir::Path::Unknown(names) => Err(TypeResolutionError::UnknownExpressionReference {
             source_ref,
             module_id,
             path: names.clone(),
-        },
+        }),
     }
 }
 
@@ -201,7 +201,7 @@ fn resolve_function_call(
     module_id: ModuleId,
     target: &hir::Path,
     args: &Vec<hir::ExpressionIdx>,
-) -> Expression {
+) -> Result<Expression, TypeResolutionError> {
     let fql = match target {
         hir::Path::ThisModule {
             name,
@@ -216,38 +216,38 @@ fn resolve_function_call(
                 let pat_fql = Fql::new(module_id, pat_id);
                 EPFql::Pattern(pat_fql)
             } else {
-                return Expression::UnknownReference {
+                return Err(TypeResolutionError::UnknownExpressionReference {
                     source_ref,
                     module_id,
                     path: ne_vec![name.clone()],
-                };
+                });
             }
         }
         hir::Path::OtherModule(fqn) => {
-            if let Some(expr_fql) = resolve_cross_module_expression(db, &fqn) {
+            if let Ok(expr_fql) = resolve_cross_module_expression(db, &fqn, source_ref.clone()) {
                 EPFql::Expression(expr_fql)
             } else {
-                return Expression::UnknownReference {
+                return Err(TypeResolutionError::UnknownExpressionReference {
                     source_ref,
                     module_id,
                     path: fqn.segments(),
-                };
+                });
             }
         }
         hir::Path::Unknown(names) => {
-            return Expression::UnknownReference {
+            return Err(TypeResolutionError::UnknownExpressionReference {
                 source_ref,
                 module_id,
                 path: names.clone(),
-            }
+            })
         }
     };
 
-    Expression::FunctionCall {
+    Ok(Expression::FunctionCall {
         target: fql,
         args: args
             .iter()
             .map(|arg_id| Fql::new(module_id, *arg_id))
             .collect(),
-    }
+    })
 }

@@ -8,9 +8,7 @@
 
 use super::Fql;
 use alloy_hir as hir;
-use alloy_hir::Name;
-use alloy_hir_resolved::EPFql;
-use non_empty_vec::NonEmpty;
+use alloy_hir_resolved::{EPFql, TypeResolutionError};
 use rustc_hash::FxHashMap;
 
 mod constraint_gen;
@@ -227,7 +225,7 @@ pub(super) struct HMInferenceContext<'db> {
     /// Polymorphic type schemes for let-bound variables
     pub(super) poly_env: FxHashMap<EPFql, PolyType>,
     /// Resolution errors collected during inference (FQL + reference path + module_id)
-    pub(super) resolution_errors: Vec<(EPFql, NonEmpty<Name>, alloy_workspace::ModuleId)>,
+    pub(super) resolution_errors: Vec<TypeResolutionError>,
 }
 
 impl<'db> HMInferenceContext<'db> {
@@ -266,13 +264,8 @@ impl<'db> HMInferenceContext<'db> {
     }
 
     /// Report a resolution error
-    pub(super) fn report_resolution_error(
-        &mut self,
-        fql: impl Into<EPFql>,
-        name: NonEmpty<Name>,
-        module_id: alloy_workspace::ModuleId,
-    ) {
-        self.resolution_errors.push((fql.into(), name, module_id));
+    pub(super) fn report_resolution_error(&mut self, err: TypeResolutionError) {
+        self.resolution_errors.push(err);
     }
 
     #[must_use]

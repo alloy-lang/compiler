@@ -1,3 +1,9 @@
+typedef Type1 = Thing
+
+trait TestTrait1 where
+    -- imagine all the things here
+end
+
 behavior TestTrait1 for Type1
     typeof test : String
 end
@@ -14,7 +20,7 @@ HirTypedModule {
             WhereKw,
         ],
         kind: Missing {
-            offset: 34,
+            offset: 120,
         },
         context: BehaviorWhere,
     },

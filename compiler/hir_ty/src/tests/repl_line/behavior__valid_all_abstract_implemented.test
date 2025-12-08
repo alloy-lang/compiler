@@ -1,13 +1,17 @@
-trait TestTrait1 where
-    typeof test : Int
+typedef Type1 = Thing
 
-    let thing = "hi"
+trait Trait1 where
+    typeof test : Int
+end
+
+behavior Trait1 for Type1 where
+    let test = 0
 end
 ===
 HirTypedModule {
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
-            String,
+            Int,
         ),
     },
     pattern_types: {},

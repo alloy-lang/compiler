@@ -1,25 +1,51 @@
+mod behavior;
+mod diagnostics;
 mod expr;
 mod fql;
 mod pattern;
+mod r#trait;
+mod type_definition;
+mod type_reference;
+mod type_variable;
 
 use alloy_hir as hir;
+use non_empty_vec::NonEmpty;
+
+pub use behavior::*;
+pub use diagnostics::*;
 pub use expr::*;
 pub use fql::*;
-use non_empty_vec::NonEmpty;
 pub use pattern::*;
+pub use r#trait::*;
+pub use type_definition::*;
+pub use type_reference::*;
+pub use type_variable::*;
 
 /// Helper function to resolve a cross-module expression reference
 fn resolve_cross_module_expression(
     db: &dyn hir::HirDatabase,
     fqn: &hir::Fqn,
-) -> Option<Fql<hir::Expression>> {
+    source_ref: Fql<hir::Expression>,
+) -> Result<Fql<hir::Expression>, TypeResolutionError> {
+    let module_slug = fqn.module_slug();
     if fqn.sub_path.is_empty() {
-        let module_slug = fqn.module_slug();
-        let other_module_id = db.find_module_by_slug(&*module_slug)?;
+        let Some(other_module_id) = db.find_module_by_slug(&*module_slug) else {
+            return Err(TypeResolutionError::UnknownModule {
+                module_slug: module_slug.to_string(),
+                source_ref: source_ref.into(),
+            });
+        };
         let (hir_module, _) = hir::lower_file(db, other_module_id);
-        let (expr_id, _) =
-            hir_module.get_expression_by_name(&fqn.name, alloy_scope::Scopes::ROOT)?;
-        return Some(Fql::new(other_module_id, expr_id));
+        let Some((expr_id, _)) =
+            hir_module.get_expression_by_name(&fqn.name, alloy_scope::Scopes::ROOT)
+        else {
+            return Err(TypeResolutionError::UnknownExpressionReference {
+                source_ref,
+                module_id: other_module_id,
+                path: fqn.segments(),
+            });
+        };
+        return Ok(Fql::new(other_module_id, expr_id));
     }
 
     // Build the full path: module + name + sub_path (except last element)
@@ -56,13 +82,17 @@ fn resolve_cross_module_expression(
         let Some((expr_id, _)) =
             hir_module.get_expression_by_name(type_name, alloy_scope::Scopes::ROOT)
         else {
-            continue; // Try next split
+            // we found the module, but not the expression
+            continue;
         };
 
-        return Some(Fql::new(other_module_id, expr_id));
+        return Ok(Fql::new(other_module_id, expr_id));
     }
 
-    None
+    Err(TypeResolutionError::UnknownModule {
+        module_slug: module_slug.to_string(),
+        source_ref: source_ref.into(),
+    })
 }
 
 /// Helper function to resolve a cross-module type definition reference
@@ -76,20 +106,45 @@ fn resolve_cross_module_expression(
 pub(crate) fn resolve_cross_module_type_definition(
     db: &dyn hir::HirDatabase,
     fqn: &hir::Fqn,
-) -> Option<Fql<hir::TypeDefinition>> {
-    // If sub_path is empty, just look up the type directly
+    source_ref: EPTFql,
+) -> Result<Fql<hir::TypeDefinition>, TypeResolutionError> {
+    let mut module_slug = fqn.module_slug();
     if fqn.sub_path.is_empty() {
-        let module_slug = fqn.module_slug();
-        let other_module_id = db.find_module_by_slug(&*module_slug)?;
+        let Some(other_module_id) = db.find_module_by_slug(&*module_slug) else {
+            return Err(TypeResolutionError::UnknownModule {
+                module_slug: module_slug.to_string(),
+                source_ref,
+            });
+        };
         let (hir_module, _) = hir::lower_file(db, other_module_id);
 
-        let (type_def_id, _) =
-            hir_module.get_type_definition_by_name(&fqn.name, alloy_scope::Scopes::ROOT)?;
-        return Some(Fql::new(other_module_id, type_def_id));
+        let Some((type_def_id, _)) =
+            hir_module.get_type_definition_by_name(&fqn.name, alloy_scope::Scopes::ROOT)
+        else {
+            return match source_ref {
+                EPTFql::Expression(fql) => Err(TypeResolutionError::UnknownExpressionReference {
+                    source_ref: fql,
+                    module_id: other_module_id,
+                    path: fqn.segments(),
+                }),
+                EPTFql::Pattern(fql) => Err(TypeResolutionError::UnknownPatternReference {
+                    source_ref: fql,
+                    module_id: other_module_id,
+                    path: fqn.segments(),
+                }),
+                EPTFql::TypeReference(fql) => Err(TypeResolutionError::UnknownTypeReference {
+                    source_ref: fql,
+                    module_id: other_module_id,
+                    path: fqn.segments(),
+                }),
+            };
+        };
+        return Ok(Fql::new(other_module_id, type_def_id));
     }
 
     // Build the full path: module + name + sub_path (except last element)
     let full_path: NonEmpty<_> = fqn.segments();
+    println!("full_path: {:?}", full_path);
 
     // The last element of full_path is always the variant name
     let variant_name = full_path.last();
@@ -109,12 +164,13 @@ pub(crate) fn resolve_cross_module_type_definition(
         };
 
         // Try to find this module
-        let module_slug = module_path
+        module_slug = module_path
             .iter()
             .map(|n| n.as_str())
             .collect::<Vec<_>>()
             .join("::");
 
+        println!("module_slug: {:?}", module_slug);
         let Some(other_module_id) = db.find_module_by_slug(&module_slug) else {
             continue; // Try next split
         };
@@ -125,14 +181,19 @@ pub(crate) fn resolve_cross_module_type_definition(
         let Some((type_def_id, type_def)) =
             hir_module.get_type_definition_by_name(type_name, alloy_scope::Scopes::ROOT)
         else {
-            continue; // Try next split
+            // we found the module, but not the type definition
+            continue;
         };
 
         // Check if this type has the requested variant
         if type_def.kind.has_variant(variant_name) {
-            return Some(Fql::new(other_module_id, type_def_id));
+            return Ok(Fql::new(other_module_id, type_def_id));
         }
     }
 
-    None
+    println!("error module_slug: {:?}", module_slug);
+    Err(TypeResolutionError::UnknownModule {
+        module_slug: module_slug.to_string(),
+        source_ref,
+    })
 }

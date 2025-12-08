@@ -1,3 +1,9 @@
+typedef Type1 = Thing
+
+trait TestTrait1 where
+    -- imagine all the things here
+end
+
 behavior TestTrait1 for Type1 where
     typeof test1
     typeof test2 : self -> String -> Int
@@ -15,7 +21,7 @@ HirTypedModule {
             Colon,
         ],
         kind: Missing {
-            offset: 57,
+            offset: 143,
         },
         context: TypeOfColon,
     },
@@ -26,7 +32,7 @@ HirTypedModule {
             LParen,
         ],
         kind: Missing {
-            offset: 57,
+            offset: 143,
         },
         context: TypeOfType,
     },

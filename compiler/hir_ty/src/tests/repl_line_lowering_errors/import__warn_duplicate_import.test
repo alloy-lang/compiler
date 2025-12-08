@@ -13,12 +13,26 @@ HirTypedModule {
     warnings: [],
     errors: [
         TypeInferenceError {
-            kind: UnresolvedReference {
-                name: "std::functor::map",
-                module_id: ModuleId(
-                    Id(4),
-                ),
-            },
+            kind: TypeResolutionError(
+                UnknownExpressionReference {
+                    source_ref: Fql {
+                        module_id: ModuleId(
+                            Id(4),
+                        ),
+                        local_id: Idx::<Expression>(0),
+                    },
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    path: NonEmpty(
+                        [
+                            "std",
+                            "functor",
+                            "map",
+                        ],
+                    ),
+                },
+            ),
             range: 51..66,
         },
     ],

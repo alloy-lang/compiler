@@ -6,6 +6,7 @@
 use crate::hir_ty::{Fql, ResolvedType};
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir as hir;
+use alloy_hir_resolved as res;
 use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
@@ -21,7 +22,7 @@ pub fn check_type_annotation(
 ) {
     // Check for type annotation conflicts
     if let Some((name, scope)) = name_op {
-        let Some(expected_type) = super::type_reference::type_reference_to_resolved(
+        let Some(expected_type) = super::type_annotation::type_annotation_to_resolved(
             db,
             current_module_id,
             &hir::Path::ThisModule {
@@ -171,14 +172,20 @@ fn check_trait_constraints(
 /// Check if a type has a behavior implementation for the required trait
 fn has_behavior_for_trait(
     db: &dyn HirTyDatabase,
-    type_fql: &Fql<hir::TypeDefinition>,
+    expected_type_fql: &Fql<hir::TypeDefinition>,
     required_trait: &Fql<hir::Trait>,
 ) -> bool {
-    let (hir_module, _) = hir::lower_file(db, type_fql.module_id);
+    let (hir_module, _) = hir::lower_file(db, expected_type_fql.module_id);
 
     // Search through all behaviors in the type's module
-    for (_behavior_idx, behavior, _range, _name) in hir_module.behaviors() {
-        if does_behavior_match(db, type_fql.module_id, behavior, type_fql, required_trait) {
+    for (behavior_idx, _behavior, _range, _name) in hir_module.behaviors() {
+        if does_behavior_match(
+            db,
+            expected_type_fql.module_id,
+            behavior_idx,
+            expected_type_fql,
+            required_trait,
+        ) {
             return true;
         }
     }
@@ -190,119 +197,19 @@ fn has_behavior_for_trait(
 fn does_behavior_match(
     db: &dyn HirTyDatabase,
     behavior_module_id: ModuleId,
-    behavior: &hir::Behavior,
-    type_fql: &Fql<hir::TypeDefinition>,
+    behavior_idx: hir::BehaviorIdx,
+    expected_type_fql: &Fql<hir::TypeDefinition>,
     required_trait: &Fql<hir::Trait>,
 ) -> bool {
-    let (hir_module, _) = hir::lower_file(db, behavior_module_id);
-
-    // Get the type and trait references that this behavior is attached to
-    let attached_type_ref = hir_module.get_type_reference(behavior.attached_type);
-    let attached_trait_ref = hir_module.get_type_reference(behavior.attached_trait);
-
-    // Check if the attached type resolves to our type definition
-    let type_matches =
-        type_reference_matches_typedef(db, behavior_module_id, attached_type_ref, type_fql);
-
-    // Check if the attached trait resolves to our required trait
-    let trait_matches =
-        type_reference_matches_trait(db, behavior_module_id, attached_trait_ref, required_trait);
-
-    type_matches && trait_matches
-}
-
-/// Check if a type reference resolves to the given type definition
-fn type_reference_matches_typedef(
-    db: &dyn HirTyDatabase,
-    current_module_id: ModuleId,
-    type_ref: &hir::TypeReference,
-    expected_type_fql: &Fql<hir::TypeDefinition>,
-) -> bool {
-    // Extract the path from the type reference
-    let path = match type_ref {
-        hir::TypeReference::Named(path) => path,
-        _ => return false,
+    let behavior = res::resolve_behavior_by_id(db, behavior_module_id, behavior_idx);
+    let Ok(attached_type_fql) = &behavior.attached_type else {
+        return false;
+    };
+    let Ok(attached_trait_fql) = &behavior.attached_trait else {
+        return false;
     };
 
-    // Resolve the path to see if it points to the expected type definition
-    match path {
-        hir::Path::ThisModule { name, scope, .. } => {
-            // Try to resolve in the current module
-            let (hir_module, _) = hir::lower_file(db, current_module_id);
-            if let Some((type_idx, _)) = hir_module.get_type_definition_by_name(name, *scope) {
-                // Check if this type definition matches our expected one
-                current_module_id == expected_type_fql.module_id
-                    && type_idx == expected_type_fql.local_id
-            } else {
-                false
-            }
-        }
-        hir::Path::OtherModule(fqn) => {
-            // Resolve the module
-            let module_slug = fqn.module_slug();
-            if let Some(other_module_id) = db.find_module_by_slug(&*module_slug) {
-                let (hir_module, _) = hir::lower_file(db, other_module_id);
-                if let Some((type_idx, _)) =
-                    hir_module.get_type_definition_by_name(&fqn.name, alloy_scope::Scopes::ROOT)
-                {
-                    // Check if this type definition matches our expected one
-                    other_module_id == expected_type_fql.module_id
-                        && type_idx == expected_type_fql.local_id
-                } else {
-                    false
-                }
-            } else {
-                false
-            }
-        }
-        hir::Path::Unknown(_) => false,
-    }
-}
-
-/// Check if a type reference resolves to the given trait
-fn type_reference_matches_trait(
-    db: &dyn HirTyDatabase,
-    current_module_id: ModuleId,
-    type_ref: &hir::TypeReference,
-    expected_trait_fql: &Fql<hir::Trait>,
-) -> bool {
-    // Extract the path from the type reference
-    let path = match type_ref {
-        hir::TypeReference::Named(path) => path,
-        _ => return false,
-    };
-
-    // Resolve the path to see if it points to the expected trait
-    match path {
-        hir::Path::ThisModule { name, .. } => {
-            // Try to resolve in the current module
-            let (hir_module, _) = hir::lower_file(db, current_module_id);
-            if let Some((trait_idx, _)) = hir_module.get_trait_by_name(name) {
-                // Check if this trait matches our expected one
-                current_module_id == expected_trait_fql.module_id
-                    && trait_idx == expected_trait_fql.local_id
-            } else {
-                false
-            }
-        }
-        hir::Path::OtherModule(fqn) => {
-            // Resolve the module
-            let module_slug = fqn.module_slug();
-            if let Some(other_module_id) = db.find_module_by_slug(&*module_slug) {
-                let (hir_module, _) = hir::lower_file(db, other_module_id);
-                if let Some((trait_idx, _)) = hir_module.get_trait_by_name(&fqn.name) {
-                    // Check if this trait matches our expected one
-                    other_module_id == expected_trait_fql.module_id
-                        && trait_idx == expected_trait_fql.local_id
-                } else {
-                    false
-                }
-            } else {
-                false
-            }
-        }
-        hir::Path::Unknown(_) => false,
-    }
+    attached_type_fql != expected_type_fql && required_trait != attached_trait_fql
 }
 
 #[derive(Debug, Clone, PartialEq)]

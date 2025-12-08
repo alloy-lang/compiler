@@ -1,10 +1,10 @@
-import other
+import test_data
 
 trait Trait1 where
     -- empty
 end
 
-behavior Trait1 for other::Type1 where
+behavior Trait1 for test_data::Test where
     -- imagine all the things here
 end
 ===
@@ -13,10 +13,10 @@ HirModule {
         Idx::<Import>(0): {
             "item": Import {
                 segments: [],
-                last: "other",
+                last: "test_data",
             },
-            "name": "other",
-            "range": 0..14,
+            "name": "test_data",
+            "range": 0..18,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -31,7 +31,7 @@ HirModule {
                     scope: Idx::<Scope>(0),
                 },
             ),
-            "range": 60..67,
+            "range": 64..71,
         },
         Idx::<TypeReference>(1): {
             "item": Named(
@@ -40,14 +40,14 @@ HirModule {
                         module: NonEmpty(
                             [],
                         ),
-                        name: "other",
+                        name: "test_data",
                         sub_path: [
-                            "Type1",
+                            "Test",
                         ],
                     },
                 ),
             ),
-            "range": 71..84,
+            "range": 75..91,
         },
     },
     type_definitions: EmptyIndex::<TypeDefinition>,
@@ -60,7 +60,7 @@ HirModule {
                 members: [],
             },
             "name": "Trait1",
-            "range": 14..51,
+            "range": 18..55,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -77,7 +77,7 @@ HirModule {
                 Idx::<TypeReference>(1),
                 Idx::<TypeReference>(0),
             ),
-            "range": 51..128,
+            "range": 55..135,
             "scope_id": Idx::<Scope>(0),
         },
     },

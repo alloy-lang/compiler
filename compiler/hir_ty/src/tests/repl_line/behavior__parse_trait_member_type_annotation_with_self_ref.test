@@ -6,6 +6,28 @@ HirTypedModule {
     expression_types: {},
     pattern_types: {},
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: TypeResolutionError(
+                UnknownTraitReference {
+                    source_ref: Fql {
+                        module_id: ModuleId(
+                            Id(4),
+                        ),
+                        local_id: Idx::<TypeReference>(0),
+                    },
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    path: NonEmpty(
+                        [
+                            "TestTrait1",
+                        ],
+                    ),
+                },
+            ),
+            range: 0..79,
+        },
+    ],
 }
 []
