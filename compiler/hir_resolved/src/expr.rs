@@ -44,6 +44,12 @@ pub enum Expression {
         type_def: Fql<hir::TypeDefinition>,
         variant_name: hir::Name,
     },
+    /// Reference to an abstract trait member (has type annotation but no implementation)
+    AbstractTraitMemberRef {
+        trait_fql: Fql<hir::Trait>,
+        member_name: hir::Name,
+        type_annotation: Fql<hir::TypeReference>,
+    },
 }
 
 pub fn resolve_expression_by_id(
@@ -131,6 +137,22 @@ fn resolve_variable_ref(
             if let Some((pat_id, _)) = hir_module.get_pattern_by_name(name, *this_scope) {
                 let pat_fql = Fql::new(module_id, pat_id);
                 return Ok(Expression::VariableRef(pat_fql.into()));
+            }
+
+            // Check if this is an abstract trait member reference
+            // (within a trait scope, referencing a member with a type annotation but no implementation)
+            let scope = *this_scope;
+            if let Some((trait_idx, trait_def)) = hir_module.find_trait_containing_scope(scope) {
+                // Check if this name is an abstract trait member
+                for (member_name, type_annotation_idx) in trait_def.abstract_members() {
+                    if member_name == name {
+                        return Ok(Expression::AbstractTraitMemberRef {
+                            trait_fql: Fql::new(module_id, trait_idx),
+                            member_name: member_name.clone(),
+                            type_annotation: Fql::new(module_id, type_annotation_idx),
+                        });
+                    }
+                }
             }
 
             // Check if this is a qualified variant constructor (e.g., Option::None)

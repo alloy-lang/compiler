@@ -57,9 +57,66 @@ impl Diagnostic for TypeInferenceError {
                     format!("Infinite type detected: `{}` occurs in `{}`", var, ty)
                 }
             },
-            TypeInferenceErrorKind::TypeResolutionError(err) => {
-                todo!("Type resolution error reporting not implemented yet")
-            }
+            TypeInferenceErrorKind::TypeResolutionError(err) => match err {
+                TypeResolutionError::UnknownModule { module_slug, .. } => {
+                    format!("Cannot find module `{}`", module_slug)
+                }
+                TypeResolutionError::UnknownTraitModule { module_slug, .. } => {
+                    format!("Cannot find module `{}` for trait reference", module_slug)
+                }
+                TypeResolutionError::UnknownExpressionReference { path, .. } => {
+                    let path_str = path
+                        .iter()
+                        .map(|n| n.as_str())
+                        .collect::<Vec<_>>()
+                        .join("::");
+                    format!("Cannot find value `{}` in this scope", path_str)
+                }
+                TypeResolutionError::UnknownPatternReference { path, .. } => {
+                    let path_str = path
+                        .iter()
+                        .map(|n| n.as_str())
+                        .collect::<Vec<_>>()
+                        .join("::");
+                    format!("Cannot find pattern `{}` in this scope", path_str)
+                }
+                TypeResolutionError::UnknownTypeReference { path, .. } => {
+                    let path_str = path
+                        .iter()
+                        .map(|n| n.as_str())
+                        .collect::<Vec<_>>()
+                        .join("::");
+                    format!("Cannot find type `{}` in this scope", path_str)
+                }
+                TypeResolutionError::UnknownTypeDefinition { path, .. } => {
+                    let path_str = path
+                        .iter()
+                        .map(|n| n.as_str())
+                        .collect::<Vec<_>>()
+                        .join("::");
+                    format!("Cannot find type definition `{}`", path_str)
+                }
+                TypeResolutionError::UnknownTraitReference { path, .. } => {
+                    let path_str = path
+                        .iter()
+                        .map(|n| n.as_str())
+                        .collect::<Vec<_>>()
+                        .join("::");
+                    format!("Cannot find trait `{}`", path_str)
+                }
+                TypeResolutionError::UnknownTraitName { fqn, .. } => {
+                    let path_str = fqn
+                        .segments()
+                        .iter()
+                        .map(|n| n.as_str())
+                        .collect::<Vec<_>>()
+                        .join("::");
+                    format!("Cannot find trait `{}`", path_str)
+                }
+                TypeResolutionError::BoundedTraitReference { .. } => {
+                    "Bounded trait reference resolution not yet implemented".to_string()
+                }
+            },
             TypeInferenceErrorKind::MissingTraitImplementation {
                 trait_name,
                 member_name,
@@ -101,9 +158,59 @@ impl Diagnostic for TypeInferenceError {
                     }
                 }
             }
-            TypeInferenceErrorKind::TypeResolutionError(err) => {
-                todo!("Type resolution error reporting not implemented yet")
-            }
+            TypeInferenceErrorKind::TypeResolutionError(err) => match err {
+                TypeResolutionError::UnknownModule { module_slug, .. } => {
+                    builder
+                        .with_primary_label(format!("module `{}` not found", module_slug))
+                        .with_help("Make sure the module is imported and the path is correct")
+                }
+                TypeResolutionError::UnknownTraitModule { module_slug, .. } => {
+                    builder
+                        .with_primary_label(format!("module `{}` not found", module_slug))
+                        .with_help("Check that the trait's module is imported correctly")
+                }
+                TypeResolutionError::UnknownExpressionReference { path, module_id, .. } => {
+                    let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
+                    builder
+                        .with_primary_label(format!("cannot find `{}`", path_str))
+                        .with_help(format!("No value named `{}` found in module {:?}", path_str, module_id))
+                }
+                TypeResolutionError::UnknownPatternReference { path, module_id, .. } => {
+                    let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
+                    builder
+                        .with_primary_label(format!("cannot find `{}`", path_str))
+                        .with_help(format!("No pattern named `{}` found in module {:?}", path_str, module_id))
+                }
+                TypeResolutionError::UnknownTypeReference { path, module_id, .. } => {
+                    let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
+                    builder
+                        .with_primary_label(format!("cannot find type `{}`", path_str))
+                        .with_help(format!("No type named `{}` found in module {:?}", path_str, module_id))
+                }
+                TypeResolutionError::UnknownTypeDefinition { path, module_id, .. } => {
+                    let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
+                    builder
+                        .with_primary_label(format!("cannot find type `{}`", path_str))
+                        .with_help(format!("No type definition named `{}` found in module {:?}", path_str, module_id))
+                }
+                TypeResolutionError::UnknownTraitReference { path, module_id, .. } => {
+                    let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
+                    builder
+                        .with_primary_label(format!("cannot find trait `{}`", path_str))
+                        .with_help(format!("No trait named `{}` found in module {:?}", path_str, module_id))
+                }
+                TypeResolutionError::UnknownTraitName { fqn, .. } => {
+                    let path_str = fqn.segments().iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
+                    builder
+                        .with_primary_label(format!("cannot find trait `{}`", path_str))
+                        .with_help("Check that the trait name is correct and the module is imported")
+                }
+                TypeResolutionError::BoundedTraitReference { .. } => {
+                    builder
+                        .with_primary_label("bounded trait reference")
+                        .with_help("Bounded trait references are not yet fully implemented")
+                }
+            },
             TypeInferenceErrorKind::MissingTraitImplementation {
                 trait_name,
                 member_name,

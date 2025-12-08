@@ -72,27 +72,6 @@ pub enum HirReferenceType {
     Type,
 }
 
-/// Represents exported symbols from a module at root scope (scope 0)
-#[derive(Clone, PartialEq, Eq)]
-pub struct ModuleExports {
-    /// Type definitions exported by this module
-    pub types: FxHashMap<Name, TypeDefinitionIdx>,
-    /// Expression definitions exported by this module
-    pub expressions: FxHashMap<Name, ExpressionIdx>,
-    /// Trait definitions exported by this module
-    pub traits: FxHashMap<Name, TraitIdx>,
-}
-
-impl ModuleExports {
-    fn new() -> Self {
-        Self {
-            types: FxHashMap::default(),
-            expressions: FxHashMap::default(),
-            traits: FxHashMap::default(),
-        }
-    }
-}
-
 #[derive(Debug, Clone, PartialEq)]
 pub struct HirModule {
     imports: Index<Import>,
@@ -244,41 +223,33 @@ impl HirModule {
         self.behaviors.get(idx)
     }
 
-    /// Collect all exported symbols from this module
-    /// For now, we export everything at the root scope (scope 0)
-    pub fn module_exports(&self) -> ModuleExports {
-        let mut exports = ModuleExports::new();
+    /// Check if a scope is equal to or descended from another scope
+    /// Returns true if `child` is the same as `ancestor` or is nested within it
+    fn scope_is_descendant_of(&self, child: ScopeIdx, ancestor: ScopeIdx) -> bool {
+        let mut current = child;
+        loop {
+            if current == ancestor {
+                return true;
+            }
+            let parent = self.scopes.parent_scope(current);
+            if current == parent {
+                // Reached root without finding ancestor
+                return false;
+            }
+            current = parent;
+        }
+    }
 
-        // Root scope is always index 0
-
-        // Collect type definitions at root scope
-        for (type_idx, _type_def, _range, name_scope) in self.type_definitions() {
-            if let Some((name, scope)) = name_scope {
-                if scope == Scopes::ROOT {
-                    exports.types.insert(name, type_idx);
-                }
+    /// Find the trait that contains the given scope, if any
+    /// This checks if the scope is within a trait's scope hierarchy
+    pub fn find_trait_containing_scope(&self, scope: ScopeIdx) -> Option<(TraitIdx, &Trait)> {
+        for (trait_idx, trait_def, _range, _name_scope) in self.traits() {
+            let trait_scope = trait_def.scope();
+            if self.scope_is_descendant_of(scope, trait_scope) {
+                return Some((trait_idx, trait_def));
             }
         }
-
-        // Collect trait definitions at root scope
-        for (trait_idx, _trait_def, _range, name_scope) in self.traits() {
-            if let Some((name, scope)) = name_scope {
-                if scope == Scopes::ROOT {
-                    exports.traits.insert(name, trait_idx);
-                }
-            }
-        }
-
-        // Collect expression exports (patterns are never exported)
-        for (expr_idx, _expr, _range, name_scope) in self.expressions() {
-            if let Some((name, scope)) = name_scope {
-                if scope == Scopes::ROOT {
-                    exports.expressions.insert(name, expr_idx);
-                }
-            }
-        }
-
-        exports
+        None
     }
 }
 

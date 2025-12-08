@@ -117,7 +117,10 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
 
 /// Convert a ResolvedType to a MonoType for use in constraint generation
 /// This allows type annotations to be converted into constraints that guide inference
-fn resolved_to_mono(resolved: &ResolvedType, ctx: &mut HMInferenceContext) -> Option<MonoType> {
+pub(super) fn resolved_to_mono(
+    resolved: &ResolvedType,
+    ctx: &mut HMInferenceContext,
+) -> Option<MonoType> {
     match resolved {
         ResolvedType::UnknownReference(_) => None,
         ResolvedType::Unconstrained => Some(MonoType::Unconstrained),

@@ -1,9 +1,22 @@
+typedef Type1 = Thing
+
+trait Trait1 where
+    typeof test : self -> String -> Int
+
+    -- TODO: should be able to resolve abstract trait members
+    let thing = test
+end
+
 behavior TestTrait1 for Type1 where
     typeof test : self -> String -> Int
 end
 ===
 HirTypedModule {
-    expression_types: {},
+    expression_types: {
+        Idx::<Expression>(0): Generic(
+            0,
+        ),
+    },
     pattern_types: {},
     warnings: [],
     errors: [
@@ -14,7 +27,7 @@ HirTypedModule {
                         module_id: ModuleId(
                             Id(4),
                         ),
-                        local_id: Idx::<TypeReference>(0),
+                        local_id: Idx::<TypeReference>(5),
                     },
                     module_id: ModuleId(
                         Id(4),
@@ -26,7 +39,7 @@ HirTypedModule {
                     ),
                 },
             ),
-            range: 0..79,
+            range: 171..250,
         },
     ],
 }

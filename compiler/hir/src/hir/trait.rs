@@ -22,6 +22,8 @@ pub enum TraitMember {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Trait {
     pub(crate) name: Name,
+    /// The scope where this trait's members are defined
+    scope: ScopeIdx,
     self_constraints: Vec<TypeVariableConstraint>,
     named_type_variables: FxHashMap<Name, TypeDefinitionIdx>,
     members: Vec<TraitMember>,
@@ -36,6 +38,9 @@ pub(super) fn lower_trait(ctx: &mut LoweringCtx, ast: &ast::TraitDef) {
     let name = Name::new(name.text());
 
     let trait_ = ctx.inside_scope("trait", |ctx| {
+        // Capture the current scope (the trait's scope)
+        let trait_scope = ctx.scopes.current_scope();
+
         let named_type_variables = ast
             .named_type_variables()
             .iter()
@@ -106,6 +111,7 @@ pub(super) fn lower_trait(ctx: &mut LoweringCtx, ast: &ast::TraitDef) {
 
         Trait {
             name: name.clone(),
+            scope: trait_scope,
             self_constraints,
             named_type_variables,
             members,
@@ -124,6 +130,11 @@ impl Trait {
     /// Get the name of this trait
     pub fn name(&self) -> &Name {
         &self.name
+    }
+
+    /// Get the scope where this trait's members are defined
+    pub fn scope(&self) -> ScopeIdx {
+        self.scope
     }
 
     /// Get all abstract members (those with type annotations but no implementations)

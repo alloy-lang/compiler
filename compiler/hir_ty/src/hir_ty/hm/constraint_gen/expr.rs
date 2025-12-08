@@ -1,5 +1,7 @@
+use super::super::inference::resolved_to_mono;
 use super::{HMInferenceContext, MonoType};
 use crate::hir_ty::hm::constraint_gen::pattern::infer_pattern_hm;
+use crate::hir_ty::type_annotation::{type_reference_to_resolved_type, TypeResolutionContext};
 use alloy_hir as hir;
 use alloy_hir_resolved as res;
 use alloy_hir_resolved::{EPFql, Fql};
@@ -54,6 +56,14 @@ pub(crate) fn infer_expr_hm(
             // For now, give variant constructors a fresh type variable
             // TODO: Look up the actual type of the variant from the type definition
             infer_variant_constructor(ctx, source_fql, type_def)
+        }
+        res::Expression::AbstractTraitMemberRef {
+            trait_fql: _,
+            member_name: _,
+            type_annotation,
+        } => {
+            // Abstract trait member references use the type from their type annotation
+            infer_abstract_trait_member_ref(ctx, source_fql, type_annotation)
         }
         res::Expression::Missing => infer_missing_expr(ctx, source_fql),
     }
@@ -232,6 +242,32 @@ fn infer_variant_constructor(
 ) -> MonoType {
     // TODO: Look up the actual type of the variant from the type definition
     // For now, just use a fresh type variable
+    let ty = ctx.fresh_type_var();
+    ctx.assign_type(source_fql, ty)
+}
+
+fn infer_abstract_trait_member_ref(
+    ctx: &mut HMInferenceContext,
+    source_fql: Fql<hir::Expression>,
+    type_annotation: Fql<hir::TypeReference>,
+) -> MonoType {
+    // Resolve the type annotation to get the type for this abstract member
+    // Create a temporary type resolution context
+    let mut type_ctx = TypeResolutionContext::new();
+
+    if let Some(resolved_type) = type_reference_to_resolved_type(
+        ctx.db,
+        type_annotation.module_id,
+        type_annotation.local_id,
+        &mut type_ctx,
+    ) {
+        // Convert the resolved type to a monotype
+        if let Some(mono_ty) = resolved_to_mono(&resolved_type, ctx) {
+            return ctx.assign_type(source_fql, mono_ty);
+        }
+    }
+
+    // If we can't resolve the type annotation, use a fresh type variable
     let ty = ctx.fresh_type_var();
     ctx.assign_type(source_fql, ty)
 }

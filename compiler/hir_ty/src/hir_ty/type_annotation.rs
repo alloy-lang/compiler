@@ -7,7 +7,7 @@ use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
 
 /// Context for resolving type references, tracks type variable ID assignments
-pub(super) struct TypeResolutionContext {
+pub struct TypeResolutionContext {
     /// Maps type definition indices to assigned Generic IDs
     type_var_to_id: FxHashMap<hir::TypeDefinitionIdx, usize>,
     /// Next generic ID to assign
@@ -15,7 +15,7 @@ pub(super) struct TypeResolutionContext {
 }
 
 impl TypeResolutionContext {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             type_var_to_id: FxHashMap::default(),
             next_id: 0,
@@ -59,7 +59,7 @@ fn type_annotation_to_resolved_with_ctx(
     )
 }
 
-fn type_reference_to_resolved_type(
+pub fn type_reference_to_resolved_type(
     db: &dyn HirTyDatabase,
     current_module_id: ModuleId,
     type_idx: hir::TypeIdx,
