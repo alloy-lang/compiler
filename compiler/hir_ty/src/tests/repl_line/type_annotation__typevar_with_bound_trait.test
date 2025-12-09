@@ -11,42 +11,79 @@ let test_func = |a, b| -> test
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): TypeDef(
-            Fql {
-                module_id: ModuleId(
-                    Id(0),
-                ),
-                local_id: Idx::<TypeDefinition>(1),
-            },
+        Idx::<Expression>(0): Generic(
+            0,
         ),
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
-                0,
+                1,
             ),
             return_type: Lambda {
                 arg_type: Generic(
-                    1,
+                    2,
                 ),
-                return_type: TypeDef(
-                    Fql {
-                        module_id: ModuleId(
-                            Id(0),
-                        ),
-                        local_id: Idx::<TypeDefinition>(1),
-                    },
+                return_type: Generic(
+                    0,
                 ),
             },
         },
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            0,
+            1,
         ),
         Idx::<Pattern>(1): Generic(
-            1,
+            2,
         ),
     },
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: ConflictingTypeAnnotation {
+                expected: Lambda {
+                    arg_type: ConstrainedGeneric {
+                        id: 0,
+                        constraints: NonEmpty(
+                            [
+                                Fql {
+                                    module_id: ModuleId(
+                                        Id(4),
+                                    ),
+                                    local_id: Idx::<Trait>(0),
+                                },
+                            ],
+                        ),
+                    },
+                    return_type: Lambda {
+                        arg_type: Generic(
+                            1,
+                        ),
+                        return_type: TypeDef(
+                            Fql {
+                                module_id: ModuleId(
+                                    Id(0),
+                                ),
+                                local_id: Idx::<TypeDefinition>(1),
+                            },
+                        ),
+                    },
+                },
+                found: Lambda {
+                    arg_type: Generic(
+                        1,
+                    ),
+                    return_type: Lambda {
+                        arg_type: Generic(
+                            2,
+                        ),
+                        return_type: Generic(
+                            0,
+                        ),
+                    },
+                },
+            },
+            range: 165..195,
+        },
+    ],
 }
 []

@@ -9,9 +9,10 @@
 use super::Fql;
 use alloy_hir as hir;
 use alloy_hir_resolved::{EPFql, TypeResolutionError};
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxHashMap, FxHashSet};
 
 mod constraint_gen;
+mod dependency_analysis;
 mod inference;
 pub mod unification;
 
@@ -156,7 +157,7 @@ pub(super) fn free_type_vars(ty: &MonoType) -> Vec<TypeVarId> {
     vars.into_iter().collect()
 }
 
-fn collect_free_vars(ty: &MonoType, vars: &mut rustc_hash::FxHashSet<TypeVarId>) {
+fn collect_free_vars(ty: &MonoType, vars: &mut FxHashSet<TypeVarId>) {
     match ty {
         MonoType::Unconstrained => {}
         MonoType::Var(v) => {
@@ -184,7 +185,7 @@ fn collect_free_vars(ty: &MonoType, vars: &mut rustc_hash::FxHashSet<TypeVarId>)
 impl PolyType {
     /// Generalize a monotype into a polytype by quantifying free variables
     /// that are not present in the environment
-    pub(super) fn generalize(ty: MonoType, env_vars: &rustc_hash::FxHashSet<TypeVarId>) -> Self {
+    pub(super) fn generalize(ty: MonoType, env_vars: &FxHashSet<TypeVarId>) -> Self {
         let free_vars = free_type_vars(&ty);
         let quantified: Vec<TypeVarId> = free_vars
             .into_iter()
@@ -226,6 +227,13 @@ pub(super) struct HMInferenceContext<'db> {
     pub(super) poly_env: FxHashMap<EPFql, PolyType>,
     /// Resolution errors collected during inference (FQL + reference path + module_id)
     pub(super) resolution_errors: Vec<TypeResolutionError>,
+    /// Map from expression ID to its dependency group index (for lazy constraint generation)
+    pub(super) expr_to_group: FxHashMap<hir::ExpressionIdx, usize>,
+    /// Current dependency group being processed (for lazy constraint generation)
+    pub(super) current_group: Option<usize>,
+    /// Type variables that were active before the current group started
+    /// (used for proper generalization in let-polymorphism)
+    pub(super) env_type_vars: FxHashSet<TypeVarId>,
 }
 
 impl<'db> HMInferenceContext<'db> {
@@ -237,6 +245,21 @@ impl<'db> HMInferenceContext<'db> {
             type_env: FxHashMap::default(),
             poly_env: FxHashMap::default(),
             resolution_errors: Vec::new(),
+            expr_to_group: FxHashMap::default(),
+            current_group: None,
+            env_type_vars: FxHashSet::default(),
+        }
+    }
+
+    /// Check if an expression is in a later dependency group than the current one
+    /// Returns true if we should avoid inferring this expression now
+    pub(super) fn is_in_later_group(&self, expr_id: hir::ExpressionIdx) -> bool {
+        if let (Some(current), Some(&expr_group)) =
+            (self.current_group, self.expr_to_group.get(&expr_id))
+        {
+            expr_group > current
+        } else {
+            false
         }
     }
 
@@ -285,12 +308,9 @@ impl<'db> HMInferenceContext<'db> {
 
     /// Generalize a type for let-binding
     pub(super) fn generalize_type(&self, ty: MonoType) -> PolyType {
-        // Get all free variables in the current environment
-        let mut env_vars = rustc_hash::FxHashSet::default();
-        for t in self.type_env.values() {
-            env_vars.extend(free_type_vars(t));
-        }
-        PolyType::generalize(ty, &env_vars)
+        // Use the environment type variables from before this group
+        // This ensures we quantify over type variables local to this expression
+        PolyType::generalize(ty, &self.env_type_vars)
     }
 
     /// Instantiate a polymorphic type

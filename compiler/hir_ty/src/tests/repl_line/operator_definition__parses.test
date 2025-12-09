@@ -15,14 +15,9 @@ HirTypedModule {
                 1,
             ),
             return_type: Lambda {
-                arg_type: Lambda {
-                    arg_type: Generic(
-                        2,
-                    ),
-                    return_type: Generic(
-                        3,
-                    ),
-                },
+                arg_type: Generic(
+                    2,
+                ),
                 return_type: Generic(
                     0,
                 ),
@@ -33,16 +28,48 @@ HirTypedModule {
         Idx::<Pattern>(0): Generic(
             1,
         ),
-        Idx::<Pattern>(1): Lambda {
-            arg_type: Generic(
-                2,
-            ),
-            return_type: Generic(
-                3,
-            ),
-        },
+        Idx::<Pattern>(1): Generic(
+            2,
+        ),
     },
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: ConflictingTypeAnnotation {
+                expected: Lambda {
+                    arg_type: Generic(
+                        0,
+                    ),
+                    return_type: Lambda {
+                        arg_type: Lambda {
+                            arg_type: Generic(
+                                0,
+                            ),
+                            return_type: Generic(
+                                1,
+                            ),
+                        },
+                        return_type: Generic(
+                            1,
+                        ),
+                    },
+                },
+                found: Lambda {
+                    arg_type: Generic(
+                        1,
+                    ),
+                    return_type: Lambda {
+                        arg_type: Generic(
+                            2,
+                        ),
+                        return_type: Generic(
+                            0,
+                        ),
+                    },
+                },
+            },
+            range: 97..129,
+        },
+    ],
 }
 []

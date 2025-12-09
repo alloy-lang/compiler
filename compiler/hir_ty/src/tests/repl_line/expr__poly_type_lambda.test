@@ -1,0 +1,57 @@
+typeof id : t1 -> t1 where
+  typevar t1
+let id = |x| -> x
+
+let string_example = id("hi")
+let int_example = id(10)
+
+===
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(5): Generic(
+            1,
+        ),
+        Idx::<Expression>(2): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(4): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): Lambda {
+            arg_type: Generic(
+                0,
+            ),
+            return_type: Generic(
+                0,
+            ),
+        },
+        Idx::<Expression>(3): BuiltIn(
+            String,
+        ),
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): BuiltIn(
+            String,
+        ),
+    },
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnificationError(
+                TypeMismatch(
+                    Concrete(
+                        String,
+                    ),
+                    Concrete(
+                        Int,
+                    ),
+                ),
+            ),
+            range: 89..114,
+        },
+    ],
+}
+[]

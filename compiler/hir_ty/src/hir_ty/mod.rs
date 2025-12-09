@@ -59,6 +59,31 @@ pub enum ResolvedType {
     TODO,
 }
 
+impl ResolvedType {
+    /// Check if this type contains type variables (is polymorphic)
+    /// Returns true if the type contains Generic or ConstrainedGeneric variants
+    pub fn is_polymorphic(&self) -> bool {
+        match self {
+            ResolvedType::Generic(_) | ResolvedType::ConstrainedGeneric { .. } => true,
+            ResolvedType::Lambda {
+                arg_type,
+                return_type,
+            } => arg_type.is_polymorphic() || return_type.is_polymorphic(),
+            ResolvedType::Tuple(elements) => elements.iter().any(|e| e.is_polymorphic()),
+            ResolvedType::Bounded { base, args } => {
+                base.is_polymorphic() || args.iter().any(|a| a.is_polymorphic())
+            }
+            ResolvedType::UnknownReference(_)
+            | ResolvedType::Unconstrained
+            | ResolvedType::Missing
+            | ResolvedType::Unit
+            | ResolvedType::TypeDef(_)
+            | ResolvedType::BuiltIn(_)
+            | ResolvedType::TODO => false,
+        }
+    }
+}
+
 impl std::fmt::Display for ResolvedType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

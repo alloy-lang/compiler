@@ -1,0 +1,27 @@
+typedef Identity[t] = Id t
+
+-- TODO: data constructors for single-constructor types should be referencable by top-level name only. ie Identity instead of Identity::Id
+let string_example = Identity::Id "hi"
+let int_example = Identity::Id 10
+
+===
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): Generic(
+            0,
+        ),
+        Idx::<Expression>(2): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(1): Generic(
+            1,
+        ),
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [],
+}
+[]

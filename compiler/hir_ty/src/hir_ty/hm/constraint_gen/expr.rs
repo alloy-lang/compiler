@@ -17,6 +17,13 @@ pub(crate) fn infer_expr_hm(
         return existing_ty;
     }
 
+    // Lazy constraint generation: if this expression is in a later group,
+    // don't infer it now - just return a fresh type variable
+    // DON'T assign to type_env to avoid polluting env_type_vars for generalization
+    if ctx.is_in_later_group(source_fql.local_id) {
+        return ctx.fresh_type_var();
+    }
+
     let expr = match alloy_hir_resolved::resolve_expression_by_id(
         ctx.db,
         source_fql.module_id,
@@ -74,6 +81,14 @@ fn infer_variable_ref(
     source_fql: Fql<hir::Expression>,
     ref_fql: EPFql,
 ) -> MonoType {
+    // First check if this variable already has a type (possibly polymorphic)
+    // This enables let-polymorphism: if the variable has been generalized,
+    // we'll instantiate it with fresh type variables
+    if let Some(existing_ty) = ctx.maybe_find_type(ref_fql.clone()) {
+        return ctx.assign_type(source_fql, existing_ty);
+    }
+
+    // If not found, infer it (this handles forward references)
     let ty = match &ref_fql {
         EPFql::Expression(expr_fql) => infer_expr_hm(ctx, expr_fql.clone()),
         EPFql::Pattern(pat_fql) => infer_pattern_hm(ctx, pat_fql.clone()),
