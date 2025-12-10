@@ -1,7 +1,8 @@
-use crate::{Fql, TypeResolutionError};
+use crate::{cross_module_resolver, EPTFql, Fql, TypeResolutionError};
 use alloy_hir as hir;
 use alloy_workspace::ModuleId;
-use non_empty_vec::ne_vec;
+use la_arena::Idx;
+use non_empty_vec::{ne_vec, NonEmpty};
 
 pub struct Trait {}
 
@@ -62,6 +63,56 @@ pub fn resolve_trait_by_path(
     }
 }
 
+// ============================================================================
+// Trait Lookup
+// ============================================================================
+
+struct TraitLookup;
+
+impl cross_module_resolver::ModuleLookup<hir::Trait> for TraitLookup {
+    type Item = hir::Trait;
+
+    fn lookup_in_module(
+        hir_module: &hir::HirModule,
+        name: &hir::Name,
+    ) -> Option<(Idx<hir::Trait>, Self::Item)> {
+        hir_module
+            .get_trait_by_name(name)
+            .map(|(id, trait_)| (id, trait_.clone()))
+    }
+
+    fn unknown_item_error(
+        source_ref: impl Into<EPTFql>,
+        _module_id: ModuleId,
+        path: NonEmpty<hir::Name>,
+    ) -> TypeResolutionError {
+        let EPTFql::TypeReference(source_ref) = source_ref.into() else {
+            panic!("Trait resolution requires TypeReference");
+        };
+
+        // Build the Fqn from the path
+        let path_len: usize = path.len().into();
+        let fqn = if path_len == 1 {
+            // Single element path: just the trait name
+            // For Fqn, module field is NonEmpty<Name>, so we need to convert
+            hir::Fqn::new(
+                ne_vec![path[0].clone()],
+                path[0].clone(),
+                Vec::<hir::Name>::new(),
+            )
+        } else {
+            // Multi-element path: construct module as NonEmpty, last is trait name, middle is sub_path
+            hir::Fqn::new(
+                ne_vec![path[0].clone()],
+                path.last().clone(),
+                path[1..path_len - 1].to_vec(),
+            )
+        };
+
+        TypeResolutionError::UnknownTraitName { source_ref, fqn }
+    }
+}
+
 /// Helper function to resolve a cross-module trait reference
 ///
 /// This handles qualified trait references by trying different ways to split
@@ -75,59 +126,5 @@ fn resolve_cross_module_trait(
     fqn: &hir::Fqn,
     source_ref: Fql<hir::TypeReference>,
 ) -> Result<Fql<hir::Trait>, TypeResolutionError> {
-    let module_slug = fqn.module_slug();
-    // If sub_path is empty, just look up the trait directly
-    if fqn.sub_path.is_empty() {
-        let Some(other_module_id) = db.find_module_by_slug(&*module_slug) else {
-            return Err(TypeResolutionError::UnknownTraitModule {
-                module_slug: module_slug.to_string(),
-                source_ref,
-            });
-        };
-        let (hir_module, _) = hir::lower_file(db, other_module_id);
-        let Some((trait_idx, _)) = hir_module.get_trait_by_name(&fqn.name) else {
-            return Err(TypeResolutionError::UnknownTraitName {
-                source_ref,
-                fqn: fqn.clone(),
-            });
-        };
-        return Ok(Fql::new(other_module_id, trait_idx));
-    }
-
-    // Build the full path: module + name + sub_path
-    let full_path: non_empty_vec::NonEmpty<_> = fqn.segments();
-
-    // Try different splits: start from the end and work backwards
-    // The last element is always the trait name
-    let full_path_length = full_path.len().into();
-    for split_point in (1..full_path_length).rev() {
-        let module_path = &full_path[..split_point];
-        let trait_name = &full_path[split_point];
-
-        // Try to find this module
-        let module_slug = module_path
-            .iter()
-            .map(|n| n.as_str())
-            .collect::<Vec<_>>()
-            .join("::");
-
-        let Some(other_module_id) = db.find_module_by_slug(&module_slug) else {
-            continue; // Try next split
-        };
-
-        let (hir_module, _) = hir::lower_file(db, other_module_id);
-
-        // Try to find the trait in this module
-        let Some((trait_idx, _)) = hir_module.get_trait_by_name(trait_name) else {
-            // we found the module, but not the trait
-            continue; // Try next split
-        };
-
-        return Ok(Fql::new(other_module_id, trait_idx));
-    }
-
-    Err(TypeResolutionError::UnknownTraitModule {
-        module_slug: module_slug.to_string(),
-        source_ref,
-    })
+    cross_module_resolver::resolve_cross_module::<hir::Trait, TraitLookup>(db, fqn, source_ref)
 }

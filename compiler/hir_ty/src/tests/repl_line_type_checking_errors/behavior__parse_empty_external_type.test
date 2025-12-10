@@ -12,23 +12,6 @@ HirTypedModule {
     expression_types: {},
     pattern_types: {},
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: TypeResolutionError(
-                UnknownModule {
-                    source_ref: TypeReference(
-                        Fql {
-                            module_id: ModuleId(
-                                Id(4),
-                            ),
-                            local_id: Idx::<TypeReference>(1),
-                        },
-                    ),
-                    module_slug: "test_data",
-                },
-            ),
-            range: 54..134,
-        },
-    ],
+    errors: [],
 }
 []

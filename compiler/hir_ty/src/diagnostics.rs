@@ -61,9 +61,6 @@ impl Diagnostic for TypeInferenceError {
                 TypeResolutionError::UnknownModule { module_slug, .. } => {
                     format!("Cannot find module `{}`", module_slug)
                 }
-                TypeResolutionError::UnknownTraitModule { module_slug, .. } => {
-                    format!("Cannot find module `{}` for trait reference", module_slug)
-                }
                 TypeResolutionError::UnknownExpressionReference { path, .. } => {
                     let path_str = path
                         .iter()
@@ -163,11 +160,6 @@ impl Diagnostic for TypeInferenceError {
                     builder
                         .with_primary_label(format!("module `{}` not found", module_slug))
                         .with_help("Make sure the module is imported and the path is correct")
-                }
-                TypeResolutionError::UnknownTraitModule { module_slug, .. } => {
-                    builder
-                        .with_primary_label(format!("module `{}` not found", module_slug))
-                        .with_help("Check that the trait's module is imported correctly")
                 }
                 TypeResolutionError::UnknownExpressionReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");

@@ -91,11 +91,11 @@ fn on_demand_test() {
 
 #[track_caller]
 fn run_hir_ty_test(
-    path: &Path,
+    _path: &Path,
     input: &str,
-    expect_parse_errors: bool,
-    expect_lowering_errors: bool,
-    expect_type_checking_errors: bool,
+    _expect_parse_errors: bool,
+    _expect_lowering_errors: bool,
+    _expect_type_checking_errors: bool,
 ) -> String {
     let mut db = TestHirTyDatabase::default();
     db.add_module(
@@ -123,7 +123,7 @@ fn run_hir_ty_test(
     );
     let test_module_id = db.add_module("main", camino::Utf8Path::new("./test/main.alloy"), input);
 
-    let (hir_module, parse_errors) = hir::lower_file(&db, test_module_id);
+    let (_hir_module, parse_errors) = hir::lower_file(&db, test_module_id);
     let typed_module = crate::type_check_module(&db, test_module_id);
 
     // let file_name = path.to_str().expect("Expected filename");
@@ -179,6 +179,14 @@ fn run_hir_ty_test(
     //     // );
     // }
 
+    // let mut reporter = DiagnosticsReporter::new();
+    // reporter.add_all(test_module_id, typed_module.errors().into_iter().cloned());
+    //
+    // format!(
+    //     "{typed_module:#?}\n{parse_errors:#?}\n{}\n",
+    //     reporter.render_no_color(&db),
+    // )
+
     format!("{typed_module:#?}\n{parse_errors:#?}")
 }
 
@@ -209,15 +217,18 @@ fn test_std_lib() {
             let type_inference_warnings = type_map.warnings();
             let type_inference_errors = type_map.errors();
 
+            let mut reporter = DiagnosticsReporter::new();
+            reporter.add_all(test_module_id, type_inference_errors.into_iter().cloned());
+
             assert!(
                 type_inference_warnings.is_empty(),
-                "file '{path}' contained type inference warnings: {:#?}",
+                "file '{path}' contained type inference warnings:\n{:#?}",
                 type_inference_warnings,
             );
             assert!(
                 type_inference_errors.is_empty(),
-                "file '{path}' contained type inference errors: {:#?}",
-                type_inference_errors,
+                "file '{path}' contained type inference errors:\n{}",
+                reporter.render_no_color(db),
             );
         },
     );

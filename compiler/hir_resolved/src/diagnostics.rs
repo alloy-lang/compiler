@@ -10,10 +10,6 @@ pub enum TypeResolutionError {
         source_ref: EPTFql,
         module_slug: String,
     },
-    UnknownTraitModule {
-        source_ref: Fql<hir::TypeReference>,
-        module_slug: String,
-    },
     UnknownExpressionReference {
         source_ref: Fql<hir::Expression>,
         module_id: ModuleId,
@@ -74,10 +70,6 @@ impl TypeResolutionError {
                 let (hir_module, _) = hir::lower_file(db, source_ref.module_id);
                 hir_module.get_pattern_range(source_ref.local_id)
             }
-            TypeResolutionError::UnknownTraitModule { source_ref, .. } => {
-                let (hir_module, _) = hir::lower_file(db, source_ref.module_id);
-                hir_module.get_type_reference_range(source_ref.local_id)
-            }
             TypeResolutionError::UnknownTypeReference { source_ref, .. } => {
                 let (hir_module, _) = hir::lower_file(db, source_ref.module_id);
                 hir_module.get_type_reference_range(source_ref.local_id)
@@ -96,7 +88,7 @@ impl TypeResolutionError {
             }
             TypeResolutionError::BoundedTraitReference {
                 source_ref,
-                target_ref,
+                target_ref: _,
             } => {
                 let (hir_module, _) = hir::lower_file(db, source_ref.module_id);
                 hir_module.get_type_reference_range(source_ref.local_id)

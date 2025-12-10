@@ -1,7 +1,8 @@
-use crate::Fql;
+use crate::{cross_module_resolver, EPTFql, Fql, TypeResolutionError};
 use alloy_hir as hir;
 use alloy_scope::{ScopeIdx, Scopes};
 use alloy_workspace::ModuleId;
+use la_arena::Idx;
 use non_empty_vec::NonEmpty;
 
 pub fn resolve_type_reference_by_path(
@@ -31,63 +32,46 @@ fn get_type_reference_by_name(
     Some(Fql::new(module_id, type_idx))
 }
 
-/// Helper function to resolve a cross-module expression reference
+// ============================================================================
+// Type Reference Lookup
+// ============================================================================
+
+struct TypeReferenceLookup;
+
+impl cross_module_resolver::ModuleLookup<hir::TypeReference> for TypeReferenceLookup {
+    type Item = hir::TypeReference;
+
+    fn lookup_in_module(
+        hir_module: &hir::HirModule,
+        name: &hir::Name,
+    ) -> Option<(Idx<hir::TypeReference>, Self::Item)> {
+        hir_module
+            .get_type_reference_by_name(name, Scopes::ROOT)
+            .map(|(id, type_ref)| (id, type_ref.clone()))
+    }
+
+    fn unknown_item_error(
+        source_ref: impl Into<EPTFql>,
+        module_id: ModuleId,
+        path: NonEmpty<hir::Name>,
+    ) -> TypeResolutionError {
+        let EPTFql::TypeReference(source_ref) = source_ref.into() else {
+            panic!("Trait resolution requires TypeReference");
+        };
+        TypeResolutionError::UnknownTypeReference {
+            source_ref: source_ref.into(),
+            module_id,
+            path,
+        }
+    }
+}
+
+/// Helper function to resolve a cross-module type reference
 fn resolve_cross_module_type_reference(
     db: &dyn hir::HirDatabase,
     fqn: &hir::Fqn,
 ) -> Option<Fql<hir::TypeReference>> {
-    let module_slug = fqn.module_slug();
-    if fqn.sub_path.is_empty() {
-        let Some(other_module_id) = db.find_module_by_slug(&*module_slug) else {
-            return None;
-        };
-        let (hir_module, _) = hir::lower_file(db, other_module_id);
-        let Some((expr_id, _)) = hir_module.get_type_reference_by_name(&fqn.name, Scopes::ROOT)
-        else {
-            return None;
-        };
-        return Some(Fql::new(other_module_id, expr_id));
-    }
-
-    // Build the full path: module + name + sub_path (except last element)
-    let full_path: NonEmpty<_> = fqn.segments();
-
-    // Try different splits: start from the end and work backwards
-    // For "std::option::Option::Some", try:
-    //   1. module="std::option::Option" (probably doesn't exist)
-    //   2. module="std::option", type="Option" (this should work!)
-    //   3. module="std", type="option" (probably not a type)
-    let full_path_length = full_path.len().into();
-    for split_point in (1..=full_path_length).rev() {
-        let module_path = &full_path[..split_point];
-        let type_name = if split_point < full_path_length {
-            &full_path[split_point]
-        } else {
-            continue; // No type name after this split
-        };
-
-        // Try to find this module
-        let module_slug = module_path
-            .iter()
-            .map(|n| n.as_str())
-            .collect::<Vec<_>>()
-            .join("::");
-
-        let Some(other_module_id) = db.find_module_by_slug(&module_slug) else {
-            continue; // Try next split
-        };
-
-        let (hir_module, _) = hir::lower_file(db, other_module_id);
-
-        // Try to find the type in this module
-        let Some((expr_id, _)) = hir_module.get_type_reference_by_name(type_name, Scopes::ROOT)
-        else {
-            // we found the module, but not the type reference
-            continue; // Try next split
-        };
-
-        return Some(Fql::new(other_module_id, expr_id));
-    }
-
-    None
+    cross_module_resolver::resolve_cross_module_optional::<hir::TypeReference, TypeReferenceLookup>(
+        db, fqn,
+    )
 }

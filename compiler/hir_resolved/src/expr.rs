@@ -191,14 +191,13 @@ fn resolve_variable_ref(
             }
 
             // Try to resolve as a variant constructor
-            if let Ok(sub_path) = NonEmpty::try_from(fqn.sub_path.clone()) {
+            if let Some(variant_name) = &fqn.sub_path {
                 if let Ok(type_def_fql) =
                     resolve_cross_module_type_definition(db, &fqn, source_ref.clone().into())
                 {
-                    let variant_name = sub_path.last().clone();
                     return Ok(Expression::VariantConstructor {
                         type_def: type_def_fql,
-                        variant_name,
+                        variant_name: variant_name.clone(),
                     });
                 }
             }

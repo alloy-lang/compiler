@@ -1,6 +1,6 @@
-use crate::{resolve_cross_module_type_definition, EPTFql, Fql, TypeResolutionError};
+use crate::{resolve_cross_module_type_definition, Fql, TypeResolutionError};
 use alloy_hir as hir;
-use alloy_scope::{ScopeIdx, Scopes};
+use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
 use non_empty_vec::ne_vec;
 
