@@ -29,7 +29,7 @@ HirModule {
                             ],
                         ),
                         name: "test",
-                        sub_path: [],
+                        sub_path: None,
                     },
                 ),
                 scope: Idx::<Scope>(0),

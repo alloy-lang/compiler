@@ -24,14 +24,14 @@ HirModule {
                         module: NonEmpty(
                             [
                                 "test_data",
+                                "More",
+                                "Stuff",
                             ],
                         ),
                         name: "ResultThing",
-                        sub_path: [
-                            "More",
-                            "Stuff",
+                        sub_path: Some(
                             "here",
-                        ],
+                        ),
                     },
                 ),
                 scope: Idx::<Scope>(0),

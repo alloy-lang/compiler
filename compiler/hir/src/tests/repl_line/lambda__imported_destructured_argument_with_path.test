@@ -54,13 +54,13 @@ HirModule {
                         module: NonEmpty(
                             [
                                 "std",
+                                "Option",
                             ],
                         ),
                         name: "option",
-                        sub_path: [
-                            "Option",
+                        sub_path: Some(
                             "Some",
-                        ],
+                        ),
                     },
                 ),
                 scope: Idx::<Scope>(1),

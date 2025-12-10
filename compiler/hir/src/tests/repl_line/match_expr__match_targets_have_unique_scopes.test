@@ -42,7 +42,7 @@ HirModule {
                             ],
                         ),
                         name: "test",
-                        sub_path: [],
+                        sub_path: None,
                     },
                 ),
                 scope: Idx::<Scope>(0),
@@ -108,9 +108,9 @@ HirModule {
                             ],
                         ),
                         name: "Either",
-                        sub_path: [
+                        sub_path: Some(
                             "Left",
-                        ],
+                        ),
                     },
                 ),
                 scope: Idx::<Scope>(1),
@@ -139,9 +139,9 @@ HirModule {
                             ],
                         ),
                         name: "Either",
-                        sub_path: [
+                        sub_path: Some(
                             "Right",
-                        ],
+                        ),
                     },
                 ),
                 scope: Idx::<Scope>(2),

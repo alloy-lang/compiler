@@ -38,12 +38,12 @@ HirModule {
                 OtherModule(
                     Fqn {
                         module: NonEmpty(
-                            [],
+                            [
+                                "test_data",
+                            ],
                         ),
-                        name: "test_data",
-                        sub_path: [
-                            "Test",
-                        ],
+                        name: "Test",
+                        sub_path: None,
                     },
                 ),
             ),

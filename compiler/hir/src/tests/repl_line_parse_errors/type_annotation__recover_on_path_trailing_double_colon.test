@@ -36,7 +36,7 @@ HirModule {
                             ],
                         ),
                         name: "ResultThing",
-                        sub_path: [],
+                        sub_path: None,
                     },
                 ),
             ),
@@ -67,9 +67,9 @@ HirModule {
                             ],
                         ),
                         name: "ResultThing",
-                        sub_path: [
+                        sub_path: Some(
                             "More",
-                        ],
+                        ),
                     },
                 ),
             ),

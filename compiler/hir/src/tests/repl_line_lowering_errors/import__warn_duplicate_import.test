@@ -30,7 +30,7 @@ HirModule {
                             ],
                         ),
                         name: "map",
-                        sub_path: [],
+                        sub_path: None,
                     },
                 ),
                 scope: Idx::<Scope>(0),

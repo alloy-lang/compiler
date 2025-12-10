@@ -37,9 +37,9 @@ HirModule {
                             ],
                         ),
                         name: "functor",
-                        sub_path: [
+                        sub_path: Some(
                             "Functor",
-                        ],
+                        ),
                     },
                 ),
             ),

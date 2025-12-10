@@ -59,9 +59,9 @@ HirModule {
                             ],
                         ),
                         name: "Option",
-                        sub_path: [
+                        sub_path: Some(
                             "Some",
-                        ],
+                        ),
                     },
                 ),
                 scope: Idx::<Scope>(1),

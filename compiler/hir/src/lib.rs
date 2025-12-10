@@ -67,25 +67,49 @@ impl From<&String> for Name {
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct Fqn {
-    // todo: consider replacing module path with the module id
     pub module: NonEmpty<Name>,
     pub name: Name,
-    pub sub_path: Vec<Name>,
+    pub sub_path: Option<Name>,
 }
 
 impl Fqn {
     #[inline]
     pub fn new(
         module: impl IntoIterator<Item = impl Into<Name>>,
-        name: impl Into<Name>,
-        path: impl IntoIterator<Item = impl Into<Name>>,
+        local_name: impl Into<Name>,
+        sub_path: impl IntoIterator<Item = impl Into<Name>>,
     ) -> Self {
-        unsafe {
-            Self {
-                module: NonEmpty::new_unchecked(module.into_iter().map(Into::into).collect()),
-                name: name.into(),
-                sub_path: path.into_iter().map(Into::into).collect(),
+        let mut raw_sub_path: Vec<Name> = sub_path.into_iter().map(Into::into).collect();
+        let sub_path_last = raw_sub_path.pop();
+
+        let (module, name, sub_path) = {
+            let mut module_segments: Vec<Name> = vec![];
+            for segment in module.into_iter() {
+                module_segments.push(segment.into());
             }
+            let local_name = local_name.into();
+
+            // Build additional segments from raw_sub_path (not including the last element which is in sub_path_last)
+            for segment in &raw_sub_path {
+                module_segments.push(segment.clone());
+            }
+
+            if module_segments.is_empty() && sub_path_last.is_some() {
+                module_segments.push(local_name);
+                let module = unsafe { NonEmpty::new_unchecked(module_segments) };
+                (module, sub_path_last.unwrap(), None)
+            }
+            // Normal case: module is not empty, keep sub_path as-is
+            else {
+                let module = unsafe { NonEmpty::new_unchecked(module_segments) };
+                (module, local_name, sub_path_last)
+            }
+        };
+
+        Self {
+            module,
+            name,
+            sub_path,
         }
     }
 
@@ -103,7 +127,7 @@ impl Fqn {
             segments.push(segment.clone());
         }
         segments.push(self.name.clone());
-        for segment in &self.sub_path {
+        if let Some(segment) = &self.sub_path {
             segments.push(segment.clone());
         }
         segments

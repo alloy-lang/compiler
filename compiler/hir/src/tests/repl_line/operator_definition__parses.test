@@ -30,9 +30,9 @@ HirModule {
                             ],
                         ),
                         name: "Test",
-                        sub_path: [
+                        sub_path: Some(
                             "Thing",
-                        ],
+                        ),
                     },
                 ),
                 scope: Idx::<Scope>(2),

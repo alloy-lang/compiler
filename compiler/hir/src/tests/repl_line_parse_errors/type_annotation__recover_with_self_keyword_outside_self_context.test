@@ -49,7 +49,7 @@ HirModule {
                             ],
                         ),
                         name: "Test",
-                        sub_path: [],
+                        sub_path: None,
                     },
                 ),
             ),

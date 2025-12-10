@@ -34,7 +34,7 @@ HirModule {
                             ],
                         ),
                         name: "Functor",
-                        sub_path: [],
+                        sub_path: None,
                     },
                 ),
             ),

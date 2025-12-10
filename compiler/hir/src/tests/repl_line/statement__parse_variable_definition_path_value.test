@@ -20,14 +20,15 @@ HirModule {
                 path: OtherModule(
                     Fqn {
                         module: NonEmpty(
-                            [],
+                            [
+                                "option",
+                                "Option",
+                            ],
                         ),
                         name: "std",
-                        sub_path: [
-                            "option",
-                            "Option",
+                        sub_path: Some(
                             "None",
-                        ],
+                        ),
                     },
                 ),
                 scope: Idx::<Scope>(0),

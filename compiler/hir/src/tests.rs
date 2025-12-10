@@ -16,12 +16,12 @@ impl salsa::Database for TestHirDatabase {}
 
 #[salsa::db]
 impl alloy_workspace::WorkspaceDatabase for TestHirDatabase {
-    fn add_module(&mut self, slug: &str, path: &camino::Utf8Path, contents: &str) -> ModuleId {
+    fn add_module(&'_ mut self, slug: &str, path: &camino::Utf8Path, contents: &str) -> ModuleId {
         let prepared = alloy_workspace::prepare_module(self, slug, path, contents);
         self.workspace.insert_prepared_module(prepared)
     }
 
-    fn get_source(&self, module_id: ModuleId) -> SourceFile {
+    fn get_source(&'_ self, module_id: ModuleId) -> SourceFile<'_> {
         self.workspace.get_source(module_id)
     }
 

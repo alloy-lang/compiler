@@ -1,6 +1,5 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
-use itertools::Itertools;
 
 #[allow(clippy::module_name_repetitions)]
 pub type ImportIdx = Idx<Import>;
@@ -26,20 +25,6 @@ impl Import {
 
     pub fn segments(&self) -> &[Name] {
         &self.segments
-    }
-
-    pub fn as_slug(&self) -> String {
-        let mut slug = String::new();
-        for segment in &self.segments {
-            slug.push_str(segment.as_str());
-            slug.push_str("::");
-        }
-        slug.push_str(self.last.as_str());
-        slug
-    }
-
-    pub fn as_slug_no_last(&self) -> String {
-        self.segments().iter().join("::")
     }
 }
 
