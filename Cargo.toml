@@ -28,7 +28,7 @@ rustc-hash = "1.1"
 salsa = { git = "https://github.com/salsa-rs/salsa", package = "salsa-2022", rev = "05b4e3ebdcdc47730cdd359e7e97fb2470527279" }
 serde = "1.0"
 text-size = "1.1"
-toml = "0.8"
+toml = "0.9"
 url = "2.5.0"
 walkdir = "2"
 
