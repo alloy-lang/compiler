@@ -45,6 +45,7 @@ HirModule {
         Idx::<Trait>(0): {
             "item": Trait {
                 name: "TestTrait1",
+                scope: Idx::<Scope>(1),
                 self_constraints: [
                     Trait(
                         Idx::<TypeReference>(0),

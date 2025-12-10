@@ -10,7 +10,6 @@ use ast::AstElement;
 use la_arena::Idx;
 use non_empty_vec::NonEmpty;
 use ordered_float::NotNan;
-use rustc_hash::FxHashMap;
 use std::collections::HashSet;
 use std::convert::TryFrom;
 use text_size::TextRange;

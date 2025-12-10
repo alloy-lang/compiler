@@ -42,6 +42,7 @@ HirModule {
         Idx::<Trait>(0): {
             "item": Trait {
                 name: "TestTrait1",
+                scope: Idx::<Scope>(1),
                 self_constraints: [],
                 named_type_variables: {
                     "t1": Idx::<TypeDefinition>(0),
@@ -55,6 +56,7 @@ HirModule {
         Idx::<Trait>(1): {
             "item": Trait {
                 name: "TestTrait2",
+                scope: Idx::<Scope>(2),
                 self_constraints: [],
                 named_type_variables: {
                     "t1": Idx::<TypeDefinition>(1),
