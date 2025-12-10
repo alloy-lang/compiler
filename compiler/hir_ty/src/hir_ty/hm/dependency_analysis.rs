@@ -261,10 +261,3 @@ fn collect_from_fql(
         collect_from_expression(db, module_id, &expr, deps);
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    // Tests will be added as we integrate with the test infrastructure
-}
