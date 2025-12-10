@@ -54,10 +54,10 @@ HirModule {
                         module: NonEmpty(
                             [
                                 "std",
-                                "Option",
+                                "option",
                             ],
                         ),
-                        name: "option",
+                        name: "Option",
                         sub_path: Some(
                             "Some",
                         ),

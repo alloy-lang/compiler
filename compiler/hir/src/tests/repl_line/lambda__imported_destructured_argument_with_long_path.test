@@ -51,11 +51,11 @@ HirModule {
                     Fqn {
                         module: NonEmpty(
                             [
+                                "std",
                                 "option",
-                                "Option",
                             ],
                         ),
-                        name: "std",
+                        name: "Option",
                         sub_path: Some(
                             "Some",
                         ),

@@ -24,11 +24,11 @@ HirModule {
                         module: NonEmpty(
                             [
                                 "test_data",
+                                "ResultThing",
                                 "More",
-                                "Stuff",
                             ],
                         ),
-                        name: "ResultThing",
+                        name: "Stuff",
                         sub_path: Some(
                             "here",
                         ),
