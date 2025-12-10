@@ -12,7 +12,7 @@ alloy_ast = { path = "../../compiler/ast" }
 alloy_hir = { path = "../../compiler/hir" }
 reedline = "0.32"
 nu-ansi-term = "0.50"
-dirs = "5.0"
+dirs = "6.0"
 
 [dev-dependencies]
 expect-test = { workspace = true }
