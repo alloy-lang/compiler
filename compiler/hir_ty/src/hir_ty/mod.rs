@@ -59,6 +59,16 @@ pub enum ResolvedType {
     TODO,
 }
 
+/// Represents a single instantiation of a polymorphic type at a specific call site
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PolyInstantiation {
+    /// The location where the polymorphic value was instantiated (used)
+    pub call_site: alloy_hir_resolved::EPFql,
+    /// The concrete types that each quantified type variable was instantiated to
+    /// The order matches the order of quantified variables in the PolyType
+    pub type_args: Vec<ResolvedType>,
+}
+
 impl ResolvedType {
     /// Check if this type contains type variables (is polymorphic)
     /// Returns true if the type contains Generic or ConstrainedGeneric variants

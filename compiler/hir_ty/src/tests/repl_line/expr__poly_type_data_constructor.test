@@ -66,5 +66,6 @@ HirTypedModule {
             range: 207..242,
         },
     ],
+    poly_instantiations: {},
 }
 []

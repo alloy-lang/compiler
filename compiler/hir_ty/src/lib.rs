@@ -21,6 +21,9 @@ pub struct HirTypedModule {
     pattern_types: FxHashMap<hir::PatternIdx, ResolvedType>,
     warnings: Vec<TypeInferenceWarning>,
     errors: Vec<TypeInferenceError>,
+    /// Track polymorphic instantiations: definition -> list of instantiations
+    /// Each instantiation records where the polymorphic value was used and with what concrete types
+    pub poly_instantiations: FxHashMap<alloy_hir_resolved::EPFql, Vec<PolyInstantiation>>,
 }
 
 impl HirTypedModule {
@@ -30,6 +33,7 @@ impl HirTypedModule {
             pattern_types: Default::default(),
             warnings: Vec::new(),
             errors: Vec::new(),
+            poly_instantiations: FxHashMap::default(),
         }
     }
 

@@ -75,6 +75,7 @@ HirTypedModule {
     },
     warnings: [],
     errors: [],
+    poly_instantiations: {},
 }
 [
     ParseError {

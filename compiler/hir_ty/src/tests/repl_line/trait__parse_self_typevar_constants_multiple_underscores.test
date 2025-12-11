@@ -7,5 +7,6 @@ HirTypedModule {
     pattern_types: {},
     warnings: [],
     errors: [],
+    poly_instantiations: {},
 }
 []
