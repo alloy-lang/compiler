@@ -1,27 +1,70 @@
 typedef Identity[t] = Id t
 
 -- TODO: data constructors for single-constructor types should be referencable by top-level name only. ie Identity instead of Identity::Id
-let string_example = Identity::Id "hi"
-let int_example = Identity::Id 10
+let string_example = Identity::Id("hi")
+let int_example = Identity::Id(10)
 
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Generic(
-            0,
-        ),
-        Idx::<Expression>(2): BuiltIn(
+        Idx::<Expression>(0): BuiltIn(
             String,
         ),
-        Idx::<Expression>(1): Generic(
-            1,
-        ),
-        Idx::<Expression>(3): BuiltIn(
+        Idx::<Expression>(2): BuiltIn(
             Int,
+        ),
+        Idx::<Expression>(1): Generic(
+            0,
+        ),
+        Idx::<Expression>(3): Generic(
+            1,
         ),
     },
     pattern_types: {},
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: TypeResolutionError(
+                UnknownExpressionReference {
+                    source_ref: Fql {
+                        module_id: ModuleId(
+                            Id(4),
+                        ),
+                        local_id: Idx::<Expression>(1),
+                    },
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    path: NonEmpty(
+                        [
+                            "Identity",
+                        ],
+                    ),
+                },
+            ),
+            range: 167..207,
+        },
+        TypeInferenceError {
+            kind: TypeResolutionError(
+                UnknownExpressionReference {
+                    source_ref: Fql {
+                        module_id: ModuleId(
+                            Id(4),
+                        ),
+                        local_id: Idx::<Expression>(3),
+                    },
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    path: NonEmpty(
+                        [
+                            "Identity",
+                        ],
+                    ),
+                },
+            ),
+            range: 207..242,
+        },
+    ],
 }
 []

@@ -291,4 +291,38 @@ mod small_tests {
             )],
         );
     }
+
+    #[test]
+    fn let_polymorphism_identity_function() {
+        check_named(
+            r#"
+                typeof id : t1 -> t1 where
+                  typevar t1
+                let id = |x| -> x
+
+                let string_example = id("hi")
+                let int_example = id(10)
+            "#,
+            &[
+                (
+                    "id",
+                    0,
+                    ResolvedType::Lambda {
+                        arg_type: Box::new(ResolvedType::Generic(0)),
+                        return_type: Box::new(ResolvedType::Generic(0)),
+                    },
+                ),
+                (
+                    "string_example",
+                    0,
+                    ResolvedType::BuiltIn(hir::BuiltInType::String),
+                ),
+                (
+                    "int_example",
+                    0,
+                    ResolvedType::BuiltIn(hir::BuiltInType::Int),
+                ),
+            ],
+        );
+    }
 }
