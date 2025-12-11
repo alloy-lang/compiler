@@ -268,10 +268,8 @@ impl<'db> HMInferenceContext<'db> {
         if let Some(poly_ty) = self.poly_env.get(&fql).cloned() {
             // Instantiate with fresh type variables
             Some(poly_ty.instantiate(&mut self.type_var_gen))
-        } else if let Some(mono_ty) = self.type_env.get(&fql).cloned() {
-            Some(mono_ty)
         } else {
-            None
+            self.type_env.get(&fql).cloned()
         }
     }
 

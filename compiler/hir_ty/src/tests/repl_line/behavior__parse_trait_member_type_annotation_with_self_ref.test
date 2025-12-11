@@ -1,14 +1,14 @@
 typedef Type1 = Thing
 
-trait Trait1 where
+trait TestTrait1 where
     typeof test : self -> String -> Int
 
-    -- TODO: should be able to resolve abstract trait members
     let thing = test
 end
 
 behavior TestTrait1 for Type1 where
     typeof test : self -> String -> Int
+    let test = |sf, str| -> 0
 end
 ===
 HirTypedModule {
@@ -16,30 +16,61 @@ HirTypedModule {
         Idx::<Expression>(0): Generic(
             0,
         ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(2): Lambda {
+            arg_type: Generic(
+                1,
+            ),
+            return_type: Lambda {
+                arg_type: Generic(
+                    2,
+                ),
+                return_type: BuiltIn(
+                    Int,
+                ),
+            },
+        },
     },
-    pattern_types: {},
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            1,
+        ),
+        Idx::<Pattern>(1): Generic(
+            2,
+        ),
+    },
     warnings: [],
     errors: [
         TypeInferenceError {
-            kind: TypeResolutionError(
-                UnknownTraitReference {
-                    source_ref: Fql {
-                        module_id: ModuleId(
-                            Id(4),
+            kind: ConflictingTypeAnnotation {
+                expected: Lambda {
+                    arg_type: TODO,
+                    return_type: Lambda {
+                        arg_type: BuiltIn(
+                            String,
                         ),
-                        local_id: Idx::<TypeReference>(5),
+                        return_type: BuiltIn(
+                            Int,
+                        ),
                     },
-                    module_id: ModuleId(
-                        Id(4),
-                    ),
-                    path: NonEmpty(
-                        [
-                            "TestTrait1",
-                        ],
-                    ),
                 },
-            ),
-            range: 171..250,
+                found: Lambda {
+                    arg_type: Generic(
+                        1,
+                    ),
+                    return_type: Lambda {
+                        arg_type: Generic(
+                            2,
+                        ),
+                        return_type: BuiltIn(
+                            Int,
+                        ),
+                    },
+                },
+            },
+            range: 193..219,
         },
     ],
 }
