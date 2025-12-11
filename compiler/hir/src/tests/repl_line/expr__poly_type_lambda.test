@@ -1,0 +1,162 @@
+typeof id : t1 -> t1 where
+  typevar t1
+let id = |x| -> x
+
+let string_example = id("hi")
+let int_example = id(10)
+
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: ThisModule {
+                    name: "x",
+                    subname: None,
+                    scope: Idx::<Scope>(2),
+                },
+                scope: Idx::<Scope>(2),
+            },
+            "range": 56..59,
+        },
+        Idx::<Expression>(1): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                ],
+                body: Idx::<Expression>(0),
+            },
+            "name": "id",
+            "range": 40..59,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(2): {
+            "item": Literal(
+                String(
+                    "hi",
+                ),
+            ),
+            "range": 83..87,
+        },
+        Idx::<Expression>(3): {
+            "item": FunctionCall {
+                target: ThisModule {
+                    name: "id",
+                    subname: None,
+                    scope: Idx::<Scope>(0),
+                },
+                scope: Idx::<Scope>(0),
+                args: [
+                    Idx::<Expression>(2),
+                ],
+            },
+            "name": "string_example",
+            "range": 59..89,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(4): {
+            "item": Literal(
+                Int(
+                    10,
+                ),
+            ),
+            "range": 110..112,
+        },
+        Idx::<Expression>(5): {
+            "item": FunctionCall {
+                target: ThisModule {
+                    name: "id",
+                    subname: None,
+                    scope: Idx::<Scope>(0),
+                },
+                scope: Idx::<Scope>(0),
+                args: [
+                    Idx::<Expression>(4),
+                ],
+            },
+            "name": "int_example",
+            "range": 89..114,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "x",
+            },
+            "name": "x",
+            "range": 50..51,
+            "scope_id": Idx::<Scope>(2),
+        },
+    },
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule {
+                    name: "t1",
+                    subname: None,
+                    scope: Idx::<Scope>(1),
+                },
+            ),
+            "range": 12..15,
+        },
+        Idx::<TypeReference>(1): {
+            "item": Named(
+                ThisModule {
+                    name: "t1",
+                    subname: None,
+                    scope: Idx::<Scope>(1),
+                },
+            ),
+            "range": 18..21,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(0),
+                return_type: Idx::<TypeReference>(1),
+            },
+            "name": "id",
+            "range": 12..21,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t1",
+            "range": 29..40,
+            "scope_id": Idx::<Scope>(1),
+        },
+    },
+    traits: EmptyIndex::<Trait>,
+    behaviors: EmptyIndex::<Behavior>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]

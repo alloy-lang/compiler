@@ -1,0 +1,127 @@
+typedef Identity[t] = Id t
+
+-- TODO: data constructors for single-constructor types should be referencable by top-level name only. ie Identity instead of Identity::Id
+let string_example = Identity::Id("hi")
+let int_example = Identity::Id(10)
+
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": Literal(
+                String(
+                    "hi",
+                ),
+            ),
+            "range": 201..205,
+        },
+        Idx::<Expression>(1): {
+            "item": FunctionCall {
+                target: ThisModule {
+                    name: "Identity",
+                    subname: Some(
+                        "Id",
+                    ),
+                    scope: Idx::<Scope>(0),
+                },
+                scope: Idx::<Scope>(0),
+                args: [
+                    Idx::<Expression>(0),
+                ],
+            },
+            "name": "string_example",
+            "range": 167..207,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(2): {
+            "item": Literal(
+                Int(
+                    10,
+                ),
+            ),
+            "range": 238..240,
+        },
+        Idx::<Expression>(3): {
+            "item": FunctionCall {
+                target: ThisModule {
+                    name: "Identity",
+                    subname: Some(
+                        "Id",
+                    ),
+                    scope: Idx::<Scope>(0),
+                },
+                scope: Idx::<Scope>(0),
+                args: [
+                    Idx::<Expression>(2),
+                ],
+            },
+            "name": "int_example",
+            "range": 207..242,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule {
+                    name: "t",
+                    subname: None,
+                    scope: Idx::<Scope>(1),
+                },
+            ),
+            "range": 25..167,
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "t",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t",
+            "range": 17..18,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "Identity",
+                kind: Single(
+                    TypeDefinitionMember {
+                        name: "Id",
+                        properties: [
+                            Idx::<TypeReference>(0),
+                        ],
+                    },
+                ),
+            },
+            "name": "Identity",
+            "range": 0..167,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    traits: EmptyIndex::<Trait>,
+    behaviors: EmptyIndex::<Behavior>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]
