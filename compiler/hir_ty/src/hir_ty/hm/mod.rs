@@ -200,17 +200,23 @@ impl PolyType {
     }
 
     /// Instantiate a polytype with fresh type variables
-    pub(super) fn instantiate(&self, gen: &mut TypeVarGenerator) -> MonoType {
+    /// Returns (instantiated_type, fresh_vars_in_order)
+    /// The fresh_vars Vec contains the fresh variables in the same order as self.quantified
+    pub(super) fn instantiate(&self, gen: &mut TypeVarGenerator) -> (MonoType, Vec<TypeVarId>) {
         if self.quantified.is_empty() {
-            return self.body.clone();
+            return (self.body.clone(), Vec::new());
         }
 
         let mut subst = unification::Substitution::new();
+        let mut fresh_vars = Vec::with_capacity(self.quantified.len());
+
         for var in &self.quantified {
-            subst.insert(*var, MonoType::Var(gen.fresh()));
+            let fresh = gen.fresh();
+            fresh_vars.push(fresh);
+            subst.insert(*var, MonoType::Var(fresh));
         }
 
-        subst.apply(&self.body)
+        (subst.apply(&self.body), fresh_vars)
     }
 }
 
@@ -234,6 +240,10 @@ pub(super) struct HMInferenceContext<'db> {
     /// Type variables that were active before the current group started
     /// (used for proper generalization in let-polymorphism)
     pub(super) env_type_vars: FxHashSet<TypeVarId>,
+    /// Track instantiations: polymorphic definition -> list of (call_site, fresh_vars)
+    /// The Vec<TypeVarId> contains the fresh type variables created during instantiation
+    /// in the same order as the quantified variables in the PolyType
+    pub(super) instantiations: FxHashMap<EPFql, Vec<(EPFql, Vec<TypeVarId>)>>,
 }
 
 impl<'db> HMInferenceContext<'db> {
@@ -248,6 +258,7 @@ impl<'db> HMInferenceContext<'db> {
             expr_to_group: FxHashMap::default(),
             current_group: None,
             env_type_vars: FxHashSet::default(),
+            instantiations: FxHashMap::default(),
         }
     }
 
@@ -266,10 +277,38 @@ impl<'db> HMInferenceContext<'db> {
     fn maybe_find_type(&mut self, fql: impl Into<EPFql>) -> Option<MonoType> {
         let fql = fql.into();
         if let Some(poly_ty) = self.poly_env.get(&fql).cloned() {
-            // Instantiate with fresh type variables
-            Some(poly_ty.instantiate(&mut self.type_var_gen))
+            // Instantiate with fresh type variables (without tracking)
+            let (instantiated, _fresh_vars) = poly_ty.instantiate(&mut self.type_var_gen);
+            Some(instantiated)
         } else {
             self.type_env.get(&fql).cloned()
+        }
+    }
+
+    /// Find a type and track instantiation if it's polymorphic
+    /// call_site: The location where this type is being referenced
+    fn maybe_find_type_tracked(
+        &mut self,
+        def_fql: impl Into<EPFql>,
+        call_site: EPFql,
+    ) -> Option<MonoType> {
+        let def_fql = def_fql.into();
+
+        if let Some(poly_ty) = self.poly_env.get(&def_fql).cloned() {
+            // Instantiate with fresh type variables
+            let (instantiated, fresh_vars) = poly_ty.instantiate(&mut self.type_var_gen);
+
+            // Track this instantiation
+            if !fresh_vars.is_empty() {
+                self.instantiations
+                    .entry(def_fql)
+                    .or_insert_with(Vec::new)
+                    .push((call_site, fresh_vars));
+            }
+
+            Some(instantiated)
+        } else {
+            self.type_env.get(&def_fql).cloned()
         }
     }
 
@@ -309,10 +348,5 @@ impl<'db> HMInferenceContext<'db> {
         // Use the environment type variables from before this group
         // This ensures we quantify over type variables local to this expression
         PolyType::generalize(ty, &self.env_type_vars)
-    }
-
-    /// Instantiate a polymorphic type
-    pub(super) fn instantiate_poly(&mut self, poly: &PolyType) -> MonoType {
-        poly.instantiate(&mut self.type_var_gen)
     }
 }

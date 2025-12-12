@@ -56,6 +56,15 @@ impl HirTypedModule {
     pub fn errors(&self) -> &[TypeInferenceError] {
         &self.errors
     }
+
+    /// Get all instantiations for a polymorphic definition
+    pub fn instantiations(&self, def_fql: &alloy_hir_resolved::EPFql) -> &[PolyInstantiation] {
+        // TODO: Add deduplication, if needed
+        self.poly_instantiations
+            .get(def_fql)
+            .map(|v| v.as_slice())
+            .unwrap_or(&[])
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -87,6 +96,7 @@ mod small_tests {
     use la_arena::RawIdx;
     use non_empty_vec::NonEmpty;
     use text_size::{TextRange, TextSize};
+    use alloy_hir_resolved::{EPFql, Fql};
 
     fn check(input: &str, expected: &[(u32, ResolvedType)]) {
         let (_, parse_errors) = ast::source_file(input);
@@ -328,5 +338,48 @@ mod small_tests {
                 ),
             ],
         );
+    }
+
+    #[test]
+    fn track_polymorphic_instantiation_direct() {
+        let mut db = TestHirTyDatabase::default();
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test/test.alloy"),
+            r#"
+                typeof id : t1 -> t1 where
+                  typevar t1
+                let id = |x| -> x
+
+                let string_result = id("hi")
+                let int_result = id(42)
+            "#,
+        );
+
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+        let ctx = crate::type_check_module(&db, module_id);
+
+        // Get the FQL for 'id'
+        let (id_expr, _) = hir_module
+            .get_expression_by_name(
+                &hir::Name::new("id"),
+                ScopeIdx::from_raw(la_arena::RawIdx::from(0)),
+            )
+            .unwrap();
+        let id_fql =
+            EPFql::Expression(Fql::new(module_id, id_expr));
+
+        // Verify id was instantiated twice
+        let instantiations = ctx.instantiations(&id_fql);
+        assert_eq!(instantiations.len(), 2, "Expected two instantiations of id");
+
+        // Collect the type args
+        let type_args: Vec<_> = instantiations
+            .iter()
+            .map(|inst| &inst.type_args[0])
+            .collect();
+
+        assert!(type_args.contains(&&ResolvedType::BuiltIn(hir::BuiltInType::String)));
+        assert!(type_args.contains(&&ResolvedType::BuiltIn(hir::BuiltInType::Int)));
     }
 }

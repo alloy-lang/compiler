@@ -218,6 +218,31 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
         check_type_annotation(db, &mut result, module_id, range, name_op, resolved_type);
     }
 
+    // Phase 4: Resolve instantiations to concrete types
+    for (def_fql, instantiations) in ctx.instantiations {
+        let mut resolved_instantiations = Vec::new();
+
+        for (call_site, fresh_vars) in instantiations {
+            // Resolve each fresh variable to a concrete type using the final substitution
+            let type_args: Vec<ResolvedType> = fresh_vars
+                .iter()
+                .map(|&var_id| {
+                    let mono_ty = substitution.apply(&MonoType::Var(var_id));
+                    mono_to_resolved_with_map(&mono_ty, &mut type_var_map, &mut next_generic_id)
+                })
+                .collect();
+
+            resolved_instantiations.push(crate::hir_ty::PolyInstantiation {
+                call_site,
+                type_args,
+            });
+        }
+
+        result
+            .poly_instantiations
+            .insert(def_fql, resolved_instantiations);
+    }
+
     // Convert resolution errors to diagnostics
     for err in ctx.resolution_errors {
         let range = err.get_range(db);
