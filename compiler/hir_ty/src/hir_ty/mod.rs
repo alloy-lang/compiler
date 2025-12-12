@@ -63,7 +63,7 @@ pub enum ResolvedType {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PolyInstantiation {
     /// The location where the polymorphic value was instantiated (used)
-    pub call_site: alloy_hir_resolved::EPFql,
+    pub call_site: Fql<hir::Expression>,
     /// The concrete types that each quantified type variable was instantiated to
     /// The order matches the order of quantified variables in the PolyType
     pub type_args: Vec<ResolvedType>,

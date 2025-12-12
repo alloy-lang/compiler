@@ -5,7 +5,7 @@
 //! topological order, with strongly-connected components handled together.
 
 use alloy_hir as hir;
-use alloy_hir_resolved::{self as res, EPFql, Fql};
+use alloy_hir_resolved::{self as res, EPFql, EPTdFql, Fql};
 use alloy_workspace::ModuleId;
 use rustc_hash::{FxHashMap, FxHashSet};
 
@@ -195,12 +195,13 @@ fn collect_from_expression(
         res::Expression::FunctionCall { target, args } => {
             // Target might be an expression reference
             match target {
-                EPFql::Expression(expr_fql) => {
+                EPTdFql::Expression(expr_fql) => {
                     if expr_fql.module_id == module_id {
                         deps.insert(expr_fql.local_id);
                     }
                 }
-                EPFql::Pattern(_) => {} // Pattern refs don't create dependencies
+                EPTdFql::Pattern(_) => {} // Pattern refs don't create dependencies
+                EPTdFql::TypeDefinition(_) => {} // Type Defs don't create dependencies
             }
             // Recursively check arguments
             for arg in args {

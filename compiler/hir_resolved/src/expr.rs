@@ -1,10 +1,9 @@
-use super::{resolve_cross_module_expression, resolve_cross_module_type_definition};
+use super::{resolve_cross_module_expression, resolve_cross_module_type_definition, EPTdFql};
 use crate::diagnostics::TypeResolutionError;
 use crate::{EPFql, Fql};
 use alloy_hir as hir;
 use alloy_workspace::ModuleId;
 use non_empty_vec::{ne_vec, NonEmpty};
-use std::convert::TryFrom;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Expression {
@@ -32,7 +31,7 @@ pub enum Expression {
         body: Fql<hir::Expression>,
     },
     FunctionCall {
-        target: EPFql,
+        target: EPTdFql,
         args: Vec<Fql<hir::Expression>>,
     },
     Match {
@@ -232,10 +231,15 @@ fn resolve_function_call(
             let (hir_module, _) = hir::lower_file(db, module_id);
             if let Some((expr_id, _)) = hir_module.get_expression_by_name(name, *this_scope) {
                 let expr_fql = Fql::new(module_id, expr_id);
-                EPFql::Expression(expr_fql)
+                EPTdFql::Expression(expr_fql)
             } else if let Some((pat_id, _)) = hir_module.get_pattern_by_name(name, *this_scope) {
                 let pat_fql = Fql::new(module_id, pat_id);
-                EPFql::Pattern(pat_fql)
+                EPTdFql::Pattern(pat_fql)
+            } else if let Some((td_id, _)) =
+                hir_module.get_type_definition_by_name(name, *this_scope)
+            {
+                let td_fql = Fql::new(module_id, td_id);
+                EPTdFql::TypeDefinition(td_fql)
             } else {
                 return Err(TypeResolutionError::UnknownExpressionReference {
                     source_ref,
@@ -246,7 +250,11 @@ fn resolve_function_call(
         }
         hir::Path::OtherModule(fqn) => {
             if let Ok(expr_fql) = resolve_cross_module_expression(db, &fqn, source_ref.clone()) {
-                EPFql::Expression(expr_fql)
+                EPTdFql::Expression(expr_fql)
+            } else if let Ok(td_fql) =
+                resolve_cross_module_type_definition(db, &fqn, source_ref.clone().into())
+            {
+                EPTdFql::TypeDefinition(td_fql)
             } else {
                 return Err(TypeResolutionError::UnknownExpressionReference {
                     source_ref,

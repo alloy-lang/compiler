@@ -22,6 +22,16 @@ pub struct TypeDefinitionMember {
     properties: Vec<Fql<hir::TypeReference>>,
 }
 
+impl TypeDefinitionMember {
+    pub fn name(&self) -> &hir::Name {
+        &self.name
+    }
+
+    pub fn properties(&self) -> &[Fql<hir::TypeReference>] {
+        &self.properties
+    }
+}
+
 pub fn resolve_type_definition_by_path(
     db: &dyn hir::HirDatabase,
     current_module_id: ModuleId,

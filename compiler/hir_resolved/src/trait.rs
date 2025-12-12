@@ -1,4 +1,4 @@
-use crate::{cross_module_resolver, EPTFql, Fql, TypeResolutionError};
+use crate::{cross_module_resolver, EPTrFql, Fql, TypeResolutionError};
 use alloy_hir as hir;
 use alloy_workspace::ModuleId;
 use la_arena::Idx;
@@ -82,11 +82,11 @@ impl cross_module_resolver::ModuleLookup<hir::Trait> for TraitLookup {
     }
 
     fn unknown_item_error(
-        source_ref: impl Into<EPTFql>,
+        source_ref: impl Into<EPTrFql>,
         _module_id: ModuleId,
         path: NonEmpty<hir::Name>,
     ) -> TypeResolutionError {
-        let EPTFql::TypeReference(source_ref) = source_ref.into() else {
+        let EPTrFql::TypeReference(source_ref) = source_ref.into() else {
             panic!("Trait resolution requires TypeReference");
         };
 

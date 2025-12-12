@@ -8,7 +8,7 @@ use super::{HMInferenceContext, MonoType};
 use crate::diagnostics::TypeInferenceErrorKind;
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir as hir;
-use alloy_hir_resolved::EPFql;
+use alloy_hir_resolved::EPTdFql;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
@@ -63,12 +63,18 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
             // Only collect type variables from top-level named expressions (let-bindings)
             // This excludes internal expressions like lambda parameters and bodies
             let should_include = match fql {
-                EPFql::Expression(expr_fql) => {
+                EPTdFql::Expression(expr_fql) => {
                     // Only include if this expression has a name AND is in the same module
                     expr_fql.module_id == module_id && expr_names.contains_key(&expr_fql.local_id)
                 }
                 // Patterns are internal to their expressions, don't include them
-                EPFql::Pattern(_) => false,
+                EPTdFql::Pattern(_) => false,
+                EPTdFql::TypeDefinition(td_fql) => {
+                    // Type definitions can be polymorphic (e.g., List[t], Option[t])
+                    // Include them if they're in the same module
+                    // Unlike expressions, type definitions are always named by definition
+                    td_fql.module_id == module_id
+                }
             };
 
             if should_include {

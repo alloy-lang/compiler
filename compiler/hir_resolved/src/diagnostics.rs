@@ -1,4 +1,4 @@
-use crate::{EPTFql, Fql};
+use crate::{EPTrFql, Fql};
 use alloy_hir as hir;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
@@ -7,7 +7,7 @@ use text_size::TextRange;
 #[derive(Debug, Clone, PartialEq)]
 pub enum TypeResolutionError {
     UnknownModule {
-        source_ref: EPTFql,
+        source_ref: EPTrFql,
         module_slug: String,
     },
     UnknownExpressionReference {
@@ -49,15 +49,15 @@ impl TypeResolutionError {
     pub fn get_range(&self, db: &dyn hir::HirDatabase) -> TextRange {
         match self {
             TypeResolutionError::UnknownModule { source_ref, .. } => match source_ref {
-                EPTFql::Expression(fql) => {
+                EPTrFql::Expression(fql) => {
                     let (hir_module, _) = hir::lower_file(db, fql.module_id);
                     hir_module.get_expression_range(fql.local_id)
                 }
-                EPTFql::Pattern(fql) => {
+                EPTrFql::Pattern(fql) => {
                     let (hir_module, _) = hir::lower_file(db, fql.module_id);
                     hir_module.get_pattern_range(fql.local_id)
                 }
-                EPTFql::TypeReference(fql) => {
+                EPTrFql::TypeReference(fql) => {
                     let (hir_module, _) = hir::lower_file(db, fql.module_id);
                     hir_module.get_type_reference_range(fql.local_id)
                 }

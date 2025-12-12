@@ -23,7 +23,7 @@ pub struct HirTypedModule {
     errors: Vec<TypeInferenceError>,
     /// Track polymorphic instantiations: definition -> list of instantiations
     /// Each instantiation records where the polymorphic value was used and with what concrete types
-    pub poly_instantiations: FxHashMap<alloy_hir_resolved::EPFql, Vec<PolyInstantiation>>,
+    pub poly_instantiations: FxHashMap<alloy_hir_resolved::EPTdFql, Vec<PolyInstantiation>>,
 }
 
 impl HirTypedModule {
@@ -96,7 +96,7 @@ mod small_tests {
     use la_arena::RawIdx;
     use non_empty_vec::NonEmpty;
     use text_size::{TextRange, TextSize};
-    use alloy_hir_resolved::{EPFql, Fql};
+    use alloy_hir_resolved::{EPTdFql, Fql};
 
     fn check(input: &str, expected: &[(u32, ResolvedType)]) {
         let (_, parse_errors) = ast::source_file(input);
@@ -366,8 +366,7 @@ mod small_tests {
                 ScopeIdx::from_raw(la_arena::RawIdx::from(0)),
             )
             .unwrap();
-        let id_fql =
-            EPFql::Expression(Fql::new(module_id, id_expr));
+        let id_fql = EPTdFql::Expression(Fql::new(module_id, id_expr));
 
         // Verify id was instantiated twice
         let instantiations = ctx.instantiations(&id_fql);

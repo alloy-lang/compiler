@@ -3,7 +3,7 @@
 //! This module provides a generic framework for resolving cross-module references
 //! for different HIR node types (expressions, type definitions, traits, etc.)
 
-use crate::{EPTFql, Fql, TypeResolutionError};
+use crate::{EPTrFql, Fql, TypeResolutionError};
 use alloy_hir as hir;
 use alloy_workspace::ModuleId;
 use la_arena::Idx;
@@ -33,7 +33,7 @@ pub(crate) trait ModuleLookup<T> {
     /// Create an error for when the module is not found
     fn unknown_module_error(
         module_slug: String,
-        source_ref: impl Into<EPTFql>,
+        source_ref: impl Into<EPTrFql>,
     ) -> TypeResolutionError {
         TypeResolutionError::UnknownModule {
             module_slug,
@@ -43,22 +43,22 @@ pub(crate) trait ModuleLookup<T> {
 
     /// Create an error for when the item is not found in the module
     fn unknown_item_error(
-        source_ref: impl Into<EPTFql>,
-        module_id: alloy_workspace::ModuleId,
+        source_ref: impl Into<EPTrFql>,
+        module_id: ModuleId,
         path: NonEmpty<hir::Name>,
     ) -> TypeResolutionError {
         match source_ref.into() {
-            EPTFql::Expression(fql) => TypeResolutionError::UnknownExpressionReference {
+            EPTrFql::Expression(fql) => TypeResolutionError::UnknownExpressionReference {
                 source_ref: fql,
                 module_id,
                 path,
             },
-            EPTFql::Pattern(fql) => TypeResolutionError::UnknownPatternReference {
+            EPTrFql::Pattern(fql) => TypeResolutionError::UnknownPatternReference {
                 source_ref: fql,
                 module_id,
                 path,
             },
-            EPTFql::TypeReference(fql) => TypeResolutionError::UnknownTypeReference {
+            EPTrFql::TypeReference(fql) => TypeResolutionError::UnknownTypeReference {
                 source_ref: fql,
                 module_id,
                 path,
@@ -71,7 +71,7 @@ pub(crate) trait ModuleLookup<T> {
 pub(crate) fn resolve_cross_module<T, L>(
     db: &dyn hir::HirDatabase,
     fqn: &hir::Fqn,
-    source_ref: impl Into<EPTFql> + Clone,
+    source_ref: impl Into<EPTrFql> + Clone,
 ) -> Result<Fql<T>, TypeResolutionError>
 where
     L: ModuleLookup<T>,

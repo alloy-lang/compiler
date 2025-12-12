@@ -4,7 +4,7 @@ use crate::hir_ty::hm::constraint_gen::pattern::infer_pattern_hm;
 use crate::hir_ty::type_annotation::{type_reference_to_resolved_type, TypeResolutionContext};
 use alloy_hir as hir;
 use alloy_hir_resolved as res;
-use alloy_hir_resolved::{EPFql, Fql};
+use alloy_hir_resolved::{EPFql, EPTdFql, Fql, TypeDefinition, TypeDefinitionKind};
 use non_empty_vec::NonEmpty;
 
 /// Generate constraints for an expression using HM inference
@@ -84,7 +84,10 @@ fn infer_variable_ref(
     // First check if this variable already has a type (possibly polymorphic)
     // This enables let-polymorphism: if the variable has been generalized,
     // we'll instantiate it with fresh type variables
-    if let Some(existing_ty) = ctx.maybe_find_type(ref_fql.clone()) {
+    // Use tracked version: source_fql is the call site, ref_fql is the definition
+    if let Some(existing_ty) =
+        ctx.maybe_find_type_tracked(ref_fql.clone(), source_fql.clone().into())
+    {
         return ctx.assign_type(source_fql, existing_ty);
     }
 
@@ -122,8 +125,8 @@ fn infer_lambda(
 
 fn infer_function_call(
     ctx: &mut HMInferenceContext,
-    fql: Fql<hir::Expression>,
-    target: EPFql,
+    source_fql: Fql<hir::Expression>,
+    target: EPTdFql,
     args: Vec<Fql<hir::Expression>>,
 ) -> MonoType {
     let func_ty = match target {
@@ -144,9 +147,9 @@ fn infer_function_call(
     }
 
     // Add equation: func_ty = arg1 -> ... -> result
-    ctx.add_equation(func_ty, expected_func_ty, fql.clone());
+    ctx.add_equation(func_ty, expected_func_ty, source_fql.clone());
 
-    ctx.assign_type(fql, result_ty)
+    ctx.assign_type(source_fql, result_ty)
 }
 
 fn infer_binary(

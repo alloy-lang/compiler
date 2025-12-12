@@ -329,7 +329,7 @@ impl<'db> HMInferenceContext<'db> {
     }
 
     #[must_use]
-    fn assign_type(&mut self, fql: impl Into<EPFql>, ty: MonoType) -> MonoType {
+    fn assign_type(&mut self, fql: impl Into<EPTdFql>, ty: MonoType) -> MonoType {
         self.type_env.insert(fql.into(), ty.clone());
         ty
     }

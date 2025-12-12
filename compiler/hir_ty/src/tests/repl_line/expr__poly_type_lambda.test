@@ -49,14 +49,12 @@ HirTypedModule {
             },
         ): [
             PolyInstantiation {
-                call_site: Expression(
-                    Fql {
-                        module_id: ModuleId(
-                            Id(4),
-                        ),
-                        local_id: Idx::<Expression>(3),
-                    },
-                ),
+                call_site: Fql {
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    local_id: Idx::<Expression>(3),
+                },
                 type_args: [
                     BuiltIn(
                         String,
@@ -64,14 +62,12 @@ HirTypedModule {
                 ],
             },
             PolyInstantiation {
-                call_site: Expression(
-                    Fql {
-                        module_id: ModuleId(
-                            Id(4),
-                        ),
-                        local_id: Idx::<Expression>(5),
-                    },
-                ),
+                call_site: Fql {
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    local_id: Idx::<Expression>(5),
+                },
                 type_args: [
                     BuiltIn(
                         Int,

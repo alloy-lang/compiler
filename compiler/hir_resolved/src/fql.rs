@@ -75,54 +75,117 @@ impl Into<EPFql> for &Fql<hir::Pattern> {
 
 /// A fully qualified reference to an expression, pattern, or type_reference within a specific module
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EPTFql {
+pub enum EPTrFql {
     Expression(Fql<hir::Expression>),
     Pattern(Fql<hir::Pattern>),
     TypeReference(Fql<hir::TypeReference>),
 }
 
-impl EPTFql {
+impl EPTrFql {
     pub fn module_id(&self) -> ModuleId {
         match self {
-            EPTFql::Expression(fql) => fql.module_id,
-            EPTFql::Pattern(fql) => fql.module_id,
-            EPTFql::TypeReference(fql) => fql.module_id,
+            EPTrFql::Expression(fql) => fql.module_id,
+            EPTrFql::Pattern(fql) => fql.module_id,
+            EPTrFql::TypeReference(fql) => fql.module_id,
         }
     }
 }
 
-impl Into<EPTFql> for Fql<hir::Expression> {
-    fn into(self) -> EPTFql {
-        EPTFql::Expression(self)
+impl Into<EPTrFql> for Fql<hir::Expression> {
+    fn into(self) -> EPTrFql {
+        EPTrFql::Expression(self)
     }
 }
 
-impl Into<EPTFql> for &Fql<hir::Expression> {
-    fn into(self) -> EPTFql {
-        EPTFql::Expression(self.clone())
+impl Into<EPTrFql> for &Fql<hir::Expression> {
+    fn into(self) -> EPTrFql {
+        EPTrFql::Expression(self.clone())
     }
 }
 
-impl Into<EPTFql> for Fql<hir::Pattern> {
-    fn into(self) -> EPTFql {
-        EPTFql::Pattern(self)
+impl Into<EPTrFql> for Fql<hir::Pattern> {
+    fn into(self) -> EPTrFql {
+        EPTrFql::Pattern(self)
     }
 }
 
-impl Into<EPTFql> for &Fql<hir::Pattern> {
-    fn into(self) -> EPTFql {
-        EPTFql::Pattern(self.clone())
+impl Into<EPTrFql> for &Fql<hir::Pattern> {
+    fn into(self) -> EPTrFql {
+        EPTrFql::Pattern(self.clone())
     }
 }
 
-impl Into<EPTFql> for Fql<hir::TypeReference> {
-    fn into(self) -> EPTFql {
-        EPTFql::TypeReference(self)
+impl Into<EPTrFql> for Fql<hir::TypeReference> {
+    fn into(self) -> EPTrFql {
+        EPTrFql::TypeReference(self)
     }
 }
 
-impl Into<EPTFql> for &Fql<hir::TypeReference> {
-    fn into(self) -> EPTFql {
-        EPTFql::TypeReference(self.clone())
+impl Into<EPTrFql> for &Fql<hir::TypeReference> {
+    fn into(self) -> EPTrFql {
+        EPTrFql::TypeReference(self.clone())
+    }
+}
+
+/// A fully qualified reference to an expression, pattern, or type_definition within a specific module
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum EPTdFql {
+    Expression(Fql<hir::Expression>),
+    Pattern(Fql<hir::Pattern>),
+    TypeDefinition(Fql<hir::TypeDefinition>),
+}
+
+impl EPTdFql {
+    pub fn module_id(&self) -> ModuleId {
+        match self {
+            EPTdFql::Expression(fql) => fql.module_id,
+            EPTdFql::Pattern(fql) => fql.module_id,
+            EPTdFql::TypeDefinition(fql) => fql.module_id,
+        }
+    }
+}
+
+impl Into<EPTdFql> for Fql<hir::Expression> {
+    fn into(self) -> EPTdFql {
+        EPTdFql::Expression(self)
+    }
+}
+
+impl Into<EPTdFql> for &Fql<hir::Expression> {
+    fn into(self) -> EPTdFql {
+        EPTdFql::Expression(self.clone())
+    }
+}
+
+impl Into<EPTdFql> for Fql<hir::Pattern> {
+    fn into(self) -> EPTdFql {
+        EPTdFql::Pattern(self)
+    }
+}
+
+impl Into<EPTdFql> for &Fql<hir::Pattern> {
+    fn into(self) -> EPTdFql {
+        EPTdFql::Pattern(self.clone())
+    }
+}
+
+impl Into<EPTdFql> for Fql<hir::TypeDefinition> {
+    fn into(self) -> EPTdFql {
+        EPTdFql::TypeDefinition(self)
+    }
+}
+
+impl Into<EPTdFql> for &Fql<hir::TypeDefinition> {
+    fn into(self) -> EPTdFql {
+        EPTdFql::TypeDefinition(self.clone())
+    }
+}
+
+impl Into<EPTdFql> for EPFql {
+    fn into(self) -> EPTdFql {
+        match self {
+            EPFql::Expression(fql) => EPTdFql::Expression(fql),
+            EPFql::Pattern(fql) => EPTdFql::Pattern(fql),
+        }
     }
 }

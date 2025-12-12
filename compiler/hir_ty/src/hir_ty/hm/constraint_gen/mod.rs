@@ -22,19 +22,19 @@ use alloy_hir as hir;
 
 use super::{HMInferenceContext, MonoType};
 
-use alloy_hir_resolved::EPFql;
+use alloy_hir_resolved::EPTdFql;
 pub(crate) use expr::infer_expr_hm;
 
 fn infer_literal(
     ctx: &mut HMInferenceContext,
-    fql: impl Into<EPFql>,
+    fql: impl Into<EPTdFql>,
     lit: hir::Literal,
 ) -> MonoType {
     let ty = MonoType::Concrete(hir::BuiltInType::from(&lit));
     ctx.assign_type(fql, ty)
 }
 
-fn infer_unit(ctx: &mut HMInferenceContext, fql: impl Into<EPFql>) -> MonoType {
+fn infer_unit(ctx: &mut HMInferenceContext, fql: impl Into<EPTdFql>) -> MonoType {
     let ty = MonoType::Unit;
     ctx.assign_type(fql, ty)
 }

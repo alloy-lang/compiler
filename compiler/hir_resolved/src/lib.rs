@@ -90,7 +90,7 @@ impl cross_module_resolver::ModuleLookup<hir::TypeDefinition> for TypeDefinition
 pub(crate) fn resolve_cross_module_type_definition(
     db: &dyn hir::HirDatabase,
     fqn: &hir::Fqn,
-    source_ref: EPTFql,
+    source_ref: EPTrFql,
 ) -> Result<Fql<hir::TypeDefinition>, TypeResolutionError> {
     cross_module_resolver::resolve_cross_module::<hir::TypeDefinition, TypeDefinitionLookup>(
         db, fqn, source_ref,
