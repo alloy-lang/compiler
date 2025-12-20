@@ -1,47 +1,55 @@
-import test_data::test
-
 typedef Either[l, r] =
   | Left(l)
   | Right(r)
 end
+
+let test = Either::Left(42)
 
 match test when
   \ Either::Left(l)  -> l
   \ Either::Right(r) -> r
 ===
 HirModule {
-    imports: Index::<Import> {
-        Idx::<Import>(0): {
-            "item": Import {
-                segments: [
-                    "test_data",
-                ],
-                last: "test",
-            },
-            "name": "test",
-            "range": 0..24,
-            "scope_id": Idx::<Scope>(0),
-        },
-    },
+    imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
-            "item": VariableRef {
-                path: OtherModule(
-                    Fqn {
-                        module: NonEmpty(
-                            [
-                                "test_data",
-                            ],
-                        ),
-                        name: "test",
-                        sub_path: None,
-                    },
+            "item": Literal(
+                Int(
+                    42,
                 ),
-                scope: Idx::<Scope>(0),
-            },
-            "range": 83..88,
+            ),
+            "range": 77..79,
         },
         Idx::<Expression>(1): {
+            "item": FunctionCall {
+                target: ThisModule {
+                    name: "Either",
+                    subname: Some(
+                        "Left",
+                    ),
+                    scope: Idx::<Scope>(0),
+                },
+                scope: Idx::<Scope>(0),
+                args: [
+                    Idx::<Expression>(0),
+                ],
+            },
+            "name": "test",
+            "range": 53..82,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(2): {
+            "item": VariableRef {
+                path: ThisModule {
+                    name: "test",
+                    subname: None,
+                    scope: Idx::<Scope>(0),
+                },
+                scope: Idx::<Scope>(0),
+            },
+            "range": 88..93,
+        },
+        Idx::<Expression>(3): {
             "item": VariableRef {
                 path: ThisModule {
                     name: "l",
@@ -50,9 +58,9 @@ HirModule {
                 },
                 scope: Idx::<Scope>(2),
             },
-            "range": 117..121,
+            "range": 122..126,
         },
-        Idx::<Expression>(2): {
+        Idx::<Expression>(4): {
             "item": VariableRef {
                 path: ThisModule {
                     name: "r",
@@ -61,23 +69,23 @@ HirModule {
                 },
                 scope: Idx::<Scope>(3),
             },
-            "range": 143..144,
+            "range": 148..149,
         },
-        Idx::<Expression>(3): {
+        Idx::<Expression>(5): {
             "item": Match {
-                condition: Idx::<Expression>(0),
+                condition: Idx::<Expression>(2),
                 targets: [
                     (
                         Idx::<Pattern>(1),
-                        Idx::<Expression>(1),
+                        Idx::<Expression>(3),
                     ),
                     (
                         Idx::<Pattern>(3),
-                        Idx::<Expression>(2),
+                        Idx::<Expression>(4),
                     ),
                 ],
             },
-            "range": 77..144,
+            "range": 82..149,
         },
     },
     patterns: Index::<Pattern> {
@@ -86,7 +94,7 @@ HirModule {
                 name: "l",
             },
             "name": "l",
-            "range": 110..111,
+            "range": 115..116,
             "scope_id": Idx::<Scope>(2),
         },
         Idx::<Pattern>(1): {
@@ -103,14 +111,14 @@ HirModule {
                     Idx::<Pattern>(0),
                 ],
             },
-            "range": 97..114,
+            "range": 102..119,
         },
         Idx::<Pattern>(2): {
             "item": VariableDeclaration {
                 name: "r",
             },
             "name": "r",
-            "range": 137..138,
+            "range": 142..143,
             "scope_id": Idx::<Scope>(3),
         },
         Idx::<Pattern>(3): {
@@ -127,7 +135,7 @@ HirModule {
                     Idx::<Pattern>(2),
                 ],
             },
-            "range": 123..140,
+            "range": 128..145,
         },
     },
     type_references: Index::<TypeReference> {
@@ -139,13 +147,13 @@ HirModule {
                     scope: Idx::<Scope>(1),
                 },
             ),
-            "range": 56..57,
+            "range": 32..33,
         },
         Idx::<TypeReference>(1): {
             "item": ParenthesizedType(
                 Idx::<TypeReference>(0),
             ),
-            "range": 55..61,
+            "range": 31..37,
         },
         Idx::<TypeReference>(2): {
             "item": Named(
@@ -155,13 +163,13 @@ HirModule {
                     scope: Idx::<Scope>(1),
                 },
             ),
-            "range": 69..70,
+            "range": 45..46,
         },
         Idx::<TypeReference>(3): {
             "item": ParenthesizedType(
                 Idx::<TypeReference>(2),
             ),
-            "range": 68..72,
+            "range": 44..48,
         },
     },
     type_definitions: Index::<TypeDefinition> {
@@ -173,7 +181,7 @@ HirModule {
                 ),
             },
             "name": "l",
-            "range": 39..40,
+            "range": 15..16,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeDefinition>(1): {
@@ -184,7 +192,7 @@ HirModule {
                 ),
             },
             "name": "r",
-            "range": 42..43,
+            "range": 18..19,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeDefinition>(2): {
@@ -208,7 +216,7 @@ HirModule {
                 ),
             },
             "name": "Either",
-            "range": 24..77,
+            "range": 0..53,
             "scope_id": Idx::<Scope>(0),
         },
     },

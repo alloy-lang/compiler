@@ -3,6 +3,8 @@ typedef Either[l, r] =
   | Right(r)
 end
 
+let test = Either::Left(42)
+
 match test when
   \ Either::Left(l)  -> l
   \ Either::Right(r) -> r
@@ -77,6 +79,44 @@ match test when
                     ],
                 },
             ],
+        },
+    ),
+    ValueDef(
+        ValueDef {
+            name: Some(
+                Ident(
+                    Ident {
+                        text: "test",
+                    },
+                ),
+            ),
+            value: Some(
+                FunctionCall(
+                    FunctionCall {
+                        target: Some(
+                            VariableRef {
+                                name: Some(
+                                    Path {
+                                        segments: [
+                                            "Either",
+                                            "Left",
+                                        ],
+                                    },
+                                ),
+                            },
+                        ),
+                        args: [
+                            IntLiteral(
+                                IntLiteral {
+                                    value: Some(
+                                        42,
+                                    ),
+                                },
+                            ),
+                        ],
+                    },
+                ),
+            ),
         },
     ),
     Expression(

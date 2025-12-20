@@ -1,0 +1,113 @@
+typedef Option[t] =
+    | None
+    | Some(t)
+end
+
+let example = Option::Some("hello")
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": Literal(
+                String(
+                    "hello",
+                ),
+            ),
+            "range": 77..84,
+        },
+        Idx::<Expression>(1): {
+            "item": FunctionCall {
+                target: ThisModule {
+                    name: "Option",
+                    subname: Some(
+                        "Some",
+                    ),
+                    scope: Idx::<Scope>(0),
+                },
+                scope: Idx::<Scope>(0),
+                args: [
+                    Idx::<Expression>(0),
+                ],
+            },
+            "name": "example",
+            "range": 50..85,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule {
+                    name: "t",
+                    subname: None,
+                    scope: Idx::<Scope>(1),
+                },
+            ),
+            "range": 42..43,
+        },
+        Idx::<TypeReference>(1): {
+            "item": ParenthesizedType(
+                Idx::<TypeReference>(0),
+            ),
+            "range": 41..45,
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "t",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t",
+            "range": 15..16,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "Option",
+                kind: Union(
+                    [
+                        TypeDefinitionMember {
+                            name: "None",
+                            properties: [],
+                        },
+                        TypeDefinitionMember {
+                            name: "Some",
+                            properties: [
+                                Idx::<TypeReference>(1),
+                            ],
+                        },
+                    ],
+                ),
+            },
+            "name": "Option",
+            "range": 0..50,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    traits: EmptyIndex::<Trait>,
+    behaviors: EmptyIndex::<Behavior>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]

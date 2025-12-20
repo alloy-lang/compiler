@@ -3,11 +3,13 @@ typedef Either[l, r] =
   | Right(r)
 end
 
+let test = Either::Left(42)
+
 match test when
   \ Either::Left(l)  -> l
   \ Either::Right(r) -> r
 ===
-SourceFile@0..120
+SourceFile@0..149
   TypeDefinition@0..53
     TypedefKw@0..7 "typedef"
     Whitespace@7..8 " "
@@ -49,58 +51,77 @@ SourceFile@0..120
           Whitespace@47..48 "\n"
     EndKw@48..51 "end"
     Whitespace@51..53 "\n\n"
-  MatchExpr@53..120
-    MatchKw@53..58 "match"
-    Whitespace@58..59 " "
-    MatchExprArg@59..64
-      VariableRef@59..64
-        Path@59..64
-          Ident@59..63 "test"
-          Whitespace@63..64 " "
-    WhenKw@64..68 "when"
-    Whitespace@68..71 "\n  "
-    MatchTarget@71..97
-      Backslash@71..72 "\\"
-      Whitespace@72..73 " "
-      MatchTargetCondition@73..90
-        Destructure@73..90
-          DestructureTarget@73..85
-            Path@73..85
-              Ident@73..79 "Either"
-              DoubleColon@79..81 "::"
-              Ident@81..85 "Left"
-          LParen@85..86 "("
-          DestructureArg@86..87
-            VariableDeclaration@86..87
-              Ident@86..87 "l"
-          RParen@87..88 ")"
-          Whitespace@88..90 "  "
-      RightArrow@90..92 "->"
-      Whitespace@92..93 " "
-      MatchTargetValue@93..97
-        VariableRef@93..97
-          Path@93..97
-            Ident@93..94 "l"
-            Whitespace@94..97 "\n  "
-    MatchTarget@97..120
-      Backslash@97..98 "\\"
-      Whitespace@98..99 " "
-      MatchTargetCondition@99..116
-        Destructure@99..116
-          DestructureTarget@99..112
-            Path@99..112
-              Ident@99..105 "Either"
-              DoubleColon@105..107 "::"
-              Ident@107..112 "Right"
-          LParen@112..113 "("
-          DestructureArg@113..114
-            VariableDeclaration@113..114
-              Ident@113..114 "r"
-          RParen@114..115 ")"
-          Whitespace@115..116 " "
-      RightArrow@116..118 "->"
-      Whitespace@118..119 " "
-      MatchTargetValue@119..120
-        VariableRef@119..120
-          Path@119..120
-            Ident@119..120 "r"
+  ValueDef@53..82
+    LetKw@53..56 "let"
+    Whitespace@56..57 " "
+    Ident@57..61 "test"
+    Whitespace@61..62 " "
+    Equals@62..63 "="
+    Whitespace@63..64 " "
+    FunctionCall@64..82
+      VariableRef@64..76
+        Path@64..76
+          Ident@64..70 "Either"
+          DoubleColon@70..72 "::"
+          Ident@72..76 "Left"
+      FunctionCallArgList@76..82
+        LParen@76..77 "("
+        IntLiteral@77..79
+          Integer@77..79 "42"
+        RParen@79..80 ")"
+        Whitespace@80..82 "\n\n"
+  MatchExpr@82..149
+    MatchKw@82..87 "match"
+    Whitespace@87..88 " "
+    MatchExprArg@88..93
+      VariableRef@88..93
+        Path@88..93
+          Ident@88..92 "test"
+          Whitespace@92..93 " "
+    WhenKw@93..97 "when"
+    Whitespace@97..100 "\n  "
+    MatchTarget@100..126
+      Backslash@100..101 "\\"
+      Whitespace@101..102 " "
+      MatchTargetCondition@102..119
+        Destructure@102..119
+          DestructureTarget@102..114
+            Path@102..114
+              Ident@102..108 "Either"
+              DoubleColon@108..110 "::"
+              Ident@110..114 "Left"
+          LParen@114..115 "("
+          DestructureArg@115..116
+            VariableDeclaration@115..116
+              Ident@115..116 "l"
+          RParen@116..117 ")"
+          Whitespace@117..119 "  "
+      RightArrow@119..121 "->"
+      Whitespace@121..122 " "
+      MatchTargetValue@122..126
+        VariableRef@122..126
+          Path@122..126
+            Ident@122..123 "l"
+            Whitespace@123..126 "\n  "
+    MatchTarget@126..149
+      Backslash@126..127 "\\"
+      Whitespace@127..128 " "
+      MatchTargetCondition@128..145
+        Destructure@128..145
+          DestructureTarget@128..141
+            Path@128..141
+              Ident@128..134 "Either"
+              DoubleColon@134..136 "::"
+              Ident@136..141 "Right"
+          LParen@141..142 "("
+          DestructureArg@142..143
+            VariableDeclaration@142..143
+              Ident@142..143 "r"
+          RParen@143..144 ")"
+          Whitespace@144..145 " "
+      RightArrow@145..147 "->"
+      Whitespace@147..148 " "
+      MatchTargetValue@148..149
+        VariableRef@148..149
+          Path@148..149
+            Ident@148..149 "r"

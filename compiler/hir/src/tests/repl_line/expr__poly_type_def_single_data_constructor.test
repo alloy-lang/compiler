@@ -13,15 +13,13 @@ HirModule {
                     "hi",
                 ),
             ),
-            "range": 201..205,
+            "range": 58..62,
         },
         Idx::<Expression>(1): {
             "item": FunctionCall {
                 target: ThisModule {
                     name: "Identity",
-                    subname: Some(
-                        "Id",
-                    ),
+                    subname: None,
                     scope: Idx::<Scope>(0),
                 },
                 scope: Idx::<Scope>(0),
@@ -30,7 +28,7 @@ HirModule {
                 ],
             },
             "name": "string_example",
-            "range": 167..207,
+            "range": 28..64,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(2): {
@@ -39,15 +37,13 @@ HirModule {
                     10,
                 ),
             ),
-            "range": 238..240,
+            "range": 91..93,
         },
         Idx::<Expression>(3): {
             "item": FunctionCall {
                 target: ThisModule {
                     name: "Identity",
-                    subname: Some(
-                        "Id",
-                    ),
+                    subname: None,
                     scope: Idx::<Scope>(0),
                 },
                 scope: Idx::<Scope>(0),
@@ -56,7 +52,7 @@ HirModule {
                 ],
             },
             "name": "int_example",
-            "range": 207..242,
+            "range": 64..95,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -70,7 +66,7 @@ HirModule {
                     scope: Idx::<Scope>(1),
                 },
             ),
-            "range": 25..167,
+            "range": 25..28,
         },
     },
     type_definitions: Index::<TypeDefinition> {
@@ -98,7 +94,7 @@ HirModule {
                 ),
             },
             "name": "Identity",
-            "range": 0..167,
+            "range": 0..28,
             "scope_id": Idx::<Scope>(0),
         },
     },

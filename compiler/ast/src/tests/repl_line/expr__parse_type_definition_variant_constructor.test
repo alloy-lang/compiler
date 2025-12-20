@@ -1,0 +1,98 @@
+typedef Option[t] =
+    | None
+    | Some(t)
+end
+
+let example = Option::Some("hello")
+===
+[
+    TypeDefinition(
+        TypeDefinition {
+            name: Some(
+                Ident {
+                    text: "Option",
+                },
+            ),
+            type_args: [
+                Ident {
+                    text: "t",
+                },
+            ],
+            types: [
+                TypeDefinitionMember {
+                    name: Some(
+                        Ident {
+                            text: "None",
+                        },
+                    ),
+                    properties: [],
+                },
+                TypeDefinitionMember {
+                    name: Some(
+                        Ident {
+                            text: "Some",
+                        },
+                    ),
+                    properties: [
+                        ParenthesizedType(
+                            ParenthesizedType {
+                                inner: Some(
+                                    TypeIdentifier(
+                                        TypeIdentifier {
+                                            name: Some(
+                                                Path {
+                                                    segments: [
+                                                        "t",
+                                                    ],
+                                                },
+                                            ),
+                                        },
+                                    ),
+                                ),
+                            },
+                        ),
+                    ],
+                },
+            ],
+        },
+    ),
+    ValueDef(
+        ValueDef {
+            name: Some(
+                Ident(
+                    Ident {
+                        text: "example",
+                    },
+                ),
+            ),
+            value: Some(
+                FunctionCall(
+                    FunctionCall {
+                        target: Some(
+                            VariableRef {
+                                name: Some(
+                                    Path {
+                                        segments: [
+                                            "Option",
+                                            "Some",
+                                        ],
+                                    },
+                                ),
+                            },
+                        ),
+                        args: [
+                            StringLiteral(
+                                StringLiteral {
+                                    value: Some(
+                                        "hello",
+                                    ),
+                                },
+                            ),
+                        ],
+                    },
+                ),
+            ),
+        },
+    ),
+]
+[]

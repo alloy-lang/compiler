@@ -1,0 +1,56 @@
+typedef Option[t] =
+    | None
+    | Some(t)
+end
+
+let example = Option::Some("hello")
+===
+SourceFile@0..85
+  TypeDefinition@0..50
+    TypedefKw@0..7 "typedef"
+    Whitespace@7..8 " "
+    Ident@8..14 "Option"
+    LBracket@14..15 "["
+    BoundedTypeArg@15..16
+      Ident@15..16 "t"
+    RBracket@16..17 "]"
+    Whitespace@17..18 " "
+    Equals@18..19 "="
+    Whitespace@19..24 "\n    "
+    Pipe@24..25 "|"
+    Whitespace@25..26 " "
+    TypeDefinitionMember@26..35
+      Ident@26..30 "None"
+      Whitespace@30..35 "\n    "
+    Pipe@35..36 "|"
+    Whitespace@36..37 " "
+    TypeDefinitionMember@37..45
+      Ident@37..41 "Some"
+      TypeDefinitionMemberProperty@41..45
+        ParenthesizedType@41..45
+          LParen@41..42 "("
+          TypeIdentifier@42..43
+            Path@42..43
+              Ident@42..43 "t"
+          RParen@43..44 ")"
+          Whitespace@44..45 "\n"
+    EndKw@45..48 "end"
+    Whitespace@48..50 "\n\n"
+  ValueDef@50..85
+    LetKw@50..53 "let"
+    Whitespace@53..54 " "
+    Ident@54..61 "example"
+    Whitespace@61..62 " "
+    Equals@62..63 "="
+    Whitespace@63..64 " "
+    FunctionCall@64..85
+      VariableRef@64..76
+        Path@64..76
+          Ident@64..70 "Option"
+          DoubleColon@70..72 "::"
+          Ident@72..76 "Some"
+      FunctionCallArgList@76..85
+        LParen@76..77 "("
+        StringLiteral@77..84
+          String@77..84 "\"hello\""
+        RParen@84..85 ")"
