@@ -5,15 +5,25 @@ mod type_definition;
 
 use alloy_hir as hir;
 use alloy_hir_resolved::Fql;
+use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use std::hash::Hash;
 
 mod hm;
-pub use hm::infer_types_hm;
 pub use hm::unification::UnificationError;
 
 // Re-export type annotation checking function for use by other modules
+use crate::HirTypedModule;
 pub(super) use type_annotation_check::check_type_annotation;
+
+pub(super) fn infer_types(db: &dyn crate::HirTyDatabase, module_id: ModuleId) -> HirTypedModule {
+    let mut result = hm::infer_types_hm(db, module_id);
+
+    // Validate that all behaviors implement their trait's abstract members
+    behavior_validation::validate_behaviors(db, module_id, &mut result);
+
+    result
+}
 
 // ============================================================================
 // Type Resolution and Checking

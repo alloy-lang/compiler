@@ -8,7 +8,7 @@
 
 use super::Fql;
 use alloy_hir as hir;
-use alloy_hir_resolved::{EPFql, TypeResolutionError};
+use alloy_hir_resolved::{EPFql, EPTdFql, TypeResolutionError};
 use rustc_hash::{FxHashMap, FxHashSet};
 
 mod constraint_gen;
@@ -228,9 +228,9 @@ pub(super) struct HMInferenceContext<'db> {
     /// Type equations to be solved
     pub(super) equations: Vec<TypeEquation>,
     /// Type environment (maps expressions/patterns to their types)
-    pub(super) type_env: FxHashMap<EPFql, MonoType>,
+    pub(super) type_env: FxHashMap<EPTdFql, MonoType>,
     /// Polymorphic type schemes for let-bound variables
-    pub(super) poly_env: FxHashMap<EPFql, PolyType>,
+    pub(super) poly_env: FxHashMap<EPTdFql, PolyType>,
     /// Resolution errors collected during inference (FQL + reference path + module_id)
     pub(super) resolution_errors: Vec<TypeResolutionError>,
     /// Map from expression ID to its dependency group index (for lazy constraint generation)
@@ -243,7 +243,7 @@ pub(super) struct HMInferenceContext<'db> {
     /// Track instantiations: polymorphic definition -> list of (call_site, fresh_vars)
     /// The Vec<TypeVarId> contains the fresh type variables created during instantiation
     /// in the same order as the quantified variables in the PolyType
-    pub(super) instantiations: FxHashMap<EPFql, Vec<(EPFql, Vec<TypeVarId>)>>,
+    pub(super) instantiations: FxHashMap<EPTdFql, Vec<(Fql<hir::Expression>, Vec<TypeVarId>)>>,
 }
 
 impl<'db> HMInferenceContext<'db> {
@@ -274,7 +274,7 @@ impl<'db> HMInferenceContext<'db> {
         }
     }
 
-    fn maybe_find_type(&mut self, fql: impl Into<EPFql>) -> Option<MonoType> {
+    fn maybe_find_type(&mut self, fql: impl Into<EPTdFql>) -> Option<MonoType> {
         let fql = fql.into();
         if let Some(poly_ty) = self.poly_env.get(&fql).cloned() {
             // Instantiate with fresh type variables (without tracking)
@@ -289,8 +289,8 @@ impl<'db> HMInferenceContext<'db> {
     /// call_site: The location where this type is being referenced
     fn maybe_find_type_tracked(
         &mut self,
-        def_fql: impl Into<EPFql>,
-        call_site: EPFql,
+        def_fql: impl Into<EPTdFql>,
+        call_site: Fql<hir::Expression>,
     ) -> Option<MonoType> {
         let def_fql = def_fql.into();
 

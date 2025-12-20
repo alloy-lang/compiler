@@ -3,7 +3,6 @@ typedef Type1 = Thing
 trait Trait1 where
     typeof test : Int
 
-    -- TODO: should be able to resolve abstract trait members
     let thing = test
 end
 

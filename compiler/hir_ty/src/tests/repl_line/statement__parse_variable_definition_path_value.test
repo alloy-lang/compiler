@@ -4,8 +4,13 @@ let foo = std::option::Option::None
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Generic(
-            0,
+        Idx::<Expression>(0): TypeDef(
+            Fql {
+                module_id: ModuleId(
+                    Id(1),
+                ),
+                local_id: Idx::<TypeDefinition>(1),
+            },
         ),
     },
     pattern_types: {},

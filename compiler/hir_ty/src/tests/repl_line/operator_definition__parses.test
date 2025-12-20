@@ -7,29 +7,63 @@ let (|>) = |x, f| -> Test::Thing
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Generic(
-            0,
-        ),
+        Idx::<Expression>(0): Lambda {
+            arg_type: Generic(
+                2,
+            ),
+            return_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId(
+                            Id(0),
+                        ),
+                        local_id: Idx::<TypeDefinition>(1),
+                    },
+                ),
+                args: [
+                    Generic(
+                        2,
+                    ),
+                ],
+            },
+        },
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
-                1,
+                0,
             ),
             return_type: Lambda {
                 arg_type: Generic(
-                    2,
+                    1,
                 ),
-                return_type: Generic(
-                    0,
-                ),
+                return_type: Lambda {
+                    arg_type: Generic(
+                        2,
+                    ),
+                    return_type: Bounded {
+                        base: TypeDef(
+                            Fql {
+                                module_id: ModuleId(
+                                    Id(0),
+                                ),
+                                local_id: Idx::<TypeDefinition>(1),
+                            },
+                        ),
+                        args: [
+                            Generic(
+                                2,
+                            ),
+                        ],
+                    },
+                },
             },
         },
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            1,
+            0,
         ),
         Idx::<Pattern>(1): Generic(
-            2,
+            1,
         ),
     },
     warnings: [],
@@ -56,15 +90,32 @@ HirTypedModule {
                 },
                 found: Lambda {
                     arg_type: Generic(
-                        1,
+                        0,
                     ),
                     return_type: Lambda {
                         arg_type: Generic(
-                            2,
+                            1,
                         ),
-                        return_type: Generic(
-                            0,
-                        ),
+                        return_type: Lambda {
+                            arg_type: Generic(
+                                2,
+                            ),
+                            return_type: Bounded {
+                                base: TypeDef(
+                                    Fql {
+                                        module_id: ModuleId(
+                                            Id(0),
+                                        ),
+                                        local_id: Idx::<TypeDefinition>(1),
+                                    },
+                                ),
+                                args: [
+                                    Generic(
+                                        2,
+                                    ),
+                                ],
+                            },
+                        },
                     },
                 },
             },

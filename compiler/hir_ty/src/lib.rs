@@ -1,4 +1,5 @@
 use alloy_hir as hir;
+use alloy_hir_resolved::EPTdFql;
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
 use text_size::TextRange;
@@ -23,7 +24,7 @@ pub struct HirTypedModule {
     errors: Vec<TypeInferenceError>,
     /// Track polymorphic instantiations: definition -> list of instantiations
     /// Each instantiation records where the polymorphic value was used and with what concrete types
-    pub poly_instantiations: FxHashMap<alloy_hir_resolved::EPTdFql, Vec<PolyInstantiation>>,
+    poly_instantiations: FxHashMap<EPTdFql, Vec<PolyInstantiation>>,
 }
 
 impl HirTypedModule {
@@ -34,6 +35,19 @@ impl HirTypedModule {
             warnings: Vec::new(),
             errors: Vec::new(),
             poly_instantiations: FxHashMap::default(),
+        }
+    }
+
+    pub(crate) fn insert_type(&mut self, fql: EPTdFql, resolved_type: ResolvedType) {
+        match fql {
+            EPTdFql::Expression(fql) => {
+                self.expression_types.insert(fql.local_id, resolved_type);
+            }
+            EPTdFql::Pattern(fql) => {
+                self.pattern_types
+                    .insert(fql.local_id, resolved_type.clone());
+            }
+            EPTdFql::TypeDefinition(_) => {}
         }
     }
 
@@ -58,7 +72,7 @@ impl HirTypedModule {
     }
 
     /// Get all instantiations for a polymorphic definition
-    pub fn instantiations(&self, def_fql: &alloy_hir_resolved::EPFql) -> &[PolyInstantiation] {
+    pub fn instantiations(&self, def_fql: &EPTdFql) -> &[PolyInstantiation] {
         // TODO: Add deduplication, if needed
         self.poly_instantiations
             .get(def_fql)
@@ -80,7 +94,7 @@ pub struct TypeResolutionResult {
 /// during full compilation, we will want to generate errors and warnings for all modules
 #[salsa::tracked]
 pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedModule {
-    infer_types_hm(db, module_id)
+    infer_types(db, module_id)
 }
 
 #[cfg(test)]
@@ -91,12 +105,12 @@ mod small_tests {
     use alloy_ast as ast;
     use alloy_hir as hir;
     use alloy_hir::ExpressionIdx;
+    use alloy_hir_resolved::{EPTdFql, Fql};
     use alloy_scope::ScopeIdx;
     use alloy_workspace::WorkspaceDatabase;
     use la_arena::RawIdx;
     use non_empty_vec::NonEmpty;
     use text_size::{TextRange, TextSize};
-    use alloy_hir_resolved::{EPTdFql, Fql};
 
     fn check(input: &str, expected: &[(u32, ResolvedType)]) {
         let (_, parse_errors) = ast::source_file(input);

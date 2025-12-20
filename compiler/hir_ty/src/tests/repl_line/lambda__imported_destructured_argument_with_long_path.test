@@ -5,23 +5,23 @@ import std
 HirTypedModule {
     expression_types: {
         Idx::<Expression>(0): Generic(
-            0,
+            1,
         ),
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
-                1,
+                0,
             ),
             return_type: Generic(
-                0,
+                1,
             ),
         },
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            0,
+            1,
         ),
         Idx::<Pattern>(1): Generic(
-            1,
+            0,
         ),
     },
     warnings: [],

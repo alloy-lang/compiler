@@ -14,18 +14,18 @@ end
 HirTypedModule {
     expression_types: {
         Idx::<Expression>(0): Generic(
-            0,
+            2,
         ),
         Idx::<Expression>(1): BuiltIn(
             Int,
         ),
         Idx::<Expression>(2): Lambda {
             arg_type: Generic(
-                1,
+                0,
             ),
             return_type: Lambda {
                 arg_type: Generic(
-                    2,
+                    1,
                 ),
                 return_type: BuiltIn(
                     Int,
@@ -35,10 +35,10 @@ HirTypedModule {
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            1,
+            0,
         ),
         Idx::<Pattern>(1): Generic(
-            2,
+            1,
         ),
     },
     warnings: [],
@@ -58,11 +58,11 @@ HirTypedModule {
                 },
                 found: Lambda {
                     arg_type: Generic(
-                        1,
+                        0,
                     ),
                     return_type: Lambda {
                         arg_type: Generic(
-                            2,
+                            1,
                         ),
                         return_type: BuiltIn(
                             Int,

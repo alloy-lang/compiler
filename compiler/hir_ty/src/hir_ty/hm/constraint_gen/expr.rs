@@ -58,11 +58,10 @@ pub(crate) fn infer_expr_hm(
         }
         res::Expression::VariantConstructor {
             type_def,
-            variant_name: _,
+            variant_name,
         } => {
-            // For now, give variant constructors a fresh type variable
-            // TODO: Look up the actual type of the variant from the type definition
-            infer_variant_constructor(ctx, source_fql, type_def)
+            // Infer the type of the variant constructor
+            infer_variant_constructor(ctx, source_fql, type_def, variant_name)
         }
         res::Expression::AbstractTraitMemberRef {
             trait_fql: _,
@@ -129,10 +128,36 @@ fn infer_function_call(
     target: EPTdFql,
     args: Vec<Fql<hir::Expression>>,
 ) -> MonoType {
-    let func_ty = match target {
-        EPFql::Expression(expr_fql) => infer_expr_hm(ctx, expr_fql),
-        EPFql::Pattern(pat_fql) => infer_pattern_hm(ctx, pat_fql),
-    };
+    // Try to get the function type with tracking if it's polymorphic
+    // This handles cases like `id("hi")` where the target directly references a polymorphic function
+    let func_ty =
+        if let Some(tracked_ty) = ctx.maybe_find_type_tracked(target.clone(), source_fql.clone()) {
+            // Found a type (possibly polymorphic, now instantiated and tracked)
+            tracked_ty
+        } else {
+            // Not found or not polymorphic yet, infer it
+            match &target {
+                EPTdFql::Expression(expr_fql) => infer_expr_hm(ctx, expr_fql.clone()),
+                EPTdFql::Pattern(pat_fql) => infer_pattern_hm(ctx, pat_fql.clone()),
+                EPTdFql::TypeDefinition(td_fql) => {
+                    // Infer the type definition (e.g., variant constructors)
+                    // This will populate poly_env if it's polymorphic
+                    infer_type_definition(ctx, td_fql.clone());
+
+                    // Now try to get it again with tracking
+                    // If it's polymorphic, it will be in poly_env and we'll track this instantiation
+                    if let Some(tracked_ty) =
+                        ctx.maybe_find_type_tracked(target.clone(), source_fql.clone())
+                    {
+                        tracked_ty
+                    } else {
+                        // Not polymorphic, just get the regular type
+                        ctx.maybe_find_type(target.clone())
+                            .unwrap_or_else(|| ctx.fresh_type_var())
+                    }
+                }
+            }
+        };
 
     let arg_types = args
         .iter()
@@ -253,14 +278,146 @@ pub(super) fn infer_missing_expr(
     ctx.assign_type(source_fql, ty)
 }
 
+/// Build a constructor type from a variant member
+/// Returns: param1 -> param2 -> ... -> TypeDef[type_args]
+fn build_constructor_type(
+    ctx: &mut HMInferenceContext,
+    type_def_fql: &Fql<hir::TypeDefinition>,
+    member: &res::TypeDefinitionMember,
+) -> MonoType {
+    use super::super::TypeVarId;
+    use rustc_hash::FxHashMap;
+
+    // Create a shared type resolution context for all parameters
+    // This ensures consistent Generic IDs across all type references
+    let mut type_ctx = TypeResolutionContext::new();
+
+    // Mapping from Generic ID to MonoType::Var for type parameters
+    let mut generic_to_var: FxHashMap<usize, TypeVarId> = FxHashMap::default();
+
+    // Helper to convert ResolvedType to MonoType with consistent type variable mapping
+    let resolved_to_mono_tracked = |resolved: &crate::hir_ty::ResolvedType,
+                                    ctx: &mut HMInferenceContext,
+                                    generic_map: &mut FxHashMap<usize, TypeVarId>|
+     -> Option<MonoType> {
+        use crate::hir_ty::ResolvedType;
+        match resolved {
+            ResolvedType::Generic(id) => {
+                // Use or create a type variable for this generic ID
+                let var_id = *generic_map.entry(*id).or_insert_with(|| {
+                    let fresh = ctx.type_var_gen.fresh();
+                    fresh
+                });
+                Some(MonoType::Var(var_id))
+            }
+            ResolvedType::ConstrainedGeneric { id, .. } => {
+                // Treat constrained generics the same for now
+                let var_id = *generic_map.entry(*id).or_insert_with(|| {
+                    let fresh = ctx.type_var_gen.fresh();
+                    fresh
+                });
+                Some(MonoType::Var(var_id))
+            }
+            other => resolved_to_mono(other, ctx),
+        }
+    };
+
+    // Get the parameter types from the variant's properties
+    let param_types: Vec<MonoType> = member
+        .properties()
+        .iter()
+        .map(|type_idx| {
+            // Convert TypeIdx to MonoType
+            if let Some(resolved) = type_reference_to_resolved_type(
+                ctx.db,
+                type_idx.module_id,
+                type_idx.local_id,
+                &mut type_ctx,
+            ) {
+                // Convert ResolvedType to MonoType with tracked generics
+                resolved_to_mono_tracked(&resolved, ctx, &mut generic_to_var)
+                    .unwrap_or_else(|| ctx.fresh_type_var())
+            } else {
+                ctx.fresh_type_var()
+            }
+        })
+        .collect();
+
+    // Build the result type
+    let result_type = if generic_to_var.is_empty() {
+        // No type parameters - just the TypeDef
+        MonoType::TypeDef(type_def_fql.clone())
+    } else {
+        // Has type parameters - build App with type arguments
+        // Sort by generic ID to ensure consistent ordering
+        let mut type_vars: Vec<_> = generic_to_var.iter().collect();
+        type_vars.sort_by_key(|(id, _)| *id);
+        let args: Vec<MonoType> = type_vars
+            .into_iter()
+            .map(|(_, &var_id)| MonoType::Var(var_id))
+            .collect();
+
+        MonoType::App {
+            constructor: Box::new(MonoType::TypeDef(type_def_fql.clone())),
+            args,
+        }
+    };
+
+    // Build curried function type: param1 -> (param2 -> (... -> result))
+    if param_types.is_empty() {
+        // No parameters - the variant is just the result type (e.g., None)
+        result_type
+    } else {
+        param_types
+            .into_iter()
+            .rev()
+            .fold(result_type, |acc, param_ty| {
+                MonoType::Function(Box::new(param_ty), Box::new(acc))
+            })
+    }
+}
+
 fn infer_variant_constructor(
     ctx: &mut HMInferenceContext,
     source_fql: Fql<hir::Expression>,
-    _type_def: Fql<hir::TypeDefinition>,
+    type_def_fql: Fql<hir::TypeDefinition>,
+    variant_name: hir::Name,
 ) -> MonoType {
-    // TODO: Look up the actual type of the variant from the type definition
-    // For now, just use a fresh type variable
-    let ty = ctx.fresh_type_var();
+    // Find the variant member
+    let variant_member = {
+        let type_def = res::resolve_type_definition_by_id(
+            ctx.db,
+            type_def_fql.module_id,
+            type_def_fql.local_id,
+        );
+
+        match type_def {
+            Some(TypeDefinition {
+                name: _,
+                kind: TypeDefinitionKind::Single(member),
+            }) => {
+                if member.name() == &variant_name {
+                    Some(member)
+                } else {
+                    None
+                }
+            }
+            Some(TypeDefinition {
+                name: _,
+                kind: TypeDefinitionKind::Union(members),
+            }) => members.iter().find(|m| m.name() == &variant_name).cloned(),
+            None => None,
+        }
+    };
+
+    let Some(member) = variant_member else {
+        // Variant not found - return fresh type variable
+        let ty = ctx.fresh_type_var();
+        return ctx.assign_type(source_fql, ty);
+    };
+
+    // Build the constructor type using the shared helper
+    let ty = build_constructor_type(ctx, &type_def_fql, &member);
     ctx.assign_type(source_fql, ty)
 }
 
@@ -288,4 +445,73 @@ fn infer_abstract_trait_member_ref(
     // If we can't resolve the type annotation, use a fresh type variable
     let ty = ctx.fresh_type_var();
     ctx.assign_type(source_fql, ty)
+}
+
+fn infer_type_definition(
+    ctx: &mut HMInferenceContext,
+    td_fql: Fql<hir::TypeDefinition>,
+) -> MonoType {
+    // Check if already inferred - don't use cached polymorphic types
+    // Polymorphic types are stored in poly_env and instantiated with fresh variables
+    if let Some(existing) = ctx.maybe_find_type(&td_fql) {
+        return existing;
+    }
+
+    // Resolve the type definition to get its kind
+    let type_def = res::resolve_type_definition_by_id(ctx.db, td_fql.module_id, td_fql.local_id);
+
+    let ty = match type_def {
+        Some(TypeDefinition {
+            name: _,
+            kind: TypeDefinitionKind::Single(member),
+        }) => {
+            // Single-variant type - treat as a variant constructor
+            // For example: typedef Identity[t] = Id t
+            // When you call Identity(...), it's the same as Id(...)
+            let constructor_ty = build_constructor_type(ctx, &td_fql, &member);
+
+            // Check if this is a polymorphic constructor (has App with type variables)
+            let is_polymorphic = has_type_variables(&constructor_ty);
+
+            if is_polymorphic {
+                // Generalize and store in poly_env for proper instantiation
+                // This ensures each use gets fresh type variables
+                let poly_ty = ctx.generalize_type(constructor_ty.clone());
+                ctx.poly_env.insert(td_fql.clone().into(), poly_ty);
+            }
+
+            constructor_ty
+        }
+        Some(TypeDefinition {
+            name: _,
+            kind: TypeDefinitionKind::Union(_members),
+        }) => {
+            panic!("Union type definitions should be handled via variant constructors");
+            // Multi-variant type - cannot be called as a function directly
+            // You must use the specific variant constructor (e.g., Some, None)
+            // Return the TypeDef, which will cause a unification error if used as a function
+            MonoType::TypeDef(td_fql.clone())
+        }
+        None => {
+            // Type definition not found or couldn't be resolved
+            ctx.fresh_type_var()
+        }
+    };
+
+    ctx.assign_type(td_fql, ty)
+}
+
+/// Check if a MonoType contains type variables (is polymorphic)
+fn has_type_variables(ty: &MonoType) -> bool {
+    match ty {
+        MonoType::Var(_) => true,
+        MonoType::Function(arg, ret) => has_type_variables(arg) || has_type_variables(ret),
+        MonoType::Tuple(elements) => elements.iter().any(has_type_variables),
+        MonoType::App { constructor, args } => {
+            has_type_variables(constructor) || args.iter().any(has_type_variables)
+        }
+        MonoType::Unconstrained | MonoType::Concrete(_) | MonoType::TypeDef(_) | MonoType::Unit => {
+            false
+        }
+    }
 }

@@ -1,8 +1,7 @@
 typedef Identity[t] = Id t
 
--- TODO: data constructors for single-constructor types should be referencable by top-level name only. ie Identity instead of Identity::Id
-let string_example = Identity::Id("hi")
-let int_example = Identity::Id(10)
+let string_example = Identity("hi")
+let int_example = Identity(10)
 
 ===
 HirTypedModule {
@@ -13,59 +12,76 @@ HirTypedModule {
         Idx::<Expression>(2): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(1): Generic(
-            0,
-        ),
-        Idx::<Expression>(3): Generic(
-            1,
-        ),
+        Idx::<Expression>(1): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    local_id: Idx::<TypeDefinition>(1),
+                },
+            ),
+            args: [
+                BuiltIn(
+                    String,
+                ),
+            ],
+        },
+        Idx::<Expression>(3): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    local_id: Idx::<TypeDefinition>(1),
+                },
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
     },
     pattern_types: {},
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: TypeResolutionError(
-                UnknownExpressionReference {
-                    source_ref: Fql {
-                        module_id: ModuleId(
-                            Id(4),
-                        ),
-                        local_id: Idx::<Expression>(1),
-                    },
+    errors: [],
+    poly_instantiations: {
+        TypeDefinition(
+            Fql {
+                module_id: ModuleId(
+                    Id(4),
+                ),
+                local_id: Idx::<TypeDefinition>(1),
+            },
+        ): [
+            PolyInstantiation {
+                call_site: Fql {
                     module_id: ModuleId(
                         Id(4),
                     ),
-                    path: NonEmpty(
-                        [
-                            "Identity",
-                        ],
-                    ),
+                    local_id: Idx::<Expression>(1),
                 },
-            ),
-            range: 167..207,
-        },
-        TypeInferenceError {
-            kind: TypeResolutionError(
-                UnknownExpressionReference {
-                    source_ref: Fql {
-                        module_id: ModuleId(
-                            Id(4),
-                        ),
-                        local_id: Idx::<Expression>(3),
-                    },
+                type_args: [
+                    BuiltIn(
+                        String,
+                    ),
+                ],
+            },
+            PolyInstantiation {
+                call_site: Fql {
                     module_id: ModuleId(
                         Id(4),
                     ),
-                    path: NonEmpty(
-                        [
-                            "Identity",
-                        ],
-                    ),
+                    local_id: Idx::<Expression>(3),
                 },
-            ),
-            range: 207..242,
-        },
-    ],
-    poly_instantiations: {},
+                type_args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+        ],
+    },
 }
 []

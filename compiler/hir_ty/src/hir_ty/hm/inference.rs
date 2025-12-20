@@ -173,26 +173,29 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
     let mut type_var_map: FxHashMap<TypeVarId, usize> = FxHashMap::default();
     let mut next_generic_id = 0;
 
-    for (expression_id, _expression, range, name_op) in hir_module.expressions() {
-        let fql = Fql::new(module_id, expression_id);
+    for (fql, poly_type) in &ctx.poly_env {
+        // For polymorphic types, we only need to convert the body
+        let mono_ty = &poly_type.body;
+        let resolved_type =
+            mono_to_resolved_with_map(mono_ty, &mut type_var_map, &mut next_generic_id);
 
-        // For polymorphic expressions (in poly_env), we should use the generalized type
-        // For monomorphic expressions, use type_env with substitution applied
-        let mono_ty = if let Some(poly_ty) = ctx.poly_env.get(&fql.clone().into()).cloned() {
-            // Don't instantiate - just use the body of the polytype
-            // This preserves the generic type variables in the output
-            poly_ty.body
-        } else if let Some(mono_ty) = ctx.type_env.get(&fql.clone().into()).cloned() {
-            substitution.apply(&mono_ty)
-        } else {
-            continue;
-        };
+        result.insert_type(fql.clone(), resolved_type.clone());
+    }
 
+    for (fql, mono_type) in &ctx.type_env {
+        // For monomorphic types, apply substitution first
+        let mono_ty = substitution.apply(&mono_type);
         let resolved_type =
             mono_to_resolved_with_map(&mono_ty, &mut type_var_map, &mut next_generic_id);
-        result
-            .expression_types
-            .insert(expression_id, resolved_type.clone());
+
+        result.insert_type(fql.clone(), resolved_type.clone());
+    }
+
+    for (expression_id, _expression, range, name_op) in hir_module.expressions() {
+        let fql = Fql::new(module_id, expression_id);
+        let Some(resolved_type) = result.expression_types.get(&fql.local_id).cloned() else {
+            continue;
+        };
 
         // Check for type annotation conflicts
         check_type_annotation(db, &mut result, module_id, range, name_op, resolved_type);
@@ -200,24 +203,9 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
 
     for (pattern_id, _pattern, range, name_op) in hir_module.patterns() {
         let fql = Fql::new(module_id, pattern_id);
-
-        // For polymorphic patterns (in poly_env), we should use the generalized type
-        // For monomorphic patterns, use type_env with substitution applied
-        let mono_ty = if let Some(poly_ty) = ctx.poly_env.get(&fql.clone().into()).cloned() {
-            // Don't instantiate - just use the body of the polytype
-            // This preserves the generic type variables in the output
-            poly_ty.body
-        } else if let Some(mono_ty) = ctx.type_env.get(&fql.clone().into()).cloned() {
-            substitution.apply(&mono_ty)
-        } else {
+        let Some(resolved_type) = result.pattern_types.get(&fql.local_id).cloned() else {
             continue;
         };
-
-        let resolved_type =
-            mono_to_resolved_with_map(&mono_ty, &mut type_var_map, &mut next_generic_id);
-        result
-            .pattern_types
-            .insert(pattern_id, resolved_type.clone());
 
         // TODO: patterns cannot have type annotations, however pattern types can be specified BY type annotations on expressions
         // Check for type annotation conflicts
@@ -258,9 +246,6 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
     for err in unification_errors {
         result.push_error(err);
     }
-
-    // Validate that all behaviors implement their trait's abstract members
-    super::super::behavior_validation::validate_behaviors(db, module_id, &mut result);
 
     result
 }
