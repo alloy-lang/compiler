@@ -106,7 +106,7 @@ mod small_tests {
     use alloy_hir as hir;
     use alloy_hir::ExpressionIdx;
     use alloy_hir_resolved::{EPTdFql, Fql};
-    use alloy_scope::ScopeIdx;
+    use alloy_scope::{ScopeIdx, Scopes};
     use alloy_workspace::WorkspaceDatabase;
     use la_arena::RawIdx;
     use non_empty_vec::NonEmpty;
@@ -377,7 +377,7 @@ mod small_tests {
         let (id_expr, _) = hir_module
             .get_expression_by_name(
                 &hir::Name::new("id"),
-                ScopeIdx::from_raw(la_arena::RawIdx::from(0)),
+                Scopes::ROOT,
             )
             .unwrap();
         let id_fql = EPTdFql::Expression(Fql::new(module_id, id_expr));
@@ -394,5 +394,46 @@ mod small_tests {
 
         assert!(type_args.contains(&&ResolvedType::BuiltIn(hir::BuiltInType::String)));
         assert!(type_args.contains(&&ResolvedType::BuiltIn(hir::BuiltInType::Int)));
+    }
+
+    #[test]
+    fn track_polymorphic_type_def_usage() {
+        let mut db = TestHirTyDatabase::default();
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test/test.alloy"),
+            r#"
+                typedef Option[t] =
+                  | None
+                  | Some(t)
+                end
+
+                let example = Option::Some("hello")
+            "#,
+        );
+
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+        let ctx = crate::type_check_module(&db, module_id);
+
+        // Get the FQL for 'example'
+        let (option_td, _) = hir_module
+            .get_type_definition_by_name(
+                &hir::Name::new("Option"),
+                Scopes::ROOT,
+            )
+            .unwrap();
+        let example_fql = EPTdFql::TypeDefinition(Fql::new(module_id, option_td));
+
+        // Verify id was instantiated twice
+        let instantiations = ctx.instantiations(&example_fql);
+        assert_eq!(instantiations.len(), 1, "Expected instantiations of 'Option': {:#?}", ctx.poly_instantiations);
+
+        // Collect the type args
+        let type_args: Vec<_> = instantiations
+            .iter()
+            .map(|inst| &inst.type_args[0])
+            .collect();
+
+        assert!(type_args.contains(&&ResolvedType::BuiltIn(hir::BuiltInType::String)));
     }
 }
