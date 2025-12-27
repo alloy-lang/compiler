@@ -6,26 +6,9 @@ match test when
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Lambda {
-            arg_type: Generic(
-                1,
-            ),
-            return_type: Bounded {
-                base: TypeDef(
-                    Fql {
-                        module_id: ModuleId(
-                            Id(0),
-                        ),
-                        local_id: Idx::<TypeDefinition>(1),
-                    },
-                ),
-                args: [
-                    Generic(
-                        1,
-                    ),
-                ],
-            },
-        },
+        Idx::<Expression>(0): BuiltIn(
+            Bool,
+        ),
         Idx::<Expression>(2): BuiltIn(
             Int,
         ),
@@ -45,100 +28,8 @@ HirTypedModule {
         ),
     },
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: UnificationError(
-                TypeMismatch(
-                    Function(
-                        Var(
-                            TypeVarId(
-                                1,
-                            ),
-                        ),
-                        App {
-                            constructor: TypeDef(
-                                Fql {
-                                    module_id: ModuleId(
-                                        Id(0),
-                                    ),
-                                    local_id: Idx::<TypeDefinition>(1),
-                                },
-                            ),
-                            args: [
-                                Var(
-                                    TypeVarId(
-                                        1,
-                                    ),
-                                ),
-                            ],
-                        },
-                    ),
-                    Concrete(
-                        Bool,
-                    ),
-                ),
-            ),
-            range: 44..49,
-        },
-        TypeInferenceError {
-            kind: UnificationError(
-                TypeMismatch(
-                    Function(
-                        Var(
-                            TypeVarId(
-                                1,
-                            ),
-                        ),
-                        App {
-                            constructor: TypeDef(
-                                Fql {
-                                    module_id: ModuleId(
-                                        Id(0),
-                                    ),
-                                    local_id: Idx::<TypeDefinition>(1),
-                                },
-                            ),
-                            args: [
-                                Var(
-                                    TypeVarId(
-                                        1,
-                                    ),
-                                ),
-                            ],
-                        },
-                    ),
-                    Concrete(
-                        Bool,
-                    ),
-                ),
-            ),
-            range: 55..61,
-        },
-    ],
-    poly_instantiations: {
-        TypeDefinition(
-            Fql {
-                module_id: ModuleId(
-                    Id(0),
-                ),
-                local_id: Idx::<TypeDefinition>(1),
-            },
-        ): [
-            PolyInstantiation {
-                call_site: Fql {
-                    module_id: ModuleId(
-                        Id(0),
-                    ),
-                    local_id: Idx::<Expression>(0),
-                },
-                type_args: [
-                    Generic(
-                        1,
-                    ),
-                ],
-            },
-        ],
-    },
+    errors: [],
+    poly_instantiations: {},
 }
 [
     ParseError {

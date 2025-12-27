@@ -11,63 +11,29 @@ let test_func = |a, b| -> test
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Lambda {
-            arg_type: Generic(
-                3,
-            ),
-            return_type: Bounded {
-                base: TypeDef(
-                    Fql {
-                        module_id: ModuleId(
-                            Id(0),
-                        ),
-                        local_id: Idx::<TypeDefinition>(1),
-                    },
-                ),
-                args: [
-                    Generic(
-                        3,
-                    ),
-                ],
-            },
-        },
+        Idx::<Expression>(0): Generic(
+            2,
+        ),
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
-                1,
+                0,
             ),
             return_type: Lambda {
                 arg_type: Generic(
+                    1,
+                ),
+                return_type: Generic(
                     2,
                 ),
-                return_type: Lambda {
-                    arg_type: Generic(
-                        3,
-                    ),
-                    return_type: Bounded {
-                        base: TypeDef(
-                            Fql {
-                                module_id: ModuleId(
-                                    Id(0),
-                                ),
-                                local_id: Idx::<TypeDefinition>(1),
-                            },
-                        ),
-                        args: [
-                            Generic(
-                                3,
-                            ),
-                        ],
-                    },
-                },
             },
         },
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            1,
+            0,
         ),
         Idx::<Pattern>(1): Generic(
-            2,
+            1,
         ),
     },
     warnings: [],
@@ -104,61 +70,21 @@ HirTypedModule {
                 },
                 found: Lambda {
                     arg_type: Generic(
-                        1,
+                        0,
                     ),
                     return_type: Lambda {
                         arg_type: Generic(
+                            1,
+                        ),
+                        return_type: Generic(
                             2,
                         ),
-                        return_type: Lambda {
-                            arg_type: Generic(
-                                3,
-                            ),
-                            return_type: Bounded {
-                                base: TypeDef(
-                                    Fql {
-                                        module_id: ModuleId(
-                                            Id(0),
-                                        ),
-                                        local_id: Idx::<TypeDefinition>(1),
-                                    },
-                                ),
-                                args: [
-                                    Generic(
-                                        3,
-                                    ),
-                                ],
-                            },
-                        },
                     },
                 },
             },
             range: 165..195,
         },
     ],
-    poly_instantiations: {
-        TypeDefinition(
-            Fql {
-                module_id: ModuleId(
-                    Id(0),
-                ),
-                local_id: Idx::<TypeDefinition>(1),
-            },
-        ): [
-            PolyInstantiation {
-                call_site: Fql {
-                    module_id: ModuleId(
-                        Id(0),
-                    ),
-                    local_id: Idx::<Expression>(0),
-                },
-                type_args: [
-                    Generic(
-                        3,
-                    ),
-                ],
-            },
-        ],
-    },
+    poly_instantiations: {},
 }
 []
