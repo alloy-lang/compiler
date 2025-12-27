@@ -1,0 +1,79 @@
+typedef Option[t] =
+  | None
+  | Some(t)
+end
+
+let constructor_example = Option::Some
+
+let example = constructor_example("hello")
+===
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): Lambda {
+            arg_type: BuiltIn(
+                String,
+            ),
+            return_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId(
+                            Id(4),
+                        ),
+                        local_id: Idx::<TypeDefinition>(1),
+                    },
+                ),
+                args: [
+                    BuiltIn(
+                        String,
+                    ),
+                ],
+            },
+        },
+        Idx::<Expression>(1): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(2): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    local_id: Idx::<TypeDefinition>(1),
+                },
+            ),
+            args: [
+                BuiltIn(
+                    String,
+                ),
+            ],
+        },
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [],
+    poly_instantiations: {
+        TypeDefinition(
+            Fql {
+                module_id: ModuleId(
+                    Id(4),
+                ),
+                local_id: Idx::<TypeDefinition>(1),
+            },
+        ): [
+            PolyInstantiation {
+                call_site: Fql {
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    local_id: Idx::<Expression>(0),
+                },
+                type_args: [
+                    BuiltIn(
+                        String,
+                    ),
+                ],
+            },
+        ],
+    },
+}
+[]

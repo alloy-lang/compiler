@@ -32,6 +32,7 @@ pub enum Expression {
     },
     FunctionCall {
         target: EPTdFql,
+        variant_name: Option<hir::Name>,
         args: Vec<Fql<hir::Expression>>,
     },
     Match {
@@ -222,24 +223,36 @@ fn resolve_function_call(
     target: &hir::Path,
     args: &Vec<hir::ExpressionIdx>,
 ) -> Result<Expression, TypeResolutionError> {
-    let fql = match target {
+    let (fql, variant_name) = match target {
         hir::Path::ThisModule {
             name,
+            subname,
             scope: this_scope,
-            ..
         } => {
             let (hir_module, _) = hir::lower_file(db, module_id);
             if let Some((expr_id, _)) = hir_module.get_expression_by_name(name, *this_scope) {
                 let expr_fql = Fql::new(module_id, expr_id);
-                EPTdFql::Expression(expr_fql)
+                (EPTdFql::Expression(expr_fql), None)
             } else if let Some((pat_id, _)) = hir_module.get_pattern_by_name(name, *this_scope) {
                 let pat_fql = Fql::new(module_id, pat_id);
-                EPTdFql::Pattern(pat_fql)
+                (EPTdFql::Pattern(pat_fql), None)
             } else if let Some((td_id, _)) =
                 hir_module.get_type_definition_by_name(name, *this_scope)
             {
                 let td_fql = Fql::new(module_id, td_id);
-                EPTdFql::TypeDefinition(td_fql)
+                // Check if there's a variant subname (e.g., Option::Some)
+                let variant = if let Some(subname) = subname {
+                    // Verify that the subname is a valid variant
+                    let type_def = hir_module.get_type_definition(td_id);
+                    if type_def.kind.has_variant(subname) {
+                        Some(subname.clone())
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                };
+                (EPTdFql::TypeDefinition(td_fql), variant)
             } else {
                 return Err(TypeResolutionError::UnknownExpressionReference {
                     source_ref,
@@ -250,11 +263,12 @@ fn resolve_function_call(
         }
         hir::Path::OtherModule(fqn) => {
             if let Ok(expr_fql) = resolve_cross_module_expression(db, &fqn, source_ref.clone()) {
-                EPTdFql::Expression(expr_fql)
+                (EPTdFql::Expression(expr_fql), None)
             } else if let Ok(td_fql) =
                 resolve_cross_module_type_definition(db, &fqn, source_ref.clone().into())
             {
-                EPTdFql::TypeDefinition(td_fql)
+                // TODO: Handle cross-module variant references (e.g., Other::Module::Option::Some)
+                (EPTdFql::TypeDefinition(td_fql), None)
             } else {
                 return Err(TypeResolutionError::UnknownExpressionReference {
                     source_ref,
@@ -274,6 +288,7 @@ fn resolve_function_call(
 
     Ok(Expression::FunctionCall {
         target: fql,
+        variant_name,
         args: args
             .iter()
             .map(|arg_id| Fql::new(module_id, *arg_id))

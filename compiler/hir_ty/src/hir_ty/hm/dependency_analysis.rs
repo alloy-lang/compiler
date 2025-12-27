@@ -192,7 +192,11 @@ fn collect_from_expression(
             // Args are patterns - they don't create expression dependencies
             let _ = args;
         }
-        res::Expression::FunctionCall { target, args } => {
+        res::Expression::FunctionCall {
+            target,
+            variant_name: _,
+            args,
+        } => {
             // Target might be an expression reference
             match target {
                 EPTdFql::Expression(expr_fql) => {

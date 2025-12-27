@@ -17,15 +17,39 @@ HirTypedModule {
         Idx::<Expression>(5): Generic(
             1,
         ),
-        Idx::<Expression>(2): Generic(
-            0,
-        ),
+        Idx::<Expression>(2): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    local_id: Idx::<TypeDefinition>(2),
+                },
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
         Idx::<Expression>(4): Generic(
             1,
         ),
-        Idx::<Expression>(1): Generic(
-            0,
-        ),
+        Idx::<Expression>(1): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    local_id: Idx::<TypeDefinition>(2),
+                },
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
         Idx::<Expression>(3): Generic(
             1,
         ),
@@ -37,41 +61,62 @@ HirTypedModule {
         Idx::<Pattern>(2): Generic(
             1,
         ),
-        Idx::<Pattern>(1): Generic(
-            0,
-        ),
-        Idx::<Pattern>(3): Generic(
-            0,
-        ),
+        Idx::<Pattern>(1): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    local_id: Idx::<TypeDefinition>(2),
+                },
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+        Idx::<Pattern>(3): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    local_id: Idx::<TypeDefinition>(2),
+                },
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
     },
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: UnificationError(
-                TypeMismatch(
-                    TypeDef(
-                        Fql {
-                            module_id: ModuleId(
-                                Id(4),
-                            ),
-                            local_id: Idx::<TypeDefinition>(2),
-                        },
-                    ),
-                    Function(
-                        Concrete(
-                            Int,
-                        ),
-                        Var(
-                            TypeVarId(
-                                0,
-                            ),
-                        ),
-                    ),
+    errors: [],
+    poly_instantiations: {
+        TypeDefinition(
+            Fql {
+                module_id: ModuleId(
+                    Id(4),
                 ),
-            ),
-            range: 53..82,
-        },
-    ],
-    poly_instantiations: {},
+                local_id: Idx::<TypeDefinition>(2),
+            },
+        ): [
+            PolyInstantiation {
+                call_site: Fql {
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    local_id: Idx::<Expression>(1),
+                },
+                type_args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+        ],
+    },
 }
 []

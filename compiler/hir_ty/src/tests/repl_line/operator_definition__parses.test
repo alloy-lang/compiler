@@ -9,7 +9,7 @@ HirTypedModule {
     expression_types: {
         Idx::<Expression>(0): Lambda {
             arg_type: Generic(
-                2,
+                3,
             ),
             return_type: Bounded {
                 base: TypeDef(
@@ -22,22 +22,22 @@ HirTypedModule {
                 ),
                 args: [
                     Generic(
-                        2,
+                        3,
                     ),
                 ],
             },
         },
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
-                0,
+                1,
             ),
             return_type: Lambda {
                 arg_type: Generic(
-                    1,
+                    2,
                 ),
                 return_type: Lambda {
                     arg_type: Generic(
-                        2,
+                        3,
                     ),
                     return_type: Bounded {
                         base: TypeDef(
@@ -50,7 +50,7 @@ HirTypedModule {
                         ),
                         args: [
                             Generic(
-                                2,
+                                3,
                             ),
                         ],
                     },
@@ -60,10 +60,10 @@ HirTypedModule {
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            0,
+            1,
         ),
         Idx::<Pattern>(1): Generic(
-            1,
+            2,
         ),
     },
     warnings: [],
@@ -90,15 +90,15 @@ HirTypedModule {
                 },
                 found: Lambda {
                     arg_type: Generic(
-                        0,
+                        1,
                     ),
                     return_type: Lambda {
                         arg_type: Generic(
-                            1,
+                            2,
                         ),
                         return_type: Lambda {
                             arg_type: Generic(
-                                2,
+                                3,
                             ),
                             return_type: Bounded {
                                 base: TypeDef(
@@ -111,7 +111,7 @@ HirTypedModule {
                                 ),
                                 args: [
                                     Generic(
-                                        2,
+                                        3,
                                     ),
                                 ],
                             },
@@ -122,6 +122,29 @@ HirTypedModule {
             range: 97..129,
         },
     ],
-    poly_instantiations: {},
+    poly_instantiations: {
+        TypeDefinition(
+            Fql {
+                module_id: ModuleId(
+                    Id(0),
+                ),
+                local_id: Idx::<TypeDefinition>(1),
+            },
+        ): [
+            PolyInstantiation {
+                call_site: Fql {
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    local_id: Idx::<Expression>(0),
+                },
+                type_args: [
+                    Generic(
+                        3,
+                    ),
+                ],
+            },
+        ],
+    },
 }
 []

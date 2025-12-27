@@ -42,9 +42,11 @@ pub(crate) fn infer_expr_hm(
         res::Expression::Unit => super::infer_unit(ctx, source_fql),
         res::Expression::VariableRef(ref_fql) => infer_variable_ref(ctx, source_fql, ref_fql),
         res::Expression::Lambda { args, body } => infer_lambda(ctx, source_fql, args, body),
-        res::Expression::FunctionCall { target, args } => {
-            infer_function_call(ctx, source_fql, target, args)
-        }
+        res::Expression::FunctionCall {
+            target,
+            variant_name,
+            args,
+        } => infer_function_call(ctx, source_fql, target, variant_name, args),
         res::Expression::Binary { lhs, rhs, .. } => infer_binary(ctx, source_fql, lhs, rhs),
         res::Expression::Tuple(elements) => infer_tuple_expr(ctx, source_fql, elements),
         res::Expression::IfThenElse {
@@ -126,6 +128,7 @@ fn infer_function_call(
     ctx: &mut HMInferenceContext,
     source_fql: Fql<hir::Expression>,
     target: EPTdFql,
+    variant_name: Option<hir::Name>,
     args: Vec<Fql<hir::Expression>>,
 ) -> MonoType {
     // Try to get the function type with tracking if it's polymorphic
@@ -140,20 +143,33 @@ fn infer_function_call(
                 EPTdFql::Expression(expr_fql) => infer_expr_hm(ctx, expr_fql.clone()),
                 EPTdFql::Pattern(pat_fql) => infer_pattern_hm(ctx, pat_fql.clone()),
                 EPTdFql::TypeDefinition(td_fql) => {
-                    // Infer the type definition (e.g., variant constructors)
-                    // This will populate poly_env if it's polymorphic
-                    infer_type_definition(ctx, td_fql.clone());
-
-                    // Now try to get it again with tracking
-                    // If it's polymorphic, it will be in poly_env and we'll track this instantiation
-                    if let Some(tracked_ty) =
-                        ctx.maybe_find_type_tracked(target.clone(), source_fql.clone())
-                    {
-                        tracked_ty
+                    // Check if this is a call to a specific variant (e.g., Option::Some)
+                    if let Some(ref vname) = variant_name {
+                        // Infer the specific variant constructor
+                        // This handles tracking if it's polymorphic and returns the instantiated type
+                        infer_variant_constructor(
+                            ctx,
+                            source_fql.clone(),
+                            td_fql.clone(),
+                            vname.clone(),
+                        )
                     } else {
-                        // Not polymorphic, just get the regular type
-                        ctx.maybe_find_type(target.clone())
-                            .unwrap_or_else(|| ctx.fresh_type_var())
+                        // Calling the type definition itself (single-variant types)
+                        // Infer the type definition (e.g., variant constructors)
+                        // This will populate poly_env if it's polymorphic
+                        infer_type_definition(ctx, td_fql.clone());
+
+                        // Now try to get it again with tracking
+                        // If it's polymorphic, it will be in poly_env and we'll track this instantiation
+                        if let Some(tracked_ty) =
+                            ctx.maybe_find_type_tracked(target.clone(), source_fql.clone())
+                        {
+                            tracked_ty
+                        } else {
+                            // Not polymorphic, just get the regular type
+                            ctx.maybe_find_type(target.clone())
+                                .unwrap_or_else(|| ctx.fresh_type_var())
+                        }
                     }
                 }
             }
@@ -383,6 +399,13 @@ fn infer_variant_constructor(
     type_def_fql: Fql<hir::TypeDefinition>,
     variant_name: hir::Name,
 ) -> MonoType {
+    // Check if we already have this variant constructor type with tracking
+    // This enables polymorphic instantiation tracking for union type variants
+    let variant_fql = EPTdFql::TypeDefinition(type_def_fql.clone());
+    if let Some(tracked_ty) = ctx.maybe_find_type_tracked(variant_fql.clone(), source_fql.clone()) {
+        return ctx.assign_type(source_fql, tracked_ty);
+    }
+
     // Find the variant member
     let variant_member = {
         let type_def = res::resolve_type_definition_by_id(
@@ -417,8 +440,27 @@ fn infer_variant_constructor(
     };
 
     // Build the constructor type using the shared helper
-    let ty = build_constructor_type(ctx, &type_def_fql, &member);
-    ctx.assign_type(source_fql, ty)
+    let constructor_ty = build_constructor_type(ctx, &type_def_fql, &member);
+
+    // Check if this is a polymorphic constructor
+    let is_polymorphic = has_type_variables(&constructor_ty);
+
+    if is_polymorphic {
+        // Generalize and store in poly_env for proper instantiation
+        // For variant constructors, quantify over ALL free variables (not filtered by env_type_vars)
+        // since constructors are top-level polymorphic values
+        use rustc_hash::FxHashSet;
+        let poly_ty =
+            super::super::PolyType::generalize(constructor_ty.clone(), &FxHashSet::default());
+        ctx.poly_env.insert(variant_fql.clone(), poly_ty);
+
+        // Now get it again with tracking to record this instantiation
+        if let Some(tracked_ty) = ctx.maybe_find_type_tracked(variant_fql, source_fql.clone()) {
+            return ctx.assign_type(source_fql, tracked_ty);
+        }
+    }
+
+    ctx.assign_type(source_fql, constructor_ty)
 }
 
 fn infer_abstract_trait_member_ref(
@@ -475,8 +517,13 @@ fn infer_type_definition(
 
             if is_polymorphic {
                 // Generalize and store in poly_env for proper instantiation
-                // This ensures each use gets fresh type variables
-                let poly_ty = ctx.generalize_type(constructor_ty.clone());
+                // For type definition constructors, quantify over ALL free variables
+                // since constructors are top-level polymorphic values
+                use rustc_hash::FxHashSet;
+                let poly_ty = super::super::PolyType::generalize(
+                    constructor_ty.clone(),
+                    &FxHashSet::default(),
+                );
                 ctx.poly_env.insert(td_fql.clone().into(), poly_ty);
             }
 
@@ -486,7 +533,6 @@ fn infer_type_definition(
             name: _,
             kind: TypeDefinitionKind::Union(_members),
         }) => {
-            panic!("Union type definitions should be handled via variant constructors");
             // Multi-variant type - cannot be called as a function directly
             // You must use the specific variant constructor (e.g., Some, None)
             // Return the TypeDef, which will cause a unification error if used as a function
