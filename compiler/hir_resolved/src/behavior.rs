@@ -35,6 +35,7 @@ impl Behavior {
     }
 }
 
+#[salsa::tracked]
 pub fn resolve_behavior_by_id(
     db: &dyn hir::HirDatabase,
     module_id: ModuleId,

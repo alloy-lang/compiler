@@ -17,6 +17,7 @@ pub enum Pattern {
     Tuple(NonEmpty<Fql<hir::Pattern>>),
 }
 
+#[salsa::tracked]
 pub fn resolve_pattern_by_id(
     db: &dyn hir::HirDatabase,
     module_id: ModuleId,

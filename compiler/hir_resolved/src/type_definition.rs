@@ -76,6 +76,7 @@ fn get_type_definition_by_name(
     Some(Fql::new(module_id, type_idx))
 }
 
+#[salsa::tracked]
 pub fn resolve_type_definition_by_ref_id(
     db: &dyn hir::HirDatabase,
     module_id: ModuleId,
@@ -99,6 +100,7 @@ pub fn resolve_type_definition_by_ref_id(
     }
 }
 
+#[salsa::tracked]
 pub fn resolve_type_definition_by_id(
     db: &dyn hir::HirDatabase,
     module_id: ModuleId,

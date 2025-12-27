@@ -14,6 +14,7 @@ pub enum TypeVariableConstraint {
     Trait(Fql<hir::Trait>),
 }
 
+#[salsa::tracked]
 pub fn resolve_type_variable_by_id(
     db: &dyn hir::HirDatabase,
     module_id: alloy_workspace::ModuleId,

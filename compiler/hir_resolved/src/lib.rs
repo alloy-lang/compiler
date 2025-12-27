@@ -41,8 +41,8 @@ impl cross_module_resolver::ModuleLookup<hir::Expression> for ExpressionLookup {
     }
 }
 
-/// Helper function to resolve a cross-module expression reference
-fn resolve_cross_module_expression(
+/// Resolve a cross-module expression reference
+pub fn resolve_cross_module_expression(
     db: &dyn hir::HirDatabase,
     fqn: &hir::Fqn,
     source_ref: Fql<hir::Expression>,
@@ -79,7 +79,7 @@ impl cross_module_resolver::ModuleLookup<hir::TypeDefinition> for TypeDefinition
     }
 }
 
-/// Helper function to resolve a cross-module type definition reference
+/// Resolve a cross-module type definition reference
 ///
 /// This handles qualified variant references by trying different ways to split
 /// the path into (module, type, variant).

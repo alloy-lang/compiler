@@ -52,6 +52,7 @@ pub enum Expression {
     },
 }
 
+#[salsa::tracked]
 pub fn resolve_expression_by_id(
     db: &dyn hir::HirDatabase,
     module_id: ModuleId,

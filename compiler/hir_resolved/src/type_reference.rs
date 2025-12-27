@@ -16,7 +16,7 @@ pub fn resolve_type_reference_by_path(
             scope: target_scope,
             ..
         } => get_type_reference_by_name(db, current_module_id, name, *target_scope),
-        hir::Path::OtherModule(fqn) => resolve_cross_module_type_reference(db, &fqn),
+        hir::Path::OtherModule(fqn) => resolve_cross_module_type_reference(db, fqn),
         hir::Path::Unknown(_) => None,
     }
 }
@@ -66,7 +66,7 @@ impl cross_module_resolver::ModuleLookup<hir::TypeReference> for TypeReferenceLo
     }
 }
 
-/// Helper function to resolve a cross-module type reference
+/// Resolve a cross-module type reference
 fn resolve_cross_module_type_reference(
     db: &dyn hir::HirDatabase,
     fqn: &hir::Fqn,

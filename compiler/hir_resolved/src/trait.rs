@@ -6,6 +6,7 @@ use non_empty_vec::{ne_vec, NonEmpty};
 
 pub struct Trait {}
 
+#[salsa::tracked]
 pub fn resolve_trait_by_ref_id(
     db: &dyn hir::HirDatabase,
     module_id: ModuleId,
@@ -113,7 +114,7 @@ impl cross_module_resolver::ModuleLookup<hir::Trait> for TraitLookup {
     }
 }
 
-/// Helper function to resolve a cross-module trait reference
+/// Resolve a cross-module trait reference
 ///
 /// This handles qualified trait references by trying different ways to split
 /// the path into (module, trait).
