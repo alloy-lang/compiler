@@ -21,3 +21,12 @@ Cargo.lock
 pegviz.html
 
 *.future_test
+
+# Claude
+.claude
+
+# Code coverage
+lcov.info
+coverage.json
+*.profraw
+*.profdata

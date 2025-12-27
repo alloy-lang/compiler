@@ -23,3 +23,16 @@ dependencies = [
     "build",
     "test"
 ]
+
+[tasks.cov]
+description = "Generate code coverage report in HTML format"
+workspace = false
+command = "cargo"
+dependencies = ["cov-clean"]
+args = ["llvm-cov", "--workspace", "--html", "--ignore-run-fail", "--open"]
+
+[tasks.cov-clean]
+description = "Clean coverage artifacts"
+workspace = false
+command = "cargo"
+args = ["llvm-cov", "clean", "--workspace"]
