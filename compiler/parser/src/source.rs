@@ -69,7 +69,7 @@ impl<'t, 'input> Source<'t, 'input> {
         self.tokens
             .get(self.cursor)
             .map(|Token { kind, .. }| *kind)
-            .map_or(false, TokenKind::is_trivia)
+            .is_some_and(TokenKind::is_trivia)
     }
 }
 

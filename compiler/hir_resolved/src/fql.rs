@@ -49,27 +49,27 @@ impl EPFql {
     }
 }
 
-impl Into<EPFql> for Fql<hir::Expression> {
-    fn into(self) -> EPFql {
-        EPFql::Expression(self)
+impl From<Fql<hir::Expression>> for EPFql {
+    fn from(val: Fql<hir::Expression>) -> Self {
+        EPFql::Expression(val)
     }
 }
 
-impl Into<EPFql> for &Fql<hir::Expression> {
-    fn into(self) -> EPFql {
-        EPFql::Expression(self.clone())
+impl From<&Fql<hir::Expression>> for EPFql {
+    fn from(val: &Fql<hir::Expression>) -> Self {
+        EPFql::Expression(val.clone())
     }
 }
 
-impl Into<EPFql> for Fql<hir::Pattern> {
-    fn into(self) -> EPFql {
-        EPFql::Pattern(self)
+impl From<Fql<hir::Pattern>> for EPFql {
+    fn from(val: Fql<hir::Pattern>) -> Self {
+        EPFql::Pattern(val)
     }
 }
 
-impl Into<EPFql> for &Fql<hir::Pattern> {
-    fn into(self) -> EPFql {
-        EPFql::Pattern(self.clone())
+impl From<&Fql<hir::Pattern>> for EPFql {
+    fn from(val: &Fql<hir::Pattern>) -> Self {
+        EPFql::Pattern(val.clone())
     }
 }
 
@@ -91,39 +91,39 @@ impl EPTrFql {
     }
 }
 
-impl Into<EPTrFql> for Fql<hir::Expression> {
-    fn into(self) -> EPTrFql {
-        EPTrFql::Expression(self)
+impl From<Fql<hir::Expression>> for EPTrFql {
+    fn from(val: Fql<hir::Expression>) -> Self {
+        EPTrFql::Expression(val)
     }
 }
 
-impl Into<EPTrFql> for &Fql<hir::Expression> {
-    fn into(self) -> EPTrFql {
-        EPTrFql::Expression(self.clone())
+impl From<&Fql<hir::Expression>> for EPTrFql {
+    fn from(val: &Fql<hir::Expression>) -> Self {
+        EPTrFql::Expression(val.clone())
     }
 }
 
-impl Into<EPTrFql> for Fql<hir::Pattern> {
-    fn into(self) -> EPTrFql {
-        EPTrFql::Pattern(self)
+impl From<Fql<hir::Pattern>> for EPTrFql {
+    fn from(val: Fql<hir::Pattern>) -> Self {
+        EPTrFql::Pattern(val)
     }
 }
 
-impl Into<EPTrFql> for &Fql<hir::Pattern> {
-    fn into(self) -> EPTrFql {
-        EPTrFql::Pattern(self.clone())
+impl From<&Fql<hir::Pattern>> for EPTrFql {
+    fn from(val: &Fql<hir::Pattern>) -> Self {
+        EPTrFql::Pattern(val.clone())
     }
 }
 
-impl Into<EPTrFql> for Fql<hir::TypeReference> {
-    fn into(self) -> EPTrFql {
-        EPTrFql::TypeReference(self)
+impl From<Fql<hir::TypeReference>> for EPTrFql {
+    fn from(val: Fql<hir::TypeReference>) -> Self {
+        EPTrFql::TypeReference(val)
     }
 }
 
-impl Into<EPTrFql> for &Fql<hir::TypeReference> {
-    fn into(self) -> EPTrFql {
-        EPTrFql::TypeReference(self.clone())
+impl From<&Fql<hir::TypeReference>> for EPTrFql {
+    fn from(val: &Fql<hir::TypeReference>) -> Self {
+        EPTrFql::TypeReference(val.clone())
     }
 }
 
@@ -145,45 +145,45 @@ impl EPTdFql {
     }
 }
 
-impl Into<EPTdFql> for Fql<hir::Expression> {
-    fn into(self) -> EPTdFql {
-        EPTdFql::Expression(self)
+impl From<Fql<hir::Expression>> for EPTdFql {
+    fn from(val: Fql<hir::Expression>) -> Self {
+        EPTdFql::Expression(val)
     }
 }
 
-impl Into<EPTdFql> for &Fql<hir::Expression> {
-    fn into(self) -> EPTdFql {
-        EPTdFql::Expression(self.clone())
+impl From<&Fql<hir::Expression>> for EPTdFql {
+    fn from(val: &Fql<hir::Expression>) -> Self {
+        EPTdFql::Expression(val.clone())
     }
 }
 
-impl Into<EPTdFql> for Fql<hir::Pattern> {
-    fn into(self) -> EPTdFql {
-        EPTdFql::Pattern(self)
+impl From<Fql<hir::Pattern>> for EPTdFql {
+    fn from(val: Fql<hir::Pattern>) -> Self {
+        EPTdFql::Pattern(val)
     }
 }
 
-impl Into<EPTdFql> for &Fql<hir::Pattern> {
-    fn into(self) -> EPTdFql {
-        EPTdFql::Pattern(self.clone())
+impl From<&Fql<hir::Pattern>> for EPTdFql {
+    fn from(val: &Fql<hir::Pattern>) -> Self {
+        EPTdFql::Pattern(val.clone())
     }
 }
 
-impl Into<EPTdFql> for Fql<hir::TypeDefinition> {
-    fn into(self) -> EPTdFql {
-        EPTdFql::TypeDefinition(self)
+impl From<Fql<hir::TypeDefinition>> for EPTdFql {
+    fn from(val: Fql<hir::TypeDefinition>) -> Self {
+        EPTdFql::TypeDefinition(val)
     }
 }
 
-impl Into<EPTdFql> for &Fql<hir::TypeDefinition> {
-    fn into(self) -> EPTdFql {
-        EPTdFql::TypeDefinition(self.clone())
+impl From<&Fql<hir::TypeDefinition>> for EPTdFql {
+    fn from(val: &Fql<hir::TypeDefinition>) -> Self {
+        EPTdFql::TypeDefinition(val.clone())
     }
 }
 
-impl Into<EPTdFql> for EPFql {
-    fn into(self) -> EPTdFql {
-        match self {
+impl From<EPFql> for EPTdFql {
+    fn from(val: EPFql) -> Self {
+        match val {
             EPFql::Expression(fql) => EPTdFql::Expression(fql),
             EPFql::Pattern(fql) => EPTdFql::Pattern(fql),
         }

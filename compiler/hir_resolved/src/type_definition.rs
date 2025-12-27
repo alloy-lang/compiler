@@ -69,9 +69,7 @@ fn get_type_definition_by_name(
     scope: ScopeIdx,
 ) -> Option<Fql<hir::TypeDefinition>> {
     let (hir_module, _) = hir::lower_file(db, module_id);
-    let Some((type_idx, _)) = hir_module.get_type_definition_by_name(name, scope) else {
-        return None;
-    };
+    let (type_idx, _) = hir_module.get_type_definition_by_name(name, scope)?;
 
     Some(Fql::new(module_id, type_idx))
 }
@@ -90,7 +88,7 @@ pub fn resolve_type_definition_by_ref_id(
         hir::TypeReference::Named(path) => {
             resolve_type_definition_by_path(db, module_id, path, source_ref)
         }
-        hir::TypeReference::Bounded { base, args: TODO } => {
+        hir::TypeReference::Bounded { base, args: _TODO } => {
             resolve_type_definition_by_ref_id(db, module_id, *base)
         }
         _ => unreachable!(

@@ -89,7 +89,7 @@ fn resolve_destructure(
         }
         hir::Path::OtherModule(fqn) => {
             if let Ok(type_fql) =
-                resolve_cross_module_type_definition(db, &fqn, source_ref.clone().into())
+                resolve_cross_module_type_definition(db, fqn, source_ref.clone().into())
             {
                 type_fql
             } else {

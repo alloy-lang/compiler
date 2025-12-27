@@ -72,7 +72,7 @@ impl<'t, 'input> Parser<'t, 'input> {
     pub(crate) fn at_set(&mut self, set: TokenSet) -> bool {
         self.source
             .peek_nth_kind(0)
-            .map_or(false, |k| set.contains(k))
+            .is_some_and(|k| set.contains(k))
     }
 
     pub(crate) fn at_top_level_token_or_set(&mut self, set: TokenSet) -> bool {

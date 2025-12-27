@@ -43,7 +43,7 @@ pub fn resolve_type_variable_by_id(
                     }
                     hir::TypeVariableConstraint::Trait(trait_path) => {
                         resolve_trait_by_ref_id(db, module_id, *trait_path)
-                            .map(|fql_trait| TypeVariableConstraint::Trait(fql_trait))
+                            .map(TypeVariableConstraint::Trait)
                     }
                 })
                 .collect::<Vec<_>>();

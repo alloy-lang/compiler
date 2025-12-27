@@ -59,7 +59,7 @@ impl cross_module_resolver::ModuleLookup<hir::TypeReference> for TypeReferenceLo
             panic!("Trait resolution requires TypeReference");
         };
         TypeResolutionError::UnknownTypeReference {
-            source_ref: source_ref.into(),
+            source_ref,
             module_id,
             path,
         }

@@ -80,7 +80,7 @@ where
 
     // Case 1: No sub_path - direct lookup
     if fqn.sub_path.is_some() {
-        let Some(other_module_id) = db.find_module_by_slug(&*module_slug) else {
+        let Some(other_module_id) = db.find_module_by_slug(&module_slug) else {
             return Err(L::unknown_module_error(
                 module_slug.to_string(),
                 source_ref.clone(),
@@ -109,11 +109,11 @@ where
     }
 
     // Case 2: Has sub_path - try different splits
-    let Some((item_name, remaining_path, other_module_id)) = find_module(db, fqn) else {
+    let Some((item_name, _remaining_path, other_module_id)) = find_module(db, fqn) else {
         return Err(L::unknown_module_error(module_slug.to_string(), source_ref));
     };
     let (hir_module, _) = hir::lower_file(db, other_module_id);
-    let Some((item_id, item)) = L::lookup_in_module(&hir_module, &item_name) else {
+    let Some((item_id, _item)) = L::lookup_in_module(&hir_module, &item_name) else {
         return Err(L::unknown_item_error(
             source_ref,
             other_module_id,
@@ -136,7 +136,7 @@ where
 
     // Case 1: No sub_path - direct lookup
     if fqn.sub_path.is_some() {
-        let other_module_id = db.find_module_by_slug(&*module_slug)?;
+        let other_module_id = db.find_module_by_slug(&module_slug)?;
         let (hir_module, _) = hir::lower_file(db, other_module_id);
         let (item_id, item) = L::lookup_in_module(&hir_module, &fqn.name)?;
         if !L::validate(item, &[]) {

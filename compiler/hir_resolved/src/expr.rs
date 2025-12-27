@@ -187,14 +187,14 @@ fn resolve_variable_ref(
         }
         hir::Path::OtherModule(fqn) => {
             // Try to resolve as a regular expression reference
-            if let Ok(var_fql) = resolve_cross_module_expression(db, &fqn, source_ref.clone()) {
+            if let Ok(var_fql) = resolve_cross_module_expression(db, fqn, source_ref.clone()) {
                 return Ok(Expression::VariableRef(var_fql.into()));
             }
 
             // Try to resolve as a variant constructor
             if let Some(variant_name) = &fqn.sub_path {
                 if let Ok(type_def_fql) =
-                    resolve_cross_module_type_definition(db, &fqn, source_ref.clone().into())
+                    resolve_cross_module_type_definition(db, fqn, source_ref.clone().into())
                 {
                     return Ok(Expression::VariantConstructor {
                         type_def: type_def_fql,
@@ -222,7 +222,7 @@ fn resolve_function_call(
     source_ref: Fql<hir::Expression>,
     module_id: ModuleId,
     target: &hir::Path,
-    args: &Vec<hir::ExpressionIdx>,
+    args: &[hir::ExpressionIdx],
 ) -> Result<Expression, TypeResolutionError> {
     let (fql, variant_name) = match target {
         hir::Path::ThisModule {
@@ -263,10 +263,10 @@ fn resolve_function_call(
             }
         }
         hir::Path::OtherModule(fqn) => {
-            if let Ok(expr_fql) = resolve_cross_module_expression(db, &fqn, source_ref.clone()) {
+            if let Ok(expr_fql) = resolve_cross_module_expression(db, fqn, source_ref.clone()) {
                 (EPTdFql::Expression(expr_fql), None)
             } else if let Ok(td_fql) =
-                resolve_cross_module_type_definition(db, &fqn, source_ref.clone().into())
+                resolve_cross_module_type_definition(db, fqn, source_ref.clone().into())
             {
                 // TODO: Handle cross-module variant references (e.g., Other::Module::Option::Some)
                 (EPTdFql::TypeDefinition(td_fql), None)
