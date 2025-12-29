@@ -805,10 +805,7 @@ pub fn lower_file<'db>(
 }
 
 #[must_use]
-pub fn lower_source_file(
-    db: &dyn HirDatabase,
-    source_file: &ast::SourceFile,
-) -> HirModule {
+pub fn lower_source_file(db: &dyn HirDatabase, source_file: &ast::SourceFile) -> HirModule {
     let glossary = AstGlossary::summarize_source_file(source_file);
 
     let mut ctx = LoweringCtx::new(db, glossary);

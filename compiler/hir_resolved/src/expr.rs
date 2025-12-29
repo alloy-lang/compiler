@@ -142,8 +142,7 @@ fn resolve_variable_ref(
 
             // Check if this is an abstract trait member reference
             // (within a trait scope, referencing a member with a type annotation but no implementation)
-            let scope = *this_scope;
-            if let Some((trait_idx, trait_def)) = hir_module.find_trait_containing_scope(scope) {
+            if let Some((trait_idx, trait_def)) = hir_module.find_trait_containing_scope(*this_scope) {
                 // Check if this name is an abstract trait member
                 for (member_name, type_annotation_idx) in trait_def.abstract_members() {
                     if member_name == name {
@@ -179,6 +178,7 @@ fn resolve_variable_ref(
                 }
             }
 
+            // lowering error
             Err(TypeResolutionError::UnknownExpressionReference {
                 source_ref,
                 module_id,
@@ -209,11 +209,14 @@ fn resolve_variable_ref(
                 path: fqn.segments(),
             })
         }
-        hir::Path::Unknown(names) => Err(TypeResolutionError::UnknownExpressionReference {
-            source_ref,
-            module_id,
-            path: names.clone(),
-        }),
+        hir::Path::Unknown(names) => {
+            // lowering error
+            Err(TypeResolutionError::UnknownExpressionReference {
+                source_ref,
+                module_id,
+                path: names.clone(),
+            })
+        }
     }
 }
 
@@ -255,6 +258,7 @@ fn resolve_function_call(
                 };
                 (EPTdFql::TypeDefinition(td_fql), variant)
             } else {
+                // lowering error
                 return Err(TypeResolutionError::UnknownExpressionReference {
                     source_ref,
                     module_id,
@@ -279,11 +283,12 @@ fn resolve_function_call(
             }
         }
         hir::Path::Unknown(names) => {
+            // lowering error
             return Err(TypeResolutionError::UnknownExpressionReference {
                 source_ref,
                 module_id,
                 path: names.clone(),
-            })
+            });
         }
     };
 

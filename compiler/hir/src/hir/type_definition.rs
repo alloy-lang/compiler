@@ -19,6 +19,7 @@ pub enum TypeDefinitionKind {
 
 impl TypeDefinitionKind {
     /// Check if this type definition has a variant with the given name
+    #[must_use]
     pub fn has_variant(&self, variant_name: &Name) -> bool {
         match self {
             TypeDefinitionKind::Single(member) => member.name() == variant_name,

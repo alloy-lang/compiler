@@ -27,6 +27,7 @@ pub(crate) trait ModuleLookup<T> {
     /// Validate the found item (e.g., check if type has a variant)
     /// Returns true if validation passes, false otherwise
     fn validate(_item: Self::Item, _remaining_path: &[hir::Name]) -> bool {
+        // remaining_path.is_empty()
         true // Default: no validation needed
     }
 

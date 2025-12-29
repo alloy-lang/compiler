@@ -101,11 +101,11 @@ fn run_hir_ty_test(
     db.add_module(
         "test_data",
         camino::Utf8Path::new("./test/test_data.alloy"),
-        r#"
+        r"
     typedef Test[t] = Thing t
     let test = Test(0)
     let new = |t| -> Test(t)
-    "#,
+    ",
     );
     db.add_module(
         "std::option",

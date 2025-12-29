@@ -18,3 +18,4 @@ rustc-hash = { workspace = true }
 [dev-dependencies]
 alloy_parser = {path = "../parser"}
 alloy_test_harness = {path = "../test_harness"}
+camino = { workspace = true }
