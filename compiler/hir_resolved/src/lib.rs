@@ -4,6 +4,8 @@ mod diagnostics;
 mod expr;
 mod fql;
 mod pattern;
+#[cfg(test)]
+mod tests;
 mod r#trait;
 mod type_definition;
 mod type_reference;

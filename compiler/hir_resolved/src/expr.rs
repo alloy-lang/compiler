@@ -301,3 +301,244 @@ fn resolve_function_call(
             .collect(),
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{resolve_expression_by_id, Expression};
+    use crate::tests::TestHirResDatabase;
+    use crate::{EPFql, EPTrFql, Fql, TypeResolutionError};
+    use alloy_hir as hir;
+    use alloy_hir::Name;
+    use alloy_workspace::{ModuleId, WorkspaceDatabase};
+    use la_arena::{Idx, RawIdx};
+    use non_empty_vec::ne_vec;
+    use std::fs;
+
+    fn maybe_find_example(
+        db: &dyn hir::HirDatabase,
+        module_id: ModuleId,
+    ) -> Result<Expression, TypeResolutionError> {
+        let (hir_module, _) = hir::lower_file(db, module_id);
+        let (idx, _expr) = hir_module
+            .get_expression_by_name(&Name::new("example"), alloy_scope::Scopes::ROOT)
+            .expect("expected expression");
+        resolve_expression_by_id(db, module_id, idx)
+    }
+
+    fn find_example(db: &dyn hir::HirDatabase, module_id: ModuleId) -> Expression {
+        let actual = maybe_find_example(db, module_id).expect("must find expression");
+        let Expression::VariableRef(EPFql::Expression(fql)) = actual else {
+            panic!("expected actual to be VariableRef, but was {:?}", actual);
+        };
+
+        resolve_expression_by_id(db, fql.module_id, fql.local_id).expect("must find expression")
+    }
+
+    fn build_db() -> TestHirResDatabase {
+        let mut db = TestHirResDatabase::default();
+        db.add_module(
+            "std::option",
+            camino::Utf8Path::new("/std/src/option.alloy"),
+            fs::read_to_string("../../std/src/option.alloy")
+                .expect("Expected to read std/src/option.alloy")
+                .as_str(),
+        );
+
+        db
+    }
+
+    #[test]
+    fn resolve_cross_module_expression_with_direct_import_unknown_variable() {
+        let mut db = build_db();
+        db.add_module(
+            "other",
+            camino::Utf8Path::new("./other.alloy"),
+            r"
+    let test_data = 1
+            ",
+        );
+
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    import other::unknown_test_data
+
+    let example = unknown_test_data
+            ",
+        );
+
+        let err = maybe_find_example(&db, module_id).expect_err("must fail to find expression");
+
+        let expected = TypeResolutionError::UnknownExpressionReference {
+            source_ref: Fql {
+                module_id,
+                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+            },
+            module_id,
+            path: ne_vec![Name::new("other"), Name::new("unknown_test_data")],
+        };
+        assert_eq!(expected, err);
+    }
+
+    #[test]
+    fn resolve_cross_module_expression_with_direct_import() {
+        let mut db = build_db();
+        db.add_module(
+            "other",
+            camino::Utf8Path::new("./other.alloy"),
+            r"
+    let test_data = 1
+            ",
+        );
+
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    import other::test_data
+
+    let example = test_data
+            ",
+        );
+
+        let actual_ref = find_example(&db, module_id);
+
+        assert_eq!(Expression::Literal(hir::Literal::Int(1)), actual_ref);
+    }
+
+    #[test]
+    fn resolve_cross_module_expression_with_extended_import() {
+        let mut db = build_db();
+        db.add_module(
+            "other",
+            camino::Utf8Path::new("./other.alloy"),
+            r"
+    let test_data = 1
+            ",
+        );
+
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    import other
+
+    let example = other::test_data
+            ",
+        );
+
+        let actual_ref = find_example(&db, module_id);
+
+        assert_eq!(Expression::Literal(hir::Literal::Int(1)), actual_ref);
+    }
+
+    #[test]
+    fn resolve_cross_module_expression_with_extra_path_returns_error() {
+        let mut db = build_db();
+        db.add_module(
+            "other",
+            camino::Utf8Path::new("./other.alloy"),
+            r"
+    let test_data = 1
+            ",
+        );
+
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    import other
+
+    let example = other::test_data::stuff
+            ",
+        );
+
+        let actual = maybe_find_example(&db, module_id).expect("must find expression");
+        let Expression::VariableRef(EPFql::Expression(fql)) = actual else {
+            panic!("expected actual to be VariableRef, but was {:?}", actual);
+        };
+
+        let err = resolve_expression_by_id(&db, fql.module_id, fql.local_id).expect_err("must fail to find expression");
+
+        let expected = TypeResolutionError::UnknownExpressionReference {
+            source_ref: Fql {
+                module_id,
+                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+            },
+            module_id,
+            path: ne_vec![Name::new("other"), Name::new("unknown_test_data"), Name::new("stuff")],
+        };
+
+        assert_eq!(expected, err);
+    }
+
+    #[test]
+    fn resolve_cross_module_expression_unknown_module() {
+        let mut db = build_db();
+        db.add_module(
+            "other",
+            camino::Utf8Path::new("./other.alloy"),
+            r"
+    let test_data = 1
+            ",
+        );
+
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    import not_other
+
+    let example = not_other::test_data
+            ",
+        );
+
+        let err = maybe_find_example(&db, module_id).expect_err("must find module error");
+
+        let expected = TypeResolutionError::UnknownModule {
+            source_ref: EPTrFql::Expression(Fql {
+                module_id,
+                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+            }),
+            module_slug: "not_other".to_string(),
+        };
+
+        assert_eq!(expected, err);
+    }
+
+    #[test]
+    fn resolve_cross_module_type_def_with_incorrect_sub_path_returns_error() {
+        let mut db = build_db();
+        db.add_module(
+            "other",
+            camino::Utf8Path::new("./other.alloy"),
+            r"
+    let test_data = 1
+            ",
+        );
+
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    import std::option::Option
+
+    let example = Option::Other
+            ",
+        );
+
+        let err = maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
+
+        let expected = TypeResolutionError::UnknownExpressionReference {
+            source_ref: Fql {
+                module_id,
+                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+            },
+            module_id,
+            path: ne_vec![Name::new("other"), Name::new("unknown_test_data"), Name::new("stuff")],
+        };
+
+        assert_eq!(expected, err);
+    }
+}
