@@ -82,6 +82,10 @@ impl cross_module_resolver::ModuleLookup<hir::Trait> for TraitLookup {
             .map(|(id, trait_)| (id, trait_.clone()))
     }
 
+    fn validate(_item: Self::Item, _remaining_path: &[hir::Name]) -> bool {
+        true // Default: no validation needed
+    }
+
     fn unknown_item_error(
         source_ref: impl Into<EPTrFql>,
         _module_id: ModuleId,
@@ -111,6 +115,16 @@ impl cross_module_resolver::ModuleLookup<hir::Trait> for TraitLookup {
         };
 
         TypeResolutionError::UnknownTraitName { source_ref, fqn }
+    }
+
+    fn validation_error(
+        _source_ref: impl Into<EPTrFql>,
+        _module_id: ModuleId,
+        _path: NonEmpty<hir::Name>,
+        _remaining_path: &[hir::Name],
+        _item_id: hir::TraitIdx,
+    ) -> TypeResolutionError {
+        unreachable!("traits don't have sub items")
     }
 }
 

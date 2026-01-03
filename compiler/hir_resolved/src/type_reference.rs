@@ -2,7 +2,6 @@ use crate::{cross_module_resolver, EPTrFql, Fql, TypeResolutionError};
 use alloy_hir as hir;
 use alloy_scope::{ScopeIdx, Scopes};
 use alloy_workspace::ModuleId;
-use la_arena::Idx;
 use non_empty_vec::NonEmpty;
 
 pub fn resolve_type_reference_by_path(
@@ -44,10 +43,14 @@ impl cross_module_resolver::ModuleLookup<hir::TypeReference> for TypeReferenceLo
     fn lookup_in_module(
         hir_module: &hir::HirModule,
         name: &hir::Name,
-    ) -> Option<(Idx<hir::TypeReference>, Self::Item)> {
+    ) -> Option<(hir::TypeIdx, Self::Item)> {
         hir_module
             .get_type_reference_by_name(name, Scopes::ROOT)
             .map(|(id, type_ref)| (id, type_ref.clone()))
+    }
+
+    fn validate(_item: Self::Item, _remaining_path: &[hir::Name]) -> bool {
+        true // Default: no validation needed
     }
 
     fn unknown_item_error(
@@ -63,6 +66,16 @@ impl cross_module_resolver::ModuleLookup<hir::TypeReference> for TypeReferenceLo
             module_id,
             path,
         }
+    }
+
+    fn validation_error(
+        _source_ref: impl Into<EPTrFql>,
+        _module_id: ModuleId,
+        _path: NonEmpty<hir::Name>,
+        _remaining_path: &[hir::Name],
+        _item_id: hir::TypeIdx,
+    ) -> TypeResolutionError {
+        unreachable!("type references don't have sub items")
     }
 }
 

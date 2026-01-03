@@ -93,6 +93,9 @@ impl Diagnostic for TypeInferenceError {
                         .join("::");
                     format!("Cannot find type definition `{}`", path_str)
                 }
+                TypeResolutionError::UnknownTypeDefinitionVariant { .. } => {
+                    todo!()
+                }
                 TypeResolutionError::UnknownTraitReference { path, .. } => {
                     let path_str = path
                         .iter()
@@ -184,6 +187,9 @@ impl Diagnostic for TypeInferenceError {
                     builder
                         .with_primary_label(format!("cannot find type `{}`", path_str))
                         .with_help(format!("No type definition named `{}` found in module {:?}", path_str, module_id))
+                }
+                TypeResolutionError::UnknownTypeDefinitionVariant { source_ref, target_type_fql, variant_name } => {
+                    todo!()
                 }
                 TypeResolutionError::UnknownTraitReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");

@@ -13,11 +13,13 @@ mod type_variable;
 
 use alloy_hir as hir;
 use alloy_scope::Scopes;
+use alloy_workspace::ModuleId;
 pub use behavior::*;
 pub use diagnostics::*;
 pub use expr::*;
 pub use fql::*;
 use la_arena::Idx;
+use non_empty_vec::NonEmpty;
 pub use pattern::*;
 pub use r#trait::*;
 pub use type_definition::*;
@@ -40,6 +42,21 @@ impl cross_module_resolver::ModuleLookup<hir::Expression> for ExpressionLookup {
         hir_module
             .get_expression_by_name(name, Scopes::ROOT)
             .map(|(id, expr)| (id, expr.clone()))
+    }
+
+    fn validate(_item: Self::Item, remaining_path: &[hir::Name]) -> bool {
+        // Expressions don't have sub-components, so reject any non-empty remaining path
+        remaining_path.is_empty()
+    }
+
+    fn validation_error(
+        source_ref: impl Into<EPTrFql>,
+        module_id: ModuleId,
+        path: NonEmpty<hir::Name>,
+        _remaining_path: &[hir::Name],
+        _item_id: hir::ExpressionIdx,
+    ) -> TypeResolutionError {
+        Self::unknown_item_error(source_ref, module_id, path)
     }
 }
 
@@ -78,6 +95,23 @@ impl cross_module_resolver::ModuleLookup<hir::TypeDefinition> for TypeDefinition
             return item.kind.has_variant(variant_name);
         }
         true
+    }
+
+    fn validation_error(
+        source_ref: impl Into<EPTrFql>,
+        module_id: ModuleId,
+        _path: NonEmpty<hir::Name>,
+        remaining_path: &[hir::Name],
+        item_id: hir::TypeDefinitionIdx,
+    ) -> TypeResolutionError {
+        TypeResolutionError::UnknownTypeDefinitionVariant {
+            source_ref: source_ref.into(),
+            target_type_fql: Fql {
+                module_id,
+                local_id: item_id,
+            },
+            variant_name: remaining_path.iter().next().cloned(),
+        }
     }
 }
 

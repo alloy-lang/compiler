@@ -142,7 +142,9 @@ fn resolve_variable_ref(
 
             // Check if this is an abstract trait member reference
             // (within a trait scope, referencing a member with a type annotation but no implementation)
-            if let Some((trait_idx, trait_def)) = hir_module.find_trait_containing_scope(*this_scope) {
+            if let Some((trait_idx, trait_def)) =
+                hir_module.find_trait_containing_scope(*this_scope)
+            {
                 // Check if this name is an abstract trait member
                 for (member_name, type_annotation_idx) in trait_def.abstract_members() {
                     if member_name == name {
@@ -187,19 +189,46 @@ fn resolve_variable_ref(
         }
         hir::Path::OtherModule(fqn) => {
             // Try to resolve as a regular expression reference
-            if let Ok(var_fql) = resolve_cross_module_expression(db, fqn, source_ref.clone()) {
-                return Ok(Expression::VariableRef(var_fql.into()));
+            match resolve_cross_module_expression(db, fqn, source_ref.clone()) {
+                Ok(var_fql) => {
+                    return Ok(Expression::VariableRef(var_fql.into()));
+                }
+                Err(err @ TypeResolutionError::UnknownModule { .. }) => {
+                    // If the module doesn't exist, propagate that error immediately
+                    return Err(err);
+                }
+                Err(_) => {
+                    // Continue to try variant constructor
+                }
             }
 
             // Try to resolve as a variant constructor
             if let Some(variant_name) = &fqn.sub_path {
-                if let Ok(type_def_fql) =
-                    resolve_cross_module_type_definition(db, fqn, source_ref.clone().into())
-                {
-                    return Ok(Expression::VariantConstructor {
-                        type_def: type_def_fql,
-                        variant_name: variant_name.clone(),
-                    });
+                match resolve_cross_module_type_definition(db, fqn, source_ref.clone().into()) {
+                    Ok(type_def_fql) => {
+                        // Validate that the variant actually exists in the type definition
+                        let (type_def_module, _) = hir::lower_file(db, type_def_fql.module_id);
+                        let type_def = type_def_module.get_type_definition(type_def_fql.local_id);
+
+                        if type_def.kind.has_variant(variant_name) {
+                            return Ok(Expression::VariantConstructor {
+                                type_def: type_def_fql,
+                                variant_name: variant_name.clone(),
+                            });
+                        }
+                        return Err(TypeResolutionError::UnknownExpressionReference {
+                            source_ref,
+                            module_id,
+                            path: fqn.segments(),
+                        });
+                    }
+                    Err(err @ TypeResolutionError::UnknownModule { .. }) => {
+                        // If the module doesn't exist, propagate that error
+                        return Err(err);
+                    }
+                    Err(_) => {
+                        // Continue to final error
+                    }
                 }
             }
 
@@ -454,12 +483,7 @@ mod tests {
             ",
         );
 
-        let actual = maybe_find_example(&db, module_id).expect("must find expression");
-        let Expression::VariableRef(EPFql::Expression(fql)) = actual else {
-            panic!("expected actual to be VariableRef, but was {:?}", actual);
-        };
-
-        let err = resolve_expression_by_id(&db, fql.module_id, fql.local_id).expect_err("must fail to find expression");
+        let err = maybe_find_example(&db, module_id).expect_err("must fail to find expression");
 
         let expected = TypeResolutionError::UnknownExpressionReference {
             source_ref: Fql {
@@ -467,7 +491,11 @@ mod tests {
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
             },
             module_id,
-            path: ne_vec![Name::new("other"), Name::new("unknown_test_data"), Name::new("stuff")],
+            path: ne_vec![
+                Name::new("other"),
+                Name::new("test_data"),
+                Name::new("stuff")
+            ],
         };
 
         assert_eq!(expected, err);
@@ -528,7 +556,8 @@ mod tests {
             ",
         );
 
-        let err = maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
+        let err =
+            maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
 
         let expected = TypeResolutionError::UnknownExpressionReference {
             source_ref: Fql {
@@ -536,7 +565,12 @@ mod tests {
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
             },
             module_id,
-            path: ne_vec![Name::new("other"), Name::new("unknown_test_data"), Name::new("stuff")],
+            path: ne_vec![
+                Name::new("std"),
+                Name::new("option"),
+                Name::new("Option"),
+                Name::new("Other")
+            ],
         };
 
         assert_eq!(expected, err);

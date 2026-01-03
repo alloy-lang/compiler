@@ -26,10 +26,7 @@ pub(crate) trait ModuleLookup<T> {
 
     /// Validate the found item (e.g., check if type has a variant)
     /// Returns true if validation passes, false otherwise
-    fn validate(_item: Self::Item, _remaining_path: &[hir::Name]) -> bool {
-        // remaining_path.is_empty()
-        true // Default: no validation needed
-    }
+    fn validate(_item: Self::Item, _remaining_path: &[hir::Name]) -> bool;
 
     /// Create an error for when the module is not found
     fn unknown_module_error(
@@ -66,6 +63,15 @@ pub(crate) trait ModuleLookup<T> {
             },
         }
     }
+
+    /// Create an error for when the item is not found in the module
+    fn validation_error(
+        _source_ref: impl Into<EPTrFql>,
+        _module_id: ModuleId,
+        _path: NonEmpty<hir::Name>,
+        _remaining_path: &[hir::Name],
+        _item_id: Idx<T>,
+    ) -> TypeResolutionError;
 }
 
 /// Generic cross-module resolution function
@@ -79,13 +85,10 @@ where
 {
     let module_slug = fqn.module_slug();
 
-    // Case 1: No sub_path - direct lookup
-    if fqn.sub_path.is_some() {
+    // Case 1: Has sub_path - direct lookup with sub-component
+    if let Some(sub_path) = &fqn.sub_path {
         let Some(other_module_id) = db.find_module_by_slug(&module_slug) else {
-            return Err(L::unknown_module_error(
-                module_slug.to_string(),
-                source_ref.clone(),
-            ));
+            return Err(L::unknown_module_error(module_slug, source_ref));
         };
 
         let (hir_module, _) = hir::lower_file(db, other_module_id);
@@ -97,30 +100,47 @@ where
             ));
         };
 
-        // Validate even for direct lookups (in case there's a sub-component)
-        if !L::validate(item, &[]) {
-            return Err(L::unknown_item_error(
+        // Validate the sub-component (e.g., variant name for type definitions)
+        let remaining_path = vec![sub_path.clone()];
+        if !L::validate(item, &remaining_path) {
+            return Err(L::validation_error(
                 source_ref,
                 other_module_id,
                 fqn.segments(),
+                &remaining_path,
+                item_id,
             ));
         }
 
         return Ok(Fql::new(other_module_id, item_id));
     }
 
-    // Case 2: Has sub_path - try different splits
-    let Some((item_name, _remaining_path, other_module_id)) = find_module(db, fqn) else {
-        return Err(L::unknown_module_error(module_slug.to_string(), source_ref));
+    // Case 2: No sub_path - try different splits to find the module boundary
+    let Some((item_name, remaining_path, other_module_id)) = find_module(db, fqn) else {
+        return Err(L::unknown_module_error(
+            module_slug.clone(),
+            source_ref.clone(),
+        ));
     };
     let (hir_module, _) = hir::lower_file(db, other_module_id);
-    let Some((item_id, _item)) = L::lookup_in_module(&hir_module, &item_name) else {
+    let Some((item_id, item)) = L::lookup_in_module(&hir_module, &item_name) else {
         return Err(L::unknown_item_error(
-            source_ref,
+            source_ref.clone(),
             other_module_id,
             fqn.segments(),
         ));
     };
+
+    // Validate any remaining path components
+    if !L::validate(item, &remaining_path) {
+        return Err(L::validation_error(
+            source_ref,
+            other_module_id,
+            fqn.segments(),
+            &remaining_path,
+            item_id,
+        ));
+    }
 
     Ok(Fql::new(other_module_id, item_id))
 }
@@ -135,18 +155,23 @@ where
 {
     let module_slug = fqn.module_slug();
 
-    // Case 1: No sub_path - direct lookup
+    // Case 1: Has sub_path - direct lookup with sub-component
     if fqn.sub_path.is_some() {
         let other_module_id = db.find_module_by_slug(&module_slug)?;
         let (hir_module, _) = hir::lower_file(db, other_module_id);
         let (item_id, item) = L::lookup_in_module(&hir_module, &fqn.name)?;
-        if !L::validate(item, &[]) {
+        let sub_path_slice = fqn
+            .sub_path
+            .as_ref()
+            .map(|s| vec![s.clone()])
+            .unwrap_or_default();
+        if !L::validate(item, &sub_path_slice) {
             return None;
         }
         return Some(Fql::new(other_module_id, item_id));
     }
 
-    // Case 2: Has sub_path - try different splits
+    // Case 2: No sub_path - try different splits to find the module boundary
     let (item_name, remaining_path, other_module_id) = find_module(db, fqn)?;
     let (hir_module, _) = hir::lower_file(db, other_module_id);
     let (item_id, item) = L::lookup_in_module(&hir_module, &item_name)?;
