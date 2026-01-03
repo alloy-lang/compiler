@@ -1,41 +1,22 @@
-import std::functor::map
-import std::functor::map
+import std::option::Option
+import std::option::Option
 
-let thing = map
+let thing = Option::None
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Generic(
-            0,
+        Idx::<Expression>(0): TypeDef(
+            Fql {
+                module_id: ModuleId(
+                    Id(1),
+                ),
+                local_id: Idx::<TypeDefinition>(1),
+            },
         ),
     },
     pattern_types: {},
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: TypeResolutionError(
-                UnknownExpressionReference {
-                    source_ref: Fql {
-                        module_id: ModuleId(
-                            Id(4),
-                        ),
-                        local_id: Idx::<Expression>(0),
-                    },
-                    module_id: ModuleId(
-                        Id(4),
-                    ),
-                    path: NonEmpty(
-                        [
-                            "std",
-                            "functor",
-                            "map",
-                        ],
-                    ),
-                },
-            ),
-            range: 51..66,
-        },
-    ],
+    errors: [],
     poly_instantiations: {},
 }
 []

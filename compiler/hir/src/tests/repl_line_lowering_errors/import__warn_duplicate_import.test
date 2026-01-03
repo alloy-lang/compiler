@@ -1,7 +1,7 @@
-import std::functor::map
-import std::functor::map
+import std::option::Option
+import std::option::Option
 
-let thing = map
+let thing = Option::None
 ===
 HirModule {
     imports: Index::<Import> {
@@ -9,12 +9,12 @@ HirModule {
             "item": Import {
                 segments: [
                     "std",
-                    "functor",
+                    "option",
                 ],
-                last: "map",
+                last: "Option",
             },
-            "name": "map",
-            "range": 0..25,
+            "name": "Option",
+            "range": 0..27,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -26,17 +26,19 @@ HirModule {
                         module: NonEmpty(
                             [
                                 "std",
-                                "functor",
+                                "option",
                             ],
                         ),
-                        name: "map",
-                        sub_path: None,
+                        name: "Option",
+                        sub_path: Some(
+                            "None",
+                        ),
                     },
                 ),
                 scope: Idx::<Scope>(0),
             },
             "name": "thing",
-            "range": 51..66,
+            "range": 55..79,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -60,11 +62,11 @@ HirModule {
     warnings: [
         LoweringWarning {
             kind: DuplicateImport {
-                name: "map",
-                first: 0..25,
-                second: 25..51,
+                name: "Option",
+                first: 0..27,
+                second: 27..55,
             },
-            range: 25..51,
+            range: 27..55,
         },
     ],
     errors: [],
