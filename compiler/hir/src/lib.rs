@@ -73,7 +73,6 @@ pub struct Fqn {
 }
 
 impl Fqn {
-    #[inline]
     pub fn new(
         module: impl IntoIterator<Item = impl Into<Name>>,
         local_name: impl Into<Name>,
