@@ -2,7 +2,7 @@ use alloy_workspace::{ModuleId, SourceFile, Workspace};
 
 #[salsa::db]
 #[derive(Default, Clone)]
-pub(crate) struct CompilerDatabase {
+pub struct CompilerDatabase {
     storage: salsa::Storage<Self>,
     workspace: Workspace,
 }

@@ -302,7 +302,7 @@ impl<'db> HMInferenceContext<'db> {
             if !fresh_vars.is_empty() {
                 self.instantiations
                     .entry(def_fql)
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push((call_site, fresh_vars));
             }
 

@@ -188,7 +188,7 @@ impl Diagnostic for TypeInferenceError {
                         .with_primary_label(format!("cannot find type `{}`", path_str))
                         .with_help(format!("No type definition named `{}` found in module {:?}", path_str, module_id))
                 }
-                TypeResolutionError::UnknownTypeDefinitionVariant { source_ref, target_type_fql, variant_name } => {
+                TypeResolutionError::UnknownTypeDefinitionVariant { source_ref: _, target_type_fql: _, variant_name: _ } => {
                     todo!()
                 }
                 TypeResolutionError::UnknownTraitReference { path, module_id, .. } => {

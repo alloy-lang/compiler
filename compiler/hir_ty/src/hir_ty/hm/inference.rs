@@ -184,7 +184,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
 
     for (fql, mono_type) in &ctx.type_env {
         // For monomorphic types, apply substitution first
-        let mono_ty = substitution.apply(&mono_type);
+        let mono_ty = substitution.apply(mono_type);
         let resolved_type =
             mono_to_resolved_with_map(&mono_ty, &mut type_var_map, &mut next_generic_id);
 

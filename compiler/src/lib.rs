@@ -29,8 +29,8 @@ pub struct PackageMetadata {
     name: String,
 }
 
-pub fn compile<'db>(
-    db: &'db mut db::CompilerDatabase,
+pub fn compile(
+    db: &mut db::CompilerDatabase,
     _external_packages: &[PackageMetadata],
     current_project: Project,
     _target: CompilationTarget,
