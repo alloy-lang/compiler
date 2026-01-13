@@ -85,43 +85,22 @@ where
 {
     let module_slug = fqn.module_slug();
 
-    // Case 1: Has sub_path - direct lookup with sub-component
-    if let Some(sub_path) = &fqn.sub_path {
+    let (item_name, remaining_path, other_module_id) = if let Some(sub_path) = &fqn.sub_path {
+        // Case 1: Has sub_path - direct lookup with sub-component
         let Some(other_module_id) = db.find_module_by_slug(&module_slug) else {
             return Err(L::unknown_module_error(module_slug, source_ref));
         };
 
-        let (hir_module, _) = hir::lower_file(db, other_module_id);
-        let Some((item_id, item)) = L::lookup_in_module(&hir_module, &fqn.name) else {
-            return Err(L::unknown_item_error(
-                source_ref,
-                other_module_id,
-                fqn.segments(),
-            ));
+        (fqn.name.clone(), vec![sub_path.clone()], other_module_id)
+    } else {
+        // Case 2: No sub_path - try different splits to find the module boundary
+        let Some((item_name, remaining_path, other_module_id)) = find_module(db, fqn) else {
+            return Err(L::unknown_module_error(module_slug, source_ref));
         };
 
-        // Validate the sub-component (e.g., variant name for type definitions)
-        let remaining_path = vec![sub_path.clone()];
-        if !L::validate(item, &remaining_path) {
-            return Err(L::validation_error(
-                source_ref,
-                other_module_id,
-                fqn.segments(),
-                &remaining_path,
-                item_id,
-            ));
-        }
-
-        return Ok(Fql::new(other_module_id, item_id));
-    }
-
-    // Case 2: No sub_path - try different splits to find the module boundary
-    let Some((item_name, remaining_path, other_module_id)) = find_module(db, fqn) else {
-        return Err(L::unknown_module_error(
-            module_slug.clone(),
-            source_ref.clone(),
-        ));
+        (item_name, remaining_path, other_module_id)
     };
+
     let (hir_module, _) = hir::lower_file(db, other_module_id);
     let Some((item_id, item)) = L::lookup_in_module(&hir_module, &item_name) else {
         return Err(L::unknown_item_error(
@@ -155,24 +134,14 @@ where
 {
     let module_slug = fqn.module_slug();
 
-    // Case 1: Has sub_path - direct lookup with sub-component
-    if fqn.sub_path.is_some() {
+    let (item_name, remaining_path, other_module_id) = if let Some(sub_path) = &fqn.sub_path {
+        // Case 1: Has sub_path - direct lookup with sub-component
         let other_module_id = db.find_module_by_slug(&module_slug)?;
-        let (hir_module, _) = hir::lower_file(db, other_module_id);
-        let (item_id, item) = L::lookup_in_module(&hir_module, &fqn.name)?;
-        let sub_path_slice = fqn
-            .sub_path
-            .as_ref()
-            .map(|s| vec![s.clone()])
-            .unwrap_or_default();
-        if !L::validate(item, &sub_path_slice) {
-            return None;
-        }
-        return Some(Fql::new(other_module_id, item_id));
-    }
-
-    // Case 2: No sub_path - try different splits to find the module boundary
-    let (item_name, remaining_path, other_module_id) = find_module(db, fqn)?;
+        (fqn.name.clone(), vec![sub_path.clone()], other_module_id)
+    } else {
+        // Case 2: No sub_path - try different splits to find the module boundary
+        find_module(db, fqn)?
+    };
     let (hir_module, _) = hir::lower_file(db, other_module_id);
     let (item_id, item) = L::lookup_in_module(&hir_module, &item_name)?;
 
@@ -201,7 +170,7 @@ fn find_module(
 
         let module_slug = module_path
             .iter()
-            .map(|n| n.as_str())
+            .map(alloy_hir::Name::as_str)
             .collect::<Vec<_>>()
             .join("::");
 
