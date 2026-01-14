@@ -19,20 +19,20 @@ impl fmt::Display for Path {
             Path::ThisModule { name, subname, .. } => vec![name]
                 .into_iter()
                 .chain(subname.iter())
-                .map(|n| n.to_string())
+                .map(ToString::to_string)
                 .collect::<Vec<_>>()
                 .join("::")
                 .fmt(f),
             Path::OtherModule(fqn) => fqn
                 .segments()
                 .iter()
-                .map(|n| n.to_string())
+                .map(ToString::to_string)
                 .collect::<Vec<_>>()
                 .join("::")
                 .fmt(f),
             Path::Unknown(names) => names
                 .iter()
-                .map(|n| n.to_string())
+                .map(ToString::to_string)
                 .collect::<Vec<_>>()
                 .join("::")
                 .fmt(f),
