@@ -158,25 +158,21 @@ fn resolve_variable_ref(
             }
 
             // Check if this is a qualified variant constructor (e.g., Option::None)
-            if let Some(subname) = subname {
-                let type_name = name;
-                let variant_name = subname;
-
+            if let Some(variant_name) = subname {
                 if let Some((type_def_id, type_def)) =
-                    hir_module.get_type_definition_by_name(type_name, *this_scope)
+                    hir_module.get_type_definition_by_name(name, *this_scope)
                 {
-                    return if type_def.kind.has_variant(variant_name) {
-                        Ok(Expression::VariantConstructor {
+                    if type_def.kind.has_variant(variant_name) {
+                        return Ok(Expression::VariantConstructor {
                             type_def: Fql::new(module_id, type_def_id),
                             variant_name: variant_name.clone(),
-                        })
-                    } else {
-                        return Err(TypeResolutionError::UnknownExpressionReference {
-                            source_ref,
-                            module_id,
-                            path: ne_vec![type_name.clone(), variant_name.clone()],
                         });
-                    };
+                    }
+                    return Err(TypeResolutionError::UnknownExpressionReference {
+                        source_ref,
+                        module_id,
+                        path: ne_vec![name.clone(), variant_name.clone()],
+                    });
                 }
             }
 
@@ -188,46 +184,31 @@ fn resolve_variable_ref(
             })
         }
         hir::Path::OtherModule(fqn) => {
+            if db.find_module_by_slug(&fqn.module_slug()).is_none() {
+                return Err(TypeResolutionError::UnknownModule {
+                    module_slug: fqn.module_slug(),
+                    source_ref: source_ref.into(),
+                });
+            }
+
             // Try to resolve as a regular expression reference
-            match resolve_cross_module_expression(db, fqn, source_ref.clone()) {
-                Ok(var_fql) => {
-                    return Ok(Expression::VariableRef(var_fql.into()));
-                }
-                Err(err @ TypeResolutionError::UnknownModule { .. }) => {
-                    // If the module doesn't exist, propagate that error immediately
-                    return Err(err);
-                }
-                Err(_) => {
-                    // Continue to try variant constructor
-                }
+            if let Ok(var_fql) = resolve_cross_module_expression(db, fqn, source_ref.clone()) {
+                return Ok(Expression::VariableRef(var_fql.into()));
             }
 
             // Try to resolve as a variant constructor
             if let Some(variant_name) = &fqn.sub_path {
-                match resolve_cross_module_type_definition(db, fqn, source_ref.clone().into()) {
-                    Ok(type_def_fql) => {
-                        // Validate that the variant actually exists in the type definition
-                        let (type_def_module, _) = hir::lower_file(db, type_def_fql.module_id);
-                        let type_def = type_def_module.get_type_definition(type_def_fql.local_id);
+                if let Ok(type_def_fql) =
+                    resolve_cross_module_type_definition(db, fqn, source_ref.clone().into())
+                {
+                    let (type_def_module, _) = hir::lower_file(db, type_def_fql.module_id);
+                    let type_def = type_def_module.get_type_definition(type_def_fql.local_id);
 
-                        if type_def.kind.has_variant(variant_name) {
-                            return Ok(Expression::VariantConstructor {
-                                type_def: type_def_fql,
-                                variant_name: variant_name.clone(),
-                            });
-                        }
-                        return Err(TypeResolutionError::UnknownExpressionReference {
-                            source_ref,
-                            module_id,
-                            path: fqn.segments(),
+                    if type_def.kind.has_variant(variant_name) {
+                        return Ok(Expression::VariantConstructor {
+                            type_def: type_def_fql,
+                            variant_name: variant_name.clone(),
                         });
-                    }
-                    Err(err @ TypeResolutionError::UnknownModule { .. }) => {
-                        // If the module doesn't exist, propagate that error
-                        return Err(err);
-                    }
-                    Err(_) => {
-                        // Continue to final error
                     }
                 }
             }
@@ -273,18 +254,13 @@ fn resolve_function_call(
                 hir_module.get_type_definition_by_name(name, *this_scope)
             {
                 let td_fql = Fql::new(module_id, td_id);
-                // Check if there's a variant subname (e.g., Option::Some)
-                let variant = if let Some(subname) = subname {
-                    // Verify that the subname is a valid variant
-                    let type_def = hir_module.get_type_definition(td_id);
-                    if type_def.kind.has_variant(subname) {
-                        Some(subname.clone())
-                    } else {
-                        None
-                    }
-                } else {
-                    None
-                };
+                let variant = subname
+                    .as_ref()
+                    .filter(|subname| {
+                        let type_def = hir_module.get_type_definition(td_id);
+                        type_def.kind.has_variant(subname)
+                    })
+                    .cloned();
                 (EPTdFql::TypeDefinition(td_fql), variant)
             } else {
                 // lowering error
@@ -341,7 +317,6 @@ mod tests {
     use alloy_workspace::{ModuleId, WorkspaceDatabase};
     use la_arena::{Idx, RawIdx};
     use non_empty_vec::ne_vec;
-    use std::fs;
 
     fn maybe_find_example(
         db: &dyn hir::HirDatabase,
@@ -363,22 +338,38 @@ mod tests {
         resolve_expression_by_id(db, fql.module_id, fql.local_id).expect("must find expression")
     }
 
-    fn build_db() -> TestHirResDatabase {
-        let mut db = TestHirResDatabase::default();
-        db.add_module(
-            "std::option",
-            camino::Utf8Path::new("/std/src/option.alloy"),
-            fs::read_to_string("../../std/src/option.alloy")
-                .expect("Expected to read std/src/option.alloy")
-                .as_str(),
+    //
+    // variable_ref - cross module
+    //
+
+    #[test]
+    fn resolve_cross_module_variable_ref_with_unknown_module() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    import unknown::unknown_test_data
+
+    let example = unknown_test_data
+            ",
         );
 
-        db
+        let err = maybe_find_example(&db, module_id).expect_err("must fail to find expression");
+
+        let expected = TypeResolutionError::UnknownModule {
+            source_ref: EPTrFql::Expression(Fql {
+                module_id,
+                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+            }),
+            module_slug: "unknown".to_string(),
+        };
+        assert_eq!(expected, err);
     }
 
     #[test]
-    fn resolve_cross_module_expression_with_direct_import_unknown_variable() {
-        let mut db = build_db();
+    fn resolve_cross_module_variable_ref_with_direct_import_unknown_variable() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
         db.add_module(
             "other",
             camino::Utf8Path::new("./other.alloy"),
@@ -411,8 +402,8 @@ mod tests {
     }
 
     #[test]
-    fn resolve_cross_module_expression_with_direct_import() {
-        let mut db = build_db();
+    fn resolve_cross_module_variable_ref_with_direct_import() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
         db.add_module(
             "other",
             camino::Utf8Path::new("./other.alloy"),
@@ -437,8 +428,8 @@ mod tests {
     }
 
     #[test]
-    fn resolve_cross_module_expression_with_extended_import() {
-        let mut db = build_db();
+    fn resolve_cross_module_variable_ref_with_extended_import() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
         db.add_module(
             "other",
             camino::Utf8Path::new("./other.alloy"),
@@ -463,8 +454,8 @@ mod tests {
     }
 
     #[test]
-    fn resolve_cross_module_expression_with_extra_path_returns_error() {
-        let mut db = build_db();
+    fn resolve_cross_module_variable_ref_with_extra_path_returns_error() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
         db.add_module(
             "other",
             camino::Utf8Path::new("./other.alloy"),
@@ -502,8 +493,8 @@ mod tests {
     }
 
     #[test]
-    fn resolve_cross_module_expression_unknown_module() {
-        let mut db = build_db();
+    fn resolve_cross_module_variable_ref_unknown_module() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
         db.add_module(
             "other",
             camino::Utf8Path::new("./other.alloy"),
@@ -536,16 +527,62 @@ mod tests {
     }
 
     #[test]
-    fn resolve_cross_module_type_def_with_incorrect_sub_path_returns_error() {
-        let mut db = build_db();
-        db.add_module(
-            "other",
-            camino::Utf8Path::new("./other.alloy"),
+    fn resolve_cross_module_variable_ref_type_def_variant_constructor() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
             r"
-    let test_data = 1
+    import std::option::Option
+
+    let example = Option::None
             ",
         );
 
+        let actual = maybe_find_example(&db, module_id).expect("must find expression");
+
+        assert_eq!(
+            Expression::VariantConstructor {
+                type_def: Fql {
+                    module_id: ModuleId::new(&db, "std::option"),
+                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                },
+                variant_name: Name::from("None")
+            },
+            actual
+        );
+    }
+
+    #[test]
+    fn resolve_cross_module_variable_ref_type_def_variant_constructor_unknown_module() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    import std::unknown::Unknown
+
+    let example = Unknown::None
+            ",
+        );
+
+        let err =
+            maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
+
+        let expected = TypeResolutionError::UnknownModule {
+            source_ref: EPTrFql::Expression(Fql {
+                module_id,
+                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+            }),
+            module_slug: "std::unknown".to_string(),
+        };
+
+        assert_eq!(expected, err);
+    }
+
+    #[test]
+    fn resolve_cross_module_variable_ref_type_def_with_incorrect_sub_path_returns_error() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
         let module_id = db.add_module(
             "test_stuff",
             camino::Utf8Path::new("./test_stuff.alloy"),
@@ -571,6 +608,36 @@ mod tests {
                 Name::new("Option"),
                 Name::new("Other")
             ],
+        };
+
+        assert_eq!(expected, err);
+    }
+
+    //
+    // variable_ref - unknown path
+    //
+
+    #[test]
+    fn unknown_path_variable_ref() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    let example = unknown
+            ",
+        );
+
+        let err =
+            maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
+
+        let expected = TypeResolutionError::UnknownExpressionReference {
+            source_ref: Fql {
+                module_id,
+                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+            },
+            module_id,
+            path: ne_vec![Name::new("unknown")],
         };
 
         assert_eq!(expected, err);

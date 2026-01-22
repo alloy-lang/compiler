@@ -104,7 +104,7 @@ where
     let (hir_module, _) = hir::lower_file(db, other_module_id);
     let Some((item_id, item)) = L::lookup_in_module(&hir_module, &item_name) else {
         return Err(L::unknown_item_error(
-            source_ref.clone(),
+            source_ref,
             other_module_id,
             fqn.segments(),
         ));
