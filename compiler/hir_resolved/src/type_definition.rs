@@ -1,8 +1,9 @@
-use crate::{resolve_cross_module_type_definition, Fql, TypeResolutionError};
+use crate::{resolve_cross_module_type_definition, Fql, TypeDefinitionLookup, TypeResolutionError};
 use alloy_hir as hir;
 use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
 use non_empty_vec::ne_vec;
+use crate::cross_module_resolver::resolve_cross_module_optional;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeDefinition {
@@ -60,6 +61,37 @@ pub fn resolve_type_definition_by_path(
             path: names.clone(),
         }),
     }
+}
+
+pub(crate) fn resolve_type_definition_by_path_variant(
+    db: &dyn hir::HirDatabase,
+    module_id: ModuleId,
+    path: &hir::Path,
+) -> Option<(Fql<hir::TypeDefinition>, hir::Name)> {
+    let (type_def_fql, variant_name): (Fql<hir::TypeDefinition>, hir::Name) = match path {
+        hir::Path::ThisModule {
+            name,
+            subname,
+            scope,
+        } => {
+            let variant_name = subname.clone()?;
+            let (hir_module, _) = hir::lower_file(db, module_id);
+            let (type_def_id, _) = hir_module.get_type_definition_by_name(name, *scope)?;
+
+            (Fql::new(module_id, type_def_id), variant_name)
+        }
+        hir::Path::OtherModule(fqn) => {
+            let variant_name = fqn.sub_path.clone()?;
+            let td_fql = resolve_cross_module_optional::<hir::TypeDefinition, TypeDefinitionLookup>(
+                db, fqn,
+            )?;
+
+            (td_fql, variant_name)
+        }
+        hir::Path::Unknown(_) => return None,
+    };
+
+    Some((type_def_fql, variant_name))
 }
 
 fn get_type_definition_by_name(

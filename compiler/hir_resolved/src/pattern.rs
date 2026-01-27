@@ -45,6 +45,20 @@ pub fn resolve_pattern_by_id(
     Ok(pat)
 }
 
+pub(crate) fn resolve_pattern_by_path(
+    db: &dyn hir::HirDatabase,
+    module_id: ModuleId,
+    path: &hir::Path,
+) -> Option<Fql<hir::Pattern>> {
+    if let hir::Path::ThisModule { name, scope, .. } = path {
+        let (hir_module, _) = hir::lower_file(db, module_id);
+        let (var_id, _) = hir_module.get_pattern_by_name(name, *scope)?;
+        Some(Fql::new(module_id, var_id))
+    } else {
+        None
+    }
+}
+
 fn resolve_destructure(
     db: &dyn hir::HirDatabase,
     source_ref: Fql<hir::Pattern>,

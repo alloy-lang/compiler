@@ -1,5 +1,6 @@
+use std::fs;
 use alloy_hir as hir;
-use alloy_workspace::{ModuleId, SourceFile, Workspace};
+use alloy_workspace::{ModuleId, SourceFile, Workspace, WorkspaceDatabase};
 
 #[salsa::db]
 #[derive(Default, Clone)]
@@ -29,3 +30,18 @@ impl alloy_workspace::WorkspaceDatabase for TestHirResDatabase {
 
 #[salsa::db]
 impl hir::HirDatabase for TestHirResDatabase {}
+
+impl TestHirResDatabase {
+    pub(crate) fn new_with_stdlib() -> Self {
+        let mut db = TestHirResDatabase::default();
+        db.add_module(
+            "std::option",
+            camino::Utf8Path::new("/std/src/option.alloy"),
+            fs::read_to_string("../../std/src/option.alloy")
+                .expect("Expected to read std/src/option.alloy")
+                .as_str(),
+        );
+
+        db
+    }
+}

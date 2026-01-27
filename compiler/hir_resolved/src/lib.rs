@@ -60,17 +60,6 @@ impl cross_module_resolver::ModuleLookup<hir::Expression> for ExpressionLookup {
     }
 }
 
-/// Resolve a cross-module expression reference
-pub fn resolve_cross_module_expression(
-    db: &dyn hir::HirDatabase,
-    fqn: &hir::Fqn,
-    source_ref: Fql<hir::Expression>,
-) -> Result<Fql<hir::Expression>, TypeResolutionError> {
-    cross_module_resolver::resolve_cross_module::<hir::Expression, ExpressionLookup>(
-        db, fqn, source_ref,
-    )
-}
-
 // ============================================================================
 // Type Definition Lookup
 // ============================================================================

@@ -1,8 +1,12 @@
-use super::{resolve_cross_module_expression, resolve_cross_module_type_definition, EPTdFql};
+use super::{cross_module_resolver, EPTdFql, ExpressionLookup, TypeDefinitionLookup};
 use crate::diagnostics::TypeResolutionError;
+use crate::pattern::resolve_pattern_by_path;
+use crate::r#trait::resolve_abstract_trait_member_by_path;
+use crate::type_definition::resolve_type_definition_by_path_variant;
 use crate::{EPFql, Fql};
 use alloy_hir as hir;
 use alloy_workspace::ModuleId;
+use cross_module_resolver::resolve_cross_module_optional;
 use non_empty_vec::{ne_vec, NonEmpty};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -79,7 +83,7 @@ pub fn resolve_expression_by_id(
             }
         }
         hir::Expression::FunctionCall { target, args, .. } => {
-            resolve_function_call(db, source_ref, module_id, target, args)?
+            resolve_function_call(db, &source_ref, module_id, target, args)?
         }
         hir::Expression::Binary { op, lhs, rhs } => Expression::Binary {
             op: op.clone(),
@@ -116,73 +120,50 @@ pub fn resolve_expression_by_id(
     Ok(expr)
 }
 
+pub(crate) fn resolve_expression_by_path(
+    db: &dyn hir::HirDatabase,
+    module_id: ModuleId,
+    path: &hir::Path,
+) -> Option<Fql<hir::Expression>> {
+    match path {
+        hir::Path::ThisModule { name, scope, .. } => {
+            let (hir_module, _) = hir::lower_file(db, module_id);
+            let (var_id, _) = hir_module.get_expression_by_name(name, *scope)?;
+            Some(Fql::new(module_id, var_id))
+        }
+        hir::Path::OtherModule(fqn) => {
+            resolve_cross_module_optional::<hir::Expression, ExpressionLookup>(db, fqn)
+        }
+        hir::Path::Unknown(_) => None,
+    }
+}
+
 fn resolve_variable_ref(
     db: &dyn hir::HirDatabase,
     source_ref: Fql<hir::Expression>,
     module_id: ModuleId,
     path: &hir::Path,
 ) -> Result<Expression, TypeResolutionError> {
-    match path {
-        hir::Path::ThisModule {
-            name,
-            subname,
-            scope: this_scope,
-        } => {
-            let (hir_module, _) = hir::lower_file(db, module_id);
+    if let Some(var_fql) = resolve_expression_by_path(db, module_id, path) {
+        return Ok(Expression::VariableRef(var_fql.into()));
+    }
+    if let Some(pat_fql) = resolve_pattern_by_path(db, module_id, path) {
+        return Ok(Expression::VariableRef(pat_fql.into()));
+    }
+    if let Some((type_def_fql, variant_name)) =
+        resolve_type_definition_by_path_variant(db, module_id, path)
+    {
+        return Ok(Expression::VariantConstructor {
+            type_def: type_def_fql,
+            variant_name,
+        });
+    }
+    if let Some(expr) = resolve_abstract_trait_member_by_path(db, module_id, path) {
+        return Ok(expr);
+    }
 
-            // First try to resolve as a variable (expression or pattern)
-            if let Some((var_id, _)) = hir_module.get_expression_by_name(name, *this_scope) {
-                let var_fql = Fql::new(module_id, var_id);
-                return Ok(Expression::VariableRef(var_fql.into()));
-            }
-            if let Some((pat_id, _)) = hir_module.get_pattern_by_name(name, *this_scope) {
-                let pat_fql = Fql::new(module_id, pat_id);
-                return Ok(Expression::VariableRef(pat_fql.into()));
-            }
-
-            // Check if this is an abstract trait member reference
-            // (within a trait scope, referencing a member with a type annotation but no implementation)
-            if let Some((trait_idx, trait_def)) =
-                hir_module.find_trait_containing_scope(*this_scope)
-            {
-                // Check if this name is an abstract trait member
-                for (member_name, type_annotation_idx) in trait_def.abstract_members() {
-                    if member_name == name {
-                        return Ok(Expression::AbstractTraitMemberRef {
-                            trait_fql: Fql::new(module_id, trait_idx),
-                            member_name: member_name.clone(),
-                            type_annotation: Fql::new(module_id, type_annotation_idx),
-                        });
-                    }
-                }
-            }
-
-            // Check if this is a qualified variant constructor (e.g., Option::None)
-            if let Some(variant_name) = subname {
-                if let Some((type_def_id, type_def)) =
-                    hir_module.get_type_definition_by_name(name, *this_scope)
-                {
-                    if type_def.kind.has_variant(variant_name) {
-                        return Ok(Expression::VariantConstructor {
-                            type_def: Fql::new(module_id, type_def_id),
-                            variant_name: variant_name.clone(),
-                        });
-                    }
-                    return Err(TypeResolutionError::UnknownExpressionReference {
-                        source_ref,
-                        module_id,
-                        path: ne_vec![name.clone(), variant_name.clone()],
-                    });
-                }
-            }
-
-            // lowering error
-            Err(TypeResolutionError::UnknownExpressionReference {
-                source_ref,
-                module_id,
-                path: ne_vec![name.clone()],
-            })
-        }
+    let error_path = match path {
+        hir::Path::ThisModule { name, .. } => ne_vec![name.clone()],
         hir::Path::OtherModule(fqn) => {
             if db.find_module_by_slug(&fqn.module_slug()).is_none() {
                 return Err(TypeResolutionError::UnknownModule {
@@ -191,111 +172,26 @@ fn resolve_variable_ref(
                 });
             }
 
-            // Try to resolve as a regular expression reference
-            if let Ok(var_fql) = resolve_cross_module_expression(db, fqn, source_ref.clone()) {
-                return Ok(Expression::VariableRef(var_fql.into()));
-            }
-
-            // Try to resolve as a variant constructor
-            if let Some(variant_name) = &fqn.sub_path {
-                if let Ok(type_def_fql) =
-                    resolve_cross_module_type_definition(db, fqn, source_ref.clone().into())
-                {
-                    let (type_def_module, _) = hir::lower_file(db, type_def_fql.module_id);
-                    let type_def = type_def_module.get_type_definition(type_def_fql.local_id);
-
-                    if type_def.kind.has_variant(variant_name) {
-                        return Ok(Expression::VariantConstructor {
-                            type_def: type_def_fql,
-                            variant_name: variant_name.clone(),
-                        });
-                    }
-                }
-            }
-
-            Err(TypeResolutionError::UnknownExpressionReference {
-                source_ref,
-                module_id,
-                path: fqn.segments(),
-            })
+            fqn.segments()
         }
-        hir::Path::Unknown(names) => {
-            // lowering error
-            Err(TypeResolutionError::UnknownExpressionReference {
-                source_ref,
-                module_id,
-                path: names.clone(),
-            })
-        }
-    }
+        hir::Path::Unknown(names) => names.clone(),
+    };
+
+    Err(TypeResolutionError::UnknownExpressionReference {
+        source_ref,
+        module_id,
+        path: error_path,
+    })
 }
 
 fn resolve_function_call(
     db: &dyn hir::HirDatabase,
-    source_ref: Fql<hir::Expression>,
+    source_ref: &Fql<hir::Expression>,
     module_id: ModuleId,
     target: &hir::Path,
     args: &[hir::ExpressionIdx],
 ) -> Result<Expression, TypeResolutionError> {
-    let (fql, variant_name) = match target {
-        hir::Path::ThisModule {
-            name,
-            subname,
-            scope: this_scope,
-        } => {
-            let (hir_module, _) = hir::lower_file(db, module_id);
-            if let Some((expr_id, _)) = hir_module.get_expression_by_name(name, *this_scope) {
-                let expr_fql = Fql::new(module_id, expr_id);
-                (EPTdFql::Expression(expr_fql), None)
-            } else if let Some((pat_id, _)) = hir_module.get_pattern_by_name(name, *this_scope) {
-                let pat_fql = Fql::new(module_id, pat_id);
-                (EPTdFql::Pattern(pat_fql), None)
-            } else if let Some((td_id, _)) =
-                hir_module.get_type_definition_by_name(name, *this_scope)
-            {
-                let td_fql = Fql::new(module_id, td_id);
-                let variant = subname
-                    .as_ref()
-                    .filter(|subname| {
-                        let type_def = hir_module.get_type_definition(td_id);
-                        type_def.kind.has_variant(subname)
-                    })
-                    .cloned();
-                (EPTdFql::TypeDefinition(td_fql), variant)
-            } else {
-                // lowering error
-                return Err(TypeResolutionError::UnknownExpressionReference {
-                    source_ref,
-                    module_id,
-                    path: ne_vec![name.clone()],
-                });
-            }
-        }
-        hir::Path::OtherModule(fqn) => {
-            if let Ok(expr_fql) = resolve_cross_module_expression(db, fqn, source_ref.clone()) {
-                (EPTdFql::Expression(expr_fql), None)
-            } else if let Ok(td_fql) =
-                resolve_cross_module_type_definition(db, fqn, source_ref.clone().into())
-            {
-                // TODO: Handle cross-module variant references (e.g., Other::Module::Option::Some)
-                (EPTdFql::TypeDefinition(td_fql), None)
-            } else {
-                return Err(TypeResolutionError::UnknownExpressionReference {
-                    source_ref,
-                    module_id,
-                    path: fqn.segments(),
-                });
-            }
-        }
-        hir::Path::Unknown(names) => {
-            // lowering error
-            return Err(TypeResolutionError::UnknownExpressionReference {
-                source_ref,
-                module_id,
-                path: names.clone(),
-            });
-        }
-    };
+    let (fql, variant_name) = find_function_target(db, source_ref, module_id, target)?;
 
     Ok(Expression::FunctionCall {
         target: fql,
@@ -307,11 +203,57 @@ fn resolve_function_call(
     })
 }
 
+fn find_function_target(
+    db: &dyn hir::HirDatabase,
+    source_ref: &Fql<hir::Expression>,
+    module_id: ModuleId,
+    target: &hir::Path,
+) -> Result<(EPTdFql, Option<hir::Name>), TypeResolutionError> {
+    if let Some(var_fql) = resolve_expression_by_path(db, module_id, target) {
+        return Ok((var_fql.into(), None));
+    }
+    if let Some(pat_fql) = resolve_pattern_by_path(db, module_id, target) {
+        return Ok((pat_fql.into(), None));
+    }
+    if let Some((type_def_fql, variant_name)) =
+        resolve_type_definition_by_path_variant(db, module_id, target)
+    {
+        return Ok((type_def_fql.into(), Some(variant_name)));
+    }
+    // TODO: function calls to abstract trait members
+    // if let Some(expr) = resolve_abstract_trait_member_by_path(db, module_id, target) {
+    //     return Err(Ok(expr));
+    // }
+
+    let error_path = match target {
+        hir::Path::ThisModule { name, .. } => ne_vec![name.clone()],
+        hir::Path::OtherModule(fqn) => {
+            if db.find_module_by_slug(&fqn.module_slug()).is_none() {
+                return Err(TypeResolutionError::UnknownModule {
+                    module_slug: fqn.module_slug(),
+                    source_ref: source_ref.into(),
+                });
+            }
+
+            fqn.segments()
+        }
+        hir::Path::Unknown(names) => names.clone(),
+    };
+
+    Err(TypeResolutionError::UnknownExpressionReference {
+        source_ref: source_ref.clone(),
+        module_id,
+        path: error_path,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::{resolve_expression_by_id, Expression};
     use crate::tests::TestHirResDatabase;
-    use crate::{EPFql, EPTrFql, Fql, TypeResolutionError};
+    use crate::{
+        resolve_pattern_by_id, EPFql, EPTdFql, EPTrFql, Fql, Pattern, TypeResolutionError,
+    };
     use alloy_hir as hir;
     use alloy_hir::Name;
     use alloy_workspace::{ModuleId, WorkspaceDatabase};
@@ -325,7 +267,7 @@ mod tests {
         let (hir_module, _) = hir::lower_file(db, module_id);
         let (idx, _expr) = hir_module
             .get_expression_by_name(&Name::new("example"), alloy_scope::Scopes::ROOT)
-            .expect("expected expression");
+            .unwrap_or_else(|| panic!("expected expression. hir_module: {:#?}", hir_module));
         resolve_expression_by_id(db, module_id, idx)
     }
 
@@ -336,6 +278,201 @@ mod tests {
         };
 
         resolve_expression_by_id(db, fql.module_id, fql.local_id).expect("must find expression")
+    }
+
+    //
+    // variable_ref - this module
+    //
+
+    #[test]
+    fn resolve_same_module_variable_ref() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    let test_data = 1
+    let example = test_data
+            ",
+        );
+
+        let actual_ref = find_example(&db, module_id);
+
+        assert_eq!(Expression::Literal(hir::Literal::Int(1)), actual_ref);
+    }
+
+    #[test]
+    fn resolve_same_module_pattern_ref() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    let thing = |arg1| -> (arg1, 0)
+            ",
+        );
+
+        let actual = resolve_expression_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
+            .expect("resolve expression 0");
+        let Expression::VariableRef(EPFql::Pattern(fql)) = actual else {
+            panic!("expected actual to be VariableRef, but was {:?}", actual);
+        };
+
+        let actual_ref =
+            resolve_pattern_by_id(&db, fql.module_id, fql.local_id).expect("must find expression");
+
+        assert_eq!(Pattern::VariableDeclaration, actual_ref);
+    }
+
+    #[test]
+    fn resolve_same_module_trait_member_ref() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    trait TestTrait1 where
+        typeof abstract : Int
+        let example = abstract
+    end
+            ",
+        );
+
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+        let (idx, _expr) = hir_module
+            .get_expression_by_name(&Name::new("example"), Idx::from_raw(RawIdx::from_u32(1)))
+            .unwrap_or_else(|| panic!("expected expression. hir_module: {:#?}", hir_module));
+
+        let actual = resolve_expression_by_id(&db, module_id, idx).expect("must find expression");
+        let Expression::AbstractTraitMemberRef { member_name, .. } = actual else {
+            panic!(
+                "expected actual to be AbstractTraitMemberRef, but was {:?}",
+                actual
+            );
+        };
+
+        assert_eq!(Name::from("abstract"), member_name);
+    }
+
+    #[test]
+    fn resolve_same_module_type_def_variant_constructor() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    typedef Option[t] = Some(t) | None
+
+    let example = Option::None
+            ",
+        );
+
+        let actual = maybe_find_example(&db, module_id).expect("must find expression");
+
+        assert_eq!(
+            Expression::VariantConstructor {
+                type_def: Fql {
+                    module_id: ModuleId::new(&db, "test_stuff"),
+                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                },
+                variant_name: Name::from("None")
+            },
+            actual
+        );
+    }
+
+    //
+    // function_call - this module
+    //
+
+    #[test]
+    fn resolve_same_module_function_call_variable_ref() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    let test_func = |x| -> x + 1
+    let example = test_func(123)
+            ",
+        );
+
+        let actual = maybe_find_example(&db, module_id).expect("must find expression");
+
+        assert_eq!(
+            Expression::FunctionCall {
+                target: EPTdFql::Expression(Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(3)),
+                }),
+                variant_name: None,
+                args: vec![Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(4)),
+                }],
+            },
+            actual,
+        );
+    }
+
+    #[test]
+    fn resolve_same_module_function_call_variant_constructor() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    typedef Option[t] = Some(t) | None
+    let example = Option::Some(123)
+            ",
+        );
+
+        let actual = maybe_find_example(&db, module_id).expect("must find expression");
+
+        assert_eq!(
+            Expression::FunctionCall {
+                target: EPTdFql::TypeDefinition(Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                }),
+                variant_name: Some(Name::new("Some")),
+                args: vec![Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                }],
+            },
+            actual,
+        );
+    }
+
+    #[test]
+    fn resolve_same_module_function_call_argument_reference() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    let example = |func, arg| -> func(arg)
+            ",
+        );
+
+        let actual = resolve_expression_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
+            .expect("must find expression");
+
+        assert_eq!(
+            Expression::FunctionCall {
+                target: EPTdFql::Pattern(Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                }),
+                variant_name: None,
+                args: vec![Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                }],
+            },
+            actual,
+        );
     }
 
     //
@@ -495,14 +632,6 @@ mod tests {
     #[test]
     fn resolve_cross_module_variable_ref_unknown_module() {
         let mut db = TestHirResDatabase::new_with_stdlib();
-        db.add_module(
-            "other",
-            camino::Utf8Path::new("./other.alloy"),
-            r"
-    let test_data = 1
-            ",
-        );
-
         let module_id = db.add_module(
             "test_stuff",
             camino::Utf8Path::new("./test_stuff.alloy"),
@@ -614,6 +743,138 @@ mod tests {
     }
 
     //
+    // function_call - cross module
+    //
+
+    #[test]
+    fn resolve_cross_module_function_call_variable_ref() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        db.add_module(
+            "other",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    let test_func = |x| -> x + 1
+            ",
+        );
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    import other
+
+    let example = other::test_func(123)
+            ",
+        );
+
+        let actual = maybe_find_example(&db, module_id).expect("must find expression");
+
+        assert_eq!(
+            Expression::FunctionCall {
+                target: EPTdFql::Expression(Fql {
+                    module_id: ModuleId::new(&db, "other"),
+                    local_id: Idx::from_raw(RawIdx::from_u32(3)),
+                }),
+                variant_name: None,
+                args: vec![Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                }],
+            },
+            actual,
+        );
+    }
+
+    #[test]
+    fn resolve_cross_module_function_call_variant_constructor() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    import std::option::Option
+
+    let example = Option::Some(123)
+            ",
+        );
+
+        let actual = maybe_find_example(&db, module_id).expect("must find expression");
+
+        assert_eq!(
+            Expression::FunctionCall {
+                target: EPTdFql::TypeDefinition(Fql {
+                    module_id: ModuleId::new(&db, "std::option"),
+                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                }),
+                variant_name: Some(Name::new("Some")),
+                args: vec![Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                }],
+            },
+            actual,
+        );
+    }
+
+    #[test]
+    fn resolve_cross_module_variant_constructor_type_def_with_incorrect_sub_path_returns_error() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    import std::option::Option
+
+    let example = Option::Other(123)
+            ",
+        );
+
+        let err =
+            maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
+
+        let expected = TypeResolutionError::UnknownExpressionReference {
+            source_ref: Fql {
+                module_id,
+                local_id: Idx::from_raw(RawIdx::from_u32(1)),
+            },
+            module_id,
+            path: ne_vec![
+                Name::new("std"),
+                Name::new("option"),
+                Name::new("Option"),
+                Name::new("Other")
+            ],
+        };
+
+        assert_eq!(expected, err);
+    }
+
+    #[test]
+    fn resolve_cross_module_function_call_unknown_module() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    import not_other
+
+    let example = not_other::test_func(123)
+            ",
+        );
+
+        let err = maybe_find_example(&db, module_id).expect_err("must find module error");
+
+        let expected = TypeResolutionError::UnknownModule {
+            source_ref: EPTrFql::Expression(Fql {
+                module_id,
+                local_id: Idx::from_raw(RawIdx::from_u32(1)),
+            }),
+            module_slug: "not_other".to_string(),
+        };
+
+        assert_eq!(expected, err);
+    }
+
+    //
     // variable_ref - unknown path
     //
 
@@ -628,13 +889,42 @@ mod tests {
             ",
         );
 
-        let err =
-            maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
+        let err = maybe_find_example(&db, module_id).expect_err("must fail to find variable ref");
 
         let expected = TypeResolutionError::UnknownExpressionReference {
             source_ref: Fql {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
+            },
+            module_id,
+            path: ne_vec![Name::new("unknown")],
+        };
+
+        assert_eq!(expected, err);
+    }
+
+    //
+    // function_call - unknown path
+    //
+
+    #[test]
+    fn unknown_path_function_call() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    let example = unknown(123)
+            ",
+        );
+
+        let err =
+            maybe_find_example(&db, module_id).expect_err("must fail to find function target");
+
+        let expected = TypeResolutionError::UnknownExpressionReference {
+            source_ref: Fql {
+                module_id,
+                local_id: Idx::from_raw(RawIdx::from_u32(1)),
             },
             module_id,
             path: ne_vec![Name::new("unknown")],
