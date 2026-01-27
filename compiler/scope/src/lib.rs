@@ -70,6 +70,24 @@ impl Scopes {
     pub fn iter(&self) -> ScopesIterator<'_> {
         ScopesIterator::new(self)
     }
+
+    /// Check if a scope is equal to or descended from another scope
+    /// Returns true if `child` is the same as `ancestor` or is nested within it
+    #[must_use]
+    pub fn scope_is_descendant_of(&self, child: ScopeIdx, ancestor: ScopeIdx) -> bool {
+        let mut current = child;
+        loop {
+            if current == ancestor {
+                return true;
+            }
+            let parent = self.parent_scope(current);
+            if current == parent {
+                // Reached root without finding ancestor
+                return false;
+            }
+            current = parent;
+        }
+    }
 }
 
 pub struct ScopesIterator<'a> {

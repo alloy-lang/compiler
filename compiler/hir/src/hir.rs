@@ -222,29 +222,12 @@ impl HirModule {
         self.behaviors.get(idx)
     }
 
-    /// Check if a scope is equal to or descended from another scope
-    /// Returns true if `child` is the same as `ancestor` or is nested within it
-    fn scope_is_descendant_of(&self, child: ScopeIdx, ancestor: ScopeIdx) -> bool {
-        let mut current = child;
-        loop {
-            if current == ancestor {
-                return true;
-            }
-            let parent = self.scopes.parent_scope(current);
-            if current == parent {
-                // Reached root without finding ancestor
-                return false;
-            }
-            current = parent;
-        }
-    }
-
     /// Find the trait that contains the given scope, if any
     /// This checks if the scope is within a trait's scope hierarchy
     pub fn find_trait_containing_scope(&self, scope: ScopeIdx) -> Option<(TraitIdx, &Trait)> {
         for (trait_idx, trait_def, _range, _name_scope) in self.traits() {
             let trait_scope = trait_def.scope();
-            if self.scope_is_descendant_of(scope, trait_scope) {
+            if self.scopes.scope_is_descendant_of(scope, trait_scope) {
                 return Some((trait_idx, trait_def));
             }
         }
