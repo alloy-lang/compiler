@@ -1,9 +1,9 @@
+use crate::cross_module_resolver::resolve_cross_module_optional;
 use crate::{resolve_cross_module_type_definition, Fql, TypeDefinitionLookup, TypeResolutionError};
 use alloy_hir as hir;
 use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
 use non_empty_vec::ne_vec;
-use crate::cross_module_resolver::resolve_cross_module_optional;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeDefinition {

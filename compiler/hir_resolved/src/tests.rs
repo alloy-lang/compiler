@@ -1,6 +1,6 @@
-use std::fs;
 use alloy_hir as hir;
 use alloy_workspace::{ModuleId, SourceFile, Workspace, WorkspaceDatabase};
+use std::fs;
 
 #[salsa::db]
 #[derive(Default, Clone)]

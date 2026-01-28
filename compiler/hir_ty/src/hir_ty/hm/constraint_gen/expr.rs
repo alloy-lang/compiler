@@ -86,9 +86,7 @@ fn infer_variable_ref(
     // This enables let-polymorphism: if the variable has been generalized,
     // we'll instantiate it with fresh type variables
     // Use tracked version: source_fql is the call site, ref_fql is the definition
-    if let Some(existing_ty) =
-        ctx.maybe_find_type_tracked(ref_fql.clone(), source_fql.clone())
-    {
+    if let Some(existing_ty) = ctx.maybe_find_type_tracked(ref_fql.clone(), source_fql.clone()) {
         return ctx.assign_type(source_fql, existing_ty);
     }
 
@@ -320,18 +318,16 @@ fn build_constructor_type(
         match resolved {
             ResolvedType::Generic(id) => {
                 // Use or create a type variable for this generic ID
-                let var_id = *generic_map.entry(*id).or_insert_with(|| {
-                    
-                    ctx.type_var_gen.fresh()
-                });
+                let var_id = *generic_map
+                    .entry(*id)
+                    .or_insert_with(|| ctx.type_var_gen.fresh());
                 Some(MonoType::Var(var_id))
             }
             ResolvedType::ConstrainedGeneric { id, .. } => {
                 // Treat constrained generics the same for now
-                let var_id = *generic_map.entry(*id).or_insert_with(|| {
-                    
-                    ctx.type_var_gen.fresh()
-                });
+                let var_id = *generic_map
+                    .entry(*id)
+                    .or_insert_with(|| ctx.type_var_gen.fresh());
                 Some(MonoType::Var(var_id))
             }
             other => resolved_to_mono(other, ctx),
