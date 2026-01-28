@@ -1,4 +1,5 @@
-use crate::{resolve_cross_module_type_definition, Fql, TypeResolutionError};
+use crate::type_definition::resolve_type_definition_by_path_variant;
+use crate::{Fql, TypeResolutionError};
 use alloy_hir as hir;
 use alloy_workspace::ModuleId;
 use non_empty_vec::{ne_vec, NonEmpty};
@@ -11,6 +12,7 @@ pub enum Pattern {
     Nil,
     Destructure {
         target: Fql<hir::TypeDefinition>,
+        variant_name: hir::Name,
         args: Vec<Fql<hir::Pattern>>,
     },
     Unit,
@@ -36,7 +38,7 @@ pub fn resolve_pattern_by_id(
             unsafe { Pattern::Tuple(NonEmpty::new_unchecked(fql_elements)) }
         }
         hir::Pattern::Destructure { target, args, .. } => {
-            resolve_destructure(db, source_ref, module_id, target, args.clone())?
+            resolve_destructure(db, source_ref, module_id, target, args)?
         }
         hir::Pattern::Nil => Pattern::Nil,
         hir::Pattern::Missing => Pattern::Missing,
@@ -64,67 +66,177 @@ fn resolve_destructure(
     source_ref: Fql<hir::Pattern>,
     module_id: ModuleId,
     target: &hir::Path,
-    args: Vec<hir::PatternIdx>,
+    args: &[hir::PatternIdx],
 ) -> Result<Pattern, TypeResolutionError> {
+    let Some((type_def_fql, variant_name)) =
+        resolve_type_definition_by_path_variant(db, module_id, target)
+    else {
+        let error_path = match target {
+            hir::Path::ThisModule { name, .. } => ne_vec![name.clone()],
+            hir::Path::OtherModule(fqn) => {
+                if db.find_module_by_slug(&fqn.module_slug()).is_none() {
+                    return Err(TypeResolutionError::UnknownModule {
+                        module_slug: fqn.module_slug(),
+                        source_ref: source_ref.into(),
+                    });
+                }
+
+                fqn.segments()
+            }
+            hir::Path::Unknown(names) => names.clone(),
+        };
+
+        return Err(TypeResolutionError::UnknownPatternReference {
+            source_ref,
+            module_id,
+            path: error_path,
+        });
+    };
+
     let fql_args = args
         .iter()
         .map(|p| Fql::new(module_id, *p))
         .collect::<Vec<_>>();
 
-    let target = match target {
-        hir::Path::ThisModule {
-            name: type_name,
-            subname,
-            scope: target_scope,
-        } => {
-            let (hir_module, _) = hir::lower_file(db, module_id);
-
-            if let Some((type_def_id, type_def)) =
-                hir_module.get_type_definition_by_name(type_name, *target_scope)
-            {
-                // Check if this is a qualified variant (e.g., Option::Some)
-                if let Some(variant_name) = subname {
-                    if !type_def.kind.has_variant(variant_name) {
-                        return Err(TypeResolutionError::UnknownPatternReference {
-                            source_ref,
-                            module_id,
-                            path: ne_vec![type_name.clone(), variant_name.clone()],
-                        });
-                    }
-                }
-                Fql::new(module_id, type_def_id)
-            } else {
-                return Err(TypeResolutionError::UnknownPatternReference {
-                    source_ref,
-                    module_id,
-                    path: ne_vec![type_name.clone()],
-                });
-            }
-        }
-        hir::Path::OtherModule(fqn) => {
-            if let Ok(type_fql) =
-                resolve_cross_module_type_definition(db, fqn, source_ref.clone().into())
-            {
-                type_fql
-            } else {
-                return Err(TypeResolutionError::UnknownPatternReference {
-                    source_ref,
-                    module_id,
-                    path: fqn.segments(),
-                });
-            }
-        }
-        hir::Path::Unknown(names) => {
-            return Err(TypeResolutionError::UnknownPatternReference {
-                source_ref,
-                module_id,
-                path: names.clone(),
-            })
-        }
-    };
-
     Ok(Pattern::Destructure {
-        target,
+        target: type_def_fql,
+        variant_name,
         args: fql_args,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tests::TestHirResDatabase;
+    use crate::EPTrFql;
+    use alloy_hir::Name;
+    use alloy_workspace::WorkspaceDatabase;
+    use la_arena::{Idx, RawIdx};
+
+    #[test]
+    fn test_destructure_pattern_resolves() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+    import std::option::Option
+    let unwrap = |Option::Some(x)| -> x
+            ",
+        );
+
+        let actual_0 = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
+            .expect("expected to resolve pattern");
+        assert_eq!(Pattern::VariableDeclaration, actual_0);
+        let actual_1 = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
+            .expect("expected to resolve pattern");
+        assert_eq!(
+            Pattern::Destructure {
+                target: Fql {
+                    module_id: ModuleId::new(&db, "std::option"),
+                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                },
+                variant_name: Name::new("Some"),
+                args: vec![Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                }],
+            },
+            actual_1
+        );
+    }
+
+    #[test]
+    fn test_destructure_pattern_with_invalid_variant() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+    import std::option::Option
+    let unwrap = |Option::InvalidVariant(x)| -> x
+            ",
+        );
+
+        let actual_0 = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
+            .expect("expected to resolve pattern");
+        assert_eq!(Pattern::VariableDeclaration, actual_0);
+        let err = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
+            .expect_err("expected to resolve pattern");
+        assert_eq!(
+            TypeResolutionError::UnknownPatternReference {
+                source_ref: Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                },
+                module_id,
+                path: ne_vec![
+                    Name::new("std"),
+                    Name::new("option"),
+                    Name::new("Option"),
+                    Name::new("InvalidVariant")
+                ],
+            },
+            err
+        );
+    }
+
+    #[test]
+    fn test_destructure_pattern_with_unknown_type() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+    let unwrap = |UnknownType(x)| -> x
+            ",
+        );
+
+        let actual_0 = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
+            .expect("expected to resolve pattern");
+        assert_eq!(Pattern::VariableDeclaration, actual_0);
+        let err = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
+            .expect_err("expected to resolve pattern");
+        assert_eq!(
+            TypeResolutionError::UnknownPatternReference {
+                source_ref: Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                },
+                module_id,
+                path: ne_vec![Name::new("UnknownType")],
+            },
+            err
+        );
+    }
+
+    #[test]
+    fn test_destructure_pattern_with_unknown_module() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+    import unknown::Option
+    let unwrap = |Option::Some(x)| -> x
+            ",
+        );
+
+        let actual_0 = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
+            .expect("expected to resolve pattern");
+        assert_eq!(Pattern::VariableDeclaration, actual_0);
+        let err = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
+            .expect_err("expected to resolve pattern");
+        assert_eq!(
+            TypeResolutionError::UnknownModule {
+                source_ref: EPTrFql::Pattern(Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                }),
+                module_slug: "unknown".to_string(),
+            },
+            err
+        );
+    }
 }

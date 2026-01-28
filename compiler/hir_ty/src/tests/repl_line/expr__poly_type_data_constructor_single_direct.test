@@ -1,4 +1,4 @@
-typedef Identity[t] = Id t
+typedef Identity[t] = Identity t
 
 let string_example = Identity("hi")
 let int_example = Identity(10)
