@@ -1,8 +1,9 @@
-use crate::cross_module_resolver::resolve_cross_module_optional;
-use crate::{resolve_cross_module_type_definition, Fql, TypeDefinitionLookup, TypeResolutionError};
+use crate::{cross_module_resolver, Fql, TypeDefinitionLookup, TypeResolutionError};
 use alloy_hir as hir;
 use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
+use cross_module_resolver::resolve_cross_module_optional;
+use cross_module_resolver::resolve_cross_module;
 use non_empty_vec::ne_vec;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -53,7 +54,7 @@ pub fn resolve_type_definition_by_path(
             Ok(type_def_fql)
         }
         hir::Path::OtherModule(fqn) => {
-            resolve_cross_module_type_definition(db, fqn, source_ref.into())
+            resolve_cross_module::<hir::TypeDefinition, TypeDefinitionLookup>(db, fqn, source_ref)
         }
         hir::Path::Unknown(names) => Err(TypeResolutionError::UnknownTypeDefinition {
             source_ref,

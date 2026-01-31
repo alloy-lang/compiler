@@ -1,4 +1,4 @@
-use super::{cross_module_resolver, EPTdFql, ExpressionLookup, TypeDefinitionLookup};
+use super::{cross_module_resolver, EPTdFql, ExpressionLookup};
 use crate::diagnostics::TypeResolutionError;
 use crate::pattern::resolve_pattern_by_path;
 use crate::r#trait::resolve_abstract_trait_member_by_path;
