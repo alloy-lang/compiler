@@ -59,6 +59,13 @@ fn resolve_trait_by_path(
                 return Ok(fql);
             };
 
+            if db.find_module_by_slug(&fqn.module_slug()).is_none() {
+                return Err(TypeResolutionError::UnknownModule {
+                    module_slug: fqn.module_slug(),
+                    source_ref: source_ref.into(),
+                });
+            }
+
             fqn.segments()
         }
         hir::Path::Unknown(names) => names.clone(),
@@ -290,6 +297,28 @@ mod tests {
             source_ref,
             module_id,
             path: ne_vec!["traits".into(), "UnknownTrait".into()],
+        };
+
+        assert_eq!(expected, actual_err);
+    }
+
+    #[test]
+    fn test_resolve_trait_unknown_module() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+        import fake_traits
+        typeof dummy : fake_traits::UnknownTrait
+                ",
+        );
+
+        let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
+        let actual_err = find_trait_error(&db, module_id);
+        let expected = TypeResolutionError::UnknownModule {
+            source_ref: EPTrFql::TypeReference(source_ref),
+            module_slug: "fake_traits".to_string(),
         };
 
         assert_eq!(expected, actual_err);
