@@ -1,6 +1,7 @@
 use crate::{cross_module_resolver, EPTrFql, Expression, Fql, TypeResolutionError};
 use alloy_hir as hir;
 use alloy_workspace::ModuleId;
+use cross_module_resolver::resolve_cross_module_optional;
 use la_arena::Idx;
 use non_empty_vec::{ne_vec, NonEmpty};
 
@@ -40,28 +41,34 @@ fn resolve_trait_by_path(
     path: &hir::Path,
     source_ref: Fql<hir::TypeReference>,
 ) -> Result<Fql<hir::Trait>, TypeResolutionError> {
-    match path {
+    let error_path = match path {
         hir::Path::ThisModule { name, subname, .. } => {
             if subname.is_some() {
                 unreachable!("Traits can't be qualified");
             }
             let (hir_module, _) = hir::lower_file(db, module_id);
-            let Some((trait_idx, _)) = hir_module.get_trait_by_name(name) else {
-                return Err(TypeResolutionError::UnknownTraitReference {
-                    source_ref,
-                    module_id,
-                    path: ne_vec![name.clone()],
-                });
+            if let Some((trait_idx, _)) = hir_module.get_trait_by_name(name) {
+                return Ok(Fql::new(module_id, trait_idx));
             };
-            Ok(Fql::new(module_id, trait_idx))
+
+            // lowering error
+            ne_vec![name.clone()]
         }
-        hir::Path::OtherModule(fqn) => resolve_cross_module_trait(db, fqn, source_ref),
-        hir::Path::Unknown(names) => Err(TypeResolutionError::UnknownTraitReference {
-            source_ref,
-            module_id,
-            path: names.clone(),
-        }),
-    }
+        hir::Path::OtherModule(fqn) => {
+            if let Some(fql) = resolve_cross_module_optional::<hir::Trait, TraitLookup>(db, fqn) {
+                return Ok(fql);
+            };
+
+            fqn.segments()
+        }
+        hir::Path::Unknown(names) => names.clone(),
+    };
+
+    Err(TypeResolutionError::UnknownTraitReference {
+        source_ref,
+        module_id,
+        path: error_path,
+    })
 }
 
 pub(crate) fn resolve_abstract_trait_member_by_path(
@@ -114,33 +121,18 @@ impl cross_module_resolver::ModuleLookup<hir::Trait> for TraitLookup {
 
     fn unknown_item_error(
         source_ref: impl Into<EPTrFql>,
-        _module_id: ModuleId,
+        module_id: ModuleId,
         path: NonEmpty<hir::Name>,
     ) -> TypeResolutionError {
         let EPTrFql::TypeReference(source_ref) = source_ref.into() else {
             panic!("Trait resolution requires TypeReference");
         };
 
-        // Build the Fqn from the path
-        let path_len: usize = path.len().into();
-        let fqn = if path_len == 1 {
-            // Single element path: just the trait name
-            // For Fqn, module field is NonEmpty<Name>, so we need to convert
-            hir::Fqn::new(
-                ne_vec![path[0].clone()],
-                path[0].clone(),
-                Vec::<hir::Name>::new(),
-            )
-        } else {
-            // Multi-element path: construct module as NonEmpty, last is trait name, middle is sub_path
-            hir::Fqn::new(
-                ne_vec![path[0].clone()],
-                path.last().clone(),
-                path[1..path_len - 1].to_vec(),
-            )
-        };
-
-        TypeResolutionError::UnknownTraitName { source_ref, fqn }
+        TypeResolutionError::UnknownTraitReference {
+            source_ref,
+            module_id,
+            path,
+        }
     }
 
     fn validation_error(
@@ -154,22 +146,6 @@ impl cross_module_resolver::ModuleLookup<hir::Trait> for TraitLookup {
     }
 }
 
-/// Resolve a cross-module trait reference
-///
-/// This handles qualified trait references by trying different ways to split
-/// the path into (module, trait).
-///
-/// For example, `std::option::Trait1` could be split as:
-/// - module: "std::option", trait: "Trait1"
-/// - module: "std", trait: "option" (invalid - option is not a trait)
-fn resolve_cross_module_trait(
-    db: &dyn hir::HirDatabase,
-    fqn: &hir::Fqn,
-    source_ref: Fql<hir::TypeReference>,
-) -> Result<Fql<hir::Trait>, TypeResolutionError> {
-    cross_module_resolver::resolve_cross_module::<hir::Trait, TraitLookup>(db, fqn, source_ref)
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -177,30 +153,13 @@ mod tests {
     use alloy_workspace::WorkspaceDatabase;
     use la_arena::RawIdx;
 
-    fn find_trait(db: &dyn hir::HirDatabase, module_id: ModuleId, name: &str) -> Fql<hir::Trait> {
-        let path = hir::Path::ThisModule {
-            name: name.into(),
-            subname: None,
-            scope: alloy_scope::Scopes::ROOT,
-        };
-
-        let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
-        resolve_trait_by_path(db, module_id, &path, source_ref).expect("must find trait")
+    fn find_trait(db: &dyn hir::HirDatabase, module_id: ModuleId) -> Fql<hir::Trait> {
+        resolve_trait_by_ref_id(db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
+            .expect("must find trait")
     }
 
-    fn find_trait_error(
-        db: &dyn hir::HirDatabase,
-        module_id: ModuleId,
-        name: &str,
-    ) -> TypeResolutionError {
-        let path = hir::Path::ThisModule {
-            name: name.into(),
-            subname: None,
-            scope: alloy_scope::Scopes::ROOT,
-        };
-
-        let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
-        resolve_trait_by_path(db, module_id, &path, source_ref)
+    fn find_trait_error(db: &dyn hir::HirDatabase, module_id: ModuleId) -> TypeResolutionError {
+        resolve_trait_by_ref_id(db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
             .expect_err("must fail to find trait")
     }
 
@@ -213,21 +172,29 @@ mod tests {
             r"
     trait MyTrait where
     end
+    
+    typeof dummy : MyTrait
             ",
         );
 
-        let actual = find_trait(&db, module_id, "MyTrait");
+        let actual_trait = find_trait(&db, module_id);
         let expected = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
 
-        assert_eq!(expected, actual);
+        assert_eq!(expected, actual_trait);
     }
 
     #[test]
-    fn test_resolve_trait_unknown_this_module() {
+    fn test_resolve_trait_unknown() {
         let mut db = TestHirResDatabase::new_with_stdlib();
-        let module_id = db.add_module("test", camino::Utf8Path::new("./test.alloy"), r"");
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+        typeof dummy : UnknownTrait
+        ",
+        );
 
-        let actual = find_trait_error(&db, module_id, "UnknownTrait");
+        let actual_err = find_trait_error(&db, module_id);
 
         let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
         let expected = TypeResolutionError::UnknownTraitReference {
@@ -236,7 +203,7 @@ mod tests {
             path: ne_vec!["UnknownTrait".into()],
         };
 
-        assert_eq!(expected, actual);
+        assert_eq!(expected, actual_err);
     }
 
     #[test]
@@ -256,20 +223,44 @@ mod tests {
             camino::Utf8Path::new("./test.alloy"),
             r"
     import traits::MyTrait
+    typeof dummy : MyTrait
             ",
         );
 
-        let fqn = hir::Fqn {
-            module: ne_vec![hir::Name::new("traits")],
-            name: hir::Name::new("MyTrait"),
-            sub_path: None,
-        };
-
-        let type_ref_fql = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
-        let actual = resolve_cross_module_trait(&db, &fqn, type_ref_fql).expect("must find trait");
+        let actual_trait = find_trait(&db, module_id);
         let expected = Fql::new(other_module_id, Idx::from_raw(RawIdx::from_u32(0)));
 
-        assert_eq!(expected, actual);
+        assert_eq!(expected, actual_trait);
+    }
+
+    #[test]
+    fn test_resolve_trait_cross_module_extra_path() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let other_module_id = db.add_module(
+            "traits",
+            camino::Utf8Path::new("./traits.alloy"),
+            r"
+    trait MyTrait where
+    end
+            ",
+        );
+
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+    import traits::MyTrait
+    typeof dummy : MyTrait::extra_junk
+            ",
+        );
+
+        let actual_trait = find_trait(&db, module_id);
+        let expected = Fql::new(other_module_id, Idx::from_raw(RawIdx::from_u32(1)));
+
+        assert_eq!(
+            expected, actual_trait,
+            "TODO: the ref has extra junk, this should be an error"
+        );
     }
 
     #[test]
@@ -289,103 +280,56 @@ mod tests {
             camino::Utf8Path::new("./test.alloy"),
             r"
         import traits
+        typeof dummy : traits::UnknownTrait
                 ",
         );
 
-        let fqn = hir::Fqn {
-            module: ne_vec![hir::Name::new("traits")],
-            name: hir::Name::new("UnknownTrait"),
-            sub_path: None,
+        let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
+        let actual_err = find_trait_error(&db, module_id);
+        let expected = TypeResolutionError::UnknownTraitReference {
+            source_ref,
+            module_id,
+            path: ne_vec!["traits".into(), "UnknownTrait".into()],
         };
 
-        let type_ref_fql = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
-        let actual = resolve_cross_module_trait(&db, &fqn, type_ref_fql.clone())
-            .expect_err("must fail to find trait");
-        let expected = TypeResolutionError::UnknownTraitName {
-            source_ref: type_ref_fql,
-            fqn,
-        };
-
-        assert_eq!(expected, actual);
+        assert_eq!(expected, actual_err);
     }
 
     #[test]
-    fn test_resolve_trait_unknown_path() {
+    fn test_resolve_trait_bounded_type_reference() {
         let mut db = TestHirResDatabase::new_with_stdlib();
-        let module_id = db.add_module("test", camino::Utf8Path::new("./test.alloy"), r"");
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+    typedef MyType = MyType Int
+    trait MyTrait where
+    end
+    behavior MyTrait[t] for MyType where
+        typevar t
+    end
+            ",
+        );
 
-        let full_path = ne_vec![hir::Name::new("unknown"), hir::Name::new("path")];
-        let unknown_path = hir::Path::Unknown(full_path.clone());
+        let bounded_type_idx = Idx::from_raw(RawIdx::from_u32(3));
 
-        let type_ref_fql = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
-        let actual = resolve_trait_by_path(&db, module_id, &unknown_path, type_ref_fql.clone())
-            .expect_err("must fail to find trait");
-        let expected = TypeResolutionError::UnknownTraitReference {
-            source_ref: type_ref_fql,
-            module_id,
-            path: full_path,
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+        let type_ref = hir_module.get_type_reference(bounded_type_idx);
+        assert!(matches!(type_ref, hir::TypeReference::Bounded { .. }));
+
+        let err = resolve_trait_by_ref_id(&db, module_id, bounded_type_idx)
+            .expect_err("must fail with bounded trait ref");
+        let expected = TypeResolutionError::BoundedTraitReference {
+            source_ref: Fql {
+                module_id,
+                local_id: Idx::from_raw(RawIdx::from_u32(3)),
+            },
+            target_ref: Fql {
+                module_id,
+                local_id: Idx::from_raw(RawIdx::from_u32(1)),
+            },
         };
 
-        assert_eq!(expected, actual);
+        assert_eq!(expected, err);
     }
-    //
-    //     #[test]
-    //     fn test_resolve_trait_bounded_type_reference() {
-    //         let mut db = TestHirResDatabase::new_with_stdlib();
-    //         let module_id = db.add_module(
-    //             "test",
-    //             camino::Utf8Path::new("./test.alloy"),
-    //             r"
-    //     trait MyTrait where
-    //     end
-    //             ",
-    //         );
-    //
-    //         let (hir_module, _) = hir::lower_file(&db, module_id);
-    //         // Create a bounded type reference scenario
-    //         let type_refs: Vec<_> = hir_module.type_references()
-    //             .map(|(idx, _, _, _)| idx)
-    //             .collect();
-    //
-    //         for type_ref_idx in type_refs {
-    //             let type_ref = hir_module.get_type_reference(type_ref_idx);
-    //             if let hir::TypeReference::Bounded { .. } = type_ref {
-    //                 let result = resolve_trait_by_ref_id(&db, module_id, type_ref_idx);
-    //                 assert!(result.is_err(), "Should fail with bounded type reference");
-    //
-    //                 if let Err(TypeResolutionError::BoundedTraitReference { .. }) = result {
-    //                     // Correct error type
-    //                     return;
-    //                 } else {
-    //                     panic!("Expected BoundedTraitReference error");
-    //                 }
-    //             }
-    //         }
-    //     }
-    //
-    //     #[test]
-    //     fn test_error_get_range_for_trait_errors() {
-    //         let mut db = TestHirResDatabase::new_with_stdlib();
-    //         let module_id = db.add_module(
-    //             "test",
-    //             camino::Utf8Path::new("./test.alloy"),
-    //             r"
-    //     behavior UnknownTrait for Int where
-    //     end
-    //             ",
-    //         );
-    //
-    //         let path = hir::Path::ThisModule {
-    //             name: hir::Name::new("UnknownTrait"),
-    //             subname: None,
-    //             scope: alloy_scope::Scopes::ROOT,
-    //         };
-    //
-    //         let type_ref_fql = Fql::new(module_id, la_arena::Idx::from_raw(la_arena::RawIdx::from_u32(0)));
-    //         if let Err(err) = resolve_trait_by_path(&db, module_id, &path, type_ref_fql) {
-    //             // Verify get_range() works for trait errors
-    //             let range = err.get_range(&db);
-    //             assert!(range.len() > 0.into());
-    //         }
-    //     }
 }

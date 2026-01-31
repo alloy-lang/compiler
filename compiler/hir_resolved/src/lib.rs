@@ -103,21 +103,3 @@ impl cross_module_resolver::ModuleLookup<hir::TypeDefinition> for TypeDefinition
         }
     }
 }
-
-/// Resolve a cross-module type definition reference
-///
-/// This handles qualified variant references by trying different ways to split
-/// the path into (module, type, variant).
-///
-/// For example, `std::option::Option::Some` could be split as:
-/// - module: "std::option", type: "Option", variant: "Some"
-/// - module: "std", type: "option", variant: "Option" (invalid - Option is not a variant)
-pub(crate) fn resolve_cross_module_type_definition(
-    db: &dyn hir::HirDatabase,
-    fqn: &hir::Fqn,
-    source_ref: EPTrFql,
-) -> Result<Fql<hir::TypeDefinition>, TypeResolutionError> {
-    cross_module_resolver::resolve_cross_module::<hir::TypeDefinition, TypeDefinitionLookup>(
-        db, fqn, source_ref,
-    )
-}
