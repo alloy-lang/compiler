@@ -162,24 +162,24 @@ fn resolve_variable_ref(
         return Ok(expr);
     }
 
-    let error_path = match path {
-        hir::Path::ThisModule { name, .. } => ne_vec![name.clone()],
+    let (error_module_id, error_path) = match path {
+        hir::Path::ThisModule { name, .. } => (module_id, ne_vec![name.clone()]),
         hir::Path::OtherModule(fqn) => {
-            if db.find_module_by_slug(&fqn.module_slug()).is_none() {
+            let Some(module_id) =  db.find_module_by_slug(&fqn.module_slug()) else {
                 return Err(TypeResolutionError::UnknownModule {
                     module_slug: fqn.module_slug(),
                     source_ref: source_ref.into(),
                 });
-            }
+            };
 
-            fqn.segments()
+            (module_id, fqn.segments())
         }
-        hir::Path::Unknown(names) => names.clone(),
+        hir::Path::Unknown(names) => (module_id, names.clone()),
     };
 
     Err(TypeResolutionError::UnknownExpressionReference {
         source_ref,
-        module_id,
+        module_id: error_module_id,
         path: error_path,
     })
 }
@@ -532,7 +532,7 @@ mod tests {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
             },
-            module_id,
+            module_id: ModuleId::new(&db, "other"),
             path: ne_vec![Name::new("other"), Name::new("unknown_test_data")],
         };
         assert_eq!(expected, err);
@@ -618,7 +618,7 @@ mod tests {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
             },
-            module_id,
+            module_id: ModuleId::new(&db, "other"),
             path: ne_vec![
                 Name::new("other"),
                 Name::new("test_data"),
@@ -730,7 +730,7 @@ mod tests {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
             },
-            module_id,
+            module_id: ModuleId::new(&db, "std::option"),
             path: ne_vec![
                 Name::new("std"),
                 Name::new("option"),
