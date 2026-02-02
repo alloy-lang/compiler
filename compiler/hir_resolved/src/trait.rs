@@ -191,6 +191,29 @@ mod tests {
     }
 
     #[test]
+    fn test_resolve_trait_this_module_extra_path() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+    trait MyTrait where
+    end
+    
+    typeof dummy : MyTrait::extra_junk
+            ",
+        );
+
+        let actual_trait = find_trait(&db, module_id);
+        let expected = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(1)));
+
+        assert_eq!(
+            expected, actual_trait,
+            "TODO: the ref has extra junk, this should be an error"
+        );
+    }
+
+    #[test]
     fn test_resolve_trait_unknown() {
         let mut db = TestHirResDatabase::new_with_stdlib();
         let module_id = db.add_module(
