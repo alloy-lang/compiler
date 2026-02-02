@@ -9,11 +9,10 @@ pub fn type_definition_to_resolved(
     db: &dyn HirTyDatabase,
     ctx: &mut super::type_annotation::TypeResolutionContext,
     current_module_id: ModuleId,
-    path: &hir::Path,
-    source_ref: Fql<hir::TypeReference>,
+    type_idx: hir::TypeIdx,
 ) -> Option<ResolvedType> {
     let resolved_type_def_fql =
-        res::resolve_type_definition_by_path(db, current_module_id, path, source_ref).ok()?;
+        res::resolve_type_definition_by_ref_id(db, current_module_id, type_idx).ok()?;
     type_definition_to_resolved_type(
         db,
         resolved_type_def_fql.module_id,

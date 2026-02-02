@@ -81,8 +81,7 @@ pub fn type_reference_to_resolved_type(
                         db,
                         ctx,
                         current_module_id,
-                        path,
-                        source_ref,
+                        type_idx,
                     )
                 },
             )?
