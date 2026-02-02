@@ -2,6 +2,7 @@ use crate::{cross_module_resolver, EPTrFql, Fql, TypeResolutionError};
 use alloy_hir as hir;
 use alloy_scope::{ScopeIdx, Scopes};
 use alloy_workspace::ModuleId;
+use cross_module_resolver::resolve_cross_module_optional;
 use non_empty_vec::NonEmpty;
 
 pub fn resolve_type_reference_by_path(
@@ -13,7 +14,9 @@ pub fn resolve_type_reference_by_path(
         hir::Path::ThisModule { name, scope, .. } => {
             get_type_reference_by_name(db, current_module_id, name, *scope)
         }
-        hir::Path::OtherModule(fqn) => resolve_cross_module_type_reference(db, fqn),
+        hir::Path::OtherModule(fqn) => {
+            resolve_cross_module_optional::<hir::TypeReference, TypeReferenceLookup>(db, fqn)
+        }
         hir::Path::Unknown(_) => None,
     }
 }
@@ -77,21 +80,12 @@ impl cross_module_resolver::ModuleLookup<hir::TypeReference> for TypeReferenceLo
     }
 }
 
-/// Resolve a cross-module type reference
-fn resolve_cross_module_type_reference(
-    db: &dyn hir::HirDatabase,
-    fqn: &hir::Fqn,
-) -> Option<Fql<hir::TypeReference>> {
-    cross_module_resolver::resolve_cross_module_optional::<hir::TypeReference, TypeReferenceLookup>(
-        db, fqn,
-    )
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::tests::TestHirResDatabase;
     use alloy_workspace::WorkspaceDatabase;
+    use la_arena::{Idx, RawIdx};
 
     #[test]
     fn test_resolve_type_reference_this_module() {
@@ -101,31 +95,56 @@ mod tests {
             camino::Utf8Path::new("./test.alloy"),
             r"
     typedef MyType = Thing
-    typeof foo : MyType
+    typeof dummy : MyType
             ",
         );
 
-        let (hir_module, _) = hir::lower_file(&db, module_id);
-        // Find the type reference in the type annotation
-        if let Some((_value_idx, _)) =
-            hir_module.get_expression_by_name(&hir::Name::new("foo"), alloy_scope::Scopes::ROOT)
-        {
-            // The type reference should be resolvable
-            let type_refs: Vec<_> = hir_module
-                .type_references()
-                .map(|(idx, _, _, _)| idx)
-                .collect();
+        let path = hir::Path::ThisModule {
+            name: "dummy".into(),
+            subname: None,
+            scope: Scopes::ROOT,
+        };
 
-            for type_ref_idx in type_refs {
-                let type_ref = hir_module.get_type_reference(type_ref_idx);
-                if let hir::TypeReference::Named(path) = type_ref {
-                    let result = resolve_type_reference_by_path(&db, module_id, path);
-                    if result.is_some() {
-                        return; // Found at least one resolvable type reference
-                    }
-                }
-            }
-        }
+        let actual_ref = resolve_type_reference_by_path(&db, module_id, &path)
+            .expect("must find type reference");
+        let expected = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
+
+        assert_eq!(expected, actual_ref);
+    }
+
+    #[test]
+    fn test_resolve_type_reference_cross_module() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        db.add_module(
+            "types",
+            camino::Utf8Path::new("./types.alloy"),
+            r"
+    typedef MyType = Thing
+            ",
+        );
+
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+    import types
+    typeof dummy : types::MyType
+            ",
+        );
+
+        // Test that unknown cross-module type references return None
+        let fqn = hir::Fqn {
+            module: non_empty_vec::ne_vec![hir::Name::new("types")],
+            name: hir::Name::new("MyType"),
+            sub_path: None,
+        };
+        let path = hir::Path::OtherModule(fqn);
+
+        let actual = resolve_type_reference_by_path(&db, module_id, &path);
+        assert!(
+            actual.is_none(),
+            "Should return None for unknown cross-module type"
+        );
     }
 
     #[test]
@@ -144,6 +163,7 @@ mod tests {
             camino::Utf8Path::new("./test.alloy"),
             r"
     import types
+    typeof dummy : types::UnknownType
             ",
         );
 
@@ -153,10 +173,11 @@ mod tests {
             name: hir::Name::new("UnknownType"),
             sub_path: None,
         };
+        let path = hir::Path::OtherModule(fqn);
 
-        let result = resolve_cross_module_type_reference(&db, &fqn);
+        let actual = resolve_type_reference_by_path(&db, module_id, &path);
         assert!(
-            result.is_none(),
+            actual.is_none(),
             "Should return None for unknown cross-module type"
         );
     }
@@ -180,25 +201,5 @@ mod tests {
 
         let result = resolve_type_reference_by_path(&db, module_id, &unknown_path);
         assert!(result.is_none(), "Unknown path should return None");
-    }
-
-    #[test]
-    fn test_get_type_reference_by_name_not_found() {
-        let mut db = TestHirResDatabase::new_with_stdlib();
-        let module_id = db.add_module(
-            "test",
-            camino::Utf8Path::new("./test.alloy"),
-            r"
-    typedef MyType = Thing
-            ",
-        );
-
-        let result = get_type_reference_by_name(
-            &db,
-            module_id,
-            &hir::Name::new("NonExistentType"),
-            alloy_scope::Scopes::ROOT,
-        );
-        assert!(result.is_none(), "Should return None for non-existent type");
     }
 }
