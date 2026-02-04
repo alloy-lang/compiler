@@ -82,7 +82,7 @@ pub fn resolve_type_definition_by_ref_id(
             resolve_type_definition_by_ref_id(db, module_id, *base)
         }
         _ => unreachable!(
-            "Invalid type reference for trait resolution: {:?}",
+            "Invalid type reference kind for type def resolution: {:?}",
             type_ref
         ),
     }
@@ -181,7 +181,6 @@ impl resolver::Resolver<hir::TypeDefinition> for TypeDefinitionResolver {
         type_def_fql: Fql<hir::TypeDefinition>,
         subname: Option<hir::Name>,
     ) -> Option<TypeResolutionError> {
-        // For type definitions, check if the variant exists (if one is requested)
         if let Some(variant_name) = &subname {
             let (hir_module, _) = hir::lower_file(db, type_def_fql.module_id);
             let type_def = hir_module.get_type_definition(type_def_fql.local_id);

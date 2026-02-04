@@ -73,7 +73,7 @@ pub fn resolve_expression_by_id(
         hir::Expression::Literal(lit) => Expression::Literal(lit.clone()),
         hir::Expression::Unit => Expression::Unit,
         hir::Expression::VariableRef { path, .. } => {
-            resolve_variable_ref(db, source_ref, module_id, path)?
+            resolve_variable_ref(db, &source_ref, module_id, path)?
         }
         hir::Expression::Lambda { args, body } => {
             let fql_args = args
@@ -125,52 +125,27 @@ pub fn resolve_expression_by_id(
 
 fn resolve_variable_ref(
     db: &dyn hir::HirDatabase,
-    source_ref: Fql<hir::Expression>,
+    source_ref: &Fql<hir::Expression>,
     module_id: ModuleId,
     path: &hir::Path,
 ) -> Result<Expression, TypeResolutionError> {
-    if let Ok(var_fql) = resolve_by_path::<hir::Expression, ExpressionResolver>(
-        db,
-        module_id,
-        path,
-        source_ref.clone(),
-    ) {
+    if let Ok(var_fql) =
+        resolve_by_path::<hir::Expression, ExpressionResolver>(db, module_id, path, source_ref)
+    {
         return Ok(Expression::VariableRef(var_fql.into()));
     }
     if let Some(pat_fql) = resolve_pattern_by_path(db, module_id, path) {
         return Ok(Expression::VariableRef(pat_fql.into()));
     }
-    if let Ok((type_def_fql, variant_name)) =
-        resolve_type_definition_by_path_variant(db, module_id, path, &source_ref)
-    {
-        return Ok(Expression::VariantConstructor {
-            type_def: type_def_fql,
-            variant_name,
-        });
-    }
     if let Some(expr) = resolve_abstract_trait_member_by_path(db, module_id, path) {
         return Ok(expr);
     }
+    let (type_def_fql, variant_name) =
+        resolve_type_definition_by_path_variant(db, module_id, path, source_ref)?;
 
-    let (error_module_id, error_path) = match path {
-        hir::Path::ThisModule { name, .. } => (module_id, ne_vec![name.clone()]),
-        hir::Path::OtherModule(fqn) => {
-            let Some(module_id) = db.find_module_by_slug(&fqn.module_slug()) else {
-                return Err(TypeResolutionError::UnknownModule {
-                    module_slug: fqn.module_slug(),
-                    source_ref: source_ref.into(),
-                });
-            };
-
-            (module_id, fqn.segments())
-        }
-        hir::Path::Unknown(names) => (module_id, names.clone()),
-    };
-
-    Err(TypeResolutionError::UnknownExpressionReference {
-        source_ref,
-        module_id: error_module_id,
-        path: error_path,
+    Ok(Expression::VariantConstructor {
+        type_def: type_def_fql,
+        variant_name,
     })
 }
 
@@ -199,47 +174,22 @@ fn find_function_target(
     module_id: ModuleId,
     target: &hir::Path,
 ) -> Result<(EPTdFql, Option<hir::Name>), TypeResolutionError> {
-    if let Ok(var_fql) = resolve_by_path::<hir::Expression, ExpressionResolver>(
-        db,
-        module_id,
-        target,
-        source_ref.clone(),
-    ) {
+    if let Ok(var_fql) =
+        resolve_by_path::<hir::Expression, ExpressionResolver>(db, module_id, target, source_ref)
+    {
         return Ok((var_fql.into(), None));
     }
     if let Some(pat_fql) = resolve_pattern_by_path(db, module_id, target) {
         return Ok((pat_fql.into(), None));
     }
-    if let Ok((type_def_fql, variant_name)) =
-        resolve_type_definition_by_path_variant(db, module_id, target, source_ref)
-    {
-        return Ok((type_def_fql.into(), Some(variant_name)));
-    }
     // TODO: function calls to abstract trait members
     // if let Some(expr) = resolve_abstract_trait_member_by_path(db, module_id, target) {
     //     return Err(Ok(expr));
     // }
+    let (type_def_fql, variant_name) =
+        resolve_type_definition_by_path_variant(db, module_id, target, source_ref)?;
 
-    let (error_module_id, error_path) = match target {
-        hir::Path::ThisModule { name, .. } => (module_id, ne_vec![name.clone()]),
-        hir::Path::OtherModule(fqn) => {
-            let Some(module_id) = db.find_module_by_slug(&fqn.module_slug()) else {
-                return Err(TypeResolutionError::UnknownModule {
-                    module_slug: fqn.module_slug(),
-                    source_ref: source_ref.into(),
-                });
-            };
-
-            (module_id, fqn.segments())
-        }
-        hir::Path::Unknown(names) => (module_id, names.clone()),
-    };
-
-    Err(TypeResolutionError::UnknownExpressionReference {
-        source_ref: source_ref.clone(),
-        module_id: error_module_id,
-        path: error_path,
-    })
+    Ok((type_def_fql.into(), Some(variant_name)))
 }
 
 // ============================================================================
@@ -775,18 +725,16 @@ mod tests {
         let err =
             maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
 
-        let expected = TypeResolutionError::UnknownExpressionReference {
-            source_ref: Fql {
+        let expected = TypeResolutionError::UnknownTypeDefinitionVariant {
+            source_ref: EPTrFql::Expression(Fql {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
+            }),
+            target_type_fql: Fql {
+                module_id: ModuleId::new(&db, "std::option"),
+                local_id: Idx::from_raw(RawIdx::from_u32(1)),
             },
-            module_id: ModuleId::new(&db, "std::option"),
-            path: ne_vec![
-                Name::new("std"),
-                Name::new("option"),
-                Name::new("Option"),
-                Name::new("Other")
-            ],
+            variant_name: Name::new("Other"),
         };
 
         assert_eq!(expected, err);
@@ -881,18 +829,16 @@ mod tests {
         let err =
             maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
 
-        let expected = TypeResolutionError::UnknownExpressionReference {
-            source_ref: Fql {
+        let expected = TypeResolutionError::UnknownTypeDefinitionVariant {
+            source_ref: EPTrFql::Expression(Fql {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(1)),
+            }),
+            target_type_fql: Fql {
+                module_id: ModuleId::new(&db, "std::option"),
+                local_id: Idx::from_raw(RawIdx::from_u32(1)),
             },
-            module_id: ModuleId::new(&db, "std::option"),
-            path: ne_vec![
-                Name::new("std"),
-                Name::new("option"),
-                Name::new("Option"),
-                Name::new("Other")
-            ],
+            variant_name: Name::new("Other"),
         };
 
         assert_eq!(expected, err);

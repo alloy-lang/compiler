@@ -16,7 +16,7 @@ pub fn resolve_type_reference_by_path(
         path,
         Fql {
             module_id: current_module_id,
-            local_id: Idx::<hir::TypeReference>::from_raw(RawIdx::from_u32(0)),
+            local_id: Idx::<hir::TypeReference>::from_raw(RawIdx::from_u32(u32::MAX)),
         },
     )
     .ok()
@@ -132,7 +132,7 @@ mod tests {
 
         // Test that unknown cross-module type references return None
         let fqn = hir::Fqn {
-            module: non_empty_vec::ne_vec![hir::Name::new("types")],
+            module: ne_vec![hir::Name::new("types")],
             name: hir::Name::new("MyType"),
             sub_path: None,
         };
@@ -167,7 +167,7 @@ mod tests {
 
         // Test that unknown cross-module type references return None
         let fqn = hir::Fqn {
-            module: non_empty_vec::ne_vec![hir::Name::new("types")],
+            module: ne_vec![hir::Name::new("types")],
             name: hir::Name::new("UnknownType"),
             sub_path: None,
         };
@@ -191,7 +191,7 @@ mod tests {
             ",
         );
 
-        let unknown_path = hir::Path::Unknown(non_empty_vec::ne_vec![
+        let unknown_path = hir::Path::Unknown(ne_vec![
             hir::Name::new("unknown"),
             hir::Name::new("path"),
             hir::Name::new("Type"),

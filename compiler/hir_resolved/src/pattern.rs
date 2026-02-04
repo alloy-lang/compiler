@@ -2,7 +2,7 @@ use crate::type_definition::resolve_type_definition_by_path_variant;
 use crate::{Fql, TypeResolutionError};
 use alloy_hir as hir;
 use alloy_workspace::ModuleId;
-use non_empty_vec::{ne_vec, NonEmpty};
+use non_empty_vec::NonEmpty;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Pattern {
@@ -90,6 +90,7 @@ mod tests {
     use crate::EPTrFql;
     use alloy_workspace::WorkspaceDatabase;
     use la_arena::{Idx, RawIdx};
+    use non_empty_vec::ne_vec;
 
     #[test]
     fn test_destructure_pattern_resolves() {
