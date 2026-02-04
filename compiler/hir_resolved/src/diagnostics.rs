@@ -33,7 +33,11 @@ pub enum TypeResolutionError {
     UnknownTypeDefinitionVariant {
         source_ref: EPTrFql,
         target_type_fql: Fql<hir::TypeDefinition>,
-        variant_name: Option<hir::Name>,
+        variant_name: hir::Name,
+    },
+    MissingTypeDefinitionVariant {
+        source_ref: EPTrFql,
+        target_type_fql: Fql<hir::TypeDefinition>,
     },
     UnknownTraitReference {
         source_ref: Fql<hir::TypeReference>,
@@ -82,6 +86,16 @@ impl TypeResolutionError {
                 hir_module.get_type_reference_range(source_ref.local_id)
             }
             TypeResolutionError::UnknownTypeDefinitionVariant { source_ref, .. } => {
+                let (hir_module, _) = hir::lower_file(db, source_ref.module_id());
+                match source_ref {
+                    EPTrFql::Expression(fql) => hir_module.get_expression_range(fql.local_id),
+                    EPTrFql::Pattern(fql) => hir_module.get_pattern_range(fql.local_id),
+                    EPTrFql::TypeReference(fql) => {
+                        hir_module.get_type_reference_range(fql.local_id)
+                    }
+                }
+            }
+            TypeResolutionError::MissingTypeDefinitionVariant { source_ref, .. } => {
                 let (hir_module, _) = hir::lower_file(db, source_ref.module_id());
                 match source_ref {
                     EPTrFql::Expression(fql) => hir_module.get_expression_range(fql.local_id),

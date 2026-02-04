@@ -68,7 +68,7 @@ fn resolve_destructure(
     target: &hir::Path,
     args: &[hir::PatternIdx],
 ) -> Result<Pattern, TypeResolutionError> {
-    let Some((type_def_fql, variant_name)) =
+    let Ok((type_def_fql, variant_name)) =
         resolve_type_definition_by_path_variant(db, module_id, target, &source_ref)
     else {
         let error_path = match target {
@@ -110,7 +110,6 @@ mod tests {
     use super::*;
     use crate::tests::TestHirResDatabase;
     use crate::EPTrFql;
-    use alloy_hir::Name;
     use alloy_workspace::WorkspaceDatabase;
     use la_arena::{Idx, RawIdx};
 
@@ -137,7 +136,7 @@ mod tests {
                     module_id: ModuleId::new(&db, "std::option"),
                     local_id: Idx::from_raw(RawIdx::from_u32(1)),
                 },
-                variant_name: Name::new("Some"),
+                variant_name: hir::Name::new("Some"),
                 args: vec![Fql {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(0)),
@@ -165,18 +164,16 @@ mod tests {
         let err = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
             .expect_err("expected to resolve pattern");
         assert_eq!(
-            TypeResolutionError::UnknownPatternReference {
-                source_ref: Fql {
+            TypeResolutionError::UnknownTypeDefinitionVariant {
+                source_ref: EPTrFql::Pattern(Fql {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                }),
+                target_type_fql: Fql {
+                    module_id: ModuleId::new(&db, "std::option"),
+                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
                 },
-                module_id,
-                path: ne_vec![
-                    Name::new("std"),
-                    Name::new("option"),
-                    Name::new("Option"),
-                    Name::new("InvalidVariant")
-                ],
+                variant_name: hir::Name::new("InvalidVariant")
             },
             err
         );
@@ -205,7 +202,7 @@ mod tests {
                     local_id: Idx::from_raw(RawIdx::from_u32(1)),
                 },
                 module_id,
-                path: ne_vec![Name::new("UnknownType")],
+                path: ne_vec![hir::Name::new("UnknownType")],
             },
             err
         );

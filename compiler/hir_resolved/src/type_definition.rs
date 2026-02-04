@@ -38,19 +38,28 @@ pub(crate) fn resolve_type_definition_by_path_variant(
     module_id: ModuleId,
     path: &hir::Path,
     source_ref: impl Into<EPTrFql> + Clone,
-) -> Option<(Fql<hir::TypeDefinition>, hir::Name)> {
+) -> Result<(Fql<hir::TypeDefinition>, hir::Name), TypeResolutionError> {
     let variant_name = match path {
-        hir::Path::ThisModule { subname, .. } => subname.clone()?,
-        hir::Path::OtherModule(fqn) => fqn.sub_path.clone()?,
-        hir::Path::Unknown(_) => return None,
+        hir::Path::ThisModule { subname, .. } => subname.clone(),
+        hir::Path::OtherModule(fqn) => fqn.sub_path.clone(),
+        hir::Path::Unknown(_) => None,
     };
 
     let type_def_fql = resolver::resolve_by_path::<hir::TypeDefinition, TypeDefinitionResolver>(
-        db, module_id, path, source_ref,
-    )
-    .ok()?;
+        db,
+        module_id,
+        path,
+        source_ref.clone(),
+    )?;
 
-    Some((type_def_fql, variant_name))
+    let Some(variant_name) = variant_name else {
+        return Err(TypeResolutionError::MissingTypeDefinitionVariant {
+            source_ref: source_ref.into(),
+            target_type_fql: type_def_fql,
+        });
+    };
+
+    Ok((type_def_fql, variant_name))
 }
 
 #[salsa::tracked]
@@ -180,7 +189,7 @@ impl resolver::Resolver<hir::TypeDefinition> for TypeDefinitionResolver {
                 return Some(TypeResolutionError::UnknownTypeDefinitionVariant {
                     source_ref: source_ref.into(),
                     target_type_fql: type_def_fql,
-                    variant_name: subname,
+                    variant_name: variant_name.clone(),
                 });
             }
         }
@@ -242,7 +251,7 @@ mod tests {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
             },
-            variant_name: Some(hir::Name::new("Extra")),
+            variant_name: hir::Name::new("Extra"),
         };
 
         assert_eq!(expected, actual_err);
@@ -309,7 +318,7 @@ mod tests {
                 module_id: ModuleId::new(&db, "types"),
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
             },
-            variant_name: Some(hir::Name::new("Extra")),
+            variant_name: hir::Name::new("Extra"),
         };
 
         assert_eq!(expected, actual_err);

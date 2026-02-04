@@ -96,6 +96,9 @@ impl Diagnostic for TypeInferenceError {
                 TypeResolutionError::UnknownTypeDefinitionVariant { .. } => {
                     todo!()
                 }
+                TypeResolutionError::MissingTypeDefinitionVariant { .. } => {
+                    todo!()
+                }
                 TypeResolutionError::UnknownTraitReference { path, .. } => {
                     let path_str = path
                         .iter()
@@ -183,6 +186,9 @@ impl Diagnostic for TypeInferenceError {
                         .with_help(format!("No type definition named `{}` found in module {:?}", path_str, module_id))
                 }
                 TypeResolutionError::UnknownTypeDefinitionVariant { source_ref: _, target_type_fql: _, variant_name: _ } => {
+                    todo!()
+                }
+                TypeResolutionError::MissingTypeDefinitionVariant { source_ref: _, target_type_fql: _ } => {
                     todo!()
                 }
                 TypeResolutionError::UnknownTraitReference { path, module_id, .. } => {

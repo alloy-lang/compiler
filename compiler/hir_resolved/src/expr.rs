@@ -140,7 +140,7 @@ fn resolve_variable_ref(
     if let Some(pat_fql) = resolve_pattern_by_path(db, module_id, path) {
         return Ok(Expression::VariableRef(pat_fql.into()));
     }
-    if let Some((type_def_fql, variant_name)) =
+    if let Ok((type_def_fql, variant_name)) =
         resolve_type_definition_by_path_variant(db, module_id, path, &source_ref)
     {
         return Ok(Expression::VariantConstructor {
@@ -210,7 +210,7 @@ fn find_function_target(
     if let Some(pat_fql) = resolve_pattern_by_path(db, module_id, target) {
         return Ok((pat_fql.into(), None));
     }
-    if let Some((type_def_fql, variant_name)) =
+    if let Ok((type_def_fql, variant_name)) =
         resolve_type_definition_by_path_variant(db, module_id, target, source_ref)
     {
         return Ok((type_def_fql.into(), Some(variant_name)));
