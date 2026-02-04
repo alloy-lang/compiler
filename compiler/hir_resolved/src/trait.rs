@@ -1,9 +1,10 @@
-use crate::{cross_module_resolver, EPTrFql, Expression, Fql, TypeResolutionError};
+use crate::resolver::resolve_by_path;
+use crate::{resolver, EPTrFql, Expression, Fql, TypeResolutionError};
 use alloy_hir as hir;
+use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
-use cross_module_resolver::resolve_cross_module_optional;
 use la_arena::Idx;
-use non_empty_vec::{ne_vec, NonEmpty};
+use non_empty_vec::NonEmpty;
 
 pub struct Trait {}
 
@@ -18,7 +19,9 @@ pub fn resolve_trait_by_ref_id(
     let type_ref = hir_module.get_type_reference(type_idx);
 
     match type_ref {
-        hir::TypeReference::Named(path) => resolve_trait_by_path(db, module_id, path, source_ref),
+        hir::TypeReference::Named(path) => {
+            resolve_by_path::<hir::Trait, TraitResolver>(db, module_id, path, source_ref)
+        }
         hir::TypeReference::Bounded { base, .. } => {
             Err(TypeResolutionError::BoundedTraitReference {
                 source_ref,
@@ -30,52 +33,6 @@ pub fn resolve_trait_by_ref_id(
             type_ref
         ),
     }
-}
-
-/// Resolve a trait from a hir::Path
-///
-/// This handles both ThisModule and OtherModule paths, resolving them to Fql<Trait>
-fn resolve_trait_by_path(
-    db: &dyn hir::HirDatabase,
-    module_id: ModuleId,
-    path: &hir::Path,
-    source_ref: Fql<hir::TypeReference>,
-) -> Result<Fql<hir::Trait>, TypeResolutionError> {
-    let error_path = match path {
-        hir::Path::ThisModule { name, subname, .. } => {
-            if subname.is_some() {
-                unreachable!("Traits can't be qualified");
-            }
-            let (hir_module, _) = hir::lower_file(db, module_id);
-            if let Some((trait_idx, _)) = hir_module.get_trait_by_name(name) {
-                return Ok(Fql::new(module_id, trait_idx));
-            };
-
-            // lowering error
-            ne_vec![name.clone()]
-        }
-        hir::Path::OtherModule(fqn) => {
-            if let Some(fql) = resolve_cross_module_optional::<hir::Trait, TraitLookup>(db, fqn) {
-                return Ok(fql);
-            };
-
-            if db.find_module_by_slug(&fqn.module_slug()).is_none() {
-                return Err(TypeResolutionError::UnknownModule {
-                    module_slug: fqn.module_slug(),
-                    source_ref: source_ref.into(),
-                });
-            }
-
-            fqn.segments()
-        }
-        hir::Path::Unknown(names) => names.clone(),
-    };
-
-    Err(TypeResolutionError::UnknownTraitReference {
-        source_ref,
-        module_id,
-        path: error_path,
-    })
 }
 
 pub(crate) fn resolve_abstract_trait_member_by_path(
@@ -105,25 +62,20 @@ pub(crate) fn resolve_abstract_trait_member_by_path(
 }
 
 // ============================================================================
-// Trait Lookup
+// Trait Resolver
 // ============================================================================
 
-struct TraitLookup;
+struct TraitResolver;
 
-impl cross_module_resolver::ModuleLookup<hir::Trait> for TraitLookup {
-    type Item = hir::Trait;
-
+impl resolver::Resolver<hir::Trait> for TraitResolver {
     fn lookup_in_module(
         hir_module: &hir::HirModule,
         name: &hir::Name,
-    ) -> Option<(Idx<hir::Trait>, Self::Item)> {
+        _scope: ScopeIdx,
+    ) -> Option<(Idx<hir::Trait>, hir::Trait)> {
         hir_module
             .get_trait_by_name(name)
-            .map(|(id, trait_)| (id, trait_.clone()))
-    }
-
-    fn validate(_item: Self::Item, _remaining_path: &[hir::Name]) -> bool {
-        true // Default: no validation needed
+            .map(|(idx, item)| (idx, item.clone()))
     }
 
     fn unknown_item_error(
@@ -142,14 +94,26 @@ impl cross_module_resolver::ModuleLookup<hir::Trait> for TraitLookup {
         }
     }
 
-    fn validation_error(
-        _source_ref: impl Into<EPTrFql>,
-        _module_id: ModuleId,
-        _path: NonEmpty<hir::Name>,
-        _remaining_path: &[hir::Name],
-        _item_id: hir::TraitIdx,
-    ) -> TypeResolutionError {
-        unreachable!("traits don't have sub items")
+    fn validate(
+        _db: &dyn hir::HirDatabase,
+        source_ref: impl Into<EPTrFql>,
+        trait_fql: Fql<hir::Trait>,
+        subname: Option<hir::Name>,
+    ) -> Option<TypeResolutionError> {
+        if let Some(subname) = subname {
+            let EPTrFql::TypeReference(source_ref) = source_ref.into() else {
+                panic!("Trait resolution requires TypeReference");
+            };
+
+            return Some(TypeResolutionError::UnknownTraitMember {
+                source_ref,
+                module_id: trait_fql.module_id,
+                trait_idx: trait_fql.local_id,
+                subname,
+            });
+        }
+
+        None
     }
 }
 
@@ -159,6 +123,7 @@ mod tests {
     use crate::tests::TestHirResDatabase;
     use alloy_workspace::WorkspaceDatabase;
     use la_arena::RawIdx;
+    use non_empty_vec::ne_vec;
 
     fn find_trait(db: &dyn hir::HirDatabase, module_id: ModuleId) -> Fql<hir::Trait> {
         resolve_trait_by_ref_id(db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
@@ -204,13 +169,17 @@ mod tests {
             ",
         );
 
-        let actual_trait = find_trait(&db, module_id);
-        let expected = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(1)));
+        let actual_err = find_trait_error(&db, module_id);
 
-        assert_eq!(
-            expected, actual_trait,
-            "TODO: the ref has extra junk, this should be an error"
-        );
+        let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
+        let expected = TypeResolutionError::UnknownTraitMember {
+            source_ref,
+            module_id: ModuleId::new(&db, "test"),
+            trait_idx: Idx::from_raw(RawIdx::from_u32(0)),
+            subname: hir::Name::new("extra_junk"),
+        };
+
+        assert_eq!(expected, actual_err);
     }
 
     #[test]
@@ -266,7 +235,7 @@ mod tests {
     #[test]
     fn test_resolve_trait_cross_module_extra_path() {
         let mut db = TestHirResDatabase::new_with_stdlib();
-        let other_module_id = db.add_module(
+        db.add_module(
             "traits",
             camino::Utf8Path::new("./traits.alloy"),
             r"
@@ -284,13 +253,17 @@ mod tests {
             ",
         );
 
-        let actual_trait = find_trait(&db, module_id);
-        let expected = Fql::new(other_module_id, Idx::from_raw(RawIdx::from_u32(1)));
+        let actual_err = find_trait_error(&db, module_id);
 
-        assert_eq!(
-            expected, actual_trait,
-            "TODO: the ref has extra junk, this should be an error"
-        );
+        let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
+        let expected = TypeResolutionError::UnknownTraitMember {
+            source_ref,
+            module_id: ModuleId::new(&db, "traits"),
+            trait_idx: Idx::from_raw(RawIdx::from_u32(0)),
+            subname: hir::Name::new("extra_junk"),
+        };
+
+        assert_eq!(expected, actual_err);
     }
 
     #[test]
@@ -318,7 +291,7 @@ mod tests {
         let actual_err = find_trait_error(&db, module_id);
         let expected = TypeResolutionError::UnknownTraitReference {
             source_ref,
-            module_id,
+            module_id: ModuleId::new(&db, "traits"),
             path: ne_vec!["traits".into(), "UnknownTrait".into()],
         };
 
@@ -337,8 +310,9 @@ mod tests {
                 ",
         );
 
-        let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
         let actual_err = find_trait_error(&db, module_id);
+
+        let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
         let expected = TypeResolutionError::UnknownModule {
             source_ref: EPTrFql::TypeReference(source_ref),
             module_slug: "fake_traits".to_string(),

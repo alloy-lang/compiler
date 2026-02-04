@@ -69,7 +69,7 @@ fn resolve_destructure(
     args: &[hir::PatternIdx],
 ) -> Result<Pattern, TypeResolutionError> {
     let Some((type_def_fql, variant_name)) =
-        resolve_type_definition_by_path_variant(db, module_id, target)
+        resolve_type_definition_by_path_variant(db, module_id, target, &source_ref)
     else {
         let error_path = match target {
             hir::Path::ThisModule { name, .. } => ne_vec![name.clone()],

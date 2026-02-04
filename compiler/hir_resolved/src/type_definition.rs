@@ -1,10 +1,9 @@
-use crate::{cross_module_resolver, EPTrFql, Fql, TypeResolutionError};
+use crate::{resolver, EPTrFql, Fql, TypeResolutionError};
 use alloy_hir as hir;
-use alloy_scope::{ScopeIdx, Scopes};
+use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
-use cross_module_resolver::resolve_cross_module_optional;
 use la_arena::Idx;
-use non_empty_vec::{ne_vec, NonEmpty};
+use non_empty_vec::NonEmpty;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeDefinition {
@@ -38,23 +37,25 @@ pub(crate) fn resolve_type_definition_by_path_variant(
     db: &dyn hir::HirDatabase,
     module_id: ModuleId,
     path: &hir::Path,
+    source_ref: impl Into<EPTrFql> + Clone,
 ) -> Option<(Fql<hir::TypeDefinition>, hir::Name)> {
     let (type_def_fql, variant_name): (Fql<hir::TypeDefinition>, hir::Name) = match path {
-        hir::Path::ThisModule {
-            name,
-            subname,
-            scope,
-        } => {
+        hir::Path::ThisModule { subname, .. } => {
             let variant_name = subname.clone()?;
-            let type_def_id = get_type_definition_by_name(db, module_id, name, *scope)?;
+            let type_def_id = resolver::resolve_by_path::<
+                hir::TypeDefinition,
+                TypeDefinitionResolver,
+            >(db, module_id, path, source_ref)
+            .ok()?;
 
             (type_def_id, variant_name)
         }
         hir::Path::OtherModule(fqn) => {
             let variant_name = fqn.sub_path.clone()?;
-            let td_fql = resolve_cross_module_optional::<hir::TypeDefinition, TypeDefinitionLookup>(
-                db, fqn,
-            )?;
+            let td_fql = resolver::resolve_by_path::<hir::TypeDefinition, TypeDefinitionResolver>(
+                db, module_id, path, source_ref,
+            )
+            .ok()?;
 
             (td_fql, variant_name)
         }
@@ -75,9 +76,10 @@ pub fn resolve_type_definition_by_ref_id(
     let type_ref = hir_module.get_type_reference(type_idx);
 
     match type_ref {
-        hir::TypeReference::Named(path) => {
-            resolve_type_definition_by_path(db, module_id, path, source_ref)
-        }
+        hir::TypeReference::Named(path) => resolver::resolve_by_path::<
+            hir::TypeDefinition,
+            TypeDefinitionResolver,
+        >(db, module_id, path, source_ref),
         hir::TypeReference::Bounded { base, args: _ } => {
             // TODO: bounded type reference should check args
             resolve_type_definition_by_ref_id(db, module_id, *base)
@@ -135,107 +137,66 @@ pub fn resolve_type_definition_by_id(
     })
 }
 
-fn resolve_type_definition_by_path(
-    db: &dyn hir::HirDatabase,
-    current_module_id: ModuleId,
-    path: &hir::Path,
-    source_ref: Fql<hir::TypeReference>,
-) -> Result<Fql<hir::TypeDefinition>, TypeResolutionError> {
-    if let Some(type_def_fql) = resolve_type_definition_by_path_op(db, current_module_id, path) {
-        return Ok(type_def_fql);
-    }
-
-    let (error_module_id, error_path) = match path {
-        hir::Path::ThisModule { name, .. } => (current_module_id, ne_vec![name.clone()]),
-        hir::Path::OtherModule(fqn) => {
-            let Some(module_id) = db.find_module_by_slug(&fqn.module_slug()) else {
-                return Err(TypeResolutionError::UnknownModule {
-                    module_slug: fqn.module_slug(),
-                    source_ref: source_ref.into(),
-                });
-            };
-
-            (module_id, fqn.segments())
-        }
-        hir::Path::Unknown(names) => (current_module_id, names.clone()),
-    };
-
-    Err(TypeResolutionError::UnknownTypeDefinition {
-        source_ref,
-        module_id: error_module_id,
-        path: error_path,
-    })
-}
-
-fn resolve_type_definition_by_path_op(
-    db: &dyn hir::HirDatabase,
-    current_module_id: ModuleId,
-    path: &hir::Path,
-) -> Option<Fql<hir::TypeDefinition>> {
-    match path {
-        hir::Path::ThisModule { name, scope, .. } => {
-            get_type_definition_by_name(db, current_module_id, name, *scope)
-        }
-        hir::Path::OtherModule(fqn) => {
-            resolve_cross_module_optional::<hir::TypeDefinition, TypeDefinitionLookup>(db, fqn)
-        }
-        hir::Path::Unknown(names) => None,
-    }
-}
-
-fn get_type_definition_by_name(
-    db: &dyn hir::HirDatabase,
-    module_id: ModuleId,
-    name: &hir::Name,
-    scope: ScopeIdx,
-) -> Option<Fql<hir::TypeDefinition>> {
-    let (hir_module, _) = hir::lower_file(db, module_id);
-    let (type_idx, _) = hir_module.get_type_definition_by_name(name, scope)?;
-
-    Some(Fql::new(module_id, type_idx))
-}
-
 // ============================================================================
-// Type Definition Lookup
+// Type Definition Resolver
 // ============================================================================
 
-struct TypeDefinitionLookup;
+struct TypeDefinitionResolver;
 
-impl cross_module_resolver::ModuleLookup<hir::TypeDefinition> for TypeDefinitionLookup {
-    type Item = hir::TypeDefinition;
-
+impl resolver::Resolver<hir::TypeDefinition> for TypeDefinitionResolver {
     fn lookup_in_module(
         hir_module: &hir::HirModule,
         name: &hir::Name,
-    ) -> Option<(Idx<hir::TypeDefinition>, Self::Item)> {
+        scope: ScopeIdx,
+    ) -> Option<(Idx<hir::TypeDefinition>, hir::TypeDefinition)> {
         hir_module
-            .get_type_definition_by_name(name, Scopes::ROOT)
+            .get_type_definition_by_name(name, scope)
             .map(|(id, typedef)| (id, typedef.clone()))
     }
 
-    fn validate(item: Self::Item, remaining_path: &[hir::Name]) -> bool {
-        // For type definitions, check if the variant exists (if one is requested)
-        if let Some(variant_name) = remaining_path.last() {
-            return item.kind.has_variant(variant_name);
-        }
-        true
-    }
-
-    fn validation_error(
+    fn unknown_item_error(
         source_ref: impl Into<EPTrFql>,
         module_id: ModuleId,
-        _path: NonEmpty<hir::Name>,
-        remaining_path: &[hir::Name],
-        item_id: hir::TypeDefinitionIdx,
+        path: NonEmpty<hir::Name>,
     ) -> TypeResolutionError {
-        TypeResolutionError::UnknownTypeDefinitionVariant {
-            source_ref: source_ref.into(),
-            target_type_fql: Fql {
+        match source_ref.into() {
+            EPTrFql::Expression(fql) => TypeResolutionError::UnknownExpressionReference {
+                source_ref: fql,
                 module_id,
-                local_id: item_id,
+                path,
             },
-            variant_name: remaining_path.iter().next().cloned(),
+            EPTrFql::Pattern(fql) => TypeResolutionError::UnknownPatternReference {
+                source_ref: fql,
+                module_id,
+                path,
+            },
+            EPTrFql::TypeReference(fql) => TypeResolutionError::UnknownTypeDefinition {
+                source_ref: fql,
+                module_id,
+                path,
+            },
         }
+    }
+
+    fn validate(
+        db: &dyn hir::HirDatabase,
+        source_ref: impl Into<EPTrFql>,
+        type_def_fql: Fql<hir::TypeDefinition>,
+        subname: Option<hir::Name>,
+    ) -> Option<TypeResolutionError> {
+        // For type definitions, check if the variant exists (if one is requested)
+        if let Some(variant_name) = &subname {
+            let (hir_module, _) = hir::lower_file(db, type_def_fql.module_id);
+            let type_def = hir_module.get_type_definition(type_def_fql.local_id);
+            if !type_def.kind.has_variant(variant_name) {
+                return Some(TypeResolutionError::UnknownTypeDefinitionVariant {
+                    source_ref: source_ref.into(),
+                    target_type_fql: type_def_fql,
+                    variant_name: subname,
+                });
+            }
+        }
+        None
     }
 }
 
@@ -247,6 +208,7 @@ mod tests {
     use alloy_hir::TypeIdx;
     use alloy_workspace::WorkspaceDatabase;
     use la_arena::{Idx, RawIdx};
+    use non_empty_vec::ne_vec;
 
     const TYPE_REF_IDX: TypeIdx = Idx::from_raw(RawIdx::from_u32(0));
 

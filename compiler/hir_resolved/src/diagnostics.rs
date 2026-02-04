@@ -40,6 +40,12 @@ pub enum TypeResolutionError {
         module_id: ModuleId,
         path: NonEmpty<hir::Name>,
     },
+    UnknownTraitMember {
+        source_ref: Fql<hir::TypeReference>,
+        module_id: ModuleId,
+        trait_idx: hir::TraitIdx,
+        subname: hir::Name,
+    },
     BoundedTraitReference {
         source_ref: Fql<hir::TypeReference>,
         target_ref: Fql<hir::TypeReference>,
@@ -86,6 +92,10 @@ impl TypeResolutionError {
                 }
             }
             TypeResolutionError::UnknownTraitReference { source_ref, .. } => {
+                let (hir_module, _) = hir::lower_file(db, source_ref.module_id);
+                hir_module.get_type_reference_range(source_ref.local_id)
+            }
+            TypeResolutionError::UnknownTraitMember { source_ref, .. } => {
                 let (hir_module, _) = hir::lower_file(db, source_ref.module_id);
                 hir_module.get_type_reference_range(source_ref.local_id)
             }

@@ -1,57 +1,42 @@
-use crate::{cross_module_resolver, EPTrFql, Fql, TypeResolutionError};
+use crate::{resolver, EPTrFql, Fql, TypeResolutionError};
 use alloy_hir as hir;
-use alloy_scope::{ScopeIdx, Scopes};
+use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
-use cross_module_resolver::resolve_cross_module_optional;
-use non_empty_vec::NonEmpty;
+use la_arena::{Idx, RawIdx};
+use non_empty_vec::{ne_vec, NonEmpty};
 
 pub fn resolve_type_reference_by_path(
     db: &dyn hir::HirDatabase,
     current_module_id: ModuleId,
     path: &hir::Path,
 ) -> Option<Fql<hir::TypeReference>> {
-    match path {
-        hir::Path::ThisModule { name, scope, .. } => {
-            get_type_reference_by_name(db, current_module_id, name, *scope)
-        }
-        hir::Path::OtherModule(fqn) => {
-            resolve_cross_module_optional::<hir::TypeReference, TypeReferenceLookup>(db, fqn)
-        }
-        hir::Path::Unknown(_) => None,
-    }
-}
-
-fn get_type_reference_by_name(
-    db: &dyn hir::HirDatabase,
-    module_id: ModuleId,
-    name: &hir::Name,
-    scope: ScopeIdx,
-) -> Option<Fql<hir::TypeReference>> {
-    let (hir_module, _) = hir::lower_file(db, module_id);
-    let (type_idx, _) = hir_module.get_type_reference_by_name(name, scope)?;
-    Some(Fql::new(module_id, type_idx))
+    resolver::resolve_by_path::<hir::TypeReference, TypeReferenceResolver>(
+        db,
+        current_module_id,
+        path,
+        Fql {
+            module_id: current_module_id,
+            local_id: Idx::<hir::TypeReference>::from_raw(RawIdx::from_u32(0)),
+        },
+    )
+    .ok()
 }
 
 // ============================================================================
-// Type Reference Lookup
+// TypeReference Resolver
 // ============================================================================
 
-struct TypeReferenceLookup;
+struct TypeReferenceResolver;
 
-impl cross_module_resolver::ModuleLookup<hir::TypeReference> for TypeReferenceLookup {
-    type Item = hir::TypeReference;
-
+impl resolver::Resolver<hir::TypeReference> for TypeReferenceResolver {
     fn lookup_in_module(
         hir_module: &hir::HirModule,
         name: &hir::Name,
-    ) -> Option<(hir::TypeIdx, Self::Item)> {
+        scope: ScopeIdx,
+    ) -> Option<(Idx<hir::TypeReference>, hir::TypeReference)> {
         hir_module
-            .get_type_reference_by_name(name, Scopes::ROOT)
-            .map(|(id, type_ref)| (id, type_ref.clone()))
-    }
-
-    fn validate(_item: Self::Item, _remaining_path: &[hir::Name]) -> bool {
-        true // Default: no validation needed
+            .get_type_reference_by_name(name, scope)
+            .map(|(id, expr)| (id, expr.clone()))
     }
 
     fn unknown_item_error(
@@ -60,8 +45,9 @@ impl cross_module_resolver::ModuleLookup<hir::TypeReference> for TypeReferenceLo
         path: NonEmpty<hir::Name>,
     ) -> TypeResolutionError {
         let EPTrFql::TypeReference(source_ref) = source_ref.into() else {
-            panic!("Trait resolution requires TypeReference");
+            panic!("TypeReference resolution requires TypeReference");
         };
+
         TypeResolutionError::UnknownTypeReference {
             source_ref,
             module_id,
@@ -69,14 +55,25 @@ impl cross_module_resolver::ModuleLookup<hir::TypeReference> for TypeReferenceLo
         }
     }
 
-    fn validation_error(
-        _source_ref: impl Into<EPTrFql>,
-        _module_id: ModuleId,
-        _path: NonEmpty<hir::Name>,
-        _remaining_path: &[hir::Name],
-        _item_id: hir::TypeIdx,
-    ) -> TypeResolutionError {
-        unreachable!("type references don't have sub items")
+    fn validate(
+        _db: &dyn hir::HirDatabase,
+        source_ref: impl Into<EPTrFql>,
+        item_fql: Fql<hir::TypeReference>,
+        subname: Option<hir::Name>,
+    ) -> Option<TypeResolutionError> {
+        if let Some(subname) = subname {
+            let EPTrFql::TypeReference(source_ref) = source_ref.into() else {
+                panic!("TypeReference resolution requires TypeReference");
+            };
+
+            return Some(TypeResolutionError::UnknownTypeReference {
+                source_ref,
+                module_id: item_fql.module_id,
+                path: ne_vec![subname],
+            });
+        }
+
+        None
     }
 }
 
@@ -84,6 +81,7 @@ impl cross_module_resolver::ModuleLookup<hir::TypeReference> for TypeReferenceLo
 mod tests {
     use super::*;
     use crate::tests::TestHirResDatabase;
+    use alloy_scope::Scopes;
     use alloy_workspace::WorkspaceDatabase;
     use la_arena::{Idx, RawIdx};
 

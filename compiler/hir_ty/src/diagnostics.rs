@@ -104,14 +104,8 @@ impl Diagnostic for TypeInferenceError {
                         .join("::");
                     format!("Cannot find trait `{}`", path_str)
                 }
-                TypeResolutionError::UnknownTraitName { fqn, .. } => {
-                    let path_str = fqn
-                        .segments()
-                        .iter()
-                        .map(|n| n.as_str())
-                        .collect::<Vec<_>>()
-                        .join("::");
-                    format!("Cannot find trait `{}`", path_str)
+                TypeResolutionError::UnknownTraitMember { subname, .. } => {
+                    format!("Cannot find trait member `{}`", subname.as_str())
                 }
                 TypeResolutionError::BoundedTraitReference { .. } => {
                     "Bounded trait reference resolution not yet implemented".to_string()
@@ -197,10 +191,9 @@ impl Diagnostic for TypeInferenceError {
                         .with_primary_label(format!("cannot find trait `{}`", path_str))
                         .with_help(format!("No trait named `{}` found in module {:?}", path_str, module_id))
                 }
-                TypeResolutionError::UnknownTraitName { fqn, .. } => {
-                    let path_str = fqn.segments().iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
+                TypeResolutionError::UnknownTraitMember { subname, .. } => {
                     builder
-                        .with_primary_label(format!("cannot find trait `{}`", path_str))
+                        .with_primary_label(format!("cannot find trait member `{}`", subname.as_str()))
                         .with_help("Check that the trait name is correct and the module is imported")
                 }
                 TypeResolutionError::BoundedTraitReference { .. } => {

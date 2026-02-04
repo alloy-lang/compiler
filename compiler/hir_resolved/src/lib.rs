@@ -1,9 +1,9 @@
 mod behavior;
-mod cross_module_resolver;
 mod diagnostics;
 mod expr;
 mod fql;
 mod pattern;
+mod resolver;
 #[cfg(test)]
 mod tests;
 mod r#trait;
@@ -11,51 +11,12 @@ mod type_definition;
 mod type_reference;
 mod type_variable;
 
-use alloy_hir as hir;
-use alloy_scope::Scopes;
-use alloy_workspace::ModuleId;
 pub use behavior::*;
 pub use diagnostics::*;
 pub use expr::*;
 pub use fql::*;
-use la_arena::Idx;
-use non_empty_vec::NonEmpty;
 pub use pattern::*;
 pub use r#trait::*;
 pub use type_definition::*;
 pub use type_reference::*;
 pub use type_variable::*;
-
-// ============================================================================
-// Expression Lookup
-// ============================================================================
-
-struct ExpressionLookup;
-
-impl cross_module_resolver::ModuleLookup<hir::Expression> for ExpressionLookup {
-    type Item = hir::Expression;
-
-    fn lookup_in_module(
-        hir_module: &hir::HirModule,
-        name: &hir::Name,
-    ) -> Option<(Idx<hir::Expression>, Self::Item)> {
-        hir_module
-            .get_expression_by_name(name, Scopes::ROOT)
-            .map(|(id, expr)| (id, expr.clone()))
-    }
-
-    fn validate(_item: Self::Item, remaining_path: &[hir::Name]) -> bool {
-        // Expressions don't have sub-components, so reject any non-empty remaining path
-        remaining_path.is_empty()
-    }
-
-    fn validation_error(
-        source_ref: impl Into<EPTrFql>,
-        module_id: ModuleId,
-        path: NonEmpty<hir::Name>,
-        _remaining_path: &[hir::Name],
-        _item_id: hir::ExpressionIdx,
-    ) -> TypeResolutionError {
-        Self::unknown_item_error(source_ref, module_id, path)
-    }
-}
