@@ -39,28 +39,16 @@ pub(crate) fn resolve_type_definition_by_path_variant(
     path: &hir::Path,
     source_ref: impl Into<EPTrFql> + Clone,
 ) -> Option<(Fql<hir::TypeDefinition>, hir::Name)> {
-    let (type_def_fql, variant_name): (Fql<hir::TypeDefinition>, hir::Name) = match path {
-        hir::Path::ThisModule { subname, .. } => {
-            let variant_name = subname.clone()?;
-            let type_def_id = resolver::resolve_by_path::<
-                hir::TypeDefinition,
-                TypeDefinitionResolver,
-            >(db, module_id, path, source_ref)
-            .ok()?;
-
-            (type_def_id, variant_name)
-        }
-        hir::Path::OtherModule(fqn) => {
-            let variant_name = fqn.sub_path.clone()?;
-            let td_fql = resolver::resolve_by_path::<hir::TypeDefinition, TypeDefinitionResolver>(
-                db, module_id, path, source_ref,
-            )
-            .ok()?;
-
-            (td_fql, variant_name)
-        }
+    let variant_name = match path {
+        hir::Path::ThisModule { subname, .. } => subname.clone()?,
+        hir::Path::OtherModule(fqn) => fqn.sub_path.clone()?,
         hir::Path::Unknown(_) => return None,
     };
+
+    let type_def_fql = resolver::resolve_by_path::<hir::TypeDefinition, TypeDefinitionResolver>(
+        db, module_id, path, source_ref,
+    )
+    .ok()?;
 
     Some((type_def_fql, variant_name))
 }
