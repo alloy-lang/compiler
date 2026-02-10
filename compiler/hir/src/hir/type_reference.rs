@@ -44,7 +44,7 @@ pub type TypeIdx = Idx<TypeReference>;
 pub enum TypeReference {
     Unconstrained,
     Missing,
-    SelfRef,
+    SelfRef(ScopeIdx),
     Unit,
     Named(Path),
     BuiltIn(BuiltInType),
@@ -66,8 +66,9 @@ pub(super) fn lower_type_reference(ctx: &mut LoweringCtx, ast: &ast::Type) -> Ty
 }
 
 fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> TypeReference {
+    let current_scope = ctx.scopes.current_scope();
     match ast {
-        ast::Type::SelfType(_) => TypeReference::SelfRef,
+        ast::Type::SelfType(_) => TypeReference::SelfRef(current_scope),
         ast::Type::UnitType(_) => TypeReference::Unit,
         ast::Type::NilIdentifier(_) => TypeReference::Unconstrained,
         ast::Type::TypeIdentifier(t) => {

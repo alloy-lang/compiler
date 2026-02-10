@@ -65,14 +65,13 @@ pub fn type_reference_to_resolved_type(
     type_idx: hir::TypeIdx,
     ctx: &mut TypeResolutionContext,
 ) -> Option<ResolvedType> {
-    let source_ref = Fql::new(current_module_id, type_idx);
     let (hir_module, _) = hir::lower_file(db, current_module_id);
     let type_ref = hir_module.get_type_reference(type_idx);
 
     let ty = match &type_ref {
         hir::TypeReference::Unconstrained => ResolvedType::Unconstrained,
         hir::TypeReference::Missing => ResolvedType::Missing,
-        hir::TypeReference::SelfRef => ResolvedType::TODO,
+        hir::TypeReference::SelfRef(scope) => ResolvedType::TODO,
         hir::TypeReference::Unit => ResolvedType::Unit,
         hir::TypeReference::Named(path) => {
             type_annotation_to_resolved_with_ctx(db, current_module_id, path, ctx).or_else(
