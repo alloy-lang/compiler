@@ -153,7 +153,6 @@ impl Project {
         self.modules.iter().any(|m| m.path == path)
     }
 
-    #[must_use]
     pub fn modules(&self) -> impl Iterator<Item = &ModuleFile> {
         self.modules.iter()
     }

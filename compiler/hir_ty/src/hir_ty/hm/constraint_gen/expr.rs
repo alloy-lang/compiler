@@ -40,7 +40,7 @@ pub(crate) fn infer_expr_hm(
     match expr {
         res::Expression::Literal(lit) => super::infer_literal(ctx, source_fql, lit),
         res::Expression::Unit => super::infer_unit(ctx, source_fql),
-        res::Expression::VariableRef(ref_fql) => infer_variable_ref(ctx, source_fql, ref_fql),
+        res::Expression::VariableRef(ref_fql) => infer_variable_ref(ctx, source_fql, &ref_fql),
         res::Expression::Lambda { args, body } => infer_lambda(ctx, source_fql, args, body),
         res::Expression::FunctionCall {
             target,
@@ -80,7 +80,7 @@ pub(crate) fn infer_expr_hm(
 fn infer_variable_ref(
     ctx: &mut HMInferenceContext,
     source_fql: Fql<hir::Expression>,
-    ref_fql: EPFql,
+    ref_fql: &EPFql,
 ) -> MonoType {
     // First check if this variable already has a type (possibly polymorphic)
     // This enables let-polymorphism: if the variable has been generalized,
@@ -91,7 +91,7 @@ fn infer_variable_ref(
     }
 
     // If not found, infer it (this handles forward references)
-    let ty = match &ref_fql {
+    let ty = match ref_fql {
         EPFql::Expression(expr_fql) => infer_expr_hm(ctx, expr_fql.clone()),
         EPFql::Pattern(pat_fql) => infer_pattern_hm(ctx, pat_fql.clone()),
     };
