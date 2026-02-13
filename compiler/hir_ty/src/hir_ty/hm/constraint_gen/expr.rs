@@ -58,6 +58,10 @@ pub(crate) fn infer_expr_hm(
         res::Expression::Match { condition, targets } => {
             infer_match(ctx, source_fql, condition, &targets)
         }
+        res::Expression::DataConstructor { type_def } => {
+            // Infer the type of the variant constructor
+            infer_data_constructor(ctx, source_fql, type_def)
+        }
         res::Expression::VariantConstructor {
             type_def,
             variant_name,
@@ -387,6 +391,23 @@ fn build_constructor_type(
                 MonoType::Function(Box::new(param_ty), Box::new(acc))
             })
     }
+}
+
+fn infer_data_constructor(
+    ctx: &mut HMInferenceContext,
+    source_fql: Fql<hir::Expression>,
+    type_def_fql: Fql<hir::TypeDefinition>,
+) -> MonoType {
+    // Check if we already have this variant constructor type with tracking
+    // This enables polymorphic instantiation tracking for union type variants
+    let variant_fql = EPTdFql::TypeDefinition(type_def_fql.clone());
+    if let Some(tracked_ty) = ctx.maybe_find_type_tracked(variant_fql.clone(), source_fql.clone()) {
+        return ctx.assign_type(source_fql, tracked_ty);
+    }
+
+    // Variant not found - return fresh type variable
+    let ty = ctx.fresh_type_var();
+    ctx.assign_type(source_fql, ty)
 }
 
 fn infer_variant_constructor(

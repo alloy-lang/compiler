@@ -27,6 +27,15 @@ impl TypeDefinitionKind {
             TypeDefinitionKind::Missing | TypeDefinitionKind::TypeVariable(_) => false,
         }
     }
+    #[must_use]
+    pub fn has_variants(&self) -> bool {
+        match self {
+            TypeDefinitionKind::Union(_) => true,
+            TypeDefinitionKind::Single(_)
+            | TypeDefinitionKind::Missing
+            | TypeDefinitionKind::TypeVariable(_) => false,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]

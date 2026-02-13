@@ -243,6 +243,7 @@ fn collect_from_expression(
         // These don't have dependencies on other expressions
         res::Expression::Literal(_)
         | res::Expression::Unit
+        | res::Expression::DataConstructor { .. }
         | res::Expression::VariantConstructor { .. }
         | res::Expression::AbstractTraitMemberRef { .. }
         | res::Expression::Missing => {}

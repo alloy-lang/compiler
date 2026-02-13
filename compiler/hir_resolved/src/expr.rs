@@ -46,6 +46,10 @@ pub enum Expression {
         condition: Fql<hir::Expression>,
         targets: Vec<(Fql<hir::Pattern>, Fql<hir::Expression>)>,
     },
+    /// Reference to a data constructor (e.g., Identity)
+    DataConstructor {
+        type_def: Fql<hir::TypeDefinition>,
+    },
     /// Reference to a variant constructor (e.g., Option::None or Option::Some)
     VariantConstructor {
         type_def: Fql<hir::TypeDefinition>,
@@ -143,6 +147,12 @@ fn resolve_variable_ref(
     let (type_def_fql, variant_name) =
         resolve_type_definition_by_path_variant(db, module_id, path, source_ref)?;
 
+    let Some(variant_name) = variant_name else {
+        return Ok(Expression::DataConstructor {
+            type_def: type_def_fql,
+        });
+    };
+
     Ok(Expression::VariantConstructor {
         type_def: type_def_fql,
         variant_name,
@@ -189,7 +199,7 @@ fn find_function_target(
     let (type_def_fql, variant_name) =
         resolve_type_definition_by_path_variant(db, module_id, target, source_ref)?;
 
-    Ok((type_def_fql.into(), Some(variant_name)))
+    Ok((type_def_fql.into(), variant_name))
 }
 
 // ============================================================================
@@ -436,6 +446,36 @@ mod tests {
                     local_id: Idx::from_raw(RawIdx::from_u32(1)),
                 }),
                 variant_name: Some(Name::new("Some")),
+                args: vec![Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                }],
+            },
+            actual,
+        );
+    }
+
+    #[test]
+    fn resolve_same_module_function_call_data_constructor() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    typedef Identity[t] = Identity(t)
+    let example = Identity(123)
+            ",
+        );
+
+        let actual = maybe_find_example(&db, module_id).expect("must find expression");
+
+        assert_eq!(
+            Expression::FunctionCall {
+                target: EPTdFql::TypeDefinition(Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                }),
+                variant_name: None,
                 args: vec![Fql {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(0)),

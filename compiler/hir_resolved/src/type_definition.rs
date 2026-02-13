@@ -38,7 +38,7 @@ pub(crate) fn resolve_type_definition_by_path_variant(
     module_id: ModuleId,
     path: &hir::Path,
     source_ref: impl Into<EPTrFql> + Clone,
-) -> Result<(Fql<hir::TypeDefinition>, hir::Name), TypeResolutionError> {
+) -> Result<(Fql<hir::TypeDefinition>, Option<hir::Name>), TypeResolutionError> {
     let variant_name = match path {
         hir::Path::ThisModule { subname, .. } => subname.clone(),
         hir::Path::OtherModule(fqn) => fqn.sub_path.clone(),
@@ -51,6 +51,11 @@ pub(crate) fn resolve_type_definition_by_path_variant(
         path,
         source_ref.clone(),
     )?;
+    let (hir_module, _) = hir::lower_file(db, type_def_fql.module_id);
+    let type_def = hir_module.get_type_definition(type_def_fql.local_id);
+    if !type_def.kind.has_variants() {
+        return Ok((type_def_fql, variant_name));
+    }
 
     let Some(variant_name) = variant_name else {
         return Err(TypeResolutionError::MissingTypeDefinitionVariant {
@@ -59,7 +64,7 @@ pub(crate) fn resolve_type_definition_by_path_variant(
         });
     };
 
-    Ok((type_def_fql, variant_name))
+    Ok((type_def_fql, Some(variant_name)))
 }
 
 #[salsa::tracked]

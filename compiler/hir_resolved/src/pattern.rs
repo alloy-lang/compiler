@@ -76,6 +76,13 @@ fn resolve_destructure(
         .map(|p| Fql::new(module_id, *p))
         .collect::<Vec<_>>();
 
+    let Some(variant_name) = variant_name else {
+        return Err(TypeResolutionError::MissingTypeDefinitionVariant {
+            source_ref: source_ref.into(),
+            target_type_fql: type_def_fql,
+        });
+    };
+
     Ok(Pattern::Destructure {
         target: type_def_fql,
         variant_name,
@@ -154,6 +161,38 @@ mod tests {
                     local_id: Idx::from_raw(RawIdx::from_u32(1)),
                 },
                 variant_name: hir::Name::new("InvalidVariant")
+            },
+            err
+        );
+    }
+
+    #[test]
+    fn test_destructure_pattern_with_missing_variant() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+    import std::option::Option
+    let unwrap = |Option(x)| -> x
+            ",
+        );
+
+        let actual_0 = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
+            .expect("expected to resolve pattern");
+        assert_eq!(Pattern::VariableDeclaration, actual_0);
+        let err = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
+            .expect_err("expected to resolve pattern");
+        assert_eq!(
+            TypeResolutionError::MissingTypeDefinitionVariant {
+                source_ref: EPTrFql::Pattern(Fql {
+                    module_id,
+                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                }),
+                target_type_fql: Fql {
+                    module_id: ModuleId::new(&db, "std::option"),
+                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                }
             },
             err
         );
