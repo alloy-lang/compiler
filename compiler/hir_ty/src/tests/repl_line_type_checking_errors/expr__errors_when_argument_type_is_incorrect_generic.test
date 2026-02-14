@@ -1,0 +1,141 @@
+import std::option::Option
+
+typeof test : Option[String] -> Int
+let test = |arg| -> 0
+
+let incorrect_arg = Option::Some(0)
+let test_result = test(incorrect_arg)
+===
+HirTypedModule {
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(5): Generic(
+            1,
+        ),
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(4): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(1),
+                    ),
+                    local_id: Idx::<TypeDefinition>(1),
+                },
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+        Idx::<Expression>(1): Lambda {
+            arg_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId(
+                            Id(1),
+                        ),
+                        local_id: Idx::<TypeDefinition>(1),
+                    },
+                ),
+                args: [
+                    BuiltIn(
+                        String,
+                    ),
+                ],
+            },
+            return_type: BuiltIn(
+                Int,
+            ),
+        },
+        Idx::<Expression>(3): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(1),
+                    ),
+                    local_id: Idx::<TypeDefinition>(1),
+                },
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(1),
+                    ),
+                    local_id: Idx::<TypeDefinition>(1),
+                },
+            ),
+            args: [
+                BuiltIn(
+                    String,
+                ),
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnificationError(
+                TypeMismatch(
+                    Concrete(
+                        String,
+                    ),
+                    Concrete(
+                        Int,
+                    ),
+                ),
+            ),
+            range: 123..160,
+        },
+    ],
+    poly_instantiations: {
+        TypeDefinition(
+            Fql {
+                module_id: ModuleId(
+                    Id(1),
+                ),
+                local_id: Idx::<TypeDefinition>(1),
+            },
+        ): [
+            PolyInstantiation {
+                call_site: Fql {
+                    module_id: ModuleId(
+                        Id(4),
+                    ),
+                    local_id: Idx::<Expression>(3),
+                },
+                type_args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+        ],
+    },
+}
+[]
+[E002] Error: Type mismatch: expected `String`, found `Int`
+   ╭─[./test/main.alloy:7:1]
+   │
+ 7 │ let test_result = test(incorrect_arg)
+   │ ──────────────────┬──────────────────  
+   │                   ╰──────────────────── expected `String`, found `Int`
+   │ 
+   │ Help: These types must be compatible
+───╯
+
+
+

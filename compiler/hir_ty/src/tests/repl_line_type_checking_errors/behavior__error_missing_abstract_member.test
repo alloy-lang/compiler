@@ -35,3 +35,17 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
+[E004] Error: Behavior must implement abstract member `foo` from trait `Trait1`
+    ╭─[./test/main.alloy:8:1]
+    │
+  8 │ ╭─▶ behavior Trait1 for Type1 where
+    ┆ ┆   
+ 10 │ ├─▶ end
+    │ │        
+    │ ╰──────── missing implementation of `foo`
+    │     
+    │     Help: Trait `Trait1` requires an implementation of `foo` for type `Fql { module_id: ModuleId(Id(4)), local_id: Idx::<TypeDefinition>(0) }`
+────╯
+
+
+

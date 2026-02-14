@@ -76,3 +76,15 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
+[E001] Error: Type annotation conflict: expected `<TODO> -> String -> Int`, found `t0 -> t1 -> Int`
+    ╭─[./test/main.alloy:11:5]
+    │
+ 11 │     let test = |sf, str| -> 0
+    │     ─────────────┬────────────  
+    │                  ╰────────────── expected `<TODO> -> String -> Int`, found `t0 -> t1 -> Int`
+    │ 
+    │ Help: The type annotation says this should be `<TODO> -> String -> Int`, but type inference determined it to be `t0 -> t1 -> Int`
+────╯
+
+
+

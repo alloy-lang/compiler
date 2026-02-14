@@ -50,3 +50,15 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
+[E003] Error: Cannot find pattern `Option::Some` in this scope
+   ╭─[./test/main.alloy:1:2]
+   │
+ 1 │ |Option::Some(x)| -> x
+   │  ───────┬───────  
+   │         ╰───────── cannot find `Option::Some`
+   │ 
+   │ Help: No pattern named `Option::Some` found in module ModuleId(Id(4))
+───╯
+
+
+

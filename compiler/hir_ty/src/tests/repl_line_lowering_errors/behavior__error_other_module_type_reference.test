@@ -33,3 +33,17 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
+[E003] Error: Cannot find module `other`
+   ╭─[./test/main.alloy:7:1]
+   │
+ 7 │ ╭─▶ behavior TestTrait1 for other::Type1 where
+   ┆ ┆   
+ 9 │ ├─▶ end
+   │ │        
+   │ ╰──────── module `other` not found
+   │     
+   │     Help: Make sure the module is imported and the path is correct
+───╯
+
+
+

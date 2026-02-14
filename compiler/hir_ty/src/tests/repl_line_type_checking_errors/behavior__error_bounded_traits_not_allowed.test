@@ -38,3 +38,17 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
+[E003] Error: Bounded trait reference resolution not yet implemented
+    ╭─[./test/main.alloy:7:1]
+    │
+  7 │ ╭─▶ behavior Trait1[t1, t2] for Type1 where
+    ┆ ┆   
+ 11 │ ├─▶ end
+    │ │        
+    │ ╰──────── bounded trait reference
+    │     
+    │     Help: Bounded trait references are not yet fully implemented
+────╯
+
+
+

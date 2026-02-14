@@ -57,3 +57,15 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
+[E002] Error: Type mismatch: expected `String`, found `Int`
+    ╭─[./test/main.alloy:10:25]
+    │
+ 10 │   \ Either::Right(r) -> 7
+    │                         ┬  
+    │                         ╰── expected `String`, found `Int`
+    │ 
+    │ Help: These types must be compatible
+────╯
+
+
+

@@ -97,3 +97,15 @@ HirTypedModule {
     },
 }
 []
+[E002] Error: Type mismatch: expected `String`, found `Int`
+   ╭─[./test/main.alloy:8:1]
+   │
+ 8 │ let int_example = constructor(10)
+   │ ────────────────┬────────────────  
+   │                 ╰────────────────── expected `String`, found `Int`
+   │ 
+   │ Help: These types must be compatible
+───╯
+
+
+

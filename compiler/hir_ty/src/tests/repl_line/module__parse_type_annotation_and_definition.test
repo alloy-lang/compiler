@@ -194,3 +194,15 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
+[E001] Error: Type annotation conflict: expected `(t0 -> t1) -> t0 -> t0 -> TypeDef(1)[(t1, t1)]`, found `(t0 -> t1) -> t0 -> t0 -> (t1, t1)`
+   ╭─[./test/main.alloy:9:5]
+   │
+ 9 │     let testThing = |funky, x, y| -> test_data::new <| (funky(x), funky(y))
+   │     ───────────────────────────────────┬───────────────────────────────────  
+   │                                        ╰───────────────────────────────────── expected `(t0 -> t1) -> t0 -> t0 -> TypeDef(1)[(t1, t1)]`, found `(t0 -> t1) -> t0 -> t0 -> (t1, t1)`
+   │ 
+   │ Help: The type annotation says this should be `(t0 -> t1) -> t0 -> t0 -> TypeDef(1)[(t1, t1)]`, but type inference determined it to be `(t0 -> t1) -> t0 -> t0 -> (t1, t1)`
+───╯
+
+
+

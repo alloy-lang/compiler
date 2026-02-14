@@ -88,3 +88,15 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
+[E001] Error: Type annotation conflict: expected `t0 : Trait(0) -> t1 -> TypeDef(1)`, found `t0 -> t1 -> t2`
+    ╭─[./test/main.alloy:10:1]
+    │
+ 10 │ let test_func = |a, b| -> test
+    │ ───────────────┬──────────────  
+    │                ╰──────────────── expected `t0 : Trait(0) -> t1 -> TypeDef(1)`, found `t0 -> t1 -> t2`
+    │ 
+    │ Help: The type annotation says this should be `t0 : Trait(0) -> t1 -> TypeDef(1)`, but type inference determined it to be `t0 -> t1 -> t2`
+────╯
+
+
+
