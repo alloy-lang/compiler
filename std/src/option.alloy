@@ -2,7 +2,7 @@ module Option
 where
 
 import std::eq::Eq
-import std::order::Ord
+import std::order::{Ord, Ordering}
 import std::debug::Debug
 import std::functor::Functor
 import std::monad::Monad
@@ -34,9 +34,9 @@ behavior Ord for Option[t] where
   let compare = |left, right| ->
     match (left, right) when
       \ (Option::Some(l_val), Option::Some(r_val)) -> Ord::compare(l_val, r_val)
-      \ (Option::None, Option::Some(_))            -> LT
-      \ (Option::Some(_), Option::None)            -> GT
-      \ (Option::None, Option::None)               -> EQ
+      \ (Option::None, Option::Some(_))            -> Ordering::LT
+      \ (Option::Some(_), Option::None)            -> Ordering::GT
+      \ (Option::None, Option::None)               -> Ordering::EQ
 
 end
 
