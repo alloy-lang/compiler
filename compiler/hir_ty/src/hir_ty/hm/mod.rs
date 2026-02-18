@@ -198,6 +198,16 @@ impl PolyType {
             body: ty,
         }
     }
+    
+    pub(super) fn generalize_all(ty: MonoType) -> Self {
+        let quantified = free_type_vars(&ty);
+
+        Self {
+            quantified,
+            constraints: Vec::new(),
+            body: ty,
+        }
+    }
 
     /// Instantiate a polytype with fresh type variables
     /// Returns (instantiated_type, fresh_vars_in_order)

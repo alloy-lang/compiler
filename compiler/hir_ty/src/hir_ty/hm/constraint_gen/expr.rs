@@ -1,11 +1,14 @@
 use super::super::inference::resolved_to_mono;
+use super::super::{PolyType, TypeVarId};
 use super::{HMInferenceContext, MonoType};
 use crate::hir_ty::hm::constraint_gen::pattern::infer_pattern_hm;
 use crate::hir_ty::type_annotation::{type_reference_to_resolved_type, TypeResolutionContext};
+use crate::hir_ty::ResolvedType;
 use alloy_hir as hir;
 use alloy_hir_resolved as res;
 use alloy_hir_resolved::{EPFql, EPTdFql, Fql, TypeDefinition, TypeDefinitionKind};
 use non_empty_vec::NonEmpty;
+use rustc_hash::FxHashMap;
 
 /// Generate constraints for an expression using HM inference
 pub(crate) fn infer_expr_hm(
@@ -303,9 +306,6 @@ fn build_constructor_type(
     type_def_fql: &Fql<hir::TypeDefinition>,
     member: &res::TypeDefinitionMember,
 ) -> MonoType {
-    use super::super::TypeVarId;
-    use rustc_hash::FxHashMap;
-
     // Create a shared type resolution context for all parameters
     // This ensures consistent Generic IDs across all type references
     let mut type_ctx = TypeResolutionContext::new();
@@ -318,7 +318,6 @@ fn build_constructor_type(
                                     ctx: &mut HMInferenceContext,
                                     generic_map: &mut FxHashMap<usize, TypeVarId>|
      -> Option<MonoType> {
-        use crate::hir_ty::ResolvedType;
         match resolved {
             ResolvedType::Generic(id) => {
                 // Use or create a type variable for this generic ID
@@ -466,9 +465,7 @@ fn infer_variant_constructor(
         // Generalize and store in poly_env for proper instantiation
         // For variant constructors, quantify over ALL free variables (not filtered by env_type_vars)
         // since constructors are top-level polymorphic values
-        use rustc_hash::FxHashSet;
-        let poly_ty =
-            super::super::PolyType::generalize(constructor_ty.clone(), &FxHashSet::default());
+        let poly_ty = PolyType::generalize_all(constructor_ty.clone());
         ctx.poly_env.insert(variant_fql.clone(), poly_ty);
 
         // Now get it again with tracking to record this instantiation
@@ -536,11 +533,7 @@ fn infer_type_definition(
                 // Generalize and store in poly_env for proper instantiation
                 // For type definition constructors, quantify over ALL free variables
                 // since constructors are top-level polymorphic values
-                use rustc_hash::FxHashSet;
-                let poly_ty = super::super::PolyType::generalize(
-                    constructor_ty.clone(),
-                    &FxHashSet::default(),
-                );
+                let poly_ty = PolyType::generalize_all(constructor_ty.clone());
                 ctx.poly_env.insert(td_fql.clone().into(), poly_ty);
             }
 
