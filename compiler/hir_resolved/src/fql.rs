@@ -18,6 +18,24 @@ impl<T> Fql<T> {
     }
 }
 
+impl Fql<hir::Trait> {
+    pub fn trait_name(&self, db: &dyn hir::HirDatabase) -> String {
+        let (module, _) = hir::lower_file(db, self.module_id);
+        module.get_trait(self.local_id).name().as_str().to_string()
+    }
+}
+
+impl Fql<hir::TypeDefinition> {
+    pub fn type_def_name(&self, db: &dyn hir::HirDatabase) -> String {
+        let (module, _) = hir::lower_file(db, self.module_id);
+        module
+            .get_type_definition(self.local_id)
+            .name
+            .as_str()
+            .to_string()
+    }
+}
+
 impl<T> PartialEq for Fql<T> {
     fn eq(&self, other: &Self) -> bool {
         self.module_id == other.module_id && self.local_id == other.local_id
