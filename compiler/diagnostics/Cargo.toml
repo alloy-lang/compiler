@@ -11,6 +11,6 @@ ariadne = { workspace = true }
 text-size = { workspace = true }
 
 [dev-dependencies]
-alloy_parser = {path = "../parser"}
-expect-test = { workspace = true }
-pretty_assertions = { workspace = true }
+alloy_test_harness = {path = "../test_harness"}
+camino = { workspace = true }
+salsa = { workspace = true }

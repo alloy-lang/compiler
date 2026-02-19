@@ -3,12 +3,14 @@
 use ariadne::{Config, Label, Report};
 use std::ops::Range;
 
+use alloy_workspace::WorkspaceDatabase;
+
 use crate::core::{Diagnostic, DiagnosticLabel};
 
 /// Builder for constructing rich diagnostics
-#[derive(Debug)]
 pub struct DiagnosticBuilder<'a> {
     diagnostic: &'a dyn Diagnostic,
+    db: &'a dyn WorkspaceDatabase,
     labels: Vec<DiagnosticLabel>,
     notes: Vec<String>,
     help: Option<String>,
@@ -16,13 +18,18 @@ pub struct DiagnosticBuilder<'a> {
 
 impl<'a> DiagnosticBuilder<'a> {
     /// Create a new builder for a diagnostic
-    pub fn new(diagnostic: &'a dyn Diagnostic) -> Self {
+    pub fn new(diagnostic: &'a dyn Diagnostic, db: &'a dyn WorkspaceDatabase) -> Self {
         Self {
             diagnostic,
+            db,
             labels: Vec::new(),
             notes: Vec::new(),
             help: None,
         }
+    }
+
+    pub fn format_module(&self, module_id: &alloy_workspace::ModuleId) -> String {
+        module_id.path(self.db)
     }
 
     /// Add a label to the primary span

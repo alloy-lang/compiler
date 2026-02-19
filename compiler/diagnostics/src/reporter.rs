@@ -98,7 +98,7 @@ impl DiagnosticsReporter {
                 let source_id = raw_file.raw_path(db);
                 let source = raw_file.contents(db);
 
-                let builder = DiagnosticBuilder::new(entry.diagnostic.as_ref());
+                let builder = DiagnosticBuilder::new(entry.diagnostic.as_ref(), db);
                 let report = entry
                     .diagnostic
                     .build_report(builder)
@@ -123,7 +123,7 @@ impl DiagnosticsReporter {
                 let source_id = raw_file.raw_path(db);
                 let source = raw_file.contents(db);
 
-                let builder = DiagnosticBuilder::new(entry.diagnostic.as_ref());
+                let builder = DiagnosticBuilder::new(entry.diagnostic.as_ref(), db);
                 let report = entry
                     .diagnostic
                     .build_report(builder)

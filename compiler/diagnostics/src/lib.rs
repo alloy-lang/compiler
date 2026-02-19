@@ -57,10 +57,14 @@ pub use core::{Diagnostic, DiagnosticLabel, Severity};
 pub use reporter::DiagnosticsReporter;
 
 #[cfg(test)]
+mod test_db;
+
+#[cfg(test)]
 mod tests {
     use super::*;
     use ariadne::Source;
     use text_size::TextRange;
+    use test_db::TestDiagnosticsDatabase;
 
     #[derive(Debug)]
     struct TestError {
@@ -97,8 +101,10 @@ mod tests {
         source_id: impl Into<String>,
         source: &str,
     ) -> String {
+        let db = TestDiagnosticsDatabase::default();
+
         let source_id = source_id.into();
-        let builder = DiagnosticBuilder::new(diagnostic);
+        let builder = DiagnosticBuilder::new(diagnostic, &db);
         let report = diagnostic.build_report(builder).build(source_id.clone());
 
         let mut buf = Vec::new();
