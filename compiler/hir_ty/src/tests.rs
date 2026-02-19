@@ -1,40 +1,10 @@
 use alloy_diagnostics::DiagnosticsReporter;
 use alloy_hir as hir;
-use alloy_workspace::{ModuleId, SourceFile, Workspace, WorkspaceDatabase};
+use alloy_workspace::WorkspaceDatabase;
 use std::path::Path;
 use std::{env, fs};
 
-#[salsa::db]
-#[derive(Default, Clone)]
-pub(crate) struct TestHirTyDatabase {
-    storage: salsa::Storage<Self>,
-    workspace: Workspace,
-}
-
-#[salsa::db]
-impl salsa::Database for TestHirTyDatabase {}
-
-#[salsa::db]
-impl WorkspaceDatabase for TestHirTyDatabase {
-    fn add_module(&mut self, slug: &str, path: &camino::Utf8Path, contents: &str) -> ModuleId {
-        let prepared = alloy_workspace::prepare_module(self, slug, path, contents);
-        self.workspace.insert_prepared_module(prepared)
-    }
-
-    fn get_source(&'_ self, module_id: ModuleId) -> SourceFile<'_> {
-        self.workspace.get_source(module_id)
-    }
-
-    fn find_module_by_slug(&self, slug: &str) -> Option<ModuleId> {
-        self.workspace.find_module_by_slug(self, slug)
-    }
-}
-
-#[salsa::db]
-impl hir::HirDatabase for TestHirTyDatabase {}
-
-#[salsa::db]
-impl crate::HirTyDatabase for TestHirTyDatabase {}
+alloy_test_harness::test_database!(TestHirTyDatabase: hir::HirDatabase, crate::HirTyDatabase);
 
 #[test]
 fn repl_line() {

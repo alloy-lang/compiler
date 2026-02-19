@@ -4,6 +4,61 @@ use std::panic::{RefUnwindSafe, UnwindSafe};
 use std::path::{Path, PathBuf};
 use std::{env, fs};
 
+/// Generates a salsa test database struct with `WorkspaceDatabase` implemented.
+///
+/// The struct gets `#[salsa::db]`, `#[derive(Default, Clone)]`, and standard
+/// `salsa::Database` + `WorkspaceDatabase` impls. Additional salsa database
+/// traits can be listed after the struct name.
+///
+/// # Example
+///
+/// ```ignore
+/// alloy_test_harness::test_database!(pub(crate) TestDb: hir::HirDatabase, crate::MyDatabase);
+/// ```
+#[macro_export]
+macro_rules! test_database {
+    ($name:ident $(: $($trait:path),+ $(,)?)?) => {
+        #[salsa::db]
+        #[derive(Default, Clone)]
+        pub(crate) struct $name {
+            storage: salsa::Storage<Self>,
+            workspace: alloy_workspace::Workspace,
+        }
+
+        #[salsa::db]
+        impl salsa::Database for $name {}
+
+        #[salsa::db]
+        impl alloy_workspace::WorkspaceDatabase for $name {
+            fn add_module(
+                &mut self,
+                slug: &str,
+                path: &camino::Utf8Path,
+                contents: &str,
+            ) -> alloy_workspace::ModuleId {
+                let prepared = alloy_workspace::prepare_module(self, slug, path, contents);
+                self.workspace.insert_prepared_module(prepared)
+            }
+
+            fn get_source(
+                &'_ self,
+                module_id: alloy_workspace::ModuleId,
+            ) -> alloy_workspace::SourceFile<'_> {
+                self.workspace.get_source(module_id)
+            }
+
+            fn find_module_by_slug(&self, slug: &str) -> Option<alloy_workspace::ModuleId> {
+                self.workspace.find_module_by_slug(self, slug)
+            }
+        }
+
+        $($(
+            #[salsa::db]
+            impl $trait for $name {}
+        )+)?
+    };
+}
+
 /// # Panics
 ///
 /// Will panic if tests fail.
