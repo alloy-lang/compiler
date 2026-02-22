@@ -2,6 +2,7 @@ use alloy_hir as hir;
 use alloy_hir_resolved::EPTdFql;
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
+use std::collections::HashMap;
 use text_size::TextRange;
 
 mod hir_ty;
@@ -30,8 +31,8 @@ pub struct HirTypedModule {
 impl HirTypedModule {
     pub(crate) fn empty() -> Self {
         Self {
-            expression_types: Default::default(),
-            pattern_types: Default::default(),
+            expression_types: HashMap::default(),
+            pattern_types: HashMap::default(),
             warnings: Vec::new(),
             errors: Vec::new(),
             poly_instantiations: FxHashMap::default(),
@@ -71,13 +72,13 @@ impl HirTypedModule {
         &self.errors
     }
 
+    #[must_use]
     /// Get all instantiations for a polymorphic definition
     pub fn instantiations(&self, def_fql: &EPTdFql) -> &[PolyInstantiation] {
         // TODO: Add deduplication, if needed
         self.poly_instantiations
             .get(def_fql)
-            .map(|v| v.as_slice())
-            .unwrap_or(&[])
+            .map_or(&[], |v| v.as_slice())
     }
 }
 

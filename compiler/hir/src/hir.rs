@@ -333,7 +333,7 @@ struct LoweringCtx<'db> {
     type_references: Index<TypeReference>,
     type_definitions: Index<TypeDefinition>,
     traits: Index<Trait>,
-    behaviors: Index<Behavior, (TypeIdx, TypeIdx)>,
+    behaviors: Index<Behavior, (/* type */ TypeIdx, /* trait */ TypeIdx)>,
     scopes: Scopes,
     used_imports: HashSet<ImportIdx>,
     warnings: Vec<LoweringWarning>,

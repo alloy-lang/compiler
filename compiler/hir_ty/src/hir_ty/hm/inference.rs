@@ -147,8 +147,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
                     // Check if this should be generalized
                     let should_generalize = annotation_opt
                         .as_ref()
-                        .map(|ann| ann.is_polymorphic())
-                        .unwrap_or(false);
+                        .is_some_and(ResolvedType::is_polymorphic);
 
                     if should_generalize {
                         // Generalize the type and store in poly_env

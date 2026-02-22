@@ -153,7 +153,7 @@ fn check_trait_constraints(
         // For concrete user-defined types, check if they have behavior implementations
         ResolvedType::TypeDef(type_fql, _) => {
             // Check each required trait
-            for (required_trait, _) in constraints.iter() {
+            for (required_trait, _) in constraints {
                 if !has_behavior_for_trait(db, type_fql, required_trait) {
                     return Err(TypeError::ConstraintNotSatisfied);
                 }
