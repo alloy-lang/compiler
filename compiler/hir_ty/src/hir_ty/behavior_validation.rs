@@ -52,6 +52,8 @@ fn validate_behavior(
     let (trait_module, _) = hir::lower_file(db, trait_fql.module_id);
     let trait_def = trait_module.get_trait(trait_fql.local_id);
 
+    let type_name = type_fql.type_def_name(db);
+
     // Check all abstract members of the trait
     for (member_name, _type_annotation) in trait_def.abstract_members() {
         // Check if behavior has an implementation for this member
@@ -60,7 +62,7 @@ fn validate_behavior(
                 TypeInferenceErrorKind::MissingTraitImplementation {
                     trait_name: trait_def.name().to_string(),
                     member_name: member_name.to_string(),
-                    type_fql: type_fql.clone(),
+                    type_name: type_name.clone(),
                 },
                 behavior_range,
             );

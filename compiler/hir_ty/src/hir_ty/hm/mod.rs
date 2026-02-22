@@ -43,7 +43,8 @@ pub enum MonoType {
     /// Built-in concrete type (e.g., `Int`, `String`)
     Concrete(hir::BuiltInType),
     /// User-defined type constructor (e.g., `List`, `Option`, `MyType`)
-    TypeDef(Fql<hir::TypeDefinition>),
+    /// The String is the human-readable type name for display purposes
+    TypeDef(Fql<hir::TypeDefinition>, hir::Name),
     /// Function type (e.g., `a -> b`)
     Function(Box<MonoType>, Box<MonoType>),
     /// Tuple type (e.g., `(a, b, c)`)
@@ -64,8 +65,8 @@ impl std::fmt::Display for MonoType {
             MonoType::Unconstrained => write!(f, "_"),
             MonoType::Var(var) => write!(f, "t{}", var.0),
             MonoType::Concrete(builtin) => write!(f, "{builtin:?}"),
-            MonoType::TypeDef(type_fql) => {
-                write!(f, "TypeDef({})", type_fql.local_id.into_raw())
+            MonoType::TypeDef(_, name) => {
+                write!(f, "{name}")
             }
             MonoType::Function(arg, ret) => {
                 // Add parentheses if arg is also a function
@@ -178,7 +179,7 @@ fn collect_free_vars(ty: &MonoType, vars: &mut FxHashSet<TypeVarId>) {
                 collect_free_vars(t, vars);
             }
         }
-        MonoType::Concrete(_) | MonoType::TypeDef(_) | MonoType::Unit => {}
+        MonoType::Concrete(_) | MonoType::TypeDef(..) | MonoType::Unit => {}
     }
 }
 
@@ -198,7 +199,7 @@ impl PolyType {
             body: ty,
         }
     }
-    
+
     pub(super) fn generalize_all(ty: MonoType) -> Self {
         let quantified = free_type_vars(&ty);
 

@@ -11,6 +11,7 @@ HirTypedModule {
                 ),
                 local_id: Idx::<TypeDefinition>(1),
             },
+            "Option",
         ),
     },
     pattern_types: {},

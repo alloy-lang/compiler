@@ -283,7 +283,9 @@ pub(super) fn resolved_to_mono(
         // TODO: Track the constraints and enforce them during solving
         ResolvedType::ConstrainedGeneric { .. } => Some(ctx.fresh_type_var()),
         // Convert TypeDef to MonoType::TypeDef
-        ResolvedType::TypeDef(type_fql) => Some(MonoType::TypeDef(type_fql.clone())),
+        ResolvedType::TypeDef(type_fql, name) => {
+            Some(MonoType::TypeDef(type_fql.clone(), name.clone()))
+        }
         // For Bounded types, convert to MonoType::App
         ResolvedType::Bounded { base, args } => {
             let base_mono = resolved_to_mono(base, ctx)?;
@@ -344,7 +346,7 @@ fn mono_to_resolved_with_map(
                 ResolvedType::Tuple(NonEmpty::from((first, rest)))
             }
         }
-        MonoType::TypeDef(type_fql) => ResolvedType::TypeDef(type_fql.clone()),
+        MonoType::TypeDef(type_fql, name) => ResolvedType::TypeDef(type_fql.clone(), name.clone()),
         MonoType::App { constructor, args } => {
             let base = mono_to_resolved_with_map(constructor, type_var_map, next_generic_id);
             let resolved_args: Vec<_> = args

@@ -63,8 +63,8 @@ mod test_db;
 mod tests {
     use super::*;
     use ariadne::Source;
-    use text_size::TextRange;
     use test_db::TestDiagnosticsDatabase;
+    use text_size::TextRange;
 
     #[derive(Debug)]
     struct TestError {

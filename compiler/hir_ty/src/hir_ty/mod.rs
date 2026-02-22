@@ -43,7 +43,8 @@ pub enum ResolvedType {
     Unit,
     /// User-defined type (nominal typing)
     /// Two TypeDefs are equal iff they point to the same type definition
-    TypeDef(Fql<hir::TypeDefinition>),
+    /// The String is the human-readable type name for display purposes
+    TypeDef(Fql<hir::TypeDefinition>, hir::Name),
     BuiltIn(hir::BuiltInType),
     Lambda {
         arg_type: Box<ResolvedType>,
@@ -60,9 +61,10 @@ pub enum ResolvedType {
     /// Generic type variable with trait constraints (for bounded polymorphism)
     /// The usize represents a canonical type variable ID
     /// The NonEmpty contains trait constraints this generic must satisfy
+    /// Each constraint is a (Fql, name) pair for human-readable display
     ConstrainedGeneric {
         id: usize,
-        constraints: NonEmpty<Fql<hir::Trait>>,
+        constraints: NonEmpty<(Fql<hir::Trait>, hir::Name)>,
     },
     /// Placeholder for unimplemented type system features
     /// Used for TypeReference::SelfRef, MonoType::App, and other TODO cases
@@ -97,7 +99,7 @@ impl ResolvedType {
             | ResolvedType::Unconstrained
             | ResolvedType::Missing
             | ResolvedType::Unit
-            | ResolvedType::TypeDef(_)
+            | ResolvedType::TypeDef(..)
             | ResolvedType::BuiltIn(_)
             | ResolvedType::TODO => false,
         }
@@ -111,7 +113,7 @@ impl std::fmt::Display for ResolvedType {
             ResolvedType::Unconstrained => write!(f, "_"),
             ResolvedType::Missing => write!(f, "<missing>"),
             ResolvedType::Unit => write!(f, "()"),
-            ResolvedType::TypeDef(fql) => write!(f, "TypeDef({})", fql.local_id.into_raw()),
+            ResolvedType::TypeDef(_, name) => write!(f, "{name}"),
             ResolvedType::BuiltIn(builtin) => write!(f, "{builtin:?}"),
             ResolvedType::Lambda {
                 arg_type,
@@ -148,11 +150,11 @@ impl std::fmt::Display for ResolvedType {
                 write!(f, "t{id}")?;
                 if !constraints.is_empty() {
                     write!(f, " : ")?;
-                    for (i, constraint) in constraints.iter().enumerate() {
+                    for (i, (_, trait_name)) in constraints.iter().enumerate() {
                         if i > 0 {
                             write!(f, " + ")?;
                         }
-                        write!(f, "Trait({})", constraint.local_id.into_raw())?;
+                        write!(f, "{trait_name}")?;
                     }
                 }
                 Ok(())

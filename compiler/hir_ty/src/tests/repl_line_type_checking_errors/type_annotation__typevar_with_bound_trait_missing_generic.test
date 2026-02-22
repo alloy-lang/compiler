@@ -4,7 +4,7 @@ trait TestTrait1 where
     self = #Type[_]
 end
 
-typeof test_func : t1 -> t2 -> Test[Int] where
+typeof test_func : t1 -> t2 -> Test where
     typevar t1 = TestTrait1
     typevar t2
 let test_func = |a, b| -> test
@@ -61,22 +61,15 @@ HirTypedModule {
                         arg_type: Generic(
                             1,
                         ),
-                        return_type: Bounded {
-                            base: TypeDef(
-                                Fql {
-                                    module_id: ModuleId(
-                                        Id(0),
-                                    ),
-                                    local_id: Idx::<TypeDefinition>(1),
-                                },
-                                "Test",
-                            ),
-                            args: [
-                                BuiltIn(
-                                    Int,
+                        return_type: TypeDef(
+                            Fql {
+                                module_id: ModuleId(
+                                    Id(0),
                                 ),
-                            ],
-                        },
+                                local_id: Idx::<TypeDefinition>(1),
+                            },
+                            "Test",
+                        ),
                     },
                 },
                 found: Lambda {
@@ -93,20 +86,20 @@ HirTypedModule {
                     },
                 },
             },
-            range: 170..200,
+            range: 165..195,
         },
     ],
     poly_instantiations: {},
 }
 []
-[E001] Error: Type annotation conflict: expected `t0 : TestTrait1 -> t1 -> Test[Int]`, found `t0 -> t1 -> t2`
+[E001] Error: Type annotation conflict: expected `t0 : TestTrait1 -> t1 -> Test`, found `t0 -> t1 -> t2`
     ╭─[./test/main.alloy:10:1]
     │
  10 │ let test_func = |a, b| -> test
     │ ───────────────┬──────────────  
-    │                ╰──────────────── expected `t0 : TestTrait1 -> t1 -> Test[Int]`, found `t0 -> t1 -> t2`
+    │                ╰──────────────── expected `t0 : TestTrait1 -> t1 -> Test`, found `t0 -> t1 -> t2`
     │ 
-    │ Help: The type annotation says this should be `t0 : TestTrait1 -> t1 -> Test[Int]`, but type inference determined it to be `t0 -> t1 -> t2`
+    │ Help: The type annotation says this should be `t0 : TestTrait1 -> t1 -> Test`, but type inference determined it to be `t0 -> t1 -> t2`
 ────╯
 
 

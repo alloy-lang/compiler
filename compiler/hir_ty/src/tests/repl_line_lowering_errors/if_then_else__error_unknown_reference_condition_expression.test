@@ -50,7 +50,7 @@ HirTypedModule {
    │    ──┬──  
    │      ╰──── cannot find `test`
    │ 
-   │ Help: No value named `test` found in module ModuleId(Id(4))
+   │ Help: No value named `test` found in module `main`
 ───╯
 
 

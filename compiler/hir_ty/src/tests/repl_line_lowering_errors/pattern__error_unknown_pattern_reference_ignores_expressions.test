@@ -67,7 +67,7 @@ HirTypedModule {
    │  ─────┬────  
    │       ╰────── cannot find `unknown`
    │ 
-   │ Help: No pattern named `unknown` found in module ModuleId(Id(4))
+   │ Help: No pattern named `unknown` found in module `main`
 ───╯
 
 

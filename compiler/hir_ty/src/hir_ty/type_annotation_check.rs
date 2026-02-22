@@ -66,7 +66,7 @@ fn check_type_compatibility(
         (ResolvedType::TODO, _) | (_, ResolvedType::TODO) => Err(TypeError::Incompatible),
         (ResolvedType::Unit, ResolvedType::Unit) => Ok(()),
         (ResolvedType::BuiltIn(a), ResolvedType::BuiltIn(b)) if a == b => Ok(()),
-        (ResolvedType::TypeDef(a), ResolvedType::TypeDef(b)) if a == b => Ok(()),
+        (ResolvedType::TypeDef(a, _), ResolvedType::TypeDef(b, _)) if a == b => Ok(()),
 
         // Generic type variables
         // TODO: Track generic type variable assignments to ensure consistency
@@ -147,13 +147,13 @@ fn check_type_compatibility(
 fn check_trait_constraints(
     db: &dyn HirTyDatabase,
     ty: &ResolvedType,
-    constraints: &NonEmpty<Fql<hir::Trait>>,
+    constraints: &NonEmpty<(Fql<hir::Trait>, hir::Name)>,
 ) -> Result<(), TypeError> {
     match ty {
         // For concrete user-defined types, check if they have behavior implementations
-        ResolvedType::TypeDef(type_fql) => {
+        ResolvedType::TypeDef(type_fql, _) => {
             // Check each required trait
-            for required_trait in constraints.iter() {
+            for (required_trait, _) in constraints.iter() {
                 if !has_behavior_for_trait(db, type_fql, required_trait) {
                     return Err(TypeError::ConstraintNotSatisfied);
                 }

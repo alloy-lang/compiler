@@ -57,7 +57,7 @@ HirTypedModule {
    │  ───────┬───────  
    │         ╰───────── cannot find `Option::Some`
    │ 
-   │ Help: No pattern named `Option::Some` found in module ModuleId(Id(4))
+   │ Help: No pattern named `Option::Some` found in module `main`
 ───╯
 
 

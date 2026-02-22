@@ -1,7 +1,7 @@
 use crate::hir_ty::ResolvedType;
 use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, Severity};
 use alloy_hir as hir;
-use alloy_hir_resolved::{Fql, TypeResolutionError};
+use alloy_hir_resolved::TypeResolutionError;
 use text_size::TextRange;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -93,11 +93,11 @@ impl Diagnostic for TypeInferenceError {
                         .join("::");
                     format!("Cannot find type definition `{}`", path_str)
                 }
-                TypeResolutionError::UnknownTypeDefinitionVariant { .. } => {
-                    todo!()
+                TypeResolutionError::UnknownTypeDefinitionVariant { variant_name, .. } => {
+                    format!("Unknown variant `{}`", variant_name.as_str())
                 }
                 TypeResolutionError::MissingTypeDefinitionVariant { .. } => {
-                    todo!()
+                    "Missing variant name for multi-variant type".to_string()
                 }
                 TypeResolutionError::UnknownTraitReference { path, .. } => {
                     let path_str = path
@@ -163,39 +163,48 @@ impl Diagnostic for TypeInferenceError {
                 }
                 TypeResolutionError::UnknownExpressionReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
+                    let module_path = builder.format_module(module_id);
                     builder
                         .with_primary_label(format!("cannot find `{}`", path_str))
-                        .with_help(format!("No value named `{}` found in module {:?}", path_str, module_id))
+                        .with_help(format!("No value named `{}` found in module `{}`", path_str, module_path))
                 }
                 TypeResolutionError::UnknownPatternReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
+                    let module_path = builder.format_module(module_id);
                     builder
                         .with_primary_label(format!("cannot find `{}`", path_str))
-                        .with_help(format!("No pattern named `{}` found in module {:?}", path_str, module_id))
+                        .with_help(format!("No pattern named `{}` found in module `{}`", path_str, module_path))
                 }
                 TypeResolutionError::UnknownTypeReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
+                    let module_path = builder.format_module(module_id);
                     builder
                         .with_primary_label(format!("cannot find type `{}`", path_str))
-                        .with_help(format!("No type named `{}` found in module {:?}", path_str, module_id))
+                        .with_help(format!("No type named `{}` found in module `{}`", path_str, module_path))
                 }
                 TypeResolutionError::UnknownTypeDefinition { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
+                    let module_path = builder.format_module(module_id);
                     builder
                         .with_primary_label(format!("cannot find type `{}`", path_str))
-                        .with_help(format!("No type definition named `{}` found in module {:?}", path_str, module_id))
+                        .with_help(format!("No type definition named `{}` found in module `{}`", path_str, module_path))
                 }
-                TypeResolutionError::UnknownTypeDefinitionVariant { source_ref: _, target_type_fql: _, variant_name: _ } => {
-                    todo!()
+                TypeResolutionError::UnknownTypeDefinitionVariant { variant_name, .. } => {
+                    builder
+                        .with_primary_label(format!("variant `{}` not found", variant_name.as_str()))
+                        .with_help(format!("No variant named `{}` exists on this type", variant_name.as_str()))
                 }
-                TypeResolutionError::MissingTypeDefinitionVariant { source_ref: _, target_type_fql: _ } => {
-                    todo!()
+                TypeResolutionError::MissingTypeDefinitionVariant { .. } => {
+                    builder
+                        .with_primary_label("missing variant name")
+                        .with_help("Multi-variant types require specifying a variant (e.g., `Type::Variant`)")
                 }
                 TypeResolutionError::UnknownTraitReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
+                    let module_path = builder.format_module(module_id);
                     builder
                         .with_primary_label(format!("cannot find trait `{}`", path_str))
-                        .with_help(format!("No trait named `{}` found in module {:?}", path_str, module_id))
+                        .with_help(format!("No trait named `{}` found in module `{}`", path_str, module_path))
                 }
                 TypeResolutionError::UnknownTraitMember { subname, .. } => {
                     builder
@@ -211,15 +220,15 @@ impl Diagnostic for TypeInferenceError {
             TypeInferenceErrorKind::MissingTraitImplementation {
                 trait_name,
                 member_name,
-                type_fql,
+                type_name,
             } => builder
                 .with_primary_label(format!(
                     "missing implementation of `{}`",
                     member_name
                 ))
                 .with_help(format!(
-                    "Trait `{}` requires an implementation of `{}` for type `{:?}`",
-                    trait_name, member_name, type_fql
+                    "Trait `{}` requires an implementation of `{}` for type `{}`",
+                    trait_name, member_name, type_name
                 )),
         }
     }
@@ -252,7 +261,7 @@ pub enum TypeInferenceErrorKind {
     MissingTraitImplementation {
         trait_name: String,
         member_name: String,
-        type_fql: Fql<hir::TypeDefinition>,
+        type_name: hir::Name,
     },
 }
 

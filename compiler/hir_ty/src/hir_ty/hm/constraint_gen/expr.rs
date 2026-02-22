@@ -359,9 +359,10 @@ fn build_constructor_type(
         .collect();
 
     // Build the result type
+    let type_name = type_def_fql.type_def_name(ctx.db);
     let result_type = if generic_to_var.is_empty() {
         // No type parameters - just the TypeDef
-        MonoType::TypeDef(type_def_fql.clone())
+        MonoType::TypeDef(type_def_fql.clone(), type_name)
     } else {
         // Has type parameters - build App with type arguments
         // Sort by generic ID to ensure consistent ordering
@@ -373,7 +374,7 @@ fn build_constructor_type(
             .collect();
 
         MonoType::App {
-            constructor: Box::new(MonoType::TypeDef(type_def_fql.clone())),
+            constructor: Box::new(MonoType::TypeDef(type_def_fql.clone(), type_name)),
             args,
         }
     };
@@ -540,13 +541,13 @@ fn infer_type_definition(
             constructor_ty
         }
         Some(TypeDefinition {
-            name: _,
+            name: td_name,
             kind: TypeDefinitionKind::Union(_members),
         }) => {
             // Multi-variant type - cannot be called as a function directly
             // You must use the specific variant constructor (e.g., Some, None)
             // Return the TypeDef, which will cause a unification error if used as a function
-            MonoType::TypeDef(td_fql.clone())
+            MonoType::TypeDef(td_fql.clone(), td_name)
         }
         None => {
             // Type definition not found or couldn't be resolved
@@ -566,8 +567,9 @@ fn has_type_variables(ty: &MonoType) -> bool {
         MonoType::App { constructor, args } => {
             has_type_variables(constructor) || args.iter().any(has_type_variables)
         }
-        MonoType::Unconstrained | MonoType::Concrete(_) | MonoType::TypeDef(_) | MonoType::Unit => {
-            false
-        }
+        MonoType::Unconstrained
+        | MonoType::Concrete(_)
+        | MonoType::TypeDef(..)
+        | MonoType::Unit => false,
     }
 }

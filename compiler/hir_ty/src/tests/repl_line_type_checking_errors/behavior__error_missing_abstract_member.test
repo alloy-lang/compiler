@@ -22,12 +22,7 @@ HirTypedModule {
             kind: MissingTraitImplementation {
                 trait_name: "Trait1",
                 member_name: "foo",
-                type_fql: Fql {
-                    module_id: ModuleId(
-                        Id(4),
-                    ),
-                    local_id: Idx::<TypeDefinition>(0),
-                },
+                type_name: "Type1",
             },
             range: 93..145,
         },
@@ -44,7 +39,7 @@ HirTypedModule {
     │ │        
     │ ╰──────── missing implementation of `foo`
     │     
-    │     Help: Trait `Trait1` requires an implementation of `foo` for type `Fql { module_id: ModuleId(Id(4)), local_id: Idx::<TypeDefinition>(0) }`
+    │     Help: Trait `Trait1` requires an implementation of `foo` for type `Type1`
 ────╯
 
 

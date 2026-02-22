@@ -28,7 +28,7 @@ fn type_definition_to_resolved_type(
     ctx: &mut super::type_annotation::TypeResolutionContext,
 ) -> Option<ResolvedType> {
     let (hir_module, _) = hir::lower_file(db, current_module_id);
-    let hir::TypeDefinition { name: _, kind } = hir_module.get_type_definition(type_idx);
+    let hir::TypeDefinition { name, kind } = hir_module.get_type_definition(type_idx);
 
     let ty = match kind {
         hir::TypeDefinitionKind::Missing => ResolvedType::Missing,
@@ -39,17 +39,19 @@ fn type_definition_to_resolved_type(
             match type_var {
                 hir::TypeVariable::Unbound => ResolvedType::Generic(generic_id),
                 hir::TypeVariable::Constrained(constraints) => {
-                    // Convert trait constraints to Fql<hir::Trait> references
+                    // Convert trait constraints to (Fql<hir::Trait>, name) pairs
                     let trait_constraints: Vec<_> = constraints
                         .iter()
                         .filter_map(|constraint| match constraint {
                             hir::TypeVariableConstraint::Trait(type_idx) => {
-                                alloy_hir_resolved::resolve_trait_by_ref_id(
+                                let trait_fql = alloy_hir_resolved::resolve_trait_by_ref_id(
                                     db,
                                     current_module_id,
                                     *type_idx,
                                 )
-                                .ok()
+                                .ok()?;
+                                let name = trait_fql.trait_name(db);
+                                Some((trait_fql, name))
                             }
                             hir::TypeVariableConstraint::Kind(_) => {
                                 // Kind constraints aren't trait constraints
@@ -61,6 +63,7 @@ fn type_definition_to_resolved_type(
 
                     if trait_constraints.is_empty() {
                         // If no trait constraints (only kind constraints), treat as unconstrained
+                        // TODO: kind checking
                         ResolvedType::Generic(generic_id)
                     } else {
                         // SAFETY: We just checked that trait_constraints is non-empty
@@ -77,7 +80,7 @@ fn type_definition_to_resolved_type(
         }
         hir::TypeDefinitionKind::Single(_) | hir::TypeDefinitionKind::Union(_) => {
             // Return a TypeDef pointing to this type definition
-            ResolvedType::TypeDef(Fql::new(current_module_id, type_idx))
+            ResolvedType::TypeDef(Fql::new(current_module_id, type_idx), name.clone())
         }
     };
 

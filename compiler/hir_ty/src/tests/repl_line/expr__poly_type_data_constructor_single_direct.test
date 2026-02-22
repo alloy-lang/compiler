@@ -20,6 +20,7 @@ HirTypedModule {
                     ),
                     local_id: Idx::<TypeDefinition>(1),
                 },
+                "Identity",
             ),
             args: [
                 BuiltIn(
@@ -35,6 +36,7 @@ HirTypedModule {
                     ),
                     local_id: Idx::<TypeDefinition>(1),
                 },
+                "Identity",
             ),
             args: [
                 BuiltIn(

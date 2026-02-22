@@ -21,6 +21,7 @@ HirTypedModule {
                         ),
                         local_id: Idx::<TypeDefinition>(1),
                     },
+                    "Option",
                 ),
                 args: [
                     BuiltIn(
@@ -40,6 +41,7 @@ HirTypedModule {
                     ),
                     local_id: Idx::<TypeDefinition>(1),
                 },
+                "Option",
             ),
             args: [
                 BuiltIn(

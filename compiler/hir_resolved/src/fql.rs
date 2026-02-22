@@ -19,20 +19,16 @@ impl<T> Fql<T> {
 }
 
 impl Fql<hir::Trait> {
-    pub fn trait_name(&self, db: &dyn hir::HirDatabase) -> String {
+    pub fn trait_name(&self, db: &dyn hir::HirDatabase) -> hir::Name {
         let (module, _) = hir::lower_file(db, self.module_id);
-        module.get_trait(self.local_id).name().as_str().to_string()
+        module.get_trait(self.local_id).name().clone()
     }
 }
 
 impl Fql<hir::TypeDefinition> {
-    pub fn type_def_name(&self, db: &dyn hir::HirDatabase) -> String {
+    pub fn type_def_name(&self, db: &dyn hir::HirDatabase) -> hir::Name {
         let (module, _) = hir::lower_file(db, self.module_id);
-        module
-            .get_type_definition(self.local_id)
-            .name
-            .as_str()
-            .to_string()
+        module.get_type_definition(self.local_id).name.clone()
     }
 }
 

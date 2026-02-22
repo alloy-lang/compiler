@@ -40,3 +40,15 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
+[E003] Error: Unknown variant `Nothing`
+   ╭─[./test/main.alloy:5:1]
+   │
+ 5 │ let unknown = Either::Nothing
+   │ ───────────────┬──────────────  
+   │                ╰──────────────── variant `Nothing` not found
+   │ 
+   │ Help: No variant named `Nothing` exists on this type
+───╯
+
+
+
