@@ -33,7 +33,7 @@ rustc-hash = "1.1"
 salsa = "0.24.0"
 serde = "1.0"
 text-size = "1.1"
-toml = "0.8"
+toml = "1.0"
 url = "2.5.8"
 walkdir = "2"
 
