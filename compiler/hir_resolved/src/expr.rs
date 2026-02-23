@@ -515,6 +515,46 @@ mod tests {
         );
     }
 
+    #[test]
+    fn resolve_same_module_function_call_trait_reference() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    trait TestTrait where
+      self = #Type[_]
+      typeof test_func : (a -> self[b]) -> self[a] -> self[b] where
+        typevar a
+        typevar b
+    end
+
+    typeof example : (t1 -> m[t2]) -> m[t1] -> m[t2] where
+      typevar m = TestTrait
+      typevar t1
+      typevar t2
+    let example = TestTrait::test_func
+",
+        );
+
+        let err =
+            maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
+
+        let expected = TypeResolutionError::UnknownTypeDefinitionVariant {
+            source_ref: EPTrFql::Expression(Fql {
+                module_id,
+                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+            }),
+            target_type_fql: Fql {
+                module_id: ModuleId::new(&db, "std::option"),
+                local_id: Idx::from_raw(RawIdx::from_u32(1)),
+            },
+            variant_name: Name::new("Other"),
+        };
+
+        assert_eq!(expected, err);
+    }
+
     //
     // variable_ref - cross module
     //
