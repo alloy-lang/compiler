@@ -23,7 +23,7 @@ use rustc_hash::FxHashMap;
 ///    c. Generalization: For polymorphic type annotations, generalize and store in poly_env
 /// 3. Application: Apply final substitution to all types and convert to ResolvedType
 pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedModule {
-    let mut ctx = HMInferenceContext::new(db);
+    let mut ctx = HMInferenceContext::new(db, module_id);
     let (hir_module, _) = hir::lower_file(db, module_id);
 
     // Phase 0: Build dependency graph and compute topological order

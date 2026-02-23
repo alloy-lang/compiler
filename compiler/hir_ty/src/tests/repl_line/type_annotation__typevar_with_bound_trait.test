@@ -11,124 +11,82 @@ let test_func = |a, b| -> test
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Generic(
-            2,
-        ),
+        Idx::<Expression>(0): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(0),
+                    ),
+                    local_id: Idx::<TypeDefinition>(1),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
-                0,
+                1,
             ),
             return_type: Lambda {
                 arg_type: Generic(
-                    1,
-                ),
-                return_type: Generic(
                     2,
                 ),
+                return_type: Bounded {
+                    base: TypeDef(
+                        Fql {
+                            module_id: ModuleId(
+                                Id(0),
+                            ),
+                            local_id: Idx::<TypeDefinition>(1),
+                        },
+                        "Test",
+                    ),
+                    args: [
+                        BuiltIn(
+                            Int,
+                        ),
+                    ],
+                },
             },
         },
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            0,
+            1,
         ),
         Idx::<Pattern>(1): Generic(
-            1,
+            2,
         ),
     },
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: ConflictingTypeAnnotation {
-                annotated_type: Lambda {
-                    arg_type: ConstrainedGeneric {
-                        id: 0,
-                        constraints: NonEmpty(
-                            [
-                                (
-                                    Fql {
-                                        module_id: ModuleId(
-                                            Id(4),
-                                        ),
-                                        local_id: Idx::<Trait>(0),
-                                    },
-                                    "TestTrait1",
-                                ),
-                            ],
-                        ),
-                    },
-                    return_type: Lambda {
-                        arg_type: Generic(
-                            1,
-                        ),
-                        return_type: Bounded {
-                            base: TypeDef(
-                                Fql {
-                                    module_id: ModuleId(
-                                        Id(0),
-                                    ),
-                                    local_id: Idx::<TypeDefinition>(1),
-                                },
-                                "Test",
-                            ),
-                            args: [
-                                BuiltIn(
-                                    Int,
-                                ),
-                            ],
-                        },
-                    },
-                },
-                inferred_type: Lambda {
-                    arg_type: Generic(
-                        0,
-                    ),
-                    return_type: Lambda {
-                        arg_type: Generic(
-                            1,
-                        ),
-                        return_type: Generic(
-                            2,
-                        ),
-                    },
-                },
-                reason: DirectConflict {
-                    annotated_type: Bounded {
-                        base: TypeDef(
-                            Fql {
-                                module_id: ModuleId(
-                                    Id(0),
-                                ),
-                                local_id: Idx::<TypeDefinition>(1),
-                            },
-                            "Test",
-                        ),
-                        args: [
-                            BuiltIn(
-                                Int,
-                            ),
-                        ],
-                    },
-                    inferred_type: Generic(
-                        2,
-                    ),
-                },
+    errors: [],
+    poly_instantiations: {
+        TypeDefinition(
+            Fql {
+                module_id: ModuleId(
+                    Id(0),
+                ),
+                local_id: Idx::<TypeDefinition>(1),
             },
-            range: 170..200,
-        },
-    ],
-    poly_instantiations: {},
+        ): [
+            PolyInstantiation {
+                call_site: Fql {
+                    module_id: ModuleId(
+                        Id(0),
+                    ),
+                    local_id: Idx::<Expression>(1),
+                },
+                type_args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+        ],
+    },
 }
 []
-[E001] Error: Type annotation conflict: expected `t0 : TestTrait1 -> t1 -> Test[Int]`, found `t0 -> t1 -> t2`
-    ╭─[./test/main.alloy:10:1]
-    │
- 10 │ let test_func = |a, b| -> test
-    │ ───────────────┬──────────────  
-    │                ╰──────────────── expected `Test[Int]`, found `t2`
-    │ 
-    │ Help: The type annotation says this should be `Test[Int]`, but type inference determined it to be `t2`
-────╯
-
-
-

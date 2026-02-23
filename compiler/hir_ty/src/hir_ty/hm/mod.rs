@@ -234,6 +234,8 @@ impl PolyType {
 /// Inference context for HM type inference
 pub(super) struct HMInferenceContext<'db> {
     pub(super) db: &'db dyn crate::HirTyDatabase,
+    /// The module currently being type-checked
+    pub(super) module_id: alloy_workspace::ModuleId,
     /// Type variable generator
     pub(super) type_var_gen: TypeVarGenerator,
     /// Type equations to be solved
@@ -258,9 +260,13 @@ pub(super) struct HMInferenceContext<'db> {
 }
 
 impl<'db> HMInferenceContext<'db> {
-    pub(super) fn new(db: &'db dyn crate::HirTyDatabase) -> Self {
+    pub(super) fn new(
+        db: &'db dyn crate::HirTyDatabase,
+        module_id: alloy_workspace::ModuleId,
+    ) -> Self {
         Self {
             db,
+            module_id,
             type_var_gen: TypeVarGenerator::new(),
             equations: Vec::new(),
             type_env: FxHashMap::default(),

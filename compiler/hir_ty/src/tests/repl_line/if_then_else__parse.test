@@ -4,22 +4,110 @@ if test then 2 else 3
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): BuiltIn(
-            Bool,
-        ),
+        Idx::<Expression>(0): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(0),
+                    ),
+                    local_id: Idx::<TypeDefinition>(1),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
         Idx::<Expression>(2): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(1): BuiltIn(
-            Int,
-        ),
+        Idx::<Expression>(1): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(0),
+                    ),
+                    local_id: Idx::<TypeDefinition>(1),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
         Idx::<Expression>(3): BuiltIn(
             Int,
         ),
     },
     pattern_types: {},
     warnings: [],
-    errors: [],
-    poly_instantiations: {},
+    errors: [
+        TypeInferenceError {
+            kind: UnificationError(
+                TypeMismatch(
+                    App {
+                        constructor: TypeDef(
+                            Fql {
+                                module_id: ModuleId(
+                                    Id(0),
+                                ),
+                                local_id: Idx::<TypeDefinition>(1),
+                            },
+                            "Test",
+                        ),
+                        args: [
+                            Concrete(
+                                Int,
+                            ),
+                        ],
+                    },
+                    Concrete(
+                        Bool,
+                    ),
+                ),
+            ),
+            range: 24..45,
+        },
+    ],
+    poly_instantiations: {
+        TypeDefinition(
+            Fql {
+                module_id: ModuleId(
+                    Id(0),
+                ),
+                local_id: Idx::<TypeDefinition>(1),
+            },
+        ): [
+            PolyInstantiation {
+                call_site: Fql {
+                    module_id: ModuleId(
+                        Id(0),
+                    ),
+                    local_id: Idx::<Expression>(1),
+                },
+                type_args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+        ],
+    },
 }
 []
+[E002] Error: Type mismatch: expected `Test[Int]`, found `Bool`
+   ╭─[./test/main.alloy:3:1]
+   │
+ 3 │ if test then 2 else 3
+   │ ──────────┬──────────  
+   │           ╰──────────── expected `Test[Int]`, found `Bool`
+   │ 
+   │ Help: These types must be compatible
+───╯
+
+
+

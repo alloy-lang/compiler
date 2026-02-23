@@ -6,9 +6,22 @@ match test when
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): BuiltIn(
-            Bool,
-        ),
+        Idx::<Expression>(0): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(0),
+                    ),
+                    local_id: Idx::<TypeDefinition>(1),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
         Idx::<Expression>(2): BuiltIn(
             Int,
         ),
@@ -20,16 +33,79 @@ HirTypedModule {
         ),
     },
     pattern_types: {
-        Idx::<Pattern>(0): BuiltIn(
-            Bool,
-        ),
+        Idx::<Pattern>(0): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId(
+                        Id(0),
+                    ),
+                    local_id: Idx::<TypeDefinition>(1),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
         Idx::<Pattern>(1): BuiltIn(
             Bool,
         ),
     },
     warnings: [],
-    errors: [],
-    poly_instantiations: {},
+    errors: [
+        TypeInferenceError {
+            kind: UnificationError(
+                TypeMismatch(
+                    App {
+                        constructor: TypeDef(
+                            Fql {
+                                module_id: ModuleId(
+                                    Id(0),
+                                ),
+                                local_id: Idx::<TypeDefinition>(1),
+                            },
+                            "Test",
+                        ),
+                        args: [
+                            Concrete(
+                                Int,
+                            ),
+                        ],
+                    },
+                    Concrete(
+                        Bool,
+                    ),
+                ),
+            ),
+            range: 53..59,
+        },
+    ],
+    poly_instantiations: {
+        TypeDefinition(
+            Fql {
+                module_id: ModuleId(
+                    Id(0),
+                ),
+                local_id: Idx::<TypeDefinition>(1),
+            },
+        ): [
+            PolyInstantiation {
+                call_site: Fql {
+                    module_id: ModuleId(
+                        Id(0),
+                    ),
+                    local_id: Idx::<Expression>(1),
+                },
+                type_args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+        ],
+    },
 }
 [
     ParseError {
@@ -49,3 +125,15 @@ HirTypedModule {
         context: MatchTargetCondition,
     },
 ]
+[E002] Error: Type mismatch: expected `Test[Int]`, found `Bool`
+   ╭─[./test/main.alloy:5:5]
+   │
+ 5 │   \ False -> 1
+   │     ───┬──  
+   │        ╰──── expected `Test[Int]`, found `Bool`
+   │ 
+   │ Help: These types must be compatible
+───╯
+
+
+

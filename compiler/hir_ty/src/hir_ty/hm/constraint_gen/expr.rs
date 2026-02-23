@@ -21,9 +21,11 @@ pub(crate) fn infer_expr_hm(
     }
 
     // Lazy constraint generation: if this expression is in a later group,
-    // don't infer it now - just return a fresh type variable
+    // don't infer it now - just return a fresh type variable.
+    // Only applies to expressions in the current module — cross-module expressions
+    // have their own independent ordering and must always be inferred immediately.
     // DON'T assign to type_env to avoid polluting env_type_vars for generalization
-    if ctx.is_in_later_group(source_fql.local_id) {
+    if source_fql.module_id == ctx.module_id && ctx.is_in_later_group(source_fql.local_id) {
         return ctx.fresh_type_var();
     }
 
