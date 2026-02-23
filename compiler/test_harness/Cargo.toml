@@ -12,5 +12,6 @@ pretty_assertions = { workspace = true }
 alloy_project = { path = "../project" }
 alloy_workspace = { path = "../workspace" }
 camino = { workspace = true }
+la-arena = { workspace = true }
 
 [dev-dependencies]

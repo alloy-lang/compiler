@@ -59,6 +59,24 @@ macro_rules! test_database {
     };
 }
 
+#[macro_export]
+macro_rules! idx {
+    ($idx:expr) => {
+        la_arena::Idx::from_raw(la_arena::RawIdx::from_u32($idx))
+    };
+}
+
+#[macro_export]
+macro_rules! expr_idx {
+    ($db:expr, $module_id:expr, $name:expr) => {{
+        let (hir_module, _) = alloy_hir::lower_file($db, $module_id);
+        hir_module
+            .get_expression_by_name(&alloy_hir::Name::new($name), alloy_scope::Scopes::ROOT)
+            .expect(&format!("failed to find '{}' in {:#?}", $name, hir_module))
+            .0
+    }};
+}
+
 /// # Panics
 ///
 /// Will panic if tests fail.

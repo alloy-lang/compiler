@@ -267,3 +267,241 @@ fn collect_from_fql(
         collect_from_expression(db, module_id, &expr, deps);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use alloy_hir::ExpressionIdx;
+    use alloy_test_harness::{expr_idx, idx};
+    use alloy_workspace::WorkspaceDatabase;
+    use maplit::btreemap;
+    use std::collections::BTreeMap;
+
+    alloy_test_harness::test_database!(TestDb: hir::HirDatabase, crate::HirTyDatabase);
+
+    fn btree_deps(graph: &DependencyGraph) -> BTreeMap<ExpressionIdx, Vec<ExpressionIdx>> {
+        graph
+            .dependencies
+            .iter()
+            .map(|(k, v)| (*k, v.iter().cloned().collect::<Vec<_>>()))
+            .collect::<BTreeMap<_, _>>()
+    }
+
+    #[test]
+    fn single_literal_no_deps() {
+        let mut db = TestDb::default();
+        let module_id = db.add_module("test", camino::Utf8Path::new("./test.alloy"), "let x = 1");
+
+        let graph = DependencyGraph::build(&db, module_id);
+
+        let expected_dependencies = btreemap! {
+            expr_idx!(&db, module_id, "x") => vec![],
+        };
+        assert_eq!(btree_deps(&graph), expected_dependencies);
+
+        let order = graph.topological_order();
+        assert_eq!(order, vec![vec![idx!(0)]]);
+    }
+
+    #[test]
+    fn two_independent_expressions_no_deps() {
+        let mut db = TestDb::default();
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+            let x = 1
+            let y = 2
+            ",
+        );
+
+        let graph = DependencyGraph::build(&db, module_id);
+
+        let expected_dependencies = btreemap! {
+            expr_idx!(&db, module_id, "x") => vec![],
+            expr_idx!(&db, module_id, "y") => vec![],
+        };
+        assert_eq!(btree_deps(&graph), expected_dependencies);
+
+        let order = graph.topological_order();
+        assert_eq!(
+            order,
+            vec![
+                vec![expr_idx!(&db, module_id, "x")],
+                vec![expr_idx!(&db, module_id, "y")],
+            ]
+        );
+    }
+
+    #[test]
+    fn sequential_dependency_ordering() {
+        let mut db = TestDb::default();
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+            let x = 1
+            let y = x
+            ",
+        );
+
+        let graph = DependencyGraph::build(&db, module_id);
+
+        let expected_dependencies = btreemap! {
+            expr_idx!(&db, module_id, "x") => vec![],
+            expr_idx!(&db, module_id, "y") => vec![expr_idx!(&db, module_id, "x")],
+        };
+        assert_eq!(btree_deps(&graph), expected_dependencies);
+
+        let order = graph.topological_order();
+        assert_eq!(
+            order,
+            vec![
+                vec![expr_idx!(&db, module_id, "x")],
+                vec![expr_idx!(&db, module_id, "y")],
+            ]
+        );
+    }
+
+    #[test]
+    fn cross_module_ref_creates_no_local_dependency() {
+        let mut db = TestDb::default();
+        db.add_module(
+            "other",
+            camino::Utf8Path::new("./other.alloy"),
+            "let value = 42",
+        );
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+            import other::value
+            let x = value
+            ",
+        );
+
+        let graph = DependencyGraph::build(&db, module_id);
+
+        let expected_dependencies = btreemap! {
+            expr_idx!(&db, module_id, "x") => vec![],
+        };
+        assert_eq!(btree_deps(&graph), expected_dependencies);
+
+        let order = graph.topological_order();
+        assert_eq!(order, vec![vec![expr_idx!(&db, module_id, "x")]]);
+    }
+
+    #[test]
+    fn cross_module_ref_in_lambda_body() {
+        let mut db = TestDb::default();
+        db.add_module(
+            "other",
+            camino::Utf8Path::new("./other.alloy"),
+            "let value = 42",
+        );
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+            import other::value
+            let f = |x| -> value
+            ",
+        );
+
+        let graph = DependencyGraph::build(&db, module_id);
+
+        let expected_dependencies = btreemap! {
+            idx!(0) => vec![],
+            expr_idx!(&db, module_id, "f") => vec![idx!(0)],
+        };
+        assert_eq!(btree_deps(&graph), expected_dependencies);
+
+        let order = graph.topological_order();
+        assert_eq!(
+            order,
+            vec![vec![idx!(0)], vec![expr_idx!(&db, module_id, "f")]]
+        );
+    }
+
+    #[test]
+    fn cross_module_typedef_reference_deps() {
+        let mut db = TestDb::default();
+        db.add_module(
+            "test_data",
+            camino::Utf8Path::new("./test_data.alloy"),
+            r"
+            typedef Test[t] = Thing t
+            let test = Test(0)
+            ",
+        );
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+            import test_data::test
+            let f = |a, b| -> test
+            ",
+        );
+
+        let graph = DependencyGraph::build(&db, module_id);
+
+        let expected_dependencies = btreemap! {
+            idx!(0) => vec![],
+            expr_idx!(&db, module_id, "f") => vec![idx!(0)],
+        };
+        assert_eq!(btree_deps(&graph), expected_dependencies);
+
+        let order = graph.topological_order();
+        assert_eq!(
+            order,
+            vec![vec![idx!(0)], vec![expr_idx!(&db, module_id, "f")]]
+        );
+    }
+
+    /// Test that the topological order handles the same expression indices
+    /// existing in both the local module and an imported module without confusion.
+    #[test]
+    fn cross_module_expression_index_collision() {
+        let mut db = TestDb::default();
+        // Create a module with multiple expressions so its indices overlap
+        // with the test module's indices
+        db.add_module(
+            "other",
+            camino::Utf8Path::new("./other.alloy"),
+            r"
+            let a = 1
+            let b = 2
+            let c = 3
+            ",
+        );
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+            import other::c
+            let x = 1
+            let y = x
+            let z = c
+            ",
+        );
+
+        let graph = DependencyGraph::build(&db, module_id);
+
+        let expected_dependencies = btreemap! {
+            expr_idx!(&db, module_id, "x") => vec![],
+            expr_idx!(&db, module_id, "y") => vec![expr_idx!(&db, module_id, "x")],
+            expr_idx!(&db, module_id, "z") => vec![],
+        };
+        assert_eq!(btree_deps(&graph), expected_dependencies);
+
+        let order = graph.topological_order();
+        assert_eq!(
+            order,
+            vec![
+                vec![expr_idx!(&db, module_id, "x")],
+                vec![expr_idx!(&db, module_id, "y")],
+                vec![expr_idx!(&db, module_id, "z")]
+            ]
+        );
+    }
+}
