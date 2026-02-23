@@ -357,7 +357,7 @@ HirTypedModule {
 }
 []
 [E001] Error: Type annotation conflict: expected `(t0 -> t1) -> t0 -> t0 -> Test[(t1, t1)]`, found `(t1 -> t2) -> t1 -> t1 -> t3 -> Test[t3]`
-   ╭─[./test/main.alloy:9:5]
+   ╭─[ ./test/main.alloy:9:5 ]
    │
  9 │     let testThing = |funky, x, y| -> test_data::new <| (funky(x), funky(y))
    │     ───────────────────────────────────┬───────────────────────────────────  
@@ -367,7 +367,7 @@ HirTypedModule {
 ───╯
 
 [E002] Error: Type mismatch: expected `t0 -> Test[t0]`, found `(t8, t8)`
-   ╭─[./test/main.alloy:9:38]
+   ╭─[ ./test/main.alloy:9:38 ]
    │
  9 │     let testThing = |funky, x, y| -> test_data::new <| (funky(x), funky(y))
    │                                      ───────────────────┬──────────────────  

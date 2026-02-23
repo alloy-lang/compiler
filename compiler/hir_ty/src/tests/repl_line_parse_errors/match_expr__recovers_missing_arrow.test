@@ -132,7 +132,7 @@ HirTypedModule {
     },
 ]
 [E002] Error: Type mismatch: expected `Test[Int]`, found `Bool`
-   ╭─[./test/main.alloy:4:5]
+   ╭─[ ./test/main.alloy:4:5 ]
    │
  4 │   \ True 0
    │     ──┬──  
@@ -142,7 +142,7 @@ HirTypedModule {
 ───╯
 
 [E002] Error: Type mismatch: expected `Test[Int]`, found `Bool`
-   ╭─[./test/main.alloy:5:5]
+   ╭─[ ./test/main.alloy:5:5 ]
    │
  5 │   \ False -> 1
    │     ───┬──  

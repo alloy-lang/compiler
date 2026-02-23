@@ -41,7 +41,7 @@ HirTypedModule {
 }
 []
 [E003] Error: Unknown variant `Nothing`
-   ╭─[./test/main.alloy:5:1]
+   ╭─[ ./test/main.alloy:5:1 ]
    │
  5 │ let unknown = Either::Nothing
    │ ───────────────┬──────────────  

@@ -22,7 +22,7 @@ HirTypedModule {
     errors: [
         TypeInferenceError {
             kind: ConflictingTypeAnnotation {
-                expected: Lambda {
+                annotated_type: Lambda {
                     arg_type: Lambda {
                         arg_type: Generic(
                             0,
@@ -32,12 +32,15 @@ HirTypedModule {
                                 id: 1,
                                 constraints: NonEmpty(
                                     [
-                                        Fql {
-                                            module_id: ModuleId(
-                                                Id(4),
-                                            ),
-                                            local_id: Idx::<Trait>(0),
-                                        },
+                                        (
+                                            Fql {
+                                                module_id: ModuleId(
+                                                    Id(4),
+                                                ),
+                                                local_id: Idx::<Trait>(0),
+                                            },
+                                            "TestTrait",
+                                        ),
                                     ],
                                 ),
                             },
@@ -54,12 +57,15 @@ HirTypedModule {
                                 id: 1,
                                 constraints: NonEmpty(
                                     [
-                                        Fql {
-                                            module_id: ModuleId(
-                                                Id(4),
-                                            ),
-                                            local_id: Idx::<Trait>(0),
-                                        },
+                                        (
+                                            Fql {
+                                                module_id: ModuleId(
+                                                    Id(4),
+                                                ),
+                                                local_id: Idx::<Trait>(0),
+                                            },
+                                            "TestTrait",
+                                        ),
                                     ],
                                 ),
                             },
@@ -74,12 +80,15 @@ HirTypedModule {
                                 id: 1,
                                 constraints: NonEmpty(
                                     [
-                                        Fql {
-                                            module_id: ModuleId(
-                                                Id(4),
-                                            ),
-                                            local_id: Idx::<Trait>(0),
-                                        },
+                                        (
+                                            Fql {
+                                                module_id: ModuleId(
+                                                    Id(4),
+                                                ),
+                                                local_id: Idx::<Trait>(0),
+                                            },
+                                            "TestTrait",
+                                        ),
                                     ],
                                 ),
                             },
@@ -91,9 +100,92 @@ HirTypedModule {
                         },
                     },
                 },
-                found: Generic(
+                inferred_type: Generic(
                     0,
                 ),
+                reason: DirectConflict {
+                    annotated_type: Lambda {
+                        arg_type: Lambda {
+                            arg_type: Generic(
+                                0,
+                            ),
+                            return_type: Bounded {
+                                base: ConstrainedGeneric {
+                                    id: 1,
+                                    constraints: NonEmpty(
+                                        [
+                                            (
+                                                Fql {
+                                                    module_id: ModuleId(
+                                                        Id(4),
+                                                    ),
+                                                    local_id: Idx::<Trait>(0),
+                                                },
+                                                "TestTrait",
+                                            ),
+                                        ],
+                                    ),
+                                },
+                                args: [
+                                    Generic(
+                                        2,
+                                    ),
+                                ],
+                            },
+                        },
+                        return_type: Lambda {
+                            arg_type: Bounded {
+                                base: ConstrainedGeneric {
+                                    id: 1,
+                                    constraints: NonEmpty(
+                                        [
+                                            (
+                                                Fql {
+                                                    module_id: ModuleId(
+                                                        Id(4),
+                                                    ),
+                                                    local_id: Idx::<Trait>(0),
+                                                },
+                                                "TestTrait",
+                                            ),
+                                        ],
+                                    ),
+                                },
+                                args: [
+                                    Generic(
+                                        0,
+                                    ),
+                                ],
+                            },
+                            return_type: Bounded {
+                                base: ConstrainedGeneric {
+                                    id: 1,
+                                    constraints: NonEmpty(
+                                        [
+                                            (
+                                                Fql {
+                                                    module_id: ModuleId(
+                                                        Id(4),
+                                                    ),
+                                                    local_id: Idx::<Trait>(0),
+                                                },
+                                                "TestTrait",
+                                            ),
+                                        ],
+                                    ),
+                                },
+                                args: [
+                                    Generic(
+                                        2,
+                                    ),
+                                ],
+                            },
+                        },
+                    },
+                    inferred_type: Generic(
+                        0,
+                    ),
+                },
             },
             range: 254..286,
         },
@@ -122,24 +214,24 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
-[E001] Error: Type annotation conflict: expected `(t0 -> t1 : Trait(0)[t2]) -> t1 : Trait(0)[t0] -> t1 : Trait(0)[t2]`, found `t0`
-    ╭─[./test/main.alloy:12:1]
+[E001] Error: Type annotation conflict: expected `(t0 -> t1 : TestTrait[t2]) -> t1 : TestTrait[t0] -> t1 : TestTrait[t2]`, found `t0`
+    ╭─[ ./test/main.alloy:12:1 ]
     │
  12 │ let (=<<) = TestTrait::test_func
     │ ────────────────┬───────────────  
-    │                 ╰───────────────── expected `(t0 -> t1 : Trait(0)[t2]) -> t1 : Trait(0)[t0] -> t1 : Trait(0)[t2]`, found `t0`
+    │                 ╰───────────────── expected `(t0 -> t1 : TestTrait[t2]) -> t1 : TestTrait[t0] -> t1 : TestTrait[t2]`, found `t0`
     │ 
-    │ Help: The type annotation says this should be `(t0 -> t1 : Trait(0)[t2]) -> t1 : Trait(0)[t0] -> t1 : Trait(0)[t2]`, but type inference determined it to be `t0`
+    │ Help: The type annotation says this should be `(t0 -> t1 : TestTrait[t2]) -> t1 : TestTrait[t0] -> t1 : TestTrait[t2]`, but type inference determined it to be `t0`
 ────╯
 
 [E003] Error: Cannot find value `TestTrait` in this scope
-    ╭─[./test/main.alloy:12:1]
+    ╭─[ ./test/main.alloy:12:1 ]
     │
  12 │ let (=<<) = TestTrait::test_func
     │ ────────────────┬───────────────  
     │                 ╰───────────────── cannot find `TestTrait`
     │ 
-    │ Help: No value named `TestTrait` found in module ModuleId(Id(4))
+    │ Help: No value named `TestTrait` found in module `main`
 ────╯
 
 

@@ -34,7 +34,7 @@ HirTypedModule {
 }
 []
 [E003] Error: Cannot find module `other`
-   ╭─[./test/main.alloy:7:1]
+   ╭─[ ./test/main.alloy:7:1 ]
    │
  7 │ ╭─▶ behavior TestTrait1 for other::Type1 where
    ┆ ┆   

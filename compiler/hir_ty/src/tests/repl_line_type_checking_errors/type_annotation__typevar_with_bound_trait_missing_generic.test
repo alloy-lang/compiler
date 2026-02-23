@@ -182,7 +182,7 @@ HirTypedModule {
 }
 []
 [E001] Error: Type annotation conflict: expected `t0 : TestTrait1 -> t1 -> Test`, found `t1 -> t2 -> Test[Int]`
-    ╭─[./test/main.alloy:10:1]
+    ╭─[ ./test/main.alloy:10:1 ]
     │
  10 │ let test_func = |a, b| -> test
     │ ───────────────┬──────────────  

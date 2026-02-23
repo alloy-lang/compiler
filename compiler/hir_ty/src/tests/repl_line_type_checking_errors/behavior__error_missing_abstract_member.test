@@ -31,7 +31,7 @@ HirTypedModule {
 }
 []
 [E004] Error: Behavior must implement abstract member `foo` from trait `Trait1`
-    ╭─[./test/main.alloy:8:1]
+    ╭─[ ./test/main.alloy:8:1 ]
     │
   8 │ ╭─▶ behavior Trait1 for Type1 where
     ┆ ┆   

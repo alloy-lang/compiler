@@ -44,7 +44,7 @@ HirTypedModule {
 }
 []
 [E003] Error: Cannot find value `test` in this scope
-   ╭─[./test/main.alloy:1:4]
+   ╭─[ ./test/main.alloy:1:4 ]
    │
  1 │ if test then 2 else 3
    │    ──┬──  

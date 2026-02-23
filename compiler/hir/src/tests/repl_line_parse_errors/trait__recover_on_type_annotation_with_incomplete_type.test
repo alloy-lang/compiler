@@ -15,7 +15,9 @@ HirModule {
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeReference>(1): {
-            "item": SelfRef,
+            "item": SelfRef(
+                Idx::<Scope>(3),
+            ),
             "range": 59..64,
         },
         Idx::<TypeReference>(2): {

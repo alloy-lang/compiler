@@ -83,7 +83,7 @@ HirTypedModule {
 }
 []
 [E001] Error: Type annotation conflict: expected `<TODO> -> String -> Int`, found `t0 -> t1 -> Int`
-    ╭─[./test/main.alloy:11:5]
+    ╭─[ ./test/main.alloy:11:5 ]
     │
  11 │     let test = |sf, str| -> 0
     │     ─────────────┬────────────  

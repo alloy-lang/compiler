@@ -73,8 +73,7 @@ impl<'a> DiagnosticBuilder<'a> {
 
         let mut report_builder = Report::build(
             self.diagnostic.severity().to_report_kind(),
-            source_id.clone(),
-            span_range.start,
+            (source_id.clone(), span_range),
         );
 
         // Apply config if provided

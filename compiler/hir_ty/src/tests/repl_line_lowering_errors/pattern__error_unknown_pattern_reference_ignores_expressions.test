@@ -61,7 +61,7 @@ HirTypedModule {
 }
 []
 [E003] Error: Cannot find pattern `unknown` in this scope
-   ╭─[./test/main.alloy:3:2]
+   ╭─[ ./test/main.alloy:3:2 ]
    │
  3 │ |unknown(a)| -> a + "a"
    │  ─────┬────  

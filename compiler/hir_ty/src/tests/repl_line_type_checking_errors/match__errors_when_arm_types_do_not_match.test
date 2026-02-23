@@ -120,7 +120,7 @@ HirTypedModule {
 }
 []
 [E002] Error: Type mismatch: expected `String`, found `Int`
-    ╭─[./test/main.alloy:10:25]
+    ╭─[ ./test/main.alloy:10:25 ]
     │
  10 │   \ Either::Right(r) -> 7
     │                         ┬  

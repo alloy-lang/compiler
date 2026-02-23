@@ -132,7 +132,7 @@ HirTypedModule {
 }
 []
 [E002] Error: Type mismatch: expected `String`, found `Int`
-   ╭─[./test/main.alloy:7:1]
+   ╭─[ ./test/main.alloy:7:1 ]
    │
  7 │ let test_result = test(incorrect_arg)
    │ ──────────────────┬──────────────────  

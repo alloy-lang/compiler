@@ -51,7 +51,7 @@ HirTypedModule {
 }
 []
 [E003] Error: Cannot find pattern `Option::Some` in this scope
-   ╭─[./test/main.alloy:1:2]
+   ╭─[ ./test/main.alloy:1:2 ]
    │
  1 │ |Option::Some(x)| -> x
    │  ───────┬───────  

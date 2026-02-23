@@ -17,8 +17,8 @@ members = [
 ]
 
 [workspace.dependencies]
-ariadne = "0.4"
-camino = "1.1.6"
+ariadne = "0.6"
+camino = "1.2.2"
 expect-test = "1.5"
 itertools = "0.13"
 la-arena = "0.3"
@@ -26,14 +26,14 @@ maplit = "1.0"
 non-empty-vec = "0.2"
 num-derive = "0.4"
 num-traits = "0.2"
-ordered-float = "3.0"
-pretty_assertions = "1.2"
+ordered-float = "3.9"
+pretty_assertions = "1.4"
 rowan = "0.15"
 rustc-hash = "1.1"
 salsa = "0.24.0"
 serde = "1.0"
 text-size = "1.1"
 toml = "0.8"
-url = "2.5.0"
+url = "2.5.8"
 walkdir = "2"
 

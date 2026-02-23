@@ -52,7 +52,9 @@ HirModule {
     },
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
-            "item": SelfRef,
+            "item": SelfRef(
+                Idx::<Scope>(3),
+            ),
             "range": 60..65,
         },
         Idx::<TypeReference>(1): {

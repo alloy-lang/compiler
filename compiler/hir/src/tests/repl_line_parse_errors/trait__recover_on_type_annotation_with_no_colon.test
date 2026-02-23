@@ -9,7 +9,9 @@ HirModule {
     patterns: EmptyIndex::<Pattern>,
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
-            "item": SelfRef,
+            "item": SelfRef(
+                Idx::<Scope>(2),
+            ),
             "range": 42..47,
         },
         Idx::<TypeReference>(1): {
@@ -41,7 +43,9 @@ HirModule {
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeReference>(5): {
-            "item": SelfRef,
+            "item": SelfRef(
+                Idx::<Scope>(3),
+            ),
             "range": 83..88,
         },
         Idx::<TypeReference>(6): {
