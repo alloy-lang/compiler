@@ -40,7 +40,7 @@ HirTypedModule {
     errors: [
         TypeInferenceError {
             kind: ConflictingTypeAnnotation {
-                expected: Lambda {
+                annotated_type: Lambda {
                     arg_type: ConstrainedGeneric {
                         id: 0,
                         constraints: NonEmpty(
@@ -79,7 +79,7 @@ HirTypedModule {
                         },
                     },
                 },
-                found: Lambda {
+                inferred_type: Lambda {
                     arg_type: Generic(
                         0,
                     ),
@@ -91,6 +91,27 @@ HirTypedModule {
                             2,
                         ),
                     },
+                },
+                reason: DirectConflict {
+                    annotated_type: Bounded {
+                        base: TypeDef(
+                            Fql {
+                                module_id: ModuleId(
+                                    Id(0),
+                                ),
+                                local_id: Idx::<TypeDefinition>(1),
+                            },
+                            "Test",
+                        ),
+                        args: [
+                            BuiltIn(
+                                Int,
+                            ),
+                        ],
+                    },
+                    inferred_type: Generic(
+                        2,
+                    ),
                 },
             },
             range: 170..200,
@@ -104,9 +125,9 @@ HirTypedModule {
     │
  10 │ let test_func = |a, b| -> test
     │ ───────────────┬──────────────  
-    │                ╰──────────────── expected `t0 : TestTrait1 -> t1 -> Test[Int]`, found `t0 -> t1 -> t2`
+    │                ╰──────────────── expected `Test[Int]`, found `t2`
     │ 
-    │ Help: The type annotation says this should be `t0 : TestTrait1 -> t1 -> Test[Int]`, but type inference determined it to be `t0 -> t1 -> t2`
+    │ Help: The type annotation says this should be `Test[Int]`, but type inference determined it to be `t2`
 ────╯
 
 

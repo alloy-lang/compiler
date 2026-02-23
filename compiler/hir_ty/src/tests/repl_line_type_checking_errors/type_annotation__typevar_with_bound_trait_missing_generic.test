@@ -40,7 +40,7 @@ HirTypedModule {
     errors: [
         TypeInferenceError {
             kind: ConflictingTypeAnnotation {
-                expected: Lambda {
+                annotated_type: Lambda {
                     arg_type: ConstrainedGeneric {
                         id: 0,
                         constraints: NonEmpty(
@@ -72,7 +72,7 @@ HirTypedModule {
                         ),
                     },
                 },
-                found: Lambda {
+                inferred_type: Lambda {
                     arg_type: Generic(
                         0,
                     ),
@@ -84,6 +84,20 @@ HirTypedModule {
                             2,
                         ),
                     },
+                },
+                reason: DirectConflict {
+                    annotated_type: TypeDef(
+                        Fql {
+                            module_id: ModuleId(
+                                Id(0),
+                            ),
+                            local_id: Idx::<TypeDefinition>(1),
+                        },
+                        "Test",
+                    ),
+                    inferred_type: Generic(
+                        2,
+                    ),
                 },
             },
             range: 165..195,
@@ -97,9 +111,9 @@ HirTypedModule {
     │
  10 │ let test_func = |a, b| -> test
     │ ───────────────┬──────────────  
-    │                ╰──────────────── expected `t0 : TestTrait1 -> t1 -> Test`, found `t0 -> t1 -> t2`
+    │                ╰──────────────── expected `Test`, found `t2`
     │ 
-    │ Help: The type annotation says this should be `t0 : TestTrait1 -> t1 -> Test`, but type inference determined it to be `t0 -> t1 -> t2`
+    │ Help: The type annotation says this should be `Test`, but type inference determined it to be `t2`
 ────╯
 
 

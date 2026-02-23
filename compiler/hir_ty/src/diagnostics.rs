@@ -37,17 +37,18 @@ impl Diagnostic for TypeInferenceError {
             TypeInferenceErrorKind::ConflictingTypeAnnotation { .. } => Some("E001"),
             TypeInferenceErrorKind::UnificationError(_) => Some("E002"),
             TypeInferenceErrorKind::TypeResolutionError { .. } => Some("E003"),
-            TypeInferenceErrorKind::MissingTraitImplementation { .. } => Some("E004"),
+            TypeInferenceErrorKind::MissingTraitMemberImplementation { .. } => Some("E004"),
         }
     }
 
     fn message(&self) -> String {
         match &self.kind {
-            TypeInferenceErrorKind::ConflictingTypeAnnotation { expected, found } => {
-                format!(
-                    "Type annotation conflict: expected `{}`, found `{}`",
-                    expected, found
-                )
+            TypeInferenceErrorKind::ConflictingTypeAnnotation {
+                annotated_type,
+                inferred_type,
+                ..
+            } => {
+                format!("Type annotation conflict: expected `{annotated_type}`, found `{inferred_type}`")
             }
             TypeInferenceErrorKind::UnificationError(unif_err) => match unif_err {
                 crate::hir_ty::UnificationError::TypeMismatch(expected, found) => {
@@ -114,7 +115,7 @@ impl Diagnostic for TypeInferenceError {
                     "Bounded trait reference resolution not yet implemented".to_string()
                 }
             },
-            TypeInferenceErrorKind::MissingTraitImplementation {
+            TypeInferenceErrorKind::MissingTraitMemberImplementation {
                 trait_name,
                 member_name,
                 ..
@@ -133,13 +134,22 @@ impl Diagnostic for TypeInferenceError {
 
     fn build_report<'a>(&self, builder: DiagnosticBuilder<'a>) -> DiagnosticBuilder<'a> {
         match &self.kind {
-            TypeInferenceErrorKind::ConflictingTypeAnnotation { expected, found } => {
-                builder
-                    .with_primary_label(format!("expected `{}`, found `{}`", expected, found))
-                    .with_help(format!(
-                        "The type annotation says this should be `{}`, but type inference determined it to be `{}`",
-                        expected, found
-                    ))
+            TypeInferenceErrorKind::ConflictingTypeAnnotation { reason, .. } => {
+                match reason {
+                    ConflictingTypeAnnotationReason::DirectConflict { annotated_type: inner_ea, inferred_type: inner_it } => {
+                        builder
+                            .with_primary_label(format!("expected `{}`, found `{}`", inner_ea, inner_it))
+                            .with_help(format!(
+                                "The type annotation says this should be `{}`, but type inference determined it to be `{}`",
+                                inner_ea, inner_it
+                            ))
+                    }
+                    ConflictingTypeAnnotationReason::MissingBehaviorImplementation { trait_name, type_name } => {
+                        builder
+                            .with_primary_label(format!("missing implementation of trait `{}`", trait_name))
+                            .with_help(format!("Type `{}` must implement trait `{}`", type_name, trait_name))
+                    }
+                }
             }
             TypeInferenceErrorKind::UnificationError(unif_err) => {
                 match unif_err {
@@ -217,7 +227,7 @@ impl Diagnostic for TypeInferenceError {
                         .with_help("Bounded trait references are not yet fully implemented")
                 }
             },
-            TypeInferenceErrorKind::MissingTraitImplementation {
+            TypeInferenceErrorKind::MissingTraitMemberImplementation {
                 trait_name,
                 member_name,
                 type_name,
@@ -253,14 +263,27 @@ impl Diagnostic for TypeInferenceError {
 #[derive(Debug, Clone, PartialEq)]
 pub enum TypeInferenceErrorKind {
     ConflictingTypeAnnotation {
-        expected: ResolvedType,
-        found: ResolvedType,
+        annotated_type: ResolvedType,
+        inferred_type: ResolvedType,
+        reason: ConflictingTypeAnnotationReason,
     },
     UnificationError(crate::hir_ty::UnificationError),
     TypeResolutionError(TypeResolutionError),
-    MissingTraitImplementation {
-        trait_name: String,
-        member_name: String,
+    MissingTraitMemberImplementation {
+        trait_name: hir::Name,
+        member_name: hir::Name,
+        type_name: hir::Name,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum ConflictingTypeAnnotationReason {
+    DirectConflict {
+        annotated_type: ResolvedType,
+        inferred_type: ResolvedType,
+    },
+    MissingBehaviorImplementation {
+        trait_name: hir::Name,
         type_name: hir::Name,
     },
 }

@@ -19,7 +19,7 @@ HirTypedModule {
     warnings: [],
     errors: [
         TypeInferenceError {
-            kind: MissingTraitImplementation {
+            kind: MissingTraitMemberImplementation {
                 trait_name: "Trait1",
                 member_name: "foo",
                 type_name: "Type1",

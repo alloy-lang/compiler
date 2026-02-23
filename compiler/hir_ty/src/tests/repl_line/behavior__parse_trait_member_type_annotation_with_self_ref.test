@@ -45,7 +45,7 @@ HirTypedModule {
     errors: [
         TypeInferenceError {
             kind: ConflictingTypeAnnotation {
-                expected: Lambda {
+                annotated_type: Lambda {
                     arg_type: TODO,
                     return_type: Lambda {
                         arg_type: BuiltIn(
@@ -56,7 +56,7 @@ HirTypedModule {
                         ),
                     },
                 },
-                found: Lambda {
+                inferred_type: Lambda {
                     arg_type: Generic(
                         0,
                     ),
@@ -68,6 +68,12 @@ HirTypedModule {
                             Int,
                         ),
                     },
+                },
+                reason: DirectConflict {
+                    annotated_type: TODO,
+                    inferred_type: Generic(
+                        0,
+                    ),
                 },
             },
             range: 193..219,
@@ -81,9 +87,9 @@ HirTypedModule {
     │
  11 │     let test = |sf, str| -> 0
     │     ─────────────┬────────────  
-    │                  ╰────────────── expected `<TODO> -> String -> Int`, found `t0 -> t1 -> Int`
+    │                  ╰────────────── expected `<TODO>`, found `t0`
     │ 
-    │ Help: The type annotation says this should be `<TODO> -> String -> Int`, but type inference determined it to be `t0 -> t1 -> Int`
+    │ Help: The type annotation says this should be `<TODO>`, but type inference determined it to be `t0`
 ────╯
 
 

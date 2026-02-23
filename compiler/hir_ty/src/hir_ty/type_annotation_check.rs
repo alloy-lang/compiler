@@ -3,10 +3,12 @@
 //! This module handles checking that inferred types are compatible with their
 //! type annotations, including trait constraint verification.
 
-use crate::hir_ty::{Fql, ResolvedType};
+use crate::diagnostics::{ConflictingTypeAnnotationReason, TypeInferenceErrorKind};
+use crate::hir_ty::ResolvedType;
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir as hir;
 use alloy_hir_resolved as res;
+use alloy_hir_resolved::Fql;
 use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
@@ -36,11 +38,12 @@ pub fn check_type_annotation(
         };
 
         // Check if the inferred type is compatible with the expected type
-        if let Err(_error) = check_type_compatibility(db, &expected_type, &resolved_type) {
+        if let Err(reason) = check_type_compatibility(db, &expected_type, &resolved_type) {
             result.error(
-                crate::diagnostics::TypeInferenceErrorKind::ConflictingTypeAnnotation {
-                    expected: expected_type,
-                    found: resolved_type,
+                TypeInferenceErrorKind::ConflictingTypeAnnotation {
+                    annotated_type: expected_type,
+                    inferred_type: resolved_type,
+                    reason,
                 },
                 range,
             );
@@ -57,13 +60,23 @@ fn check_type_compatibility(
     db: &dyn HirTyDatabase,
     expected: &ResolvedType,
     found: &ResolvedType,
-) -> Result<(), TypeError> {
+) -> Result<(), ConflictingTypeAnnotationReason> {
     match (expected, found) {
         // Exact matches
         (ResolvedType::UnknownReference(_), _) | (_, ResolvedType::UnknownReference(_)) => Ok(()),
         (ResolvedType::Unconstrained, _) | (_, ResolvedType::Unconstrained) => Ok(()),
-        (ResolvedType::Missing, _) | (_, ResolvedType::Missing) => Err(TypeError::Incompatible),
-        (ResolvedType::TODO, _) | (_, ResolvedType::TODO) => Err(TypeError::Incompatible),
+        (ResolvedType::Missing, _) | (_, ResolvedType::Missing) => {
+            Err(ConflictingTypeAnnotationReason::DirectConflict {
+                annotated_type: expected.clone(),
+                inferred_type: found.clone(),
+            })
+        }
+        (ResolvedType::TODO, _) | (_, ResolvedType::TODO) => {
+            Err(ConflictingTypeAnnotationReason::DirectConflict {
+                annotated_type: expected.clone(),
+                inferred_type: found.clone(),
+            })
+        }
         (ResolvedType::Unit, ResolvedType::Unit) => Ok(()),
         (ResolvedType::BuiltIn(a), ResolvedType::BuiltIn(b)) if a == b => Ok(()),
         (ResolvedType::TypeDef(a, _), ResolvedType::TypeDef(b, _)) if a == b => Ok(()),
@@ -103,7 +116,10 @@ fn check_type_compatibility(
         // Tuple types - check all elements
         (ResolvedType::Tuple(exp_elems), ResolvedType::Tuple(found_elems)) => {
             if exp_elems.len() != found_elems.len() {
-                return Err(TypeError::TupleLengthMismatch);
+                return Err(ConflictingTypeAnnotationReason::DirectConflict {
+                    annotated_type: expected.clone(),
+                    inferred_type: found.clone(),
+                });
             }
             for (exp_elem, found_elem) in exp_elems.iter().zip(found_elems.iter()) {
                 check_type_compatibility(db, exp_elem, found_elem)?;
@@ -127,7 +143,10 @@ fn check_type_compatibility(
 
             // Check argument counts match
             if exp_args.len() != found_args.len() {
-                return Err(TypeError::Incompatible);
+                return Err(ConflictingTypeAnnotationReason::DirectConflict {
+                    annotated_type: expected.clone(),
+                    inferred_type: found.clone(),
+                });
             }
 
             // Check all type arguments are compatible
@@ -139,7 +158,10 @@ fn check_type_compatibility(
         }
 
         // Everything else is incompatible
-        _ => Err(TypeError::Incompatible),
+        _ => Err(ConflictingTypeAnnotationReason::DirectConflict {
+            annotated_type: expected.clone(),
+            inferred_type: found.clone(),
+        }),
     }
 }
 
@@ -148,14 +170,19 @@ fn check_trait_constraints(
     db: &dyn HirTyDatabase,
     ty: &ResolvedType,
     constraints: &NonEmpty<(Fql<hir::Trait>, hir::Name)>,
-) -> Result<(), TypeError> {
+) -> Result<(), ConflictingTypeAnnotationReason> {
     match ty {
         // For concrete user-defined types, check if they have behavior implementations
         ResolvedType::TypeDef(type_fql, _) => {
             // Check each required trait
             for (required_trait, _) in constraints {
                 if !has_behavior_for_trait(db, type_fql, required_trait) {
-                    return Err(TypeError::ConstraintNotSatisfied);
+                    return Err(
+                        ConflictingTypeAnnotationReason::MissingBehaviorImplementation {
+                            trait_name: required_trait.trait_name(db),
+                            type_name: type_fql.type_def_name(db),
+                        },
+                    );
                 }
             }
             Ok(())
@@ -210,11 +237,4 @@ fn does_behavior_match(
     };
 
     attached_type_fql != expected_type_fql && required_trait != attached_trait_fql
-}
-
-#[derive(Debug, Clone, PartialEq)]
-enum TypeError {
-    Incompatible,
-    TupleLengthMismatch,
-    ConstraintNotSatisfied,
 }

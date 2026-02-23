@@ -111,7 +111,7 @@ HirTypedModule {
     errors: [
         TypeInferenceError {
             kind: ConflictingTypeAnnotation {
-                expected: Lambda {
+                annotated_type: Lambda {
                     arg_type: Lambda {
                         arg_type: Generic(
                             0,
@@ -156,7 +156,7 @@ HirTypedModule {
                         },
                     },
                 },
-                found: Lambda {
+                inferred_type: Lambda {
                     arg_type: Lambda {
                         arg_type: Generic(
                             0,
@@ -188,6 +188,45 @@ HirTypedModule {
                         },
                     },
                 },
+                reason: DirectConflict {
+                    annotated_type: Bounded {
+                        base: TypeDef(
+                            Fql {
+                                module_id: ModuleId(
+                                    Id(0),
+                                ),
+                                local_id: Idx::<TypeDefinition>(1),
+                            },
+                            "Test",
+                        ),
+                        args: [
+                            Tuple(
+                                NonEmpty(
+                                    [
+                                        Generic(
+                                            1,
+                                        ),
+                                        Generic(
+                                            1,
+                                        ),
+                                    ],
+                                ),
+                            ),
+                        ],
+                    },
+                    inferred_type: Tuple(
+                        NonEmpty(
+                            [
+                                Generic(
+                                    1,
+                                ),
+                                Generic(
+                                    1,
+                                ),
+                            ],
+                        ),
+                    ),
+                },
             },
             range: 213..284,
         },
@@ -200,9 +239,9 @@ HirTypedModule {
    │
  9 │     let testThing = |funky, x, y| -> test_data::new <| (funky(x), funky(y))
    │     ───────────────────────────────────┬───────────────────────────────────  
-   │                                        ╰───────────────────────────────────── expected `(t0 -> t1) -> t0 -> t0 -> Test[(t1, t1)]`, found `(t0 -> t1) -> t0 -> t0 -> (t1, t1)`
+   │                                        ╰───────────────────────────────────── expected `Test[(t1, t1)]`, found `(t1, t1)`
    │ 
-   │ Help: The type annotation says this should be `(t0 -> t1) -> t0 -> t0 -> Test[(t1, t1)]`, but type inference determined it to be `(t0 -> t1) -> t0 -> t0 -> (t1, t1)`
+   │ Help: The type annotation says this should be `Test[(t1, t1)]`, but type inference determined it to be `(t1, t1)`
 ───╯
 
 

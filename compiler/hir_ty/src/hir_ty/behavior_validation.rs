@@ -59,9 +59,9 @@ fn validate_behavior(
         // Check if behavior has an implementation for this member
         if !behavior.has_implementation(member_name) {
             result.error(
-                TypeInferenceErrorKind::MissingTraitImplementation {
-                    trait_name: trait_def.name().to_string(),
-                    member_name: member_name.to_string(),
+                TypeInferenceErrorKind::MissingTraitMemberImplementation {
+                    trait_name: trait_def.name().clone(),
+                    member_name: member_name.clone(),
                     type_name: type_name.clone(),
                 },
                 behavior_range,

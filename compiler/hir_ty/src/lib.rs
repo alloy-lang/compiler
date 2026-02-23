@@ -100,7 +100,9 @@ pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirType
 
 #[cfg(test)]
 mod small_tests {
-    use crate::diagnostics::TypeInferenceError;
+    use crate::diagnostics::{
+        ConflictingTypeAnnotationReason, TypeInferenceError, TypeInferenceErrorKind,
+    };
     use crate::hir_ty::ResolvedType;
     use crate::tests::TestHirTyDatabase;
     use alloy_ast as ast;
@@ -294,9 +296,13 @@ mod small_tests {
                 let x = 1
             "#,
             &[TypeInferenceError::new(
-                crate::diagnostics::TypeInferenceErrorKind::ConflictingTypeAnnotation {
-                    expected: ResolvedType::BuiltIn(hir::BuiltInType::String),
-                    found: ResolvedType::BuiltIn(hir::BuiltInType::Int),
+                TypeInferenceErrorKind::ConflictingTypeAnnotation {
+                    annotated_type: ResolvedType::BuiltIn(hir::BuiltInType::String),
+                    inferred_type: ResolvedType::BuiltIn(hir::BuiltInType::Int),
+                    reason: ConflictingTypeAnnotationReason::DirectConflict {
+                        annotated_type: ResolvedType::BuiltIn(hir::BuiltInType::String),
+                        inferred_type: ResolvedType::BuiltIn(hir::BuiltInType::Int),
+                    },
                 },
                 TextRange::new(TextSize::from(51), TextSize::from(73)),
             )],
