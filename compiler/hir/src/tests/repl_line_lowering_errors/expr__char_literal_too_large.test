@@ -17,6 +17,7 @@ HirModule {
                     name: "c",
                     subname: None,
                     scope: Idx::<Scope>(0),
+                    resolution_kind: Expression,
                 },
                 scope: Idx::<Scope>(0),
             },

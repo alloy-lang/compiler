@@ -30,6 +30,12 @@ HirModule {
                             "None",
                         ),
                     },
+                    [
+                        Pattern,
+                        Expression,
+                        Trait,
+                        TypeDefinition,
+                    ],
                 ),
                 scope: Idx::<Scope>(0),
             },

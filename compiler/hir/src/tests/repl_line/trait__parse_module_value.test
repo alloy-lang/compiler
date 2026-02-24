@@ -1,6 +1,6 @@
-trait Trait1 where
-    typeof test : Int
+let test = 17
 
+trait Trait1 where
     let thing = test
 end
 ===
@@ -12,27 +12,28 @@ HirModule {
                 path: ThisModule {
                     name: "test",
                     subname: None,
-                    scope: Idx::<Scope>(1),
-                    resolution_kind: TypeAnnotation,
+                    scope: Idx::<Scope>(0),
+                    resolution_kind: Expression,
                 },
                 scope: Idx::<Scope>(1),
             },
             "name": "thing",
-            "range": 46..63,
+            "range": 38..55,
             "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<Expression>(1): {
+            "item": Literal(
+                Int(
+                    17,
+                ),
+            ),
+            "name": "test",
+            "range": 0..15,
+            "scope_id": Idx::<Scope>(0),
         },
     },
     patterns: EmptyIndex::<Pattern>,
-    type_references: Index::<TypeReference> {
-        Idx::<TypeReference>(0): {
-            "item": BuiltIn(
-                Int,
-            ),
-            "name": "test",
-            "range": 37..46,
-            "scope_id": Idx::<Scope>(1),
-        },
-    },
+    type_references: EmptyIndex::<TypeReference>,
     type_definitions: EmptyIndex::<TypeDefinition>,
     traits: Index::<Trait> {
         Idx::<Trait>(0): {
@@ -42,10 +43,6 @@ HirModule {
                 self_constraints: [],
                 named_type_variables: {},
                 members: [
-                    Abstract {
-                        name: "test",
-                        type_annotation: Idx::<TypeReference>(0),
-                    },
                     Concrete {
                         name: "thing",
                         type_annotation: None,
@@ -54,7 +51,7 @@ HirModule {
                 ],
             },
             "name": "Trait1",
-            "range": 0..66,
+            "range": 15..58,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -62,7 +59,7 @@ HirModule {
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 3,
+            len: 2,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -71,10 +68,6 @@ HirModule {
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "trait",
-                },
-                Scope {
-                    parent: Idx::<Scope>(1),
-                    tag: "type annotation",
                 },
             ],
         },

@@ -29,6 +29,12 @@ HirModule {
                         name: "test",
                         sub_path: None,
                     },
+                    [
+                        Pattern,
+                        Expression,
+                        Trait,
+                        TypeDefinition,
+                    ],
                 ),
                 scope: Idx::<Scope>(0),
             },

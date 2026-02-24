@@ -53,6 +53,10 @@ HirModule {
                         name: "Test",
                         sub_path: None,
                     },
+                    [
+                        Trait,
+                        TypeDefinition,
+                    ],
                 ),
             ),
             "range": 69..74,

@@ -11,6 +11,7 @@ HirModule {
                     name: "a",
                     subname: None,
                     scope: Idx::<Scope>(1),
+                    resolution_kind: Pattern,
                 },
                 scope: Idx::<Scope>(1),
             },
@@ -22,6 +23,7 @@ HirModule {
                     name: "b",
                     subname: None,
                     scope: Idx::<Scope>(1),
+                    resolution_kind: Pattern,
                 },
                 scope: Idx::<Scope>(1),
             },
@@ -73,6 +75,7 @@ HirModule {
                     name: "funky",
                     subname: None,
                     scope: Idx::<Scope>(0),
+                    resolution_kind: Expression,
                 },
                 scope: Idx::<Scope>(0),
                 args: [

@@ -35,6 +35,10 @@ HirModule {
                             "Functor",
                         ),
                     },
+                    [
+                        Trait,
+                        TypeDefinition,
+                    ],
                 ),
             ),
             "range": 59..76,

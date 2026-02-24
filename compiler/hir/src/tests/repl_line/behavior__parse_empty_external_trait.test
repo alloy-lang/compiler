@@ -33,6 +33,10 @@ HirModule {
                         name: "Trait1",
                         sub_path: None,
                     },
+                    [
+                        Trait,
+                        TypeDefinition,
+                    ],
                 ),
             ),
             "range": 46..60,
@@ -43,6 +47,7 @@ HirModule {
                     name: "Type1",
                     subname: None,
                     scope: Idx::<Scope>(0),
+                    resolution_kind: TypeDefinition,
                 },
             ),
             "range": 64..70,

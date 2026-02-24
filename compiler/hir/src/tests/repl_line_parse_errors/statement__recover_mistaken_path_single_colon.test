@@ -33,6 +33,12 @@ HirModule {
                             "here",
                         ),
                     },
+                    [
+                        Pattern,
+                        Expression,
+                        Trait,
+                        TypeDefinition,
+                    ],
                 ),
                 scope: Idx::<Scope>(0),
             },

@@ -9,6 +9,7 @@ HirModule {
                     name: "x",
                     subname: None,
                     scope: Idx::<Scope>(1),
+                    resolution_kind: Pattern,
                 },
                 scope: Idx::<Scope>(1),
             },

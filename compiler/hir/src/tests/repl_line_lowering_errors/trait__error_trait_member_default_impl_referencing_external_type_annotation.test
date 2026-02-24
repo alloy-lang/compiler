@@ -1,7 +1,8 @@
-trait Trait1 where
-    typeof test : Int
+typeof test : Int
 
-    let thing = test
+trait Trait1 where
+    typeof thing : Int
+    let thing    = test
 end
 ===
 HirModule {
@@ -9,16 +10,17 @@ HirModule {
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
             "item": VariableRef {
-                path: ThisModule {
-                    name: "test",
-                    subname: None,
-                    scope: Idx::<Scope>(1),
-                    resolution_kind: TypeAnnotation,
-                },
+                path: Unknown(
+                    NonEmpty(
+                        [
+                            "test",
+                        ],
+                    ),
+                ),
                 scope: Idx::<Scope>(1),
             },
             "name": "thing",
-            "range": 46..63,
+            "range": 65..85,
             "scope_id": Idx::<Scope>(1),
         },
     },
@@ -28,9 +30,17 @@ HirModule {
             "item": BuiltIn(
                 Int,
             ),
-            "name": "test",
-            "range": 37..46,
+            "name": "thing",
+            "range": 57..65,
             "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeReference>(1): {
+            "item": BuiltIn(
+                Int,
+            ),
+            "name": "test",
+            "range": 14..19,
+            "scope_id": Idx::<Scope>(0),
         },
     },
     type_definitions: EmptyIndex::<TypeDefinition>,
@@ -42,19 +52,17 @@ HirModule {
                 self_constraints: [],
                 named_type_variables: {},
                 members: [
-                    Abstract {
-                        name: "test",
-                        type_annotation: Idx::<TypeReference>(0),
-                    },
                     Concrete {
                         name: "thing",
-                        type_annotation: None,
+                        type_annotation: Some(
+                            Idx::<TypeReference>(0),
+                        ),
                         value: Idx::<Expression>(0),
                     },
                 ],
             },
             "name": "Trait1",
-            "range": 0..66,
+            "range": 19..88,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -62,7 +70,7 @@ HirModule {
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 3,
+            len: 4,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -76,10 +84,28 @@ HirModule {
                     parent: Idx::<Scope>(1),
                     tag: "type annotation",
                 },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
             ],
         },
     },
     warnings: [],
-    errors: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                reference: "test",
+                reference_type: Expression,
+                path: NonEmpty(
+                    [
+                        "test",
+                    ],
+                ),
+                current_scope: Idx::<Scope>(1),
+            },
+            range: 80..85,
+        },
+    ],
 }
 []

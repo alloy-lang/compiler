@@ -38,6 +38,10 @@ HirModule {
                         name: "ResultThing",
                         sub_path: None,
                     },
+                    [
+                        Trait,
+                        TypeDefinition,
+                    ],
                 ),
             ),
             "range": 56..70,
@@ -71,6 +75,10 @@ HirModule {
                             "More",
                         ),
                     },
+                    [
+                        Trait,
+                        TypeDefinition,
+                    ],
                 ),
             ),
             "range": 95..112,

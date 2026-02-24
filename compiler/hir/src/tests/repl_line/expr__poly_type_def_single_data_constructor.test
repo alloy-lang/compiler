@@ -21,6 +21,7 @@ HirModule {
                     name: "Identity",
                     subname: None,
                     scope: Idx::<Scope>(0),
+                    resolution_kind: TypeDefinition,
                 },
                 scope: Idx::<Scope>(0),
                 args: [
@@ -45,6 +46,7 @@ HirModule {
                     name: "Identity",
                     subname: None,
                     scope: Idx::<Scope>(0),
+                    resolution_kind: TypeDefinition,
                 },
                 scope: Idx::<Scope>(0),
                 args: [
@@ -64,6 +66,7 @@ HirModule {
                     name: "t",
                     subname: None,
                     scope: Idx::<Scope>(1),
+                    resolution_kind: TypeDefinition,
                 },
             ),
             "range": 25..28,

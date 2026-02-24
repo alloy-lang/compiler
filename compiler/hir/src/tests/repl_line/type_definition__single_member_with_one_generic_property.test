@@ -11,6 +11,7 @@ HirModule {
                     name: "t",
                     subname: None,
                     scope: Idx::<Scope>(1),
+                    resolution_kind: TypeDefinition,
                 },
             ),
             "range": 24..25,

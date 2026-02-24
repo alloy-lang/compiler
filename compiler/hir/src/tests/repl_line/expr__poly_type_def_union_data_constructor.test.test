@@ -24,6 +24,7 @@ HirModule {
                         "Some",
                     ),
                     scope: Idx::<Scope>(0),
+                    resolution_kind: TypeDefinition,
                 },
                 scope: Idx::<Scope>(0),
                 args: [
@@ -43,6 +44,7 @@ HirModule {
                     name: "t",
                     subname: None,
                     scope: Idx::<Scope>(1),
+                    resolution_kind: TypeDefinition,
                 },
             ),
             "range": 42..43,

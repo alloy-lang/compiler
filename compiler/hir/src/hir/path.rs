@@ -8,9 +8,19 @@ pub enum Path {
         name: Name,
         subname: Option<Name>,
         scope: ScopeIdx,
+        resolution_kind: ResolutionKind,
     },
-    OtherModule(Fqn),
+    OtherModule(Fqn, Vec<ResolutionKind>),
     Unknown(NonEmpty<Name>),
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub enum ResolutionKind {
+    Trait,
+    TypeDefinition,
+    AbstractTraitMember,
+    Expression,
+    Pattern,
 }
 
 impl fmt::Display for Path {
@@ -23,7 +33,7 @@ impl fmt::Display for Path {
                 .collect::<Vec<_>>()
                 .join("::")
                 .fmt(f),
-            Path::OtherModule(fqn) => fqn
+            Path::OtherModule(fqn, _) => fqn
                 .segments()
                 .iter()
                 .map(ToString::to_string)
@@ -45,11 +55,13 @@ impl Path {
         rest: impl IntoIterator<Item = impl Into<Name>>,
         first: impl Into<Name>,
         scope: ScopeIdx,
+        resolution_kind: ResolutionKind,
     ) -> Self {
         Self::ThisModule {
             name: first.into(),
             subname: rest.into_iter().next().map(Into::into),
             scope,
+            resolution_kind,
         }
     }
 }

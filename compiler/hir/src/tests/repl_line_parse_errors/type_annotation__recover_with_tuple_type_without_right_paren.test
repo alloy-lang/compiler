@@ -32,6 +32,10 @@ HirModule {
                         name: "Test",
                         sub_path: None,
                     },
+                    [
+                        Trait,
+                        TypeDefinition,
+                    ],
                 ),
             ),
             "range": 39..44,
@@ -91,6 +95,10 @@ HirModule {
                         name: "Test",
                         sub_path: None,
                     },
+                    [
+                        Trait,
+                        TypeDefinition,
+                    ],
                 ),
             ),
             "range": 88..93,

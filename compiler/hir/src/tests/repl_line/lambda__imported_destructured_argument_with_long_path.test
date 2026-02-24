@@ -21,6 +21,7 @@ HirModule {
                     name: "x",
                     subname: None,
                     scope: Idx::<Scope>(1),
+                    resolution_kind: Pattern,
                 },
                 scope: Idx::<Scope>(1),
             },
@@ -60,6 +61,10 @@ HirModule {
                             "Some",
                         ),
                     },
+                    [
+                        Trait,
+                        TypeDefinition,
+                    ],
                 ),
                 scope: Idx::<Scope>(1),
                 args: [

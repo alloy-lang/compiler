@@ -407,7 +407,7 @@ impl<'db> LoweringCtx<'db> {
                 self.resolve_expression_reference(path_segments, path_range, reference_type)
             }
             HirReferenceType::Pattern | HirReferenceType::Type => {
-                self.resolve_type_reference(path_segments, path_range, reference_type)
+                self.resolve_type_reference(path_segments, path_range, reference_type, &[])
             }
         }
     }
@@ -417,21 +417,37 @@ impl<'db> LoweringCtx<'db> {
         path_segments: &[String],
         path_range: TextRange,
         reference_type: HirReferenceType,
+        resolution_kinds: &[ResolutionKind],
     ) -> Option<Path> {
         if let [first, rest @ ..] = path_segments {
             let local_name = Name::new(first);
 
             if let Some((_tid, scope)) = self.traits.get_id(&local_name, &self.scopes) {
-                return Some(Path::this_module(rest, first, scope));
+                return Some(Path::this_module(rest, first, scope, ResolutionKind::Trait));
             }
             if let Some((_tid, scope)) = self.type_definitions.get_id(&local_name, &self.scopes) {
-                return Some(Path::this_module(rest, first, scope));
+                return Some(Path::this_module(
+                    rest,
+                    first,
+                    scope,
+                    ResolutionKind::TypeDefinition,
+                ));
             }
             if let Some((_tid, scope)) = self.type_references.get_id(&local_name, &self.scopes) {
-                return Some(Path::this_module(rest, first, scope));
+                return Some(Path::this_module(
+                    rest,
+                    first,
+                    scope,
+                    ResolutionKind::AbstractTraitMember,
+                ));
             }
             if let Some(_ast) = self.glossary.get_type_definition_by_name(first) {
-                return Some(Path::this_module(rest, first, Scopes::ROOT));
+                return Some(Path::this_module(
+                    rest,
+                    first,
+                    Scopes::ROOT,
+                    ResolutionKind::TypeDefinition,
+                ));
             }
             if let Some((import_id, _)) = self.imports.get_id(&local_name, &self.scopes) {
                 self.used_imports.insert(import_id);
@@ -443,7 +459,13 @@ impl<'db> LoweringCtx<'db> {
                     rest.to_vec(),
                 );
 
-                return Some(Path::OtherModule(fqn));
+                let resolution_kinds = [
+                    resolution_kinds,
+                    &[ResolutionKind::Trait, ResolutionKind::TypeDefinition],
+                ]
+                .concat();
+
+                return Some(Path::OtherModule(fqn, resolution_kinds));
             }
 
             let path =
@@ -490,15 +512,35 @@ impl<'db> LoweringCtx<'db> {
             let local_name = Name::new(first);
 
             if let Some((_pid, scope)) = self.patterns.get_id(&local_name, &self.scopes) {
-                return Some(Path::this_module(rest, first, scope));
+                return Some(Path::this_module(
+                    rest,
+                    first,
+                    scope,
+                    ResolutionKind::Pattern,
+                ));
             }
             if let Some((_eid, scope)) = self.expressions.get_id(&local_name, &self.scopes) {
-                return Some(Path::this_module(rest, first, scope));
+                return Some(Path::this_module(
+                    rest,
+                    first,
+                    scope,
+                    ResolutionKind::Expression,
+                ));
             }
             if let Some(_ast) = self.glossary.get_value_by_name(first) {
-                return Some(Path::this_module(rest, first, Scopes::ROOT));
+                return Some(Path::this_module(
+                    rest,
+                    first,
+                    Scopes::ROOT,
+                    ResolutionKind::Expression,
+                ));
             }
-            return self.resolve_type_reference(path_segments, path_range, reference_type);
+            return self.resolve_type_reference(
+                path_segments,
+                path_range,
+                reference_type,
+                &[ResolutionKind::Pattern, ResolutionKind::Expression],
+            );
         }
 
         None

@@ -52,6 +52,10 @@ HirModule {
                             "None",
                         ),
                     },
+                    [
+                        Trait,
+                        TypeDefinition,
+                    ],
                 ),
                 scope: Idx::<Scope>(1),
                 args: [],
