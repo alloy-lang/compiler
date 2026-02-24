@@ -48,6 +48,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(1),
                     resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(1),
+                    ),
                 },
             ),
             "range": 46..48,

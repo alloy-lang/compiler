@@ -17,6 +17,9 @@ HirModule {
                     ),
                     scope: Idx::<Scope>(0),
                     resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(0),
+                    ),
                 },
                 scope: Idx::<Scope>(0),
             },

@@ -9,6 +9,7 @@ pub enum Path {
         subname: Option<Name>,
         scope: ScopeIdx,
         resolution_kind: ResolutionKind,
+        resolution_idx: ResolutionIdx,
     },
     OtherModule(Fqn, Vec<ResolutionKind>),
     Unknown(NonEmpty<Name>),
@@ -21,6 +22,16 @@ pub enum ResolutionKind {
     AbstractTraitMember,
     Expression,
     Pattern,
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub enum ResolutionIdx {
+    Trait(TraitIdx),
+    TypeDefinition(TypeDefinitionIdx),
+    AbstractTraitMember(TypeIdx),
+    Expression(ExpressionIdx),
+    Unresolved,
+    Pattern(PatternIdx),
 }
 
 impl fmt::Display for Path {
@@ -56,12 +67,14 @@ impl Path {
         first: impl Into<Name>,
         scope: ScopeIdx,
         resolution_kind: ResolutionKind,
+        resolution_idx: ResolutionIdx,
     ) -> Self {
         Self::ThisModule {
             name: first.into(),
             subname: rest.into_iter().next().map(Into::into),
             scope,
             resolution_kind,
+            resolution_idx,
         }
     }
 }

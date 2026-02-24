@@ -44,6 +44,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(2),
                     resolution_kind: Pattern,
+                    resolution_idx: Pattern(
+                        Idx::<Pattern>(1),
+                    ),
                 },
                 scope: Idx::<Scope>(2),
             },
@@ -56,6 +59,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(2),
                     resolution_kind: Pattern,
+                    resolution_idx: Pattern(
+                        Idx::<Pattern>(2),
+                    ),
                 },
                 scope: Idx::<Scope>(2),
                 args: [
@@ -83,6 +89,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(0),
                     resolution_kind: Expression,
+                    resolution_idx: Expression(
+                        Idx::<Expression>(0),
+                    ),
                 },
                 scope: Idx::<Scope>(0),
             },
@@ -95,6 +104,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(0),
                     resolution_kind: Expression,
+                    resolution_idx: Expression(
+                        Idx::<Expression>(2),
+                    ),
                 },
                 scope: Idx::<Scope>(0),
             },
@@ -107,6 +119,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(0),
                     resolution_kind: Expression,
+                    resolution_idx: Expression(
+                        Idx::<Expression>(5),
+                    ),
                 },
                 scope: Idx::<Scope>(0),
                 args: [

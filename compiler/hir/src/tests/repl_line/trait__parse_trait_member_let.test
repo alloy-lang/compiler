@@ -13,7 +13,10 @@ HirModule {
                     name: "test",
                     subname: None,
                     scope: Idx::<Scope>(1),
-                    resolution_kind: TypeAnnotation,
+                    resolution_kind: AbstractTraitMember,
+                    resolution_idx: AbstractTraitMember(
+                        Idx::<TypeReference>(0),
+                    ),
                 },
                 scope: Idx::<Scope>(1),
             },

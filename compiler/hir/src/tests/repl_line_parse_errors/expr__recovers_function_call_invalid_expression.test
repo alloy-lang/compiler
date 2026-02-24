@@ -12,6 +12,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(1),
                     resolution_kind: Pattern,
+                    resolution_idx: Pattern(
+                        Idx::<Pattern>(0),
+                    ),
                 },
                 scope: Idx::<Scope>(1),
             },
@@ -55,6 +58,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(0),
                     resolution_kind: Expression,
+                    resolution_idx: Expression(
+                        Idx::<Expression>(1),
+                    ),
                 },
                 scope: Idx::<Scope>(0),
                 args: [

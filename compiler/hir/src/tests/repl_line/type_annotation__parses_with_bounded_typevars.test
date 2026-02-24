@@ -50,6 +50,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(1),
                     resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(0),
+                    ),
                 },
             ),
             "range": 51..54,
@@ -61,6 +64,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(1),
                     resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(1),
+                    ),
                 },
             ),
             "range": 57..59,
@@ -115,6 +121,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(1),
                     resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(0),
+                    ),
                 },
             ),
             "range": 72..74,
@@ -156,6 +165,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(1),
                     resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(1),
+                    ),
                 },
             ),
             "range": 86..88,

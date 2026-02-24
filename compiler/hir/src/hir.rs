@@ -422,23 +422,31 @@ impl<'db> LoweringCtx<'db> {
         if let [first, rest @ ..] = path_segments {
             let local_name = Name::new(first);
 
-            if let Some((_tid, scope)) = self.traits.get_id(&local_name, &self.scopes) {
-                return Some(Path::this_module(rest, first, scope, ResolutionKind::Trait));
+            if let Some((tid, scope)) = self.traits.get_id(&local_name, &self.scopes) {
+                return Some(Path::this_module(
+                    rest,
+                    first,
+                    scope,
+                    ResolutionKind::Trait,
+                    ResolutionIdx::Trait(tid),
+                ));
             }
-            if let Some((_tid, scope)) = self.type_definitions.get_id(&local_name, &self.scopes) {
+            if let Some((tid, scope)) = self.type_definitions.get_id(&local_name, &self.scopes) {
                 return Some(Path::this_module(
                     rest,
                     first,
                     scope,
                     ResolutionKind::TypeDefinition,
+                    ResolutionIdx::TypeDefinition(tid),
                 ));
             }
-            if let Some((_tid, scope)) = self.type_references.get_id(&local_name, &self.scopes) {
+            if let Some((tid, scope)) = self.type_references.get_id(&local_name, &self.scopes) {
                 return Some(Path::this_module(
                     rest,
                     first,
                     scope,
                     ResolutionKind::AbstractTraitMember,
+                    ResolutionIdx::AbstractTraitMember(tid),
                 ));
             }
             if let Some(_ast) = self.glossary.get_type_definition_by_name(first) {
@@ -447,6 +455,7 @@ impl<'db> LoweringCtx<'db> {
                     first,
                     Scopes::ROOT,
                     ResolutionKind::TypeDefinition,
+                    ResolutionIdx::Unresolved,
                 ));
             }
             if let Some((import_id, _)) = self.imports.get_id(&local_name, &self.scopes) {
@@ -511,20 +520,22 @@ impl<'db> LoweringCtx<'db> {
         if let [first, rest @ ..] = path_segments {
             let local_name = Name::new(first);
 
-            if let Some((_pid, scope)) = self.patterns.get_id(&local_name, &self.scopes) {
+            if let Some((pid, scope)) = self.patterns.get_id(&local_name, &self.scopes) {
                 return Some(Path::this_module(
                     rest,
                     first,
                     scope,
                     ResolutionKind::Pattern,
+                    ResolutionIdx::Pattern(pid),
                 ));
             }
-            if let Some((_eid, scope)) = self.expressions.get_id(&local_name, &self.scopes) {
+            if let Some((eid, scope)) = self.expressions.get_id(&local_name, &self.scopes) {
                 return Some(Path::this_module(
                     rest,
                     first,
                     scope,
                     ResolutionKind::Expression,
+                    ResolutionIdx::Expression(eid),
                 ));
             }
             if let Some(_ast) = self.glossary.get_value_by_name(first) {
@@ -533,6 +544,7 @@ impl<'db> LoweringCtx<'db> {
                     first,
                     Scopes::ROOT,
                     ResolutionKind::Expression,
+                    ResolutionIdx::Unresolved,
                 ));
             }
             return self.resolve_type_reference(

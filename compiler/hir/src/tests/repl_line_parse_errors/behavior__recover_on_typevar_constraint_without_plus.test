@@ -21,6 +21,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(0),
                     resolution_kind: Trait,
+                    resolution_idx: Trait(
+                        Idx::<Trait>(0),
+                    ),
                 },
             ),
             "range": 117..128,
@@ -32,6 +35,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(0),
                     resolution_kind: Trait,
+                    resolution_idx: Trait(
+                        Idx::<Trait>(0),
+                    ),
                 },
             ),
             "range": 128..143,
@@ -43,6 +49,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(0),
                     resolution_kind: Trait,
+                    resolution_idx: Trait(
+                        Idx::<Trait>(0),
+                    ),
                 },
             ),
             "range": 73..84,
@@ -54,6 +63,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(0),
                     resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(0),
+                    ),
                 },
             ),
             "range": 88..94,

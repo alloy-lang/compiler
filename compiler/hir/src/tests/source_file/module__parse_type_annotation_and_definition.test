@@ -66,6 +66,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(2),
                     resolution_kind: Pattern,
+                    resolution_idx: Pattern(
+                        Idx::<Pattern>(1),
+                    ),
                 },
                 scope: Idx::<Scope>(2),
             },
@@ -78,6 +81,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(2),
                     resolution_kind: Pattern,
+                    resolution_idx: Pattern(
+                        Idx::<Pattern>(0),
+                    ),
                 },
                 scope: Idx::<Scope>(2),
                 args: [
@@ -93,6 +99,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(2),
                     resolution_kind: Pattern,
+                    resolution_idx: Pattern(
+                        Idx::<Pattern>(2),
+                    ),
                 },
                 scope: Idx::<Scope>(2),
             },
@@ -105,6 +114,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(2),
                     resolution_kind: Pattern,
+                    resolution_idx: Pattern(
+                        Idx::<Pattern>(0),
+                    ),
                 },
                 scope: Idx::<Scope>(2),
                 args: [
@@ -199,6 +211,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(1),
                     resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(1),
+                    ),
                 },
             ),
             "range": 108..111,
@@ -210,6 +225,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(1),
                     resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(0),
+                    ),
                 },
             ),
             "range": 114..116,
@@ -234,6 +252,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(1),
                     resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(1),
+                    ),
                 },
             ),
             "range": 121..124,
@@ -245,6 +266,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(1),
                     resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(1),
+                    ),
                 },
             ),
             "range": 127..130,
@@ -276,6 +300,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(1),
                     resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(0),
+                    ),
                 },
             ),
             "range": 139..141,
@@ -287,6 +314,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(1),
                     resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(0),
+                    ),
                 },
             ),
             "range": 143..145,

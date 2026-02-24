@@ -48,6 +48,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(3),
                     resolution_kind: Pattern,
+                    resolution_idx: Pattern(
+                        Idx::<Pattern>(0),
+                    ),
                 },
                 scope: Idx::<Scope>(3),
             },
@@ -60,6 +63,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(3),
                     resolution_kind: Pattern,
+                    resolution_idx: Pattern(
+                        Idx::<Pattern>(1),
+                    ),
                 },
                 scope: Idx::<Scope>(3),
             },
@@ -72,6 +78,9 @@ HirModule {
                     subname: None,
                     scope: Idx::<Scope>(3),
                     resolution_kind: Pattern,
+                    resolution_idx: Pattern(
+                        Idx::<Pattern>(1),
+                    ),
                 },
                 scope: Idx::<Scope>(3),
             },
