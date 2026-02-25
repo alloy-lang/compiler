@@ -1,6 +1,5 @@
-use super::{Fqn, HirDatabase, Name};
+use super::*;
 use crate::ast_glossary::AstGlossary;
-use crate::index::{Index, IndexItem};
 
 use alloy_ast as ast;
 use alloy_scope::{ScopeIdx, Scopes};
@@ -62,6 +61,7 @@ pub use type_definition::*;
 
 mod value;
 
+use crate::index::Index;
 use value::*;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
@@ -71,259 +71,7 @@ pub enum HirReferenceType {
     Type,
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct HirModule {
-    imports: Index<Import>,
-    expressions: Index<Expression>,
-    patterns: Index<Pattern>,
-    type_references: Index<TypeReference>,
-    type_definitions: Index<TypeDefinition>,
-    traits: Index<Trait>,
-    behaviors: Index<Behavior, (TypeIdx, TypeIdx)>,
-    scopes: Scopes,
-    warnings: Vec<LoweringWarning>,
-    errors: Vec<LoweringError>,
-}
-
-impl HirModule {
-    pub fn warnings(&self) -> &[LoweringWarning] {
-        &self.warnings
-    }
-
-    pub fn errors(&self) -> &[LoweringError] {
-        &self.errors
-    }
-
-    fn empty() -> Self {
-        Self {
-            imports: Default::default(),
-            expressions: Default::default(),
-            patterns: Default::default(),
-            type_references: Default::default(),
-            type_definitions: Default::default(),
-            traits: Default::default(),
-            behaviors: Default::default(),
-            scopes: Default::default(),
-            warnings: Vec::new(),
-            errors: Vec::new(),
-        }
-    }
-
-    // Iterator methods for accessing collections
-    pub fn type_definitions(&'_ self) -> impl Iterator<Item = IndexItem<'_, TypeDefinition, Name>> {
-        self.type_definitions.iter()
-    }
-
-    pub fn expressions(&'_ self) -> impl Iterator<Item = IndexItem<'_, Expression, Name>> {
-        self.expressions.iter()
-    }
-
-    pub fn patterns(&'_ self) -> impl Iterator<Item = IndexItem<'_, Pattern, Name>> {
-        self.patterns.iter()
-    }
-
-    pub fn type_references(&'_ self) -> impl Iterator<Item = IndexItem<'_, TypeReference, Name>> {
-        self.type_references.iter()
-    }
-
-    pub fn imports(&'_ self) -> impl Iterator<Item = IndexItem<'_, Import, Name>> {
-        self.imports.iter()
-    }
-
-    pub fn traits(&'_ self) -> impl Iterator<Item = IndexItem<'_, Trait, Name>> {
-        self.traits.iter()
-    }
-
-    pub fn behaviors(
-        &'_ self,
-    ) -> impl Iterator<Item = IndexItem<'_, Behavior, (TypeIdx, TypeIdx)>> {
-        self.behaviors.iter()
-    }
-
-    // Lookup methods by name and scope
-    pub fn get_type_definition_by_name(
-        &self,
-        name: &Name,
-        scope: ScopeIdx,
-    ) -> Option<(TypeDefinitionIdx, &TypeDefinition)> {
-        self.type_definitions
-            .get_by_scoped_name(name, scope, &self.scopes)
-    }
-
-    pub fn get_expression_by_name(
-        &self,
-        name: &Name,
-        scope: ScopeIdx,
-    ) -> Option<(ExpressionIdx, &Expression)> {
-        self.expressions
-            .get_by_scoped_name(name, scope, &self.scopes)
-    }
-
-    pub fn get_pattern_by_name(
-        &self,
-        name: &Name,
-        scope: ScopeIdx,
-    ) -> Option<(PatternIdx, &Pattern)> {
-        self.patterns.get_by_scoped_name(name, scope, &self.scopes)
-    }
-
-    pub fn get_type_reference_by_name(
-        &self,
-        name: &Name,
-        scope: ScopeIdx,
-    ) -> Option<(TypeIdx, &TypeReference)> {
-        self.type_references
-            .get_by_scoped_name(name, scope, &self.scopes)
-    }
-
-    pub fn get_trait_by_name(&self, name: &Name) -> Option<(TraitIdx, &Trait)> {
-        self.traits
-            .get_by_scoped_name(name, Scopes::ROOT, &self.scopes)
-    }
-
-    // Get methods by index
-    pub fn get_type_definition(&self, idx: TypeDefinitionIdx) -> &TypeDefinition {
-        self.type_definitions.get(idx)
-    }
-
-    pub fn get_expression(&self, idx: ExpressionIdx) -> &Expression {
-        self.expressions.get(idx)
-    }
-
-    pub fn get_expression_range(&self, idx: ExpressionIdx) -> TextRange {
-        self.expressions.get_range(idx)
-    }
-
-    pub fn get_pattern(&self, idx: PatternIdx) -> &Pattern {
-        self.patterns.get(idx)
-    }
-
-    pub fn get_pattern_range(&self, idx: PatternIdx) -> TextRange {
-        self.patterns.get_range(idx)
-    }
-
-    pub fn get_type_reference(&self, idx: TypeIdx) -> &TypeReference {
-        self.type_references.get(idx)
-    }
-
-    pub fn get_type_reference_range(&self, idx: TypeIdx) -> TextRange {
-        self.type_references.get_range(idx)
-    }
-
-    pub fn get_import(&self, idx: ImportIdx) -> &Import {
-        self.imports.get(idx)
-    }
-
-    pub fn get_trait(&self, idx: TraitIdx) -> &Trait {
-        self.traits.get(idx)
-    }
-
-    pub fn get_behavior(&self, idx: BehaviorIdx) -> &Behavior {
-        self.behaviors.get(idx)
-    }
-
-    /// Find the trait that contains the given scope, if any
-    /// This checks if the scope is within a trait's scope hierarchy
-    pub fn find_trait_containing_scope(&self, scope: ScopeIdx) -> Option<(TraitIdx, &Trait)> {
-        for (trait_idx, trait_def, _range, _name_scope) in self.traits() {
-            let trait_scope = trait_def.scope();
-            if self.scopes.scope_is_descendant_of(scope, trait_scope) {
-                return Some((trait_idx, trait_def));
-            }
-        }
-        None
-    }
-}
-
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
-pub struct LoweringError {
-    kind: LoweringErrorKind,
-    range: TextRange,
-}
-
-impl LoweringError {
-    #[must_use]
-    pub fn new(kind: LoweringErrorKind, range: TextRange) -> Self {
-        Self { kind, range }
-    }
-}
-
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
-pub enum LoweringErrorKind {
-    ConflictingValue {
-        name: Name,
-        first: TextRange,
-        second: TextRange,
-    },
-    ConflictingImport {
-        name: Name,
-        first: TextRange,
-        second: TextRange,
-    },
-    ImportGroupNotAtEnd {
-        group_range: TextRange,
-        position: usize,
-        num_segments: usize,
-    },
-    ConflictingTypeAnnotationName {
-        name: Name,
-        first: TextRange,
-        second: TextRange,
-    },
-    ConflictingTypeDefinitionName {
-        name: Name,
-        first: TextRange,
-        second: TextRange,
-    },
-    ConflictingTraitDefinitionName {
-        name: Name,
-        first: TextRange,
-        second: TextRange,
-    },
-    ConflictingBehaviorDefinition {
-        type_: TypeIdx,
-        trait_: TypeIdx,
-        first: TextRange,
-        second: TextRange,
-    },
-    ConflictingTypeVariableName {
-        name: Name,
-        first: TextRange,
-        second: TextRange,
-    },
-    UnknownReference {
-        reference: Name,
-        reference_type: HirReferenceType,
-        path: NonEmpty<Name>,
-        current_scope: ScopeIdx,
-    },
-    MultipleSelfTypeVariablesInTraitDefinition {
-        trait_name: Name,
-        ranges: Vec<TextRange>,
-    },
-    NumberLiteralTooLarge,
-    CharLiteralInvalid,
-}
-
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
-pub struct LoweringWarning {
-    kind: LoweringWarningKind,
-    range: TextRange,
-}
-
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
-pub enum LoweringWarningKind {
-    DuplicateImport {
-        name: Name,
-        first: TextRange,
-        second: TextRange,
-    },
-    UnusedImport {
-        import: Import,
-    },
-}
-
-struct LoweringCtx<'db> {
+pub(crate) struct LoweringCtx<'db> {
     #[allow(dead_code)]
     db: &'db dyn HirDatabase,
     glossary: AstGlossary,
@@ -341,7 +89,7 @@ struct LoweringCtx<'db> {
 }
 
 impl<'db> LoweringCtx<'db> {
-    fn new(db: &'db dyn HirDatabase, glossary: AstGlossary) -> Self {
+    pub(crate) fn new(db: &'db dyn HirDatabase, glossary: AstGlossary) -> Self {
         Self {
             db,
             glossary,
@@ -359,7 +107,7 @@ impl<'db> LoweringCtx<'db> {
         }
     }
 
-    fn finish(self) -> HirModule {
+    pub(crate) fn finish(self) -> HirModule {
         let mut warnings = self.warnings;
 
         for (id, import, _, _) in self.imports.iter() {
@@ -367,25 +115,22 @@ impl<'db> LoweringCtx<'db> {
                 let warn = LoweringWarningKind::UnusedImport {
                     import: import.clone(),
                 };
-                warnings.push(LoweringWarning {
-                    kind: warn,
-                    range: self.imports.get_range(id),
-                });
+                warnings.push(LoweringWarning::new(warn, self.imports.get_range(id)));
             }
         }
 
-        HirModule {
-            imports: self.imports,
-            expressions: self.expressions,
-            patterns: self.patterns,
-            type_references: self.type_references,
-            type_definitions: self.type_definitions,
-            traits: self.traits,
-            behaviors: self.behaviors,
-            scopes: self.scopes,
+        HirModule::new(
+            self.imports,
+            self.expressions,
+            self.patterns,
+            self.type_references,
+            self.type_definitions,
+            self.traits,
+            self.behaviors,
+            self.scopes,
             warnings,
-            errors: self.errors,
-        }
+            self.errors,
+        )
     }
 
     pub(crate) fn resolve_reference_path(
@@ -815,6 +560,16 @@ impl<'db> LoweringCtx<'db> {
     }
 }
 
+impl<'db> LoweringCtx<'db> {
+    fn warning(&mut self, kind: LoweringWarningKind, range: TextRange) {
+        self.warnings.push(LoweringWarning::new(kind, range));
+    }
+
+    fn error(&mut self, kind: LoweringErrorKind, range: TextRange) {
+        self.errors.push(LoweringError::new(kind, range));
+    }
+}
+
 /// Lower a raw source file to HIR.
 /// This query is cached by salsa, so repeated calls with the same file
 /// will return the cached result unless the file contents have changed.
@@ -848,14 +603,4 @@ pub fn lower_source_file(db: &dyn HirDatabase, source_file: &ast::SourceFile) ->
     let mut ctx = LoweringCtx::new(db, glossary);
     source_file::lower_source_file(&mut ctx, source_file);
     ctx.finish()
-}
-
-impl<'db> LoweringCtx<'db> {
-    fn warning(&mut self, kind: LoweringWarningKind, range: TextRange) {
-        self.warnings.push(LoweringWarning { kind, range });
-    }
-
-    fn error(&mut self, kind: LoweringErrorKind, range: TextRange) {
-        self.errors.push(LoweringError { kind, range });
-    }
 }

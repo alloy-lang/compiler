@@ -1,4 +1,4 @@
-use crate::hir::HirModule;
+use crate::HirModule;
 use alloy_ast as ast;
 use std::env;
 use std::path::Path;

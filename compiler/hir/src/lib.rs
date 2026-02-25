@@ -2,9 +2,13 @@ use non_empty_vec::NonEmpty;
 use std::fmt;
 
 mod ast_glossary;
+mod diagnostics;
 mod hir;
+mod hir_module;
 
+pub use diagnostics::*;
 pub use hir::*;
+pub use hir_module::HirModule;
 
 mod index;
 #[cfg(test)]
