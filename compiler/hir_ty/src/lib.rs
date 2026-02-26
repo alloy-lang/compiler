@@ -110,6 +110,7 @@ mod small_tests {
     use alloy_hir::ExpressionIdx;
     use alloy_hir_resolved::{EPTdFql, Fql};
     use alloy_scope::{ScopeIdx, Scopes};
+    use alloy_test_harness::idx;
     use alloy_workspace::WorkspaceDatabase;
     use la_arena::RawIdx;
     use non_empty_vec::NonEmpty;
@@ -486,5 +487,192 @@ mod small_tests {
             .collect();
 
         assert!(type_args.contains(&&ResolvedType::BuiltIn(hir::BuiltInType::String)));
+    }
+
+    /// Cross-module reference to a simple value should resolve its type
+    #[test]
+    fn infer_cross_module_variable_reference() {
+        let mut db = TestHirTyDatabase::default();
+        db.add_module(
+            "other",
+            camino::Utf8Path::new("./other.alloy"),
+            "let value = 42",
+        );
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+            import other::value
+            let x = value
+            ",
+        );
+
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+        let ctx = crate::type_check_module(&db, module_id);
+
+        assert!(
+            ctx.errors.is_empty(),
+            "Should have no errors, got: {:?}",
+            ctx.errors
+        );
+
+        let (x_id, _) = hir_module
+            .get_expression_by_name(&hir::Name::new("x"), Scopes::ROOT)
+            .expect("x not found");
+
+        let x_type = &ctx.expression_types[&x_id];
+        assert_eq!(
+            *x_type,
+            ResolvedType::BuiltIn(hir::BuiltInType::Int),
+            "x should have type Int from cross-module reference to `value = 42`"
+        );
+    }
+
+    /// Cross-module reference inside a lambda body should resolve correctly
+    #[test]
+    fn infer_cross_module_reference_in_lambda() {
+        let mut db = TestHirTyDatabase::default();
+        db.add_module(
+            "other",
+            camino::Utf8Path::new("./other.alloy"),
+            "let value = 42",
+        );
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+            import other::value
+            let f = |a| -> value
+            ",
+        );
+
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+        let ctx = crate::type_check_module(&db, module_id);
+
+        assert!(
+            ctx.errors.is_empty(),
+            "Should have no errors, got: {:?}",
+            ctx.errors
+        );
+
+        let (f_id, _) = hir_module
+            .get_expression_by_name(&hir::Name::new("f"), Scopes::ROOT)
+            .expect("f not found");
+
+        let f_type = &ctx.expression_types[&f_id];
+        match f_type {
+            ResolvedType::Lambda { return_type, .. } => {
+                assert_eq!(
+                    return_type.as_ref(),
+                    &ResolvedType::BuiltIn(hir::BuiltInType::Int),
+                    "Lambda return type should be Int from cross-module `value = 42`, \
+                     but got {:?}",
+                    return_type,
+                );
+            }
+            _ => panic!("Expected Lambda type for f, got {:?}", f_type),
+        }
+    }
+
+    /// Cross-module reference to a typedef constructor result should resolve the full type
+    #[test]
+    fn infer_cross_module_typedef_in_lambda() {
+        let mut db = TestHirTyDatabase::default();
+        let test_data_module_id = db.add_module(
+            "test_data",
+            camino::Utf8Path::new("./test/test_data.alloy"),
+            r"
+            typedef Test[t] = Thing t
+            let test = Test(0)
+            ",
+        );
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+            import test_data::test
+            let f = |a, b| -> test
+            ",
+        );
+
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+        let ctx = crate::type_check_module(&db, module_id);
+
+        let (f_id, _) = hir_module
+            .get_expression_by_name(&hir::Name::new("f"), Scopes::ROOT)
+            .expect("f not found");
+
+        let f_type = &ctx.expression_types[&f_id];
+        eprintln!("f_type = {:#?}", f_type);
+        eprintln!("errors = {:#?}", ctx.errors);
+
+        assert_eq!(
+            f_type,
+            &ResolvedType::Lambda {
+                arg_type: Box::new(ResolvedType::Generic(1)),
+                return_type: Box::new(ResolvedType::Lambda {
+                    arg_type: Box::new(ResolvedType::Generic(2)),
+                    return_type: Box::new(ResolvedType::Bounded {
+                        base: Box::new(ResolvedType::TypeDef(
+                            Fql::new(test_data_module_id, idx!(1)),
+                            hir::Name::new("Test"),
+                        )),
+                        args: vec![ResolvedType::BuiltIn(hir::BuiltInType::Int)],
+                    }),
+                }),
+            },
+        );
+    }
+
+    /// Test that expression index collision between local and imported module
+    /// doesn't cause incorrect type inference (is_in_later_group bug)
+    #[test]
+    fn cross_module_expr_index_collision_does_not_affect_inference() {
+        let mut db = TestHirTyDatabase::default();
+        // other module has 3 expressions, so Idx(0), Idx(1), Idx(2)
+        db.add_module(
+            "other",
+            camino::Utf8Path::new("./other.alloy"),
+            r"
+            let a = 1
+            let b = 2
+            let c = 3
+            ",
+        );
+        // test module also has expressions that overlap in index
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+            import other::c
+            let x = 1
+            let y = x
+            let z = c
+            ",
+        );
+
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+        let ctx = crate::type_check_module(&db, module_id);
+
+        eprintln!("expression_types = {:#?}", ctx.expression_types);
+        eprintln!("errors = {:#?}", ctx.errors);
+
+        assert!(
+            ctx.errors.is_empty(),
+            "Should have no errors, got: {:?}",
+            ctx.errors
+        );
+
+        let (z_id, _) = hir_module
+            .get_expression_by_name(&hir::Name::new("z"), Scopes::ROOT)
+            .expect("z not found");
+
+        let z_type = &ctx.expression_types[&z_id];
+        assert_eq!(
+            *z_type,
+            ResolvedType::BuiltIn(hir::BuiltInType::Int),
+            "z should have type Int from cross-module reference to `c = 3`, got {:?}",
+            z_type,
+        );
     }
 }

@@ -4,12 +4,13 @@
 //! type annotations, including trait constraint verification.
 
 use crate::diagnostics::{ConflictingTypeAnnotationReason, TypeInferenceErrorKind};
+use crate::hir_ty::type_annotation::{type_reference_to_resolved_type, TypeResolutionContext};
 use crate::hir_ty::ResolvedType;
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir as hir;
+use alloy_hir::TypeIdx;
 use alloy_hir_resolved as res;
 use alloy_hir_resolved::Fql;
-use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use text_size::TextRange;
@@ -19,35 +20,28 @@ pub fn check_type_annotation(
     result: &mut HirTypedModule,
     current_module_id: ModuleId,
     range: TextRange,
-    name_op: Option<(hir::Name, ScopeIdx)>,
+    type_annotation_idx: TypeIdx,
     resolved_type: ResolvedType,
 ) {
     // Check for type annotation conflicts
-    if let Some((name, scope)) = name_op {
-        let Some(expected_type) = super::type_annotation::type_annotation_to_resolved(
-            db,
-            current_module_id,
-            &hir::Path::ThisModule {
-                name: name.clone(),
-                subname: None,
-                scope,
-            },
-        ) else {
-            // Unable to resolve type annotation - skip check
-            return;
-        };
+    let mut ctx = TypeResolutionContext::new();
+    let Some(expected_type) =
+        type_reference_to_resolved_type(db, current_module_id, type_annotation_idx, &mut ctx)
+    else {
+        // Unable to resolve type annotation - skip check
+        return;
+    };
 
-        // Check if the inferred type is compatible with the expected type
-        if let Err(reason) = check_type_compatibility(db, &expected_type, &resolved_type) {
-            result.error(
-                TypeInferenceErrorKind::ConflictingTypeAnnotation {
-                    annotated_type: expected_type,
-                    inferred_type: resolved_type,
-                    reason,
-                },
-                range,
-            );
-        }
+    // Check if the inferred type is compatible with the expected type
+    if let Err(reason) = check_type_compatibility(db, &expected_type, &resolved_type) {
+        result.error(
+            TypeInferenceErrorKind::ConflictingTypeAnnotation {
+                annotated_type: expected_type,
+                inferred_type: resolved_type,
+                reason,
+            },
+            range,
+        );
     }
 }
 

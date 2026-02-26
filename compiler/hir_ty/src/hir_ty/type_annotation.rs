@@ -35,15 +35,6 @@ impl TypeResolutionContext {
     }
 }
 
-pub fn type_annotation_to_resolved(
-    db: &dyn HirTyDatabase,
-    current_module_id: ModuleId,
-    path: &hir::Path,
-) -> Option<ResolvedType> {
-    let mut ctx = TypeResolutionContext::new();
-    type_annotation_to_resolved_with_ctx(db, current_module_id, path, &mut ctx)
-}
-
 fn type_annotation_to_resolved_with_ctx(
     db: &dyn HirTyDatabase,
     current_module_id: ModuleId,

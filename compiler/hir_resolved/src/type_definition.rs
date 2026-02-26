@@ -41,7 +41,7 @@ pub(crate) fn resolve_type_definition_by_path_variant(
 ) -> Result<(Fql<hir::TypeDefinition>, Option<hir::Name>), TypeResolutionError> {
     let variant_name = match path {
         hir::Path::ThisModule { subname, .. } => subname.clone(),
-        hir::Path::OtherModule(fqn) => fqn.sub_path.clone(),
+        hir::Path::OtherModule(fqn, _resolution_kinds) => fqn.sub_path.clone(),
         hir::Path::Unknown(_) => None,
     };
 

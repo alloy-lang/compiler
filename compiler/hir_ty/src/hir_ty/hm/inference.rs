@@ -1,11 +1,12 @@
 //! Main type inference loop and result conversion
 
-use super::super::{check_type_annotation, Fql, ResolvedType};
+use super::super::{check_type_annotation, type_annotation, Fql, ResolvedType};
 use super::constraint_gen::infer_expr_hm;
 use super::unification::solve_equations;
 use super::TypeVarId;
 use super::{HMInferenceContext, MonoType};
 use crate::diagnostics::TypeInferenceErrorKind;
+use crate::hir_ty::type_annotation::{type_reference_to_resolved_type, TypeResolutionContext};
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir as hir;
 use alloy_hir_resolved::EPTdFql;
@@ -31,9 +32,9 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
     let expression_groups = dep_graph.topological_order();
 
     // Build a map of expression IDs to their names for efficient lookup
-    let expr_names: FxHashMap<hir::ExpressionIdx, (hir::Name, alloy_scope::ScopeIdx)> = hir_module
-        .expressions()
-        .filter_map(|(id, _, _, name_op)| name_op.map(|n| (id, n)))
+    let expr_names: FxHashMap<hir::ExpressionIdx, hir::ValueDefinition> = hir_module
+        .values()
+        .map(|value| (value.value, value.clone()))
         .collect();
 
     // Build expr_to_group mapping for lazy constraint generation
@@ -90,31 +91,33 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
             // Add type annotation constraints
             // For polymorphic annotations, we skip adding constraints here
             // and instead just use the annotation to guide generalization
-            if let Some((name, scope)) = expr_names.get(&expr_id) {
-                // Get the inferred type for this expression
-                if let Some(inferred_mono_ty) = ctx.maybe_find_type(&expr_fql) {
-                    // Resolve the type annotation to a ResolvedType
-                    let Some(annotated_resolved) =
-                        super::super::type_annotation::type_annotation_to_resolved(
+            if let Some(value) = expr_names.get(&expr_id) {
+                if let Some(type_annotation) = value.type_annotation {
+                    // Get the inferred type for this expression
+                    if let Some(inferred_mono_ty) = ctx.maybe_find_type(&expr_fql) {
+                        // Resolve the type annotation to a ResolvedType
+                        let mut type_res_ctx = TypeResolutionContext::new();
+                        let Some(annotated_resolved) = type_reference_to_resolved_type(
                             db,
                             module_id,
-                            &hir::Path::ThisModule {
-                                name: name.clone(),
-                                subname: None,
-                                scope: *scope,
-                            },
-                        )
-                    else {
-                        continue;
-                    };
+                            type_annotation,
+                            &mut type_res_ctx,
+                        ) else {
+                            continue;
+                        };
 
-                    // Only add unification constraints for non-polymorphic annotations
-                    // Polymorphic annotations are used for generalization instead
-                    if !annotated_resolved.is_polymorphic() {
-                        if let Some(annotated_mono) =
-                            resolved_to_mono(&annotated_resolved, &mut ctx)
-                        {
-                            ctx.add_equation(inferred_mono_ty, annotated_mono, expr_fql.clone());
+                        // Only add unification constraints for non-polymorphic annotations
+                        // Polymorphic annotations are used for generalization instead
+                        if !annotated_resolved.is_polymorphic() {
+                            if let Some(annotated_mono) =
+                                resolved_to_mono(&annotated_resolved, &mut ctx)
+                            {
+                                ctx.add_equation(
+                                    inferred_mono_ty,
+                                    annotated_mono,
+                                    expr_fql.clone(),
+                                );
+                            }
                         }
                     }
                 }
@@ -126,37 +129,37 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
 
         // 1c. Generalize polymorphic let-bindings
         for &expr_id in &group {
-            if let Some((name, scope)) = expr_names.get(&expr_id) {
-                let expr_fql = Fql::new(module_id, expr_id);
+            if let Some(value) = expr_names.get(&expr_id) {
+                if let Some(type_annotation) = value.type_annotation {
+                    let expr_fql = Fql::new(module_id, expr_id);
 
-                // Check if this expression has a type annotation
-                let annotation_opt = super::super::type_annotation::type_annotation_to_resolved(
-                    db,
-                    module_id,
-                    &hir::Path::ThisModule {
-                        name: name.clone(),
-                        subname: None,
-                        scope: *scope,
-                    },
-                );
+                    // Check if this expression has a type annotation
+                    let mut type_res_ctx = TypeResolutionContext::new();
+                    let annotation_opt = type_reference_to_resolved_type(
+                        db,
+                        module_id,
+                        type_annotation,
+                        &mut type_res_ctx,
+                    );
 
-                // Get the inferred type and apply substitution
-                if let Some(mono_ty) = ctx.maybe_find_type(&expr_fql) {
-                    let resolved_ty = substitution.apply(&mono_ty);
+                    // Get the inferred type and apply substitution
+                    if let Some(mono_ty) = ctx.maybe_find_type(&expr_fql) {
+                        let resolved_ty = substitution.apply(&mono_ty);
 
-                    // Check if this should be generalized
-                    let should_generalize = annotation_opt
-                        .as_ref()
-                        .is_some_and(ResolvedType::is_polymorphic);
+                        // Check if this should be generalized
+                        let should_generalize = annotation_opt
+                            .as_ref()
+                            .is_some_and(ResolvedType::is_polymorphic);
 
-                    if should_generalize {
-                        // Generalize the type and store in poly_env
-                        let poly_ty = ctx.generalize_type(resolved_ty.clone());
-                        ctx.poly_env.insert(expr_fql.clone().into(), poly_ty);
+                        if should_generalize {
+                            // Generalize the type and store in poly_env
+                            let poly_ty = ctx.generalize_type(resolved_ty.clone());
+                            ctx.poly_env.insert(expr_fql.clone().into(), poly_ty);
+                        }
+
+                        // Update type_env with the resolved type
+                        ctx.type_env.insert(expr_fql.into(), resolved_ty);
                     }
-
-                    // Update type_env with the resolved type
-                    ctx.type_env.insert(expr_fql.into(), resolved_ty);
                 }
             }
         }
@@ -190,25 +193,29 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
         result.insert_type(fql.clone(), resolved_type.clone());
     }
 
-    for (expression_id, _expression, range, name_op) in hir_module.expressions() {
-        let fql = Fql::new(module_id, expression_id);
+    for hir::ValueDefinition {
+        type_annotation,
+        value,
+        ..
+    } in hir_module.values()
+    {
+        let fql = Fql::new(module_id, *value);
         let Some(resolved_type) = result.expression_types.get(&fql.local_id).cloned() else {
             continue;
         };
+        let range = hir_module.get_expression_range(*value);
 
-        // Check for type annotation conflicts
-        check_type_annotation(db, &mut result, module_id, range, name_op, resolved_type);
-    }
-
-    for (pattern_id, _pattern, range, name_op) in hir_module.patterns() {
-        let fql = Fql::new(module_id, pattern_id);
-        let Some(resolved_type) = result.pattern_types.get(&fql.local_id).cloned() else {
-            continue;
-        };
-
-        // TODO: patterns cannot have type annotations, however pattern types can be specified BY type annotations on expressions
-        // Check for type annotation conflicts
-        check_type_annotation(db, &mut result, module_id, range, name_op, resolved_type);
+        if let Some(type_annotation) = type_annotation {
+            // Check for type annotation conflicts
+            check_type_annotation(
+                db,
+                &mut result,
+                module_id,
+                range,
+                *type_annotation,
+                resolved_type,
+            );
+        }
     }
 
     // Phase 4: Resolve instantiations to concrete types

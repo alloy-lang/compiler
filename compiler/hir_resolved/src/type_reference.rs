@@ -81,6 +81,7 @@ impl resolver::Resolver<hir::TypeReference> for TypeReferenceResolver {
 mod tests {
     use super::*;
     use crate::tests::TestHirResDatabase;
+    use alloy_hir::{ResolutionIdx, ResolutionKind};
     use alloy_scope::Scopes;
     use alloy_workspace::WorkspaceDatabase;
     use la_arena::{Idx, RawIdx};
@@ -101,6 +102,8 @@ mod tests {
             name: "dummy".into(),
             subname: None,
             scope: Scopes::ROOT,
+            resolution_kind: ResolutionKind::TypeDefinition,
+            resolution_idx: ResolutionIdx::Unresolved,
         };
 
         let actual_ref = resolve_type_reference_by_path(&db, module_id, &path)
@@ -136,7 +139,7 @@ mod tests {
             name: hir::Name::new("MyType"),
             sub_path: None,
         };
-        let path = hir::Path::OtherModule(fqn);
+        let path = hir::Path::OtherModule(fqn, vec![]);
 
         let actual = resolve_type_reference_by_path(&db, module_id, &path);
         assert!(
@@ -171,7 +174,7 @@ mod tests {
             name: hir::Name::new("UnknownType"),
             sub_path: None,
         };
-        let path = hir::Path::OtherModule(fqn);
+        let path = hir::Path::OtherModule(fqn, vec![]);
 
         let actual = resolve_type_reference_by_path(&db, module_id, &path);
         assert!(

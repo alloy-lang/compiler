@@ -40,6 +40,7 @@ where
             name,
             scope,
             subname,
+            ..
         } => (
             name.clone(),
             subname.clone(),
@@ -47,7 +48,7 @@ where
             current_module_id,
             ne_vec![name.clone()],
         ),
-        hir::Path::OtherModule(fqn) => {
+        hir::Path::OtherModule(fqn, _resolution_kinds) => {
             let module_slug = fqn.module_slug();
             let Some((item_name, subname, other_module_id)) = find_module_outer(db, fqn) else {
                 return Err(TypeResolutionError::UnknownModule {

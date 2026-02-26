@@ -42,55 +42,7 @@ HirTypedModule {
         ),
     },
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: ConflictingTypeAnnotation {
-                annotated_type: Lambda {
-                    arg_type: TODO,
-                    return_type: Lambda {
-                        arg_type: BuiltIn(
-                            String,
-                        ),
-                        return_type: BuiltIn(
-                            Int,
-                        ),
-                    },
-                },
-                inferred_type: Lambda {
-                    arg_type: Generic(
-                        0,
-                    ),
-                    return_type: Lambda {
-                        arg_type: Generic(
-                            1,
-                        ),
-                        return_type: BuiltIn(
-                            Int,
-                        ),
-                    },
-                },
-                reason: DirectConflict {
-                    annotated_type: TODO,
-                    inferred_type: Generic(
-                        0,
-                    ),
-                },
-            },
-            range: 193..219,
-        },
-    ],
+    errors: [],
     poly_instantiations: {},
 }
 []
-[E001] Error: Type annotation conflict: expected `<TODO> -> String -> Int`, found `t0 -> t1 -> Int`
-    ╭─[ ./test/main.alloy:11:5 ]
-    │
- 11 │     let test = |sf, str| -> 0
-    │     ─────────────┬────────────  
-    │                  ╰────────────── expected `<TODO>`, found `t0`
-    │ 
-    │ Help: The type annotation says this should be `<TODO>`, but type inference determined it to be `t0`
-────╯
-
-
-
