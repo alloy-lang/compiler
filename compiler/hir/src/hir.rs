@@ -4,7 +4,7 @@ use crate::ast_glossary::AstGlossary;
 use alloy_ast as ast;
 use alloy_scope::{ScopeIdx, Scopes};
 use alloy_syntax::SyntaxElement;
-use alloy_workspace::{ModuleId, SourceFile};
+use alloy_workspace::{ModuleId, RawSourceFile, SourceFile};
 use ast::AstElement;
 use la_arena::Idx;
 use non_empty_vec::NonEmpty;
@@ -595,11 +595,6 @@ impl<'db> LoweringCtx<'db> {
     }
 }
 
-/// Lower a raw source file to HIR.
-/// This query is cached by salsa, so repeated calls with the same file
-/// will return the cached result unless the file contents have changed.
-/// Returns both parse errors and the HIR module.
-#[salsa::tracked]
 pub fn lower_file<'db>(
     db: &'db dyn HirDatabase,
     module_id: ModuleId,
@@ -610,6 +605,18 @@ pub fn lower_file<'db>(
         SourceFile::Virtual(_) => return (HirModule::empty(), vec![]),
     };
 
+    lower_file_inner(db, current_file.clone())
+}
+
+/// Lower a raw source file to HIR.
+/// This query is cached by salsa, so repeated calls with the same file
+/// will return the cached result unless the file contents have changed.
+/// Returns both parse errors and the HIR module.
+#[salsa::tracked]
+pub fn lower_file_inner<'db>(
+    db: &'db dyn HirDatabase,
+    current_file: RawSourceFile,
+) -> (HirModule, Vec<alloy_parser::ParseError>) {
     let (source_file, parse_errors) = ast::source_file(current_file.contents(db));
 
     // If parsing failed, return an empty HIR module with parse errors
@@ -622,10 +629,54 @@ pub fn lower_file<'db>(
 }
 
 #[must_use]
-pub fn lower_source_file(db: &dyn HirDatabase, source_file: &ast::SourceFile) -> HirModule {
+pub fn lower_source_file<'db>(
+    db: &'db dyn HirDatabase,
+    source_file: &'db ast::SourceFile,
+) -> HirModule {
     let glossary = AstGlossary::summarize_source_file(source_file);
 
     let mut ctx = LoweringCtx::new(db, glossary);
     source_file::lower_source_file(&mut ctx, source_file);
     ctx.finish()
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::tests::TestHirDatabase;
+    use alloy_workspace::WorkspaceDatabase;
+
+    #[test]
+    fn salsa_caching_is_correctly_invalidated_when_module_is_updated() {
+        let module_path = camino::Utf8Path::new("./test/test.alloy");
+        let module_slug = "test";
+
+        let mut db = TestHirDatabase::default();
+        let module_id = db.add_module(
+            module_slug,
+            module_path,
+            r#"
+                let string_result = "hi"
+            "#,
+        );
+
+        let (first_hir_module, _) = crate::lower_file(&db, module_id);
+        let first_values = first_hir_module.values();
+
+        db.add_module(
+            module_slug,
+            module_path,
+            r#"
+                let string_result = "hi"
+                let int_result = 42
+            "#,
+        );
+
+        let (second_hir_module, _) = crate::lower_file(&db, module_id);
+        let second_values = second_hir_module.values();
+
+        assert_ne!(
+            first_values.collect::<Vec<_>>(),
+            second_values.collect::<Vec<_>>()
+        );
+    }
 }
