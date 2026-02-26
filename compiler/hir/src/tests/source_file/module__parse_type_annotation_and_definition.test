@@ -389,6 +389,15 @@ HirModule {
     },
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        "testThing": ValueDefinition {
+            name: "testThing",
+            type_annotation: Some(
+                Idx::<TypeReference>(13),
+            ),
+            value: Idx::<Expression>(7),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

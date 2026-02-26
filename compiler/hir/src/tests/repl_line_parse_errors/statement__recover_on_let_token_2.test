@@ -20,6 +20,13 @@ HirModule {
     type_definitions: EmptyIndex::<TypeDefinition>,
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        "b": ValueDefinition {
+            name: "b",
+            type_annotation: None,
+            value: Idx::<Expression>(0),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

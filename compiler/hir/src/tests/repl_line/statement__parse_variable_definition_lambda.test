@@ -76,6 +76,13 @@ HirModule {
     type_definitions: EmptyIndex::<TypeDefinition>,
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        "add": ValueDefinition {
+            name: "add",
+            type_annotation: None,
+            value: Idx::<Expression>(3),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

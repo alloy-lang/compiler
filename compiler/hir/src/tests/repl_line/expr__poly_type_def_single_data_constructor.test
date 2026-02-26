@@ -112,6 +112,18 @@ HirModule {
     },
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        "string_example": ValueDefinition {
+            name: "string_example",
+            type_annotation: None,
+            value: Idx::<Expression>(1),
+        },
+        "int_example": ValueDefinition {
+            name: "int_example",
+            type_annotation: None,
+            value: Idx::<Expression>(3),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

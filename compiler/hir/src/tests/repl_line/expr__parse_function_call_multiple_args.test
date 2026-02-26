@@ -209,6 +209,28 @@ HirModule {
     type_definitions: EmptyIndex::<TypeDefinition>,
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        "z": ValueDefinition {
+            name: "z",
+            type_annotation: None,
+            value: Idx::<Expression>(2),
+        },
+        "y": ValueDefinition {
+            name: "y",
+            type_annotation: None,
+            value: Idx::<Expression>(1),
+        },
+        "funky": ValueDefinition {
+            name: "funky",
+            type_annotation: None,
+            value: Idx::<Expression>(8),
+        },
+        "x": ValueDefinition {
+            name: "x",
+            type_annotation: None,
+            value: Idx::<Expression>(0),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

@@ -31,6 +31,7 @@ pub(crate) struct IndexIterator<'a, T, N: Eq + Hash> {
 }
 
 pub type IndexItem<'a, T, N> = (Idx<T>, &'a T, TextRange, Option<(N, ScopeIdx)>);
+pub type NamedIndexItem<'a, T, N> = (Idx<T>, &'a T, TextRange, N, ScopeIdx);
 
 impl<'a, T, N: Eq + Hash + Clone> Iterator for IndexIterator<'a, T, N> {
     type Item = IndexItem<'a, T, N>;
@@ -118,6 +119,21 @@ impl<T, N: Eq + Hash + Clone + fmt::Debug> Index<T, N> {
 
     pub(crate) fn iter(&'_ self) -> IndexIterator<'_, T, N> {
         IndexIterator::new(self)
+    }
+
+    pub(crate) fn iter_by_scope(
+        &'_ self,
+        search_scope: ScopeIdx,
+    ) -> impl Iterator<Item = NamedIndexItem<'_, T, N>> {
+        IndexIterator::new(self)
+            .filter_map(move |(idx, item, range, name_op)| {
+                if let Some((name, scope)) = name_op {
+                    Some((idx, item, range, name, scope))
+                } else {
+                    None
+                }
+            })
+            .filter(move |(_, _, _, _, scope)| *scope == search_scope)
     }
 
     pub(crate) fn insert_named(

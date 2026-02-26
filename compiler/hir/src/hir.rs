@@ -9,6 +9,7 @@ use ast::AstElement;
 use la_arena::Idx;
 use non_empty_vec::NonEmpty;
 use ordered_float::NotNan;
+use rustc_hash::FxHashMap;
 use std::collections::HashSet;
 use std::convert::TryFrom;
 use text_size::TextRange;
@@ -61,6 +62,7 @@ pub use type_definition::*;
 
 mod value;
 
+pub use crate::hir_module::ValueDefinition;
 use crate::index::Index;
 use value::*;
 
@@ -119,6 +121,28 @@ impl<'db> LoweringCtx<'db> {
             }
         }
 
+        let mut value_definitions: FxHashMap<Name, ValueDefinition> = Default::default();
+        for (expression_id, _, _, name, scope) in self.expressions.iter_by_scope(Scopes::ROOT) {
+            let value_definition =
+                match self
+                    .type_references
+                    .get_by_scoped_name(&name, scope, &self.scopes)
+                {
+                    None => ValueDefinition {
+                        name: name.clone(),
+                        value: expression_id,
+                        type_annotation: None,
+                    },
+                    Some((ta, _)) => ValueDefinition {
+                        name: name.clone(),
+                        value: expression_id,
+                        type_annotation: Some(ta),
+                    },
+                };
+
+            value_definitions.insert(name, value_definition);
+        }
+
         HirModule::new(
             self.imports,
             self.expressions,
@@ -127,6 +151,7 @@ impl<'db> LoweringCtx<'db> {
             self.type_definitions,
             self.traits,
             self.behaviors,
+            value_definitions,
             self.scopes,
             warnings,
             self.errors,

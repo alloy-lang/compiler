@@ -57,6 +57,13 @@ HirModule {
         },
     },
     behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        "test": ValueDefinition {
+            name: "test",
+            type_annotation: None,
+            value: Idx::<Expression>(1),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

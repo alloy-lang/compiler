@@ -1,10 +1,18 @@
 use super::*;
 use crate::index::{Index, IndexItem};
+use rustc_hash::FxHashMap;
 
 use alloy_scope::{ScopeIdx, Scopes};
 use text_size::TextRange;
 
 #[derive(Debug, Clone, PartialEq)]
+pub struct ValueDefinition {
+    pub name: Name,
+    pub type_annotation: Option<TypeIdx>,
+    pub value: ExpressionIdx,
+}
+
+#[derive(Clone, PartialEq)]
 pub struct HirModule {
     imports: Index<Import>,
     expressions: Index<Expression>,
@@ -13,9 +21,31 @@ pub struct HirModule {
     type_definitions: Index<TypeDefinition>,
     traits: Index<Trait>,
     behaviors: Index<Behavior, (TypeIdx, TypeIdx)>,
+    value_definitions: FxHashMap<Name, ValueDefinition>,
     scopes: Scopes,
     warnings: Vec<LoweringWarning>,
     errors: Vec<LoweringError>,
+}
+
+impl fmt::Debug for HirModule {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut debug_struct = f.debug_struct("HirModule");
+        debug_struct.field("imports", &self.imports);
+        debug_struct.field("expressions", &self.expressions);
+        debug_struct.field("patterns", &self.patterns);
+        debug_struct.field("type_references", &self.type_references);
+        debug_struct.field("type_definitions", &self.type_definitions);
+        debug_struct.field("traits", &self.traits);
+        debug_struct.field("behaviors", &self.behaviors);
+        if !self.value_definitions.is_empty() {
+            debug_struct.field("value_definitions", &self.value_definitions);
+        }
+        debug_struct.field("scopes", &self.scopes);
+        debug_struct.field("warnings", &self.warnings);
+        debug_struct.field("errors", &self.errors);
+
+        debug_struct.finish()
+    }
 }
 
 impl HirModule {
@@ -36,6 +66,7 @@ impl HirModule {
             type_definitions: Default::default(),
             traits: Default::default(),
             behaviors: Default::default(),
+            value_definitions: Default::default(),
             scopes: Default::default(),
             warnings: Vec::new(),
             errors: Vec::new(),
@@ -50,6 +81,7 @@ impl HirModule {
         type_definitions: Index<TypeDefinition>,
         traits: Index<Trait>,
         behaviors: Index<Behavior, (TypeIdx, TypeIdx)>,
+        value_definitions: FxHashMap<Name, ValueDefinition>,
         scopes: Scopes,
         warnings: Vec<LoweringWarning>,
         errors: Vec<LoweringError>,
@@ -62,6 +94,7 @@ impl HirModule {
             type_definitions,
             traits,
             behaviors,
+            value_definitions,
             scopes,
             warnings,
             errors,
@@ -75,6 +108,10 @@ impl HirModule {
 
     pub fn expressions(&'_ self) -> impl Iterator<Item = IndexItem<'_, Expression, Name>> {
         self.expressions.iter()
+    }
+
+    pub fn values(&'_ self) -> impl Iterator<Item = &ValueDefinition> {
+        self.value_definitions.values()
     }
 
     pub fn patterns(&'_ self) -> impl Iterator<Item = IndexItem<'_, Pattern, Name>> {
