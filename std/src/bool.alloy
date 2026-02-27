@@ -1,12 +1,6 @@
 module Bool
 where
 
-import std::eq::Eq
-import std::order::Ord
-import std::order::Ordering
-import std::debug::Debug
-
-
 
 --! Boolean 'not'
 typeof not : Bool -> Bool
