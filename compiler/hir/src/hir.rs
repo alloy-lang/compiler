@@ -672,4 +672,46 @@ mod tests {
             second_values.collect::<Vec<_>>()
         );
     }
+
+    #[test]
+    fn resolve_same_module_function_call_trait_reference() {
+        let mut db = TestHirDatabase::default();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    trait TestTrait where
+      self = #Type[_]
+      typeof test_func : (a -> self[b]) -> self[a] -> self[b] where
+        typevar a
+        typevar b
+    end
+
+    typeof example : (t1 -> m[t2]) -> m[t1] -> m[t2] where
+      typevar m = TestTrait
+      typevar t1
+      typevar t2
+    let example = TestTrait::test_func
+",
+        );
+
+        let (first_hir_module, _) = crate::lower_file(&db, module_id);
+        let (_, expr) = first_hir_module
+            .get_expression_by_name(&Name::new("example"), Scopes::ROOT)
+            .expect("must find example expression");
+
+        assert_eq!(
+            &Expression::VariableRef {
+                path: Path::ThisModule {
+                    name: Name::new("TestTrait"),
+                    subname: Some(Name::new("test_func")),
+                    scope: Scopes::ROOT,
+                    resolution_kind: ResolutionKind::Trait,
+                    resolution_idx: ResolutionIdx::Trait(idx!(0)),
+                },
+                scope: Scopes::ROOT,
+            },
+            expr
+        );
+    }
 }
