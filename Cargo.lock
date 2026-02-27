@@ -40,6 +40,7 @@ name = "alloy_diagnostics"
 version = "0.1.0"
 dependencies = [
  "alloy_ast",
+ "alloy_project",
  "alloy_test_harness",
  "alloy_workspace",
  "ariadne",
@@ -54,6 +55,7 @@ version = "0.1.0"
 dependencies = [
  "alloy_ast",
  "alloy_parser",
+ "alloy_project",
  "alloy_scope",
  "alloy_syntax",
  "alloy_test_harness",
@@ -74,7 +76,7 @@ version = "0.1.0"
 dependencies = [
  "alloy_ast",
  "alloy_hir",
- "alloy_parser",
+ "alloy_project",
  "alloy_scope",
  "alloy_test_harness",
  "alloy_workspace",
@@ -94,6 +96,7 @@ dependencies = [
  "alloy_diagnostics",
  "alloy_hir",
  "alloy_hir_resolved",
+ "alloy_project",
  "alloy_scope",
  "alloy_test_harness",
  "alloy_workspace",

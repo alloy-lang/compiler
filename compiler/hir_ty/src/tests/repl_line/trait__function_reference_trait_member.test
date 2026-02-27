@@ -1,5 +1,5 @@
 trait TestTrait where
-  self = #Type[_] + Applicative
+  self = #Type[_]
   typeof test_func : (a -> self[b]) -> self[a] -> self[b] where
     typevar a
     typevar b
@@ -187,7 +187,7 @@ HirTypedModule {
                     ),
                 },
             },
-            range: 254..286,
+            range: 240..272,
         },
         TypeInferenceError {
             kind: TypeResolutionError(
@@ -208,7 +208,7 @@ HirTypedModule {
                     ),
                 },
             ),
-            range: 254..286,
+            range: 240..272,
         },
     ],
     poly_instantiations: {},

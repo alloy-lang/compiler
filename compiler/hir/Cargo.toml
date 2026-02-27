@@ -21,5 +21,6 @@ itertools = { workspace = true }
 
 [dev-dependencies]
 alloy_parser = {path = "../parser"}
+alloy_project = { path = "../project" }
 alloy_test_harness = {path = "../test_harness"}
 camino = { workspace = true }

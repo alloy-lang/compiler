@@ -19,10 +19,29 @@ use std::{env, fs};
 macro_rules! test_database {
     ($name:ident $(: $($trait:path),+ $(,)?)?) => {
         #[salsa::db]
-        #[derive(Default, Clone)]
+        #[derive(Clone)]
         pub(crate) struct $name {
             storage: salsa::Storage<Self>,
             workspace: alloy_workspace::Workspace,
+        }
+
+        impl Default for $name {
+            fn default() -> Self {
+                use alloy_workspace::WorkspaceDatabase;
+                let mut db = Self {
+                    storage: Default::default(),
+                    workspace: Default::default(),
+                };
+
+                let project = alloy_project::Project::new("../../std").expect("expected project to be created");
+                for module in project.modules() {
+                    let path = module.path();
+                    let contents = std::fs::read_to_string(path).expect("expected to read module file");
+                    db.add_module(module.slug(), path, &contents);
+                }
+
+                db
+            }
         }
 
         #[salsa::db]
