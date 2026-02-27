@@ -6,7 +6,7 @@ use alloy_lexer::Token;
 use alloy_syntax::AlloyLanguage;
 
 use crate::parser::ParseError;
-use crate::Parse;
+use crate::ParseTree;
 
 use super::event::Event;
 
@@ -29,7 +29,7 @@ impl<'t, 'input> Sink<'t, 'input> {
         }
     }
 
-    pub(crate) fn finish(mut self) -> Parse {
+    pub(crate) fn finish(mut self) -> ParseTree {
         for idx in 0..self.events.len() {
             match mem::replace(&mut self.events[idx], Event::Placeholder) {
                 Event::StartNode {
@@ -73,7 +73,7 @@ impl<'t, 'input> Sink<'t, 'input> {
             self.eat_trivia();
         }
 
-        Parse {
+        ParseTree {
             green_node: self.builder.finish(),
             errors: self.errors,
         }

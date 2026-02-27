@@ -8,6 +8,8 @@ edition = "2018"
 [dependencies]
 alloy_parser = {path = "../parser"}
 alloy_syntax = { path = "../syntax" }
+alloy_workspace = { path = "../workspace" }
+salsa = { workspace = true }
 ordered-float = { workspace = true }
 text-size = { workspace = true }
 

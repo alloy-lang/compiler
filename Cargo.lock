@@ -15,7 +15,9 @@ dependencies = [
  "alloy_parser",
  "alloy_syntax",
  "alloy_test_harness",
+ "alloy_workspace",
  "ordered-float",
+ "salsa",
  "text-size",
 ]
 
@@ -23,6 +25,7 @@ dependencies = [
 name = "alloy_compiler"
 version = "0.1.0"
 dependencies = [
+ "alloy_ast",
  "alloy_hir",
  "alloy_hir_typed",
  "alloy_parser",
@@ -36,6 +39,7 @@ dependencies = [
 name = "alloy_diagnostics"
 version = "0.1.0"
 dependencies = [
+ "alloy_ast",
  "alloy_test_harness",
  "alloy_workspace",
  "ariadne",
@@ -68,6 +72,7 @@ dependencies = [
 name = "alloy_hir_resolved"
 version = "0.1.0"
 dependencies = [
+ "alloy_ast",
  "alloy_hir",
  "alloy_parser",
  "alloy_scope",
@@ -174,6 +179,7 @@ dependencies = [
 name = "alloy_test_harness"
 version = "0.1.0"
 dependencies = [
+ "alloy_ast",
  "alloy_project",
  "alloy_workspace",
  "camino",

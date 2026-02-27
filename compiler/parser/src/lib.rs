@@ -20,7 +20,7 @@ mod token_set;
 mod tests;
 
 #[must_use]
-pub fn parse_source_file(input: &str) -> Parse {
+pub fn parse_source_file(input: &str) -> ParseTree {
     let tokens: Vec<_> = Lexer::new(input).collect();
     let source = Source::new(&tokens);
     let parser = Parser::new(source);
@@ -30,12 +30,13 @@ pub fn parse_source_file(input: &str) -> Parse {
     sink.finish()
 }
 
-pub struct Parse {
+#[derive(Clone, PartialEq)]
+pub struct ParseTree {
     green_node: GreenNode,
     errors: Vec<ParseError>,
 }
 
-impl Parse {
+impl ParseTree {
     #[must_use]
     pub fn debug_tree(&self) -> String {
         let mut s = String::new();

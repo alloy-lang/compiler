@@ -11,6 +11,7 @@ ariadne = { workspace = true }
 text-size = { workspace = true }
 
 [dev-dependencies]
+alloy_ast = { path = "../ast" }
 alloy_test_harness = {path = "../test_harness"}
 camino = { workspace = true }
 salsa = { workspace = true }

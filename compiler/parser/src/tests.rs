@@ -1,4 +1,4 @@
-use crate::Parse;
+use crate::ParseTree;
 use std::env;
 
 #[test]
@@ -40,7 +40,7 @@ fn on_demand_test() {
     }
 }
 
-fn run_parser_test(input: &str, parsing_fn: fn(&str) -> Parse) -> String {
+fn run_parser_test(input: &str, parsing_fn: fn(&str) -> ParseTree) -> String {
     let actual_parse = parsing_fn(input);
 
     actual_parse.debug_tree().to_string()

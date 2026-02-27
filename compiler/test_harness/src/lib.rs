@@ -63,6 +63,9 @@ macro_rules! test_database {
             }
         }
 
+        #[salsa::db]
+        impl alloy_ast::AstDatabase for $name {}
+
         $($(
             #[salsa::db]
             impl $trait for $name {}
@@ -163,12 +166,11 @@ pub fn run_test_dir(
 #[track_caller]
 pub fn run_std_lib_tests<C: RefUnwindSafe>(
     init: impl Fn(&[&ModuleFile]) -> C + RefUnwindSafe + UnwindSafe,
-    test_fn: impl Fn(&C, &ModuleFile) + RefUnwindSafe + UnwindSafe,
+    test_fn: impl Fn(&mut C, &ModuleFile) + RefUnwindSafe + UnwindSafe,
 ) {
     let project = Project::new("../../std").expect("expected project to be created");
 
     let mut failed_tests = vec![];
-    let context = init(&project.modules().collect::<Vec<_>>());
     for module_file in project.modules() {
         let path = module_file.path();
 
@@ -178,7 +180,8 @@ pub fn run_std_lib_tests<C: RefUnwindSafe>(
         );
 
         let did_panic = std::panic::catch_unwind(|| {
-            test_fn(&context, module_file);
+            let mut context = init(&project.modules().collect::<Vec<_>>());
+            test_fn(&mut context, module_file);
         })
         .is_err();
 

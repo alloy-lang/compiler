@@ -38,6 +38,9 @@ impl alloy_workspace::WorkspaceDatabase for CompilerDatabase {
 }
 
 #[salsa::db]
+impl alloy_ast::AstDatabase for CompilerDatabase {}
+
+#[salsa::db]
 impl alloy_hir::HirDatabase for CompilerDatabase {}
 
 #[salsa::db]

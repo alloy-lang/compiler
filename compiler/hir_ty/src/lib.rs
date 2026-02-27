@@ -105,7 +105,6 @@ mod small_tests {
     };
     use crate::hir_ty::ResolvedType;
     use crate::tests::TestHirTyDatabase;
-    use alloy_ast as ast;
     use alloy_hir as hir;
     use alloy_hir::ExpressionIdx;
     use alloy_hir_resolved::{EPTdFql, Fql};
@@ -117,14 +116,14 @@ mod small_tests {
     use text_size::{TextRange, TextSize};
 
     fn check(input: &str, expected: &[(u32, ResolvedType)]) {
-        let (_, parse_errors) = ast::source_file(input);
-
         let mut db = TestHirTyDatabase::default();
         let module_id = db.add_module(
             "test_data",
             camino::Utf8Path::new("./test/test_data.alloy"),
             input,
         );
+
+        let (_, parse_errors) = hir::lower_file(&db, module_id);
 
         let ctx = crate::type_check_module(&db, module_id);
 

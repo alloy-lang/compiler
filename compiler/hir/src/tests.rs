@@ -1,5 +1,5 @@
-use crate::HirModule;
-use alloy_ast as ast;
+use alloy_workspace::WorkspaceDatabase;
+use camino::Utf8Path;
 use std::env;
 use std::path::Path;
 
@@ -59,26 +59,16 @@ fn on_demand_test() {
 }
 
 #[track_caller]
-fn lower_source_file(
-    db: &dyn crate::HirDatabase,
-    input: &str,
-) -> (HirModule, Vec<alloy_parser::ParseError>) {
-    let (source_file, parse_errors) = ast::source_file(input);
-    let source_file = source_file.expect("Failed to parse source file");
-
-    let hir = crate::lower_source_file(db, &source_file);
-    (hir, parse_errors)
-}
-
-#[track_caller]
 fn run_hir_test(
     path: &Path,
     input: &str,
     expect_parse_errors: bool,
     expect_lowering_errors: bool,
 ) -> String {
-    let db = TestHirDatabase::default();
-    let (module, parse_errors) = lower_source_file(&db, input);
+    let mut db = TestHirDatabase::default();
+
+    let module_id = db.add_module("test", Utf8Path::from_path(path).unwrap(), input);
+    let (module, parse_errors) = crate::lower_file(&db, module_id);
 
     let file_name = path.to_str().expect("Expected filename");
     if expect_parse_errors {
@@ -125,7 +115,8 @@ fn test_std_lib() {
             let path = module_file.path();
             let source = module_file.contents();
 
-            let (module, parse_errors) = lower_source_file(db, source);
+            let module_id = db.add_module("test", path, source);
+            let (module, parse_errors) = crate::lower_file(db, module_id);
             let lowering_warnings = module.warnings();
             let lowering_errors = module.errors();
 
