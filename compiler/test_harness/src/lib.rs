@@ -36,6 +36,17 @@ macro_rules! test_database {
                 path: &camino::Utf8Path,
                 contents: &str,
             ) -> alloy_workspace::ModuleId {
+                let module_id = alloy_workspace::ModuleId::new(self, slug.to_string());
+
+                if let Some(alloy_workspace::SourceFile::Raw(existing_raw)) = self.workspace.maybe_get_source(module_id) {
+                    let existing_raw = existing_raw.clone();
+                    use salsa::Setter;
+
+                    existing_raw.set_raw_path(self).to(std::sync::Arc::from(path.as_str()));
+                    existing_raw.set_contents(self).to(std::sync::Arc::from(contents));
+                    return module_id;
+                }
+
                 let prepared = alloy_workspace::prepare_module(self, slug, path, contents);
                 self.workspace.insert_prepared_module(prepared)
             }

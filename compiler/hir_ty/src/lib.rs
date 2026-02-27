@@ -186,6 +186,22 @@ mod small_tests {
     }
 
     #[test]
+    fn salsa_cache_invalidation_type_check_module() {
+        let module_path = camino::Utf8Path::new("./test/test.alloy");
+        let module_slug = "test";
+
+        let mut db = TestHirTyDatabase::default();
+        let module_id = db.add_module(module_slug, module_path, "let x = 1");
+
+        let first = crate::type_check_module(&db, module_id);
+
+        db.add_module(module_slug, module_path, "let x = 1\nlet y = 2");
+
+        let second = crate::type_check_module(&db, module_id);
+        assert_ne!(first, second);
+    }
+
+    #[test]
     fn infer_literals() {
         check("1", &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Int))]);
         check(

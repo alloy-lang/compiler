@@ -18,6 +18,7 @@ pub struct ModuleId {
     pub path: String,
 }
 
+#[derive(Clone, PartialEq, Eq)]
 pub enum SourceFile<'a> {
     Raw(&'a RawSourceFile),
     Virtual(&'a VirtualSourceFile),
@@ -55,10 +56,6 @@ pub struct PreparedModule {
     virtual_entries: Vec<(ModuleId, String)>,
 }
 
-/// Phase 1: Prepare module data by creating Salsa-tracked items
-///
-/// This function only reads from the database and creates new Salsa items.
-/// It doesn't mutate the workspace, allowing it to be called with `&self`.
 pub fn prepare_module(
     db: &dyn WorkspaceDatabase,
     slug: &str,
@@ -93,10 +90,6 @@ impl Workspace {
         }
     }
 
-    /// Phase 2: Insert a prepared module into the workspace
-    ///
-    /// This method only mutates the workspace and doesn't need database access,
-    /// completing the two-phase add_module process.
     pub fn insert_prepared_module(&mut self, prepared: PreparedModule) -> ModuleId {
         let module_id = prepared.module_id;
 
@@ -132,12 +125,16 @@ impl Workspace {
         result
     }
 
-    pub fn get_source(&'_ self, module_id: ModuleId) -> SourceFile<'_> {
+    pub fn maybe_get_source(&'_ self, module_id: ModuleId) -> Option<SourceFile<'_>> {
         self.raw_files
             .get(&module_id)
             .map(SourceFile::Raw)
             .or_else(|| self.virtual_files.get(&module_id).map(SourceFile::Virtual))
-            .expect("module ID not found")
+    }
+
+    pub fn get_source(&'_ self, module_id: ModuleId) -> SourceFile<'_> {
+        self.maybe_get_source(module_id)
+            .expect(&format!("ModuleId '{module_id:?}' not found in workspace"))
     }
 
     pub fn find_module_by_slug(&self, db: &dyn WorkspaceDatabase, slug: &str) -> Option<ModuleId> {

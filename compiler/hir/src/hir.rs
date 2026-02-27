@@ -4,7 +4,7 @@ use crate::ast_glossary::AstGlossary;
 use alloy_ast as ast;
 use alloy_scope::{ScopeIdx, Scopes};
 use alloy_syntax::SyntaxElement;
-use alloy_workspace::{ModuleId, RawSourceFile, SourceFile};
+use alloy_workspace::{ModuleId, SourceFile};
 use ast::AstElement;
 use la_arena::Idx;
 use non_empty_vec::NonEmpty;
@@ -595,6 +595,11 @@ impl<'db> LoweringCtx<'db> {
     }
 }
 
+/// Lower a raw source file to HIR.
+/// This query is cached by salsa, so repeated calls with the same file
+/// will return the cached result unless the file contents have changed.
+/// Returns both parse errors and the HIR module.
+#[salsa::tracked]
 pub fn lower_file<'db>(
     db: &'db dyn HirDatabase,
     module_id: ModuleId,
@@ -605,18 +610,6 @@ pub fn lower_file<'db>(
         SourceFile::Virtual(_) => return (HirModule::empty(), vec![]),
     };
 
-    lower_file_inner(db, current_file.clone())
-}
-
-/// Lower a raw source file to HIR.
-/// This query is cached by salsa, so repeated calls with the same file
-/// will return the cached result unless the file contents have changed.
-/// Returns both parse errors and the HIR module.
-#[salsa::tracked]
-pub fn lower_file_inner<'db>(
-    db: &'db dyn HirDatabase,
-    current_file: RawSourceFile,
-) -> (HirModule, Vec<alloy_parser::ParseError>) {
     let (source_file, parse_errors) = ast::source_file(current_file.contents(db));
 
     // If parsing failed, return an empty HIR module with parse errors
