@@ -1,6 +1,6 @@
 //! Main type inference loop and result conversion
 
-use super::super::{check_type_annotation, type_annotation, Fql, ResolvedType};
+use super::super::{check_type_annotation, Fql, ResolvedType};
 use super::constraint_gen::infer_expr_hm;
 use super::unification::solve_equations;
 use super::TypeVarId;
