@@ -1,6 +1,6 @@
 //! Centralized diagnostic collection and reporting
 
-use alloy_workspace::{ModuleId, SourceFile, WorkspaceDatabase};
+use alloy_workspace::{ModuleId, WorkspaceDatabase};
 use ariadne::{Config, Source};
 
 use crate::builder::DiagnosticBuilder;
@@ -94,20 +94,18 @@ impl DiagnosticsReporter {
     pub fn eprint(&self, db: &dyn WorkspaceDatabase) {
         for entry in &self.entries {
             let source_file = db.get_source(entry.module_id);
-            if let SourceFile::Raw(raw_file) = source_file {
-                let source_id = raw_file.raw_path(db);
-                let source = raw_file.contents(db);
+            let source_id = source_file.raw_path(db);
+            let source = source_file.contents(db);
 
-                let builder = DiagnosticBuilder::new(entry.diagnostic.as_ref(), db);
-                let report = entry
-                    .diagnostic
-                    .build_report(builder)
-                    .build(source_id.to_string());
+            let builder = DiagnosticBuilder::new(entry.diagnostic.as_ref(), db);
+            let report = entry
+                .diagnostic
+                .build_report(builder)
+                .build(source_id.to_string());
 
-                report
-                    .eprint((source_id.to_string(), Source::from(source.as_ref())))
-                    .unwrap();
-            }
+            report
+                .eprint((source_id.to_string(), Source::from(source.as_ref())))
+                .unwrap();
         }
     }
 
@@ -118,28 +116,25 @@ impl DiagnosticsReporter {
         for entry in &self.entries {
             let source_file = db.get_source(entry.module_id);
 
-            // Only render diagnostics for raw source files (skip virtual files)
-            if let SourceFile::Raw(raw_file) = source_file {
-                let source_id = raw_file.raw_path(db);
-                let source = raw_file.contents(db);
+            let source_id = source_file.raw_path(db);
+            let source = source_file.contents(db);
 
-                let builder = DiagnosticBuilder::new(entry.diagnostic.as_ref(), db);
-                let report = entry
-                    .diagnostic
-                    .build_report(builder)
-                    .build_with_config(source_id.to_string(), config);
+            let builder = DiagnosticBuilder::new(entry.diagnostic.as_ref(), db);
+            let report = entry
+                .diagnostic
+                .build_report(builder)
+                .build_with_config(source_id.to_string(), config);
 
-                let mut buf = Vec::new();
-                report
-                    .write(
-                        (source_id.to_string(), Source::from(source.as_ref())),
-                        &mut buf,
-                    )
-                    .unwrap();
+            let mut buf = Vec::new();
+            report
+                .write(
+                    (source_id.to_string(), Source::from(source.as_ref())),
+                    &mut buf,
+                )
+                .unwrap();
 
-                output.push_str(&String::from_utf8(buf).unwrap());
-                output.push('\n');
-            }
+            output.push_str(&String::from_utf8(buf).unwrap());
+            output.push('\n');
         }
 
         output

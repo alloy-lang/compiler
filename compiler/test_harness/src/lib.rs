@@ -57,7 +57,7 @@ macro_rules! test_database {
             ) -> alloy_workspace::ModuleId {
                 let module_id = alloy_workspace::ModuleId::new(self, slug.to_string());
 
-                if let Some(alloy_workspace::SourceFile::Raw(existing_raw)) = self.workspace.maybe_get_source(module_id) {
+                if let Some(existing_raw) = self.workspace.maybe_get_source(module_id) {
                     let existing_raw = existing_raw.clone();
                     use salsa::Setter;
 
@@ -73,12 +73,23 @@ macro_rules! test_database {
             fn get_source(
                 &'_ self,
                 module_id: alloy_workspace::ModuleId,
-            ) -> alloy_workspace::SourceFile<'_> {
+            ) -> &'_ alloy_workspace::RawSourceFile {
                 self.workspace.get_source(module_id)
+            }
+
+            fn get_virtual_source(
+                &'_ self,
+                module_id: alloy_workspace::VirtualModuleId,
+            ) -> &'_ alloy_workspace::VirtualSourceFile {
+                self.workspace.get_virtual_source(module_id)
             }
 
             fn find_module_by_slug(&self, slug: &str) -> Option<alloy_workspace::ModuleId> {
                 self.workspace.find_module_by_slug(self, slug)
+            }
+
+            fn find_virtual_module_by_slug(&self, slug: &str) -> Option<alloy_workspace::VirtualModuleId> {
+                self.workspace.find_virtual_module_by_slug(self, slug)
             }
         }
 

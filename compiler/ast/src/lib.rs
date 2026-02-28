@@ -12,13 +12,9 @@ pub fn parse_source_file<'db>(
     db: &'db dyn AstDatabase,
     module_id: ModuleId,
 ) -> (Option<SourceFile>, Vec<ParseError>) {
-    let current_file = db.get_source(module_id);
-    let current_file = match current_file {
-        alloy_workspace::SourceFile::Raw(raw) => raw,
-        alloy_workspace::SourceFile::Virtual(_) => return (None, vec![]),
-    };
+    let source = db.get_source(module_id);
 
-    let parse_tree = parse_source_file_inner(db, *current_file);
+    let parse_tree = parse_source_file_inner(db, *source);
     let syntax = parse_tree.syntax();
 
     (SourceFile::cast(syntax), parse_tree.errors().to_vec())

@@ -6,9 +6,13 @@ use std::sync::Arc;
 pub trait WorkspaceDatabase: salsa::Database {
     fn add_module(&mut self, slug: &str, path: &Utf8Path, contents: &str) -> ModuleId;
 
-    fn get_source(&'_ self, module_id: ModuleId) -> SourceFile<'_>;
+    fn get_source(&'_ self, module_id: ModuleId) -> &'_ RawSourceFile;
+
+    fn get_virtual_source(&'_ self, module_id: VirtualModuleId) -> &'_ VirtualSourceFile;
 
     fn find_module_by_slug(&self, slug: &str) -> Option<ModuleId>;
+
+    fn find_virtual_module_by_slug(&self, slug: &str) -> Option<VirtualModuleId>;
 }
 
 /// Represents a module identifier using :: syntax (e.g., "std::collections::HashMap")
@@ -18,10 +22,9 @@ pub struct ModuleId {
     pub path: String,
 }
 
-#[derive(Clone, PartialEq, Eq)]
-pub enum SourceFile<'a> {
-    Raw(&'a RawSourceFile),
-    Virtual(&'a VirtualSourceFile),
+#[salsa::interned(no_lifetime, debug)]
+pub struct VirtualModuleId {
+    pub path: String,
 }
 
 #[salsa::input]
@@ -43,7 +46,7 @@ pub struct VirtualSourceFile {
 #[derive(Default, Clone, PartialEq, Eq)]
 pub struct Workspace {
     raw_files: HashMap<ModuleId, RawSourceFile>,
-    virtual_files: HashMap<ModuleId, VirtualSourceFile>,
+    virtual_files: HashMap<VirtualModuleId, VirtualSourceFile>,
 }
 
 /// Prepared module data ready to be inserted into a workspace
@@ -53,7 +56,7 @@ pub struct Workspace {
 pub struct PreparedModule {
     module_id: ModuleId,
     file: RawSourceFile,
-    virtual_entries: Vec<(ModuleId, String)>,
+    virtual_entries: Vec<(VirtualModuleId, String)>,
 }
 
 pub fn prepare_module(
@@ -66,19 +69,19 @@ pub fn prepare_module(
     let file = RawSourceFile::new(db, Arc::from(path.as_str()), Arc::from(contents));
 
     // Prepare virtual module data
-    // let virtual_slugs = Workspace::compound_slugs(slug);
-    // let virtual_entries: Vec<(ModuleId, String)> = virtual_slugs
-    //     .iter()
-    //     .map(|&virtual_slug| {
-    //         let virtual_module_id = ModuleId::new(db, virtual_slug.to_string());
-    //         (virtual_module_id, virtual_slug.to_string())
-    //     })
-    //     .collect();
+    let virtual_slugs = Workspace::compound_slugs(slug);
+    let virtual_entries: Vec<(VirtualModuleId, String)> = virtual_slugs
+        .iter()
+        .map(|&virtual_slug| {
+            let virtual_module_id = VirtualModuleId::new(db, virtual_slug.to_string());
+            (virtual_module_id, virtual_slug.to_string())
+        })
+        .collect();
 
     PreparedModule {
         module_id,
         file,
-        virtual_entries: vec![],
+        virtual_entries,
     }
 }
 
@@ -125,21 +128,44 @@ impl Workspace {
         result
     }
 
-    pub fn maybe_get_source(&'_ self, module_id: ModuleId) -> Option<SourceFile<'_>> {
-        self.raw_files
-            .get(&module_id)
-            .map(SourceFile::Raw)
-            .or_else(|| self.virtual_files.get(&module_id).map(SourceFile::Virtual))
+    pub fn maybe_get_source(&'_ self, module_id: ModuleId) -> Option<&'_ RawSourceFile> {
+        self.raw_files.get(&module_id)
     }
 
-    pub fn get_source(&'_ self, module_id: ModuleId) -> SourceFile<'_> {
-        self.maybe_get_source(module_id)
-            .expect(&format!("ModuleId '{module_id:?}' not found in workspace"))
+    pub fn get_source(&'_ self, module_id: ModuleId) -> &'_ RawSourceFile {
+        self.maybe_get_source(module_id).unwrap_or_else(|| {
+            panic!(
+                "Module '{module_id:?}' not found in workspace. Available modules: {:?}",
+                self.raw_files.keys().collect::<Vec<_>>()
+            )
+        })
+    }
+
+    pub fn get_virtual_source(&'_ self, module_id: VirtualModuleId) -> &'_ VirtualSourceFile {
+        self.virtual_files.get(&module_id).unwrap_or_else(|| {
+            panic!(
+                "Virtual module '{module_id:?}' not found in workspace. Available virtual modules: {:?}",
+                self.virtual_files.keys().collect::<Vec<_>>()
+            )
+        })
     }
 
     pub fn find_module_by_slug(&self, db: &dyn WorkspaceDatabase, slug: &str) -> Option<ModuleId> {
         let module_id = ModuleId::new(db, slug.to_string());
-        if self.raw_files.contains_key(&module_id) || self.virtual_files.contains_key(&module_id) {
+        if self.raw_files.contains_key(&module_id) {
+            Some(module_id)
+        } else {
+            None
+        }
+    }
+
+    pub fn find_virtual_module_by_slug(
+        &self,
+        db: &dyn WorkspaceDatabase,
+        slug: &str,
+    ) -> Option<VirtualModuleId> {
+        let module_id = VirtualModuleId::new(db, slug.to_string());
+        if self.virtual_files.contains_key(&module_id) {
             Some(module_id)
         } else {
             None
