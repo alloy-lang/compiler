@@ -173,31 +173,31 @@ impl Diagnostic for TypeInferenceError {
                 }
                 TypeResolutionError::UnknownExpressionReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
-                    let module_path = builder.format_module(module_id);
+                    let module_slug = builder.format_module_slug(module_id);
                     builder
                         .with_primary_label(format!("cannot find `{}`", path_str))
-                        .with_help(format!("No value named `{}` found in module `{}`", path_str, module_path))
+                        .with_help(format!("No value named `{}` found in module `{}`", path_str, module_slug))
                 }
                 TypeResolutionError::UnknownPatternReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
-                    let module_path = builder.format_module(module_id);
+                    let module_slug = builder.format_module_slug(module_id);
                     builder
                         .with_primary_label(format!("cannot find `{}`", path_str))
-                        .with_help(format!("No pattern named `{}` found in module `{}`", path_str, module_path))
+                        .with_help(format!("No pattern named `{}` found in module `{}`", path_str, module_slug))
                 }
                 TypeResolutionError::UnknownTypeReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
-                    let module_path = builder.format_module(module_id);
+                    let module_slug = builder.format_module_slug(module_id);
                     builder
                         .with_primary_label(format!("cannot find type `{}`", path_str))
-                        .with_help(format!("No type named `{}` found in module `{}`", path_str, module_path))
+                        .with_help(format!("No type named `{}` found in module `{}`", path_str, module_slug))
                 }
                 TypeResolutionError::UnknownTypeDefinition { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
-                    let module_path = builder.format_module(module_id);
+                    let module_slug = builder.format_module_slug(module_id);
                     builder
                         .with_primary_label(format!("cannot find type `{}`", path_str))
-                        .with_help(format!("No type definition named `{}` found in module `{}`", path_str, module_path))
+                        .with_help(format!("No type definition named `{}` found in module `{}`", path_str, module_slug))
                 }
                 TypeResolutionError::UnknownTypeDefinitionVariant { variant_name, .. } => {
                     builder
@@ -211,10 +211,10 @@ impl Diagnostic for TypeInferenceError {
                 }
                 TypeResolutionError::UnknownTraitReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
-                    let module_path = builder.format_module(module_id);
+                    let module_slug = builder.format_module_slug(module_id);
                     builder
                         .with_primary_label(format!("cannot find trait `{}`", path_str))
-                        .with_help(format!("No trait named `{}` found in module `{}`", path_str, module_path))
+                        .with_help(format!("No trait named `{}` found in module `{}`", path_str, module_slug))
                 }
                 TypeResolutionError::UnknownTraitMember { subname, .. } => {
                     builder

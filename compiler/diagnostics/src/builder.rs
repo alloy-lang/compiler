@@ -28,7 +28,7 @@ impl<'a> DiagnosticBuilder<'a> {
         }
     }
 
-    pub fn format_module(&self, module_id: &alloy_workspace::ModuleId) -> String {
+    pub fn format_module_slug(&self, module_id: &alloy_workspace::ModuleId) -> String {
         module_id.path(self.db)
     }
 
