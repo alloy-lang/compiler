@@ -24,6 +24,9 @@ HirModule {
             "item": Named(
                 OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "test_data",
+                        },
                         module: NonEmpty(
                             [
                                 "test_data",
@@ -87,6 +90,9 @@ HirModule {
             "item": Named(
                 OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "test_data",
+                        },
                         module: NonEmpty(
                             [
                                 "test_data",

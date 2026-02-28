@@ -1,4 +1,3 @@
-use non_empty_vec::NonEmpty;
 use std::fmt;
 
 mod ast_glossary;
@@ -10,6 +9,8 @@ pub use diagnostics::*;
 pub use hir::*;
 pub use hir_module::HirModule;
 
+mod fqn;
+pub use fqn::Fqn;
 mod index;
 #[cfg(test)]
 mod tests;
@@ -66,101 +67,5 @@ impl From<&str> for Name {
 impl From<&String> for Name {
     fn from(name: &String) -> Self {
         Self(name.to_string())
-    }
-}
-
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub struct Fqn {
-    pub module: NonEmpty<Name>,
-    pub name: Name,
-    pub sub_path: Option<Name>,
-}
-
-impl Fqn {
-    pub fn new(
-        module: impl IntoIterator<Item = impl Into<Name>>,
-        local_name: impl Into<Name>,
-        sub_path: impl IntoIterator<Item = impl Into<Name>>,
-    ) -> Self {
-        let sub_path_vec: Vec<Name> = sub_path.into_iter().map(Into::into).collect();
-        let had_sub_path = !sub_path_vec.is_empty();
-
-        // Build the full path from all segments
-        let mut all_segments: Vec<Name> = module.into_iter().map(Into::into).collect();
-        let local_name = local_name.into();
-        all_segments.push(local_name);
-        all_segments.extend(sub_path_vec);
-
-        // We need at least 1 segment
-        assert!(
-            !all_segments.is_empty(),
-            "Cannot create Fqn with empty path"
-        );
-
-        match all_segments.len() {
-            // Single segment: use it for both module and name, no sub_path
-            1 => {
-                let name = all_segments[0].clone();
-                let module = unsafe { NonEmpty::new_unchecked(all_segments) };
-                Self {
-                    module,
-                    name,
-                    sub_path: None,
-                }
-            }
-            // Two segments: split as module=[first], name=second, sub_path=None
-            2 => {
-                let name = all_segments.pop().unwrap();
-                let module = unsafe { NonEmpty::new_unchecked(all_segments) };
-                Self {
-                    module,
-                    name,
-                    sub_path: None,
-                }
-            }
-            // Three or more: check if we had sub_path to decide how to split
-            _ => {
-                if had_sub_path {
-                    // Had sub_path: split as module=[...], name=second-to-last, sub_path=last
-                    let sub_path = all_segments.pop();
-                    let name = all_segments.pop().unwrap();
-                    let module = unsafe { NonEmpty::new_unchecked(all_segments) };
-                    Self {
-                        module,
-                        name,
-                        sub_path,
-                    }
-                } else {
-                    // No sub_path: split as module=[...], name=last, sub_path=None
-                    let name = all_segments.pop().unwrap();
-                    let module = unsafe { NonEmpty::new_unchecked(all_segments) };
-                    Self {
-                        module,
-                        name,
-                        sub_path: None,
-                    }
-                }
-            }
-        }
-    }
-
-    pub fn module_slug(&self) -> String {
-        self.module
-            .iter()
-            .map(|n| n.as_str())
-            .collect::<Vec<_>>()
-            .join("::")
-    }
-
-    pub fn segments(&self) -> NonEmpty<Name> {
-        let mut segments = unsafe { NonEmpty::new_unchecked(vec![]) };
-        for segment in self.module.iter() {
-            segments.push(segment.clone());
-        }
-        segments.push(self.name.clone());
-        if let Some(segment) = &self.sub_path {
-            segments.push(segment.clone());
-        }
-        segments
     }
 }

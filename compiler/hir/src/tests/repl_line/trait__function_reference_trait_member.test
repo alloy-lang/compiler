@@ -1,0 +1,463 @@
+trait TestTrait where
+  self = #Type[_]
+  typeof test_func : (a -> self[b]) -> self[a] -> self[b] where
+    typevar a
+    typevar b
+end
+
+typeof (=<<) : (t1 -> m[t2]) -> m[t1] -> m[t2] where
+  typevar m = TestTrait
+  typevar t1
+  typevar t2
+let (=<<) = TestTrait::test_func
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: ThisModule {
+                    name: "TestTrait",
+                    subname: Some(
+                        "test_func",
+                    ),
+                    scope: Idx::<Scope>(0),
+                    resolution_kind: Trait,
+                    resolution_idx: Trait(
+                        Idx::<Trait>(0),
+                    ),
+                },
+                scope: Idx::<Scope>(0),
+            },
+            "name": "=<<",
+            "range": 240..272,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule {
+                    name: "a",
+                    subname: None,
+                    scope: Idx::<Scope>(2),
+                    resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(0),
+                    ),
+                },
+            ),
+            "range": 62..64,
+        },
+        Idx::<TypeReference>(1): {
+            "item": SelfRef(
+                Idx::<Scope>(2),
+            ),
+            "range": 67..71,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Named(
+                ThisModule {
+                    name: "b",
+                    subname: None,
+                    scope: Idx::<Scope>(2),
+                    resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(1),
+                    ),
+                },
+            ),
+            "range": 72..73,
+        },
+        Idx::<TypeReference>(3): {
+            "item": Bounded {
+                base: Idx::<TypeReference>(1),
+                args: [
+                    Idx::<TypeReference>(2),
+                ],
+            },
+            "range": 67..74,
+        },
+        Idx::<TypeReference>(4): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(0),
+                return_type: Idx::<TypeReference>(3),
+            },
+            "range": 62..74,
+        },
+        Idx::<TypeReference>(5): {
+            "item": ParenthesizedType(
+                Idx::<TypeReference>(4),
+            ),
+            "range": 61..76,
+        },
+        Idx::<TypeReference>(6): {
+            "item": SelfRef(
+                Idx::<Scope>(2),
+            ),
+            "range": 79..83,
+        },
+        Idx::<TypeReference>(7): {
+            "item": Named(
+                ThisModule {
+                    name: "a",
+                    subname: None,
+                    scope: Idx::<Scope>(2),
+                    resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(0),
+                    ),
+                },
+            ),
+            "range": 84..85,
+        },
+        Idx::<TypeReference>(8): {
+            "item": Bounded {
+                base: Idx::<TypeReference>(6),
+                args: [
+                    Idx::<TypeReference>(7),
+                ],
+            },
+            "range": 79..87,
+        },
+        Idx::<TypeReference>(9): {
+            "item": SelfRef(
+                Idx::<Scope>(2),
+            ),
+            "range": 90..94,
+        },
+        Idx::<TypeReference>(10): {
+            "item": Named(
+                ThisModule {
+                    name: "b",
+                    subname: None,
+                    scope: Idx::<Scope>(2),
+                    resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(1),
+                    ),
+                },
+            ),
+            "range": 95..96,
+        },
+        Idx::<TypeReference>(11): {
+            "item": Bounded {
+                base: Idx::<TypeReference>(9),
+                args: [
+                    Idx::<TypeReference>(10),
+                ],
+            },
+            "range": 90..98,
+        },
+        Idx::<TypeReference>(12): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(8),
+                return_type: Idx::<TypeReference>(11),
+            },
+            "range": 79..98,
+        },
+        Idx::<TypeReference>(13): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(5),
+                return_type: Idx::<TypeReference>(12),
+            },
+            "name": "test_func",
+            "range": 61..98,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeReference>(14): {
+            "item": Named(
+                ThisModule {
+                    name: "TestTrait",
+                    subname: None,
+                    scope: Idx::<Scope>(0),
+                    resolution_kind: Trait,
+                    resolution_idx: Trait(
+                        Idx::<Trait>(0),
+                    ),
+                },
+            ),
+            "range": 204..216,
+        },
+        Idx::<TypeReference>(15): {
+            "item": Named(
+                ThisModule {
+                    name: "t1",
+                    subname: None,
+                    scope: Idx::<Scope>(3),
+                    resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(3),
+                    ),
+                },
+            ),
+            "range": 153..156,
+        },
+        Idx::<TypeReference>(16): {
+            "item": Named(
+                ThisModule {
+                    name: "m",
+                    subname: None,
+                    scope: Idx::<Scope>(3),
+                    resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(2),
+                    ),
+                },
+            ),
+            "range": 159..160,
+        },
+        Idx::<TypeReference>(17): {
+            "item": Named(
+                ThisModule {
+                    name: "t2",
+                    subname: None,
+                    scope: Idx::<Scope>(3),
+                    resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(4),
+                    ),
+                },
+            ),
+            "range": 161..163,
+        },
+        Idx::<TypeReference>(18): {
+            "item": Bounded {
+                base: Idx::<TypeReference>(16),
+                args: [
+                    Idx::<TypeReference>(17),
+                ],
+            },
+            "range": 159..164,
+        },
+        Idx::<TypeReference>(19): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(15),
+                return_type: Idx::<TypeReference>(18),
+            },
+            "range": 153..164,
+        },
+        Idx::<TypeReference>(20): {
+            "item": ParenthesizedType(
+                Idx::<TypeReference>(19),
+            ),
+            "range": 152..166,
+        },
+        Idx::<TypeReference>(21): {
+            "item": Named(
+                ThisModule {
+                    name: "m",
+                    subname: None,
+                    scope: Idx::<Scope>(3),
+                    resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(2),
+                    ),
+                },
+            ),
+            "range": 169..170,
+        },
+        Idx::<TypeReference>(22): {
+            "item": Named(
+                ThisModule {
+                    name: "t1",
+                    subname: None,
+                    scope: Idx::<Scope>(3),
+                    resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(3),
+                    ),
+                },
+            ),
+            "range": 171..173,
+        },
+        Idx::<TypeReference>(23): {
+            "item": Bounded {
+                base: Idx::<TypeReference>(21),
+                args: [
+                    Idx::<TypeReference>(22),
+                ],
+            },
+            "range": 169..175,
+        },
+        Idx::<TypeReference>(24): {
+            "item": Named(
+                ThisModule {
+                    name: "m",
+                    subname: None,
+                    scope: Idx::<Scope>(3),
+                    resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(2),
+                    ),
+                },
+            ),
+            "range": 178..179,
+        },
+        Idx::<TypeReference>(25): {
+            "item": Named(
+                ThisModule {
+                    name: "t2",
+                    subname: None,
+                    scope: Idx::<Scope>(3),
+                    resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(4),
+                    ),
+                },
+            ),
+            "range": 180..182,
+        },
+        Idx::<TypeReference>(26): {
+            "item": Bounded {
+                base: Idx::<TypeReference>(24),
+                args: [
+                    Idx::<TypeReference>(25),
+                ],
+            },
+            "range": 178..184,
+        },
+        Idx::<TypeReference>(27): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(23),
+                return_type: Idx::<TypeReference>(26),
+            },
+            "range": 169..184,
+        },
+        Idx::<TypeReference>(28): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(20),
+                return_type: Idx::<TypeReference>(27),
+            },
+            "name": "=<<",
+            "range": 152..184,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "a",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "a",
+            "range": 108..122,
+            "scope_id": Idx::<Scope>(2),
+        },
+        Idx::<TypeDefinition>(1): {
+            "item": TypeDefinition {
+                name: "b",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "b",
+            "range": 122..132,
+            "scope_id": Idx::<Scope>(2),
+        },
+        Idx::<TypeDefinition>(2): {
+            "item": TypeDefinition {
+                name: "m",
+                kind: TypeVariable(
+                    Constrained(
+                        NonEmpty(
+                            [
+                                Trait(
+                                    Idx::<TypeReference>(14),
+                                ),
+                            ],
+                        ),
+                    ),
+                ),
+            },
+            "name": "m",
+            "range": 192..216,
+            "scope_id": Idx::<Scope>(3),
+        },
+        Idx::<TypeDefinition>(3): {
+            "item": TypeDefinition {
+                name: "t1",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t1",
+            "range": 216..229,
+            "scope_id": Idx::<Scope>(3),
+        },
+        Idx::<TypeDefinition>(4): {
+            "item": TypeDefinition {
+                name: "t2",
+                kind: TypeVariable(
+                    Unbound,
+                ),
+            },
+            "name": "t2",
+            "range": 229..240,
+            "scope_id": Idx::<Scope>(3),
+        },
+    },
+    traits: Index::<Trait> {
+        Idx::<Trait>(0): {
+            "item": Trait {
+                name: "TestTrait",
+                scope: Idx::<Scope>(1),
+                self_constraints: [
+                    Kind(
+                        1,
+                    ),
+                ],
+                named_type_variables: {},
+                members: [
+                    Abstract {
+                        name: "test_func",
+                        type_annotation: Idx::<TypeReference>(13),
+                    },
+                ],
+            },
+            "name": "TestTrait",
+            "range": 0..137,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        "=<<": ValueDefinition {
+            name: "=<<",
+            type_annotation: Some(
+                Idx::<TypeReference>(28),
+            ),
+            value: Idx::<Expression>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 4,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "trait",
+                },
+                Scope {
+                    parent: Idx::<Scope>(1),
+                    tag: "type annotation",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [],
+}
+[]

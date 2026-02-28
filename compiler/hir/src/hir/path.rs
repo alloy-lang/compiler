@@ -13,6 +13,7 @@ pub enum Path {
     },
     OtherModule(Fqn, Vec<ResolutionKind>),
     Unknown(NonEmpty<Name>),
+    UnknownModule(NonEmpty<Name>),
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -52,6 +53,12 @@ impl fmt::Display for Path {
                 .join("::")
                 .fmt(f),
             Path::Unknown(names) => names
+                .iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>()
+                .join("::")
+                .fmt(f),
+            Path::UnknownModule(module) => module
                 .iter()
                 .map(ToString::to_string)
                 .collect::<Vec<_>>()

@@ -23,6 +23,9 @@ HirModule {
             "item": VariableRef {
                 path: OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "std::option",
+                        },
                         module: NonEmpty(
                             [
                                 "std",

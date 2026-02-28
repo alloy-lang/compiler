@@ -1,8 +1,8 @@
-import other
+import test_data
 
 typedef Type1 = Thing
 
-behavior other::Trait1 for Type1 where
+behavior test_data::Trait1 for Type1 where
     -- imagine all the things here
 end
 ===
@@ -11,10 +11,10 @@ HirModule {
         Idx::<Import>(0): {
             "item": Import {
                 segments: [],
-                last: "other",
+                last: "test_data",
             },
-            "name": "other",
-            "range": 0..14,
+            "name": "test_data",
+            "range": 0..18,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -25,9 +25,12 @@ HirModule {
             "item": Named(
                 OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "test_data",
+                        },
                         module: NonEmpty(
                             [
-                                "other",
+                                "test_data",
                             ],
                         ),
                         name: "Trait1",
@@ -39,7 +42,7 @@ HirModule {
                     ],
                 ),
             ),
-            "range": 46..60,
+            "range": 50..68,
         },
         Idx::<TypeReference>(1): {
             "item": Named(
@@ -53,7 +56,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 64..70,
+            "range": 72..78,
         },
     },
     type_definitions: Index::<TypeDefinition> {
@@ -68,7 +71,7 @@ HirModule {
                 ),
             },
             "name": "Type1",
-            "range": 14..37,
+            "range": 18..41,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -86,7 +89,7 @@ HirModule {
                 Idx::<TypeReference>(1),
                 Idx::<TypeReference>(0),
             ),
-            "range": 37..114,
+            "range": 41..122,
             "scope_id": Idx::<Scope>(0),
         },
     },

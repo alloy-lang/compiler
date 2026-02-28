@@ -38,6 +38,9 @@ HirModule {
             "item": VariableRef {
                 path: OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "test_data",
+                        },
                         module: NonEmpty(
                             [
                                 "test_data",
@@ -141,6 +144,9 @@ HirModule {
                 op: Custom(
                     OtherModule(
                         Fqn {
+                            module_id: ModuleId {
+                                path: "std::function",
+                            },
                             module: NonEmpty(
                                 [
                                     "std",
@@ -277,6 +283,9 @@ HirModule {
             "item": Named(
                 OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "test_data",
+                        },
                         module: NonEmpty(
                             [
                                 "test_data",

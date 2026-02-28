@@ -43,6 +43,7 @@ pub(crate) fn resolve_type_definition_by_path_variant(
         hir::Path::ThisModule { subname, .. } => subname.clone(),
         hir::Path::OtherModule(fqn, _resolution_kinds) => fqn.sub_path.clone(),
         hir::Path::Unknown(_) => None,
+        hir::Path::UnknownModule(_) => None,
     };
 
     let type_def_fql = resolver::resolve_by_path::<hir::TypeDefinition, TypeDefinitionResolver>(

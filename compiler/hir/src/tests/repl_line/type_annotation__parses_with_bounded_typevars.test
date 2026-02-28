@@ -26,6 +26,9 @@ HirModule {
             "item": Named(
                 OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "std::option",
+                        },
                         module: NonEmpty(
                             [
                                 "std",
@@ -97,6 +100,9 @@ HirModule {
             "item": Named(
                 OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "std::option",
+                        },
                         module: NonEmpty(
                             [
                                 "std",
@@ -141,6 +147,9 @@ HirModule {
             "item": Named(
                 OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "std::option",
+                        },
                         module: NonEmpty(
                             [
                                 "std",

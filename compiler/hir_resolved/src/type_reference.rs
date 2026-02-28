@@ -116,7 +116,7 @@ mod tests {
     #[test]
     fn test_resolve_type_reference_cross_module() {
         let mut db = TestHirResDatabase::new_with_stdlib();
-        db.add_module(
+        let types_module_id = db.add_module(
             "types",
             camino::Utf8Path::new("./types.alloy"),
             r"
@@ -135,6 +135,7 @@ mod tests {
 
         // Test that unknown cross-module type references return None
         let fqn = hir::Fqn {
+            module_id: types_module_id,
             module: ne_vec![hir::Name::new("types")],
             name: hir::Name::new("MyType"),
             sub_path: None,
@@ -151,7 +152,7 @@ mod tests {
     #[test]
     fn test_resolve_type_reference_cross_module_returns_none_for_unknown() {
         let mut db = TestHirResDatabase::new_with_stdlib();
-        db.add_module(
+        let types_module_id = db.add_module(
             "types",
             camino::Utf8Path::new("./types.alloy"),
             r"
@@ -170,6 +171,7 @@ mod tests {
 
         // Test that unknown cross-module type references return None
         let fqn = hir::Fqn {
+            module_id: types_module_id,
             module: ne_vec![hir::Name::new("types")],
             name: hir::Name::new("UnknownType"),
             sub_path: None,

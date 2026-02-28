@@ -1,18 +1,16 @@
-import test_data::ResultThing
+import std
 
-let foo = ResultThing:More:Stuff:here
+let foo = std:option:Option:None
 ===
 HirModule {
     imports: Index::<Import> {
         Idx::<Import>(0): {
             "item": Import {
-                segments: [
-                    "test_data",
-                ],
-                last: "ResultThing",
+                segments: [],
+                last: "std",
             },
-            "name": "ResultThing",
-            "range": 0..31,
+            "name": "std",
+            "range": 0..12,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -21,16 +19,18 @@ HirModule {
             "item": VariableRef {
                 path: OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "std::option",
+                        },
                         module: NonEmpty(
                             [
-                                "test_data",
-                                "ResultThing",
-                                "More",
+                                "std",
+                                "option",
                             ],
                         ),
-                        name: "Stuff",
+                        name: "Option",
                         sub_path: Some(
-                            "here",
+                            "None",
                         ),
                     },
                     [
@@ -43,7 +43,7 @@ HirModule {
                 scope: Idx::<Scope>(0),
             },
             "name": "foo",
-            "range": 31..68,
+            "range": 12..44,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -81,7 +81,7 @@ HirModule {
         ],
         kind: Unexpected {
             found: Colon,
-            range: 52..53,
+            range: 25..26,
         },
         context: VariableRef,
     },
@@ -91,7 +91,7 @@ HirModule {
         ],
         kind: Unexpected {
             found: Colon,
-            range: 57..58,
+            range: 32..33,
         },
         context: VariableRef,
     },
@@ -101,7 +101,7 @@ HirModule {
         ],
         kind: Unexpected {
             found: Colon,
-            range: 63..64,
+            range: 39..40,
         },
         context: VariableRef,
     },

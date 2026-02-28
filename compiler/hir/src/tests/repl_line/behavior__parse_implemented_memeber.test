@@ -90,6 +90,9 @@ HirModule {
             "item": FunctionCall {
                 target: OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "std::bool",
+                        },
                         module: NonEmpty(
                             [
                                 "std",
@@ -157,6 +160,9 @@ HirModule {
             "item": Named(
                 OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "std::eq",
+                        },
                         module: NonEmpty(
                             [
                                 "std",

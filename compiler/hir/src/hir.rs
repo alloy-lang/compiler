@@ -62,6 +62,7 @@ pub use type_definition::*;
 
 mod value;
 
+use crate::fqn::Fqn;
 pub use crate::hir_module::ValueDefinition;
 use crate::index::Index;
 use value::*;
@@ -232,19 +233,34 @@ impl<'db> LoweringCtx<'db> {
                 self.used_imports.insert(import_id);
 
                 let import = self.imports.get(import_id);
-                let fqn = Fqn::new(
+                let fqn = Fqn::resolve(
+                    self.db,
                     import.segments().iter().cloned(),
                     local_name.clone(),
                     rest.to_vec(),
                 );
 
-                let resolution_kinds = [
-                    resolution_kinds,
-                    &[ResolutionKind::Trait, ResolutionKind::TypeDefinition],
-                ]
-                .concat();
+                return match fqn {
+                    Ok(fqn) => {
+                        let resolution_kinds = [
+                            resolution_kinds,
+                            &[ResolutionKind::Trait, ResolutionKind::TypeDefinition],
+                        ]
+                        .concat();
 
-                return Some(Path::OtherModule(fqn, resolution_kinds));
+                        Some(Path::OtherModule(fqn, resolution_kinds))
+                    }
+                    Err(module) => {
+                        let path = self.report_unknown_module(
+                            path_range,
+                            reference_type,
+                            module,
+                            local_name,
+                        );
+
+                        Some(path)
+                    }
+                };
             }
 
             let path =
@@ -279,6 +295,24 @@ impl<'db> LoweringCtx<'db> {
             path_range,
         );
         Path::Unknown(segments)
+    }
+
+    fn report_unknown_module(
+        &mut self,
+        path_range: TextRange,
+        reference_type: HirReferenceType,
+        module: NonEmpty<Name>,
+        local_name: Name,
+    ) -> Path {
+        self.error(
+            LoweringErrorKind::UnknownModule {
+                reference: local_name,
+                reference_type,
+                module: module.clone(),
+            },
+            path_range,
+        );
+        Path::UnknownModule(module)
     }
 
     fn resolve_expression_reference(

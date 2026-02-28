@@ -1,5 +1,5 @@
 use alloy_workspace::WorkspaceDatabase;
-use camino::Utf8Path;
+use salsa::Database;
 use std::env;
 use std::path::Path;
 
@@ -66,8 +66,20 @@ fn run_hir_test(
     expect_lowering_errors: bool,
 ) -> String {
     let mut db = TestHirDatabase::default();
+    db.add_test_module(
+        "test_data",
+        r"
+    typedef Test[t] = Thing t
+    let test = Test(0)
+    let new = |t| -> Test(t)
 
-    let module_id = db.add_module("test", Utf8Path::from_path(path).unwrap(), input);
+    trait Trait1 where
+        -- empty
+    end
+    ",
+    );
+
+    let module_id = db.add_module("test", camino::Utf8Path::from_path(path).unwrap(), input);
     let (module, parse_errors) = crate::lower_file(&db, module_id);
 
     let file_name = path.to_str().expect("Expected filename");
@@ -104,7 +116,7 @@ fn run_hir_test(
         // );
     }
 
-    format!("{:#?}\n{parse_errors:#?}", module)
+    db.attach(|_| format!("{:#?}\n{parse_errors:#?}", module))
 }
 
 #[test]

@@ -25,15 +25,17 @@ HirModule {
             "item": Named(
                 OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "std::functor",
+                        },
                         module: NonEmpty(
                             [
                                 "std",
+                                "functor",
                             ],
                         ),
-                        name: "functor",
-                        sub_path: Some(
-                            "Functor",
-                        ),
+                        name: "Functor",
+                        sub_path: None,
                     },
                     [
                         Trait,

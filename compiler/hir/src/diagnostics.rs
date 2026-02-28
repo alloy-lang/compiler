@@ -65,6 +65,11 @@ pub enum LoweringErrorKind {
         path: NonEmpty<Name>,
         current_scope: ScopeIdx,
     },
+    UnknownModule {
+        reference: Name,
+        reference_type: HirReferenceType,
+        module: NonEmpty<Name>,
+    },
     MultipleSelfTypeVariablesInTraitDefinition {
         trait_name: Name,
         ranges: Vec<TextRange>,

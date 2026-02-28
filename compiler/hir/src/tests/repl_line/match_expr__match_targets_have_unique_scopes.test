@@ -36,6 +36,9 @@ HirModule {
             "item": VariableRef {
                 path: OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "test_data",
+                        },
                         module: NonEmpty(
                             [
                                 "test_data",
@@ -115,6 +118,9 @@ HirModule {
             "item": Destructure {
                 target: OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "std::either",
+                        },
                         module: NonEmpty(
                             [
                                 "std",
@@ -150,6 +156,9 @@ HirModule {
             "item": Destructure {
                 target: OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "std::either",
+                        },
                         module: NonEmpty(
                             [
                                 "std",

@@ -26,6 +26,9 @@ HirModule {
             "item": Named(
                 OtherModule(
                     Fqn {
+                        module_id: ModuleId {
+                            path: "std::functor",
+                        },
                         module: NonEmpty(
                             [
                                 "std",
