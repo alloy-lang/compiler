@@ -82,6 +82,17 @@ macro_rules! test_database {
             }
         }
 
+        impl $name {
+            pub fn add_test_module(
+                &mut self,
+                slug: &str,
+                contents: &str,
+            ) -> alloy_workspace::ModuleId {
+                use alloy_workspace::WorkspaceDatabase;
+                self.add_module(slug, &camino::Utf8Path::new(&format!("test:{}", slug)), contents)
+            }
+        }
+
         #[salsa::db]
         impl alloy_ast::AstDatabase for $name {}
 
