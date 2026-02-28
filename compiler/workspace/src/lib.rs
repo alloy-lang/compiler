@@ -66,19 +66,19 @@ pub fn prepare_module(
     let file = RawSourceFile::new(db, Arc::from(path.as_str()), Arc::from(contents));
 
     // Prepare virtual module data
-    let virtual_slugs = Workspace::compound_slugs(slug);
-    let virtual_entries: Vec<(ModuleId, String)> = virtual_slugs
-        .iter()
-        .map(|&virtual_slug| {
-            let virtual_module_id = ModuleId::new(db, virtual_slug.to_string());
-            (virtual_module_id, virtual_slug.to_string())
-        })
-        .collect();
+    // let virtual_slugs = Workspace::compound_slugs(slug);
+    // let virtual_entries: Vec<(ModuleId, String)> = virtual_slugs
+    //     .iter()
+    //     .map(|&virtual_slug| {
+    //         let virtual_module_id = ModuleId::new(db, virtual_slug.to_string());
+    //         (virtual_module_id, virtual_slug.to_string())
+    //     })
+    //     .collect();
 
     PreparedModule {
         module_id,
         file,
-        virtual_entries,
+        virtual_entries: vec![],
     }
 }
 
