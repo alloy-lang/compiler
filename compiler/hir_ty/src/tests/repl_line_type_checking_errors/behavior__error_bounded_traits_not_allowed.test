@@ -19,15 +19,15 @@ HirTypedModule {
             kind: TypeResolutionError(
                 BoundedTraitReference {
                     source_ref: Fql {
-                        module_id: ModuleId(
-                            Id(4),
-                        ),
+                        module_id: ModuleId {
+                            path: "main",
+                        },
                         local_id: Idx::<TypeReference>(3),
                     },
                     target_ref: Fql {
-                        module_id: ModuleId(
-                            Id(4),
-                        ),
+                        module_id: ModuleId {
+                            path: "main",
+                        },
                         local_id: Idx::<TypeReference>(0),
                     },
                 },

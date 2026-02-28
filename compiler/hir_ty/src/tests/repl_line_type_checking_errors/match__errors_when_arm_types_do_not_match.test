@@ -14,9 +14,9 @@ HirTypedModule {
         Idx::<Expression>(0): Bounded {
             base: TypeDef(
                 Fql {
-                    module_id: ModuleId(
-                        Id(0),
-                    ),
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
                     local_id: Idx::<TypeDefinition>(1),
                 },
                 "Test",
@@ -39,17 +39,17 @@ HirTypedModule {
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            1,
+            2,
         ),
         Idx::<Pattern>(2): Generic(
-            2,
+            1,
         ),
         Idx::<Pattern>(1): Bounded {
             base: TypeDef(
                 Fql {
-                    module_id: ModuleId(
-                        Id(0),
-                    ),
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
                     local_id: Idx::<TypeDefinition>(1),
                 },
                 "Test",
@@ -63,9 +63,9 @@ HirTypedModule {
         Idx::<Pattern>(3): Bounded {
             base: TypeDef(
                 Fql {
-                    module_id: ModuleId(
-                        Id(0),
-                    ),
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
                     local_id: Idx::<TypeDefinition>(1),
                 },
                 "Test",
@@ -96,17 +96,17 @@ HirTypedModule {
     poly_instantiations: {
         TypeDefinition(
             Fql {
-                module_id: ModuleId(
-                    Id(0),
-                ),
+                module_id: ModuleId {
+                    path: "test_data",
+                },
                 local_id: Idx::<TypeDefinition>(1),
             },
         ): [
             PolyInstantiation {
                 call_site: Fql {
-                    module_id: ModuleId(
-                        Id(0),
-                    ),
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
                     local_id: Idx::<Expression>(1),
                 },
                 type_args: [

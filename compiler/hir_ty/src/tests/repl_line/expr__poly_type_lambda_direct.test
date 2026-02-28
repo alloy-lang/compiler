@@ -42,17 +42,17 @@ HirTypedModule {
     poly_instantiations: {
         Expression(
             Fql {
-                module_id: ModuleId(
-                    Id(4),
-                ),
+                module_id: ModuleId {
+                    path: "main",
+                },
                 local_id: Idx::<Expression>(1),
             },
         ): [
             PolyInstantiation {
                 call_site: Fql {
-                    module_id: ModuleId(
-                        Id(4),
-                    ),
+                    module_id: ModuleId {
+                        path: "main",
+                    },
                     local_id: Idx::<Expression>(3),
                 },
                 type_args: [
@@ -63,9 +63,9 @@ HirTypedModule {
             },
             PolyInstantiation {
                 call_site: Fql {
-                    module_id: ModuleId(
-                        Id(4),
-                    ),
+                    module_id: ModuleId {
+                        path: "main",
+                    },
                     local_id: Idx::<Expression>(5),
                 },
                 type_args: [

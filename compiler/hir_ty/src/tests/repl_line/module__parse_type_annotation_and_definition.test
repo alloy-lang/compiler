@@ -12,21 +12,21 @@ HirTypedModule {
     expression_types: {
         Idx::<Expression>(0): Lambda {
             arg_type: Generic(
-                3,
+                2,
             ),
             return_type: Bounded {
                 base: TypeDef(
                     Fql {
-                        module_id: ModuleId(
-                            Id(0),
-                        ),
+                        module_id: ModuleId {
+                            path: "test_data",
+                        },
                         local_id: Idx::<TypeDefinition>(1),
                     },
                     "Test",
                 ),
                 args: [
                     Generic(
-                        3,
+                        2,
                     ),
                 ],
             },
@@ -34,37 +34,37 @@ HirTypedModule {
         Idx::<Expression>(7): Lambda {
             arg_type: Lambda {
                 arg_type: Generic(
-                    1,
+                    0,
                 ),
                 return_type: Generic(
-                    2,
+                    1,
                 ),
             },
             return_type: Lambda {
                 arg_type: Generic(
-                    1,
+                    0,
                 ),
                 return_type: Lambda {
                     arg_type: Generic(
-                        1,
+                        0,
                     ),
                     return_type: Lambda {
                         arg_type: Generic(
-                            3,
+                            2,
                         ),
                         return_type: Bounded {
                             base: TypeDef(
                                 Fql {
-                                    module_id: ModuleId(
-                                        Id(0),
-                                    ),
+                                    module_id: ModuleId {
+                                        path: "test_data",
+                                    },
                                     local_id: Idx::<TypeDefinition>(1),
                                 },
                                 "Test",
                             ),
                             args: [
                                 Generic(
-                                    3,
+                                    2,
                                 ),
                             ],
                         },
@@ -73,19 +73,19 @@ HirTypedModule {
             },
         },
         Idx::<Expression>(4): Generic(
-            2,
+            1,
         ),
         Idx::<Expression>(1): Generic(
-            1,
+            0,
         ),
         Idx::<Expression>(5): Tuple(
             NonEmpty(
                 [
                     Generic(
-                        2,
+                        1,
                     ),
                     Generic(
-                        2,
+                        1,
                     ),
                 ],
             ),
@@ -95,21 +95,21 @@ HirTypedModule {
         ),
         Idx::<Expression>(6): Lambda {
             arg_type: Generic(
-                3,
+                2,
             ),
             return_type: Bounded {
                 base: TypeDef(
                     Fql {
-                        module_id: ModuleId(
-                            Id(0),
-                        ),
+                        module_id: ModuleId {
+                            path: "test_data",
+                        },
                         local_id: Idx::<TypeDefinition>(1),
                     },
                     "Test",
                 ),
                 args: [
                     Generic(
-                        3,
+                        2,
                     ),
                 ],
             },
@@ -117,29 +117,34 @@ HirTypedModule {
         Idx::<Expression>(3): Bounded {
             base: TypeDef(
                 Fql {
-                    module_id: ModuleId(
-                        Id(0),
-                    ),
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
                     local_id: Idx::<TypeDefinition>(1),
                 },
                 "Test",
             ),
             args: [
                 Generic(
-                    3,
+                    2,
                 ),
             ],
         },
     },
     pattern_types: {
-        Idx::<Pattern>(0): Generic(
-            3,
+        Idx::<Pattern>(0): Lambda {
+            arg_type: Generic(
+                0,
+            ),
+            return_type: Generic(
+                1,
+            ),
+        },
+        Idx::<Pattern>(2): Generic(
+            0,
         ),
         Idx::<Pattern>(1): Generic(
-            1,
-        ),
-        Idx::<Pattern>(2): Generic(
-            1,
+            0,
         ),
     },
     warnings: [],
@@ -166,9 +171,9 @@ HirTypedModule {
                             return_type: Bounded {
                                 base: TypeDef(
                                     Fql {
-                                        module_id: ModuleId(
-                                            Id(0),
-                                        ),
+                                        module_id: ModuleId {
+                                            path: "test_data",
+                                        },
                                         local_id: Idx::<TypeDefinition>(1),
                                     },
                                     "Test",
@@ -194,37 +199,37 @@ HirTypedModule {
                 inferred_type: Lambda {
                     arg_type: Lambda {
                         arg_type: Generic(
-                            1,
+                            0,
                         ),
                         return_type: Generic(
-                            2,
+                            1,
                         ),
                     },
                     return_type: Lambda {
                         arg_type: Generic(
-                            1,
+                            0,
                         ),
                         return_type: Lambda {
                             arg_type: Generic(
-                                1,
+                                0,
                             ),
                             return_type: Lambda {
                                 arg_type: Generic(
-                                    3,
+                                    2,
                                 ),
                                 return_type: Bounded {
                                     base: TypeDef(
                                         Fql {
-                                            module_id: ModuleId(
-                                                Id(0),
-                                            ),
+                                            module_id: ModuleId {
+                                                path: "test_data",
+                                            },
                                             local_id: Idx::<TypeDefinition>(1),
                                         },
                                         "Test",
                                     ),
                                     args: [
                                         Generic(
-                                            3,
+                                            2,
                                         ),
                                     ],
                                 },
@@ -236,9 +241,9 @@ HirTypedModule {
                     annotated_type: Bounded {
                         base: TypeDef(
                             Fql {
-                                module_id: ModuleId(
-                                    Id(0),
-                                ),
+                                module_id: ModuleId {
+                                    path: "test_data",
+                                },
                                 local_id: Idx::<TypeDefinition>(1),
                             },
                             "Test",
@@ -260,21 +265,21 @@ HirTypedModule {
                     },
                     inferred_type: Lambda {
                         arg_type: Generic(
-                            3,
+                            2,
                         ),
                         return_type: Bounded {
                             base: TypeDef(
                                 Fql {
-                                    module_id: ModuleId(
-                                        Id(0),
-                                    ),
+                                    module_id: ModuleId {
+                                        path: "test_data",
+                                    },
                                     local_id: Idx::<TypeDefinition>(1),
                                 },
                                 "Test",
                             ),
                             args: [
                                 Generic(
-                                    3,
+                                    2,
                                 ),
                             ],
                         },
@@ -295,9 +300,9 @@ HirTypedModule {
                         App {
                             constructor: TypeDef(
                                 Fql {
-                                    module_id: ModuleId(
-                                        Id(0),
-                                    ),
+                                    module_id: ModuleId {
+                                        path: "test_data",
+                                    },
                                     local_id: Idx::<TypeDefinition>(1),
                                 },
                                 "Test",
@@ -333,22 +338,22 @@ HirTypedModule {
     poly_instantiations: {
         TypeDefinition(
             Fql {
-                module_id: ModuleId(
-                    Id(0),
-                ),
+                module_id: ModuleId {
+                    path: "test_data",
+                },
                 local_id: Idx::<TypeDefinition>(1),
             },
         ): [
             PolyInstantiation {
                 call_site: Fql {
-                    module_id: ModuleId(
-                        Id(0),
-                    ),
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
                     local_id: Idx::<Expression>(3),
                 },
                 type_args: [
                     Generic(
-                        3,
+                        2,
                     ),
                 ],
             },
@@ -356,14 +361,14 @@ HirTypedModule {
     },
 }
 []
-[E001] Error: Type annotation conflict: expected `(t0 -> t1) -> t0 -> t0 -> Test[(t1, t1)]`, found `(t1 -> t2) -> t1 -> t1 -> t3 -> Test[t3]`
+[E001] Error: Type annotation conflict: expected `(t0 -> t1) -> t0 -> t0 -> Test[(t1, t1)]`, found `(t0 -> t1) -> t0 -> t0 -> t2 -> Test[t2]`
    ╭─[ ./test/main.alloy:9:5 ]
    │
  9 │     let testThing = |funky, x, y| -> test_data::new <| (funky(x), funky(y))
    │     ───────────────────────────────────┬───────────────────────────────────  
-   │                                        ╰───────────────────────────────────── expected `Test[(t1, t1)]`, found `t3 -> Test[t3]`
+   │                                        ╰───────────────────────────────────── expected `Test[(t1, t1)]`, found `t2 -> Test[t2]`
    │ 
-   │ Help: The type annotation says this should be `Test[(t1, t1)]`, but type inference determined it to be `t3 -> Test[t3]`
+   │ Help: The type annotation says this should be `Test[(t1, t1)]`, but type inference determined it to be `t2 -> Test[t2]`
 ───╯
 
 [E002] Error: Type mismatch: expected `t0 -> Test[t0]`, found `(t8, t8)`

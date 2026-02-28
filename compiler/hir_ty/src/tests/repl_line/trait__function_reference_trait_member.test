@@ -34,9 +34,9 @@ HirTypedModule {
                                     [
                                         (
                                             Fql {
-                                                module_id: ModuleId(
-                                                    Id(4),
-                                                ),
+                                                module_id: ModuleId {
+                                                    path: "main",
+                                                },
                                                 local_id: Idx::<Trait>(0),
                                             },
                                             "TestTrait",
@@ -59,9 +59,9 @@ HirTypedModule {
                                     [
                                         (
                                             Fql {
-                                                module_id: ModuleId(
-                                                    Id(4),
-                                                ),
+                                                module_id: ModuleId {
+                                                    path: "main",
+                                                },
                                                 local_id: Idx::<Trait>(0),
                                             },
                                             "TestTrait",
@@ -82,9 +82,9 @@ HirTypedModule {
                                     [
                                         (
                                             Fql {
-                                                module_id: ModuleId(
-                                                    Id(4),
-                                                ),
+                                                module_id: ModuleId {
+                                                    path: "main",
+                                                },
                                                 local_id: Idx::<Trait>(0),
                                             },
                                             "TestTrait",
@@ -116,9 +116,9 @@ HirTypedModule {
                                         [
                                             (
                                                 Fql {
-                                                    module_id: ModuleId(
-                                                        Id(4),
-                                                    ),
+                                                    module_id: ModuleId {
+                                                        path: "main",
+                                                    },
                                                     local_id: Idx::<Trait>(0),
                                                 },
                                                 "TestTrait",
@@ -141,9 +141,9 @@ HirTypedModule {
                                         [
                                             (
                                                 Fql {
-                                                    module_id: ModuleId(
-                                                        Id(4),
-                                                    ),
+                                                    module_id: ModuleId {
+                                                        path: "main",
+                                                    },
                                                     local_id: Idx::<Trait>(0),
                                                 },
                                                 "TestTrait",
@@ -164,9 +164,9 @@ HirTypedModule {
                                         [
                                             (
                                                 Fql {
-                                                    module_id: ModuleId(
-                                                        Id(4),
-                                                    ),
+                                                    module_id: ModuleId {
+                                                        path: "main",
+                                                    },
                                                     local_id: Idx::<Trait>(0),
                                                 },
                                                 "TestTrait",
@@ -193,14 +193,14 @@ HirTypedModule {
             kind: TypeResolutionError(
                 UnknownExpressionReference {
                     source_ref: Fql {
-                        module_id: ModuleId(
-                            Id(4),
-                        ),
+                        module_id: ModuleId {
+                            path: "main",
+                        },
                         local_id: Idx::<Expression>(0),
                     },
-                    module_id: ModuleId(
-                        Id(4),
-                    ),
+                    module_id: ModuleId {
+                        path: "main",
+                    },
                     path: NonEmpty(
                         [
                             "TestTrait",

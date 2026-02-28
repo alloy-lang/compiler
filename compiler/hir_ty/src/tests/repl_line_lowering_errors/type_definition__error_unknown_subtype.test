@@ -19,16 +19,16 @@ HirTypedModule {
                 UnknownTypeDefinitionVariant {
                     source_ref: Expression(
                         Fql {
-                            module_id: ModuleId(
-                                Id(4),
-                            ),
+                            module_id: ModuleId {
+                                path: "main",
+                            },
                             local_id: Idx::<Expression>(0),
                         },
                     ),
                     target_type_fql: Fql {
-                        module_id: ModuleId(
-                            Id(4),
-                        ),
+                        module_id: ModuleId {
+                            path: "main",
+                        },
                         local_id: Idx::<TypeDefinition>(0),
                     },
                     variant_name: "Nothing",

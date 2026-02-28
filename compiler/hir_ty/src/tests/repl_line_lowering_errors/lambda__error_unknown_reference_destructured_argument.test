@@ -3,23 +3,23 @@
 HirTypedModule {
     expression_types: {
         Idx::<Expression>(0): Generic(
-            1,
+            0,
         ),
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
-                0,
+                1,
             ),
             return_type: Generic(
-                1,
+                0,
             ),
         },
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            1,
+            0,
         ),
         Idx::<Pattern>(1): Generic(
-            0,
+            1,
         ),
     },
     warnings: [],
@@ -28,14 +28,14 @@ HirTypedModule {
             kind: TypeResolutionError(
                 UnknownPatternReference {
                     source_ref: Fql {
-                        module_id: ModuleId(
-                            Id(4),
-                        ),
+                        module_id: ModuleId {
+                            path: "main",
+                        },
                         local_id: Idx::<Pattern>(1),
                     },
-                    module_id: ModuleId(
-                        Id(4),
-                    ),
+                    module_id: ModuleId {
+                        path: "main",
+                    },
                     path: NonEmpty(
                         [
                             "Option",

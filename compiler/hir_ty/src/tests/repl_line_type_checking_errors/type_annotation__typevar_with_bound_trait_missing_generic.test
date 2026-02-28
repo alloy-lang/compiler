@@ -14,9 +14,9 @@ HirTypedModule {
         Idx::<Expression>(0): Bounded {
             base: TypeDef(
                 Fql {
-                    module_id: ModuleId(
-                        Id(0),
-                    ),
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
                     local_id: Idx::<TypeDefinition>(1),
                 },
                 "Test",
@@ -38,9 +38,9 @@ HirTypedModule {
                 return_type: Bounded {
                     base: TypeDef(
                         Fql {
-                            module_id: ModuleId(
-                                Id(0),
-                            ),
+                            module_id: ModuleId {
+                                path: "test_data",
+                            },
                             local_id: Idx::<TypeDefinition>(1),
                         },
                         "Test",
@@ -73,9 +73,9 @@ HirTypedModule {
                             [
                                 (
                                     Fql {
-                                        module_id: ModuleId(
-                                            Id(4),
-                                        ),
+                                        module_id: ModuleId {
+                                            path: "main",
+                                        },
                                         local_id: Idx::<Trait>(0),
                                     },
                                     "TestTrait1",
@@ -89,9 +89,9 @@ HirTypedModule {
                         ),
                         return_type: TypeDef(
                             Fql {
-                                module_id: ModuleId(
-                                    Id(0),
-                                ),
+                                module_id: ModuleId {
+                                    path: "test_data",
+                                },
                                 local_id: Idx::<TypeDefinition>(1),
                             },
                             "Test",
@@ -109,9 +109,9 @@ HirTypedModule {
                         return_type: Bounded {
                             base: TypeDef(
                                 Fql {
-                                    module_id: ModuleId(
-                                        Id(0),
-                                    ),
+                                    module_id: ModuleId {
+                                        path: "test_data",
+                                    },
                                     local_id: Idx::<TypeDefinition>(1),
                                 },
                                 "Test",
@@ -127,9 +127,9 @@ HirTypedModule {
                 reason: DirectConflict {
                     annotated_type: TypeDef(
                         Fql {
-                            module_id: ModuleId(
-                                Id(0),
-                            ),
+                            module_id: ModuleId {
+                                path: "test_data",
+                            },
                             local_id: Idx::<TypeDefinition>(1),
                         },
                         "Test",
@@ -137,9 +137,9 @@ HirTypedModule {
                     inferred_type: Bounded {
                         base: TypeDef(
                             Fql {
-                                module_id: ModuleId(
-                                    Id(0),
-                                ),
+                                module_id: ModuleId {
+                                    path: "test_data",
+                                },
                                 local_id: Idx::<TypeDefinition>(1),
                             },
                             "Test",
@@ -158,17 +158,17 @@ HirTypedModule {
     poly_instantiations: {
         TypeDefinition(
             Fql {
-                module_id: ModuleId(
-                    Id(0),
-                ),
+                module_id: ModuleId {
+                    path: "test_data",
+                },
                 local_id: Idx::<TypeDefinition>(1),
             },
         ): [
             PolyInstantiation {
                 call_site: Fql {
-                    module_id: ModuleId(
-                        Id(0),
-                    ),
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
                     local_id: Idx::<Expression>(1),
                 },
                 type_args: [

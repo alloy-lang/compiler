@@ -20,9 +20,9 @@ HirTypedModule {
         Idx::<Expression>(4): Bounded {
             base: TypeDef(
                 Fql {
-                    module_id: ModuleId(
-                        Id(1),
-                    ),
+                    module_id: ModuleId {
+                        path: "std::option",
+                    },
                     local_id: Idx::<TypeDefinition>(1),
                 },
                 "Option",
@@ -37,9 +37,9 @@ HirTypedModule {
             arg_type: Bounded {
                 base: TypeDef(
                     Fql {
-                        module_id: ModuleId(
-                            Id(1),
-                        ),
+                        module_id: ModuleId {
+                            path: "std::option",
+                        },
                         local_id: Idx::<TypeDefinition>(1),
                     },
                     "Option",
@@ -57,9 +57,9 @@ HirTypedModule {
         Idx::<Expression>(3): Bounded {
             base: TypeDef(
                 Fql {
-                    module_id: ModuleId(
-                        Id(1),
-                    ),
+                    module_id: ModuleId {
+                        path: "std::option",
+                    },
                     local_id: Idx::<TypeDefinition>(1),
                 },
                 "Option",
@@ -75,9 +75,9 @@ HirTypedModule {
         Idx::<Pattern>(0): Bounded {
             base: TypeDef(
                 Fql {
-                    module_id: ModuleId(
-                        Id(1),
-                    ),
+                    module_id: ModuleId {
+                        path: "std::option",
+                    },
                     local_id: Idx::<TypeDefinition>(1),
                 },
                 "Option",
@@ -108,17 +108,17 @@ HirTypedModule {
     poly_instantiations: {
         TypeDefinition(
             Fql {
-                module_id: ModuleId(
-                    Id(1),
-                ),
+                module_id: ModuleId {
+                    path: "std::option",
+                },
                 local_id: Idx::<TypeDefinition>(1),
             },
         ): [
             PolyInstantiation {
                 call_site: Fql {
-                    module_id: ModuleId(
-                        Id(4),
-                    ),
+                    module_id: ModuleId {
+                        path: "main",
+                    },
                     local_id: Idx::<Expression>(3),
                 },
                 type_args: [

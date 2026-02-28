@@ -1,6 +1,7 @@
 use alloy_diagnostics::DiagnosticsReporter;
 use alloy_hir as hir;
 use alloy_workspace::WorkspaceDatabase;
+use salsa::Database;
 use std::path::Path;
 use std::{env, fs};
 
@@ -149,17 +150,19 @@ fn run_hir_ty_test(
     //     // );
     // }
 
-    if typed_module.errors().is_empty() {
-        format!("{typed_module:#?}\n{parse_errors:#?}")
-    } else {
-        let mut reporter = DiagnosticsReporter::new();
-        reporter.add_all(test_module_id, typed_module.errors().into_iter().cloned());
+    db.attach(|_| {
+        if typed_module.errors().is_empty() {
+            format!("{typed_module:#?}\n{parse_errors:#?}")
+        } else {
+            let mut reporter = DiagnosticsReporter::new();
+            reporter.add_all(test_module_id, typed_module.errors().into_iter().cloned());
 
-        format!(
-            "{typed_module:#?}\n{parse_errors:#?}\n{}\n",
-            reporter.render_no_color(&db),
-        )
-    }
+            format!(
+                "{typed_module:#?}\n{parse_errors:#?}\n{}\n",
+                reporter.render_no_color(&db),
+            )
+        }
+    })
 }
 
 // TODO: continue fixing lowering errors in std lib
