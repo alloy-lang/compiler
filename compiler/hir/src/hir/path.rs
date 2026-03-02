@@ -1,6 +1,5 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
-use std::fmt;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum Path {
@@ -12,8 +11,8 @@ pub enum Path {
         resolution_idx: ResolutionIdx,
     },
     OtherModule(Fqn, Vec<ResolutionKind>),
-    Unknown(NonEmpty<Name>),
-    UnknownModule(NonEmpty<Name>),
+    UnknownReference(NonEmpty<Name>),
+    UnresolvedModule(FqnResolutionError),
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
@@ -35,39 +34,6 @@ pub enum ResolutionIdx {
     Pattern(PatternIdx),
 }
 
-impl fmt::Display for Path {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Path::ThisModule { name, subname, .. } => vec![name]
-                .into_iter()
-                .chain(subname.iter())
-                .map(ToString::to_string)
-                .collect::<Vec<_>>()
-                .join("::")
-                .fmt(f),
-            Path::OtherModule(fqn, _) => fqn
-                .segments()
-                .iter()
-                .map(ToString::to_string)
-                .collect::<Vec<_>>()
-                .join("::")
-                .fmt(f),
-            Path::Unknown(names) => names
-                .iter()
-                .map(ToString::to_string)
-                .collect::<Vec<_>>()
-                .join("::")
-                .fmt(f),
-            Path::UnknownModule(module) => module
-                .iter()
-                .map(ToString::to_string)
-                .collect::<Vec<_>>()
-                .join("::")
-                .fmt(f),
-        }
-    }
-}
-
 impl Path {
     pub(crate) fn this_module(
         rest: impl IntoIterator<Item = impl Into<Name>>,
@@ -82,6 +48,23 @@ impl Path {
             scope,
             resolution_kind,
             resolution_idx,
+        }
+    }
+
+    pub fn resolution_kinds(&self) -> Vec<ResolutionKind> {
+        match self {
+            Path::ThisModule {
+                resolution_kind, ..
+            } => {
+                vec![resolution_kind.clone()]
+            }
+            Path::OtherModule(_, resolution_kinds) => resolution_kinds.clone(),
+            Path::UnknownReference(_) => {
+                vec![]
+            }
+            Path::UnresolvedModule(_) => {
+                vec![]
+            }
         }
     }
 }

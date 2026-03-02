@@ -83,40 +83,42 @@ fn run_hir_test(
     let (module, parse_errors) = crate::lower_file(&db, module_id);
 
     let file_name = path.to_str().expect("Expected filename");
-    if expect_parse_errors {
-        assert!(
-            !parse_errors.is_empty(),
-            "file '{}' did not contain parse errors",
-            file_name
-        );
-    } else {
-        assert!(
-            parse_errors.is_empty(),
-            "file '{}' contained parse errors: {parse_errors:?}",
-            file_name
-        );
-    }
-    if expect_lowering_errors {
-        assert!(
-            !module.errors().is_empty() || !module.warnings().is_empty(),
-            "file '{}' did not contain lowering errors or warnings",
-            file_name
-        );
-    } else {
-        assert!(
-            module.errors().is_empty(),
-            "file '{file_name}' contained lowering errors: {:#?}",
-            module.errors(),
-        );
-        // TODO: decide if we want to fail tests on warnings
-        // assert!(
-        //     module.warnings().is_empty(),
-        //     "file '{file_name}' contained lowering warnings: {:#?}",
-        //     module.warnings(),
-        // );
-    }
+    db.attach(|_| {
+        if expect_parse_errors {
+            assert!(
+                !parse_errors.is_empty(),
+                "file '{}' did not contain parse errors",
+                file_name
+            );
+        } else {
+            assert!(
+                parse_errors.is_empty(),
+                "file '{}' contained parse errors: {parse_errors:?}",
+                file_name
+            );
+        }
+        if expect_lowering_errors {
+            assert!(
+                !module.errors().is_empty() || !module.warnings().is_empty(),
+                "file '{}' did not contain lowering errors or warnings",
+                file_name
+            );
+        } else {
+            assert!(
+                module.errors().is_empty(),
+                "file '{file_name}' contained lowering errors: {:#?}",
+                module.errors(),
+            );
+            // TODO: decide if we want to fail tests on warnings
+            // assert!(
+            //     module.warnings().is_empty(),
+            //     "file '{file_name}' contained lowering warnings: {:#?}",
+            //     module.warnings(),
+            // );
+        }
 
-    db.attach(|_| format!("{:#?}\n{parse_errors:#?}", module))
+        format!("{:#?}\n{parse_errors:#?}", module)
+    })
 }
 
 #[test]

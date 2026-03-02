@@ -2,7 +2,7 @@ import test_data::Test
 import std::functor
 
 typeof test : t1 -> t2 -> Test where
-    typevar t1 = functor::
+    typevar t1 = functor
     typevar t2
 ===
 HirModule {
@@ -35,26 +35,15 @@ HirModule {
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
             "item": Named(
-                OtherModule(
-                    Fqn {
+                UnresolvedModule(
+                    MissingLocalName {
                         module_id: ModuleId {
-                            path: "std",
+                            path: "std::functor",
                         },
-                        module: NonEmpty(
-                            [
-                                "std",
-                            ],
-                        ),
-                        name: "functor",
-                        sub_path: None,
                     },
-                    [
-                        Trait,
-                        TypeDefinition,
-                    ],
                 ),
             ),
-            "range": 98..112,
+            "range": 98..110,
         },
         Idx::<TypeReference>(1): {
             "item": Named(
@@ -141,7 +130,7 @@ HirModule {
                 ),
             },
             "name": "t1",
-            "range": 85..112,
+            "range": 85..110,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeDefinition>(1): {
@@ -152,7 +141,7 @@ HirModule {
                 ),
             },
             "name": "t2",
-            "range": 112..122,
+            "range": 110..120,
             "scope_id": Idx::<Scope>(1),
         },
     },
@@ -175,16 +164,18 @@ HirModule {
         },
     },
     warnings: [],
-    errors: [],
-}
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Missing {
-            offset: 112,
+    errors: [
+        LoweringError {
+            kind: FailedModuleResolution {
+                reference_type: Type,
+                fqn_error: MissingLocalName {
+                    module_id: ModuleId {
+                        path: "std::functor",
+                    },
+                },
+            },
+            range: 98..110,
         },
-        context: TypeVariableTraitConstraint,
-    },
-]
+    ],
+}
+[]

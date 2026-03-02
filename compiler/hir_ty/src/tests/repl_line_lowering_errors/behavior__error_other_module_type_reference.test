@@ -15,7 +15,7 @@ HirTypedModule {
     errors: [
         TypeInferenceError {
             kind: TypeResolutionError(
-                UnknownModule {
+                UnresolvedModule {
                     source_ref: TypeReference(
                         Fql {
                             module_id: ModuleId {
@@ -24,7 +24,13 @@ HirTypedModule {
                             local_id: Idx::<TypeReference>(1),
                         },
                     ),
-                    module_slug: "other",
+                    err: UnknownRootModule {
+                        attempted_module_path: NonEmpty(
+                            [
+                                "other",
+                            ],
+                        ),
+                    },
                 },
             ),
             range: 55..114,
@@ -33,16 +39,16 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
-[E003] Error: Cannot find module `other`
+[E003] Error: Cannot find module 'other'
    ╭─[ ./test/main.alloy:7:1 ]
    │
  7 │ ╭─▶ behavior TestTrait1 for other::Type1 where
    ┆ ┆   
  9 │ ├─▶ end
    │ │        
-   │ ╰──────── module `other` not found
+   │ ╰──────── Cannot find module 'other'
    │     
-   │     Help: Make sure the module is imported and the path is correct
+   │     Help: Make sure the module path is correct
 ───╯
 
 

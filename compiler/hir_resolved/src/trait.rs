@@ -313,9 +313,11 @@ mod tests {
         let actual_err = find_trait_error(&db, module_id);
 
         let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
-        let expected = TypeResolutionError::UnknownModule {
+        let expected = TypeResolutionError::UnresolvedModule {
+            err: hir::FqnResolutionError::UnknownRootModule {
+                attempted_module_path: ne_vec![hir::Name::new("fake_traits")],
+            },
             source_ref: EPTrFql::TypeReference(source_ref),
-            module_slug: "fake_traits".to_string(),
         };
 
         assert_eq!(expected, actual_err);

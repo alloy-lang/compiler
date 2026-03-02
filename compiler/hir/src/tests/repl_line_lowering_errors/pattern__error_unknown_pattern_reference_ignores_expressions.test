@@ -67,7 +67,7 @@ HirModule {
         },
         Idx::<Pattern>(1): {
             "item": Destructure {
-                target: Unknown(
+                target: UnknownReference(
                     NonEmpty(
                         [
                             "unknown",

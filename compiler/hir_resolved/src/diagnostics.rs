@@ -6,9 +6,9 @@ use text_size::TextRange;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TypeResolutionError {
-    UnknownModule {
+    UnresolvedModule {
         source_ref: EPTrFql,
-        module_slug: String,
+        err: hir::FqnResolutionError,
     },
     UnknownExpressionReference {
         source_ref: Fql<hir::Expression>,
@@ -59,63 +59,31 @@ pub enum TypeResolutionError {
 impl TypeResolutionError {
     pub fn get_range(&self, db: &dyn hir::HirDatabase) -> TextRange {
         match self {
-            TypeResolutionError::UnknownModule { source_ref, .. } => {
-                let (hir_module, _) = hir::lower_file(db, source_ref.module_id());
-                match source_ref {
-                    EPTrFql::Expression(fql) => hir_module.get_expression_range(fql.local_id),
-                    EPTrFql::Pattern(fql) => hir_module.get_pattern_range(fql.local_id),
-                    EPTrFql::TypeReference(fql) => {
-                        hir_module.get_type_reference_range(fql.local_id)
-                    }
-                }
-            }
+            TypeResolutionError::UnresolvedModule { source_ref, .. } => source_ref.text_range(db),
             TypeResolutionError::UnknownExpressionReference { source_ref, .. } => {
-                let (hir_module, _) = hir::lower_file(db, source_ref.module_id);
-                hir_module.get_expression_range(source_ref.local_id)
+                source_ref.text_range(db)
             }
             TypeResolutionError::UnknownPatternReference { source_ref, .. } => {
-                let (hir_module, _) = hir::lower_file(db, source_ref.module_id);
-                hir_module.get_pattern_range(source_ref.local_id)
+                source_ref.text_range(db)
             }
             TypeResolutionError::UnknownTypeReference { source_ref, .. } => {
-                let (hir_module, _) = hir::lower_file(db, source_ref.module_id);
-                hir_module.get_type_reference_range(source_ref.local_id)
+                source_ref.text_range(db)
             }
             TypeResolutionError::UnknownTypeDefinition { source_ref, .. } => {
-                let (hir_module, _) = hir::lower_file(db, source_ref.module_id);
-                hir_module.get_type_reference_range(source_ref.local_id)
+                source_ref.text_range(db)
             }
             TypeResolutionError::UnknownTypeDefinitionVariant { source_ref, .. } => {
-                let (hir_module, _) = hir::lower_file(db, source_ref.module_id());
-                match source_ref {
-                    EPTrFql::Expression(fql) => hir_module.get_expression_range(fql.local_id),
-                    EPTrFql::Pattern(fql) => hir_module.get_pattern_range(fql.local_id),
-                    EPTrFql::TypeReference(fql) => {
-                        hir_module.get_type_reference_range(fql.local_id)
-                    }
-                }
+                source_ref.text_range(db)
             }
             TypeResolutionError::MissingTypeDefinitionVariant { source_ref, .. } => {
-                let (hir_module, _) = hir::lower_file(db, source_ref.module_id());
-                match source_ref {
-                    EPTrFql::Expression(fql) => hir_module.get_expression_range(fql.local_id),
-                    EPTrFql::Pattern(fql) => hir_module.get_pattern_range(fql.local_id),
-                    EPTrFql::TypeReference(fql) => {
-                        hir_module.get_type_reference_range(fql.local_id)
-                    }
-                }
+                source_ref.text_range(db)
             }
             TypeResolutionError::UnknownTraitReference { source_ref, .. } => {
-                let (hir_module, _) = hir::lower_file(db, source_ref.module_id);
-                hir_module.get_type_reference_range(source_ref.local_id)
+                source_ref.text_range(db)
             }
-            TypeResolutionError::UnknownTraitMember { source_ref, .. } => {
-                let (hir_module, _) = hir::lower_file(db, source_ref.module_id);
-                hir_module.get_type_reference_range(source_ref.local_id)
-            }
+            TypeResolutionError::UnknownTraitMember { source_ref, .. } => source_ref.text_range(db),
             TypeResolutionError::BoundedTraitReference { source_ref, .. } => {
-                let (hir_module, _) = hir::lower_file(db, source_ref.module_id);
-                hir_module.get_type_reference_range(source_ref.local_id)
+                source_ref.text_range(db)
             }
         }
     }

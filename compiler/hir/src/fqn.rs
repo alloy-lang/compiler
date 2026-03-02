@@ -1,6 +1,25 @@
 use crate::{HirDatabase, Name};
-use alloy_workspace::ModuleId;
+use alloy_workspace::{ModuleId, VirtualModuleId};
 use non_empty_vec::NonEmpty;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum FqnResolutionError {
+    UnknownRootModule {
+        attempted_module_path: NonEmpty<Name>,
+    },
+    UnknownChildModule {
+        module_id: VirtualModuleId,
+        unknown_child: Name,
+        available_child_modules: Vec<ModuleId>,
+    },
+    MissingLocalName {
+        module_id: ModuleId,
+    },
+    ExtraSegments {
+        fqn: Fqn,
+        extra_segments: NonEmpty<Name>,
+    },
+}
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct Fqn {
@@ -16,21 +35,32 @@ impl Fqn {
         module: impl IntoIterator<Item = impl Into<Name>>,
         local_name: impl Into<Name>,
         sub_path: impl IntoIterator<Item = impl Into<Name>>,
-    ) -> Result<Self, NonEmpty<Name>> {
+    ) -> Result<Self, FqnResolutionError> {
         let module_segments: Vec<Name> = module.into_iter().map(Into::into).collect();
         let local_name: Name = local_name.into();
         let sub_path_segments: Vec<Name> = sub_path.into_iter().map(Into::into).collect();
-        let has_sub_path = !sub_path_segments.is_empty();
 
         // Flatten everything into one path: [module..., local_name, sub_path...]
         let mut full_path = module_segments.clone();
         full_path.push(local_name.clone());
         full_path.extend(sub_path_segments);
 
-        assert!(!full_path.is_empty(), "Cannot create Fqn with empty path");
+        assert!(
+            full_path.len() > 1,
+            "Cannot create Fqn with less than two path segments"
+        );
 
-        // Try each split from longest module prefix to shortest
-        let mut best_module_match: Option<NonEmpty<Name>> = None;
+        {
+            let slug = full_path
+                .iter()
+                .map(Name::as_str)
+                .collect::<Vec<_>>()
+                .join("::");
+
+            if let Some(module_id) = db.find_module_by_slug(&slug) {
+                return Err(FqnResolutionError::MissingLocalName { module_id });
+            }
+        }
 
         for split in (1..full_path.len()).rev() {
             let (module_path, rest) = full_path.split_at(split);
@@ -43,44 +73,40 @@ impl Fqn {
                 .collect::<Vec<_>>()
                 .join("::");
 
-            let Some(module_id) = db.find_module_by_slug(&slug) else {
-                continue;
-            };
-
-            // Valid: remaining fits in sub_path (0 or 1 segment)
-            if remaining.len() <= 1 {
-                return Ok(Fqn {
+            if let Some(module_id) = db.find_module_by_slug(&slug) {
+                let fqn = Fqn {
                     module_id,
                     module: unsafe { NonEmpty::new_unchecked(module_path.to_vec()) },
                     name: item_name.clone(),
                     sub_path: remaining.first().cloned(),
-                });
+                };
+
+                return if remaining.len() <= 1 {
+                    Ok(fqn)
+                } else {
+                    Err(FqnResolutionError::ExtraSegments {
+                        fqn,
+                        extra_segments: unsafe { NonEmpty::new_unchecked(remaining[1..].to_vec()) },
+                    })
+                };
             }
 
-            // Module exists but too many remaining segments — remember as best guess
-            if best_module_match.is_none() {
-                best_module_match = Some(unsafe { NonEmpty::new_unchecked(module_path.to_vec()) });
+            if let Some(module_id) = db.find_virtual_module_by_slug(&slug) {
+                let virtual_source = db.get_virtual_source(module_id);
+                let available_child_modules = virtual_source.children.clone();
+
+                return Err(FqnResolutionError::UnknownChildModule {
+                    module_id,
+                    unknown_child: item_name.clone(),
+                    available_child_modules,
+                });
             }
         }
 
-        let default_guess = {
-            let mut guess = module_segments;
-            // if sub_path was provided, assume local_name is part of the module path
-            if has_sub_path {
-                guess.push(local_name);
-            }
-            unsafe { NonEmpty::new_unchecked(guess) }
-        };
-
-        Err(best_module_match.unwrap_or(default_guess))
-    }
-
-    pub fn module_slug(&self) -> String {
-        self.module
-            .iter()
-            .map(|n| n.as_str())
-            .collect::<Vec<_>>()
-            .join("::")
+        let shortest_module_path = full_path.first().cloned().unwrap();
+        Err(FqnResolutionError::UnknownRootModule {
+            attempted_module_path: NonEmpty::new(shortest_module_path.clone()),
+        })
     }
 
     pub fn segments(&self) -> NonEmpty<Name> {
@@ -100,6 +126,7 @@ impl Fqn {
 mod tests {
     use super::*;
     use crate::tests::TestHirDatabase;
+    use alloy_workspace::WorkspaceDatabase;
     use salsa::Database;
 
     fn ne_vec(segments: Vec<impl Into<Name>>) -> NonEmpty<Name> {
@@ -111,14 +138,14 @@ mod tests {
         let mut db = TestHirDatabase::default();
         let test_module_id = db.add_test_module("a::b::c", "");
 
-        let Fqn {
-            module_id,
-            module,
-            name,
-            sub_path,
-        } = Fqn::resolve(&db, ["a", "b", "c"], "d", [] as [String; 0]).unwrap();
-
         db.attach(|_| {
+            let Fqn {
+                module_id,
+                module,
+                name,
+                sub_path,
+            } = Fqn::resolve(&db, ["a", "b", "c"], "d", [] as [String; 0]).unwrap();
+
             assert_eq!(test_module_id, module_id);
             assert_eq!(module, ne_vec(vec!["a", "b", "c"]));
             assert_eq!(name, Name::new("d"));
@@ -127,18 +154,18 @@ mod tests {
     }
 
     #[test]
-    fn test_does_not_shift_into_module_when_subpath_has_more_1() {
+    fn test_does_not_shift_into_module_when_subpath_has_1() {
         let mut db = TestHirDatabase::default();
         let test_module_id = db.add_test_module("a::b::c", "");
 
-        let Fqn {
-            module_id,
-            module,
-            name,
-            sub_path,
-        } = Fqn::resolve(&db, ["a", "b", "c"], "d", ["e"]).unwrap();
-
         db.attach(|_| {
+            let Fqn {
+                module_id,
+                module,
+                name,
+                sub_path,
+            } = Fqn::resolve(&db, ["a", "b", "c"], "d", ["e"]).unwrap();
+
             assert_eq!(test_module_id, module_id);
             assert_eq!(module, ne_vec(vec!["a", "b", "c"]));
             assert_eq!(name, Name::new("d"));
@@ -151,14 +178,14 @@ mod tests {
         let mut db = TestHirDatabase::default();
         let test_module_id = db.add_test_module("a::b::c::d", "");
 
-        let Fqn {
-            module_id,
-            module,
-            name,
-            sub_path,
-        } = Fqn::resolve(&db, ["a", "b", "c"], "d", ["e"]).unwrap();
-
         db.attach(|_| {
+            let Fqn {
+                module_id,
+                module,
+                name,
+                sub_path,
+            } = Fqn::resolve(&db, ["a", "b", "c"], "d", ["e"]).unwrap();
+
             assert_eq!(test_module_id, module_id);
             assert_eq!(module, ne_vec(vec!["a", "b", "c", "d"]));
             assert_eq!(name, Name::new("e"));
@@ -171,14 +198,14 @@ mod tests {
         let mut db = TestHirDatabase::default();
         let test_module_id = db.add_test_module("a::b::c::d", "");
 
-        let Fqn {
-            module_id,
-            module,
-            name,
-            sub_path,
-        } = Fqn::resolve(&db, ["a", "b", "c"], "d", ["e", "f"]).unwrap();
-
         db.attach(|_| {
+            let Fqn {
+                module_id,
+                module,
+                name,
+                sub_path,
+            } = Fqn::resolve(&db, ["a", "b", "c"], "d", ["e", "f"]).unwrap();
+
             assert_eq!(test_module_id, module_id);
             assert_eq!(module, ne_vec(vec!["a", "b", "c", "d"]));
             assert_eq!(name, Name::new("e"));
@@ -187,21 +214,82 @@ mod tests {
     }
 
     #[test]
-    fn test_returns_best_module_path_guess_when_unable_to_find() {
-        let db = TestHirDatabase::default();
+    fn test_matches_longest_module() {
+        let mut db = TestHirDatabase::default();
+        let _ = db.add_test_module("a", "");
+        let _ = db.add_test_module("a::b", "");
+        let _ = db.add_test_module("a::b::c", "");
+        let _ = db.add_test_module("a::b::c::e", "");
+        let test_module_id = db.add_test_module("a::b::c::d", "");
 
-        let err_module_path = Fqn::resolve(&db, ["a", "b", "c"], "d", ["e", "f"]).unwrap_err();
+        db.attach(|_| {
+            let Fqn {
+                module_id,
+                module,
+                name,
+                sub_path,
+            } = Fqn::resolve(&db, ["a"], "b", ["c", "d", "e", "f"]).unwrap();
 
-        assert_eq!(err_module_path, ne_vec(vec!["a", "b", "c", "d"]));
+            assert_eq!(test_module_id, module_id);
+            assert_eq!(module, ne_vec(vec!["a", "b", "c", "d"]));
+            assert_eq!(name, Name::new("e"));
+            assert_eq!(sub_path, Some(Name::new("f")));
+        });
     }
 
     #[test]
-    fn test_returns_best_module_path_guess_when_more_than_one_subpath() {
+    fn test_err_when_unable_to_find_root_module() {
+        let db = TestHirDatabase::default();
+
+        let expected_err = FqnResolutionError::UnknownRootModule {
+            attempted_module_path: ne_vec(vec!["a"]),
+        };
+
+        let err = Fqn::resolve(&db, ["a", "b", "c"], "d", ["e", "f"]).unwrap_err();
+        assert_eq!(err, expected_err);
+
+        let err = Fqn::resolve(&db, ["a", "b", "c", "d"], "e", ["f"]).unwrap_err();
+        assert_eq!(err, expected_err);
+
+        let err = Fqn::resolve(&db, ["a", "b", "c", "d", "e"], "f", [] as [String; 0]).unwrap_err();
+        assert_eq!(err, expected_err);
+    }
+
+    #[test]
+    fn test_err_when_module_is_found_but_extra_subpath() {
         let mut db = TestHirDatabase::default();
-        let test_module_id = db.add_test_module("a::b", "");
+        db.add_test_module("a::b", "");
 
-        let err_module_path = Fqn::resolve(&db, ["a", "b", "c"], "d", ["e", "f"]).unwrap_err();
+        let expected_err = FqnResolutionError::ExtraSegments {
+            fqn: Fqn {
+                module_id: db.find_module_by_slug("a::b").unwrap(),
+                module: ne_vec(vec!["a", "b"]),
+                name: Name::new("c"),
+                sub_path: Some(Name::new("d")),
+            },
+            extra_segments: ne_vec(vec!["e", "f"]),
+        };
 
-        assert_eq!(err_module_path, ne_vec(vec!["a", "b"]));
+        db.attach(|_| {
+            let err = Fqn::resolve(&db, ["a", "b", "c"], "d", ["e", "f"]).unwrap_err();
+            assert_eq!(err, expected_err);
+        });
+    }
+
+    #[test]
+    fn test_err_when_parent_module_is_found_but_not_child() {
+        let mut db = TestHirDatabase::default();
+        let test_module_id = db.add_test_module("a::b::c::d::jk", "");
+
+        let expected_err = FqnResolutionError::UnknownChildModule {
+            module_id: VirtualModuleId::new(&db, "a::b::c::d".to_string()),
+            unknown_child: Name::new("e"),
+            available_child_modules: vec![test_module_id],
+        };
+
+        db.attach(|_| {
+            let err = Fqn::resolve(&db, ["a", "b", "c"], "d", ["e", "f"]).unwrap_err();
+            assert_eq!(err, expected_err);
+        });
     }
 }

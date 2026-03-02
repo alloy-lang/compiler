@@ -244,15 +244,16 @@ mod tests {
         assert_eq!(Pattern::VariableDeclaration, actual_0);
         let err = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
             .expect_err("expected to resolve pattern");
-        assert_eq!(
-            TypeResolutionError::UnknownModule {
-                source_ref: EPTrFql::Pattern(Fql {
-                    module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
-                }),
-                module_slug: "unknown".to_string(),
+
+        let expected = TypeResolutionError::UnresolvedModule {
+            err: hir::FqnResolutionError::UnknownRootModule {
+                attempted_module_path: ne_vec![hir::Name::new("unknown")],
             },
-            err
-        );
+            source_ref: EPTrFql::Pattern(Fql {
+                module_id,
+                local_id: Idx::from_raw(RawIdx::from_u32(1)),
+            }),
+        };
+        assert_eq!(expected, err);
     }
 }

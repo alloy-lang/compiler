@@ -196,7 +196,7 @@ mod tests {
             ",
         );
 
-        let unknown_path = hir::Path::Unknown(ne_vec![
+        let unknown_path = hir::Path::UnknownReference(ne_vec![
             hir::Name::new("unknown"),
             hir::Name::new("path"),
             hir::Name::new("Type"),

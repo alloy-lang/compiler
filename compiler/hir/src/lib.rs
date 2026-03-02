@@ -10,7 +10,7 @@ pub use hir::*;
 pub use hir_module::HirModule;
 
 mod fqn;
-pub use fqn::Fqn;
+pub use fqn::{Fqn, FqnResolutionError};
 mod index;
 #[cfg(test)]
 mod tests;

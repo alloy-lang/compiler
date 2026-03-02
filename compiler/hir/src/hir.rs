@@ -62,7 +62,7 @@ pub use type_definition::*;
 
 mod value;
 
-use crate::fqn::Fqn;
+use crate::fqn::{Fqn, FqnResolutionError};
 pub use crate::hir_module::ValueDefinition;
 use crate::index::Index;
 use value::*;
@@ -250,13 +250,9 @@ impl<'db> LoweringCtx<'db> {
 
                         Some(Path::OtherModule(fqn, resolution_kinds))
                     }
-                    Err(module) => {
-                        let path = self.report_unknown_module(
-                            path_range,
-                            reference_type,
-                            module,
-                            local_name,
-                        );
+                    Err(err) => {
+                        let path =
+                            self.report_failed_module_resolution(path_range, reference_type, err);
 
                         Some(path)
                     }
@@ -294,25 +290,23 @@ impl<'db> LoweringCtx<'db> {
             },
             path_range,
         );
-        Path::Unknown(segments)
+        Path::UnknownReference(segments)
     }
 
-    fn report_unknown_module(
+    fn report_failed_module_resolution(
         &mut self,
         path_range: TextRange,
         reference_type: HirReferenceType,
-        module: NonEmpty<Name>,
-        local_name: Name,
+        err: FqnResolutionError,
     ) -> Path {
         self.error(
-            LoweringErrorKind::UnknownModule {
-                reference: local_name,
+            LoweringErrorKind::FailedModuleResolution {
                 reference_type,
-                module: module.clone(),
+                fqn_error: err.clone(),
             },
             path_range,
         );
-        Path::UnknownModule(module)
+        Path::UnresolvedModule(err)
     }
 
     fn resolve_expression_reference(

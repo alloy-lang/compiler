@@ -7,7 +7,7 @@ HirModule {
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
             "item": Named(
-                Unknown(
+                UnknownReference(
                     NonEmpty(
                         [
                             "Unknown",

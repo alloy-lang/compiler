@@ -42,8 +42,8 @@ pub(crate) fn resolve_type_definition_by_path_variant(
     let variant_name = match path {
         hir::Path::ThisModule { subname, .. } => subname.clone(),
         hir::Path::OtherModule(fqn, _resolution_kinds) => fqn.sub_path.clone(),
-        hir::Path::Unknown(_) => None,
-        hir::Path::UnknownModule(_) => None,
+        hir::Path::UnknownReference(_) => None,
+        hir::Path::UnresolvedModule(_) => None,
     };
 
     let type_def_fql = resolver::resolve_by_path::<hir::TypeDefinition, TypeDefinitionResolver>(
@@ -376,12 +376,14 @@ mod tests {
 
         let actual_err = resolve_type_definition_by_ref_id(&db, module_id, TYPE_REF_IDX)
             .expect_err("must not find type def");
-        let expected = TypeResolutionError::UnknownModule {
+        let expected = TypeResolutionError::UnresolvedModule {
+            err: hir::FqnResolutionError::UnknownRootModule {
+                attempted_module_path: ne_vec![hir::Name::new("fake")],
+            },
             source_ref: EPTrFql::TypeReference(Fql {
                 module_id,
                 local_id: TYPE_REF_IDX,
             }),
-            module_slug: "fake".to_string(),
         };
         assert_eq!(expected, actual_err);
     }

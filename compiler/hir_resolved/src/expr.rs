@@ -266,7 +266,7 @@ mod tests {
     };
     use alloy_hir as hir;
     use alloy_hir::Name;
-    use alloy_workspace::{ModuleId, WorkspaceDatabase};
+    use alloy_workspace::{ModuleId, VirtualModuleId, WorkspaceDatabase};
     use la_arena::{Idx, RawIdx};
     use non_empty_vec::ne_vec;
 
@@ -574,12 +574,14 @@ mod tests {
 
         let err = maybe_find_example(&db, module_id).expect_err("must fail to find expression");
 
-        let expected = TypeResolutionError::UnknownModule {
+        let expected = TypeResolutionError::UnresolvedModule {
+            err: hir::FqnResolutionError::UnknownRootModule {
+                attempted_module_path: ne_vec![hir::Name::new("unknown")],
+            },
             source_ref: EPTrFql::Expression(Fql {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
             }),
-            module_slug: "unknown".to_string(),
         };
         assert_eq!(expected, err);
     }
@@ -724,12 +726,14 @@ mod tests {
 
         let err = maybe_find_example(&db, module_id).expect_err("must find module error");
 
-        let expected = TypeResolutionError::UnknownModule {
+        let expected = TypeResolutionError::UnresolvedModule {
+            err: hir::FqnResolutionError::UnknownRootModule {
+                attempted_module_path: ne_vec![hir::Name::new("not_other")],
+            },
             source_ref: EPTrFql::Expression(Fql {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
             }),
-            module_slug: "not_other".to_string(),
         };
 
         assert_eq!(expected, err);
@@ -778,12 +782,20 @@ mod tests {
         let err =
             maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
 
-        let expected = TypeResolutionError::UnknownModule {
+        let std_lib_root_module = VirtualModuleId::new(&db, "std");
+        let expected = TypeResolutionError::UnresolvedModule {
+            err: hir::FqnResolutionError::UnknownChildModule {
+                module_id: std_lib_root_module,
+                unknown_child: Name::new("unknown"),
+                available_child_modules: db
+                    .get_virtual_source(std_lib_root_module)
+                    .children
+                    .clone(),
+            },
             source_ref: EPTrFql::Expression(Fql {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
             }),
-            module_slug: "std::unknown".to_string(),
         };
 
         assert_eq!(expected, err);
@@ -939,12 +951,14 @@ mod tests {
 
         let err = maybe_find_example(&db, module_id).expect_err("must find module error");
 
-        let expected = TypeResolutionError::UnknownModule {
+        let expected = TypeResolutionError::UnresolvedModule {
+            err: hir::FqnResolutionError::UnknownRootModule {
+                attempted_module_path: ne_vec![hir::Name::new("not_other")],
+            },
             source_ref: EPTrFql::Expression(Fql {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(1)),
             }),
-            module_slug: "not_other".to_string(),
         };
 
         assert_eq!(expected, err);

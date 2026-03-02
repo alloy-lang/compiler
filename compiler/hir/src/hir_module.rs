@@ -182,6 +182,10 @@ impl HirModule {
         self.type_definitions.get(idx)
     }
 
+    pub fn get_type_definition_range(&self, idx: TypeDefinitionIdx) -> TextRange {
+        self.type_definitions.get_range(idx)
+    }
+
     pub fn get_expression(&self, idx: ExpressionIdx) -> &Expression {
         self.expressions.get(idx)
     }
@@ -212,6 +216,10 @@ impl HirModule {
 
     pub fn get_trait(&self, idx: TraitIdx) -> &Trait {
         self.traits.get(idx)
+    }
+
+    pub fn get_trait_range(&self, idx: TraitIdx) -> TextRange {
+        self.traits.get_range(idx)
     }
 
     pub fn get_behavior(&self, idx: BehaviorIdx) -> &Behavior {

@@ -27,7 +27,7 @@ HirModule {
         },
         Idx::<TypeReference>(1): {
             "item": Named(
-                Unknown(
+                UnknownReference(
                     NonEmpty(
                         [
                             "Type1",

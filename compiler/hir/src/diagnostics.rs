@@ -1,3 +1,4 @@
+use crate::fqn::FqnResolutionError;
 use crate::{HirReferenceType, Import, Name, TypeIdx};
 use alloy_scope::ScopeIdx;
 use non_empty_vec::NonEmpty;
@@ -65,10 +66,9 @@ pub enum LoweringErrorKind {
         path: NonEmpty<Name>,
         current_scope: ScopeIdx,
     },
-    UnknownModule {
-        reference: Name,
+    FailedModuleResolution {
         reference_type: HirReferenceType,
-        module: NonEmpty<Name>,
+        fqn_error: FqnResolutionError,
     },
     MultipleSelfTypeVariablesInTraitDefinition {
         trait_name: Name,

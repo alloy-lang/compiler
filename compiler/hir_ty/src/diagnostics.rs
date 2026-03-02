@@ -1,7 +1,9 @@
 use crate::hir_ty::ResolvedType;
 use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, Severity};
 use alloy_hir as hir;
+use alloy_hir::{FqnResolutionError, Name};
 use alloy_hir_resolved::TypeResolutionError;
+use itertools::Itertools;
 use text_size::TextRange;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -59,9 +61,47 @@ impl Diagnostic for TypeInferenceError {
                 }
             },
             TypeInferenceErrorKind::TypeResolutionError(err) => match err {
-                TypeResolutionError::UnknownModule { module_slug, .. } => {
-                    format!("Cannot find module `{}`", module_slug)
-                }
+                TypeResolutionError::UnresolvedModule { err, .. } => match err {
+                    FqnResolutionError::UnknownRootModule {
+                        attempted_module_path,
+                    } => {
+                        format!(
+                            "Cannot find module '{}'",
+                            attempted_module_path
+                                .iter()
+                                .map(Name::as_str)
+                                .collect::<Vec<_>>()
+                                .join("::")
+                        )
+                    }
+                    FqnResolutionError::UnknownChildModule {
+                        module_id,
+                        unknown_child,
+                        ..
+                    } => {
+                        format!(
+                            "Module '{}' does not contain child module '{}'",
+                            module_id, unknown_child,
+                        )
+                    }
+                    FqnResolutionError::MissingLocalName { module_id } => {
+                        format!("Module '{}' found but missing local name", module_id)
+                    }
+                    FqnResolutionError::ExtraSegments {
+                        fqn,
+                        extra_segments,
+                    } => {
+                        format!(
+                            "Module '{}' found but extra path segments '{}' were not resolved",
+                            fqn.module_id,
+                            extra_segments
+                                .iter()
+                                .map(Name::as_str)
+                                .collect::<Vec<_>>()
+                                .join("::")
+                        )
+                    }
+                },
                 TypeResolutionError::UnknownExpressionReference { path, .. } => {
                     let path_str = path
                         .iter()
@@ -166,10 +206,41 @@ impl Diagnostic for TypeInferenceError {
                 }
             }
             TypeInferenceErrorKind::TypeResolutionError(err) => match err {
-                TypeResolutionError::UnknownModule { module_slug, .. } => {
-                    builder
-                        .with_primary_label(format!("module `{}` not found", module_slug))
-                        .with_help("Make sure the module is imported and the path is correct")
+                TypeResolutionError::UnresolvedModule { err, .. } => {
+                    match err {
+                        FqnResolutionError::UnknownRootModule { attempted_module_path } => builder.with_primary_label(format!(
+                            "Cannot find module '{}'",
+                            attempted_module_path
+                                .iter()
+                                .map(Name::as_str)
+                                .collect::<Vec<_>>()
+                                .join("::")
+                        ))
+                            .with_help("Make sure the module path is correct"),
+                        FqnResolutionError::UnknownChildModule { module_id, unknown_child, available_child_modules, } => builder
+                            .with_primary_label(format!(
+                                "module '{}' does not contain child module '{}'",
+                                module_id, unknown_child,
+                            ))
+                            .with_help(format!(
+                                "Module '{}' has the following child modules: {}",
+                                module_id, available_child_modules.into_iter().join(", ")
+                            )),
+                        FqnResolutionError::MissingLocalName { module_id } => builder
+                            .with_primary_label(format!("module '{}' found but missing local name", module_id))
+                            .with_help(format!("Trying to import a specific item from module '{}'", module_id)),
+                        FqnResolutionError::ExtraSegments { fqn, extra_segments } => {
+                            let extra_slug = extra_segments
+                                .iter()
+                                .map(Name::as_str)
+                                .collect::<Vec<_>>()
+                                .join("::");
+
+                            builder
+                                .with_primary_label(format!("module '{}' found but extra path segments '{}' were not resolved", fqn.module_id, extra_slug))
+                                .with_help(format!("Module '{}' was found, but the path segments '{}' could not be resolved within it", fqn.module_id, extra_slug))
+                        }
+                    }
                 }
                 TypeResolutionError::UnknownExpressionReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");

@@ -54,6 +54,7 @@ name = "alloy_hir"
 version = "0.1.0"
 dependencies = [
  "alloy_ast",
+ "alloy_diagnostics",
  "alloy_parser",
  "alloy_project",
  "alloy_scope",

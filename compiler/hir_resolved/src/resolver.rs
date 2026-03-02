@@ -30,7 +30,7 @@ pub(crate) fn resolve_by_path<T, R>(
     db: &dyn hir::HirDatabase,
     current_module_id: ModuleId,
     path: &hir::Path,
-    source_ref: impl Into<EPTrFql> + Clone,
+    source_ref: impl Into<EPTrFql>,
 ) -> Result<Fql<T>, TypeResolutionError>
 where
     R: Resolver<T>,
@@ -55,20 +55,16 @@ where
             fqn.module_id,
             fqn.segments(),
         ),
-        hir::Path::Unknown(path) => {
+        hir::Path::UnknownReference(path) => {
             return Err(R::unknown_item_error(
                 source_ref,
                 current_module_id,
                 path.clone(),
             ))
         }
-        hir::Path::UnknownModule(module) => {
-            return Err(TypeResolutionError::UnknownModule {
-                module_slug: module
-                    .iter()
-                    .map(ToString::to_string)
-                    .collect::<Vec<_>>()
-                    .join("::"),
+        hir::Path::UnresolvedModule(err) => {
+            return Err(TypeResolutionError::UnresolvedModule {
+                err: err.clone(),
                 source_ref: source_ref.into(),
             });
         }
