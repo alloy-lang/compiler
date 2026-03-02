@@ -18,13 +18,26 @@ pub trait WorkspaceDatabase: salsa::Database {
 /// Represents a module identifier using :: syntax (e.g., "std::collections::HashMap")
 #[salsa::interned(no_lifetime, debug)]
 pub struct ModuleId {
-    /// The module path as a string (e.g., "std::collections")
     pub path: String,
+}
+
+impl std::fmt::Display for ModuleId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        salsa::plumbing::with_attached_database(|db| write!(f, "{}", self.path(db)))
+            .unwrap_or_else(|| write!(f, "{:?}", self))
+    }
 }
 
 #[salsa::interned(no_lifetime, debug)]
 pub struct VirtualModuleId {
     pub path: String,
+}
+
+impl std::fmt::Display for VirtualModuleId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        salsa::plumbing::with_attached_database(|db| write!(f, "{}", self.path(db)))
+            .unwrap_or_else(|| write!(f, "{:?}", self))
+    }
 }
 
 #[salsa::input]
