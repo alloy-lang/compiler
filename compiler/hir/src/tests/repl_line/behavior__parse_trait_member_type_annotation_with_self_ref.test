@@ -1,53 +1,73 @@
 typedef Type1 = Thing
 
-trait Trait1 where
+trait TestTrait1 where
     typeof test : self -> String -> Int
+
+    let thing = test
 end
 
-behavior Trait1 for Type1 where
-    let test = |me, it| -> 0
+behavior TestTrait1 for Type1 where
+    typeof test : self -> String -> Int
+    let test = |sf, str| -> 0
 end
 ===
 HirModule {
     imports: EmptyIndex::<Import>,
     expressions: Index::<Expression> {
         Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: ThisModule {
+                    name: "test",
+                    subname: None,
+                    scope: Idx::<Scope>(2),
+                    resolution_kind: AbstractTraitMember,
+                    resolution_idx: AbstractTraitMember(
+                        Idx::<TypeReference>(4),
+                    ),
+                },
+                scope: Idx::<Scope>(2),
+            },
+            "name": "thing",
+            "range": 91..108,
+            "scope_id": Idx::<Scope>(2),
+        },
+        Idx::<Expression>(1): {
             "item": Literal(
                 Int(
                     0,
                 ),
             ),
-            "range": 146..148,
+            "range": 217..219,
         },
-        Idx::<Expression>(1): {
+        Idx::<Expression>(2): {
             "item": Lambda {
                 args: [
                     Idx::<Pattern>(0),
                     Idx::<Pattern>(1),
                 ],
-                body: Idx::<Expression>(0),
+                body: Idx::<Expression>(1),
             },
             "name": "test",
-            "range": 123..148,
+            "range": 193..219,
             "scope_id": Idx::<Scope>(4),
         },
     },
     patterns: Index::<Pattern> {
         Idx::<Pattern>(0): {
             "item": VariableDeclaration {
-                name: "me",
+                name: "sf",
             },
-            "name": "me",
-            "range": 135..137,
-            "scope_id": Idx::<Scope>(5),
+            "name": "sf",
+            "range": 205..207,
+            "scope_id": Idx::<Scope>(6),
         },
         Idx::<Pattern>(1): {
             "item": VariableDeclaration {
-                name: "it",
+                name: "str",
             },
-            "name": "it",
-            "range": 139..141,
-            "scope_id": Idx::<Scope>(5),
+            "name": "str",
+            "range": 209..212,
+            "scope_id": Idx::<Scope>(6),
         },
     },
     type_references: Index::<TypeReference> {
@@ -55,26 +75,26 @@ HirModule {
             "item": SelfRef(
                 Idx::<Scope>(3),
             ),
-            "range": 60..65,
+            "range": 64..69,
         },
         Idx::<TypeReference>(1): {
             "item": BuiltIn(
                 String,
             ),
-            "range": 68..75,
+            "range": 72..79,
         },
         Idx::<TypeReference>(2): {
             "item": BuiltIn(
                 Int,
             ),
-            "range": 78..82,
+            "range": 82..91,
         },
         Idx::<TypeReference>(3): {
             "item": Lambda {
                 arg_type: Idx::<TypeReference>(1),
                 return_type: Idx::<TypeReference>(2),
             },
-            "range": 68..82,
+            "range": 72..91,
         },
         Idx::<TypeReference>(4): {
             "item": Lambda {
@@ -82,13 +102,13 @@ HirModule {
                 return_type: Idx::<TypeReference>(3),
             },
             "name": "test",
-            "range": 60..82,
+            "range": 64..91,
             "scope_id": Idx::<Scope>(2),
         },
         Idx::<TypeReference>(5): {
             "item": Named(
                 ThisModule {
-                    name: "Trait1",
+                    name: "TestTrait1",
                     subname: None,
                     scope: Idx::<Scope>(0),
                     resolution_kind: Trait,
@@ -97,7 +117,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 96..103,
+            "range": 122..133,
         },
         Idx::<TypeReference>(6): {
             "item": Named(
@@ -111,7 +131,41 @@ HirModule {
                     ),
                 },
             ),
-            "range": 107..113,
+            "range": 137..143,
+        },
+        Idx::<TypeReference>(7): {
+            "item": SelfRef(
+                Idx::<Scope>(5),
+            ),
+            "range": 167..172,
+        },
+        Idx::<TypeReference>(8): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 175..182,
+        },
+        Idx::<TypeReference>(9): {
+            "item": BuiltIn(
+                Int,
+            ),
+            "range": 185..193,
+        },
+        Idx::<TypeReference>(10): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(8),
+                return_type: Idx::<TypeReference>(9),
+            },
+            "range": 175..193,
+        },
+        Idx::<TypeReference>(11): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(7),
+                return_type: Idx::<TypeReference>(10),
+            },
+            "name": "test",
+            "range": 167..193,
+            "scope_id": Idx::<Scope>(4),
         },
     },
     type_definitions: Index::<TypeDefinition> {
@@ -133,7 +187,7 @@ HirModule {
     traits: Index::<Trait> {
         Idx::<Trait>(0): {
             "item": Trait {
-                name: "Trait1",
+                name: "TestTrait1",
                 scope: Idx::<Scope>(2),
                 self_constraints: [],
                 named_type_variables: {},
@@ -142,10 +196,15 @@ HirModule {
                         name: "test",
                         type_annotation: Idx::<TypeReference>(4),
                     },
+                    Concrete {
+                        name: "thing",
+                        type_annotation: None,
+                        value: Idx::<Expression>(0),
+                    },
                 ],
             },
-            "name": "Trait1",
-            "range": 23..87,
+            "name": "TestTrait1",
+            "range": 23..113,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -156,23 +215,25 @@ HirModule {
                 attached_trait: Idx::<TypeReference>(5),
                 attached_type: Idx::<TypeReference>(6),
                 named_type_variables: {},
-                type_annotations: {},
+                type_annotations: {
+                    "test": Idx::<TypeReference>(11),
+                },
                 values: {
-                    "test": Idx::<Expression>(1),
+                    "test": Idx::<Expression>(2),
                 },
             },
             "name": (
                 Idx::<TypeReference>(6),
                 Idx::<TypeReference>(5),
             ),
-            "range": 87..151,
+            "range": 113..222,
             "scope_id": Idx::<Scope>(0),
         },
     },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 6,
+            len: 7,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -193,6 +254,10 @@ HirModule {
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "behavior",
+                },
+                Scope {
+                    parent: Idx::<Scope>(4),
+                    tag: "type annotation",
                 },
                 Scope {
                     parent: Idx::<Scope>(4),

@@ -266,7 +266,6 @@ pub(super) fn resolved_to_mono(
         ResolvedType::UnknownReference(_) => None,
         ResolvedType::Unconstrained => Some(MonoType::Unconstrained),
         ResolvedType::Missing => None,
-        ResolvedType::TODO => None,
         ResolvedType::Unit => Some(MonoType::Unit),
         ResolvedType::BuiltIn(builtin) => Some(MonoType::Concrete(*builtin)),
         ResolvedType::Lambda {

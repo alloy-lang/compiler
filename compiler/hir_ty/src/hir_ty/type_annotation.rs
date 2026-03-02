@@ -1,3 +1,4 @@
+use super::type_definition;
 use crate::hir_ty::{Fql, ResolvedType};
 use crate::HirTyDatabase;
 use alloy_hir as hir;
@@ -12,6 +13,8 @@ pub struct TypeResolutionContext {
     type_var_to_id: FxHashMap<hir::TypeDefinitionIdx, usize>,
     /// Next generic ID to assign
     next_id: usize,
+    /// Cached generic ID for Self type (ensures consistent ID across multiple Self references)
+    self_generic_id: Option<usize>,
 }
 
 impl TypeResolutionContext {
@@ -19,6 +22,7 @@ impl TypeResolutionContext {
         Self {
             type_var_to_id: FxHashMap::default(),
             next_id: 0,
+            self_generic_id: None,
         }
     }
 
@@ -33,9 +37,20 @@ impl TypeResolutionContext {
         self.type_var_to_id.insert(type_def_idx, id);
         id
     }
+
+    /// Get or assign a Generic ID for the Self type variable
+    fn get_or_assign_self_id(&mut self) -> usize {
+        if let Some(id) = self.self_generic_id {
+            return id;
+        }
+        let id = self.next_id;
+        self.next_id += 1;
+        self.self_generic_id = Some(id);
+        id
+    }
 }
 
-fn type_annotation_to_resolved_with_ctx(
+fn named_type_reference_to_resolved_with_ctx(
     db: &dyn HirTyDatabase,
     current_module_id: ModuleId,
     path: &hir::Path,
@@ -62,20 +77,55 @@ pub fn type_reference_to_resolved_type(
     let ty = match &type_ref {
         hir::TypeReference::Unconstrained => ResolvedType::Unconstrained,
         hir::TypeReference::Missing => ResolvedType::Missing,
-        hir::TypeReference::SelfRef(scope) => ResolvedType::TODO,
-        hir::TypeReference::Unit => ResolvedType::Unit,
-        hir::TypeReference::Named(path) => {
-            type_annotation_to_resolved_with_ctx(db, current_module_id, path, ctx).or_else(
-                || {
-                    super::type_definition::type_definition_to_resolved(
-                        db,
-                        ctx,
-                        current_module_id,
-                        type_idx,
-                    )
-                },
-            )?
+        hir::TypeReference::SelfRef(scope) => {
+            // Check if we're inside a behavior — Self resolves to the concrete attached_type
+            if let Some((_idx, behavior)) = hir_module.find_behavior_containing_scope(*scope) {
+                type_reference_to_resolved_type(db, current_module_id, behavior.attached_type, ctx)?
+            }
+            // Check if we're inside a trait — Self is a constrained generic
+            else if let Some((_idx, trait_def)) = hir_module.find_trait_containing_scope(*scope) {
+                let generic_id = ctx.get_or_assign_self_id();
+
+                let trait_constraints: Vec<_> = trait_def
+                    .self_constraints()
+                    .iter()
+                    .filter_map(|c| match c {
+                        hir::TypeVariableConstraint::Trait(type_idx) => {
+                            let trait_fql =
+                                res::resolve_trait_by_ref_id(db, current_module_id, *type_idx)
+                                    .ok()?;
+                            let name = trait_fql.trait_name(db);
+                            Some((trait_fql, name))
+                        }
+                        hir::TypeVariableConstraint::Kind(_) => None,
+                    })
+                    .collect();
+
+                if trait_constraints.is_empty() {
+                    ResolvedType::Generic(generic_id)
+                } else {
+                    unsafe {
+                        ResolvedType::ConstrainedGeneric {
+                            id: generic_id,
+                            constraints: NonEmpty::new_unchecked(trait_constraints),
+                        }
+                    }
+                }
+            } else {
+                // Self used outside trait/behavior context
+                ResolvedType::Missing
+            }
         }
+        hir::TypeReference::Unit => ResolvedType::Unit,
+        hir::TypeReference::Named(path) => named_type_reference_to_resolved_with_ctx(
+            db,
+            current_module_id,
+            path,
+            ctx,
+        )
+        .or_else(|| {
+            type_definition::type_definition_to_resolved(db, ctx, current_module_id, type_idx)
+        })?,
         hir::TypeReference::BuiltIn(built_in) => ResolvedType::BuiltIn(*built_in),
         hir::TypeReference::Lambda {
             arg_type,

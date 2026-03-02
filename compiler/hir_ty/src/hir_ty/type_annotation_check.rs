@@ -65,12 +65,6 @@ fn check_type_compatibility(
                 inferred_type: found.clone(),
             })
         }
-        (ResolvedType::TODO, _) | (_, ResolvedType::TODO) => {
-            Err(ConflictingTypeAnnotationReason::DirectConflict {
-                annotated_type: expected.clone(),
-                inferred_type: found.clone(),
-            })
-        }
         (ResolvedType::Unit, ResolvedType::Unit) => Ok(()),
         (ResolvedType::BuiltIn(a), ResolvedType::BuiltIn(b)) if a == b => Ok(()),
         (ResolvedType::TypeDef(a, _), ResolvedType::TypeDef(b, _)) if a == b => Ok(()),

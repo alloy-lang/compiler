@@ -13,226 +13,49 @@ let (=<<) = TestTrait::test_func
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Generic(
-            0,
-        ),
+        Idx::<Expression>(0): Lambda {
+            arg_type: Lambda {
+                arg_type: Generic(
+                    0,
+                ),
+                return_type: Bounded {
+                    base: Generic(
+                        1,
+                    ),
+                    args: [
+                        Generic(
+                            2,
+                        ),
+                    ],
+                },
+            },
+            return_type: Lambda {
+                arg_type: Bounded {
+                    base: Generic(
+                        3,
+                    ),
+                    args: [
+                        Generic(
+                            4,
+                        ),
+                    ],
+                },
+                return_type: Bounded {
+                    base: Generic(
+                        5,
+                    ),
+                    args: [
+                        Generic(
+                            6,
+                        ),
+                    ],
+                },
+            },
+        },
     },
     pattern_types: {},
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: ConflictingTypeAnnotation {
-                annotated_type: Lambda {
-                    arg_type: Lambda {
-                        arg_type: Generic(
-                            0,
-                        ),
-                        return_type: Bounded {
-                            base: ConstrainedGeneric {
-                                id: 1,
-                                constraints: NonEmpty(
-                                    [
-                                        (
-                                            Fql {
-                                                module_id: ModuleId {
-                                                    path: "main",
-                                                },
-                                                local_id: Idx::<Trait>(0),
-                                            },
-                                            "TestTrait",
-                                        ),
-                                    ],
-                                ),
-                            },
-                            args: [
-                                Generic(
-                                    2,
-                                ),
-                            ],
-                        },
-                    },
-                    return_type: Lambda {
-                        arg_type: Bounded {
-                            base: ConstrainedGeneric {
-                                id: 1,
-                                constraints: NonEmpty(
-                                    [
-                                        (
-                                            Fql {
-                                                module_id: ModuleId {
-                                                    path: "main",
-                                                },
-                                                local_id: Idx::<Trait>(0),
-                                            },
-                                            "TestTrait",
-                                        ),
-                                    ],
-                                ),
-                            },
-                            args: [
-                                Generic(
-                                    0,
-                                ),
-                            ],
-                        },
-                        return_type: Bounded {
-                            base: ConstrainedGeneric {
-                                id: 1,
-                                constraints: NonEmpty(
-                                    [
-                                        (
-                                            Fql {
-                                                module_id: ModuleId {
-                                                    path: "main",
-                                                },
-                                                local_id: Idx::<Trait>(0),
-                                            },
-                                            "TestTrait",
-                                        ),
-                                    ],
-                                ),
-                            },
-                            args: [
-                                Generic(
-                                    2,
-                                ),
-                            ],
-                        },
-                    },
-                },
-                inferred_type: Generic(
-                    0,
-                ),
-                reason: DirectConflict {
-                    annotated_type: Lambda {
-                        arg_type: Lambda {
-                            arg_type: Generic(
-                                0,
-                            ),
-                            return_type: Bounded {
-                                base: ConstrainedGeneric {
-                                    id: 1,
-                                    constraints: NonEmpty(
-                                        [
-                                            (
-                                                Fql {
-                                                    module_id: ModuleId {
-                                                        path: "main",
-                                                    },
-                                                    local_id: Idx::<Trait>(0),
-                                                },
-                                                "TestTrait",
-                                            ),
-                                        ],
-                                    ),
-                                },
-                                args: [
-                                    Generic(
-                                        2,
-                                    ),
-                                ],
-                            },
-                        },
-                        return_type: Lambda {
-                            arg_type: Bounded {
-                                base: ConstrainedGeneric {
-                                    id: 1,
-                                    constraints: NonEmpty(
-                                        [
-                                            (
-                                                Fql {
-                                                    module_id: ModuleId {
-                                                        path: "main",
-                                                    },
-                                                    local_id: Idx::<Trait>(0),
-                                                },
-                                                "TestTrait",
-                                            ),
-                                        ],
-                                    ),
-                                },
-                                args: [
-                                    Generic(
-                                        0,
-                                    ),
-                                ],
-                            },
-                            return_type: Bounded {
-                                base: ConstrainedGeneric {
-                                    id: 1,
-                                    constraints: NonEmpty(
-                                        [
-                                            (
-                                                Fql {
-                                                    module_id: ModuleId {
-                                                        path: "main",
-                                                    },
-                                                    local_id: Idx::<Trait>(0),
-                                                },
-                                                "TestTrait",
-                                            ),
-                                        ],
-                                    ),
-                                },
-                                args: [
-                                    Generic(
-                                        2,
-                                    ),
-                                ],
-                            },
-                        },
-                    },
-                    inferred_type: Generic(
-                        0,
-                    ),
-                },
-            },
-            range: 240..272,
-        },
-        TypeInferenceError {
-            kind: TypeResolutionError(
-                UnknownExpressionReference {
-                    source_ref: Fql {
-                        module_id: ModuleId {
-                            path: "main",
-                        },
-                        local_id: Idx::<Expression>(0),
-                    },
-                    module_id: ModuleId {
-                        path: "main",
-                    },
-                    path: NonEmpty(
-                        [
-                            "TestTrait",
-                        ],
-                    ),
-                },
-            ),
-            range: 240..272,
-        },
-    ],
+    errors: [],
     poly_instantiations: {},
 }
 []
-[E001] Error: Type annotation conflict: expected `(t0 -> t1 : TestTrait[t2]) -> t1 : TestTrait[t0] -> t1 : TestTrait[t2]`, found `t0`
-    ╭─[ ./test/main.alloy:12:1 ]
-    │
- 12 │ let (=<<) = TestTrait::test_func
-    │ ────────────────┬───────────────  
-    │                 ╰───────────────── expected `(t0 -> t1 : TestTrait[t2]) -> t1 : TestTrait[t0] -> t1 : TestTrait[t2]`, found `t0`
-    │ 
-    │ Help: The type annotation says this should be `(t0 -> t1 : TestTrait[t2]) -> t1 : TestTrait[t0] -> t1 : TestTrait[t2]`, but type inference determined it to be `t0`
-────╯
-
-[E003] Error: Cannot find value `TestTrait` in this scope
-    ╭─[ ./test/main.alloy:12:1 ]
-    │
- 12 │ let (=<<) = TestTrait::test_func
-    │ ────────────────┬───────────────  
-    │                 ╰───────────────── cannot find `TestTrait`
-    │ 
-    │ Help: No value named `TestTrait` found in module `main`
-────╯
-
-
-

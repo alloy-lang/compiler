@@ -13,9 +13,19 @@ end
 ===
 HirTypedModule {
     expression_types: {
-        Idx::<Expression>(0): Generic(
-            2,
-        ),
+        Idx::<Expression>(0): Lambda {
+            arg_type: Generic(
+                2,
+            ),
+            return_type: Lambda {
+                arg_type: BuiltIn(
+                    String,
+                ),
+                return_type: BuiltIn(
+                    Int,
+                ),
+            },
+        },
         Idx::<Expression>(1): BuiltIn(
             Int,
         ),

@@ -66,9 +66,6 @@ pub enum ResolvedType {
         id: usize,
         constraints: NonEmpty<(Fql<hir::Trait>, hir::Name)>,
     },
-    /// Placeholder for unimplemented type system features
-    /// Used for TypeReference::SelfRef, MonoType::App, and other TODO cases
-    TODO,
 }
 
 /// Represents a single instantiation of a polymorphic type at a specific call site
@@ -100,8 +97,7 @@ impl ResolvedType {
             | ResolvedType::Missing
             | ResolvedType::Unit
             | ResolvedType::TypeDef(..)
-            | ResolvedType::BuiltIn(_)
-            | ResolvedType::TODO => false,
+            | ResolvedType::BuiltIn(_) => false,
         }
     }
 }
@@ -159,7 +155,6 @@ impl std::fmt::Display for ResolvedType {
                 }
                 Ok(())
             }
-            ResolvedType::TODO => write!(f, "<TODO>"),
         }
     }
 }

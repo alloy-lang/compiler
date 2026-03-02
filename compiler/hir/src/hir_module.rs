@@ -237,4 +237,19 @@ impl HirModule {
         }
         None
     }
+
+    /// Find the behavior that contains the given scope, if any
+    /// This checks if the scope is within a behavior's scope hierarchy
+    pub fn find_behavior_containing_scope(
+        &self,
+        scope: ScopeIdx,
+    ) -> Option<(BehaviorIdx, &Behavior)> {
+        for (behavior_idx, behavior, _range, _name_scope) in self.behaviors() {
+            let behavior_scope = behavior.scope();
+            if self.scopes.scope_is_descendant_of(scope, behavior_scope) {
+                return Some((behavior_idx, behavior));
+            }
+        }
+        None
+    }
 }
