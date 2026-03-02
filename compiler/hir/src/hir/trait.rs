@@ -148,6 +148,12 @@ impl Trait {
         })
     }
 
+    /// Get all abstract members (those with type annotations but no implementations)
+    pub fn abstract_member(&self, name: &Name) -> Option<(&Name, TypeIdx)> {
+        self.abstract_members()
+            .find(move |(member_name, _)| member_name == &name)
+    }
+
     /// Get all concrete members (those with implementations)
     pub fn concrete_members(&self) -> impl Iterator<Item = (&Name, ExpressionIdx)> {
         self.members.iter().filter_map(|member| match member {

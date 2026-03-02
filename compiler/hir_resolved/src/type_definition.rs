@@ -39,12 +39,7 @@ pub(crate) fn resolve_type_definition_by_path_variant(
     path: &hir::Path,
     source_ref: impl Into<EPTrFql> + Clone,
 ) -> Result<(Fql<hir::TypeDefinition>, Option<hir::Name>), TypeResolutionError> {
-    let variant_name = match path {
-        hir::Path::ThisModule { subname, .. } => subname.clone(),
-        hir::Path::OtherModule(fqn, _resolution_kinds) => fqn.sub_path.clone(),
-        hir::Path::UnknownReference(_) => None,
-        hir::Path::UnresolvedModule(_) => None,
-    };
+    let variant_name = path.subpath();
 
     let type_def_fql = resolver::resolve_by_path::<hir::TypeDefinition, TypeDefinitionResolver>(
         db,

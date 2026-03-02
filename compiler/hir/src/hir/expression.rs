@@ -313,3 +313,95 @@ fn lower_match_expression(ctx: &mut LoweringCtx, e: &ast::MatchExpr) -> Expressi
 
     Expression::Match { condition, targets }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tests::TestHirDatabase;
+    use alloy_test_harness::idx;
+    use alloy_workspace::WorkspaceDatabase;
+    use la_arena::RawIdx;
+
+    #[test]
+    fn resolve_same_module_function_call_trait_reference() {
+        let mut db = TestHirDatabase::default();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    trait TestTrait where
+      self = #Type[_]
+      typeof test_func : (a -> self[b]) -> self[a] -> self[b] where
+        typevar a
+        typevar b
+    end
+
+    typeof example : (t1 -> m[t2]) -> m[t1] -> m[t2] where
+      typevar m = TestTrait
+      typevar t1
+      typevar t2
+    let example = |transfomer, first| -> TestTrait::test_func(transformer, first)
+",
+        );
+
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+        let (_, expr) = hir_module
+            .get_expression_by_name(&Name::new("example"), idx!(1))
+            .unwrap_or_else(|| panic!("expected expression. hir_module: {:#?}", hir_module));
+
+        let Expression::Lambda { body, .. } = expr else {
+            panic!("expected actual to be Lambda, but was {:?}", expr);
+        };
+        let body = hir_module.get_expression(*body);
+
+        assert_eq!(
+            Expression::FunctionCall {
+                target: Path::ThisModule {
+                    name: Name::new("TestTrait"),
+                    subname: Some(Name::new("test_func")),
+                    scope: Scopes::ROOT,
+                    resolution_kind: ResolutionKind::Trait,
+                    resolution_idx: ResolutionIdx::Trait(idx!(0)),
+                },
+                scope: idx!(4),
+                args: vec![idx!(0), idx!(1)],
+            },
+            *body,
+        );
+    }
+
+    #[test]
+    fn resolve_same_module_trait_member_ref_outside_trait() {
+        let mut db = TestHirDatabase::default();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    trait TestTrait1 where
+        typeof abstract : self -> Int
+    end
+
+    let example = TestTrait1::abstract
+            ",
+        );
+
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+        let (_, expr) = hir_module
+            .get_expression_by_name(&Name::new("example"), Idx::from_raw(RawIdx::from_u32(1)))
+            .unwrap_or_else(|| panic!("expected expression. hir_module: {:#?}", hir_module));
+
+        assert_eq!(
+            Expression::VariableRef {
+                path: Path::ThisModule {
+                    name: Name::new("TestTrait1"),
+                    subname: Some(Name::new("abstract")),
+                    scope: Scopes::ROOT,
+                    resolution_kind: ResolutionKind::Trait,
+                    resolution_idx: ResolutionIdx::Trait(idx!(0)),
+                },
+                scope: idx!(0),
+            },
+            *expr,
+        );
+    }
+}

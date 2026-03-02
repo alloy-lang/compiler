@@ -67,4 +67,17 @@ impl Path {
             }
         }
     }
+
+    pub fn has_resolution_kind(&self, resolution_kind: ResolutionKind) -> bool {
+        self.resolution_kinds().contains(&resolution_kind)
+    }
+
+    pub fn subpath(&self) -> Option<Name> {
+        match self {
+            Path::ThisModule { subname, .. } => subname.clone(),
+            Path::OtherModule(fqn, _resolution_kinds) => fqn.sub_path.clone(),
+            Path::UnknownReference(_) => None,
+            Path::UnresolvedModule(_) => None,
+        }
+    }
 }

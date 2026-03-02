@@ -39,16 +39,14 @@ pub(crate) fn resolve_abstract_trait_member_by_path(
     db: &dyn hir::HirDatabase,
     module_id: ModuleId,
     path: &hir::Path,
+    source_ref: &Fql<hir::Expression>,
 ) -> Option<Expression> {
-    if let hir::Path::ThisModule { name, scope, .. } = path {
-        let (hir_module, _) = hir::lower_file(db, module_id);
+    if path.has_resolution_kind(hir::ResolutionKind::AbstractTraitMember) {
+        if let hir::Path::ThisModule { name, scope, .. } = path {
+            let (hir_module, _) = hir::lower_file(db, module_id);
 
-        // Check if this is an abstract trait member reference
-        // (within a trait scope, referencing a member with a type annotation but no implementation)
-        if let Some((trait_idx, trait_def)) = hir_module.find_trait_containing_scope(*scope) {
-            // Check if this name is an abstract trait member
-            for (member_name, type_annotation_idx) in trait_def.abstract_members() {
-                if member_name == name {
+            if let Some((trait_idx, trait_def)) = hir_module.find_trait_containing_scope(*scope) {
+                if let Some((member_name, type_annotation_idx)) = trait_def.abstract_member(name) {
                     return Some(Expression::AbstractTraitMemberRef {
                         trait_fql: Fql::new(module_id, trait_idx),
                         member_name: member_name.clone(),
@@ -56,6 +54,27 @@ pub(crate) fn resolve_abstract_trait_member_by_path(
                     });
                 }
             }
+        }
+    }
+
+    if path.has_resolution_kind(hir::ResolutionKind::Trait) {
+        let trait_fql =
+            resolve_by_path::<hir::Trait, TraitResolver>(db, module_id, path, source_ref).ok()?;
+        let (hir_module, _) = hir::lower_file(db, trait_fql.module_id);
+
+        let Some(member_name) = path.subpath() else {
+            return None;
+        };
+
+        if let Some((_, type_annotation)) = hir_module
+            .get_trait(trait_fql.local_id)
+            .abstract_member(&member_name)
+        {
+            return Some(Expression::AbstractTraitMemberRef {
+                trait_fql: trait_fql.clone(),
+                member_name,
+                type_annotation: Fql::new(trait_fql.module_id, type_annotation),
+            });
         }
     }
     None
@@ -83,12 +102,8 @@ impl resolver::Resolver<hir::Trait> for TraitResolver {
         module_id: ModuleId,
         path: NonEmpty<hir::Name>,
     ) -> TypeResolutionError {
-        let EPTrFql::TypeReference(source_ref) = source_ref.into() else {
-            panic!("Trait resolution requires TypeReference");
-        };
-
         TypeResolutionError::UnknownTraitReference {
-            source_ref,
+            source_ref: source_ref.into(),
             module_id,
             path,
         }
@@ -101,12 +116,17 @@ impl resolver::Resolver<hir::Trait> for TraitResolver {
         subname: Option<hir::Name>,
     ) -> Option<TypeResolutionError> {
         if let Some(subname) = subname {
-            let EPTrFql::TypeReference(source_ref) = source_ref.into() else {
-                panic!("Trait resolution requires TypeReference");
-            };
+            let (hir_module, _) = hir::lower_file(_db, trait_fql.module_id);
+            if hir_module
+                .get_trait(trait_fql.local_id)
+                .abstract_member(&subname)
+                .is_some()
+            {
+                return None;
+            }
 
             return Some(TypeResolutionError::UnknownTraitMember {
-                source_ref,
+                source_ref: source_ref.into(),
                 module_id: trait_fql.module_id,
                 trait_idx: trait_fql.local_id,
                 subname,
@@ -173,7 +193,7 @@ mod tests {
 
         let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
         let expected = TypeResolutionError::UnknownTraitMember {
-            source_ref,
+            source_ref: EPTrFql::TypeReference(source_ref),
             module_id: ModuleId::new(&db, "test"),
             trait_idx: Idx::from_raw(RawIdx::from_u32(0)),
             subname: hir::Name::new("extra_junk"),
@@ -197,7 +217,7 @@ mod tests {
 
         let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
         let expected = TypeResolutionError::UnknownTraitReference {
-            source_ref,
+            source_ref: EPTrFql::TypeReference(source_ref),
             module_id,
             path: ne_vec!["UnknownTrait".into()],
         };
@@ -257,7 +277,7 @@ mod tests {
 
         let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
         let expected = TypeResolutionError::UnknownTraitMember {
-            source_ref,
+            source_ref: EPTrFql::TypeReference(source_ref),
             module_id: ModuleId::new(&db, "traits"),
             trait_idx: Idx::from_raw(RawIdx::from_u32(0)),
             subname: hir::Name::new("extra_junk"),
@@ -290,7 +310,7 @@ mod tests {
         let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
         let actual_err = find_trait_error(&db, module_id);
         let expected = TypeResolutionError::UnknownTraitReference {
-            source_ref,
+            source_ref: EPTrFql::TypeReference(source_ref),
             module_id: ModuleId::new(&db, "traits"),
             path: ne_vec!["traits".into(), "UnknownTrait".into()],
         };

@@ -40,12 +40,12 @@ pub enum TypeResolutionError {
         target_type_fql: Fql<hir::TypeDefinition>,
     },
     UnknownTraitReference {
-        source_ref: Fql<hir::TypeReference>,
+        source_ref: EPTrFql,
         module_id: ModuleId,
         path: NonEmpty<hir::Name>,
     },
     UnknownTraitMember {
-        source_ref: Fql<hir::TypeReference>,
+        source_ref: EPTrFql,
         module_id: ModuleId,
         trait_idx: hir::TraitIdx,
         subname: hir::Name,

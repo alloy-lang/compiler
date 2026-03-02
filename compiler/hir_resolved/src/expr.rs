@@ -141,7 +141,7 @@ fn resolve_variable_ref(
     if let Some(pat_fql) = resolve_pattern_by_path(db, module_id, path) {
         return Ok(Expression::VariableRef(pat_fql.into()));
     }
-    if let Some(expr) = resolve_abstract_trait_member_by_path(db, module_id, path) {
+    if let Some(expr) = resolve_abstract_trait_member_by_path(db, module_id, path, source_ref) {
         return Ok(expr);
     }
     let (type_def_fql, variant_name) =
@@ -266,6 +266,7 @@ mod tests {
     };
     use alloy_hir as hir;
     use alloy_hir::Name;
+    use alloy_test_harness::idx;
     use alloy_workspace::{ModuleId, VirtualModuleId, WorkspaceDatabase};
     use la_arena::{Idx, RawIdx};
     use non_empty_vec::ne_vec;
@@ -335,7 +336,7 @@ mod tests {
     }
 
     #[test]
-    fn resolve_same_module_trait_member_ref() {
+    fn resolve_same_module_trait_member_ref_inside_trait() {
         let mut db = TestHirResDatabase::new_with_stdlib();
         let module_id = db.add_module(
             "test_stuff",
@@ -345,6 +346,37 @@ mod tests {
         typeof abstract : Int
         let example = abstract
     end
+            ",
+        );
+
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+        let (idx, _expr) = hir_module
+            .get_expression_by_name(&Name::new("example"), Idx::from_raw(RawIdx::from_u32(1)))
+            .unwrap_or_else(|| panic!("expected expression. hir_module: {:#?}", hir_module));
+
+        let actual = resolve_expression_by_id(&db, module_id, idx).expect("must find expression");
+        let Expression::AbstractTraitMemberRef { member_name, .. } = actual else {
+            panic!(
+                "expected actual to be AbstractTraitMemberRef, but was {:?}",
+                actual
+            );
+        };
+
+        assert_eq!(Name::from("abstract"), member_name);
+    }
+
+    #[test]
+    fn resolve_same_module_trait_member_ref_outside_trait() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test_stuff",
+            camino::Utf8Path::new("./test_stuff.alloy"),
+            r"
+    trait TestTrait1 where
+        typeof abstract : self -> Int
+    end
+
+    let example = TestTrait1::abstract
             ",
         );
 
@@ -533,26 +565,50 @@ mod tests {
       typevar m = TestTrait
       typevar t1
       typevar t2
-    let example = TestTrait::test_func
+    let example = |transfomer, first| -> TestTrait::test_func(transformer, first)
 ",
         );
 
-        let err =
-            maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+        let (idx, _expr) = hir_module
+            .get_expression_by_name(&Name::new("example"), Idx::from_raw(RawIdx::from_u32(1)))
+            .unwrap_or_else(|| panic!("expected expression. hir_module: {:#?}", hir_module));
 
-        let expected = TypeResolutionError::UnknownTypeDefinitionVariant {
-            source_ref: EPTrFql::Expression(Fql {
-                module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(0)),
-            }),
-            target_type_fql: Fql {
-                module_id: ModuleId::new(&db, "std::option"),
-                local_id: Idx::from_raw(RawIdx::from_u32(1)),
+        let actual = resolve_expression_by_id(&db, module_id, idx).expect("must find expression");
+
+        assert_eq!(
+            Expression::Lambda {
+                args: vec![
+                    Fql {
+                        module_id,
+                        local_id: idx!(0),
+                    },
+                    Fql {
+                        module_id,
+                        local_id: idx!(1),
+                    },
+                ],
+                body: Fql {
+                    module_id,
+                    local_id: idx!(2),
+                }
             },
-            variant_name: Name::new("Other"),
-        };
+            actual,
+        );
 
-        assert_eq!(expected, err);
+        // TODO: resolve function body
+        // let body = resolve_expression_by_id(&db, module_id, idx!(2)).expect("must find expression");
+        // assert_eq!(
+        //     Expression::FunctionCall {
+        //         target: EPTdFql::Expression(Fql {
+        //             module_id,
+        //             local_id: idx!(0),
+        //         }),
+        //         variant_name: None,
+        //         args: vec![],
+        //     },
+        //     body,
+        // );
     }
 
     //
