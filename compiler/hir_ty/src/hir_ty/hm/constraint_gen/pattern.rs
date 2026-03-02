@@ -21,8 +21,7 @@ pub(super) fn infer_pattern_hm(
     ) {
         Ok(p) => p,
         Err(err) => {
-            ctx.report_resolution_error(err);
-            return ctx.unknown_reference(source_fql);
+            return ctx.unknown_reference(err, source_fql);
         }
     };
 

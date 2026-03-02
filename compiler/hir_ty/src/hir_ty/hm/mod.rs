@@ -334,15 +334,14 @@ impl<'db> HMInferenceContext<'db> {
         MonoType::Var(self.type_var_gen.fresh())
     }
 
-    pub(super) fn unknown_reference(&mut self, fql: impl Into<EPFql>) -> MonoType {
-        // TODO: report an error when we can't find a reference by name
+    pub(super) fn unknown_reference(
+        &mut self,
+        err: TypeResolutionError,
+        fql: impl Into<EPFql>,
+    ) -> MonoType {
+        self.resolution_errors.push(err);
         let ty = self.fresh_type_var();
         self.assign_type(fql.into(), ty)
-    }
-
-    /// Report a resolution error
-    pub(super) fn report_resolution_error(&mut self, err: TypeResolutionError) {
-        self.resolution_errors.push(err);
     }
 
     #[must_use]

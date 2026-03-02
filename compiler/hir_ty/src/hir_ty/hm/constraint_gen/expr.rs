@@ -37,8 +37,7 @@ pub(crate) fn infer_expr_hm(
         Ok(expr) => expr,
         Err(err) => {
             // Report the resolution error
-            ctx.report_resolution_error(err);
-            return ctx.unknown_reference(source_fql);
+            return ctx.unknown_reference(err, source_fql);
         }
     };
 
