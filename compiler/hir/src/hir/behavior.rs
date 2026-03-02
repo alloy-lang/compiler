@@ -7,6 +7,7 @@ pub type BehaviorIdx = Idx<Behavior>;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Behavior {
+    scope: ScopeIdx,
     pub attached_trait: TypeIdx,
     pub attached_type: TypeIdx,
     named_type_variables: FxHashMap<Name, TypeDefinitionIdx>,
@@ -15,6 +16,10 @@ pub struct Behavior {
 }
 
 impl Behavior {
+    pub fn scope(&self) -> ScopeIdx {
+        self.scope
+    }
+
     pub fn named_type_variables(&'_ self) -> Iter<'_, Name, TypeDefinitionIdx> {
         self.named_type_variables.iter()
     }
@@ -37,6 +42,8 @@ pub(super) fn lower_behavior(ctx: &mut LoweringCtx, ast: &ast::BehaviorDef) {
     };
 
     let behavior = ctx.inside_scope("behavior", |ctx| {
+        let behavior_scope = ctx.scopes.current_scope();
+
         let named_type_variables = ast
             .named_type_variables()
             .iter()
@@ -58,6 +65,7 @@ pub(super) fn lower_behavior(ctx: &mut LoweringCtx, ast: &ast::BehaviorDef) {
             .collect();
 
         Behavior {
+            scope: behavior_scope,
             attached_trait: trait_id,
             attached_type: type_id,
             named_type_variables,

@@ -137,6 +137,11 @@ impl Trait {
         self.scope
     }
 
+    /// Get the self-type constraints for this trait (e.g., `self = #Type[_] + Eq`)
+    pub fn self_constraints(&self) -> &[TypeVariableConstraint] {
+        &self.self_constraints
+    }
+
     /// Get all abstract members (those with type annotations but no implementations)
     pub fn abstract_members(&self) -> impl Iterator<Item = (&Name, TypeIdx)> {
         self.members.iter().filter_map(|member| match member {

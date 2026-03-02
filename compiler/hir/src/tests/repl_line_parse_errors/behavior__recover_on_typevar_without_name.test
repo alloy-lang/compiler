@@ -87,6 +87,7 @@ HirModule {
     behaviors: Index::<Behavior> {
         Idx::<Behavior>(0): {
             "item": Behavior {
+                scope: Idx::<Scope>(3),
                 attached_trait: Idx::<TypeReference>(0),
                 attached_type: Idx::<TypeReference>(1),
                 named_type_variables: {
