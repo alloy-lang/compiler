@@ -7,6 +7,13 @@ ast_token!(Ident, fields: [text]);
 ast_token!(OpIdent, fields: [text]);
 ast_union_node!(IdentOrOp, kinds: [Ident, OpIdent]);
 
+impl OpIdent {
+    #[must_use]
+    pub fn text(&self) -> String {
+        self.0.text().trim_matches(&['(', ')']).to_string()
+    }
+}
+
 impl TypeDefinition {
     #[must_use]
     pub fn name(&self) -> Option<Ident> {
