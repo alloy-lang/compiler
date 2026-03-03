@@ -2,9 +2,6 @@ use super::*;
 use crate::index::{Index, IndexItem};
 use alloy_scope::{ScopeIdx, Scopes};
 use rustc_hash::FxHashMap;
-use std::iter::Enumerate;
-use std::slice::Iter;
-use std::vec::IntoIter;
 use text_size::TextRange;
 
 #[derive(Debug, Clone, PartialEq)]
