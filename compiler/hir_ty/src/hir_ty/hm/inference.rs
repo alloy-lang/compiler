@@ -1,15 +1,14 @@
 //! Main type inference loop and result conversion
 
-use super::super::{check_type_annotation, AnnotatedType, Fql, ResolvedType};
+use super::super::{check_type_annotation, Fql, ResolvedType};
 use super::constraint_gen::infer_expr_hm;
 use super::unification::solve_equations;
 use super::TypeVarId;
 use super::{HMInferenceContext, MonoType};
 use crate::diagnostics::TypeInferenceErrorKind;
-use crate::hir_ty::type_annotation::resolve_type_annotation;
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir as hir;
-use alloy_hir_resolved::EPTdFql;
+use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType, EPTdFql};
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
@@ -86,7 +85,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
                 if let Some(type_annotation) = value.type_annotation {
                     // Get the inferred type for this expression
                     if let Some(inferred_mono_ty) = ctx.maybe_find_type(&expr_fql) {
-                        let annotated = resolve_type_annotation(db, module_id, type_annotation);
+                        let annotated = resolve_annotated_type(db, module_id, type_annotation);
 
                         // Only add unification constraints for non-polymorphic annotations
                         // Polymorphic annotations are used for generalization instead
@@ -112,7 +111,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
             if let Some(value) = hir_module.get_value_by_id(&expr_id) {
                 if let Some(type_annotation) = value.type_annotation {
                     let expr_fql = Fql::new(module_id, expr_id);
-                    let annotated = resolve_type_annotation(db, module_id, type_annotation);
+                    let annotated = resolve_annotated_type(db, module_id, type_annotation);
 
                     // Get the inferred type and apply substitution
                     if let Some(mono_ty) = ctx.maybe_find_type(&expr_fql) {

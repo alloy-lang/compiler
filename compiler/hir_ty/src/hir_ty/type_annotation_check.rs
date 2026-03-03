@@ -4,13 +4,12 @@
 //! type annotations, including trait constraint verification.
 
 use crate::diagnostics::{ConflictingTypeAnnotationReason, TypeInferenceErrorKind};
-use crate::hir_ty::type_annotation::resolve_type_annotation;
-use crate::hir_ty::{AnnotatedType, ResolvedType};
+use crate::hir_ty::ResolvedType;
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir as hir;
 use alloy_hir::TypeIdx;
 use alloy_hir_resolved as res;
-use alloy_hir_resolved::Fql;
+use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType, Fql};
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use text_size::TextRange;
@@ -23,7 +22,7 @@ pub fn check_type_annotation(
     type_annotation_idx: TypeIdx,
     resolved_type: ResolvedType,
 ) {
-    let expected_type = resolve_type_annotation(db, current_module_id, type_annotation_idx);
+    let expected_type = resolve_annotated_type(db, current_module_id, type_annotation_idx);
 
     // Skip check for missing/unconstrained annotations
     if matches!(

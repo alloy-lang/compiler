@@ -1,3 +1,4 @@
+mod annotated_type;
 mod behavior;
 mod diagnostics;
 mod expr;
@@ -11,6 +12,7 @@ mod type_definition;
 mod type_reference;
 mod type_variable;
 
+pub use annotated_type::*;
 pub use behavior::*;
 pub use diagnostics::*;
 pub use expr::*;

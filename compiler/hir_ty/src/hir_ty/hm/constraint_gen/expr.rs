@@ -2,10 +2,11 @@ use super::super::inference::annotated_to_mono;
 use super::super::PolyType;
 use super::{HMInferenceContext, MonoType};
 use crate::hir_ty::hm::constraint_gen::pattern::infer_pattern_hm;
-use crate::hir_ty::type_annotation::resolve_type_annotation;
 use alloy_hir as hir;
 use alloy_hir_resolved as res;
-use alloy_hir_resolved::{EPFql, EPTdFql, Fql, TypeDefinition, TypeDefinitionKind};
+use alloy_hir_resolved::{
+    resolve_annotated_type, EPFql, EPTdFql, Fql, TypeDefinition, TypeDefinitionKind,
+};
 use non_empty_vec::NonEmpty;
 
 /// Generate constraints for an expression using HM inference
@@ -310,7 +311,7 @@ fn build_constructor_type(
         .properties()
         .iter()
         .map(|type_idx| {
-            let annotated = resolve_type_annotation(ctx.db, type_idx.module_id, type_idx.local_id);
+            let annotated = resolve_annotated_type(ctx.db, type_idx.module_id, type_idx.local_id);
             annotated_to_mono(&annotated, ctx).unwrap_or_else(|| ctx.fresh_type_var())
         })
         .collect();
@@ -440,7 +441,7 @@ fn infer_abstract_trait_member_ref(
     type_annotation: Fql<hir::TypeReference>,
 ) -> MonoType {
     let annotated =
-        resolve_type_annotation(ctx.db, type_annotation.module_id, type_annotation.local_id);
+        resolve_annotated_type(ctx.db, type_annotation.module_id, type_annotation.local_id);
 
     if let Some(mono_ty) = annotated_to_mono(&annotated, ctx) {
         return ctx.assign_type(source_fql, mono_ty);

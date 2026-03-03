@@ -1,8 +1,8 @@
-use crate::hir_ty::{AnnotatedType, ResolvedType};
+use crate::hir_ty::ResolvedType;
 use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, Severity};
 use alloy_hir as hir;
-use alloy_hir::{FqnResolutionError, Name};
-use alloy_hir_resolved::TypeResolutionError;
+use alloy_hir::FqnResolutionError;
+use alloy_hir_resolved::{AnnotatedType, TypeResolutionError};
 use itertools::Itertools;
 use text_size::TextRange;
 
@@ -69,7 +69,7 @@ impl Diagnostic for TypeInferenceError {
                             "Cannot find module '{}'",
                             attempted_module_path
                                 .iter()
-                                .map(Name::as_str)
+                                .map(hir::Name::as_str)
                                 .collect::<Vec<_>>()
                                 .join("::")
                         )
@@ -96,7 +96,7 @@ impl Diagnostic for TypeInferenceError {
                             fqn.module_id,
                             extra_segments
                                 .iter()
-                                .map(Name::as_str)
+                                .map(hir::Name::as_str)
                                 .collect::<Vec<_>>()
                                 .join("::")
                         )
@@ -212,7 +212,7 @@ impl Diagnostic for TypeInferenceError {
                             "Cannot find module '{}'",
                             attempted_module_path
                                 .iter()
-                                .map(Name::as_str)
+                                .map(hir::Name::as_str)
                                 .collect::<Vec<_>>()
                                 .join("::")
                         ))
@@ -232,7 +232,7 @@ impl Diagnostic for TypeInferenceError {
                         FqnResolutionError::ExtraSegments { fqn, extra_segments } => {
                             let extra_slug = extra_segments
                                 .iter()
-                                .map(Name::as_str)
+                                .map(hir::Name::as_str)
                                 .collect::<Vec<_>>()
                                 .join("::");
 

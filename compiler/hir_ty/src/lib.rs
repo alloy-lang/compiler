@@ -107,7 +107,7 @@ mod small_tests {
     use crate::tests::TestHirTyDatabase;
     use alloy_hir as hir;
     use alloy_hir::ExpressionIdx;
-    use alloy_hir_resolved::{EPTdFql, Fql};
+    use alloy_hir_resolved::{AnnotatedType, EPTdFql, Fql};
     use alloy_scope::{ScopeIdx, Scopes};
     use alloy_test_harness::idx;
     use alloy_workspace::WorkspaceDatabase;
@@ -304,26 +304,26 @@ mod small_tests {
         );
     }
 
-    // #[test]
-    // fn conflicting_type_annotation() {
-    //     check_error(
-    //         r#"
-    //             typeof x : String
-    //             let x = 1
-    //         "#,
-    //         &[TypeInferenceError::new(
-    //             TypeInferenceErrorKind::ConflictingTypeAnnotation {
-    //                 annotated_type: ResolvedType::BuiltIn(hir::BuiltInType::String),
-    //                 inferred_type: ResolvedType::BuiltIn(hir::BuiltInType::Int),
-    //                 reason: ConflictingTypeAnnotationReason::DirectConflict {
-    //                     annotated_type: ResolvedType::BuiltIn(hir::BuiltInType::String),
-    //                     inferred_type: ResolvedType::BuiltIn(hir::BuiltInType::Int),
-    //                 },
-    //             },
-    //             TextRange::new(TextSize::from(51), TextSize::from(73)),
-    //         )],
-    //     );
-    // }
+    #[test]
+    fn conflicting_type_annotation() {
+        check_error(
+            r#"
+                typeof x : String
+                let x = 1
+            "#,
+            &[TypeInferenceError::new(
+                TypeInferenceErrorKind::ConflictingTypeAnnotation {
+                    annotated_type: AnnotatedType::BuiltIn(hir::BuiltInType::String),
+                    inferred_type: ResolvedType::BuiltIn(hir::BuiltInType::Int),
+                    reason: ConflictingTypeAnnotationReason::DirectConflict {
+                        annotated_type: AnnotatedType::BuiltIn(hir::BuiltInType::String),
+                        inferred_type: ResolvedType::BuiltIn(hir::BuiltInType::Int),
+                    },
+                },
+                TextRange::new(TextSize::from(51), TextSize::from(73)),
+            )],
+        );
+    }
 
     #[test]
     fn type_annotation_hint_at_generic_refinement() {
