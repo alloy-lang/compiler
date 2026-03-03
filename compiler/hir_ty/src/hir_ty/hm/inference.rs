@@ -27,25 +27,15 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
     let mut ctx = HMInferenceContext::new(db, module_id);
     let (hir_module, _) = hir::lower_file(db, module_id);
 
-    // Phase 0: Build dependency graph and compute topological order
-    let dep_graph = super::dependency_analysis::DependencyGraph::build(db, module_id);
-    let expression_groups = dep_graph.topological_order();
-
-    // Build a map of expression IDs to their names for efficient lookup
-    let expr_names: FxHashMap<hir::ExpressionIdx, hir::ValueDefinition> = hir_module
-        .values()
-        .map(|value| (value.value, value.clone()))
-        .collect();
-
     // Build expr_to_group mapping for lazy constraint generation
-    for (group_idx, group) in expression_groups.iter().enumerate() {
+    for (group_idx, group) in hir_module.expression_groups() {
         for &expr_id in group {
             ctx.expr_to_group.insert(expr_id, group_idx);
         }
     }
 
     // Phase 1 & 2: Process expression groups in dependency order
-    for (group_idx, group) in expression_groups.into_iter().enumerate() {
+    for (group_idx, group) in hir_module.expression_groups() {
         // Set the current group for lazy constraint generation
         ctx.current_group = Some(group_idx);
 
@@ -66,7 +56,8 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
             let should_include = match fql {
                 EPTdFql::Expression(expr_fql) => {
                     // Only include if this expression has a name AND is in the same module
-                    expr_fql.module_id == module_id && expr_names.contains_key(&expr_fql.local_id)
+                    expr_fql.module_id == module_id
+                        && hir_module.get_value_by_id(&expr_fql.local_id).is_some()
                 }
                 // Patterns are internal to their expressions, don't include them
                 EPTdFql::Pattern(_) => false,
@@ -84,14 +75,14 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
         }
 
         // 1a. Generate constraints for all expressions in this group
-        for &expr_id in &group {
+        for &expr_id in group {
             let expr_fql = Fql::new(module_id, expr_id);
             infer_expr_hm(&mut ctx, expr_fql.clone());
 
             // Add type annotation constraints
             // For polymorphic annotations, we skip adding constraints here
             // and instead just use the annotation to guide generalization
-            if let Some(value) = expr_names.get(&expr_id) {
+            if let Some(value) = hir_module.get_value_by_id(&expr_id) {
                 if let Some(type_annotation) = value.type_annotation {
                     // Get the inferred type for this expression
                     if let Some(inferred_mono_ty) = ctx.maybe_find_type(&expr_fql) {
@@ -128,8 +119,8 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
         let (substitution, _unification_errors) = solve_equations(db, ctx.equations.clone());
 
         // 1c. Generalize polymorphic let-bindings
-        for &expr_id in &group {
-            if let Some(value) = expr_names.get(&expr_id) {
+        for &expr_id in group {
+            if let Some(value) = hir_module.get_value_by_id(&expr_id) {
                 if let Some(type_annotation) = value.type_annotation {
                     let expr_fql = Fql::new(module_id, expr_id);
 

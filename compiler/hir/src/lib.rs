@@ -1,6 +1,7 @@
 use std::fmt;
 
 mod ast_glossary;
+mod dependency_graph;
 mod diagnostics;
 mod hir;
 mod hir_module;

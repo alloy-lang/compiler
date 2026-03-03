@@ -53,11 +53,11 @@ HirTypedModule {
                     module_id: ModuleId {
                         path: "main",
                     },
-                    local_id: Idx::<Expression>(3),
+                    local_id: Idx::<Expression>(5),
                 },
                 type_args: [
                     BuiltIn(
-                        String,
+                        Int,
                     ),
                 ],
             },
@@ -66,11 +66,11 @@ HirTypedModule {
                     module_id: ModuleId {
                         path: "main",
                     },
-                    local_id: Idx::<Expression>(5),
+                    local_id: Idx::<Expression>(3),
                 },
                 type_args: [
                     BuiltIn(
-                        Int,
+                        String,
                     ),
                 ],
             },

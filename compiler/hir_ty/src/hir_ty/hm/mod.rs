@@ -12,7 +12,6 @@ use alloy_hir_resolved::{EPFql, EPTdFql, TypeResolutionError};
 use rustc_hash::{FxHashMap, FxHashSet};
 
 mod constraint_gen;
-mod dependency_analysis;
 mod inference;
 pub mod unification;
 
