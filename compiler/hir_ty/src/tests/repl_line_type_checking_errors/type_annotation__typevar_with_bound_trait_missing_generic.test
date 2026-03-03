@@ -67,8 +67,14 @@ HirTypedModule {
         TypeInferenceError {
             kind: ConflictingTypeAnnotation {
                 annotated_type: Lambda {
-                    arg_type: ConstrainedGeneric {
-                        id: 0,
+                    arg: ConstrainedTypeVar {
+                        fql: Fql {
+                            module_id: ModuleId {
+                                path: "main",
+                            },
+                            local_id: Idx::<TypeDefinition>(0),
+                        },
+                        name: "t1",
                         constraints: NonEmpty(
                             [
                                 (
@@ -83,11 +89,17 @@ HirTypedModule {
                             ],
                         ),
                     },
-                    return_type: Lambda {
-                        arg_type: Generic(
-                            1,
-                        ),
-                        return_type: TypeDef(
+                    ret: Lambda {
+                        arg: TypeVar {
+                            fql: Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<TypeDefinition>(1),
+                            },
+                            name: "t2",
+                        },
+                        ret: TypeDef(
                             Fql {
                                 module_id: ModuleId {
                                     path: "test_data",
@@ -181,7 +193,7 @@ HirTypedModule {
     },
 }
 []
-[E001] Error: Type annotation conflict: expected `t0 : TestTrait1 -> t1 -> Test`, found `t1 -> t2 -> Test[Int]`
+[E001] Error: Type annotation conflict: expected `t1 : TestTrait1 -> t2 -> Test`, found `t1 -> t2 -> Test[Int]`
     ╭─[ ./test/main.alloy:10:1 ]
     │
  10 │ let test_func = |a, b| -> test

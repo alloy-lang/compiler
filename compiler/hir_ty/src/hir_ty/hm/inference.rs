@@ -1,12 +1,12 @@
 //! Main type inference loop and result conversion
 
-use super::super::{check_type_annotation, Fql, ResolvedType};
+use super::super::{check_type_annotation, AnnotatedType, Fql, ResolvedType};
 use super::constraint_gen::infer_expr_hm;
 use super::unification::solve_equations;
 use super::TypeVarId;
 use super::{HMInferenceContext, MonoType};
 use crate::diagnostics::TypeInferenceErrorKind;
-use crate::hir_ty::type_annotation::{type_reference_to_resolved_type, TypeResolutionContext};
+use crate::hir_ty::type_annotation::resolve_type_annotation;
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir as hir;
 use alloy_hir_resolved::EPTdFql;
@@ -86,23 +86,12 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
                 if let Some(type_annotation) = value.type_annotation {
                     // Get the inferred type for this expression
                     if let Some(inferred_mono_ty) = ctx.maybe_find_type(&expr_fql) {
-                        // Resolve the type annotation to a ResolvedType
-                        let mut type_res_ctx = TypeResolutionContext::new();
-                        let Some(annotated_resolved) = type_reference_to_resolved_type(
-                            db,
-                            module_id,
-                            type_annotation,
-                            &mut type_res_ctx,
-                        ) else {
-                            continue;
-                        };
+                        let annotated = resolve_type_annotation(db, module_id, type_annotation);
 
                         // Only add unification constraints for non-polymorphic annotations
                         // Polymorphic annotations are used for generalization instead
-                        if !annotated_resolved.is_polymorphic() {
-                            if let Some(annotated_mono) =
-                                resolved_to_mono(&annotated_resolved, &mut ctx)
-                            {
+                        if !annotated.is_polymorphic() {
+                            if let Some(annotated_mono) = annotated_to_mono(&annotated, &mut ctx) {
                                 ctx.add_equation(
                                     inferred_mono_ty,
                                     annotated_mono,
@@ -123,26 +112,14 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
             if let Some(value) = hir_module.get_value_by_id(&expr_id) {
                 if let Some(type_annotation) = value.type_annotation {
                     let expr_fql = Fql::new(module_id, expr_id);
-
-                    // Check if this expression has a type annotation
-                    let mut type_res_ctx = TypeResolutionContext::new();
-                    let annotation_opt = type_reference_to_resolved_type(
-                        db,
-                        module_id,
-                        type_annotation,
-                        &mut type_res_ctx,
-                    );
+                    let annotated = resolve_type_annotation(db, module_id, type_annotation);
 
                     // Get the inferred type and apply substitution
                     if let Some(mono_ty) = ctx.maybe_find_type(&expr_fql) {
                         let resolved_ty = substitution.apply(&mono_ty);
 
                         // Check if this should be generalized
-                        let should_generalize = annotation_opt
-                            .as_ref()
-                            .is_some_and(ResolvedType::is_polymorphic);
-
-                        if should_generalize {
+                        if annotated.is_polymorphic() {
                             // Generalize the type and store in poly_env
                             let poly_ty = ctx.generalize_type(resolved_ty.clone());
                             ctx.poly_env.insert(expr_fql.clone().into(), poly_ty);
@@ -247,50 +224,52 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
     result
 }
 
-/// Convert a ResolvedType to a MonoType for use in constraint generation
-/// This allows type annotations to be converted into constraints that guide inference
-pub(super) fn resolved_to_mono(
-    resolved: &ResolvedType,
+/// Convert an AnnotatedType to a MonoType for use in constraint generation.
+/// Uses stable Fql<TypeDefinition> identities for type variables, ensuring
+/// the same type variable declaration always maps to the same TypeVarId.
+pub(super) fn annotated_to_mono(
+    annotated: &AnnotatedType,
     ctx: &mut HMInferenceContext,
 ) -> Option<MonoType> {
-    match resolved {
-        ResolvedType::UnknownReference(_) => None,
-        ResolvedType::Unconstrained => Some(MonoType::Unconstrained),
-        ResolvedType::Missing => None,
-        ResolvedType::Unit => Some(MonoType::Unit),
-        ResolvedType::BuiltIn(builtin) => Some(MonoType::Concrete(*builtin)),
-        ResolvedType::Lambda {
-            arg_type,
-            return_type,
-        } => {
-            let arg_mono = resolved_to_mono(arg_type, ctx)?;
-            let ret_mono = resolved_to_mono(return_type, ctx)?;
-            Some(MonoType::Function(Box::new(arg_mono), Box::new(ret_mono)))
-        }
-        ResolvedType::Tuple(elements) => {
-            let mono_elements: Option<Vec<_>> =
-                elements.iter().map(|e| resolved_to_mono(e, ctx)).collect();
-            mono_elements.map(MonoType::Tuple)
-        }
-        // For Generic types in annotations, create fresh type variables
-        // This allows generic annotations to work properly
-        ResolvedType::Generic(_) => Some(ctx.fresh_type_var()),
-        // For constrained generics, create a fresh type variable
-        // TODO: Track the constraints and enforce them during solving
-        ResolvedType::ConstrainedGeneric { .. } => Some(ctx.fresh_type_var()),
-        // Convert TypeDef to MonoType::TypeDef
-        ResolvedType::TypeDef(type_fql, name) => {
+    match annotated {
+        AnnotatedType::Missing => None,
+        AnnotatedType::Unconstrained => Some(MonoType::Unconstrained),
+        AnnotatedType::Unit => Some(MonoType::Unit),
+        AnnotatedType::BuiltIn(builtin) => Some(MonoType::Concrete(*builtin)),
+        AnnotatedType::TypeDef(type_fql, name) => {
             Some(MonoType::TypeDef(type_fql.clone(), name.clone()))
         }
-        // For Bounded types, convert to MonoType::App
-        ResolvedType::Bounded { base, args } => {
-            let base_mono = resolved_to_mono(base, ctx)?;
-            let args_mono: Option<Vec<_>> = args.iter().map(|a| resolved_to_mono(a, ctx)).collect();
-            let args_mono = args_mono?;
+        AnnotatedType::Lambda { arg, ret } => {
+            let arg_mono = annotated_to_mono(arg, ctx)?;
+            let ret_mono = annotated_to_mono(ret, ctx)?;
+            Some(MonoType::Function(Box::new(arg_mono), Box::new(ret_mono)))
+        }
+        AnnotatedType::Tuple(elements) => {
+            let mono_elements: Option<Vec<_>> =
+                elements.iter().map(|e| annotated_to_mono(e, ctx)).collect();
+            mono_elements.map(MonoType::Tuple)
+        }
+        AnnotatedType::Bounded { base, args } => {
+            let base_mono = annotated_to_mono(base, ctx)?;
+            let args_mono: Option<Vec<_>> =
+                args.iter().map(|a| annotated_to_mono(a, ctx)).collect();
             Some(MonoType::App {
                 constructor: Box::new(base_mono),
-                args: args_mono,
+                args: args_mono?,
             })
+        }
+        AnnotatedType::TypeVar { fql, name } => {
+            let var_id = ctx.get_or_create_annotation_type_var(fql.clone(), name.clone());
+            Some(MonoType::Var(var_id))
+        }
+        AnnotatedType::ConstrainedTypeVar { fql, name, .. } => {
+            // TODO: Track the constraints and enforce them during solving
+            let var_id = ctx.get_or_create_annotation_type_var(fql.clone(), name.clone());
+            Some(MonoType::Var(var_id))
+        }
+        AnnotatedType::SelfType { trait_fql, .. } => {
+            let var_id = ctx.get_or_create_self_type_var(trait_fql.clone());
+            Some(MonoType::Var(var_id))
         }
     }
 }

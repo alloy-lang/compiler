@@ -32,21 +32,21 @@ HirTypedModule {
             return_type: Lambda {
                 arg_type: Bounded {
                     base: Generic(
-                        3,
+                        1,
                     ),
                     args: [
                         Generic(
-                            4,
+                            0,
                         ),
                     ],
                 },
                 return_type: Bounded {
                     base: Generic(
-                        5,
+                        1,
                     ),
                     args: [
                         Generic(
-                            6,
+                            2,
                         ),
                     ],
                 },

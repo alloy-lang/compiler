@@ -1,14 +1,12 @@
-use super::super::inference::resolved_to_mono;
-use super::super::{PolyType, TypeVarId};
+use super::super::inference::annotated_to_mono;
+use super::super::PolyType;
 use super::{HMInferenceContext, MonoType};
 use crate::hir_ty::hm::constraint_gen::pattern::infer_pattern_hm;
-use crate::hir_ty::type_annotation::{type_reference_to_resolved_type, TypeResolutionContext};
-use crate::hir_ty::ResolvedType;
+use crate::hir_ty::type_annotation::resolve_type_annotation;
 use alloy_hir as hir;
 use alloy_hir_resolved as res;
 use alloy_hir_resolved::{EPFql, EPTdFql, Fql, TypeDefinition, TypeDefinitionKind};
 use non_empty_vec::NonEmpty;
-use rustc_hash::FxHashMap;
 
 /// Generate constraints for an expression using HM inference
 pub(crate) fn infer_expr_hm(
@@ -307,82 +305,39 @@ fn build_constructor_type(
     type_def_fql: &Fql<hir::TypeDefinition>,
     member: &res::TypeDefinitionMember,
 ) -> MonoType {
-    // Create a shared type resolution context for all parameters
-    // This ensures consistent Generic IDs across all type references
-    let mut type_ctx = TypeResolutionContext::new();
-
-    // Mapping from Generic ID to MonoType::Var for type parameters
-    let mut generic_to_var: FxHashMap<usize, TypeVarId> = FxHashMap::default();
-
-    // Helper to convert ResolvedType to MonoType with consistent type variable mapping
-    let resolved_to_mono_tracked = |resolved: &crate::hir_ty::ResolvedType,
-                                    ctx: &mut HMInferenceContext,
-                                    generic_map: &mut FxHashMap<usize, TypeVarId>|
-     -> Option<MonoType> {
-        match resolved {
-            ResolvedType::Generic(id) => {
-                // Use or create a type variable for this generic ID
-                let var_id = *generic_map
-                    .entry(*id)
-                    .or_insert_with(|| ctx.type_var_gen.fresh());
-                Some(MonoType::Var(var_id))
-            }
-            ResolvedType::ConstrainedGeneric { id, .. } => {
-                // Treat constrained generics the same for now
-                let var_id = *generic_map
-                    .entry(*id)
-                    .or_insert_with(|| ctx.type_var_gen.fresh());
-                Some(MonoType::Var(var_id))
-            }
-            other => resolved_to_mono(other, ctx),
-        }
-    };
-
     // Get the parameter types from the variant's properties
     let param_types: Vec<MonoType> = member
         .properties()
         .iter()
         .map(|type_idx| {
-            // Convert TypeIdx to MonoType
-            if let Some(resolved) = type_reference_to_resolved_type(
-                ctx.db,
-                type_idx.module_id,
-                type_idx.local_id,
-                &mut type_ctx,
-            ) {
-                // Convert ResolvedType to MonoType with tracked generics
-                resolved_to_mono_tracked(&resolved, ctx, &mut generic_to_var)
-                    .unwrap_or_else(|| ctx.fresh_type_var())
-            } else {
-                ctx.fresh_type_var()
-            }
+            let annotated = resolve_type_annotation(ctx.db, type_idx.module_id, type_idx.local_id);
+            annotated_to_mono(&annotated, ctx).unwrap_or_else(|| ctx.fresh_type_var())
         })
         .collect();
 
-    // Build the result type
+    // Collect type variable args that are free in the param types.
+    // These become the type parameters of the constructor.
     let type_name = type_def_fql.type_def_name(ctx.db);
-    let result_type = if generic_to_var.is_empty() {
-        // No type parameters - just the TypeDef
+    let free_vars = super::super::free_type_vars_set(&param_types);
+    let type_var_args: Vec<MonoType> = ctx
+        .annotation_type_vars
+        .values()
+        .filter(|var_id| free_vars.contains(var_id))
+        .map(|&var_id| MonoType::Var(var_id))
+        .collect();
+
+    // Build the result type
+    let result_type = if type_var_args.is_empty() {
         MonoType::TypeDef(type_def_fql.clone(), type_name)
     } else {
-        // Has type parameters - build App with type arguments
-        // Sort by generic ID to ensure consistent ordering
-        let mut type_vars: Vec<_> = generic_to_var.iter().collect();
-        type_vars.sort_by_key(|(id, _)| *id);
-        let args: Vec<MonoType> = type_vars
-            .into_iter()
-            .map(|(_, &var_id)| MonoType::Var(var_id))
-            .collect();
-
         MonoType::App {
             constructor: Box::new(MonoType::TypeDef(type_def_fql.clone(), type_name)),
-            args,
+            args: type_var_args,
         }
     };
 
     // Build curried function type: param1 -> (param2 -> (... -> result))
     if param_types.is_empty() {
-        // No parameters - the variant is just the result type (e.g., None)
         result_type
     } else {
         param_types
@@ -484,20 +439,11 @@ fn infer_abstract_trait_member_ref(
     source_fql: Fql<hir::Expression>,
     type_annotation: Fql<hir::TypeReference>,
 ) -> MonoType {
-    // Resolve the type annotation to get the type for this abstract member
-    // Create a temporary type resolution context
-    let mut type_ctx = TypeResolutionContext::new();
+    let annotated =
+        resolve_type_annotation(ctx.db, type_annotation.module_id, type_annotation.local_id);
 
-    if let Some(resolved_type) = type_reference_to_resolved_type(
-        ctx.db,
-        type_annotation.module_id,
-        type_annotation.local_id,
-        &mut type_ctx,
-    ) {
-        // Convert the resolved type to a monotype
-        if let Some(mono_ty) = resolved_to_mono(&resolved_type, ctx) {
-            return ctx.assign_type(source_fql, mono_ty);
-        }
+    if let Some(mono_ty) = annotated_to_mono(&annotated, ctx) {
+        return ctx.assign_type(source_fql, mono_ty);
     }
 
     // If we can't resolve the type annotation, use a fresh type variable

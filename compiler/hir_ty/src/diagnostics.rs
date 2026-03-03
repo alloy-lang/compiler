@@ -1,4 +1,4 @@
-use crate::hir_ty::ResolvedType;
+use crate::hir_ty::{AnnotatedType, ResolvedType};
 use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, Severity};
 use alloy_hir as hir;
 use alloy_hir::{FqnResolutionError, Name};
@@ -334,7 +334,7 @@ impl Diagnostic for TypeInferenceError {
 #[derive(Debug, Clone, PartialEq)]
 pub enum TypeInferenceErrorKind {
     ConflictingTypeAnnotation {
-        annotated_type: ResolvedType,
+        annotated_type: AnnotatedType,
         inferred_type: ResolvedType,
         reason: ConflictingTypeAnnotationReason,
     },
@@ -350,7 +350,7 @@ pub enum TypeInferenceErrorKind {
 #[derive(Debug, Clone, PartialEq)]
 pub enum ConflictingTypeAnnotationReason {
     DirectConflict {
-        annotated_type: ResolvedType,
+        annotated_type: AnnotatedType,
         inferred_type: ResolvedType,
     },
     MissingBehaviorImplementation {

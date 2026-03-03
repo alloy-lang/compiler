@@ -151,10 +151,18 @@ impl TypeVarGenerator {
 
 /// Compute the free type variables in a type
 pub(super) fn free_type_vars(ty: &MonoType) -> Vec<TypeVarId> {
-    use rustc_hash::FxHashSet;
     let mut vars = FxHashSet::default();
     collect_free_vars(ty, &mut vars);
     vars.into_iter().collect()
+}
+
+/// Compute the free type variables across a slice of types, returning a set
+pub(super) fn free_type_vars_set(types: &[MonoType]) -> FxHashSet<TypeVarId> {
+    let mut vars = FxHashSet::default();
+    for ty in types {
+        collect_free_vars(ty, &mut vars);
+    }
+    vars
 }
 
 fn collect_free_vars(ty: &MonoType, vars: &mut FxHashSet<TypeVarId>) {
@@ -256,6 +264,14 @@ pub(super) struct HMInferenceContext<'db> {
     /// The Vec<TypeVarId> contains the fresh type variables created during instantiation
     /// in the same order as the quantified variables in the PolyType
     pub(super) instantiations: FxHashMap<EPTdFql, Vec<(Fql<hir::Expression>, Vec<TypeVarId>)>>,
+    /// Maps annotation type variable Fql → TypeVarId
+    /// Ensures the same type variable declaration always maps to the same inference variable
+    pub(super) annotation_type_vars: FxHashMap<Fql<hir::TypeDefinition>, TypeVarId>,
+    /// Maps Self type Fql → TypeVarId
+    /// Ensures the same Self type in the same trait always maps to the same inference variable
+    pub(super) self_type_vars: FxHashMap<Fql<hir::Trait>, TypeVarId>,
+    /// Maps TypeVarId → user-visible name (for error messages)
+    pub(super) type_var_names: FxHashMap<TypeVarId, hir::Name>,
 }
 
 impl<'db> HMInferenceContext<'db> {
@@ -275,6 +291,9 @@ impl<'db> HMInferenceContext<'db> {
             current_group: None,
             env_type_vars: FxHashSet::default(),
             instantiations: FxHashMap::default(),
+            annotation_type_vars: FxHashMap::default(),
+            self_type_vars: FxHashMap::default(),
+            type_var_names: FxHashMap::default(),
         }
     }
 
@@ -363,5 +382,33 @@ impl<'db> HMInferenceContext<'db> {
         // Use the environment type variables from before this group
         // This ensures we quantify over type variables local to this expression
         PolyType::generalize(ty, &self.env_type_vars)
+    }
+
+    /// Get or create a type variable for an annotation type variable (typevar declaration).
+    /// Ensures the same Fql<TypeDefinition> always maps to the same TypeVarId.
+    pub(super) fn get_or_create_annotation_type_var(
+        &mut self,
+        fql: Fql<hir::TypeDefinition>,
+        name: hir::Name,
+    ) -> TypeVarId {
+        if let Some(&var_id) = self.annotation_type_vars.get(&fql) {
+            return var_id;
+        }
+        let var_id = self.type_var_gen.fresh();
+        self.annotation_type_vars.insert(fql, var_id);
+        self.type_var_names.insert(var_id, name);
+        var_id
+    }
+
+    /// Get or create a type variable for a Self type in a trait context.
+    /// Ensures the same Fql<Trait> always maps to the same TypeVarId.
+    pub(super) fn get_or_create_self_type_var(&mut self, trait_fql: Fql<hir::Trait>) -> TypeVarId {
+        if let Some(&var_id) = self.self_type_vars.get(&trait_fql) {
+            return var_id;
+        }
+        let var_id = self.type_var_gen.fresh();
+        self.self_type_vars.insert(trait_fql, var_id);
+        self.type_var_names.insert(var_id, hir::Name::new("Self"));
+        var_id
     }
 }

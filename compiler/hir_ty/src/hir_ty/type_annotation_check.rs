@@ -4,8 +4,8 @@
 //! type annotations, including trait constraint verification.
 
 use crate::diagnostics::{ConflictingTypeAnnotationReason, TypeInferenceErrorKind};
-use crate::hir_ty::type_annotation::{type_reference_to_resolved_type, TypeResolutionContext};
-use crate::hir_ty::ResolvedType;
+use crate::hir_ty::type_annotation::resolve_type_annotation;
+use crate::hir_ty::{AnnotatedType, ResolvedType};
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir as hir;
 use alloy_hir::TypeIdx;
@@ -23,14 +23,15 @@ pub fn check_type_annotation(
     type_annotation_idx: TypeIdx,
     resolved_type: ResolvedType,
 ) {
-    // Check for type annotation conflicts
-    let mut ctx = TypeResolutionContext::new();
-    let Some(expected_type) =
-        type_reference_to_resolved_type(db, current_module_id, type_annotation_idx, &mut ctx)
-    else {
-        // Unable to resolve type annotation - skip check
+    let expected_type = resolve_type_annotation(db, current_module_id, type_annotation_idx);
+
+    // Skip check for missing/unconstrained annotations
+    if matches!(
+        expected_type,
+        AnnotatedType::Missing | AnnotatedType::Unconstrained
+    ) {
         return;
-    };
+    }
 
     // Check if the inferred type is compatible with the expected type
     if let Err(reason) = check_type_compatibility(db, &expected_type, &resolved_type) {
@@ -45,64 +46,72 @@ pub fn check_type_annotation(
     }
 }
 
-/// Check if the `found` type is compatible with the `expected` type.
-/// This is more permissive than equality - it allows:
-/// - Generic type variables to match (even with different IDs)
-/// - Checking that trait constraints are satisfied
-/// - Subtyping relationships (in the future)
+/// Check if the `found` type is compatible with the `expected` annotation type.
+/// This compares an AnnotatedType (what the user wrote) against a ResolvedType (what inference produced).
 fn check_type_compatibility(
     db: &dyn HirTyDatabase,
-    expected: &ResolvedType,
+    expected: &AnnotatedType,
     found: &ResolvedType,
 ) -> Result<(), ConflictingTypeAnnotationReason> {
     match (expected, found) {
-        // Exact matches
-        (ResolvedType::UnknownReference(_), _) | (_, ResolvedType::UnknownReference(_)) => Ok(()),
-        (ResolvedType::Unconstrained, _) | (_, ResolvedType::Unconstrained) => Ok(()),
-        (ResolvedType::Missing, _) | (_, ResolvedType::Missing) => {
+        // Wildcards on either side
+        (AnnotatedType::Unconstrained, _) | (_, ResolvedType::Unconstrained) => Ok(()),
+        (AnnotatedType::Missing, _) | (_, ResolvedType::Missing) => {
             Err(ConflictingTypeAnnotationReason::DirectConflict {
                 annotated_type: expected.clone(),
                 inferred_type: found.clone(),
             })
         }
-        (ResolvedType::Unit, ResolvedType::Unit) => Ok(()),
-        (ResolvedType::BuiltIn(a), ResolvedType::BuiltIn(b)) if a == b => Ok(()),
-        (ResolvedType::TypeDef(a, _), ResolvedType::TypeDef(b, _)) if a == b => Ok(()),
+        (_, ResolvedType::UnknownReference(_)) => Ok(()),
 
-        // Generic type variables
-        // TODO: Track generic type variable assignments to ensure consistency
-        (ResolvedType::Generic(_), ResolvedType::Generic(_)) => Ok(()),
+        // Unit
+        (AnnotatedType::Unit, ResolvedType::Unit) => Ok(()),
 
-        // Constrained generics - the found type must satisfy the constraints
-        (ResolvedType::ConstrainedGeneric { id: _, constraints }, found_ty) => {
+        // Built-in types
+        (AnnotatedType::BuiltIn(a), ResolvedType::BuiltIn(b)) if a == b => Ok(()),
+
+        // Nominal type definitions
+        (AnnotatedType::TypeDef(a, _), ResolvedType::TypeDef(b, _)) if a == b => Ok(()),
+
+        // Type variables in annotation match any generic in inference result
+        (AnnotatedType::TypeVar { .. }, ResolvedType::Generic(_)) => Ok(()),
+        (AnnotatedType::TypeVar { .. }, ResolvedType::ConstrainedGeneric { .. }) => Ok(()),
+
+        // Constrained type variables - check trait constraints
+        (AnnotatedType::ConstrainedTypeVar { constraints, .. }, found_ty) => {
             check_trait_constraints(db, found_ty, constraints)
         }
 
-        // A generic can match a constrained generic if we're checking from found -> expected
-        // (this allows inference to be more general than the annotation)
-        (ResolvedType::Generic(_), ResolvedType::ConstrainedGeneric { .. }) => {
-            // TODO: We might want to track that this generic has constraints
-            Ok(())
+        // Self type in annotation matches generics
+        (AnnotatedType::SelfType { .. }, ResolvedType::Generic(_)) => Ok(()),
+        (
+            AnnotatedType::SelfType {
+                trait_constraints: constraints,
+                ..
+            },
+            found_ty,
+        ) if !constraints.is_empty() => {
+            // Self type with constraints — check that the found type satisfies them
+            // SAFETY: We just checked non-empty
+            let constraints_ne = unsafe { NonEmpty::new_unchecked(constraints.clone()) };
+            check_trait_constraints(db, found_ty, &constraints_ne)
         }
 
-        // Lambda types - check arguments and return types recursively
+        // Lambda types
         (
+            AnnotatedType::Lambda { arg, ret },
             ResolvedType::Lambda {
-                arg_type: exp_arg,
-                return_type: exp_ret,
-            },
-            ResolvedType::Lambda {
-                arg_type: found_arg,
-                return_type: found_ret,
+                arg_type,
+                return_type,
             },
         ) => {
-            check_type_compatibility(db, exp_arg, found_arg)?;
-            check_type_compatibility(db, exp_ret, found_ret)?;
+            check_type_compatibility(db, arg, arg_type)?;
+            check_type_compatibility(db, ret, return_type)?;
             Ok(())
         }
 
-        // Tuple types - check all elements
-        (ResolvedType::Tuple(exp_elems), ResolvedType::Tuple(found_elems)) => {
+        // Tuple types
+        (AnnotatedType::Tuple(exp_elems), ResolvedType::Tuple(found_elems)) => {
             if exp_elems.len() != found_elems.len() {
                 return Err(ConflictingTypeAnnotationReason::DirectConflict {
                     annotated_type: expected.clone(),
@@ -115,9 +124,9 @@ fn check_type_compatibility(
             Ok(())
         }
 
-        // Bounded types - check base type and all arguments
+        // Bounded types
         (
-            ResolvedType::Bounded {
+            AnnotatedType::Bounded {
                 base: exp_base,
                 args: exp_args,
             },
@@ -126,22 +135,16 @@ fn check_type_compatibility(
                 args: found_args,
             },
         ) => {
-            // Check that bases are compatible
             check_type_compatibility(db, exp_base, found_base)?;
-
-            // Check argument counts match
             if exp_args.len() != found_args.len() {
                 return Err(ConflictingTypeAnnotationReason::DirectConflict {
                     annotated_type: expected.clone(),
                     inferred_type: found.clone(),
                 });
             }
-
-            // Check all type arguments are compatible
             for (exp_arg, found_arg) in exp_args.iter().zip(found_args.iter()) {
                 check_type_compatibility(db, exp_arg, found_arg)?;
             }
-
             Ok(())
         }
 
@@ -160,9 +163,7 @@ fn check_trait_constraints(
     constraints: &NonEmpty<(Fql<hir::Trait>, hir::Name)>,
 ) -> Result<(), ConflictingTypeAnnotationReason> {
     match ty {
-        // For concrete user-defined types, check if they have behavior implementations
         ResolvedType::TypeDef(type_fql, _) => {
-            // Check each required trait
             for (required_trait, _) in constraints {
                 if !has_behavior_for_trait(db, type_fql, required_trait) {
                     return Err(
@@ -175,11 +176,7 @@ fn check_trait_constraints(
             }
             Ok(())
         }
-        // Generic types can't be checked at compile time
-        // They'll be checked when instantiated with concrete types
         ResolvedType::Generic(_) | ResolvedType::ConstrainedGeneric { .. } => Ok(()),
-        // For other types (BuiltIn, Lambda, Tuple), we accept them for now
-        // TODO: Implement constraint checking for built-in types, lambdas, etc.
         _ => Ok(()),
     }
 }
@@ -192,7 +189,6 @@ fn has_behavior_for_trait(
 ) -> bool {
     let (hir_module, _) = hir::lower_file(db, expected_type_fql.module_id);
 
-    // Search through all behaviors in the type's module
     for (behavior_idx, _behavior, _range, _name) in hir_module.behaviors() {
         if does_behavior_match(
             db,
