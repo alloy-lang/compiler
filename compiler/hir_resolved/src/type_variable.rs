@@ -1,4 +1,4 @@
-use crate::{resolve_trait_by_ref_id, Fql, TypeResolutionError};
+use crate::{resolve_trait_by_ref_id, Fql, HirResolutionError};
 use alloy_hir as hir;
 use non_empty_vec::NonEmpty;
 
@@ -19,7 +19,7 @@ pub fn resolve_type_variable_by_id(
     db: &dyn hir::HirDatabase,
     module_id: alloy_workspace::ModuleId,
     type_def_idx: hir::TypeDefinitionIdx,
-) -> (TypeVariable, Vec<TypeResolutionError>) {
+) -> (TypeVariable, Vec<HirResolutionError>) {
     let (hir_module, _) = hir::lower_file(db, module_id);
     let type_def = hir_module.get_type_definition(type_def_idx);
 

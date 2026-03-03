@@ -14,7 +14,7 @@ HirTypedModule {
     warnings: [],
     errors: [
         TypeInferenceError {
-            kind: TypeResolutionError(
+            kind: HirResolutionError(
                 UnresolvedModule {
                     source_ref: TypeReference(
                         Fql {

@@ -2,7 +2,7 @@ use crate::hir_ty::ResolvedType;
 use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, Severity};
 use alloy_hir as hir;
 use alloy_hir::FqnResolutionError;
-use alloy_hir_resolved::{AnnotatedType, TypeResolutionError};
+use alloy_hir_resolved::{AnnotatedType, HirResolutionError};
 use itertools::Itertools;
 use text_size::TextRange;
 
@@ -38,7 +38,7 @@ impl Diagnostic for TypeInferenceError {
         match &self.kind {
             TypeInferenceErrorKind::ConflictingTypeAnnotation { .. } => Some("E001"),
             TypeInferenceErrorKind::UnificationError(_) => Some("E002"),
-            TypeInferenceErrorKind::TypeResolutionError { .. } => Some("E003"),
+            TypeInferenceErrorKind::HirResolutionError { .. } => Some("E003"),
             TypeInferenceErrorKind::MissingTraitMemberImplementation { .. } => Some("E004"),
         }
     }
@@ -60,8 +60,8 @@ impl Diagnostic for TypeInferenceError {
                     format!("Infinite type detected: `{}` occurs in `{}`", var, ty)
                 }
             },
-            TypeInferenceErrorKind::TypeResolutionError(err) => match err {
-                TypeResolutionError::UnresolvedModule { err, .. } => match err {
+            TypeInferenceErrorKind::HirResolutionError(err) => match err {
+                HirResolutionError::UnresolvedModule { err, .. } => match err {
                     FqnResolutionError::UnknownRootModule {
                         attempted_module_path,
                     } => {
@@ -102,7 +102,7 @@ impl Diagnostic for TypeInferenceError {
                         )
                     }
                 },
-                TypeResolutionError::UnknownExpressionReference { path, .. } => {
+                HirResolutionError::UnknownExpressionReference { path, .. } => {
                     let path_str = path
                         .iter()
                         .map(|n| n.as_str())
@@ -110,7 +110,7 @@ impl Diagnostic for TypeInferenceError {
                         .join("::");
                     format!("Cannot find value `{}` in this scope", path_str)
                 }
-                TypeResolutionError::UnknownPatternReference { path, .. } => {
+                HirResolutionError::UnknownPatternReference { path, .. } => {
                     let path_str = path
                         .iter()
                         .map(|n| n.as_str())
@@ -118,7 +118,7 @@ impl Diagnostic for TypeInferenceError {
                         .join("::");
                     format!("Cannot find pattern `{}` in this scope", path_str)
                 }
-                TypeResolutionError::UnknownTypeReference { path, .. } => {
+                HirResolutionError::UnknownTypeReference { path, .. } => {
                     let path_str = path
                         .iter()
                         .map(|n| n.as_str())
@@ -126,7 +126,7 @@ impl Diagnostic for TypeInferenceError {
                         .join("::");
                     format!("Cannot find type `{}` in this scope", path_str)
                 }
-                TypeResolutionError::UnknownTypeDefinition { path, .. } => {
+                HirResolutionError::UnknownTypeDefinition { path, .. } => {
                     let path_str = path
                         .iter()
                         .map(|n| n.as_str())
@@ -134,13 +134,13 @@ impl Diagnostic for TypeInferenceError {
                         .join("::");
                     format!("Cannot find type definition `{}`", path_str)
                 }
-                TypeResolutionError::UnknownTypeDefinitionVariant { variant_name, .. } => {
+                HirResolutionError::UnknownTypeDefinitionVariant { variant_name, .. } => {
                     format!("Unknown variant `{}`", variant_name.as_str())
                 }
-                TypeResolutionError::MissingTypeDefinitionVariant { .. } => {
+                HirResolutionError::MissingTypeDefinitionVariant { .. } => {
                     "Missing variant name for multi-variant type".to_string()
                 }
-                TypeResolutionError::UnknownTraitReference { path, .. } => {
+                HirResolutionError::UnknownTraitReference { path, .. } => {
                     let path_str = path
                         .iter()
                         .map(|n| n.as_str())
@@ -148,10 +148,10 @@ impl Diagnostic for TypeInferenceError {
                         .join("::");
                     format!("Cannot find trait `{}`", path_str)
                 }
-                TypeResolutionError::UnknownTraitMember { subname, .. } => {
+                HirResolutionError::UnknownTraitMember { subname, .. } => {
                     format!("Cannot find trait member `{}`", subname.as_str())
                 }
-                TypeResolutionError::BoundedTraitReference { .. } => {
+                HirResolutionError::BoundedTraitReference { .. } => {
                     "Bounded trait reference resolution not yet implemented".to_string()
                 }
             },
@@ -205,8 +205,8 @@ impl Diagnostic for TypeInferenceError {
                     }
                 }
             }
-            TypeInferenceErrorKind::TypeResolutionError(err) => match err {
-                TypeResolutionError::UnresolvedModule { err, .. } => {
+            TypeInferenceErrorKind::HirResolutionError(err) => match err {
+                HirResolutionError::UnresolvedModule { err, .. } => {
                     match err {
                         FqnResolutionError::UnknownRootModule { attempted_module_path } => builder.with_primary_label(format!(
                             "Cannot find module '{}'",
@@ -242,57 +242,57 @@ impl Diagnostic for TypeInferenceError {
                         }
                     }
                 }
-                TypeResolutionError::UnknownExpressionReference { path, module_id, .. } => {
+                HirResolutionError::UnknownExpressionReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
                     let module_slug = builder.format_module_slug(module_id);
                     builder
                         .with_primary_label(format!("cannot find `{}`", path_str))
                         .with_help(format!("No value named `{}` found in module `{}`", path_str, module_slug))
                 }
-                TypeResolutionError::UnknownPatternReference { path, module_id, .. } => {
+                HirResolutionError::UnknownPatternReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
                     let module_slug = builder.format_module_slug(module_id);
                     builder
                         .with_primary_label(format!("cannot find `{}`", path_str))
                         .with_help(format!("No pattern named `{}` found in module `{}`", path_str, module_slug))
                 }
-                TypeResolutionError::UnknownTypeReference { path, module_id, .. } => {
+                HirResolutionError::UnknownTypeReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
                     let module_slug = builder.format_module_slug(module_id);
                     builder
                         .with_primary_label(format!("cannot find type `{}`", path_str))
                         .with_help(format!("No type named `{}` found in module `{}`", path_str, module_slug))
                 }
-                TypeResolutionError::UnknownTypeDefinition { path, module_id, .. } => {
+                HirResolutionError::UnknownTypeDefinition { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
                     let module_slug = builder.format_module_slug(module_id);
                     builder
                         .with_primary_label(format!("cannot find type `{}`", path_str))
                         .with_help(format!("No type definition named `{}` found in module `{}`", path_str, module_slug))
                 }
-                TypeResolutionError::UnknownTypeDefinitionVariant { variant_name, .. } => {
+                HirResolutionError::UnknownTypeDefinitionVariant { variant_name, .. } => {
                     builder
                         .with_primary_label(format!("variant `{}` not found", variant_name.as_str()))
                         .with_help(format!("No variant named `{}` exists on this type", variant_name.as_str()))
                 }
-                TypeResolutionError::MissingTypeDefinitionVariant { .. } => {
+                HirResolutionError::MissingTypeDefinitionVariant { .. } => {
                     builder
                         .with_primary_label("missing variant name")
                         .with_help("Multi-variant types require specifying a variant (e.g., `Type::Variant`)")
                 }
-                TypeResolutionError::UnknownTraitReference { path, module_id, .. } => {
+                HirResolutionError::UnknownTraitReference { path, module_id, .. } => {
                     let path_str = path.iter().map(|n| n.as_str()).collect::<Vec<_>>().join("::");
                     let module_slug = builder.format_module_slug(module_id);
                     builder
                         .with_primary_label(format!("cannot find trait `{}`", path_str))
                         .with_help(format!("No trait named `{}` found in module `{}`", path_str, module_slug))
                 }
-                TypeResolutionError::UnknownTraitMember { subname, .. } => {
+                HirResolutionError::UnknownTraitMember { subname, .. } => {
                     builder
                         .with_primary_label(format!("cannot find trait member `{}`", subname.as_str()))
                         .with_help("Check that the trait name is correct and the module is imported")
                 }
-                TypeResolutionError::BoundedTraitReference { .. } => {
+                HirResolutionError::BoundedTraitReference { .. } => {
                     builder
                         .with_primary_label("bounded trait reference")
                         .with_help("Bounded trait references are not yet fully implemented")
@@ -339,7 +339,7 @@ pub enum TypeInferenceErrorKind {
         reason: ConflictingTypeAnnotationReason,
     },
     UnificationError(crate::hir_ty::UnificationError),
-    TypeResolutionError(TypeResolutionError),
+    HirResolutionError(HirResolutionError),
     MissingTraitMemberImplementation {
         trait_name: hir::Name,
         member_name: hir::Name,

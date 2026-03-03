@@ -31,7 +31,7 @@ fn validate_behavior(
         Ok(trait_fql) => trait_fql,
         Err(err) => {
             result.error(
-                TypeInferenceErrorKind::TypeResolutionError(err.clone()),
+                TypeInferenceErrorKind::HirResolutionError(err.clone()),
                 behavior_range,
             );
             return;
@@ -41,7 +41,7 @@ fn validate_behavior(
         Ok(type_fql) => type_fql,
         Err(err) => {
             result.error(
-                TypeInferenceErrorKind::TypeResolutionError(err.clone()),
+                TypeInferenceErrorKind::HirResolutionError(err.clone()),
                 behavior_range,
             );
             return;

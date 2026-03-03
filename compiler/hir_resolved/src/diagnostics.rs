@@ -5,7 +5,7 @@ use non_empty_vec::NonEmpty;
 use text_size::TextRange;
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum TypeResolutionError {
+pub enum HirResolutionError {
     UnresolvedModule {
         source_ref: EPTrFql,
         err: hir::FqnResolutionError,
@@ -56,33 +56,33 @@ pub enum TypeResolutionError {
     },
 }
 
-impl TypeResolutionError {
+impl HirResolutionError {
     pub fn get_range(&self, db: &dyn hir::HirDatabase) -> TextRange {
         match self {
-            TypeResolutionError::UnresolvedModule { source_ref, .. } => source_ref.text_range(db),
-            TypeResolutionError::UnknownExpressionReference { source_ref, .. } => {
+            HirResolutionError::UnresolvedModule { source_ref, .. } => source_ref.text_range(db),
+            HirResolutionError::UnknownExpressionReference { source_ref, .. } => {
                 source_ref.text_range(db)
             }
-            TypeResolutionError::UnknownPatternReference { source_ref, .. } => {
+            HirResolutionError::UnknownPatternReference { source_ref, .. } => {
                 source_ref.text_range(db)
             }
-            TypeResolutionError::UnknownTypeReference { source_ref, .. } => {
+            HirResolutionError::UnknownTypeReference { source_ref, .. } => {
                 source_ref.text_range(db)
             }
-            TypeResolutionError::UnknownTypeDefinition { source_ref, .. } => {
+            HirResolutionError::UnknownTypeDefinition { source_ref, .. } => {
                 source_ref.text_range(db)
             }
-            TypeResolutionError::UnknownTypeDefinitionVariant { source_ref, .. } => {
+            HirResolutionError::UnknownTypeDefinitionVariant { source_ref, .. } => {
                 source_ref.text_range(db)
             }
-            TypeResolutionError::MissingTypeDefinitionVariant { source_ref, .. } => {
+            HirResolutionError::MissingTypeDefinitionVariant { source_ref, .. } => {
                 source_ref.text_range(db)
             }
-            TypeResolutionError::UnknownTraitReference { source_ref, .. } => {
+            HirResolutionError::UnknownTraitReference { source_ref, .. } => {
                 source_ref.text_range(db)
             }
-            TypeResolutionError::UnknownTraitMember { source_ref, .. } => source_ref.text_range(db),
-            TypeResolutionError::BoundedTraitReference { source_ref, .. } => {
+            HirResolutionError::UnknownTraitMember { source_ref, .. } => source_ref.text_range(db),
+            HirResolutionError::BoundedTraitReference { source_ref, .. } => {
                 source_ref.text_range(db)
             }
         }

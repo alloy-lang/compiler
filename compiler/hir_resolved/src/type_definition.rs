@@ -1,4 +1,4 @@
-use crate::{resolver, EPTrFql, Fql, TypeResolutionError};
+use crate::{resolver, EPTrFql, Fql, HirResolutionError};
 use alloy_hir as hir;
 use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
@@ -38,7 +38,7 @@ pub(crate) fn resolve_type_definition_by_path_variant(
     module_id: ModuleId,
     path: &hir::Path,
     source_ref: impl Into<EPTrFql> + Clone,
-) -> Result<(Fql<hir::TypeDefinition>, Option<hir::Name>), TypeResolutionError> {
+) -> Result<(Fql<hir::TypeDefinition>, Option<hir::Name>), HirResolutionError> {
     let variant_name = path.subpath();
 
     let type_def_fql = resolver::resolve_by_path::<hir::TypeDefinition, TypeDefinitionResolver>(
@@ -54,7 +54,7 @@ pub(crate) fn resolve_type_definition_by_path_variant(
     }
 
     let Some(variant_name) = variant_name else {
-        return Err(TypeResolutionError::MissingTypeDefinitionVariant {
+        return Err(HirResolutionError::MissingTypeDefinitionVariant {
             source_ref: source_ref.into(),
             target_type_fql: type_def_fql,
         });
@@ -68,7 +68,7 @@ pub fn resolve_type_definition_by_ref_id(
     db: &dyn hir::HirDatabase,
     module_id: ModuleId,
     type_idx: hir::TypeIdx,
-) -> Result<Fql<hir::TypeDefinition>, TypeResolutionError> {
+) -> Result<Fql<hir::TypeDefinition>, HirResolutionError> {
     let source_ref = Fql::new(module_id, type_idx);
     let (hir_module, _) = hir::lower_file(db, module_id);
     let type_ref = hir_module.get_type_reference(type_idx);
@@ -156,19 +156,19 @@ impl resolver::Resolver<hir::TypeDefinition> for TypeDefinitionResolver {
         source_ref: impl Into<EPTrFql>,
         module_id: ModuleId,
         path: NonEmpty<hir::Name>,
-    ) -> TypeResolutionError {
+    ) -> HirResolutionError {
         match source_ref.into() {
-            EPTrFql::Expression(fql) => TypeResolutionError::UnknownExpressionReference {
+            EPTrFql::Expression(fql) => HirResolutionError::UnknownExpressionReference {
                 source_ref: fql,
                 module_id,
                 path,
             },
-            EPTrFql::Pattern(fql) => TypeResolutionError::UnknownPatternReference {
+            EPTrFql::Pattern(fql) => HirResolutionError::UnknownPatternReference {
                 source_ref: fql,
                 module_id,
                 path,
             },
-            EPTrFql::TypeReference(fql) => TypeResolutionError::UnknownTypeDefinition {
+            EPTrFql::TypeReference(fql) => HirResolutionError::UnknownTypeDefinition {
                 source_ref: fql,
                 module_id,
                 path,
@@ -181,12 +181,12 @@ impl resolver::Resolver<hir::TypeDefinition> for TypeDefinitionResolver {
         source_ref: impl Into<EPTrFql>,
         type_def_fql: Fql<hir::TypeDefinition>,
         subname: Option<hir::Name>,
-    ) -> Option<TypeResolutionError> {
+    ) -> Option<HirResolutionError> {
         if let Some(variant_name) = &subname {
             let (hir_module, _) = hir::lower_file(db, type_def_fql.module_id);
             let type_def = hir_module.get_type_definition(type_def_fql.local_id);
             if !type_def.kind.has_variant(variant_name) {
-                return Some(TypeResolutionError::UnknownTypeDefinitionVariant {
+                return Some(HirResolutionError::UnknownTypeDefinitionVariant {
                     source_ref: source_ref.into(),
                     target_type_fql: type_def_fql,
                     variant_name: variant_name.clone(),
@@ -242,7 +242,7 @@ mod tests {
 
         let actual_err = resolve_type_definition_by_ref_id(&db, module_id, TYPE_REF_IDX)
             .expect_err("must fail to find type def variant");
-        let expected = TypeResolutionError::UnknownTypeDefinitionVariant {
+        let expected = HirResolutionError::UnknownTypeDefinitionVariant {
             source_ref: EPTrFql::TypeReference(Fql {
                 module_id,
                 local_id: TYPE_REF_IDX,
@@ -309,7 +309,7 @@ mod tests {
 
         let actual_err = resolve_type_definition_by_ref_id(&db, module_id, TYPE_REF_IDX)
             .expect_err("must fail to find type def variant");
-        let expected = TypeResolutionError::UnknownTypeDefinitionVariant {
+        let expected = HirResolutionError::UnknownTypeDefinitionVariant {
             source_ref: EPTrFql::TypeReference(Fql {
                 module_id,
                 local_id: TYPE_REF_IDX,
@@ -346,7 +346,7 @@ mod tests {
 
         let actual_err = resolve_type_definition_by_ref_id(&db, module_id, TYPE_REF_IDX)
             .expect_err("must not find type def");
-        let expected = TypeResolutionError::UnknownTypeDefinition {
+        let expected = HirResolutionError::UnknownTypeDefinition {
             source_ref: Fql {
                 module_id,
                 local_id: TYPE_REF_IDX,
@@ -371,7 +371,7 @@ mod tests {
 
         let actual_err = resolve_type_definition_by_ref_id(&db, module_id, TYPE_REF_IDX)
             .expect_err("must not find type def");
-        let expected = TypeResolutionError::UnresolvedModule {
+        let expected = HirResolutionError::UnresolvedModule {
             err: hir::FqnResolutionError::UnknownRootModule {
                 attempted_module_path: ne_vec![hir::Name::new("fake")],
             },
@@ -396,7 +396,7 @@ mod tests {
 
         let actual_err = resolve_type_definition_by_ref_id(&db, module_id, TYPE_REF_IDX)
             .expect_err("must not find type def");
-        let expected = TypeResolutionError::UnknownTypeDefinition {
+        let expected = HirResolutionError::UnknownTypeDefinition {
             source_ref: Fql {
                 module_id,
                 local_id: TYPE_REF_IDX,

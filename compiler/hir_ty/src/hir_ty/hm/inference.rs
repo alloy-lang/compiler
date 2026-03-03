@@ -213,7 +213,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
     // Convert resolution errors to diagnostics
     for err in ctx.resolution_errors {
         let range = err.get_range(db);
-        result.error(TypeInferenceErrorKind::TypeResolutionError(err), range);
+        result.error(TypeInferenceErrorKind::HirResolutionError(err), range);
     }
 
     for err in unification_errors {

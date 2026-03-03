@@ -1,5 +1,5 @@
 use crate::resolver::resolve_by_path;
-use crate::{resolver, EPTrFql, Expression, Fql, TypeResolutionError};
+use crate::{resolver, EPTrFql, Expression, Fql, HirResolutionError};
 use alloy_hir as hir;
 use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
@@ -13,7 +13,7 @@ pub fn resolve_trait_by_ref_id(
     db: &dyn hir::HirDatabase,
     module_id: ModuleId,
     type_idx: hir::TypeIdx,
-) -> Result<Fql<hir::Trait>, TypeResolutionError> {
+) -> Result<Fql<hir::Trait>, HirResolutionError> {
     let source_ref = Fql::new(module_id, type_idx);
     let (hir_module, _) = hir::lower_file(db, module_id);
     let type_ref = hir_module.get_type_reference(type_idx);
@@ -23,7 +23,7 @@ pub fn resolve_trait_by_ref_id(
             resolve_by_path::<hir::Trait, TraitResolver>(db, module_id, path, source_ref)
         }
         hir::TypeReference::Bounded { base, .. } => {
-            Err(TypeResolutionError::BoundedTraitReference {
+            Err(HirResolutionError::BoundedTraitReference {
                 source_ref,
                 target_ref: Fql::new(module_id, *base),
             })
@@ -101,8 +101,8 @@ impl resolver::Resolver<hir::Trait> for TraitResolver {
         source_ref: impl Into<EPTrFql>,
         module_id: ModuleId,
         path: NonEmpty<hir::Name>,
-    ) -> TypeResolutionError {
-        TypeResolutionError::UnknownTraitReference {
+    ) -> HirResolutionError {
+        HirResolutionError::UnknownTraitReference {
             source_ref: source_ref.into(),
             module_id,
             path,
@@ -114,7 +114,7 @@ impl resolver::Resolver<hir::Trait> for TraitResolver {
         source_ref: impl Into<EPTrFql>,
         trait_fql: Fql<hir::Trait>,
         subname: Option<hir::Name>,
-    ) -> Option<TypeResolutionError> {
+    ) -> Option<HirResolutionError> {
         if let Some(subname) = subname {
             let (hir_module, _) = hir::lower_file(_db, trait_fql.module_id);
             if hir_module
@@ -125,7 +125,7 @@ impl resolver::Resolver<hir::Trait> for TraitResolver {
                 return None;
             }
 
-            return Some(TypeResolutionError::UnknownTraitMember {
+            return Some(HirResolutionError::UnknownTraitMember {
                 source_ref: source_ref.into(),
                 module_id: trait_fql.module_id,
                 trait_idx: trait_fql.local_id,
@@ -150,7 +150,7 @@ mod tests {
             .expect("must find trait")
     }
 
-    fn find_trait_error(db: &dyn hir::HirDatabase, module_id: ModuleId) -> TypeResolutionError {
+    fn find_trait_error(db: &dyn hir::HirDatabase, module_id: ModuleId) -> HirResolutionError {
         resolve_trait_by_ref_id(db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
             .expect_err("must fail to find trait")
     }
@@ -192,7 +192,7 @@ mod tests {
         let actual_err = find_trait_error(&db, module_id);
 
         let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
-        let expected = TypeResolutionError::UnknownTraitMember {
+        let expected = HirResolutionError::UnknownTraitMember {
             source_ref: EPTrFql::TypeReference(source_ref),
             module_id: ModuleId::new(&db, "test"),
             trait_idx: Idx::from_raw(RawIdx::from_u32(0)),
@@ -216,7 +216,7 @@ mod tests {
         let actual_err = find_trait_error(&db, module_id);
 
         let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
-        let expected = TypeResolutionError::UnknownTraitReference {
+        let expected = HirResolutionError::UnknownTraitReference {
             source_ref: EPTrFql::TypeReference(source_ref),
             module_id,
             path: ne_vec!["UnknownTrait".into()],
@@ -276,7 +276,7 @@ mod tests {
         let actual_err = find_trait_error(&db, module_id);
 
         let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
-        let expected = TypeResolutionError::UnknownTraitMember {
+        let expected = HirResolutionError::UnknownTraitMember {
             source_ref: EPTrFql::TypeReference(source_ref),
             module_id: ModuleId::new(&db, "traits"),
             trait_idx: Idx::from_raw(RawIdx::from_u32(0)),
@@ -309,7 +309,7 @@ mod tests {
 
         let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
         let actual_err = find_trait_error(&db, module_id);
-        let expected = TypeResolutionError::UnknownTraitReference {
+        let expected = HirResolutionError::UnknownTraitReference {
             source_ref: EPTrFql::TypeReference(source_ref),
             module_id: ModuleId::new(&db, "traits"),
             path: ne_vec!["traits".into(), "UnknownTrait".into()],
@@ -333,7 +333,7 @@ mod tests {
         let actual_err = find_trait_error(&db, module_id);
 
         let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
-        let expected = TypeResolutionError::UnresolvedModule {
+        let expected = HirResolutionError::UnresolvedModule {
             err: hir::FqnResolutionError::UnknownRootModule {
                 attempted_module_path: ne_vec![hir::Name::new("fake_traits")],
             },
@@ -367,7 +367,7 @@ mod tests {
 
         let err = resolve_trait_by_ref_id(&db, module_id, bounded_type_idx)
             .expect_err("must fail with bounded trait ref");
-        let expected = TypeResolutionError::BoundedTraitReference {
+        let expected = HirResolutionError::BoundedTraitReference {
             source_ref: Fql {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(3)),

@@ -1,4 +1,4 @@
-use crate::{EPTrFql, Fql, TypeResolutionError};
+use crate::{EPTrFql, Fql, HirResolutionError};
 use alloy_hir as hir;
 use alloy_scope::{ScopeIdx, Scopes};
 use alloy_workspace::ModuleId;
@@ -16,14 +16,14 @@ pub(crate) trait Resolver<T> {
         source_ref: impl Into<EPTrFql>,
         module_id: ModuleId,
         path: NonEmpty<hir::Name>,
-    ) -> TypeResolutionError;
+    ) -> HirResolutionError;
 
     fn validate(
         db: &dyn hir::HirDatabase,
         source_ref: impl Into<EPTrFql>,
         item_fql: Fql<T>,
         subname: Option<hir::Name>,
-    ) -> Option<TypeResolutionError>;
+    ) -> Option<HirResolutionError>;
 }
 
 pub(crate) fn resolve_by_path<T, R>(
@@ -31,7 +31,7 @@ pub(crate) fn resolve_by_path<T, R>(
     current_module_id: ModuleId,
     path: &hir::Path,
     source_ref: impl Into<EPTrFql>,
-) -> Result<Fql<T>, TypeResolutionError>
+) -> Result<Fql<T>, HirResolutionError>
 where
     R: Resolver<T>,
 {
@@ -63,7 +63,7 @@ where
             ))
         }
         hir::Path::UnresolvedModule(err) => {
-            return Err(TypeResolutionError::UnresolvedModule {
+            return Err(HirResolutionError::UnresolvedModule {
                 err: err.clone(),
                 source_ref: source_ref.into(),
             });

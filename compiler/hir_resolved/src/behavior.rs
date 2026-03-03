@@ -1,6 +1,6 @@
 use crate::type_definition::resolve_type_definition_by_ref_id;
 use crate::type_variable::{resolve_type_variable_by_id, TypeVariable};
-use crate::{resolve_trait_by_ref_id, Fql, TypeResolutionError};
+use crate::{resolve_trait_by_ref_id, Fql, HirResolutionError};
 use alloy_hir as hir;
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
@@ -8,9 +8,9 @@ use std::collections::hash_map::Iter;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Behavior {
-    pub attached_trait: Result<Fql<hir::Trait>, TypeResolutionError>,
-    pub attached_type: Result<Fql<hir::TypeDefinition>, TypeResolutionError>,
-    pub named_type_variables: FxHashMap<hir::Name, (TypeVariable, Vec<TypeResolutionError>)>,
+    pub attached_trait: Result<Fql<hir::Trait>, HirResolutionError>,
+    pub attached_type: Result<Fql<hir::TypeDefinition>, HirResolutionError>,
+    pub named_type_variables: FxHashMap<hir::Name, (TypeVariable, Vec<HirResolutionError>)>,
     pub type_annotations: FxHashMap<hir::Name, Fql<hir::TypeReference>>,
     pub values: FxHashMap<hir::Name, Fql<hir::Expression>>,
 }
@@ -22,7 +22,7 @@ impl Behavior {
 
     pub fn named_type_variables(
         &'_ self,
-    ) -> Iter<'_, hir::Name, (TypeVariable, Vec<TypeResolutionError>)> {
+    ) -> Iter<'_, hir::Name, (TypeVariable, Vec<HirResolutionError>)> {
         self.named_type_variables.iter()
     }
 

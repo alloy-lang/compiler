@@ -1,4 +1,4 @@
-use crate::{resolver, EPTrFql, Fql, TypeResolutionError};
+use crate::{resolver, EPTrFql, Fql, HirResolutionError};
 use alloy_hir as hir;
 use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
@@ -43,12 +43,12 @@ impl resolver::Resolver<hir::TypeReference> for TypeReferenceResolver {
         source_ref: impl Into<EPTrFql>,
         module_id: ModuleId,
         path: NonEmpty<hir::Name>,
-    ) -> TypeResolutionError {
+    ) -> HirResolutionError {
         let EPTrFql::TypeReference(source_ref) = source_ref.into() else {
             panic!("TypeReference resolution requires TypeReference");
         };
 
-        TypeResolutionError::UnknownTypeReference {
+        HirResolutionError::UnknownTypeReference {
             source_ref,
             module_id,
             path,
@@ -60,13 +60,13 @@ impl resolver::Resolver<hir::TypeReference> for TypeReferenceResolver {
         source_ref: impl Into<EPTrFql>,
         item_fql: Fql<hir::TypeReference>,
         subname: Option<hir::Name>,
-    ) -> Option<TypeResolutionError> {
+    ) -> Option<HirResolutionError> {
         if let Some(subname) = subname {
             let EPTrFql::TypeReference(source_ref) = source_ref.into() else {
                 panic!("TypeReference resolution requires TypeReference");
             };
 
-            return Some(TypeResolutionError::UnknownTypeReference {
+            return Some(HirResolutionError::UnknownTypeReference {
                 source_ref,
                 module_id: item_fql.module_id,
                 path: ne_vec![subname],

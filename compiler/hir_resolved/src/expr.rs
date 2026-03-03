@@ -1,5 +1,5 @@
 use super::{resolver, EPTdFql};
-use crate::diagnostics::TypeResolutionError;
+use crate::diagnostics::HirResolutionError;
 use crate::fql::EPTrFql;
 use crate::pattern::resolve_pattern_by_path;
 use crate::r#trait::resolve_abstract_trait_member_by_path;
@@ -68,7 +68,7 @@ pub fn resolve_expression_by_id(
     db: &dyn hir::HirDatabase,
     module_id: ModuleId,
     expr_id: hir::ExpressionIdx,
-) -> Result<Expression, TypeResolutionError> {
+) -> Result<Expression, HirResolutionError> {
     let source_ref = Fql::new(module_id, expr_id);
     let (hir_module, _) = hir::lower_file(db, module_id);
     let expr = hir_module.get_expression(expr_id);
@@ -132,7 +132,7 @@ fn resolve_variable_ref(
     source_ref: &Fql<hir::Expression>,
     module_id: ModuleId,
     path: &hir::Path,
-) -> Result<Expression, TypeResolutionError> {
+) -> Result<Expression, HirResolutionError> {
     if let Ok(var_fql) =
         resolve_by_path::<hir::Expression, ExpressionResolver>(db, module_id, path, source_ref)
     {
@@ -165,7 +165,7 @@ fn resolve_function_call(
     module_id: ModuleId,
     target: &hir::Path,
     args: &[hir::ExpressionIdx],
-) -> Result<Expression, TypeResolutionError> {
+) -> Result<Expression, HirResolutionError> {
     let (fql, variant_name) = find_function_target(db, source_ref, module_id, target)?;
 
     Ok(Expression::FunctionCall {
@@ -183,7 +183,7 @@ fn find_function_target(
     source_ref: &Fql<hir::Expression>,
     module_id: ModuleId,
     target: &hir::Path,
-) -> Result<(EPTdFql, Option<hir::Name>), TypeResolutionError> {
+) -> Result<(EPTdFql, Option<hir::Name>), HirResolutionError> {
     if let Ok(var_fql) =
         resolve_by_path::<hir::Expression, ExpressionResolver>(db, module_id, target, source_ref)
     {
@@ -223,12 +223,12 @@ impl resolver::Resolver<hir::Expression> for ExpressionResolver {
         source_ref: impl Into<EPTrFql>,
         module_id: ModuleId,
         path: NonEmpty<hir::Name>,
-    ) -> TypeResolutionError {
+    ) -> HirResolutionError {
         let EPTrFql::Expression(source_ref) = source_ref.into() else {
             panic!("Expression resolution requires Expression");
         };
 
-        TypeResolutionError::UnknownExpressionReference {
+        HirResolutionError::UnknownExpressionReference {
             source_ref,
             module_id,
             path,
@@ -240,13 +240,13 @@ impl resolver::Resolver<hir::Expression> for ExpressionResolver {
         source_ref: impl Into<EPTrFql>,
         item_fql: Fql<hir::Expression>,
         subname: Option<hir::Name>,
-    ) -> Option<TypeResolutionError> {
+    ) -> Option<HirResolutionError> {
         if let Some(subname) = subname {
             let EPTrFql::Expression(source_ref) = source_ref.into() else {
                 panic!("Expression resolution requires Expression");
             };
 
-            return Some(TypeResolutionError::UnknownExpressionReference {
+            return Some(HirResolutionError::UnknownExpressionReference {
                 source_ref,
                 module_id: item_fql.module_id,
                 path: ne_vec![subname],
@@ -261,9 +261,7 @@ impl resolver::Resolver<hir::Expression> for ExpressionResolver {
 mod tests {
     use super::{resolve_expression_by_id, Expression};
     use crate::tests::TestHirResDatabase;
-    use crate::{
-        resolve_pattern_by_id, EPFql, EPTdFql, EPTrFql, Fql, Pattern, TypeResolutionError,
-    };
+    use crate::{resolve_pattern_by_id, EPFql, EPTdFql, EPTrFql, Fql, HirResolutionError, Pattern};
     use alloy_hir as hir;
     use alloy_hir::Name;
     use alloy_test_harness::idx;
@@ -274,7 +272,7 @@ mod tests {
     fn maybe_find_example(
         db: &dyn hir::HirDatabase,
         module_id: ModuleId,
-    ) -> Result<Expression, TypeResolutionError> {
+    ) -> Result<Expression, HirResolutionError> {
         let (hir_module, _) = hir::lower_file(db, module_id);
         let (idx, _expr) = hir_module
             .get_expression_by_name(&Name::new("example"), alloy_scope::Scopes::ROOT)
@@ -630,7 +628,7 @@ mod tests {
 
         let err = maybe_find_example(&db, module_id).expect_err("must fail to find expression");
 
-        let expected = TypeResolutionError::UnresolvedModule {
+        let expected = HirResolutionError::UnresolvedModule {
             err: hir::FqnResolutionError::UnknownRootModule {
                 attempted_module_path: ne_vec![hir::Name::new("unknown")],
             },
@@ -665,7 +663,7 @@ mod tests {
 
         let err = maybe_find_example(&db, module_id).expect_err("must fail to find expression");
 
-        let expected = TypeResolutionError::UnknownExpressionReference {
+        let expected = HirResolutionError::UnknownExpressionReference {
             source_ref: Fql {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
@@ -751,7 +749,7 @@ mod tests {
 
         let err = maybe_find_example(&db, module_id).expect_err("must fail to find expression");
 
-        let expected = TypeResolutionError::UnknownExpressionReference {
+        let expected = HirResolutionError::UnknownExpressionReference {
             source_ref: Fql {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
@@ -782,7 +780,7 @@ mod tests {
 
         let err = maybe_find_example(&db, module_id).expect_err("must find module error");
 
-        let expected = TypeResolutionError::UnresolvedModule {
+        let expected = HirResolutionError::UnresolvedModule {
             err: hir::FqnResolutionError::UnknownRootModule {
                 attempted_module_path: ne_vec![hir::Name::new("not_other")],
             },
@@ -839,7 +837,7 @@ mod tests {
             maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
 
         let std_lib_root_module = VirtualModuleId::new(&db, "std");
-        let expected = TypeResolutionError::UnresolvedModule {
+        let expected = HirResolutionError::UnresolvedModule {
             err: hir::FqnResolutionError::UnknownChildModule {
                 module_id: std_lib_root_module,
                 unknown_child: Name::new("unknown"),
@@ -873,7 +871,7 @@ mod tests {
         let err =
             maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
 
-        let expected = TypeResolutionError::UnknownTypeDefinitionVariant {
+        let expected = HirResolutionError::UnknownTypeDefinitionVariant {
             source_ref: EPTrFql::Expression(Fql {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
@@ -977,7 +975,7 @@ mod tests {
         let err =
             maybe_find_example(&db, module_id).expect_err("must fail to find type def variant");
 
-        let expected = TypeResolutionError::UnknownTypeDefinitionVariant {
+        let expected = HirResolutionError::UnknownTypeDefinitionVariant {
             source_ref: EPTrFql::Expression(Fql {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(1)),
@@ -1007,7 +1005,7 @@ mod tests {
 
         let err = maybe_find_example(&db, module_id).expect_err("must find module error");
 
-        let expected = TypeResolutionError::UnresolvedModule {
+        let expected = HirResolutionError::UnresolvedModule {
             err: hir::FqnResolutionError::UnknownRootModule {
                 attempted_module_path: ne_vec![hir::Name::new("not_other")],
             },
@@ -1037,7 +1035,7 @@ mod tests {
 
         let err = maybe_find_example(&db, module_id).expect_err("must fail to find variable ref");
 
-        let expected = TypeResolutionError::UnknownExpressionReference {
+        let expected = HirResolutionError::UnknownExpressionReference {
             source_ref: Fql {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(0)),
@@ -1067,7 +1065,7 @@ mod tests {
         let err =
             maybe_find_example(&db, module_id).expect_err("must fail to find function target");
 
-        let expected = TypeResolutionError::UnknownExpressionReference {
+        let expected = HirResolutionError::UnknownExpressionReference {
             source_ref: Fql {
                 module_id,
                 local_id: Idx::from_raw(RawIdx::from_u32(1)),

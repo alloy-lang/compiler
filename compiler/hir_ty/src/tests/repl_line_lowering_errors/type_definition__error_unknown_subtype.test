@@ -15,7 +15,7 @@ HirTypedModule {
     warnings: [],
     errors: [
         TypeInferenceError {
-            kind: TypeResolutionError(
+            kind: HirResolutionError(
                 UnknownTypeDefinitionVariant {
                     source_ref: Expression(
                         Fql {

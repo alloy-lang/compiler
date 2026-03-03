@@ -16,7 +16,7 @@ HirTypedModule {
     warnings: [],
     errors: [
         TypeInferenceError {
-            kind: TypeResolutionError(
+            kind: HirResolutionError(
                 BoundedTraitReference {
                     source_ref: Fql {
                         module_id: ModuleId {

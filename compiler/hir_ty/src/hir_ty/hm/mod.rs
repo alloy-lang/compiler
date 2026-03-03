@@ -8,7 +8,7 @@
 
 use super::Fql;
 use alloy_hir as hir;
-use alloy_hir_resolved::{EPFql, EPTdFql, TypeResolutionError};
+use alloy_hir_resolved::{EPFql, EPTdFql, HirResolutionError};
 use rustc_hash::{FxHashMap, FxHashSet};
 
 mod constraint_gen;
@@ -252,7 +252,7 @@ pub(super) struct HMInferenceContext<'db> {
     /// Polymorphic type schemes for let-bound variables
     pub(super) poly_env: FxHashMap<EPTdFql, PolyType>,
     /// Resolution errors collected during inference (FQL + reference path + module_id)
-    pub(super) resolution_errors: Vec<TypeResolutionError>,
+    pub(super) resolution_errors: Vec<HirResolutionError>,
     /// Map from expression ID to its dependency group index (for lazy constraint generation)
     pub(super) expr_to_group: FxHashMap<hir::ExpressionIdx, usize>,
     /// Current dependency group being processed (for lazy constraint generation)
@@ -354,7 +354,7 @@ impl<'db> HMInferenceContext<'db> {
 
     pub(super) fn unknown_reference(
         &mut self,
-        err: TypeResolutionError,
+        err: HirResolutionError,
         fql: impl Into<EPFql>,
     ) -> MonoType {
         self.resolution_errors.push(err);

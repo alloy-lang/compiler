@@ -1,5 +1,5 @@
 use crate::type_definition::resolve_type_definition_by_path_variant;
-use crate::{Fql, TypeResolutionError};
+use crate::{Fql, HirResolutionError};
 use alloy_hir as hir;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
@@ -24,7 +24,7 @@ pub fn resolve_pattern_by_id(
     db: &dyn hir::HirDatabase,
     module_id: ModuleId,
     pat_id: hir::PatternIdx,
-) -> Result<Pattern, TypeResolutionError> {
+) -> Result<Pattern, HirResolutionError> {
     let source_ref = Fql::new(module_id, pat_id);
     let (hir_module, _) = hir::lower_file(db, module_id);
     let pat = hir_module.get_pattern(pat_id);
@@ -67,7 +67,7 @@ fn resolve_destructure(
     module_id: ModuleId,
     target: &hir::Path,
     args: &[hir::PatternIdx],
-) -> Result<Pattern, TypeResolutionError> {
+) -> Result<Pattern, HirResolutionError> {
     let (type_def_fql, variant_name) =
         resolve_type_definition_by_path_variant(db, module_id, target, source_ref)?;
 
@@ -77,7 +77,7 @@ fn resolve_destructure(
         .collect::<Vec<_>>();
 
     let Some(variant_name) = variant_name else {
-        return Err(TypeResolutionError::MissingTypeDefinitionVariant {
+        return Err(HirResolutionError::MissingTypeDefinitionVariant {
             source_ref: source_ref.into(),
             target_type_fql: type_def_fql,
         });
@@ -151,7 +151,7 @@ mod tests {
         let err = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
             .expect_err("expected to resolve pattern");
         assert_eq!(
-            TypeResolutionError::UnknownTypeDefinitionVariant {
+            HirResolutionError::UnknownTypeDefinitionVariant {
                 source_ref: EPTrFql::Pattern(Fql {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(1)),
@@ -184,7 +184,7 @@ mod tests {
         let err = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
             .expect_err("expected to resolve pattern");
         assert_eq!(
-            TypeResolutionError::MissingTypeDefinitionVariant {
+            HirResolutionError::MissingTypeDefinitionVariant {
                 source_ref: EPTrFql::Pattern(Fql {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(1)),
@@ -215,7 +215,7 @@ mod tests {
         let err = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
             .expect_err("expected to resolve pattern");
         assert_eq!(
-            TypeResolutionError::UnknownPatternReference {
+            HirResolutionError::UnknownPatternReference {
                 source_ref: Fql {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(1)),
@@ -245,7 +245,7 @@ mod tests {
         let err = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
             .expect_err("expected to resolve pattern");
 
-        let expected = TypeResolutionError::UnresolvedModule {
+        let expected = HirResolutionError::UnresolvedModule {
             err: hir::FqnResolutionError::UnknownRootModule {
                 attempted_module_path: ne_vec![hir::Name::new("unknown")],
             },

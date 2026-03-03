@@ -28,7 +28,7 @@ HirTypedModule {
     warnings: [],
     errors: [
         TypeInferenceError {
-            kind: TypeResolutionError(
+            kind: HirResolutionError(
                 UnknownExpressionReference {
                     source_ref: Fql {
                         module_id: ModuleId {
