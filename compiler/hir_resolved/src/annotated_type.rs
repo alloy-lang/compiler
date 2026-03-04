@@ -231,6 +231,202 @@ pub fn resolve_annotated_type(
     }
 }
 
+#[salsa::tracked]
+pub fn resolve_annotated_expression(
+    db: &dyn HirDatabase,
+    module_id: ModuleId,
+    type_idx: hir::TypeIdx,
+    expr_idx: hir::ExpressionIdx,
+) -> AnnotatedType {
+    let (hir_module, _) = hir::lower_file(db, module_id);
+    let expr = hir_module.get_expression(expr_idx);
+
+    resolve_annotated_expression_inner(db, module_id, type_idx, expr)
+}
+
+fn resolve_annotated_expression_inner(
+    db: &dyn HirDatabase,
+    module_id: ModuleId,
+    type_idx: hir::TypeIdx,
+    expr: &hir::Expression,
+) -> AnnotatedType {
+    let (hir_module, _) = hir::lower_file(db, module_id);
+    let type_ref = hir_module.get_type_reference(type_idx);
+
+    match (type_ref, expr) {
+        (_, hir::Expression::VariableRef { .. }) => {
+            return resolve_annotated_type(db, module_id, type_idx);
+        }
+        (hir::TypeReference::Unconstrained, _) => {
+            return AnnotatedType::Unconstrained;
+        }
+        (hir::TypeReference::Missing, _) => {
+            return AnnotatedType::Missing;
+        }
+        (hir::TypeReference::Unit, _) => {
+            return AnnotatedType::Unit;
+        }
+        (hir::TypeReference::BuiltIn(built_in), _) => {
+            return AnnotatedType::BuiltIn(*built_in);
+        }
+        (hir::TypeReference::SelfRef(_), _) => {
+            todo!("self type annotations on expressions - need to determine context (trait/behavior) to resolve properly");
+        }
+
+        (hir::TypeReference::Named(path), _) => {
+            return resolve_named_type_annotation(db, module_id, path, type_idx);
+        }
+
+        (
+            hir::TypeReference::Lambda {
+                arg_type,
+                return_type,
+            },
+            hir::Expression::Lambda { args, body },
+        ) => {
+            return if let [first, rest @ ..] = args.as_slice() {
+                let annotated_arg_type =
+                    resolve_annotated_pattern(db, module_id, *arg_type, *first);
+                if rest.is_empty() {
+                    return AnnotatedType::Lambda {
+                        arg: Box::new(annotated_arg_type),
+                        ret: Box::new(resolve_annotated_expression(
+                            db,
+                            module_id,
+                            *return_type,
+                            *body,
+                        )),
+                    };
+                }
+
+                let remainder_expr = hir::Expression::Lambda {
+                    args: rest.into(),
+                    body: *body,
+                };
+                let ret_type = resolve_annotated_expression_inner(
+                    db,
+                    module_id,
+                    *return_type,
+                    &remainder_expr,
+                );
+
+                AnnotatedType::Lambda {
+                    arg: Box::new(annotated_arg_type),
+                    ret: Box::new(ret_type),
+                }
+            } else {
+                // Lambda with no arguments - this is not valid syntax, but we'll return Missing to avoid panicking
+                AnnotatedType::Missing
+            };
+        }
+
+        (hir::TypeReference::Tuple(types), hir::Expression::Tuple(exprs)) => {
+            if types.len() != exprs.len().get() {
+                // Mismatched tuple arity - report error and return Missing
+                return AnnotatedType::Missing;
+            }
+
+            let inner_types: Vec<_> = types
+                .iter()
+                .zip(exprs.iter())
+                .map(|(type_idx, expr_idx)| {
+                    resolve_annotated_expression(db, module_id, *type_idx, *expr_idx)
+                })
+                .collect();
+
+            // SAFETY: We checked that types is non-empty
+            return unsafe { AnnotatedType::Tuple(NonEmpty::new_unchecked(inner_types)) };
+        }
+
+        (hir::TypeReference::ParenthesizedType(inner_type), _expr) => {
+            return resolve_annotated_expression_inner(db, module_id, *inner_type, expr);
+        }
+
+        (hir::TypeReference::Bounded { .. }, _) => {
+            return resolve_annotated_type(db, module_id, type_idx);
+        }
+        _ => {
+            // For other combinations of type reference and expression, we currently don't have specific handling logic.
+            // In a full implementation, we would likely want to add more cases here to handle different expression forms and how they interact with their annotated types.
+        }
+    }
+
+    todo!("Unhandled combination of type reference and expression: {type_ref:?} with {expr:?}");
+}
+
+#[salsa::tracked]
+pub fn resolve_annotated_pattern(
+    db: &dyn HirDatabase,
+    module_id: ModuleId,
+    type_idx: hir::TypeIdx,
+    pattern_idx: hir::PatternIdx,
+) -> AnnotatedType {
+    let (hir_module, _) = hir::lower_file(db, module_id);
+    let type_ref = hir_module.get_type_reference(type_idx);
+    let pattern = hir_module.get_pattern(pattern_idx);
+
+    match (type_ref, pattern) {
+        (_, hir::Pattern::Nil) => {
+            return resolve_annotated_type(db, module_id, type_idx);
+        }
+        (hir::TypeReference::Unconstrained, _) => {
+            return AnnotatedType::Unconstrained;
+        }
+        (hir::TypeReference::Missing, _) => {
+            return AnnotatedType::Missing;
+        }
+        (hir::TypeReference::Unit, _) => {
+            return AnnotatedType::Unit;
+        }
+        (hir::TypeReference::BuiltIn(built_in), _) => {
+            return AnnotatedType::BuiltIn(*built_in);
+        }
+        (hir::TypeReference::SelfRef(scope), _) => {
+            todo!("");
+        }
+
+        (hir::TypeReference::Named(path), _) => {
+            return resolve_named_type_annotation(db, module_id, path, type_idx);
+        }
+
+        (hir::TypeReference::Lambda { .. }, hir::Pattern::VariableDeclaration { .. }) => {
+            return resolve_annotated_type(db, module_id, type_idx);
+        }
+
+        (hir::TypeReference::Tuple(types), hir::Pattern::Tuple(patterns)) => {
+            if types.len() != patterns.len().get() {
+                // Mismatched tuple arity - report error and return Missing
+                return AnnotatedType::Missing;
+            }
+
+            let inner_types: Vec<_> = types
+                .iter()
+                .zip(patterns.iter())
+                .map(|(type_idx, p_idx)| {
+                    resolve_annotated_pattern(db, module_id, *type_idx, *p_idx)
+                })
+                .collect();
+
+            // SAFETY: We checked that types is non-empty
+            return unsafe { AnnotatedType::Tuple(NonEmpty::new_unchecked(inner_types)) };
+        }
+
+        (hir::TypeReference::ParenthesizedType(inner_type), _pattern) => {
+            return resolve_annotated_pattern(db, module_id, *inner_type, pattern_idx);
+        }
+
+        (hir::TypeReference::Bounded { .. }, _) => {
+            return resolve_annotated_type(db, module_id, type_idx);
+        }
+        _ => {
+            // For other combinations of type reference and pattern, we currently don't have specific handling logic.
+            // In a full implementation, we would likely want to add more cases here to handle different pattern forms and how they interact with their annotated types.
+        }
+    }
+
+    todo!("Unhandled combination of type reference and pattern: {type_ref:?} with {pattern:?}");
+}
+
 fn trait_constraints(
     db: &dyn HirDatabase,
     module_id: ModuleId,
@@ -317,5 +513,112 @@ fn resolve_type_definition_to_annotated(
         hir::TypeDefinitionKind::Single(_) | hir::TypeDefinitionKind::Union(_) => {
             AnnotatedType::TypeDef(Fql::new(module_id, type_def_idx), name.clone())
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::tests::TestHirResDatabase;
+    use alloy_test_harness::idx;
+    use salsa::Database;
+
+    #[test]
+    fn resolve_literal_int() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_test_module(
+            "test_stuff",
+            r"
+            typeof example : Int
+            let example = 1
+            ",
+        );
+
+        let actual_ref = resolve_annotated_expression(&db, module_id, idx!(0), idx!(0));
+
+        db.attach(|_| {
+            assert_eq!(AnnotatedType::BuiltIn(hir::BuiltInType::Int), actual_ref);
+        });
+    }
+
+    #[test]
+    fn resolve_lambda() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let test_data_module_id = db.add_test_module(
+            "test_data",
+            r"
+            typedef Test[t] = Thing t
+            let test = Test(0)
+            let new = |t| -> Test(t)
+
+            trait Trait1 where
+                -- empty
+            end
+            ",
+        );
+        let module_id = db.add_test_module(
+            "test_stuff",
+            r"
+            import test_data
+            import test_data::Test
+            import std::function::(<|)
+
+            typeof example : (t2 -> t1) -> t2 -> t2 -> Test[(t1, t1)] where
+              typevar t1
+              typevar t2
+            let example = |funky, x, y| -> test_data::new <| (funky(x), funky(y))
+            ",
+        );
+
+        let actual_ref = resolve_annotated_expression(&db, module_id, idx!(13), idx!(7));
+
+        db.attach(|_| {
+            assert_eq!(
+                AnnotatedType::Lambda {
+                    arg: Box::new(AnnotatedType::Lambda {
+                        arg: Box::new(AnnotatedType::TypeVar {
+                            fql: Fql::new(module_id, idx!(1)),
+                            name: hir::Name::from("t2"),
+                        }),
+                        ret: Box::new(AnnotatedType::TypeVar {
+                            fql: Fql::new(module_id, idx!(0)),
+                            name: hir::Name::from("t1"),
+                        }),
+                    }),
+                    ret: Box::new(AnnotatedType::Lambda {
+                        arg: Box::new(AnnotatedType::TypeVar {
+                            fql: Fql::new(module_id, idx!(1)),
+                            name: hir::Name::from("t2"),
+                        }),
+                        ret: Box::new(AnnotatedType::Lambda {
+                            arg: Box::new(AnnotatedType::TypeVar {
+                                fql: Fql::new(module_id, idx!(1)),
+                                name: hir::Name::from("t2"),
+                            }),
+                            ret: Box::new(AnnotatedType::Bounded {
+                                base: Box::new(AnnotatedType::TypeDef(
+                                    Fql::new(test_data_module_id, idx!(1)),
+                                    hir::Name::new("Test"),
+                                )),
+                                args: vec![AnnotatedType::Tuple(
+                                    NonEmpty::try_from(vec![
+                                        AnnotatedType::TypeVar {
+                                            fql: Fql::new(module_id, idx!(0)),
+                                            name: hir::Name::from("t1"),
+                                        },
+                                        AnnotatedType::TypeVar {
+                                            fql: Fql::new(module_id, idx!(0)),
+                                            name: hir::Name::from("t1"),
+                                        },
+                                    ])
+                                    .unwrap()
+                                )],
+                            }),
+                        }),
+                    }),
+                },
+                actual_ref,
+            );
+        });
     }
 }
