@@ -74,13 +74,14 @@ HirTypedModule {
         },
     ],
     poly_instantiations: {
-        TypeDefinition(
+        TypeDefinitionVariant(
             Fql {
                 module_id: ModuleId {
                     path: "main",
                 },
                 local_id: Idx::<TypeDefinition>(1),
             },
+            "Id",
         ): [
             PolyInstantiation {
                 call_site: Fql {

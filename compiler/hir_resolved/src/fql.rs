@@ -187,6 +187,7 @@ pub enum EPTdFql {
     Expression(Fql<hir::Expression>),
     Pattern(Fql<hir::Pattern>),
     TypeDefinition(Fql<hir::TypeDefinition>),
+    TypeDefinitionVariant(Fql<hir::TypeDefinition>, hir::Name),
 }
 
 impl EPTdFql {
@@ -195,6 +196,7 @@ impl EPTdFql {
             EPTdFql::Expression(fql) => fql.module_id,
             EPTdFql::Pattern(fql) => fql.module_id,
             EPTdFql::TypeDefinition(fql) => fql.module_id,
+            EPTdFql::TypeDefinitionVariant(fql, _) => fql.module_id,
         }
     }
 
@@ -203,6 +205,7 @@ impl EPTdFql {
             EPTdFql::Expression(fql) => fql.text_range(db),
             EPTdFql::Pattern(fql) => fql.text_range(db),
             EPTdFql::TypeDefinition(fql) => fql.text_range(db),
+            EPTdFql::TypeDefinitionVariant(fql, _) => fql.text_range(db),
         }
     }
 }

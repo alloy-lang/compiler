@@ -8,6 +8,7 @@ use non_empty_vec::NonEmpty;
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeDefinition {
     pub name: hir::Name,
+    pub type_args: Vec<Fql<hir::TypeDefinition>>,
     pub kind: TypeDefinitionKind,
 }
 
@@ -131,6 +132,11 @@ pub fn resolve_type_definition_by_id(
 
     Some(TypeDefinition {
         name: type_def.name.clone(),
+        type_args: type_def
+            .type_args
+            .iter()
+            .map(|idx| Fql::new(module_id, *idx))
+            .collect(),
         kind,
     })
 }

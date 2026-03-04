@@ -15,7 +15,7 @@ HirTypedModule {
             Int,
         ),
         Idx::<Expression>(5): Generic(
-            1,
+            2,
         ),
         Idx::<Expression>(2): Bounded {
             base: TypeDef(
@@ -31,10 +31,13 @@ HirTypedModule {
                 BuiltIn(
                     Int,
                 ),
+                Generic(
+                    3,
+                ),
             ],
         },
         Idx::<Expression>(4): Generic(
-            1,
+            2,
         ),
         Idx::<Expression>(1): Bounded {
             base: TypeDef(
@@ -50,18 +53,21 @@ HirTypedModule {
                 BuiltIn(
                     Int,
                 ),
+                Generic(
+                    3,
+                ),
             ],
         },
         Idx::<Expression>(3): Generic(
-            1,
+            2,
         ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            1,
+            2,
         ),
         Idx::<Pattern>(2): Generic(
-            1,
+            2,
         ),
         Idx::<Pattern>(1): Bounded {
             base: TypeDef(
@@ -76,6 +82,9 @@ HirTypedModule {
             args: [
                 BuiltIn(
                     Int,
+                ),
+                Generic(
+                    3,
                 ),
             ],
         },
@@ -93,19 +102,23 @@ HirTypedModule {
                 BuiltIn(
                     Int,
                 ),
+                Generic(
+                    3,
+                ),
             ],
         },
     },
     warnings: [],
     errors: [],
     poly_instantiations: {
-        TypeDefinition(
+        TypeDefinitionVariant(
             Fql {
                 module_id: ModuleId {
                     path: "main",
                 },
                 local_id: Idx::<TypeDefinition>(2),
             },
+            "Left",
         ): [
             PolyInstantiation {
                 call_site: Fql {
@@ -117,6 +130,9 @@ HirTypedModule {
                 type_args: [
                     BuiltIn(
                         Int,
+                    ),
+                    Generic(
+                        3,
                     ),
                 ],
             },

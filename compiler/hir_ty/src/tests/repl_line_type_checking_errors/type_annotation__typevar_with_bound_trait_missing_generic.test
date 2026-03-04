@@ -99,15 +99,26 @@ HirTypedModule {
                             },
                             name: "t2",
                         },
-                        ret: TypeDef(
-                            Fql {
+                        ret: TypeDef {
+                            fql: Fql {
                                 module_id: ModuleId {
                                     path: "test_data",
                                 },
                                 local_id: Idx::<TypeDefinition>(1),
                             },
-                            "Test",
-                        ),
+                            name: "Test",
+                            type_args: [
+                                TypeVarReference {
+                                    fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "test_data",
+                                        },
+                                        local_id: Idx::<TypeDefinition>(0),
+                                    },
+                                    name: "t",
+                                },
+                            ],
+                        },
                     },
                 },
                 inferred_type: Lambda {
@@ -137,15 +148,26 @@ HirTypedModule {
                     },
                 },
                 reason: DirectConflict {
-                    annotated_type: TypeDef(
-                        Fql {
+                    annotated_type: TypeDef {
+                        fql: Fql {
                             module_id: ModuleId {
                                 path: "test_data",
                             },
                             local_id: Idx::<TypeDefinition>(1),
                         },
-                        "Test",
-                    ),
+                        name: "Test",
+                        type_args: [
+                            TypeVarReference {
+                                fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "test_data",
+                                    },
+                                    local_id: Idx::<TypeDefinition>(0),
+                                },
+                                name: "t",
+                            },
+                        ],
+                    },
                     inferred_type: Bounded {
                         base: TypeDef(
                             Fql {

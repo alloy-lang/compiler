@@ -43,7 +43,11 @@ pub enum MonoType {
     Concrete(hir::BuiltInType),
     /// User-defined type constructor (e.g., `List`, `Option`, `MyType`)
     /// The String is the human-readable type name for display purposes
-    TypeDef(Fql<hir::TypeDefinition>, hir::Name),
+    TypeDef {
+        fql: Fql<hir::TypeDefinition>,
+        type_args: Vec<TypeVarId>,
+        type_def_name: hir::Name,
+    },
     /// Function type (e.g., `a -> b`)
     Function(Box<MonoType>, Box<MonoType>),
     /// Tuple type (e.g., `(a, b, c)`)
@@ -64,8 +68,8 @@ impl std::fmt::Display for MonoType {
             MonoType::Unconstrained => write!(f, "_"),
             MonoType::Var(var) => write!(f, "t{}", var.0),
             MonoType::Concrete(builtin) => write!(f, "{builtin:?}"),
-            MonoType::TypeDef(_, name) => {
-                write!(f, "{name}")
+            MonoType::TypeDef { type_def_name, .. } => {
+                write!(f, "{type_def_name}")
             }
             MonoType::Function(arg, ret) => {
                 // Add parentheses if arg is also a function
@@ -156,15 +160,6 @@ pub(super) fn free_type_vars(ty: &MonoType) -> Vec<TypeVarId> {
     vars.into_iter().collect()
 }
 
-/// Compute the free type variables across a slice of types, returning a set
-pub(super) fn free_type_vars_set(types: &[MonoType]) -> FxHashSet<TypeVarId> {
-    let mut vars = FxHashSet::default();
-    for ty in types {
-        collect_free_vars(ty, &mut vars);
-    }
-    vars
-}
-
 fn collect_free_vars(ty: &MonoType, vars: &mut FxHashSet<TypeVarId>) {
     match ty {
         MonoType::Unconstrained => {}
@@ -186,7 +181,7 @@ fn collect_free_vars(ty: &MonoType, vars: &mut FxHashSet<TypeVarId>) {
                 collect_free_vars(t, vars);
             }
         }
-        MonoType::Concrete(_) | MonoType::TypeDef(..) | MonoType::Unit => {}
+        MonoType::Concrete(_) | MonoType::TypeDef { .. } | MonoType::Unit => {}
     }
 }
 

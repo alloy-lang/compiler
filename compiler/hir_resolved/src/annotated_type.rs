@@ -10,7 +10,11 @@ pub enum AnnotatedType {
     Unit,
     BuiltIn(hir::BuiltInType),
     /// Concrete named type (Single/Union type definition)
-    TypeDef(Fql<hir::TypeDefinition>, hir::Name),
+    TypeDef {
+        fql: Fql<hir::TypeDefinition>,
+        name: hir::Name,
+        type_args: Vec<TypeVarReference>,
+    },
     /// Function type
     Lambda {
         arg: Box<AnnotatedType>,
@@ -46,6 +50,12 @@ pub enum AnnotatedType {
     Missing,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TypeVarReference {
+    pub fql: Fql<hir::TypeDefinition>,
+    pub name: hir::Name,
+}
+
 impl AnnotatedType {
     /// Check if this type contains type variables (is polymorphic)
     pub fn is_polymorphic(&self) -> bool {
@@ -60,7 +70,7 @@ impl AnnotatedType {
             }
             AnnotatedType::Unit
             | AnnotatedType::BuiltIn(_)
-            | AnnotatedType::TypeDef(..)
+            | AnnotatedType::TypeDef { .. }
             | AnnotatedType::Unconstrained
             | AnnotatedType::Missing => false,
         }
@@ -72,7 +82,7 @@ impl std::fmt::Display for AnnotatedType {
         match self {
             AnnotatedType::Unit => write!(f, "()"),
             AnnotatedType::BuiltIn(builtin) => write!(f, "{builtin:?}"),
-            AnnotatedType::TypeDef(_, name) => write!(f, "{name}"),
+            AnnotatedType::TypeDef { name, .. } => write!(f, "{name}"),
             AnnotatedType::Lambda { arg, ret } => match arg.as_ref() {
                 AnnotatedType::Lambda { .. } => write!(f, "({arg}) -> {ret}"),
                 _ => write!(f, "{arg} -> {ret}"),
@@ -472,15 +482,18 @@ fn resolve_named_type_annotation(
     AnnotatedType::Missing
 }
 
-/// Convert a type definition to an AnnotatedType.
-/// Handles type variables, single types, and union types.
-fn resolve_type_definition_to_annotated(
+#[salsa::tracked]
+pub fn resolve_type_definition_to_annotated(
     db: &dyn HirDatabase,
     module_id: ModuleId,
     type_def_idx: hir::TypeDefinitionIdx,
 ) -> AnnotatedType {
     let (hir_module, _) = hir::lower_file(db, module_id);
-    let hir::TypeDefinition { name, kind } = hir_module.get_type_definition(type_def_idx);
+    let hir::TypeDefinition {
+        name,
+        kind,
+        type_args,
+    } = hir_module.get_type_definition(type_def_idx);
 
     match kind {
         hir::TypeDefinitionKind::Missing => AnnotatedType::Missing,
@@ -511,7 +524,17 @@ fn resolve_type_definition_to_annotated(
             }
         }
         hir::TypeDefinitionKind::Single(_) | hir::TypeDefinitionKind::Union(_) => {
-            AnnotatedType::TypeDef(Fql::new(module_id, type_def_idx), name.clone())
+            AnnotatedType::TypeDef {
+                fql: Fql::new(module_id, type_def_idx),
+                type_args: type_args
+                    .iter()
+                    .map(|arg| TypeVarReference {
+                        fql: Fql::new(module_id, *arg),
+                        name: hir_module.get_type_definition(*arg).name.clone(),
+                    })
+                    .collect(),
+                name: name.clone(),
+            }
         }
     }
 }
@@ -596,10 +619,11 @@ mod tests {
                                 name: hir::Name::from("t2"),
                             }),
                             ret: Box::new(AnnotatedType::Bounded {
-                                base: Box::new(AnnotatedType::TypeDef(
-                                    Fql::new(test_data_module_id, idx!(1)),
-                                    hir::Name::new("Test"),
-                                )),
+                                base: Box::new(AnnotatedType::TypeDef {
+                                    fql: Fql::new(test_data_module_id, idx!(1)),
+                                    name: hir::Name::from("Test"),
+                                    type_args: vec![],
+                                }),
                                 args: vec![AnnotatedType::Tuple(
                                     NonEmpty::try_from(vec![
                                         AnnotatedType::TypeVar {

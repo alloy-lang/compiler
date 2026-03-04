@@ -169,19 +169,7 @@ fn run_hir_ty_test(
 // #[test]
 fn test_std_lib() {
     alloy_test_harness::run_std_lib_tests(
-        |module_files| {
-            let mut db = TestHirTyDatabase::default();
-
-            module_files.iter().for_each(|module_file| {
-                db.add_module(
-                    module_file.slug(),
-                    module_file.path(),
-                    module_file.contents(),
-                );
-            });
-
-            db
-        },
+        |_| TestHirTyDatabase::default(),
         |db, module_file| {
             let path = module_file.path();
 
@@ -195,16 +183,18 @@ fn test_std_lib() {
             let mut reporter = DiagnosticsReporter::new();
             reporter.add_all(test_module_id, type_inference_errors.into_iter().cloned());
 
-            assert!(
-                type_inference_warnings.is_empty(),
-                "file '{path}' contained type inference warnings:\n{:#?}",
-                type_inference_warnings,
-            );
-            assert!(
-                type_inference_errors.is_empty(),
-                "file '{path}' contained type inference errors:\n{}",
-                reporter.render_no_color(db),
-            );
+            db.attach(|_| {
+                assert!(
+                    type_inference_warnings.is_empty(),
+                    "file '{path}' contained type inference warnings:\n{:#?}",
+                    type_inference_warnings,
+                );
+                assert!(
+                    type_inference_errors.is_empty(),
+                    "file '{path}' contained type inference errors:\n{}",
+                    reporter.render_no_color(db),
+                );
+            });
         },
     );
 }

@@ -39,7 +39,12 @@ pub enum Expression {
     },
     FunctionCall {
         target: EPTdFql,
-        variant_name: Option<hir::Name>,
+        args: Vec<Fql<hir::Expression>>,
+    },
+    AbstractTraitFunctionCall {
+        trait_fql: Fql<hir::Trait>,
+        member_name: hir::Name,
+        type_annotation: Fql<hir::TypeReference>,
         args: Vec<Fql<hir::Expression>>,
     },
     Match {
@@ -166,16 +171,28 @@ fn resolve_function_call(
     target: &hir::Path,
     args: &[hir::ExpressionIdx],
 ) -> Result<Expression, HirResolutionError> {
-    let (fql, variant_name) = find_function_target(db, source_ref, module_id, target)?;
+    let args: Vec<_> = args
+        .iter()
+        .map(|arg_id| Fql::new(module_id, *arg_id))
+        .collect();
 
-    Ok(Expression::FunctionCall {
-        target: fql,
-        variant_name,
-        args: args
-            .iter()
-            .map(|arg_id| Fql::new(module_id, *arg_id))
-            .collect(),
-    })
+    if let Some(Expression::AbstractTraitMemberRef {
+        trait_fql,
+        member_name,
+        type_annotation,
+    }) = resolve_abstract_trait_member_by_path(db, module_id, target, source_ref)
+    {
+        return Ok(Expression::AbstractTraitFunctionCall {
+            trait_fql,
+            member_name,
+            type_annotation,
+            args,
+        });
+    };
+
+    let target = find_function_target(db, source_ref, module_id, target)?;
+
+    Ok(Expression::FunctionCall { target, args })
 }
 
 fn find_function_target(
@@ -183,23 +200,26 @@ fn find_function_target(
     source_ref: &Fql<hir::Expression>,
     module_id: ModuleId,
     target: &hir::Path,
-) -> Result<(EPTdFql, Option<hir::Name>), HirResolutionError> {
+) -> Result<EPTdFql, HirResolutionError> {
     if let Ok(var_fql) =
         resolve_by_path::<hir::Expression, ExpressionResolver>(db, module_id, target, source_ref)
     {
-        return Ok((var_fql.into(), None));
+        return Ok(var_fql.into());
     }
     if let Some(pat_fql) = resolve_pattern_by_path(db, module_id, target) {
-        return Ok((pat_fql.into(), None));
+        return Ok(pat_fql.into());
     }
-    // TODO: function calls to abstract trait members
-    // if let Some(expr) = resolve_abstract_trait_member_by_path(db, module_id, target) {
-    //     return Err(Ok(expr));
-    // }
+
     let (type_def_fql, variant_name) =
         resolve_type_definition_by_path_variant(db, module_id, target, source_ref)?;
 
-    Ok((type_def_fql.into(), variant_name))
+    match variant_name {
+        None => Ok(type_def_fql.into()),
+        Some(variant_name) => Ok(EPTdFql::TypeDefinitionVariant(
+            type_def_fql,
+            variant_name.clone(),
+        )),
+    }
 }
 
 // ============================================================================
@@ -445,7 +465,6 @@ mod tests {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(3)),
                 }),
-                variant_name: None,
                 args: vec![Fql {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(4)),
@@ -471,11 +490,13 @@ mod tests {
 
         assert_eq!(
             Expression::FunctionCall {
-                target: EPTdFql::TypeDefinition(Fql {
-                    module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
-                }),
-                variant_name: Some(Name::new("Some")),
+                target: EPTdFql::TypeDefinitionVariant(
+                    Fql {
+                        module_id,
+                        local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                    },
+                    Name::new("Some")
+                ),
                 args: vec![Fql {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(0)),
@@ -505,7 +526,6 @@ mod tests {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(1)),
                 }),
-                variant_name: None,
                 args: vec![Fql {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(0)),
@@ -535,7 +555,6 @@ mod tests {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(0)),
                 }),
-                variant_name: None,
                 args: vec![Fql {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(0)),
@@ -918,7 +937,6 @@ mod tests {
                     module_id: ModuleId::new(&db, "other"),
                     local_id: Idx::from_raw(RawIdx::from_u32(3)),
                 }),
-                variant_name: None,
                 args: vec![Fql {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(0)),
@@ -945,11 +963,13 @@ mod tests {
 
         assert_eq!(
             Expression::FunctionCall {
-                target: EPTdFql::TypeDefinition(Fql {
-                    module_id: ModuleId::new(&db, "std::option"),
-                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
-                }),
-                variant_name: Some(Name::new("Some")),
+                target: EPTdFql::TypeDefinitionVariant(
+                    Fql {
+                        module_id: ModuleId::new(&db, "std::option"),
+                        local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                    },
+                    Name::new("Some")
+                ),
                 args: vec![Fql {
                     module_id,
                     local_id: Idx::from_raw(RawIdx::from_u32(0)),

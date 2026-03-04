@@ -5,7 +5,8 @@ end
 
 let constructor_example = Option::Some
 
-let example = constructor_example("hello")
+let string_example = constructor_example("hello")
+let int_example = constructor_example(10)
 ===
 HirTypedModule {
     expression_types: {
@@ -30,9 +31,6 @@ HirTypedModule {
                 ],
             },
         },
-        Idx::<Expression>(1): BuiltIn(
-            String,
-        ),
         Idx::<Expression>(2): Bounded {
             base: TypeDef(
                 Fql {
@@ -49,18 +47,42 @@ HirTypedModule {
                 ),
             ],
         },
+        Idx::<Expression>(4): Generic(
+            1,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
     },
     pattern_types: {},
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnificationError(
+                TypeMismatch(
+                    Concrete(
+                        String,
+                    ),
+                    Concrete(
+                        Int,
+                    ),
+                ),
+            ),
+            range: 136..177,
+        },
+    ],
     poly_instantiations: {
-        TypeDefinition(
+        TypeDefinitionVariant(
             Fql {
                 module_id: ModuleId {
                     path: "main",
                 },
                 local_id: Idx::<TypeDefinition>(1),
             },
+            "Some",
         ): [
             PolyInstantiation {
                 call_site: Fql {
@@ -79,3 +101,15 @@ HirTypedModule {
     },
 }
 []
+[E002] Error: Type mismatch: expected `String`, found `Int`
+   ╭─[ ./test/main.alloy:9:1 ]
+   │
+ 9 │ let int_example = constructor_example(10)
+   │ ────────────────────┬────────────────────  
+   │                     ╰────────────────────── expected `String`, found `Int`
+   │ 
+   │ Help: These types must be compatible
+───╯
+
+
+

@@ -48,7 +48,7 @@ impl HirTypedModule {
                 self.pattern_types
                     .insert(fql.local_id, resolved_type.clone());
             }
-            EPTdFql::TypeDefinition(_) => {}
+            EPTdFql::TypeDefinition(_) | EPTdFql::TypeDefinitionVariant(_, _) => {}
         }
     }
 

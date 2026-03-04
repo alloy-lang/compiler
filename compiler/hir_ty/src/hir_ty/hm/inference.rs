@@ -8,7 +8,10 @@ use super::{HMInferenceContext, MonoType};
 use crate::diagnostics::TypeInferenceErrorKind;
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir as hir;
-use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType, EPTdFql};
+use alloy_hir::{Name, TypeDefinition};
+use alloy_hir_resolved::{
+    resolve_annotated_expression, resolve_annotated_type, AnnotatedType, EPTdFql, TypeVarReference,
+};
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
@@ -60,7 +63,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
                 }
                 // Patterns are internal to their expressions, don't include them
                 EPTdFql::Pattern(_) => false,
-                EPTdFql::TypeDefinition(td_fql) => {
+                EPTdFql::TypeDefinition(td_fql) | EPTdFql::TypeDefinitionVariant(td_fql, _) => {
                     // Type definitions can be polymorphic (e.g., List[t], Option[t])
                     // Include them if they're in the same module
                     // Unlike expressions, type definitions are always named by definition
@@ -173,6 +176,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
         let range = hir_module.get_expression_range(*value);
 
         if let Some(type_annotation) = type_annotation {
+            let _ = resolve_annotated_expression(db, module_id, *type_annotation, *value);
             // Check for type annotation conflicts
             check_type_annotation(
                 db,
@@ -235,9 +239,11 @@ pub(super) fn annotated_to_mono(
         AnnotatedType::Unconstrained => Some(MonoType::Unconstrained),
         AnnotatedType::Unit => Some(MonoType::Unit),
         AnnotatedType::BuiltIn(builtin) => Some(MonoType::Concrete(*builtin)),
-        AnnotatedType::TypeDef(type_fql, name) => {
-            Some(MonoType::TypeDef(type_fql.clone(), name.clone()))
-        }
+        AnnotatedType::TypeDef {
+            fql,
+            name,
+            type_args,
+        } => Some(type_def_to_mono(ctx, fql, name, type_args)),
         AnnotatedType::Lambda { arg, ret } => {
             let arg_mono = annotated_to_mono(arg, ctx)?;
             let ret_mono = annotated_to_mono(ret, ctx)?;
@@ -270,6 +276,26 @@ pub(super) fn annotated_to_mono(
             let var_id = ctx.get_or_create_self_type_var(trait_fql.clone());
             Some(MonoType::Var(var_id))
         }
+    }
+}
+
+fn type_def_to_mono(
+    ctx: &mut HMInferenceContext,
+    fql: &Fql<TypeDefinition>,
+    name: &Name,
+    type_args: &Vec<TypeVarReference>,
+) -> MonoType {
+    let type_args = type_args
+        .iter()
+        .map(|ty_arg| {
+            ctx.get_or_create_annotation_type_var(ty_arg.fql.clone(), ty_arg.name.clone())
+        })
+        .collect::<Vec<_>>();
+
+    MonoType::TypeDef {
+        fql: fql.clone(),
+        type_args,
+        type_def_name: name.clone(),
     }
 }
 
@@ -320,7 +346,9 @@ fn mono_to_resolved_with_map(
                 ResolvedType::Tuple(NonEmpty::from((first, rest)))
             }
         }
-        MonoType::TypeDef(type_fql, name) => ResolvedType::TypeDef(type_fql.clone(), name.clone()),
+        MonoType::TypeDef {
+            fql, type_def_name, ..
+        } => ResolvedType::TypeDef(fql.clone(), type_def_name.clone()),
         MonoType::App { constructor, args } => {
             let base = mono_to_resolved_with_map(constructor, type_var_map, next_generic_id);
             let resolved_args: Vec<_> = args

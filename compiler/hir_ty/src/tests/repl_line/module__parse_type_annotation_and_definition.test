@@ -193,15 +193,26 @@ HirTypedModule {
                                 name: "t2",
                             },
                             ret: Bounded {
-                                base: TypeDef(
-                                    Fql {
+                                base: TypeDef {
+                                    fql: Fql {
                                         module_id: ModuleId {
                                             path: "test_data",
                                         },
                                         local_id: Idx::<TypeDefinition>(1),
                                     },
-                                    "Test",
-                                ),
+                                    name: "Test",
+                                    type_args: [
+                                        TypeVarReference {
+                                            fql: Fql {
+                                                module_id: ModuleId {
+                                                    path: "test_data",
+                                                },
+                                                local_id: Idx::<TypeDefinition>(0),
+                                            },
+                                            name: "t",
+                                        },
+                                    ],
+                                },
                                 args: [
                                     Tuple(
                                         NonEmpty(
@@ -275,15 +286,26 @@ HirTypedModule {
                 },
                 reason: DirectConflict {
                     annotated_type: Bounded {
-                        base: TypeDef(
-                            Fql {
+                        base: TypeDef {
+                            fql: Fql {
                                 module_id: ModuleId {
                                     path: "test_data",
                                 },
                                 local_id: Idx::<TypeDefinition>(1),
                             },
-                            "Test",
-                        ),
+                            name: "Test",
+                            type_args: [
+                                TypeVarReference {
+                                    fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "test_data",
+                                        },
+                                        local_id: Idx::<TypeDefinition>(0),
+                                    },
+                                    name: "t",
+                                },
+                            ],
+                        },
                         args: [
                             Tuple(
                                 NonEmpty(
@@ -346,15 +368,20 @@ HirTypedModule {
                             ),
                         ),
                         App {
-                            constructor: TypeDef(
-                                Fql {
+                            constructor: TypeDef {
+                                fql: Fql {
                                     module_id: ModuleId {
                                         path: "test_data",
                                     },
                                     local_id: Idx::<TypeDefinition>(1),
                                 },
-                                "Test",
-                            ),
+                                type_args: [
+                                    TypeVarId(
+                                        1,
+                                    ),
+                                ],
+                                type_def_name: "Test",
+                            },
                             args: [
                                 Var(
                                     TypeVarId(

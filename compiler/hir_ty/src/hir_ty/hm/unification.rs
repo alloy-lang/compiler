@@ -47,7 +47,7 @@ impl Substitution {
                 constructor: Box::new(self.apply(constructor)),
                 args: args.iter().map(|t| self.apply(t)).collect(),
             },
-            MonoType::Concrete(_) | MonoType::TypeDef(..) | MonoType::Unit => ty.clone(),
+            MonoType::Concrete(_) | MonoType::TypeDef { .. } | MonoType::Unit => ty.clone(),
         }
     }
 
@@ -134,7 +134,9 @@ fn unify_types(t1: &MonoType, t2: &MonoType) -> Result<Substitution, Unification
         }
 
         // Type definitions
-        (MonoType::TypeDef(fql1, _), MonoType::TypeDef(fql2, _)) if fql1 == fql2 => {
+        (MonoType::TypeDef { fql: fql1, .. }, MonoType::TypeDef { fql: fql2, .. })
+            if fql1 == fql2 =>
+        {
             Ok(Substitution::new())
         }
 
@@ -159,7 +161,7 @@ fn occurs(var: TypeVarId, ty: &MonoType) -> bool {
         MonoType::App { constructor, args } => {
             occurs(var, constructor) || args.iter().any(|t| occurs(var, t))
         }
-        MonoType::Concrete(_) | MonoType::TypeDef(..) | MonoType::Unit => false,
+        MonoType::Concrete(_) | MonoType::TypeDef { .. } | MonoType::Unit => false,
     }
 }
 

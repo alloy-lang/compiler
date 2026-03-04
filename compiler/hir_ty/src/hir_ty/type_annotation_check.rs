@@ -70,7 +70,7 @@ fn check_type_compatibility(
         (AnnotatedType::BuiltIn(a), ResolvedType::BuiltIn(b)) if a == b => Ok(()),
 
         // Nominal type definitions
-        (AnnotatedType::TypeDef(a, _), ResolvedType::TypeDef(b, _)) if a == b => Ok(()),
+        (AnnotatedType::TypeDef { fql: a, .. }, ResolvedType::TypeDef(b, _)) if a == b => Ok(()),
 
         // Type variables in annotation match any generic in inference result
         (AnnotatedType::TypeVar { .. }, ResolvedType::Generic(_)) => Ok(()),

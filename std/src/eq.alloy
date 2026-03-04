@@ -9,5 +9,5 @@ trait Eq where
   --#[infix(left, 4)]
   let (==) = eq
   --#[infix(left, 4)]
-  let (!=) = not(eq)
+  let (!=) = |left, right| -> not(eq(left, right))
 end
