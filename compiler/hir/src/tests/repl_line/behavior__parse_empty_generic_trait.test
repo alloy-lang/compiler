@@ -35,9 +35,9 @@ HirModule {
                     name: "t1",
                     subname: None,
                     scope: Idx::<Scope>(3),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(1),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(0),
                     ),
                 },
             ),
@@ -49,9 +49,9 @@ HirModule {
                     name: "t2",
                     subname: None,
                     scope: Idx::<Scope>(3),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(2),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(1),
                     ),
                 },
             ),
@@ -97,23 +97,21 @@ HirModule {
             "range": 0..23,
             "scope_id": Idx::<Scope>(0),
         },
-        Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
+    },
+    type_variables: Index::<TypeVariable> {
+        Idx::<TypeVariable>(0): {
+            "item": TypeVariable {
                 name: "t1",
-                kind: TypeVariable(
-                    Unbound,
-                ),
+                kind: Unbound,
             },
             "name": "t1",
             "range": 104..119,
             "scope_id": Idx::<Scope>(3),
         },
-        Idx::<TypeDefinition>(2): {
-            "item": TypeDefinition {
+        Idx::<TypeVariable>(1): {
+            "item": TypeVariable {
                 name: "t2",
-                kind: TypeVariable(
-                    Unbound,
-                ),
+                kind: Unbound,
             },
             "name": "t2",
             "range": 119..181,
@@ -141,8 +139,8 @@ HirModule {
                 attached_trait: Idx::<TypeReference>(3),
                 attached_type: Idx::<TypeReference>(4),
                 named_type_variables: {
-                    "t1": Idx::<TypeDefinition>(1),
-                    "t2": Idx::<TypeDefinition>(2),
+                    "t1": Idx::<TypeVariable>(0),
+                    "t2": Idx::<TypeVariable>(1),
                 },
                 type_annotations: {},
                 values: {},

@@ -1,4 +1,5 @@
-use crate::Fql;
+use crate::resolver::resolve_by_path;
+use crate::{Fql, TypeVariableResolver};
 use alloy_hir as hir;
 use alloy_hir::HirDatabase;
 use alloy_workspace::ModuleId;
@@ -29,12 +30,12 @@ pub enum AnnotatedType {
     },
     /// Unconstrained type variable (from typevar declaration)
     TypeVar {
-        fql: Fql<hir::TypeDefinition>,
+        fql: Fql<hir::TypeVariable>,
         name: hir::Name,
     },
     /// Constrained type variable (typevar with trait bounds)
     ConstrainedTypeVar {
-        fql: Fql<hir::TypeDefinition>,
+        fql: Fql<hir::TypeVariable>,
         name: hir::Name,
         constraints: NonEmpty<(Fql<hir::Trait>, hir::Name)>,
     },
@@ -52,7 +53,7 @@ pub enum AnnotatedType {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TypeVarReference {
-    pub fql: Fql<hir::TypeDefinition>,
+    pub fql: Fql<hir::TypeVariable>,
     pub name: hir::Name,
 }
 
@@ -469,14 +470,27 @@ fn resolve_named_type_annotation(
     path: &hir::Path,
     type_idx: hir::TypeIdx,
 ) -> AnnotatedType {
+    let source_fql = Fql::new(current_module_id, type_idx);
+
     // First try: resolve via type reference path
-    if let Some(resolved_fql) = crate::resolve_type_reference_by_path(db, current_module_id, path) {
+    if let Some(resolved_fql) =
+        crate::resolve_type_reference_by_path(db, current_module_id, path, &source_fql)
+    {
         return resolve_annotated_type(db, resolved_fql.module_id, resolved_fql.local_id);
     }
 
     // Second try: resolve directly as a type definition
     if let Ok(td_fql) = crate::resolve_type_definition_by_ref_id(db, current_module_id, type_idx) {
         return resolve_type_definition_to_annotated(db, td_fql.module_id, td_fql.local_id);
+    }
+
+    if let Ok(tv_fql) = resolve_by_path::<hir::TypeVariable, TypeVariableResolver>(
+        db,
+        current_module_id,
+        path,
+        &source_fql,
+    ) {
+        return resolve_type_variable_to_annotated(db, tv_fql.module_id, tv_fql.local_id);
     }
 
     AnnotatedType::Missing
@@ -497,32 +511,6 @@ pub fn resolve_type_definition_to_annotated(
 
     match kind {
         hir::TypeDefinitionKind::Missing => AnnotatedType::Missing,
-        hir::TypeDefinitionKind::TypeVariable(type_var) => {
-            let fql = Fql::new(module_id, type_def_idx);
-            match type_var {
-                hir::TypeVariable::Unbound => AnnotatedType::TypeVar {
-                    fql,
-                    name: name.clone(),
-                },
-                hir::TypeVariable::Constrained(constraints) => {
-                    let trait_constraints: Vec<_> = constraints
-                        .iter()
-                        .filter_map(|constraint| trait_constraints(db, module_id, constraint))
-                        .collect();
-
-                    NonEmpty::try_from(trait_constraints)
-                        .map(|constraints| AnnotatedType::ConstrainedTypeVar {
-                            fql: fql.clone(),
-                            name: name.clone(),
-                            constraints,
-                        })
-                        .unwrap_or_else(|_| AnnotatedType::TypeVar {
-                            fql,
-                            name: name.clone(),
-                        })
-                }
-            }
-        }
         hir::TypeDefinitionKind::Single(_) | hir::TypeDefinitionKind::Union(_) => {
             AnnotatedType::TypeDef {
                 fql: Fql::new(module_id, type_def_idx),
@@ -530,11 +518,48 @@ pub fn resolve_type_definition_to_annotated(
                     .iter()
                     .map(|arg| TypeVarReference {
                         fql: Fql::new(module_id, *arg),
-                        name: hir_module.get_type_definition(*arg).name.clone(),
+                        name: hir_module.get_type_variable(*arg).name.clone(),
                     })
                     .collect(),
                 name: name.clone(),
             }
+        }
+    }
+}
+
+#[salsa::tracked]
+pub fn resolve_type_variable_to_annotated(
+    db: &dyn HirDatabase,
+    module_id: ModuleId,
+    type_var_idx: hir::TypeVariableIdx,
+) -> AnnotatedType {
+    let (hir_module, _) = hir::lower_file(db, module_id);
+    let hir::TypeVariable { name, kind } = hir_module.get_type_variable(type_var_idx);
+
+    let fql = Fql::new(module_id, type_var_idx);
+    match kind {
+        hir::TypeVariableKind::Unbound => AnnotatedType::TypeVar {
+            fql,
+            name: name.clone(),
+        },
+        hir::TypeVariableKind::Constrained(constraints) => {
+            let trait_constraints: Vec<_> = constraints
+                .iter()
+                .filter_map(|constraint| {
+                    trait_constraints(db, module_id, constraint)
+                })
+                .collect();
+
+            NonEmpty::try_from(trait_constraints)
+                .map(|constraints| AnnotatedType::ConstrainedTypeVar {
+                    fql: fql.clone(),
+                    name: name.clone(),
+                    constraints,
+                })
+                .unwrap_or_else(|_| AnnotatedType::TypeVar {
+                    fql,
+                    name: name.clone(),
+                })
         }
     }
 }
@@ -545,6 +570,7 @@ mod tests {
     use crate::tests::TestHirResDatabase;
     use alloy_test_harness::idx;
     use salsa::Database;
+    use std::convert::TryFrom;
 
     #[test]
     fn resolve_literal_int() {
@@ -620,9 +646,15 @@ mod tests {
                             }),
                             ret: Box::new(AnnotatedType::Bounded {
                                 base: Box::new(AnnotatedType::TypeDef {
-                                    fql: Fql::new(test_data_module_id, idx!(1)),
+                                    fql: Fql::new(test_data_module_id, idx!(0)),
                                     name: hir::Name::from("Test"),
-                                    type_args: vec![],
+                                    type_args: vec![TypeVarReference {
+                                        fql: Fql {
+                                            module_id: test_data_module_id,
+                                            local_id: idx!(0),
+                                        },
+                                        name: hir::Name::from("t"),
+                                    }],
                                 }),
                                 args: vec![AnnotatedType::Tuple(
                                     NonEmpty::try_from(vec![

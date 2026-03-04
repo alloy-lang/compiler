@@ -13,9 +13,9 @@ HirModule {
                     name: "t1",
                     subname: None,
                     scope: Idx::<Scope>(1),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(0),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(0),
                     ),
                 },
             ),
@@ -50,24 +50,21 @@ HirModule {
             "scope_id": Idx::<Scope>(0),
         },
     },
-    type_definitions: Index::<TypeDefinition> {
-        Idx::<TypeDefinition>(0): {
-            "item": TypeDefinition {
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    type_variables: Index::<TypeVariable> {
+        Idx::<TypeVariable>(0): {
+            "item": TypeVariable {
                 name: "t1",
-                kind: TypeVariable(
-                    Unbound,
-                ),
+                kind: Unbound,
             },
             "name": "t1",
             "range": 44..59,
             "scope_id": Idx::<Scope>(1),
         },
-        Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
+        Idx::<TypeVariable>(1): {
+            "item": TypeVariable {
                 name: "t1",
-                kind: TypeVariable(
-                    Unbound,
-                ),
+                kind: Unbound,
             },
             "range": 59..69,
         },

@@ -10,7 +10,7 @@ HirTypedModule {
                     module_id: ModuleId {
                         path: "std::option",
                     },
-                    local_id: Idx::<TypeDefinition>(1),
+                    local_id: Idx::<TypeDefinition>(0),
                 },
                 "Option",
             ),
@@ -30,7 +30,7 @@ HirTypedModule {
                 module_id: ModuleId {
                     path: "std::option",
                 },
-                local_id: Idx::<TypeDefinition>(1),
+                local_id: Idx::<TypeDefinition>(0),
             },
             "None",
         ): [

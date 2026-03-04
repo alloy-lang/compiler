@@ -19,7 +19,7 @@ HirTypedModule {
                         module_id: ModuleId {
                             path: "main",
                         },
-                        local_id: Idx::<TypeDefinition>(1),
+                        local_id: Idx::<TypeDefinition>(0),
                     },
                     "Identity",
                 ),
@@ -36,7 +36,7 @@ HirTypedModule {
                     module_id: ModuleId {
                         path: "main",
                     },
-                    local_id: Idx::<TypeDefinition>(1),
+                    local_id: Idx::<TypeDefinition>(0),
                 },
                 "Identity",
             ),
@@ -79,7 +79,7 @@ HirTypedModule {
                 module_id: ModuleId {
                     path: "main",
                 },
-                local_id: Idx::<TypeDefinition>(1),
+                local_id: Idx::<TypeDefinition>(0),
             },
             "Id",
         ): [

@@ -1,8 +1,16 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 
+pub type TypeVariableIdx = Idx<TypeVariable>;
+
 #[derive(Debug, Clone, PartialEq)]
-pub enum TypeVariable {
+pub struct TypeVariable {
+    pub name: Name,
+    pub kind: TypeVariableKind,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum TypeVariableKind {
     Unbound,
     Constrained(NonEmpty<TypeVariableConstraint>),
 }
@@ -16,7 +24,7 @@ pub enum TypeVariableConstraint {
 pub(super) fn lower_named_type_variable(
     ctx: &mut LoweringCtx,
     ast: &ast::NamedTypeVariable,
-) -> Option<(Name, TypeDefinitionIdx)> {
+) -> Option<(Name, TypeVariableIdx)> {
     let Some(name) = ast.name() else {
         // we can't add a type arg that we don't have a name for
         // we can skip it since it'll be reported as a parsing error
@@ -25,9 +33,9 @@ pub(super) fn lower_named_type_variable(
 
     let constraints = lower_type_variable_constraints(ctx, &ast.constraints());
     let type_variable = if constraints.is_empty() {
-        TypeVariable::Unbound
+        TypeVariableKind::Unbound
     } else {
-        TypeVariable::Constrained(unsafe { NonEmpty::new_unchecked(constraints) })
+        TypeVariableKind::Constrained(unsafe { NonEmpty::new_unchecked(constraints) })
     };
 
     Some((

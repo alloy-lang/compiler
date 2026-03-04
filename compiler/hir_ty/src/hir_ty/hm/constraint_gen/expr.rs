@@ -346,7 +346,7 @@ fn build_constructor_type(
         .map(|ty_arg| {
             ctx.get_or_create_annotation_type_var(
                 ty_arg.clone(),
-                hir_module.get_type_definition(ty_arg.local_id).name.clone(),
+                hir_module.get_type_variable(ty_arg.local_id).name.clone(),
             )
         })
         .collect::<Vec<_>>();
@@ -546,7 +546,7 @@ fn infer_type_definition(
                     .map(|ty_arg| {
                         ctx.get_or_create_annotation_type_var(
                             ty_arg.clone(),
-                            hir_module.get_type_definition(ty_arg.local_id).name.clone(),
+                            hir_module.get_type_variable(ty_arg.local_id).name.clone(),
                         )
                     })
                     .collect::<Vec<_>>(),

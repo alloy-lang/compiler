@@ -2,22 +2,20 @@ use crate::{resolver, EPTrFql, Fql, HirResolutionError};
 use alloy_hir as hir;
 use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
-use la_arena::{Idx, RawIdx};
+use la_arena::Idx;
 use non_empty_vec::{ne_vec, NonEmpty};
 
 pub fn resolve_type_reference_by_path(
     db: &dyn hir::HirDatabase,
     current_module_id: ModuleId,
     path: &hir::Path,
+    source_ref: impl Into<EPTrFql>,
 ) -> Option<Fql<hir::TypeReference>> {
     resolver::resolve_by_path::<hir::TypeReference, TypeReferenceResolver>(
         db,
         current_module_id,
         path,
-        Fql {
-            module_id: current_module_id,
-            local_id: Idx::<hir::TypeReference>::from_raw(RawIdx::from_u32(u32::MAX)),
-        },
+        source_ref,
     )
     .ok()
 }
@@ -83,6 +81,7 @@ mod tests {
     use crate::tests::TestHirResDatabase;
     use alloy_hir::{ResolutionIdx, ResolutionKind};
     use alloy_scope::Scopes;
+    use alloy_test_harness::idx;
     use alloy_workspace::WorkspaceDatabase;
     use la_arena::{Idx, RawIdx};
 
@@ -106,7 +105,8 @@ mod tests {
             resolution_idx: ResolutionIdx::Unresolved,
         };
 
-        let actual_ref = resolve_type_reference_by_path(&db, module_id, &path)
+        let source_ref: Fql<hir::TypeReference> = Fql::new(module_id, idx!(0));
+        let actual_ref = resolve_type_reference_by_path(&db, module_id, &path, source_ref)
             .expect("must find type reference");
         let expected = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
 
@@ -142,7 +142,8 @@ mod tests {
         };
         let path = hir::Path::OtherModule(fqn, vec![]);
 
-        let actual = resolve_type_reference_by_path(&db, module_id, &path);
+        let source_ref: Fql<hir::TypeReference> = Fql::new(module_id, idx!(0));
+        let actual = resolve_type_reference_by_path(&db, module_id, &path, source_ref);
         assert!(
             actual.is_none(),
             "Should return None for unknown cross-module type"
@@ -178,7 +179,8 @@ mod tests {
         };
         let path = hir::Path::OtherModule(fqn, vec![]);
 
-        let actual = resolve_type_reference_by_path(&db, module_id, &path);
+        let source_ref: Fql<hir::TypeReference> = Fql::new(module_id, idx!(0));
+        let actual = resolve_type_reference_by_path(&db, module_id, &path, source_ref);
         assert!(
             actual.is_none(),
             "Should return None for unknown cross-module type"
@@ -202,7 +204,8 @@ mod tests {
             hir::Name::new("Type"),
         ]);
 
-        let result = resolve_type_reference_by_path(&db, module_id, &unknown_path);
+        let source_ref: Fql<hir::TypeReference> = Fql::new(module_id, idx!(0));
+        let result = resolve_type_reference_by_path(&db, module_id, &unknown_path, source_ref);
         assert!(result.is_none(), "Unknown path should return None");
     }
 }

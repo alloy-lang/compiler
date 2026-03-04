@@ -12,7 +12,7 @@ HirTypedModule {
                     module_id: ModuleId {
                         path: "test_data",
                     },
-                    local_id: Idx::<TypeDefinition>(1),
+                    local_id: Idx::<TypeDefinition>(0),
                 },
                 "Test",
             ),
@@ -39,7 +39,7 @@ HirTypedModule {
                     module_id: ModuleId {
                         path: "test_data",
                     },
-                    local_id: Idx::<TypeDefinition>(1),
+                    local_id: Idx::<TypeDefinition>(0),
                 },
                 "Test",
             ),
@@ -64,7 +64,7 @@ HirTypedModule {
                                 module_id: ModuleId {
                                     path: "test_data",
                                 },
-                                local_id: Idx::<TypeDefinition>(1),
+                                local_id: Idx::<TypeDefinition>(0),
                             },
                             type_args: [
                                 TypeVarId(
@@ -93,7 +93,7 @@ HirTypedModule {
                 module_id: ModuleId {
                     path: "test_data",
                 },
-                local_id: Idx::<TypeDefinition>(1),
+                local_id: Idx::<TypeDefinition>(0),
             },
         ): [
             PolyInstantiation {

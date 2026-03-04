@@ -10,7 +10,7 @@ pub struct Behavior {
     scope: ScopeIdx,
     pub attached_trait: TypeIdx,
     pub attached_type: TypeIdx,
-    named_type_variables: FxHashMap<Name, TypeDefinitionIdx>,
+    named_type_variables: FxHashMap<Name, TypeVariableIdx>,
     type_annotations: FxHashMap<Name, TypeIdx>,
     values: FxHashMap<Name, ExpressionIdx>,
 }
@@ -20,7 +20,7 @@ impl Behavior {
         self.scope
     }
 
-    pub fn named_type_variables(&'_ self) -> Iter<'_, Name, TypeDefinitionIdx> {
+    pub fn named_type_variables(&'_ self) -> Iter<'_, Name, TypeVariableIdx> {
         self.named_type_variables.iter()
     }
 

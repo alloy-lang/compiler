@@ -121,7 +121,7 @@ mod tests {
             Pattern::Destructure {
                 target: Fql {
                     module_id: ModuleId::new(&db, "std::option"),
-                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
                 },
                 variant_name: hir::Name::new("Some"),
                 args: vec![Fql {
@@ -158,7 +158,7 @@ mod tests {
                 }),
                 target_type_fql: Fql {
                     module_id: ModuleId::new(&db, "std::option"),
-                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
                 },
                 variant_name: hir::Name::new("InvalidVariant")
             },
@@ -191,7 +191,7 @@ mod tests {
                 }),
                 target_type_fql: Fql {
                     module_id: ModuleId::new(&db, "std::option"),
-                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
                 }
             },
             err

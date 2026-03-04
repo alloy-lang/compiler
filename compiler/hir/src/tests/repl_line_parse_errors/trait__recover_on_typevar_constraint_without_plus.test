@@ -48,13 +48,12 @@ HirModule {
             "range": 73..85,
         },
     },
-    type_definitions: Index::<TypeDefinition> {
-        Idx::<TypeDefinition>(0): {
-            "item": TypeDefinition {
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    type_variables: Index::<TypeVariable> {
+        Idx::<TypeVariable>(0): {
+            "item": TypeVariable {
                 name: "t1",
-                kind: TypeVariable(
-                    Unbound,
-                ),
+                kind: Unbound,
             },
             "name": "t1",
             "range": 85..96,
@@ -75,7 +74,7 @@ HirModule {
                     ),
                 ],
                 named_type_variables: {
-                    "t1": Idx::<TypeDefinition>(0),
+                    "t1": Idx::<TypeVariable>(0),
                 },
                 members: [],
             },

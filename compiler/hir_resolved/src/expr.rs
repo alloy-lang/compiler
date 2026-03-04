@@ -433,7 +433,7 @@ mod tests {
             Expression::VariantConstructor {
                 type_def: Fql {
                     module_id: ModuleId::new(&db, "test_stuff"),
-                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
                 },
                 variant_name: Name::from("None")
             },
@@ -493,7 +493,7 @@ mod tests {
                 target: EPTdFql::TypeDefinitionVariant(
                     Fql {
                         module_id,
-                        local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                        local_id: Idx::from_raw(RawIdx::from_u32(0)),
                     },
                     Name::new("Some")
                 ),
@@ -524,7 +524,7 @@ mod tests {
             Expression::FunctionCall {
                 target: EPTdFql::TypeDefinition(Fql {
                     module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
                 }),
                 args: vec![Fql {
                     module_id,
@@ -831,7 +831,7 @@ mod tests {
             Expression::VariantConstructor {
                 type_def: Fql {
                     module_id: ModuleId::new(&db, "std::option"),
-                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
                 },
                 variant_name: Name::from("None")
             },
@@ -897,7 +897,7 @@ mod tests {
             }),
             target_type_fql: Fql {
                 module_id: ModuleId::new(&db, "std::option"),
-                local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                local_id: Idx::from_raw(RawIdx::from_u32(0)),
             },
             variant_name: Name::new("Other"),
         };
@@ -966,7 +966,7 @@ mod tests {
                 target: EPTdFql::TypeDefinitionVariant(
                     Fql {
                         module_id: ModuleId::new(&db, "std::option"),
-                        local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                        local_id: Idx::from_raw(RawIdx::from_u32(0)),
                     },
                     Name::new("Some")
                 ),
@@ -1002,7 +1002,7 @@ mod tests {
             }),
             target_type_fql: Fql {
                 module_id: ModuleId::new(&db, "std::option"),
-                local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                local_id: Idx::from_raw(RawIdx::from_u32(0)),
             },
             variant_name: Name::new("Other"),
         };

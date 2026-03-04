@@ -261,7 +261,7 @@ pub(super) struct HMInferenceContext<'db> {
     pub(super) instantiations: FxHashMap<EPTdFql, Vec<(Fql<hir::Expression>, Vec<TypeVarId>)>>,
     /// Maps annotation type variable Fql → TypeVarId
     /// Ensures the same type variable declaration always maps to the same inference variable
-    pub(super) annotation_type_vars: FxHashMap<Fql<hir::TypeDefinition>, TypeVarId>,
+    pub(super) annotation_type_vars: FxHashMap<Fql<hir::TypeVariable>, TypeVarId>,
     /// Maps Self type Fql → TypeVarId
     /// Ensures the same Self type in the same trait always maps to the same inference variable
     pub(super) self_type_vars: FxHashMap<Fql<hir::Trait>, TypeVarId>,
@@ -383,7 +383,7 @@ impl<'db> HMInferenceContext<'db> {
     /// Ensures the same Fql<TypeDefinition> always maps to the same TypeVarId.
     pub(super) fn get_or_create_annotation_type_var(
         &mut self,
-        fql: Fql<hir::TypeDefinition>,
+        fql: Fql<hir::TypeVariable>,
         name: hir::Name,
     ) -> TypeVarId {
         if let Some(&var_id) = self.annotation_type_vars.get(&fql) {

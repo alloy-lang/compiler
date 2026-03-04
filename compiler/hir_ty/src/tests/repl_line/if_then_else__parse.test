@@ -10,7 +10,7 @@ HirTypedModule {
                     module_id: ModuleId {
                         path: "test_data",
                     },
-                    local_id: Idx::<TypeDefinition>(1),
+                    local_id: Idx::<TypeDefinition>(0),
                 },
                 "Test",
             ),
@@ -23,9 +23,22 @@ HirTypedModule {
         Idx::<Expression>(2): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(1): BuiltIn(
-            Int,
-        ),
+        Idx::<Expression>(1): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
         Idx::<Expression>(3): BuiltIn(
             Int,
         ),
@@ -42,7 +55,7 @@ HirTypedModule {
                                 module_id: ModuleId {
                                     path: "test_data",
                                 },
-                                local_id: Idx::<TypeDefinition>(1),
+                                local_id: Idx::<TypeDefinition>(0),
                             },
                             type_args: [
                                 TypeVarId(
@@ -71,7 +84,7 @@ HirTypedModule {
                 module_id: ModuleId {
                     path: "test_data",
                 },
-                local_id: Idx::<TypeDefinition>(1),
+                local_id: Idx::<TypeDefinition>(0),
             },
         ): [
             PolyInstantiation {

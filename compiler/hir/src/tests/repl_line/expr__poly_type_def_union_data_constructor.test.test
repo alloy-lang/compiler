@@ -26,7 +26,7 @@ HirModule {
                     scope: Idx::<Scope>(0),
                     resolution_kind: TypeDefinition,
                     resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(1),
+                        Idx::<TypeDefinition>(0),
                     ),
                 },
                 scope: Idx::<Scope>(0),
@@ -47,9 +47,9 @@ HirModule {
                     name: "t",
                     subname: None,
                     scope: Idx::<Scope>(1),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(0),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(0),
                     ),
                 },
             ),
@@ -65,20 +65,9 @@ HirModule {
     type_definitions: Index::<TypeDefinition> {
         Idx::<TypeDefinition>(0): {
             "item": TypeDefinition {
-                name: "t",
-                kind: TypeVariable(
-                    Unbound,
-                ),
-            },
-            "name": "t",
-            "range": 15..16,
-            "scope_id": Idx::<Scope>(1),
-        },
-        Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
                 name: "Option",
                 type_args: [
-                    Idx::<TypeDefinition>(0),
+                    Idx::<TypeVariable>(0),
                 ],
                 kind: Union(
                     [
@@ -98,6 +87,17 @@ HirModule {
             "name": "Option",
             "range": 0..50,
             "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_variables: Index::<TypeVariable> {
+        Idx::<TypeVariable>(0): {
+            "item": TypeVariable {
+                name: "t",
+                kind: Unbound,
+            },
+            "name": "t",
+            "range": 15..16,
+            "scope_id": Idx::<Scope>(1),
         },
     },
     traits: EmptyIndex::<Trait>,

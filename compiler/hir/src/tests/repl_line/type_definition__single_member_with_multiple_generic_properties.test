@@ -11,9 +11,9 @@ HirModule {
                     name: "t1",
                     subname: None,
                     scope: Idx::<Scope>(1),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(0),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(0),
                     ),
                 },
             ),
@@ -25,9 +25,9 @@ HirModule {
                     name: "t2",
                     subname: None,
                     scope: Idx::<Scope>(1),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(1),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(1),
                     ),
                 },
             ),
@@ -37,32 +37,10 @@ HirModule {
     type_definitions: Index::<TypeDefinition> {
         Idx::<TypeDefinition>(0): {
             "item": TypeDefinition {
-                name: "t1",
-                kind: TypeVariable(
-                    Unbound,
-                ),
-            },
-            "name": "t1",
-            "range": 13..15,
-            "scope_id": Idx::<Scope>(1),
-        },
-        Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
-                name: "t2",
-                kind: TypeVariable(
-                    Unbound,
-                ),
-            },
-            "name": "t2",
-            "range": 17..19,
-            "scope_id": Idx::<Scope>(1),
-        },
-        Idx::<TypeDefinition>(2): {
-            "item": TypeDefinition {
                 name: "Test",
                 type_args: [
-                    Idx::<TypeDefinition>(0),
-                    Idx::<TypeDefinition>(1),
+                    Idx::<TypeVariable>(0),
+                    Idx::<TypeVariable>(1),
                 ],
                 kind: Single(
                     TypeDefinitionMember {
@@ -77,6 +55,26 @@ HirModule {
             "name": "Test",
             "range": 0..34,
             "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_variables: Index::<TypeVariable> {
+        Idx::<TypeVariable>(0): {
+            "item": TypeVariable {
+                name: "t1",
+                kind: Unbound,
+            },
+            "name": "t1",
+            "range": 13..15,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeVariable>(1): {
+            "item": TypeVariable {
+                name: "t2",
+                kind: Unbound,
+            },
+            "name": "t2",
+            "range": 17..19,
+            "scope_id": Idx::<Scope>(1),
         },
     },
     traits: EmptyIndex::<Trait>,

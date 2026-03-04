@@ -9,32 +9,10 @@ HirModule {
     type_definitions: Index::<TypeDefinition> {
         Idx::<TypeDefinition>(0): {
             "item": TypeDefinition {
-                name: "t1",
-                kind: TypeVariable(
-                    Unbound,
-                ),
-            },
-            "name": "t1",
-            "range": 14..16,
-            "scope_id": Idx::<Scope>(1),
-        },
-        Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
-                name: "t2",
-                kind: TypeVariable(
-                    Unbound,
-                ),
-            },
-            "name": "t2",
-            "range": 17..19,
-            "scope_id": Idx::<Scope>(1),
-        },
-        Idx::<TypeDefinition>(2): {
-            "item": TypeDefinition {
                 name: "Test1",
                 type_args: [
-                    Idx::<TypeDefinition>(0),
-                    Idx::<TypeDefinition>(1),
+                    Idx::<TypeVariable>(0),
+                    Idx::<TypeVariable>(1),
                 ],
                 kind: Single(
                     TypeDefinitionMember {
@@ -47,7 +25,7 @@ HirModule {
             "range": 0..29,
             "scope_id": Idx::<Scope>(0),
         },
-        Idx::<TypeDefinition>(3): {
+        Idx::<TypeDefinition>(1): {
             "item": TypeDefinition {
                 name: "Test2",
                 kind: Single(
@@ -60,6 +38,26 @@ HirModule {
             "name": "Test2",
             "range": 29..57,
             "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_variables: Index::<TypeVariable> {
+        Idx::<TypeVariable>(0): {
+            "item": TypeVariable {
+                name: "t1",
+                kind: Unbound,
+            },
+            "name": "t1",
+            "range": 14..16,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeVariable>(1): {
+            "item": TypeVariable {
+                name: "t2",
+                kind: Unbound,
+            },
+            "name": "t2",
+            "range": 17..19,
+            "scope_id": Idx::<Scope>(1),
         },
     },
     traits: EmptyIndex::<Trait>,

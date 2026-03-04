@@ -25,7 +25,7 @@ pub struct Trait {
     /// The scope where this trait's members are defined
     scope: ScopeIdx,
     self_constraints: Vec<TypeVariableConstraint>,
-    named_type_variables: FxHashMap<Name, TypeDefinitionIdx>,
+    named_type_variables: FxHashMap<Name, TypeVariableIdx>,
     members: Vec<TraitMember>,
 }
 

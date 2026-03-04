@@ -83,6 +83,7 @@ pub(crate) struct LoweringCtx<'db> {
     patterns: Index<Pattern>,
     type_references: Index<TypeReference>,
     type_definitions: Index<TypeDefinition>,
+    type_variables: Index<TypeVariable>,
     traits: Index<Trait>,
     behaviors: Index<Behavior, (/* type */ TypeIdx, /* trait */ TypeIdx)>,
     expression_deps: FxHashMap<ExpressionIdx, FxHashSet<ExpressionIdx>>,
@@ -102,6 +103,7 @@ impl<'db> LoweringCtx<'db> {
             patterns: Index::new(),
             type_references: Index::new(),
             type_definitions: Index::new(),
+            type_variables: Index::new(),
             traits: Index::new(),
             behaviors: Index::new(),
             expression_deps: FxHashMap::default(),
@@ -155,6 +157,7 @@ impl<'db> LoweringCtx<'db> {
             self.patterns,
             self.type_references,
             self.type_definitions,
+            self.type_variables,
             self.traits,
             self.behaviors,
             value_definitions,
@@ -215,6 +218,15 @@ impl<'db> LoweringCtx<'db> {
                     scope,
                     ResolutionKind::TypeDefinition,
                     ResolutionIdx::TypeDefinition(tid),
+                ));
+            }
+            if let Some((tid, scope)) = self.type_variables.get_id(&local_name, &self.scopes) {
+                return Some(Path::this_module(
+                    rest,
+                    first,
+                    scope,
+                    ResolutionKind::TypeVariable,
+                    ResolutionIdx::TypeVariable(tid),
                 ));
             }
             if let Some((tid, scope)) = self.type_references.get_id(&local_name, &self.scopes) {
@@ -505,19 +517,18 @@ impl<'db> LoweringCtx<'db> {
     pub(crate) fn add_type_variable(
         &mut self,
         name: String,
-        type_variable: TypeVariable,
+        type_variable: TypeVariableKind,
         element: &SyntaxElement,
-    ) -> TypeDefinitionIdx {
+    ) -> TypeVariableIdx {
         let name = Name::new(name);
-        let type_definition = TypeDefinition {
+        let type_variable = TypeVariable {
             name: name.clone(),
-            type_args: vec![],
-            kind: TypeDefinitionKind::TypeVariable(type_variable),
+            kind: type_variable,
         };
 
-        let res = self.type_definitions.insert_named(
+        let res = self.type_variables.insert_named(
             name.clone(),
-            type_definition.clone(),
+            type_variable.clone(),
             element.text_range(),
             &self.scopes,
         );
@@ -531,8 +542,8 @@ impl<'db> LoweringCtx<'db> {
                 };
                 self.error(err, element.text_range());
 
-                self.type_definitions
-                    .insert_not_named(type_definition, element.text_range())
+                self.type_variables
+                    .insert_not_named(type_variable, element.text_range())
             }
             Ok(pid) => pid,
         }

@@ -18,6 +18,7 @@ pub struct HirModule {
     patterns: Index<Pattern>,
     type_references: Index<TypeReference>,
     type_definitions: Index<TypeDefinition>,
+    type_variables: Index<TypeVariable>,
     traits: Index<Trait>,
     behaviors: Index<Behavior, (TypeIdx, TypeIdx)>,
     value_definitions: FxHashMap<Name, ValueDefinition>,
@@ -35,6 +36,9 @@ impl fmt::Debug for HirModule {
         debug_struct.field("patterns", &self.patterns);
         debug_struct.field("type_references", &self.type_references);
         debug_struct.field("type_definitions", &self.type_definitions);
+        if !self.type_variables.is_empty() {
+            debug_struct.field("type_variables", &self.type_variables);
+        }
         debug_struct.field("traits", &self.traits);
         debug_struct.field("behaviors", &self.behaviors);
         if !self.value_definitions.is_empty() {
@@ -67,6 +71,7 @@ impl HirModule {
             patterns: Default::default(),
             type_references: Default::default(),
             type_definitions: Default::default(),
+            type_variables: Default::default(),
             traits: Default::default(),
             behaviors: Default::default(),
             value_definitions: Default::default(),
@@ -83,6 +88,7 @@ impl HirModule {
         patterns: Index<Pattern>,
         type_references: Index<TypeReference>,
         type_definitions: Index<TypeDefinition>,
+        type_variables: Index<TypeVariable>,
         traits: Index<Trait>,
         behaviors: Index<Behavior, (TypeIdx, TypeIdx)>,
         value_definitions: FxHashMap<Name, ValueDefinition>,
@@ -97,6 +103,7 @@ impl HirModule {
             patterns,
             type_references,
             type_definitions,
+            type_variables,
             traits,
             behaviors,
             value_definitions,
@@ -156,6 +163,15 @@ impl HirModule {
             .get_by_scoped_name(name, scope, &self.scopes)
     }
 
+    pub fn get_type_variable_by_name(
+        &self,
+        name: &Name,
+        scope: ScopeIdx,
+    ) -> Option<(TypeVariableIdx, &TypeVariable)> {
+        self.type_variables
+            .get_by_scoped_name(name, scope, &self.scopes)
+    }
+
     pub fn get_expression_by_name(
         &self,
         name: &Name,
@@ -196,6 +212,10 @@ impl HirModule {
     // Get methods by index
     pub fn get_type_definition(&self, idx: TypeDefinitionIdx) -> &TypeDefinition {
         self.type_definitions.get(idx)
+    }
+
+    pub fn get_type_variable(&self, idx: TypeVariableIdx) -> &TypeVariable {
+        self.type_variables.get(idx)
     }
 
     pub fn get_type_definition_range(&self, idx: TypeDefinitionIdx) -> TextRange {

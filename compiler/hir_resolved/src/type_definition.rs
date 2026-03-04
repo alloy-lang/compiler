@@ -8,7 +8,7 @@ use non_empty_vec::NonEmpty;
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeDefinition {
     pub name: hir::Name,
-    pub type_args: Vec<Fql<hir::TypeDefinition>>,
+    pub type_args: Vec<Fql<hir::TypeVariable>>,
     pub kind: TypeDefinitionKind,
 }
 
@@ -125,8 +125,8 @@ pub fn resolve_type_definition_by_id(
                 .collect();
             TypeDefinitionKind::Union(resolved_members)
         }
-        hir::TypeDefinitionKind::Missing | hir::TypeDefinitionKind::TypeVariable(_) => {
-            return None; // or handle as needed
+        hir::TypeDefinitionKind::Missing => {
+            return None;
         }
     };
 

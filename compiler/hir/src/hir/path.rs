@@ -18,6 +18,7 @@ pub enum Path {
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum ResolutionKind {
     Trait,
+    TypeVariable,
     TypeDefinition,
     AbstractTraitMember,
     Expression,
@@ -27,6 +28,7 @@ pub enum ResolutionKind {
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum ResolutionIdx {
     Trait(TraitIdx),
+    TypeVariable(TypeVariableIdx),
     TypeDefinition(TypeDefinitionIdx),
     AbstractTraitMember(TypeIdx),
     Expression(ExpressionIdx),

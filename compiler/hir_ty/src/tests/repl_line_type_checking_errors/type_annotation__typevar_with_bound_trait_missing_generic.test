@@ -17,7 +17,7 @@ HirTypedModule {
                     module_id: ModuleId {
                         path: "test_data",
                     },
-                    local_id: Idx::<TypeDefinition>(1),
+                    local_id: Idx::<TypeDefinition>(0),
                 },
                 "Test",
             ),
@@ -29,11 +29,11 @@ HirTypedModule {
         },
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
-                1,
+                0,
             ),
             return_type: Lambda {
                 arg_type: Generic(
-                    2,
+                    1,
                 ),
                 return_type: Bounded {
                     base: TypeDef(
@@ -41,7 +41,7 @@ HirTypedModule {
                             module_id: ModuleId {
                                 path: "test_data",
                             },
-                            local_id: Idx::<TypeDefinition>(1),
+                            local_id: Idx::<TypeDefinition>(0),
                         },
                         "Test",
                     ),
@@ -56,10 +56,10 @@ HirTypedModule {
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            1,
+            0,
         ),
         Idx::<Pattern>(1): Generic(
-            2,
+            1,
         ),
     },
     warnings: [],
@@ -72,7 +72,7 @@ HirTypedModule {
                             module_id: ModuleId {
                                 path: "main",
                             },
-                            local_id: Idx::<TypeDefinition>(0),
+                            local_id: Idx::<TypeVariable>(0),
                         },
                         name: "t1",
                         constraints: NonEmpty(
@@ -95,7 +95,7 @@ HirTypedModule {
                                 module_id: ModuleId {
                                     path: "main",
                                 },
-                                local_id: Idx::<TypeDefinition>(1),
+                                local_id: Idx::<TypeVariable>(1),
                             },
                             name: "t2",
                         },
@@ -104,7 +104,7 @@ HirTypedModule {
                                 module_id: ModuleId {
                                     path: "test_data",
                                 },
-                                local_id: Idx::<TypeDefinition>(1),
+                                local_id: Idx::<TypeDefinition>(0),
                             },
                             name: "Test",
                             type_args: [
@@ -113,7 +113,7 @@ HirTypedModule {
                                         module_id: ModuleId {
                                             path: "test_data",
                                         },
-                                        local_id: Idx::<TypeDefinition>(0),
+                                        local_id: Idx::<TypeVariable>(0),
                                     },
                                     name: "t",
                                 },
@@ -123,11 +123,11 @@ HirTypedModule {
                 },
                 inferred_type: Lambda {
                     arg_type: Generic(
-                        1,
+                        0,
                     ),
                     return_type: Lambda {
                         arg_type: Generic(
-                            2,
+                            1,
                         ),
                         return_type: Bounded {
                             base: TypeDef(
@@ -135,7 +135,7 @@ HirTypedModule {
                                     module_id: ModuleId {
                                         path: "test_data",
                                     },
-                                    local_id: Idx::<TypeDefinition>(1),
+                                    local_id: Idx::<TypeDefinition>(0),
                                 },
                                 "Test",
                             ),
@@ -153,7 +153,7 @@ HirTypedModule {
                             module_id: ModuleId {
                                 path: "test_data",
                             },
-                            local_id: Idx::<TypeDefinition>(1),
+                            local_id: Idx::<TypeDefinition>(0),
                         },
                         name: "Test",
                         type_args: [
@@ -162,7 +162,7 @@ HirTypedModule {
                                     module_id: ModuleId {
                                         path: "test_data",
                                     },
-                                    local_id: Idx::<TypeDefinition>(0),
+                                    local_id: Idx::<TypeVariable>(0),
                                 },
                                 name: "t",
                             },
@@ -174,7 +174,7 @@ HirTypedModule {
                                 module_id: ModuleId {
                                     path: "test_data",
                                 },
-                                local_id: Idx::<TypeDefinition>(1),
+                                local_id: Idx::<TypeDefinition>(0),
                             },
                             "Test",
                         ),
@@ -195,7 +195,7 @@ HirTypedModule {
                 module_id: ModuleId {
                     path: "test_data",
                 },
-                local_id: Idx::<TypeDefinition>(1),
+                local_id: Idx::<TypeDefinition>(0),
             },
         ): [
             PolyInstantiation {
@@ -215,7 +215,7 @@ HirTypedModule {
     },
 }
 []
-[E001] Error: Type annotation conflict: expected `t1 : TestTrait1 -> t2 -> Test`, found `t1 -> t2 -> Test[Int]`
+[E001] Error: Type annotation conflict: expected `t1 : TestTrait1 -> t2 -> Test`, found `t0 -> t1 -> Test[Int]`
     ╭─[ ./test/main.alloy:10:1 ]
     │
  10 │ let test_func = |a, b| -> test

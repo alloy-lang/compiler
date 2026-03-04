@@ -42,9 +42,9 @@ HirModule {
                     name: "a",
                     subname: None,
                     scope: Idx::<Scope>(2),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(0),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(0),
                     ),
                 },
             ),
@@ -62,9 +62,9 @@ HirModule {
                     name: "b",
                     subname: None,
                     scope: Idx::<Scope>(2),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(1),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(1),
                     ),
                 },
             ),
@@ -104,9 +104,9 @@ HirModule {
                     name: "a",
                     subname: None,
                     scope: Idx::<Scope>(2),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(0),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(0),
                     ),
                 },
             ),
@@ -133,9 +133,9 @@ HirModule {
                     name: "b",
                     subname: None,
                     scope: Idx::<Scope>(2),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(1),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(1),
                     ),
                 },
             ),
@@ -186,9 +186,9 @@ HirModule {
                     name: "t1",
                     subname: None,
                     scope: Idx::<Scope>(3),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(3),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(3),
                     ),
                 },
             ),
@@ -200,9 +200,9 @@ HirModule {
                     name: "m",
                     subname: None,
                     scope: Idx::<Scope>(3),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(2),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(2),
                     ),
                 },
             ),
@@ -214,9 +214,9 @@ HirModule {
                     name: "t2",
                     subname: None,
                     scope: Idx::<Scope>(3),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(4),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(4),
                     ),
                 },
             ),
@@ -250,9 +250,9 @@ HirModule {
                     name: "m",
                     subname: None,
                     scope: Idx::<Scope>(3),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(2),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(2),
                     ),
                 },
             ),
@@ -264,9 +264,9 @@ HirModule {
                     name: "t1",
                     subname: None,
                     scope: Idx::<Scope>(3),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(3),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(3),
                     ),
                 },
             ),
@@ -287,9 +287,9 @@ HirModule {
                     name: "m",
                     subname: None,
                     scope: Idx::<Scope>(3),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(2),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(2),
                     ),
                 },
             ),
@@ -301,9 +301,9 @@ HirModule {
                     name: "t2",
                     subname: None,
                     scope: Idx::<Scope>(3),
-                    resolution_kind: TypeDefinition,
-                    resolution_idx: TypeDefinition(
-                        Idx::<TypeDefinition>(4),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(4),
                     ),
                 },
             ),
@@ -335,41 +335,36 @@ HirModule {
             "scope_id": Idx::<Scope>(0),
         },
     },
-    type_definitions: Index::<TypeDefinition> {
-        Idx::<TypeDefinition>(0): {
-            "item": TypeDefinition {
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    type_variables: Index::<TypeVariable> {
+        Idx::<TypeVariable>(0): {
+            "item": TypeVariable {
                 name: "a",
-                kind: TypeVariable(
-                    Unbound,
-                ),
+                kind: Unbound,
             },
             "name": "a",
             "range": 108..122,
             "scope_id": Idx::<Scope>(2),
         },
-        Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
+        Idx::<TypeVariable>(1): {
+            "item": TypeVariable {
                 name: "b",
-                kind: TypeVariable(
-                    Unbound,
-                ),
+                kind: Unbound,
             },
             "name": "b",
             "range": 122..132,
             "scope_id": Idx::<Scope>(2),
         },
-        Idx::<TypeDefinition>(2): {
-            "item": TypeDefinition {
+        Idx::<TypeVariable>(2): {
+            "item": TypeVariable {
                 name: "m",
-                kind: TypeVariable(
-                    Constrained(
-                        NonEmpty(
-                            [
-                                Trait(
-                                    Idx::<TypeReference>(14),
-                                ),
-                            ],
-                        ),
+                kind: Constrained(
+                    NonEmpty(
+                        [
+                            Trait(
+                                Idx::<TypeReference>(14),
+                            ),
+                        ],
                     ),
                 ),
             },
@@ -377,23 +372,19 @@ HirModule {
             "range": 192..216,
             "scope_id": Idx::<Scope>(3),
         },
-        Idx::<TypeDefinition>(3): {
-            "item": TypeDefinition {
+        Idx::<TypeVariable>(3): {
+            "item": TypeVariable {
                 name: "t1",
-                kind: TypeVariable(
-                    Unbound,
-                ),
+                kind: Unbound,
             },
             "name": "t1",
             "range": 216..229,
             "scope_id": Idx::<Scope>(3),
         },
-        Idx::<TypeDefinition>(4): {
-            "item": TypeDefinition {
+        Idx::<TypeVariable>(4): {
+            "item": TypeVariable {
                 name: "t2",
-                kind: TypeVariable(
-                    Unbound,
-                ),
+                kind: Unbound,
             },
             "name": "t2",
             "range": 229..240,

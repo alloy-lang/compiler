@@ -23,7 +23,7 @@ HirTypedModule {
                     module_id: ModuleId {
                         path: "main",
                     },
-                    local_id: Idx::<TypeDefinition>(2),
+                    local_id: Idx::<TypeDefinition>(0),
                 },
                 "Either",
             ),
@@ -45,7 +45,7 @@ HirTypedModule {
                     module_id: ModuleId {
                         path: "main",
                     },
-                    local_id: Idx::<TypeDefinition>(2),
+                    local_id: Idx::<TypeDefinition>(0),
                 },
                 "Either",
             ),
@@ -75,7 +75,7 @@ HirTypedModule {
                     module_id: ModuleId {
                         path: "main",
                     },
-                    local_id: Idx::<TypeDefinition>(2),
+                    local_id: Idx::<TypeDefinition>(0),
                 },
                 "Either",
             ),
@@ -94,7 +94,7 @@ HirTypedModule {
                     module_id: ModuleId {
                         path: "main",
                     },
-                    local_id: Idx::<TypeDefinition>(2),
+                    local_id: Idx::<TypeDefinition>(0),
                 },
                 "Either",
             ),
@@ -116,7 +116,7 @@ HirTypedModule {
                 module_id: ModuleId {
                     path: "main",
                 },
-                local_id: Idx::<TypeDefinition>(2),
+                local_id: Idx::<TypeDefinition>(0),
             },
             "Left",
         ): [

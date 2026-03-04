@@ -1,6 +1,9 @@
-use crate::{resolve_trait_by_ref_id, Fql, HirResolutionError};
+use crate::{resolve_trait_by_ref_id, resolver, AnnotatedType, EPTrFql, Fql, HirResolutionError};
 use alloy_hir as hir;
+use alloy_scope::ScopeIdx;
+use la_arena::Idx;
 use non_empty_vec::NonEmpty;
+use std::convert::TryFrom;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TypeVariable {
@@ -18,23 +21,14 @@ pub enum TypeVariableConstraint {
 pub fn resolve_type_variable_by_id(
     db: &dyn hir::HirDatabase,
     module_id: alloy_workspace::ModuleId,
-    type_def_idx: hir::TypeDefinitionIdx,
+    type_var_idx: hir::TypeVariableIdx,
 ) -> (TypeVariable, Vec<HirResolutionError>) {
     let (hir_module, _) = hir::lower_file(db, module_id);
-    let type_def = hir_module.get_type_definition(type_def_idx);
+    let type_var = hir_module.get_type_variable(type_var_idx);
 
-    let tv = match &type_def.kind {
-        hir::TypeDefinitionKind::Missing
-        | hir::TypeDefinitionKind::Single(_)
-        | hir::TypeDefinitionKind::Union(_) => {
-            unreachable!("syntax error")
-        }
-        hir::TypeDefinitionKind::TypeVariable(tv) => tv,
-    };
-
-    match tv {
-        hir::TypeVariable::Unbound => (TypeVariable::Unbound, vec![]),
-        hir::TypeVariable::Constrained(constraints) => {
+    match &type_var.kind {
+        hir::TypeVariableKind::Unbound => (TypeVariable::Unbound, vec![]),
+        hir::TypeVariableKind::Constrained(constraints) => {
             let constraint_results = constraints
                 .iter()
                 .map(|constraint| match constraint {
@@ -65,5 +59,56 @@ pub fn resolve_type_variable_by_id(
                 )
             }
         }
+    }
+}
+
+// ============================================================================
+// Type Variable Resolver
+// ============================================================================
+
+pub struct TypeVariableResolver;
+
+impl resolver::Resolver<hir::TypeVariable> for TypeVariableResolver {
+    fn lookup_in_module(
+        hir_module: &hir::HirModule,
+        name: &hir::Name,
+        scope: ScopeIdx,
+    ) -> Option<(Idx<hir::TypeVariable>, hir::TypeVariable)> {
+        hir_module
+            .get_type_variable_by_name(name, scope)
+            .map(|(id, typedef)| (id, typedef.clone()))
+    }
+
+    fn unknown_item_error(
+        source_ref: impl Into<EPTrFql>,
+        module_id: alloy_workspace::ModuleId,
+        path: NonEmpty<hir::Name>,
+    ) -> HirResolutionError {
+        match source_ref.into() {
+            EPTrFql::Expression(fql) => HirResolutionError::UnknownExpressionReference {
+                source_ref: fql,
+                module_id,
+                path,
+            },
+            EPTrFql::Pattern(fql) => HirResolutionError::UnknownPatternReference {
+                source_ref: fql,
+                module_id,
+                path,
+            },
+            EPTrFql::TypeReference(fql) => HirResolutionError::UnknownTypeReference {
+                source_ref: fql,
+                module_id,
+                path,
+            },
+        }
+    }
+
+    fn validate(
+        _db: &dyn hir::HirDatabase,
+        _source_ref: impl Into<EPTrFql>,
+        _type_def_fql: Fql<hir::TypeVariable>,
+        _subname: Option<hir::Name>,
+    ) -> Option<HirResolutionError> {
+        None
     }
 }

@@ -17,7 +17,7 @@ HirTypedModule {
                     module_id: ModuleId {
                         path: "test_data",
                     },
-                    local_id: Idx::<TypeDefinition>(1),
+                    local_id: Idx::<TypeDefinition>(0),
                 },
                 "Test",
             ),
@@ -29,11 +29,11 @@ HirTypedModule {
         },
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
-                1,
+                0,
             ),
             return_type: Lambda {
                 arg_type: Generic(
-                    2,
+                    1,
                 ),
                 return_type: Bounded {
                     base: TypeDef(
@@ -41,7 +41,7 @@ HirTypedModule {
                             module_id: ModuleId {
                                 path: "test_data",
                             },
-                            local_id: Idx::<TypeDefinition>(1),
+                            local_id: Idx::<TypeDefinition>(0),
                         },
                         "Test",
                     ),
@@ -56,10 +56,10 @@ HirTypedModule {
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            1,
+            0,
         ),
         Idx::<Pattern>(1): Generic(
-            2,
+            1,
         ),
     },
     warnings: [],
@@ -70,7 +70,7 @@ HirTypedModule {
                 module_id: ModuleId {
                     path: "test_data",
                 },
-                local_id: Idx::<TypeDefinition>(1),
+                local_id: Idx::<TypeDefinition>(0),
             },
         ): [
             PolyInstantiation {

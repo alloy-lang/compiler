@@ -113,7 +113,7 @@ impl<T, N: Eq + Hash + Clone + fmt::Debug> Index<T, N> {
         }
     }
 
-    fn is_empty(&self) -> bool {
+    pub(crate) fn is_empty(&self) -> bool {
         self.items.is_empty()
     }
 

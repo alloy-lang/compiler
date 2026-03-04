@@ -6,7 +6,7 @@ pub type TypeDefinitionIdx = Idx<TypeDefinition>;
 #[derive(Clone, PartialEq)]
 pub struct TypeDefinition {
     pub name: Name,
-    pub type_args: Vec<TypeDefinitionIdx>,
+    pub type_args: Vec<TypeVariableIdx>,
     pub kind: TypeDefinitionKind,
 }
 
@@ -27,7 +27,6 @@ impl fmt::Debug for TypeDefinition {
 #[derive(Debug, Clone, PartialEq)]
 pub enum TypeDefinitionKind {
     Missing,
-    TypeVariable(TypeVariable),
     Single(TypeDefinitionMember),
     Union(Vec<TypeDefinitionMember>),
 }
@@ -39,16 +38,14 @@ impl TypeDefinitionKind {
         match self {
             TypeDefinitionKind::Single(member) => member.name() == variant_name,
             TypeDefinitionKind::Union(members) => members.iter().any(|m| m.name() == variant_name),
-            TypeDefinitionKind::Missing | TypeDefinitionKind::TypeVariable(_) => false,
+            TypeDefinitionKind::Missing => false,
         }
     }
     #[must_use]
     pub fn has_variants(&self) -> bool {
         match self {
             TypeDefinitionKind::Union(_) => true,
-            TypeDefinitionKind::Single(_)
-            | TypeDefinitionKind::Missing
-            | TypeDefinitionKind::TypeVariable(_) => false,
+            TypeDefinitionKind::Single(_) | TypeDefinitionKind::Missing => false,
         }
     }
 }
@@ -84,7 +81,7 @@ pub(super) fn lower_type_definition(ctx: &mut LoweringCtx, ast: &ast::TypeDefini
             .iter()
             .map(|type_arg| {
                 let name = type_arg.text();
-                ctx.add_type_variable(name, TypeVariable::Unbound, &type_arg.syntax())
+                ctx.add_type_variable(name, TypeVariableKind::Unbound, &type_arg.syntax())
             })
             .collect::<Vec<_>>();
 

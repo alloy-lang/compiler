@@ -96,23 +96,21 @@ HirModule {
             "range": 0..23,
             "scope_id": Idx::<Scope>(0),
         },
-        Idx::<TypeDefinition>(1): {
-            "item": TypeDefinition {
+    },
+    type_variables: Index::<TypeVariable> {
+        Idx::<TypeVariable>(0): {
+            "item": TypeVariable {
                 name: "t1",
-                kind: TypeVariable(
-                    Unbound,
-                ),
+                kind: Unbound,
             },
             "name": "t1",
             "range": 181..193,
             "scope_id": Idx::<Scope>(4),
         },
-        Idx::<TypeDefinition>(2): {
-            "item": TypeDefinition {
+        Idx::<TypeVariable>(1): {
+            "item": TypeVariable {
                 name: "t1",
-                kind: TypeVariable(
-                    Unbound,
-                ),
+                kind: Unbound,
             },
             "name": "t1",
             "range": 269..280,
@@ -152,7 +150,7 @@ HirModule {
                 attached_trait: Idx::<TypeReference>(0),
                 attached_type: Idx::<TypeReference>(1),
                 named_type_variables: {
-                    "t1": Idx::<TypeDefinition>(1),
+                    "t1": Idx::<TypeVariable>(0),
                 },
                 type_annotations: {},
                 values: {},
@@ -170,7 +168,7 @@ HirModule {
                 attached_trait: Idx::<TypeReference>(2),
                 attached_type: Idx::<TypeReference>(3),
                 named_type_variables: {
-                    "t1": Idx::<TypeDefinition>(2),
+                    "t1": Idx::<TypeVariable>(1),
                 },
                 type_annotations: {},
                 values: {},
