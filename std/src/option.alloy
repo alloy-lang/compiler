@@ -69,8 +69,12 @@ behavior Applicative for Option[_] where
     typevar t2
   let apply = |f, x| -> match (f, x) when
     \ (Option::Some(f_val), Option::Some(x_val)) -> Option::Some(f_val(x_val))
-    \ _                          -> Option::None
+    \ _                                          -> Option::None
 
+
+  typeof wrap : t1 -> Option[t1] where
+    typevar t1
+  let wrap = |x| -> Option::Some(x)
 end
 
   typeof wrap : t1 -> Option[t1] where
