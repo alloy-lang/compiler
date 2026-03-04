@@ -3,10 +3,25 @@ use super::*;
 
 pub type TypeDefinitionIdx = Idx<TypeDefinition>;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub struct TypeDefinition {
     pub name: Name,
+    pub type_args: Vec<TypeDefinitionIdx>,
     pub kind: TypeDefinitionKind,
+}
+
+impl fmt::Debug for TypeDefinition {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut debug_struct = f.debug_struct("TypeDefinition");
+        debug_struct.field("name", &self.name);
+        if !self.type_args.is_empty() {
+            debug_struct.field("type_args", &self.type_args);
+        }
+        debug_struct.field("kind", &self.kind);
+
+        debug_struct.finish()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -64,10 +79,14 @@ pub(super) fn lower_type_definition(ctx: &mut LoweringCtx, ast: &ast::TypeDefini
 
     let type_definition = ctx.inside_scope("type definition", |ctx| {
         let type_args = ast.type_args();
-        for type_arg in type_args {
-            let name = type_arg.text();
-            ctx.add_type_variable(name, TypeVariable::Unbound, &type_arg.syntax());
-        }
+
+        let type_args = type_args
+            .iter()
+            .map(|type_arg| {
+                let name = type_arg.text();
+                ctx.add_type_variable(name, TypeVariable::Unbound, &type_arg.syntax())
+            })
+            .collect::<Vec<_>>();
 
         let mut members = vec![];
         for member in ast.types() {
@@ -96,6 +115,7 @@ pub(super) fn lower_type_definition(ctx: &mut LoweringCtx, ast: &ast::TypeDefini
 
         TypeDefinition {
             name: parent_name,
+            type_args,
             kind,
         }
     });

@@ -511,6 +511,7 @@ impl<'db> LoweringCtx<'db> {
         let name = Name::new(name);
         let type_definition = TypeDefinition {
             name: name.clone(),
+            type_args: vec![],
             kind: TypeDefinitionKind::TypeVariable(type_variable),
         };
 

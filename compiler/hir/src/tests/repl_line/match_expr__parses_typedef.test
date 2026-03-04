@@ -230,6 +230,10 @@ HirModule {
         Idx::<TypeDefinition>(2): {
             "item": TypeDefinition {
                 name: "Either",
+                type_args: [
+                    Idx::<TypeDefinition>(0),
+                    Idx::<TypeDefinition>(1),
+                ],
                 kind: Union(
                     [
                         TypeDefinitionMember {

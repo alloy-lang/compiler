@@ -32,6 +32,10 @@ HirModule {
         Idx::<TypeDefinition>(2): {
             "item": TypeDefinition {
                 name: "Test1",
+                type_args: [
+                    Idx::<TypeDefinition>(0),
+                    Idx::<TypeDefinition>(1),
+                ],
                 kind: Single(
                     TypeDefinitionMember {
                         name: "Empty",

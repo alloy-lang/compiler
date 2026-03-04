@@ -96,6 +96,9 @@ HirModule {
         Idx::<TypeDefinition>(1): {
             "item": TypeDefinition {
                 name: "Identity",
+                type_args: [
+                    Idx::<TypeDefinition>(0),
+                ],
                 kind: Single(
                     TypeDefinitionMember {
                         name: "Id",
