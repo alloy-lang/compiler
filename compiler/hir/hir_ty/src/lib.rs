@@ -108,19 +108,16 @@ pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirType
 
 #[cfg(test)]
 mod small_tests {
-    use crate::diagnostics::{
-        ConflictingTypeAnnotationReason, TypeInferenceError, TypeInferenceErrorKind,
-    };
+    use crate::diagnostics::TypeInferenceError;
     use crate::hir_ty::ResolvedType;
     use crate::tests::TestHirTyDatabase;
     use alloy_hir_def as hir;
-    use alloy_hir_resolved::{AnnotatedType, EPTdFql, Fql};
+    use alloy_hir_resolved::{EPTdFql, Fql};
     use alloy_scope::Scopes;
     use alloy_test_harness::idx;
-    use alloy_workspace::WorkspaceDatabase;
+    use alloy_workspace::{ModuleId, WorkspaceDatabase};
     use non_empty_vec::NonEmpty;
     use salsa::Database;
-    use text_size::{TextRange, TextSize};
 
     fn check(input: &str, expected: &[(u32, ResolvedType)]) {
         let mut db = TestHirTyDatabase::default();
@@ -142,21 +139,22 @@ mod small_tests {
             .map(|(id, ty)| (idx!(*id), ty.clone()))
             .collect();
 
-        assert_eq!(ctx.expression_types, expected);
+        db.attach(|_| assert_eq!(ctx.expression_types, expected));
     }
 
-    fn check_named(input: &str, expected: &[(&str, u32, ResolvedType)]) {
-        let mut db = TestHirTyDatabase::default();
-        let module_id = db.add_module(
-            "test_data",
-            camino::Utf8Path::new("./test/test_data.alloy"),
-            input,
-        );
+    fn check_named(
+        db: &mut TestHirTyDatabase,
+        input: &str,
+        expected: &[(&str, u32, ResolvedType)],
+    ) {
+        let module_id = db.add_test_module("test_data", input);
 
-        let (hir_module, parse_errors) = hir::lower_file(&db, module_id);
-        let ctx = crate::type_check_module(&db, module_id);
-
+        let (hir_module, parse_errors) = hir::lower_file(db, module_id);
+        eprintln!("hir_module = {:#?}", hir_module);
         assert_eq!(parse_errors, &[]);
+
+        let ctx = crate::type_check_module(db, module_id);
+        eprintln!("typed module = {:#?}", ctx);
         assert_eq!(ctx.errors, &[]);
 
         let actual = expected
@@ -169,7 +167,72 @@ mod small_tests {
             })
             .collect::<Vec<_>>();
 
-        assert_eq!(actual, expected);
+        db.attach(|_| assert_eq!(actual, expected));
+    }
+
+    fn check_expr_instantiations(
+        db: &mut TestHirTyDatabase,
+        input: &str,
+        name: &str,
+        expected: &[&[ResolvedType]],
+    ) {
+        let module_id = db.add_test_module("test_data", input);
+
+        let (hir_module, parse_errors) = hir::lower_file(db, module_id);
+        assert_eq!(parse_errors, &[]);
+
+        let (id_expr, _) = hir_module
+            .get_expression_by_name(&hir::Name::new(name), Scopes::ROOT)
+            .unwrap();
+        let id_fql = EPTdFql::Expression(Fql::new(module_id, id_expr));
+
+        check_instantiations(db, module_id, id_fql, name, expected);
+    }
+
+    fn check_type_def_instantiations(
+        db: &mut TestHirTyDatabase,
+        input: &str,
+        name: &str,
+        expected: &[&[ResolvedType]],
+    ) {
+        let module_id = db.add_test_module("test_data", input);
+
+        let (hir_module, parse_errors) = hir::lower_file(db, module_id);
+        assert_eq!(parse_errors, &[]);
+
+        let (id_expr, _) = hir_module
+            .get_type_definition_by_name(&hir::Name::new(name), Scopes::ROOT)
+            .unwrap();
+        let id_fql =
+            EPTdFql::TypeDefinitionVariant(Fql::new(module_id, id_expr), hir::Name::new("Some"));
+
+        check_instantiations(db, module_id, id_fql, name, expected);
+    }
+
+    fn check_instantiations(
+        db: &mut TestHirTyDatabase,
+        module_id: ModuleId,
+        fql: EPTdFql,
+        name: &str,
+        expected: &[&[ResolvedType]],
+    ) {
+        let ctx = crate::type_check_module(db, module_id);
+
+        assert_eq!(ctx.errors, &[]);
+
+        // Verify id was instantiated twice
+        let instantiations = ctx.instantiations(&fql);
+        assert_eq!(
+            instantiations.len(),
+            expected.len(),
+            "Expected matching instantiations of {}",
+            name
+        );
+
+        // Collect the type args
+        let type_args: Vec<_> = instantiations.iter().map(|inst| &inst.type_args).collect();
+
+        db.attach(|_| assert_eq!(type_args, expected));
     }
 
     fn check_error(input: &str, expected: &[TypeInferenceError]) {
@@ -232,7 +295,9 @@ mod small_tests {
 
     #[test]
     fn infer_variable_ref_literal() {
+        let mut db = TestHirTyDatabase::default();
         check_named(
+            &mut db,
             r"
                 let x = 1
                 let y = x
@@ -244,7 +309,9 @@ mod small_tests {
     #[test]
     fn infer_variable_ref_tuple() {
         unsafe {
+            let mut db = TestHirTyDatabase::default();
             check_named(
+                &mut db,
                 r#"
                 let x = 1
                 let y = "a"
@@ -268,7 +335,9 @@ mod small_tests {
 
     #[test]
     fn infer_variable_ref_unused_lambda() {
+        let mut db = TestHirTyDatabase::default();
         check_named(
+            &mut db,
             "let x = |a, b| -> a + b",
             &[(
                 "x",
@@ -286,7 +355,9 @@ mod small_tests {
 
     #[test]
     fn infer_lambda_based_on_usage() {
+        let mut db = TestHirTyDatabase::default();
         check_named(
+            &mut db,
             r#"
             let x = |a, b| -> a + b
             let y = x(1, 2)
@@ -331,7 +402,9 @@ mod small_tests {
 
     #[test]
     fn type_annotation_hint_at_generic_refinement() {
+        let mut db = TestHirTyDatabase::default();
         check_named(
+            &mut db,
             r#"
                 typeof x : String -> String
                 let x = |s| -> ""
@@ -349,7 +422,9 @@ mod small_tests {
 
     #[test]
     fn let_polymorphism_identity_function() {
+        let mut db = TestHirTyDatabase::default();
         check_named(
+            &mut db,
             r#"
                 typeof id : t1 -> t1 where
                   typevar t1
@@ -384,9 +459,8 @@ mod small_tests {
     #[test]
     fn track_polymorphic_instantiation_direct() {
         let mut db = TestHirTyDatabase::default();
-        let module_id = db.add_module(
-            "test",
-            camino::Utf8Path::new("./test/test.alloy"),
+        check_expr_instantiations(
+            &mut db,
             r#"
                 typeof id : t1 -> t1 where
                   typevar t1
@@ -395,37 +469,19 @@ mod small_tests {
                 let string_result = id("hi")
                 let int_result = id(42)
             "#,
+            "id",
+            &[
+                &[ResolvedType::BuiltIn(hir::BuiltInType::Int)],
+                &[ResolvedType::BuiltIn(hir::BuiltInType::String)],
+            ],
         );
-
-        let (hir_module, _) = hir::lower_file(&db, module_id);
-        let ctx = crate::type_check_module(&db, module_id);
-
-        // Get the FQL for 'id'
-        let (id_expr, _) = hir_module
-            .get_expression_by_name(&hir::Name::new("id"), Scopes::ROOT)
-            .unwrap();
-        let id_fql = EPTdFql::Expression(Fql::new(module_id, id_expr));
-
-        // Verify id was instantiated twice
-        let instantiations = ctx.instantiations(&id_fql);
-        assert_eq!(instantiations.len(), 2, "Expected two instantiations of id");
-
-        // Collect the type args
-        let type_args: Vec<_> = instantiations
-            .iter()
-            .map(|inst| &inst.type_args[0])
-            .collect();
-
-        assert!(type_args.contains(&&ResolvedType::BuiltIn(hir::BuiltInType::String)));
-        assert!(type_args.contains(&&ResolvedType::BuiltIn(hir::BuiltInType::Int)));
     }
 
     #[test]
     fn track_polymorphic_type_def_usage() {
         let mut db = TestHirTyDatabase::default();
-        let module_id = db.add_module(
-            "test",
-            camino::Utf8Path::new("./test/test.alloy"),
+        check_type_def_instantiations(
+            &mut db,
             r#"
                 typedef Option[t] =
                   | None
@@ -434,44 +490,16 @@ mod small_tests {
 
                 let example = Option::Some("hello")
             "#,
+            "Option",
+            &[&[ResolvedType::BuiltIn(hir::BuiltInType::String)]],
         );
-
-        let (hir_module, _) = hir::lower_file(&db, module_id);
-        let ctx = crate::type_check_module(&db, module_id);
-
-        eprintln!("typed module = {:#?}", ctx);
-
-        // Get the FQL for 'example'
-        let (option_td, _) = hir_module
-            .get_type_definition_by_name(&hir::Name::new("Option"), Scopes::ROOT)
-            .unwrap();
-        let example_fql =
-            EPTdFql::TypeDefinitionVariant(Fql::new(module_id, option_td), hir::Name::new("Some"));
-
-        // Verify id was instantiated twice
-        let instantiations = ctx.instantiations(&example_fql);
-        assert_eq!(
-            instantiations.len(),
-            1,
-            "Expected instantiations of 'Option': {:#?}",
-            ctx.poly_instantiations
-        );
-
-        // Collect the type args
-        let type_args: Vec<_> = instantiations
-            .iter()
-            .map(|inst| &inst.type_args[0])
-            .collect();
-
-        assert!(type_args.contains(&&ResolvedType::BuiltIn(hir::BuiltInType::String)));
     }
 
     #[test]
     fn track_polymorphic_type_def_usage_indirect() {
         let mut db = TestHirTyDatabase::default();
-        let module_id = db.add_module(
-            "test",
-            camino::Utf8Path::new("./test/test.alloy"),
+        check_type_def_instantiations(
+            &mut db,
             r#"
                 typedef Option[t] =
                   | None
@@ -482,36 +510,9 @@ mod small_tests {
 
                 let example = constructor_example("hello")
             "#,
+            "Option",
+            &[&[ResolvedType::BuiltIn(hir::BuiltInType::String)]],
         );
-
-        let (hir_module, _) = hir::lower_file(&db, module_id);
-        let ctx = crate::type_check_module(&db, module_id);
-
-        eprintln!("typed module = {:#?}", ctx);
-
-        // Get the FQL for 'example'
-        let (option_td, _) = hir_module
-            .get_type_definition_by_name(&hir::Name::new("Option"), Scopes::ROOT)
-            .unwrap();
-        let example_fql =
-            EPTdFql::TypeDefinitionVariant(Fql::new(module_id, option_td), hir::Name::new("Some"));
-
-        // Verify id was instantiated twice
-        let instantiations = ctx.instantiations(&example_fql);
-        assert_eq!(
-            instantiations.len(),
-            1,
-            "Expected instantiations of 'Option': {:#?}",
-            ctx.poly_instantiations
-        );
-
-        // Collect the type args
-        let type_args: Vec<_> = instantiations
-            .iter()
-            .map(|inst| &inst.type_args[0])
-            .collect();
-
-        assert!(type_args.contains(&&ResolvedType::BuiltIn(hir::BuiltInType::String)));
     }
 
     /// Cross-module reference to a simple value should resolve its type
@@ -523,33 +524,14 @@ mod small_tests {
             camino::Utf8Path::new("./other.alloy"),
             "let value = 42",
         );
-        let module_id = db.add_module(
-            "test",
-            camino::Utf8Path::new("./test.alloy"),
+
+        check_named(
+            &mut db,
             r"
             import other::value
             let x = value
             ",
-        );
-
-        let (hir_module, _) = hir::lower_file(&db, module_id);
-        let ctx = crate::type_check_module(&db, module_id);
-
-        assert!(
-            ctx.errors.is_empty(),
-            "Should have no errors, got: {:?}",
-            ctx.errors
-        );
-
-        let (x_id, _) = hir_module
-            .get_expression_by_name(&hir::Name::new("x"), Scopes::ROOT)
-            .expect("x not found");
-
-        let x_type = &ctx.expression_types[&x_id];
-        assert_eq!(
-            *x_type,
-            ResolvedType::BuiltIn(hir::BuiltInType::Int),
-            "x should have type Int from cross-module reference to `value = 42`"
+            &[("x", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int))],
         );
     }
 
@@ -562,96 +544,61 @@ mod small_tests {
             camino::Utf8Path::new("./other.alloy"),
             "let value = 42",
         );
-        let module_id = db.add_module(
-            "test",
-            camino::Utf8Path::new("./test.alloy"),
+
+        check_named(
+            &mut db,
             r"
             import other::value
             let f = |a| -> value
             ",
+            &[(
+                "f",
+                0,
+                ResolvedType::Lambda {
+                    arg_type: Box::new(ResolvedType::Generic(0)),
+                    return_type: Box::new(ResolvedType::BuiltIn(hir::BuiltInType::Int)),
+                },
+            )],
         );
-
-        let (hir_module, _) = hir::lower_file(&db, module_id);
-        let ctx = crate::type_check_module(&db, module_id);
-
-        assert!(
-            ctx.errors.is_empty(),
-            "Should have no errors, got: {:?}",
-            ctx.errors
-        );
-
-        let (f_id, _) = hir_module
-            .get_expression_by_name(&hir::Name::new("f"), Scopes::ROOT)
-            .expect("f not found");
-
-        let f_type = &ctx.expression_types[&f_id];
-        match f_type {
-            ResolvedType::Lambda { return_type, .. } => {
-                assert_eq!(
-                    return_type.as_ref(),
-                    &ResolvedType::BuiltIn(hir::BuiltInType::Int),
-                    "Lambda return type should be Int from cross-module `value = 42`, \
-                     but got {:?}",
-                    return_type,
-                );
-            }
-            _ => panic!("Expected Lambda type for f, got {:?}", f_type),
-        }
     }
 
     /// Cross-module reference to a typedef constructor result should resolve the full type
     #[test]
     fn infer_cross_module_typedef_in_lambda() {
         let mut db = TestHirTyDatabase::default();
-        let test_data_module_id = db.add_module(
-            "test_data",
-            camino::Utf8Path::new("./test/test_data.alloy"),
+        let other_module_id = db.add_module(
+            "other",
+            camino::Utf8Path::new("./test/other.alloy"),
             r"
             typedef Test[t] = Thing t
             let test = Test(0)
             ",
         );
-        let module_id = db.add_module(
-            "test",
-            camino::Utf8Path::new("./test.alloy"),
+
+        check_named(
+            &mut db,
             r"
-            import test_data::test
+            import other::test
             let f = |a, b| -> test
             ",
-        );
-
-        let (hir_module, _) = hir::lower_file(&db, module_id);
-        eprintln!("hir_module = {:#?}", hir_module);
-        let ctx = crate::type_check_module(&db, module_id);
-
-        eprintln!("typed module = {:#?}", ctx);
-
-        let (f_id, _) = hir_module
-            .get_expression_by_name(&hir::Name::new("f"), Scopes::ROOT)
-            .expect("f not found");
-
-        let f_type = &ctx.expression_types[&f_id];
-        eprintln!("f_type = {:#?}", f_type);
-        assert_eq!(Vec::<TypeInferenceError>::new(), ctx.errors);
-
-        db.attach(|_| {
-            assert_eq!(
-                f_type,
-                &ResolvedType::Lambda {
+            &[(
+                "f",
+                0,
+                ResolvedType::Lambda {
                     arg_type: Box::new(ResolvedType::Generic(1)),
                     return_type: Box::new(ResolvedType::Lambda {
                         arg_type: Box::new(ResolvedType::Generic(2)),
                         return_type: Box::new(ResolvedType::Bounded {
                             base: Box::new(ResolvedType::TypeDef(
-                                Fql::new(test_data_module_id, idx!(1)),
+                                Fql::new(other_module_id, idx!(0)),
                                 hir::Name::new("Test"),
                             )),
                             args: vec![ResolvedType::BuiltIn(hir::BuiltInType::Int)],
                         }),
                     }),
                 },
-            );
-        });
+            )],
+        );
     }
 
     /// Test that expression index collision between local and imported module
@@ -669,40 +616,20 @@ mod small_tests {
             let c = 3
             ",
         );
-        // test module also has expressions that overlap in index
-        let module_id = db.add_module(
-            "test",
-            camino::Utf8Path::new("./test.alloy"),
+
+        check_named(
+            &mut db,
             r"
             import other::c
             let x = 1
             let y = x
             let z = c
             ",
-        );
-
-        let (hir_module, _) = hir::lower_file(&db, module_id);
-        let ctx = crate::type_check_module(&db, module_id);
-
-        eprintln!("expression_types = {:#?}", ctx.expression_types);
-        eprintln!("errors = {:#?}", ctx.errors);
-
-        assert!(
-            ctx.errors.is_empty(),
-            "Should have no errors, got: {:?}",
-            ctx.errors
-        );
-
-        let (z_id, _) = hir_module
-            .get_expression_by_name(&hir::Name::new("z"), Scopes::ROOT)
-            .expect("z not found");
-
-        let z_type = &ctx.expression_types[&z_id];
-        assert_eq!(
-            *z_type,
-            ResolvedType::BuiltIn(hir::BuiltInType::Int),
-            "z should have type Int from cross-module reference to `c = 3`, got {:?}",
-            z_type,
+            &[
+                ("x", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int)),
+                ("y", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int)),
+                ("z", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int)),
+            ],
         );
     }
 }
