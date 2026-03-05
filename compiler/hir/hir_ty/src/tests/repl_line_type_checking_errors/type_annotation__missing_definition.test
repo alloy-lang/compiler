@@ -9,6 +9,9 @@ typeof apply : Option[(t1 -> t2)] -> Option[t1] -> Option[t2] where
 -- TODO: maybe this should be a lowering error?
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {},
     pattern_types: {},
     warnings: [],

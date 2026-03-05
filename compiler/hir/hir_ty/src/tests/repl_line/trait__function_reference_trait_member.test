@@ -12,6 +12,9 @@ typeof (=<<) : (t1 -> m[t2]) -> m[t1] -> m[t2] where
 let (=<<) = TestTrait::test_func
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): Lambda {
             arg_type: Lambda {

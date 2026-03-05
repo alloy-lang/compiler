@@ -138,7 +138,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
     // Phase 3: Solve all remaining equations to get final substitution
     let (substitution, unification_errors) = solve_equations(db, ctx.equations.clone());
     // Phase 3: Apply the substitution to all types in the environment
-    let mut result = HirTypedModule::empty();
+    let mut result = HirTypedModule::empty(module_id);
 
     // Create a shared type variable mapping for the entire module
     // This ensures that the same TypeVarId gets the same Generic ID everywhere

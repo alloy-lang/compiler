@@ -6,6 +6,9 @@ let z = 1
 funky(x y z)
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,

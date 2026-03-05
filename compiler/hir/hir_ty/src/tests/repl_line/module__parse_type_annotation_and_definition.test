@@ -9,6 +9,9 @@ module TestModule1 where
     let testThing = |funky, x, y| -> test_data::new <| (funky(x), funky(y))
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): Lambda {
             arg_type: Generic(
@@ -91,7 +94,7 @@ HirTypedModule {
             ),
         ),
         Idx::<Expression>(2): Generic(
-            2,
+            1,
         ),
         Idx::<Expression>(6): Lambda {
             arg_type: Generic(
@@ -114,22 +117,9 @@ HirTypedModule {
                 ],
             },
         },
-        Idx::<Expression>(3): Bounded {
-            base: TypeDef(
-                Fql {
-                    module_id: ModuleId {
-                        path: "test_data",
-                    },
-                    local_id: Idx::<TypeDefinition>(0),
-                },
-                "Test",
-            ),
-            args: [
-                Generic(
-                    2,
-                ),
-            ],
-        },
+        Idx::<Expression>(3): Generic(
+            0,
+        ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Lambda {
@@ -140,10 +130,10 @@ HirTypedModule {
                 1,
             ),
         },
-        Idx::<Pattern>(2): Generic(
+        Idx::<Pattern>(1): Generic(
             0,
         ),
-        Idx::<Pattern>(1): Generic(
+        Idx::<Pattern>(2): Generic(
             0,
         ),
     },

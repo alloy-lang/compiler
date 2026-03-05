@@ -12,6 +12,9 @@ behavior Trait1 for Type1 where
 end
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,

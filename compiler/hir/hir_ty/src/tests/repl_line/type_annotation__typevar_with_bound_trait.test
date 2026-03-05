@@ -10,6 +10,9 @@ typeof test_func : t1 -> t2 -> Test[Int] where
 let test_func = |a, b| -> test
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): Bounded {
             base: TypeDef(

@@ -2,6 +2,9 @@ let a (1 + 2)
 let b = a
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,

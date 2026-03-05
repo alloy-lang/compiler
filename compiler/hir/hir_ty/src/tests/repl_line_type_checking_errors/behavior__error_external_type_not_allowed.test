@@ -9,6 +9,9 @@ behavior Trait1 for test_data::Test where
 end
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {},
     pattern_types: {},
     warnings: [],

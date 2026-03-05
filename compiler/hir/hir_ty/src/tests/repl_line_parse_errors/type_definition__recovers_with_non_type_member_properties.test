@@ -4,6 +4,9 @@ typedef Test1 =
   | Thing3 String Int
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {},
     pattern_types: {},
     warnings: [],

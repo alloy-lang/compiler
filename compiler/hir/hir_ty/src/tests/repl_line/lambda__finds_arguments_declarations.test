@@ -1,6 +1,9 @@
 |arg1, arg2, arg3| -> (arg1, arg2, arg3)
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,

@@ -10,6 +10,9 @@ match test when
   \ Either::Right(r) -> 7
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): Bounded {
             base: TypeDef(

@@ -6,6 +6,9 @@ typedef Things =
 end
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): TypeDef(
             Fql {

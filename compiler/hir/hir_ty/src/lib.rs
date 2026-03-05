@@ -19,6 +19,7 @@ pub trait HirTyDatabase: hir::HirDefDatabase {}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct HirTypedModule {
+    module_id: ModuleId,
     expression_types: FxHashMap<hir::ExpressionIdx, ResolvedType>,
     pattern_types: FxHashMap<hir::PatternIdx, ResolvedType>,
     warnings: Vec<TypeInferenceWarning>,
@@ -29,8 +30,9 @@ pub struct HirTypedModule {
 }
 
 impl HirTypedModule {
-    pub(crate) fn empty() -> Self {
+    pub(crate) fn empty(module_id: ModuleId) -> Self {
         Self {
+            module_id,
             expression_types: HashMap::default(),
             pattern_types: HashMap::default(),
             warnings: Vec::new(),
@@ -40,6 +42,12 @@ impl HirTypedModule {
     }
 
     pub(crate) fn insert_type(&mut self, fql: EPTdFql, resolved_type: ResolvedType) {
+        // Only include types for the current module to avoid cross-module collisions
+        // (different modules can have the same Idx<Expression> values)
+        if fql.module_id() != self.module_id {
+            return;
+        }
+
         match fql {
             EPTdFql::Expression(fql) => {
                 self.expression_types.insert(fql.local_id, resolved_type);

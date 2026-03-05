@@ -4,6 +4,9 @@ typeof (|>) : t1 -> (t1 -> t2) -> t2 where
 let (|>) = |x, f| -> f(x)
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,

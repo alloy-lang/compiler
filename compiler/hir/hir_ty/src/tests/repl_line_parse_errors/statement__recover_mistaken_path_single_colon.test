@@ -3,6 +3,9 @@ import std
 let foo = std:option:Option:None
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): Bounded {
             base: TypeDef(

@@ -7,6 +7,9 @@ let incorrect_arg = Option::Some(0)
 let test_result = test(incorrect_arg)
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,

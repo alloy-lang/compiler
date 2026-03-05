@@ -1,6 +1,9 @@
 -where
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,

@@ -3,6 +3,9 @@ import test_data::test
 if test then 2 else 3
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): Bounded {
             base: TypeDef(
@@ -23,22 +26,9 @@ HirTypedModule {
         Idx::<Expression>(2): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(1): Bounded {
-            base: TypeDef(
-                Fql {
-                    module_id: ModuleId {
-                        path: "test_data",
-                    },
-                    local_id: Idx::<TypeDefinition>(0),
-                },
-                "Test",
-            ),
-            args: [
-                BuiltIn(
-                    Int,
-                ),
-            ],
-        },
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
         Idx::<Expression>(3): BuiltIn(
             Int,
         ),

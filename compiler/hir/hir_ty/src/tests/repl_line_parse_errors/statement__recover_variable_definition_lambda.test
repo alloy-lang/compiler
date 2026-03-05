@@ -2,6 +2,9 @@ let add1 = |a, 9| -
 let add2 = |a, b| -> a + b
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,

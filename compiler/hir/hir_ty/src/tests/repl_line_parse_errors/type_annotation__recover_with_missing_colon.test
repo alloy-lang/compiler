@@ -4,6 +4,9 @@ typeof test1   String
 typeof test2 : Test -> String -> Int
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {},
     pattern_types: {},
     warnings: [],

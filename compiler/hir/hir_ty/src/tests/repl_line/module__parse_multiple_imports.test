@@ -3,6 +3,9 @@ module TestModule1 where
     import really::real::other::Thing2
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {},
     pattern_types: {},
     warnings: [],

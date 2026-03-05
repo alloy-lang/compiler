@@ -8,6 +8,9 @@ let string_example = constructor("hi")
 let int_example = constructor(10)
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): Lambda {
             arg_type: BuiltIn(

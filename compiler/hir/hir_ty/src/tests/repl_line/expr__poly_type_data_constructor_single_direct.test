@@ -5,6 +5,9 @@ let int_example = Identity(10)
 
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
             String,

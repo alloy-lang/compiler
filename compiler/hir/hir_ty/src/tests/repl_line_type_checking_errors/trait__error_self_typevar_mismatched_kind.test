@@ -9,6 +9,9 @@ behavior TestTrait1 for TestType1[t] where
 end
 ===
 HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
     expression_types: {},
     pattern_types: {},
     warnings: [],
