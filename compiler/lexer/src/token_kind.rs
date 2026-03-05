@@ -133,6 +133,8 @@ pub enum TokenKind {
 
     #[regex("--[^\n]*")]
     Comment,
+    #[regex("--![^\n]*")]
+    DocComment,
 
     Error,
 }
@@ -140,7 +142,7 @@ pub enum TokenKind {
 impl TokenKind {
     #[must_use]
     pub fn is_trivia(self) -> bool {
-        matches!(self, Self::Whitespace | Self::Comment)
+        matches!(self, Self::Whitespace | Self::Comment | Self::DocComment)
     }
 }
 
@@ -194,6 +196,7 @@ impl fmt::Display for TokenKind {
             Self::Pipe => "‘|’",
             Self::Backslash => "’\\’",
             Self::Comment => "comment",
+            Self::DocComment => "doc comment",
             Self::Error => "an unrecognized token",
         })
     }

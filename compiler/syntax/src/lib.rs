@@ -58,6 +58,7 @@ pub enum SyntaxKind {
     Pipe,
     Backslash,
     Comment,
+    DocComment,
     Error,
 
     SourceFile,
@@ -175,6 +176,7 @@ impl From<TokenKind> for SyntaxKind {
             TokenKind::Pipe => Self::Pipe,
             TokenKind::Backslash => Self::Backslash,
             TokenKind::Comment => Self::Comment,
+            TokenKind::DocComment => Self::DocComment,
             TokenKind::Error => Self::Error,
         }
     }
