@@ -62,9 +62,7 @@ pub(crate) fn resolve_abstract_trait_member_by_path(
             resolve_by_path::<hir::Trait, TraitResolver>(db, module_id, path, source_ref).ok()?;
         let (hir_module, _) = hir::lower_file(db, trait_fql.module_id);
 
-        let Some(member_name) = path.subpath() else {
-            return None;
-        };
+        let member_name = path.subpath()?;
 
         if let Some((_, type_annotation)) = hir_module
             .get_trait(trait_fql.local_id)

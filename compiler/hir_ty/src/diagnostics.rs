@@ -224,7 +224,7 @@ impl Diagnostic for TypeInferenceError {
                             ))
                             .with_help(format!(
                                 "Module '{}' has the following child modules: {}",
-                                module_id, available_child_modules.into_iter().join(", ")
+                                module_id, available_child_modules.iter().join(", ")
                             )),
                         FqnResolutionError::MissingLocalName { module_id } => builder
                             .with_primary_label(format!("module '{}' found but missing local name", module_id))

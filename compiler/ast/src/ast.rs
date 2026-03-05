@@ -203,7 +203,7 @@ impl<E: AstElement> std::hash::Hash for AstElementPointer<E> {
 impl<E: AstElement> Clone for AstElementPointer<E> {
     fn clone(&self) -> Self {
         Self {
-            raw: self.raw.clone(),
+            raw: self.raw,
             _ty: self._ty,
         }
     }

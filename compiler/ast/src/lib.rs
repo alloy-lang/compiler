@@ -8,8 +8,8 @@ mod tests;
 #[salsa::db]
 pub trait AstDatabase: alloy_workspace::WorkspaceDatabase {}
 
-pub fn parse_source_file<'db>(
-    db: &'db dyn AstDatabase,
+pub fn parse_source_file(
+    db: &dyn AstDatabase,
     module_id: ModuleId,
 ) -> (Option<SourceFile>, Vec<ParseError>) {
     let source = db.get_source(module_id);

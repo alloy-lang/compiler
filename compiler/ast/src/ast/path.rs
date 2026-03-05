@@ -10,7 +10,7 @@ impl Path {
             .children_with_tokens()
             .filter_map(SyntaxElement::into_token)
             .filter(|node| matches!(node.kind(), SyntaxKind::Ident | SyntaxKind::OpIdent))
-            .map(|token| token.text().trim_matches(&['(', ')']).to_string())
+            .map(|token| token.text().trim_matches(['(', ')']).to_string())
             .collect()
     }
 }

@@ -18,7 +18,7 @@ impl alloy_workspace::WorkspaceDatabase for CompilerDatabase {
         let module_id = ModuleId::new(self, slug.to_string());
 
         if let Some(existing_raw) = self.workspace.maybe_get_source(module_id) {
-            let existing_raw = existing_raw.clone();
+            let existing_raw = *existing_raw;
             existing_raw.set_raw_path(self).to(Arc::from(path.as_str()));
             existing_raw.set_contents(self).to(Arc::from(contents));
             return module_id;

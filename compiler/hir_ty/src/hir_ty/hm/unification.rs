@@ -147,7 +147,7 @@ fn unify_types(t1: &MonoType, t2: &MonoType) -> Result<Substitution, Unification
         (MonoType::Unit, MonoType::Unit) => Ok(Substitution::new()),
 
         // Mismatch
-        _ => Err(UnificationError::TypeMismatch(t1.clone(), t2.clone())),
+        _ => Err(UnificationError::TypeMismatch(Box::new(t1.clone()), Box::new(t2.clone()))),
     }
 }
 
@@ -170,7 +170,7 @@ pub enum UnificationError {
     /// Occurs check failed (would create infinite type)
     OccursCheck(TypeVarId, MonoType),
     /// Types don't match
-    TypeMismatch(MonoType, MonoType),
+    TypeMismatch(Box<MonoType>, Box<MonoType>),
 }
 
 /// Solve a list of type equations

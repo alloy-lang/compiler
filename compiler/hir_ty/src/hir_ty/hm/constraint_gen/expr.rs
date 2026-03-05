@@ -519,7 +519,7 @@ fn infer_type_definition(
             // Single-variant type - treat as a variant constructor
             // For example: typedef Identity[t] = Id t
             // When you call Identity(...), it's the same as Id(...)
-            let constructor_ty = build_constructor_type(ctx, &td_fql, &type_def, &member);
+            let constructor_ty = build_constructor_type(ctx, &td_fql, &type_def, member);
 
             // Check if this is a polymorphic constructor (has App with type variables)
             let is_polymorphic = has_type_variables(&constructor_ty);

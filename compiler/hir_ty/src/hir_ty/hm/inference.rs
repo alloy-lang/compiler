@@ -283,7 +283,7 @@ fn type_def_to_mono(
     ctx: &mut HMInferenceContext,
     fql: &Fql<TypeDefinition>,
     name: &Name,
-    type_args: &Vec<TypeVarReference>,
+    type_args: &[TypeVarReference],
 ) -> MonoType {
     let type_args = type_args
         .iter()

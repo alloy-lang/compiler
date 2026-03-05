@@ -10,7 +10,7 @@ ast_union_node!(IdentOrOp, kinds: [Ident, OpIdent]);
 impl OpIdent {
     #[must_use]
     pub fn text(&self) -> String {
-        self.0.text().trim_matches(&['(', ')']).to_string()
+        self.0.text().trim_matches(['(', ')']).to_string()
     }
 }
 

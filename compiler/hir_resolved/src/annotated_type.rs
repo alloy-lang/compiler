@@ -181,7 +181,7 @@ pub fn resolve_annotated_type(
                 let kind_constraints = trait_def
                     .self_constraints()
                     .iter()
-                    .find_map(|constraint| kind_constraints(constraint));
+                    .find_map(kind_constraints);
 
                 AnnotatedType::SelfType {
                     trait_fql,
