@@ -222,6 +222,19 @@ fn find_function_target(
     }
 }
 
+pub fn resolve_custom_binary_operator(
+    db: &dyn hir::HirDatabase,
+    source_ref: &Fql<hir::Expression>,
+    operator_path: &hir::Path,
+) -> Result<Fql<hir::Expression>, HirResolutionError> {
+    resolve_by_path::<hir::Expression, ExpressionResolver>(
+        db,
+        source_ref.module_id,
+        operator_path,
+        source_ref,
+    )
+}
+
 // ============================================================================
 // Expression Resolver
 // ============================================================================

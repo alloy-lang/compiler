@@ -14,8 +14,17 @@ HirTypedModule {
     },
     expression_types: {
         Idx::<Expression>(0): Lambda {
-            arg_type: Generic(
-                2,
+            arg_type: Tuple(
+                NonEmpty(
+                    [
+                        Generic(
+                            3,
+                        ),
+                        Generic(
+                            3,
+                        ),
+                    ],
+                ),
             ),
             return_type: Bounded {
                 base: TypeDef(
@@ -28,8 +37,17 @@ HirTypedModule {
                     "Test",
                 ),
                 args: [
-                    Generic(
-                        2,
+                    Tuple(
+                        NonEmpty(
+                            [
+                                Generic(
+                                    3,
+                                ),
+                                Generic(
+                                    3,
+                                ),
+                            ],
+                        ),
                     ),
                 ],
             },
@@ -37,369 +55,116 @@ HirTypedModule {
         Idx::<Expression>(7): Lambda {
             arg_type: Lambda {
                 arg_type: Generic(
-                    0,
+                    2,
                 ),
                 return_type: Generic(
-                    1,
+                    3,
                 ),
             },
             return_type: Lambda {
                 arg_type: Generic(
-                    0,
+                    2,
                 ),
                 return_type: Lambda {
                     arg_type: Generic(
-                        0,
-                    ),
-                    return_type: Lambda {
-                        arg_type: Generic(
-                            2,
-                        ),
-                        return_type: Bounded {
-                            base: TypeDef(
-                                Fql {
-                                    module_id: ModuleId {
-                                        path: "test_data",
-                                    },
-                                    local_id: Idx::<TypeDefinition>(0),
-                                },
-                                "Test",
-                            ),
-                            args: [
-                                Generic(
-                                    2,
-                                ),
-                            ],
-                        },
-                    },
-                },
-            },
-        },
-        Idx::<Expression>(4): Generic(
-            1,
-        ),
-        Idx::<Expression>(1): Generic(
-            0,
-        ),
-        Idx::<Expression>(5): Tuple(
-            NonEmpty(
-                [
-                    Generic(
-                        1,
-                    ),
-                    Generic(
-                        1,
-                    ),
-                ],
-            ),
-        ),
-        Idx::<Expression>(2): Generic(
-            1,
-        ),
-        Idx::<Expression>(6): Lambda {
-            arg_type: Generic(
-                2,
-            ),
-            return_type: Bounded {
-                base: TypeDef(
-                    Fql {
-                        module_id: ModuleId {
-                            path: "test_data",
-                        },
-                        local_id: Idx::<TypeDefinition>(0),
-                    },
-                    "Test",
-                ),
-                args: [
-                    Generic(
                         2,
                     ),
-                ],
-            },
-        },
-        Idx::<Expression>(3): Generic(
-            0,
-        ),
-    },
-    pattern_types: {
-        Idx::<Pattern>(0): Lambda {
-            arg_type: Generic(
-                0,
-            ),
-            return_type: Generic(
-                1,
-            ),
-        },
-        Idx::<Pattern>(1): Generic(
-            0,
-        ),
-        Idx::<Pattern>(2): Generic(
-            0,
-        ),
-    },
-    warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: ConflictingTypeAnnotation {
-                annotated_type: Lambda {
-                    arg: Lambda {
-                        arg: TypeVar {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "main",
-                                },
-                                local_id: Idx::<TypeVariable>(1),
-                            },
-                            name: "t2",
-                        },
-                        ret: TypeVar {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "main",
-                                },
-                                local_id: Idx::<TypeVariable>(0),
-                            },
-                            name: "t1",
-                        },
-                    },
-                    ret: Lambda {
-                        arg: TypeVar {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "main",
-                                },
-                                local_id: Idx::<TypeVariable>(1),
-                            },
-                            name: "t2",
-                        },
-                        ret: Lambda {
-                            arg: TypeVar {
-                                fql: Fql {
-                                    module_id: ModuleId {
-                                        path: "main",
-                                    },
-                                    local_id: Idx::<TypeVariable>(1),
-                                },
-                                name: "t2",
-                            },
-                            ret: Bounded {
-                                base: TypeDef {
-                                    fql: Fql {
-                                        module_id: ModuleId {
-                                            path: "test_data",
-                                        },
-                                        local_id: Idx::<TypeDefinition>(0),
-                                    },
-                                    name: "Test",
-                                    type_args: [
-                                        TypeVarReference {
-                                            fql: Fql {
-                                                module_id: ModuleId {
-                                                    path: "test_data",
-                                                },
-                                                local_id: Idx::<TypeVariable>(0),
-                                            },
-                                            name: "t",
-                                        },
-                                    ],
-                                },
-                                args: [
-                                    Tuple(
-                                        NonEmpty(
-                                            [
-                                                TypeVar {
-                                                    fql: Fql {
-                                                        module_id: ModuleId {
-                                                            path: "main",
-                                                        },
-                                                        local_id: Idx::<TypeVariable>(0),
-                                                    },
-                                                    name: "t1",
-                                                },
-                                                TypeVar {
-                                                    fql: Fql {
-                                                        module_id: ModuleId {
-                                                            path: "main",
-                                                        },
-                                                        local_id: Idx::<TypeVariable>(0),
-                                                    },
-                                                    name: "t1",
-                                                },
-                                            ],
-                                        ),
-                                    ),
-                                ],
-                            },
-                        },
-                    },
-                },
-                inferred_type: Lambda {
-                    arg_type: Lambda {
-                        arg_type: Generic(
-                            0,
-                        ),
-                        return_type: Generic(
-                            1,
-                        ),
-                    },
-                    return_type: Lambda {
-                        arg_type: Generic(
-                            0,
-                        ),
-                        return_type: Lambda {
-                            arg_type: Generic(
-                                0,
-                            ),
-                            return_type: Lambda {
-                                arg_type: Generic(
-                                    2,
-                                ),
-                                return_type: Bounded {
-                                    base: TypeDef(
-                                        Fql {
-                                            module_id: ModuleId {
-                                                path: "test_data",
-                                            },
-                                            local_id: Idx::<TypeDefinition>(0),
-                                        },
-                                        "Test",
-                                    ),
-                                    args: [
-                                        Generic(
-                                            2,
-                                        ),
-                                    ],
-                                },
-                            },
-                        },
-                    },
-                },
-                reason: DirectConflict {
-                    annotated_type: Bounded {
-                        base: TypeDef {
-                            fql: Fql {
+                    return_type: Bounded {
+                        base: TypeDef(
+                            Fql {
                                 module_id: ModuleId {
                                     path: "test_data",
                                 },
                                 local_id: Idx::<TypeDefinition>(0),
                             },
-                            name: "Test",
-                            type_args: [
-                                TypeVarReference {
-                                    fql: Fql {
-                                        module_id: ModuleId {
-                                            path: "test_data",
-                                        },
-                                        local_id: Idx::<TypeVariable>(0),
-                                    },
-                                    name: "t",
-                                },
-                            ],
-                        },
+                            "Test",
+                        ),
                         args: [
                             Tuple(
                                 NonEmpty(
                                     [
-                                        TypeVar {
-                                            fql: Fql {
-                                                module_id: ModuleId {
-                                                    path: "main",
-                                                },
-                                                local_id: Idx::<TypeVariable>(0),
-                                            },
-                                            name: "t1",
-                                        },
-                                        TypeVar {
-                                            fql: Fql {
-                                                module_id: ModuleId {
-                                                    path: "main",
-                                                },
-                                                local_id: Idx::<TypeVariable>(0),
-                                            },
-                                            name: "t1",
-                                        },
+                                        Generic(
+                                            3,
+                                        ),
+                                        Generic(
+                                            3,
+                                        ),
                                     ],
                                 ),
                             ),
                         ],
                     },
-                    inferred_type: Lambda {
-                        arg_type: Generic(
-                            2,
-                        ),
-                        return_type: Bounded {
-                            base: TypeDef(
-                                Fql {
-                                    module_id: ModuleId {
-                                        path: "test_data",
-                                    },
-                                    local_id: Idx::<TypeDefinition>(0),
-                                },
-                                "Test",
-                            ),
-                            args: [
-                                Generic(
-                                    2,
-                                ),
-                            ],
-                        },
-                    },
                 },
             },
-            range: 213..284,
         },
-        TypeInferenceError {
-            kind: UnificationError(
-                TypeMismatch(
-                    Function(
-                        Var(
-                            TypeVarId(
-                                0,
-                            ),
-                        ),
-                        App {
-                            constructor: TypeDef {
-                                fql: Fql {
-                                    module_id: ModuleId {
-                                        path: "test_data",
-                                    },
-                                    local_id: Idx::<TypeDefinition>(0),
-                                },
-                                type_args: [
-                                    TypeVarId(
-                                        1,
-                                    ),
-                                ],
-                                type_def_name: "Test",
-                            },
-                            args: [
-                                Var(
-                                    TypeVarId(
-                                        0,
-                                    ),
-                                ),
-                            ],
-                        },
+        Idx::<Expression>(4): Generic(
+            3,
+        ),
+        Idx::<Expression>(1): Generic(
+            2,
+        ),
+        Idx::<Expression>(5): Tuple(
+            NonEmpty(
+                [
+                    Generic(
+                        3,
                     ),
-                    Tuple(
+                    Generic(
+                        3,
+                    ),
+                ],
+            ),
+        ),
+        Idx::<Expression>(2): Generic(
+            3,
+        ),
+        Idx::<Expression>(6): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                Tuple(
+                    NonEmpty(
                         [
-                            Var(
-                                TypeVarId(
-                                    8,
-                                ),
+                            Generic(
+                                3,
                             ),
-                            Var(
-                                TypeVarId(
-                                    8,
-                                ),
+                            Generic(
+                                3,
                             ),
                         ],
                     ),
                 ),
-            ),
-            range: 246..284,
+            ],
         },
-    ],
+        Idx::<Expression>(3): Generic(
+            2,
+        ),
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Lambda {
+            arg_type: Generic(
+                2,
+            ),
+            return_type: Generic(
+                3,
+            ),
+        },
+        Idx::<Pattern>(1): Generic(
+            2,
+        ),
+        Idx::<Pattern>(2): Generic(
+            2,
+        ),
+    },
+    warnings: [],
+    errors: [],
     poly_instantiations: {
         TypeDefinition(
             Fql {
@@ -417,8 +182,17 @@ HirTypedModule {
                     local_id: Idx::<Expression>(3),
                 },
                 type_args: [
-                    Generic(
-                        2,
+                    Tuple(
+                        NonEmpty(
+                            [
+                                Generic(
+                                    3,
+                                ),
+                                Generic(
+                                    3,
+                                ),
+                            ],
+                        ),
                     ),
                 ],
             },
@@ -426,25 +200,3 @@ HirTypedModule {
     },
 }
 []
-[E001] Error: Type annotation conflict: expected `(t2 -> t1) -> t2 -> t2 -> Test[(t1, t1)]`, found `(t0 -> t1) -> t0 -> t0 -> t2 -> Test[t2]`
-   ╭─[ ./test/main.alloy:9:5 ]
-   │
- 9 │     let testThing = |funky, x, y| -> test_data::new <| (funky(x), funky(y))
-   │     ───────────────────────────────────┬───────────────────────────────────  
-   │                                        ╰───────────────────────────────────── expected `Test[(t1, t1)]`, found `t2 -> Test[t2]`
-   │ 
-   │ Help: The type annotation says this should be `Test[(t1, t1)]`, but type inference determined it to be `t2 -> Test[t2]`
-───╯
-
-[E002] Error: Type mismatch: expected `t0 -> Test[t0]`, found `(t8, t8)`
-   ╭─[ ./test/main.alloy:9:38 ]
-   │
- 9 │     let testThing = |funky, x, y| -> test_data::new <| (funky(x), funky(y))
-   │                                      ───────────────────┬──────────────────  
-   │                                                         ╰──────────────────── expected `t0 -> Test[t0]`, found `(t8, t8)`
-   │ 
-   │ Help: These types must be compatible
-───╯
-
-
-

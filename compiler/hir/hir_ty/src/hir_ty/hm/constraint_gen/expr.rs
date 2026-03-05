@@ -26,6 +26,30 @@ pub(crate) fn infer_expr_hm(
         return ctx.fresh_type_var();
     }
 
+    // For cross-module expressions with polymorphic type annotations, use the annotation
+    // directly rather than re-inferring from the body. This ensures each use site gets
+    // fresh type variables via poly_env instantiation, avoiding stale specialization
+    // when a polymorphic cross-module function (e.g., <|) is used multiple times.
+    if source_fql.module_id != ctx.module_id {
+        let (other_hir_module, _) = hir::lower_file(ctx.db, source_fql.module_id);
+        if let Some(value) = other_hir_module.get_value_by_id(&source_fql.local_id) {
+            if let Some(type_annotation) = value.type_annotation {
+                let annotated =
+                    resolve_annotated_type(ctx.db, source_fql.module_id, type_annotation);
+                if annotated.is_polymorphic() {
+                    if let Some(mono_ty) = annotated_to_mono(&annotated, ctx) {
+                        let poly_ty = PolyType::generalize_all(mono_ty);
+                        ctx.poly_env.insert(source_fql.clone().into(), poly_ty);
+                        // Return a fresh instantiation
+                        if let Some(instantiated) = ctx.maybe_find_type(&source_fql) {
+                            return instantiated;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     let expr = match alloy_hir_resolved::resolve_expression_by_id(
         ctx.db,
         source_fql.module_id,
@@ -51,7 +75,7 @@ pub(crate) fn infer_expr_hm(
             args,
             ..
         } => infer_abstract_trait_function_call(ctx, source_fql, type_annotation, args),
-        res::Expression::Binary { lhs, rhs, .. } => infer_binary(ctx, source_fql, lhs, rhs),
+        res::Expression::Binary { lhs, rhs, op } => infer_binary(ctx, source_fql, lhs, rhs, op),
         res::Expression::Tuple(elements) => infer_tuple_expr(ctx, source_fql, elements),
         res::Expression::IfThenElse {
             condition,
@@ -227,18 +251,38 @@ fn infer_binary(
     source_fql: Fql<hir::Expression>,
     lhs: Fql<hir::Expression>,
     rhs: Fql<hir::Expression>,
+    op: hir::BinaryOp,
 ) -> MonoType {
-    // TODO: check operator and generate appropriate constraints
-    // ie. for arithmetic operators, both sides should be numeric types
-    // ie. for comparison operators, both sides should be comparable types, etc.
-    let lhs_ty = infer_expr_hm(ctx, lhs);
-    let rhs_ty = infer_expr_hm(ctx, rhs);
+    let lhs_ty = infer_expr_hm(ctx, lhs.clone());
+    let rhs_ty = infer_expr_hm(ctx, rhs.clone());
 
-    // For now, assume both sides have the same type and return that type
-    ctx.add_equation(lhs_ty.clone(), rhs_ty.clone(), source_fql.clone());
-
-    let result_ty = lhs_ty;
-    ctx.assign_type(source_fql, result_ty)
+    match op {
+        hir::BinaryOp::Add | hir::BinaryOp::Sub | hir::BinaryOp::Mul | hir::BinaryOp::Div => {
+            // Arithmetic operators: both sides should be numeric (for simplicity, we'll just use a type variable)
+            let num_ty = ctx.fresh_type_var();
+            ctx.add_equation(lhs_ty.clone(), num_ty.clone(), source_fql.clone());
+            ctx.add_equation(rhs_ty.clone(), num_ty.clone(), source_fql.clone());
+            return ctx.assign_type(source_fql, num_ty);
+        }
+        hir::BinaryOp::Custom(path) => {
+            if let Ok(op_expr) = res::resolve_custom_binary_operator(ctx.db, &source_fql, &path) {
+                return infer_function_call(ctx, source_fql.clone(), op_expr.into(), vec![lhs, rhs]);
+                // let op_ty = infer_expr_hm(ctx, op_expr);
+                // if let MonoType::Function(arg1_ty, func_ty) = op_ty {
+                //     if let MonoType::Function(arg2_ty, ret_ty) = func_ty.deref() {
+                //         // Add equations to unify the operator type with arg1 -> arg2 -> result
+                //         ctx.add_equation(arg1_ty.deref().clone(), lhs_ty, lhs);
+                //         ctx.add_equation(arg2_ty.deref().clone(), rhs_ty, rhs);
+                //
+                //         return ctx.assign_type(source_fql, ret_ty.deref().clone());
+                //     }
+                // }
+            }
+        }
+        hir::BinaryOp::Missing => {}
+    }
+    let result_type = ctx.fresh_type_var();
+    ctx.assign_type(source_fql, result_type)
 }
 
 fn infer_tuple_expr(
@@ -331,13 +375,6 @@ fn build_constructor_type(
     type_def: &res::TypeDefinition,
     member: &res::TypeDefinitionMember,
 ) -> MonoType {
-    // let annotated_type_def = res::resolve_type_definition_to_annotated(
-    //     ctx.db,
-    //     type_def_fql.module_id,
-    //     type_def_fql.local_id,
-    // );
-    // annotated_to_mono(&annotated_type_def, ctx).unwrap_or_else(|| ctx.fresh_type_var());
-
     let (hir_module, _) = hir::lower_file(ctx.db, type_def_fql.module_id);
 
     let type_args: Vec<_> = type_def

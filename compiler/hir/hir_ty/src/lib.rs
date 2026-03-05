@@ -153,12 +153,9 @@ mod small_tests {
         let module_id = db.add_test_module("test_data", input);
 
         let (hir_module, parse_errors) = hir::lower_file(db, module_id);
-        eprintln!("hir_module = {:#?}", hir_module);
         assert_eq!(parse_errors, &[]);
 
         let ctx = crate::type_check_module(db, module_id);
-        eprintln!("typed module = {:#?}", ctx);
-        assert_eq!(ctx.errors, &[]);
 
         let actual = expected
             .into_iter()
@@ -170,7 +167,10 @@ mod small_tests {
             })
             .collect::<Vec<_>>();
 
-        db.attach(|_| assert_eq!(actual, expected));
+        db.attach(|_| {
+            assert_eq!(actual, expected);
+            assert_eq!(ctx.errors, &[]);
+        });
     }
 
     fn check_expr_instantiations(
@@ -633,6 +633,45 @@ mod small_tests {
                 ("y", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int)),
                 ("z", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int)),
             ],
+        );
+    }
+
+    #[test]
+    fn infer_chained_binary_op() {
+        let mut db = TestHirTyDatabase::default();
+        let stdlib_order = ModuleId::new(&db, "std::order");
+
+        check_named(
+            &mut db,
+            r"
+            import std::function::(<|)
+            import std::order::{Ord, Ordering}
+
+            typeof comparing : (t2 -> t1) -> t2 -> t2 -> Ordering where
+              typevar t1 = Ord
+              typevar t2
+            let comparing = |convert, x, y| -> Ord::compare <| convert(x) <| convert(y)
+            ",
+            &[(
+                "comparing",
+                0,
+                ResolvedType::Lambda {
+                    arg_type: Box::new(ResolvedType::Lambda {
+                        arg_type: Box::new(ResolvedType::Generic(2)),
+                        return_type: Box::new(ResolvedType::Generic(3)),
+                    }),
+                    return_type: Box::new(ResolvedType::Lambda {
+                        arg_type: Box::new(ResolvedType::Generic(2)),
+                        return_type: Box::new(ResolvedType::Lambda {
+                            arg_type: Box::new(ResolvedType::Generic(2)),
+                            return_type: Box::new(ResolvedType::TypeDef(
+                                Fql::new(stdlib_order, idx!(0)),
+                                hir::Name::new("Ordering"),
+                            )),
+                        }),
+                    }),
+                },
+            )],
         );
     }
 }

@@ -21,8 +21,7 @@ end
 typeof comparing : (t2 -> t1) -> t2 -> t2 -> Ordering where
   typevar t1 = Ord
   typevar t2
-let comparing = |convert, x, y| -> Ord::compare <| (convert(x), convert(y))
-
+let comparing = |convert, x, y| -> Ord::compare <| convert(x) <| convert(y)
 
 --! Returns whether `left` is less than or equal to `right`.
 typeof (<=) : t -> t -> Bool where
