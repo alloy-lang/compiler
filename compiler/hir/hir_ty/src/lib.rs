@@ -108,16 +108,17 @@ pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirType
 
 #[cfg(test)]
 mod small_tests {
-    use crate::diagnostics::TypeInferenceError;
+    use crate::diagnostics::{ConflictingTypeAnnotationReason, TypeInferenceError, TypeInferenceErrorKind};
     use crate::hir_ty::ResolvedType;
     use crate::tests::TestHirTyDatabase;
     use alloy_hir_def as hir;
-    use alloy_hir_resolved::{EPTdFql, Fql};
+    use alloy_hir_resolved::{AnnotatedType, EPTdFql, Fql};
     use alloy_scope::Scopes;
     use alloy_test_harness::idx;
     use alloy_workspace::{ModuleId, WorkspaceDatabase};
     use non_empty_vec::NonEmpty;
     use salsa::Database;
+    use text_size::{TextRange, TextSize};
 
     fn check(input: &str, expected: &[(u32, ResolvedType)]) {
         let mut db = TestHirTyDatabase::default();
