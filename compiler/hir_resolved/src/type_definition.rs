@@ -209,11 +209,11 @@ mod tests {
     use crate::tests::TestHirResDatabase;
     use crate::EPTrFql;
     use alloy_hir::TypeIdx;
+    use alloy_test_harness::idx;
     use alloy_workspace::WorkspaceDatabase;
-    use la_arena::{Idx, RawIdx};
     use non_empty_vec::ne_vec;
 
-    const TYPE_REF_IDX: TypeIdx = Idx::from_raw(RawIdx::from_u32(0));
+    const TYPE_REF_IDX: TypeIdx = idx!(0);
 
     #[test]
     fn test_resolve_type_definition_this_module() {
@@ -229,7 +229,7 @@ mod tests {
 
         let actual_ref = resolve_type_definition_by_ref_id(&db, module_id, TYPE_REF_IDX)
             .expect("must find type def");
-        let expected = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
+        let expected = Fql::new(module_id, idx!(0));
 
         assert_eq!(expected, actual_ref);
     }
@@ -255,7 +255,7 @@ mod tests {
             }),
             target_type_fql: Fql {
                 module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                local_id: idx!(0),
             },
             variant_name: hir::Name::new("Extra"),
         };
@@ -285,10 +285,7 @@ mod tests {
 
         let actual_ref = resolve_type_definition_by_ref_id(&db, module_id, TYPE_REF_IDX)
             .expect("must find type def");
-        let expected = Fql::new(
-            ModuleId::new(&db, "types"),
-            Idx::from_raw(RawIdx::from_u32(0)),
-        );
+        let expected = Fql::new(ModuleId::new(&db, "types"), idx!(0));
 
         assert_eq!(expected, actual_ref);
     }
@@ -322,7 +319,7 @@ mod tests {
             }),
             target_type_fql: Fql {
                 module_id: ModuleId::new(&db, "types"),
-                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                local_id: idx!(0),
             },
             variant_name: hir::Name::new("Extra"),
         };

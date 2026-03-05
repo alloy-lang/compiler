@@ -286,7 +286,6 @@ mod tests {
     use alloy_hir::Name;
     use alloy_test_harness::idx;
     use alloy_workspace::{ModuleId, VirtualModuleId, WorkspaceDatabase};
-    use la_arena::{Idx, RawIdx};
     use non_empty_vec::ne_vec;
 
     fn maybe_find_example(
@@ -341,8 +340,8 @@ mod tests {
             ",
         );
 
-        let actual = resolve_expression_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
-            .expect("resolve expression 0");
+        let actual =
+            resolve_expression_by_id(&db, module_id, idx!(0)).expect("resolve expression 0");
         let Expression::VariableRef(EPFql::Pattern(fql)) = actual else {
             panic!("expected actual to be VariableRef, but was {:?}", actual);
         };
@@ -369,7 +368,7 @@ mod tests {
 
         let (hir_module, _) = hir::lower_file(&db, module_id);
         let (idx, _expr) = hir_module
-            .get_expression_by_name(&Name::new("example"), Idx::from_raw(RawIdx::from_u32(1)))
+            .get_expression_by_name(&Name::new("example"), idx!(1))
             .unwrap_or_else(|| panic!("expected expression. hir_module: {:#?}", hir_module));
 
         let actual = resolve_expression_by_id(&db, module_id, idx).expect("must find expression");
@@ -400,7 +399,7 @@ mod tests {
 
         let (hir_module, _) = hir::lower_file(&db, module_id);
         let (idx, _expr) = hir_module
-            .get_expression_by_name(&Name::new("example"), Idx::from_raw(RawIdx::from_u32(1)))
+            .get_expression_by_name(&Name::new("example"), idx!(1))
             .unwrap_or_else(|| panic!("expected expression. hir_module: {:#?}", hir_module));
 
         let actual = resolve_expression_by_id(&db, module_id, idx).expect("must find expression");
@@ -433,7 +432,7 @@ mod tests {
             Expression::VariantConstructor {
                 type_def: Fql {
                     module_id: ModuleId::new(&db, "test_stuff"),
-                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                    local_id: idx!(0),
                 },
                 variant_name: Name::from("None")
             },
@@ -463,11 +462,11 @@ mod tests {
             Expression::FunctionCall {
                 target: EPTdFql::Expression(Fql {
                     module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(3)),
+                    local_id: idx!(3),
                 }),
                 args: vec![Fql {
                     module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(4)),
+                    local_id: idx!(4),
                 }],
             },
             actual,
@@ -493,13 +492,13 @@ mod tests {
                 target: EPTdFql::TypeDefinitionVariant(
                     Fql {
                         module_id,
-                        local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                        local_id: idx!(0),
                     },
                     Name::new("Some")
                 ),
                 args: vec![Fql {
                     module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                    local_id: idx!(0),
                 }],
             },
             actual,
@@ -524,11 +523,11 @@ mod tests {
             Expression::FunctionCall {
                 target: EPTdFql::TypeDefinition(Fql {
                     module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                    local_id: idx!(0),
                 }),
                 args: vec![Fql {
                     module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                    local_id: idx!(0),
                 }],
             },
             actual,
@@ -546,18 +545,18 @@ mod tests {
             ",
         );
 
-        let actual = resolve_expression_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
-            .expect("must find expression");
+        let actual =
+            resolve_expression_by_id(&db, module_id, idx!(1)).expect("must find expression");
 
         assert_eq!(
             Expression::FunctionCall {
                 target: EPTdFql::Pattern(Fql {
                     module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                    local_id: idx!(0),
                 }),
                 args: vec![Fql {
                     module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                    local_id: idx!(0),
                 }],
             },
             actual,
@@ -588,7 +587,7 @@ mod tests {
 
         let (hir_module, _) = hir::lower_file(&db, module_id);
         let (idx, _expr) = hir_module
-            .get_expression_by_name(&Name::new("example"), Idx::from_raw(RawIdx::from_u32(1)))
+            .get_expression_by_name(&Name::new("example"), idx!(1))
             .unwrap_or_else(|| panic!("expected expression. hir_module: {:#?}", hir_module));
 
         let actual = resolve_expression_by_id(&db, module_id, idx).expect("must find expression");
@@ -653,7 +652,7 @@ mod tests {
             },
             source_ref: EPTrFql::Expression(Fql {
                 module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                local_id: idx!(0),
             }),
         };
         assert_eq!(expected, err);
@@ -685,7 +684,7 @@ mod tests {
         let expected = HirResolutionError::UnknownExpressionReference {
             source_ref: Fql {
                 module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                local_id: idx!(0),
             },
             module_id: ModuleId::new(&db, "other"),
             path: ne_vec![Name::new("other"), Name::new("unknown_test_data")],
@@ -771,7 +770,7 @@ mod tests {
         let expected = HirResolutionError::UnknownExpressionReference {
             source_ref: Fql {
                 module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                local_id: idx!(0),
             },
             module_id: ModuleId::new(&db, "other"),
             path: ne_vec![
@@ -805,7 +804,7 @@ mod tests {
             },
             source_ref: EPTrFql::Expression(Fql {
                 module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                local_id: idx!(0),
             }),
         };
 
@@ -831,7 +830,7 @@ mod tests {
             Expression::VariantConstructor {
                 type_def: Fql {
                     module_id: ModuleId::new(&db, "std::option"),
-                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                    local_id: idx!(0),
                 },
                 variant_name: Name::from("None")
             },
@@ -867,7 +866,7 @@ mod tests {
             },
             source_ref: EPTrFql::Expression(Fql {
                 module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                local_id: idx!(0),
             }),
         };
 
@@ -893,11 +892,11 @@ mod tests {
         let expected = HirResolutionError::UnknownTypeDefinitionVariant {
             source_ref: EPTrFql::Expression(Fql {
                 module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                local_id: idx!(0),
             }),
             target_type_fql: Fql {
                 module_id: ModuleId::new(&db, "std::option"),
-                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                local_id: idx!(0),
             },
             variant_name: Name::new("Other"),
         };
@@ -935,11 +934,11 @@ mod tests {
             Expression::FunctionCall {
                 target: EPTdFql::Expression(Fql {
                     module_id: ModuleId::new(&db, "other"),
-                    local_id: Idx::from_raw(RawIdx::from_u32(3)),
+                    local_id: idx!(3),
                 }),
                 args: vec![Fql {
                     module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                    local_id: idx!(0),
                 }],
             },
             actual,
@@ -966,13 +965,13 @@ mod tests {
                 target: EPTdFql::TypeDefinitionVariant(
                     Fql {
                         module_id: ModuleId::new(&db, "std::option"),
-                        local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                        local_id: idx!(0),
                     },
                     Name::new("Some")
                 ),
                 args: vec![Fql {
                     module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                    local_id: idx!(0),
                 }],
             },
             actual,
@@ -998,11 +997,11 @@ mod tests {
         let expected = HirResolutionError::UnknownTypeDefinitionVariant {
             source_ref: EPTrFql::Expression(Fql {
                 module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                local_id: idx!(1),
             }),
             target_type_fql: Fql {
                 module_id: ModuleId::new(&db, "std::option"),
-                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                local_id: idx!(0),
             },
             variant_name: Name::new("Other"),
         };
@@ -1031,7 +1030,7 @@ mod tests {
             },
             source_ref: EPTrFql::Expression(Fql {
                 module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                local_id: idx!(1),
             }),
         };
 
@@ -1058,7 +1057,7 @@ mod tests {
         let expected = HirResolutionError::UnknownExpressionReference {
             source_ref: Fql {
                 module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                local_id: idx!(0),
             },
             module_id,
             path: ne_vec![Name::new("unknown")],
@@ -1088,7 +1087,7 @@ mod tests {
         let expected = HirResolutionError::UnknownExpressionReference {
             source_ref: Fql {
                 module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                local_id: idx!(1),
             },
             module_id,
             path: ne_vec![Name::new("unknown")],

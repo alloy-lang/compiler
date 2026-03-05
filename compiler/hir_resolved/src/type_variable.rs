@@ -1,9 +1,8 @@
-use crate::{resolve_trait_by_ref_id, resolver, AnnotatedType, EPTrFql, Fql, HirResolutionError};
+use crate::{resolve_trait_by_ref_id, resolver, EPTrFql, Fql, HirResolutionError};
 use alloy_hir as hir;
 use alloy_scope::ScopeIdx;
 use la_arena::Idx;
 use non_empty_vec::NonEmpty;
-use std::convert::TryFrom;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TypeVariable {

@@ -95,8 +95,8 @@ mod tests {
     use super::*;
     use crate::tests::TestHirResDatabase;
     use crate::EPTrFql;
+    use alloy_test_harness::idx;
     use alloy_workspace::WorkspaceDatabase;
-    use la_arena::{Idx, RawIdx};
     use non_empty_vec::ne_vec;
 
     #[test]
@@ -111,22 +111,22 @@ mod tests {
             ",
         );
 
-        let actual_0 = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
-            .expect("expected to resolve pattern");
+        let actual_0 =
+            resolve_pattern_by_id(&db, module_id, idx!(0)).expect("expected to resolve pattern");
         assert_eq!(Pattern::VariableDeclaration, actual_0);
 
-        let actual_1 = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
-            .expect("expected to resolve pattern");
+        let actual_1 =
+            resolve_pattern_by_id(&db, module_id, idx!(1)).expect("expected to resolve pattern");
         assert_eq!(
             Pattern::Destructure {
                 target: Fql {
                     module_id: ModuleId::new(&db, "std::option"),
-                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                    local_id: idx!(0),
                 },
                 variant_name: hir::Name::new("Some"),
                 args: vec![Fql {
                     module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                    local_id: idx!(0),
                 }],
             },
             actual_1
@@ -145,20 +145,20 @@ mod tests {
             ",
         );
 
-        let actual_0 = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
-            .expect("expected to resolve pattern");
+        let actual_0 =
+            resolve_pattern_by_id(&db, module_id, idx!(0)).expect("expected to resolve pattern");
         assert_eq!(Pattern::VariableDeclaration, actual_0);
-        let err = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
+        let err = resolve_pattern_by_id(&db, module_id, idx!(1))
             .expect_err("expected to resolve pattern");
         assert_eq!(
             HirResolutionError::UnknownTypeDefinitionVariant {
                 source_ref: EPTrFql::Pattern(Fql {
                     module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                    local_id: idx!(1),
                 }),
                 target_type_fql: Fql {
                     module_id: ModuleId::new(&db, "std::option"),
-                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                    local_id: idx!(0),
                 },
                 variant_name: hir::Name::new("InvalidVariant")
             },
@@ -178,20 +178,20 @@ mod tests {
             ",
         );
 
-        let actual_0 = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
-            .expect("expected to resolve pattern");
+        let actual_0 =
+            resolve_pattern_by_id(&db, module_id, idx!(0)).expect("expected to resolve pattern");
         assert_eq!(Pattern::VariableDeclaration, actual_0);
-        let err = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
+        let err = resolve_pattern_by_id(&db, module_id, idx!(1))
             .expect_err("expected to resolve pattern");
         assert_eq!(
             HirResolutionError::MissingTypeDefinitionVariant {
                 source_ref: EPTrFql::Pattern(Fql {
                     module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                    local_id: idx!(1),
                 }),
                 target_type_fql: Fql {
                     module_id: ModuleId::new(&db, "std::option"),
-                    local_id: Idx::from_raw(RawIdx::from_u32(0)),
+                    local_id: idx!(0),
                 }
             },
             err
@@ -209,16 +209,16 @@ mod tests {
             ",
         );
 
-        let actual_0 = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
-            .expect("expected to resolve pattern");
+        let actual_0 =
+            resolve_pattern_by_id(&db, module_id, idx!(0)).expect("expected to resolve pattern");
         assert_eq!(Pattern::VariableDeclaration, actual_0);
-        let err = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
+        let err = resolve_pattern_by_id(&db, module_id, idx!(1))
             .expect_err("expected to resolve pattern");
         assert_eq!(
             HirResolutionError::UnknownPatternReference {
                 source_ref: Fql {
                     module_id,
-                    local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                    local_id: idx!(1),
                 },
                 module_id,
                 path: ne_vec![hir::Name::new("UnknownType")],
@@ -239,10 +239,10 @@ mod tests {
             ",
         );
 
-        let actual_0 = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
-            .expect("expected to resolve pattern");
+        let actual_0 =
+            resolve_pattern_by_id(&db, module_id, idx!(0)).expect("expected to resolve pattern");
         assert_eq!(Pattern::VariableDeclaration, actual_0);
-        let err = resolve_pattern_by_id(&db, module_id, Idx::from_raw(RawIdx::from_u32(1)))
+        let err = resolve_pattern_by_id(&db, module_id, idx!(1))
             .expect_err("expected to resolve pattern");
 
         let expected = HirResolutionError::UnresolvedModule {
@@ -251,7 +251,7 @@ mod tests {
             },
             source_ref: EPTrFql::Pattern(Fql {
                 module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                local_id: idx!(1),
             }),
         };
         assert_eq!(expected, err);

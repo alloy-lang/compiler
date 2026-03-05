@@ -83,7 +83,6 @@ mod tests {
     use alloy_scope::Scopes;
     use alloy_test_harness::idx;
     use alloy_workspace::WorkspaceDatabase;
-    use la_arena::{Idx, RawIdx};
 
     #[test]
     fn test_resolve_type_reference_this_module() {
@@ -108,7 +107,7 @@ mod tests {
         let source_ref: Fql<hir::TypeReference> = Fql::new(module_id, idx!(0));
         let actual_ref = resolve_type_reference_by_path(&db, module_id, &path, source_ref)
             .expect("must find type reference");
-        let expected = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
+        let expected = Fql::new(module_id, idx!(0));
 
         assert_eq!(expected, actual_ref);
     }

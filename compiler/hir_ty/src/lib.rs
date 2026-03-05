@@ -106,13 +106,12 @@ mod small_tests {
     use crate::hir_ty::ResolvedType;
     use crate::tests::TestHirTyDatabase;
     use alloy_hir as hir;
-    use alloy_hir::ExpressionIdx;
     use alloy_hir_resolved::{AnnotatedType, EPTdFql, Fql};
-    use alloy_scope::{ScopeIdx, Scopes};
+    use alloy_scope::Scopes;
     use alloy_test_harness::idx;
     use alloy_workspace::WorkspaceDatabase;
-    use la_arena::RawIdx;
     use non_empty_vec::NonEmpty;
+    use salsa::Database;
     use text_size::{TextRange, TextSize};
 
     fn check(input: &str, expected: &[(u32, ResolvedType)]) {
@@ -132,7 +131,7 @@ mod small_tests {
 
         let expected = expected
             .into_iter()
-            .map(|(id, ty)| (ExpressionIdx::from_raw(RawIdx::from(*id)), ty.clone()))
+            .map(|(id, ty)| (idx!(*id), ty.clone()))
             .collect();
 
         assert_eq!(ctx.expression_types, expected);
@@ -156,10 +155,7 @@ mod small_tests {
             .into_iter()
             .map(|(name, scope, _ty)| {
                 let (expression_id, _expression) = hir_module
-                    .get_expression_by_name(
-                        &hir::Name::new(*name),
-                        ScopeIdx::from_raw(RawIdx::from(*scope)),
-                    )
+                    .get_expression_by_name(&hir::Name::new(*name), idx!(*scope))
                     .expect("expression not found");
                 (*name, *scope, ctx.expression_types[&expression_id].clone())
             })
@@ -435,6 +431,8 @@ mod small_tests {
         let (hir_module, _) = hir::lower_file(&db, module_id);
         let ctx = crate::type_check_module(&db, module_id);
 
+        eprintln!("typed module = {:#?}", ctx);
+
         // Get the FQL for 'example'
         let (option_td, _) = hir_module
             .get_type_definition_by_name(&hir::Name::new("Option"), Scopes::ROOT)
@@ -479,6 +477,8 @@ mod small_tests {
 
         let (hir_module, _) = hir::lower_file(&db, module_id);
         let ctx = crate::type_check_module(&db, module_id);
+
+        eprintln!("typed module = {:#?}", ctx);
 
         // Get the FQL for 'example'
         let (option_td, _) = hir_module
@@ -611,7 +611,10 @@ mod small_tests {
         );
 
         let (hir_module, _) = hir::lower_file(&db, module_id);
+        eprintln!("hir_module = {:#?}", hir_module);
         let ctx = crate::type_check_module(&db, module_id);
+
+        eprintln!("typed module = {:#?}", ctx);
 
         let (f_id, _) = hir_module
             .get_expression_by_name(&hir::Name::new("f"), Scopes::ROOT)
@@ -619,24 +622,26 @@ mod small_tests {
 
         let f_type = &ctx.expression_types[&f_id];
         eprintln!("f_type = {:#?}", f_type);
-        eprintln!("errors = {:#?}", ctx.errors);
+        assert_eq!(Vec::<TypeInferenceError>::new(), ctx.errors);
 
-        assert_eq!(
-            f_type,
-            &ResolvedType::Lambda {
-                arg_type: Box::new(ResolvedType::Generic(1)),
-                return_type: Box::new(ResolvedType::Lambda {
-                    arg_type: Box::new(ResolvedType::Generic(2)),
-                    return_type: Box::new(ResolvedType::Bounded {
-                        base: Box::new(ResolvedType::TypeDef(
-                            Fql::new(test_data_module_id, idx!(1)),
-                            hir::Name::new("Test"),
-                        )),
-                        args: vec![ResolvedType::BuiltIn(hir::BuiltInType::Int)],
+        db.attach(|_| {
+            assert_eq!(
+                f_type,
+                &ResolvedType::Lambda {
+                    arg_type: Box::new(ResolvedType::Generic(1)),
+                    return_type: Box::new(ResolvedType::Lambda {
+                        arg_type: Box::new(ResolvedType::Generic(2)),
+                        return_type: Box::new(ResolvedType::Bounded {
+                            base: Box::new(ResolvedType::TypeDef(
+                                Fql::new(test_data_module_id, idx!(1)),
+                                hir::Name::new("Test"),
+                            )),
+                            args: vec![ResolvedType::BuiltIn(hir::BuiltInType::Int)],
+                        }),
                     }),
-                }),
-            },
-        );
+                },
+            );
+        });
     }
 
     /// Test that expression index collision between local and imported module

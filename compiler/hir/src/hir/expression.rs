@@ -320,7 +320,6 @@ mod tests {
     use crate::tests::TestHirDatabase;
     use alloy_test_harness::idx;
     use alloy_workspace::WorkspaceDatabase;
-    use la_arena::RawIdx;
 
     #[test]
     fn resolve_same_module_function_call_trait_reference() {
@@ -387,7 +386,7 @@ mod tests {
 
         let (hir_module, _) = hir::lower_file(&db, module_id);
         let (_, expr) = hir_module
-            .get_expression_by_name(&Name::new("example"), Idx::from_raw(RawIdx::from_u32(1)))
+            .get_expression_by_name(&Name::new("example"), idx!(1))
             .unwrap_or_else(|| panic!("expected expression. hir_module: {:#?}", hir_module));
 
         assert_eq!(

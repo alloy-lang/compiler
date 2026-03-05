@@ -545,9 +545,7 @@ pub fn resolve_type_variable_to_annotated(
         hir::TypeVariableKind::Constrained(constraints) => {
             let trait_constraints: Vec<_> = constraints
                 .iter()
-                .filter_map(|constraint| {
-                    trait_constraints(db, module_id, constraint)
-                })
+                .filter_map(|constraint| trait_constraints(db, module_id, constraint))
                 .collect();
 
             NonEmpty::try_from(trait_constraints)
@@ -568,7 +566,9 @@ pub fn resolve_type_variable_to_annotated(
 mod tests {
     use super::*;
     use crate::tests::TestHirResDatabase;
+    use alloy_hir::BuiltInType;
     use alloy_test_harness::idx;
+    use alloy_workspace::WorkspaceDatabase;
     use salsa::Database;
     use std::convert::TryFrom;
 
@@ -583,10 +583,10 @@ mod tests {
             ",
         );
 
-        let actual_ref = resolve_annotated_expression(&db, module_id, idx!(0), idx!(0));
+        let actual_type = resolve_annotated_expression(&db, module_id, idx!(0), idx!(0));
 
         db.attach(|_| {
-            assert_eq!(AnnotatedType::BuiltIn(hir::BuiltInType::Int), actual_ref);
+            assert_eq!(AnnotatedType::BuiltIn(hir::BuiltInType::Int), actual_type);
         });
     }
 
@@ -619,7 +619,7 @@ mod tests {
             ",
         );
 
-        let actual_ref = resolve_annotated_expression(&db, module_id, idx!(13), idx!(7));
+        let actual_type = resolve_annotated_expression(&db, module_id, idx!(13), idx!(7));
 
         db.attach(|_| {
             assert_eq!(
@@ -673,7 +673,69 @@ mod tests {
                         }),
                     }),
                 },
-                actual_ref,
+                actual_type,
+            );
+        });
+    }
+
+    #[test]
+    fn infer_cross_module_typedef_in_lambda() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let test_data_module_id = db.add_module(
+            "test_data",
+            camino::Utf8Path::new("./test/test_data.alloy"),
+            r"
+            typedef Test[t] = Thing t
+            let test = Test(0)
+            ",
+        );
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+            import test_data::test
+            import test_data
+
+            typeof f : t1 -> t2 -> test_data::Test[Int] where
+              typevar t1
+              typevar t2
+            let f = |a, b| -> test
+            ",
+        );
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+        eprintln!("hir_module = {:#?}", hir_module);
+
+        let actual_type = resolve_annotated_expression(&db, module_id, idx!(6), idx!(1));
+
+        db.attach(|_| {
+            assert_eq!(
+                AnnotatedType::Lambda {
+                    arg: Box::new(AnnotatedType::TypeVar {
+                        fql: Fql::new(module_id, idx!(0)),
+                        name: hir::Name::from("t1"),
+                    }),
+                    ret: Box::new(AnnotatedType::Lambda {
+                        arg: Box::new(AnnotatedType::TypeVar {
+                            fql: Fql::new(module_id, idx!(1)),
+                            name: hir::Name::from("t2"),
+                        }),
+                        ret: Box::new(AnnotatedType::Bounded {
+                            base: Box::new(AnnotatedType::TypeDef {
+                                fql: Fql::new(test_data_module_id, idx!(0)),
+                                name: hir::Name::from("Test"),
+                                type_args: vec![TypeVarReference {
+                                    fql: Fql {
+                                        module_id: test_data_module_id,
+                                        local_id: idx!(0),
+                                    },
+                                    name: hir::Name::from("t"),
+                                }],
+                            }),
+                            args: vec![AnnotatedType::BuiltIn(BuiltInType::Int)],
+                        }),
+                    }),
+                },
+                actual_type,
             );
         });
     }

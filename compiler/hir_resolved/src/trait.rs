@@ -141,18 +141,16 @@ impl resolver::Resolver<hir::Trait> for TraitResolver {
 mod tests {
     use super::*;
     use crate::tests::TestHirResDatabase;
+    use alloy_test_harness::idx;
     use alloy_workspace::WorkspaceDatabase;
-    use la_arena::RawIdx;
     use non_empty_vec::ne_vec;
 
     fn find_trait(db: &dyn hir::HirDatabase, module_id: ModuleId) -> Fql<hir::Trait> {
-        resolve_trait_by_ref_id(db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
-            .expect("must find trait")
+        resolve_trait_by_ref_id(db, module_id, idx!(0)).expect("must find trait")
     }
 
     fn find_trait_error(db: &dyn hir::HirDatabase, module_id: ModuleId) -> HirResolutionError {
-        resolve_trait_by_ref_id(db, module_id, Idx::from_raw(RawIdx::from_u32(0)))
-            .expect_err("must fail to find trait")
+        resolve_trait_by_ref_id(db, module_id, idx!(0)).expect_err("must fail to find trait")
     }
 
     #[test]
@@ -170,7 +168,7 @@ mod tests {
         );
 
         let actual_trait = find_trait(&db, module_id);
-        let expected = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
+        let expected = Fql::new(module_id, idx!(0));
 
         assert_eq!(expected, actual_trait);
     }
@@ -191,11 +189,11 @@ mod tests {
 
         let actual_err = find_trait_error(&db, module_id);
 
-        let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
+        let source_ref = Fql::new(module_id, idx!(0));
         let expected = HirResolutionError::UnknownTraitMember {
             source_ref: EPTrFql::TypeReference(source_ref),
             module_id: ModuleId::new(&db, "test"),
-            trait_idx: Idx::from_raw(RawIdx::from_u32(0)),
+            trait_idx: idx!(0),
             subname: hir::Name::new("extra_junk"),
         };
 
@@ -215,7 +213,7 @@ mod tests {
 
         let actual_err = find_trait_error(&db, module_id);
 
-        let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
+        let source_ref = Fql::new(module_id, idx!(0));
         let expected = HirResolutionError::UnknownTraitReference {
             source_ref: EPTrFql::TypeReference(source_ref),
             module_id,
@@ -247,7 +245,7 @@ mod tests {
         );
 
         let actual_trait = find_trait(&db, module_id);
-        let expected = Fql::new(other_module_id, Idx::from_raw(RawIdx::from_u32(0)));
+        let expected = Fql::new(other_module_id, idx!(0));
 
         assert_eq!(expected, actual_trait);
     }
@@ -275,11 +273,11 @@ mod tests {
 
         let actual_err = find_trait_error(&db, module_id);
 
-        let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
+        let source_ref = Fql::new(module_id, idx!(0));
         let expected = HirResolutionError::UnknownTraitMember {
             source_ref: EPTrFql::TypeReference(source_ref),
             module_id: ModuleId::new(&db, "traits"),
-            trait_idx: Idx::from_raw(RawIdx::from_u32(0)),
+            trait_idx: idx!(0),
             subname: hir::Name::new("extra_junk"),
         };
 
@@ -307,7 +305,7 @@ mod tests {
                 ",
         );
 
-        let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
+        let source_ref = Fql::new(module_id, idx!(0));
         let actual_err = find_trait_error(&db, module_id);
         let expected = HirResolutionError::UnknownTraitReference {
             source_ref: EPTrFql::TypeReference(source_ref),
@@ -332,7 +330,7 @@ mod tests {
 
         let actual_err = find_trait_error(&db, module_id);
 
-        let source_ref = Fql::new(module_id, Idx::from_raw(RawIdx::from_u32(0)));
+        let source_ref = Fql::new(module_id, idx!(0));
         let expected = HirResolutionError::UnresolvedModule {
             err: hir::FqnResolutionError::UnknownRootModule {
                 attempted_module_path: ne_vec![hir::Name::new("fake_traits")],
@@ -359,7 +357,7 @@ mod tests {
             ",
         );
 
-        let bounded_type_idx = Idx::from_raw(RawIdx::from_u32(3));
+        let bounded_type_idx = idx!(3);
 
         let (hir_module, _) = hir::lower_file(&db, module_id);
         let type_ref = hir_module.get_type_reference(bounded_type_idx);
@@ -370,11 +368,11 @@ mod tests {
         let expected = HirResolutionError::BoundedTraitReference {
             source_ref: Fql {
                 module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(3)),
+                local_id: idx!(3),
             },
             target_ref: Fql {
                 module_id,
-                local_id: Idx::from_raw(RawIdx::from_u32(1)),
+                local_id: idx!(1),
             },
         };
 
