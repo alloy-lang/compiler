@@ -437,7 +437,8 @@ mod small_tests {
         let (option_td, _) = hir_module
             .get_type_definition_by_name(&hir::Name::new("Option"), Scopes::ROOT)
             .unwrap();
-        let example_fql = EPTdFql::TypeDefinition(Fql::new(module_id, option_td));
+        let example_fql =
+            EPTdFql::TypeDefinitionVariant(Fql::new(module_id, option_td), hir::Name::new("Some"));
 
         // Verify id was instantiated twice
         let instantiations = ctx.instantiations(&example_fql);
@@ -484,7 +485,8 @@ mod small_tests {
         let (option_td, _) = hir_module
             .get_type_definition_by_name(&hir::Name::new("Option"), Scopes::ROOT)
             .unwrap();
-        let example_fql = EPTdFql::TypeDefinition(Fql::new(module_id, option_td));
+        let example_fql =
+            EPTdFql::TypeDefinitionVariant(Fql::new(module_id, option_td), hir::Name::new("Some"));
 
         // Verify id was instantiated twice
         let instantiations = ctx.instantiations(&example_fql);
