@@ -107,6 +107,54 @@ impl std::fmt::Display for MonoType {
     }
 }
 
+impl MonoType {
+    pub(crate) fn is_polymorphic(&self) -> bool {
+        match self {
+            MonoType::Var(_) => true,
+            MonoType::Function(arg, ret) => arg.is_polymorphic() || ret.is_polymorphic(),
+            MonoType::Tuple(elements) => elements.iter().any(Self::is_polymorphic),
+            MonoType::App { constructor, args } => {
+                constructor.is_polymorphic() || args.iter().any(Self::is_polymorphic)
+            }
+            MonoType::Unconstrained
+            | MonoType::Concrete(_)
+            | MonoType::TypeDef { .. }
+            | MonoType::Unit => false,
+        }
+    }
+
+    pub(crate) fn free_type_vars(&self) -> Vec<TypeVarId> {
+        let mut vars = FxHashSet::default();
+        self.collect_free_vars(&mut vars);
+        vars.into_iter().collect()
+    }
+
+    fn collect_free_vars(&self, vars: &mut FxHashSet<TypeVarId>) {
+        match self {
+            MonoType::Unconstrained => {}
+            MonoType::Var(v) => {
+                vars.insert(*v);
+            }
+            MonoType::Function(arg, ret) => {
+                arg.collect_free_vars(vars);
+                ret.collect_free_vars(vars);
+            }
+            MonoType::Tuple(tys) => {
+                for t in tys {
+                    t.collect_free_vars(vars);
+                }
+            }
+            MonoType::App { constructor, args } => {
+                constructor.collect_free_vars(vars);
+                for t in args {
+                    t.collect_free_vars(vars);
+                }
+            }
+            MonoType::Concrete(_) | MonoType::TypeDef { .. } | MonoType::Unit => {}
+        }
+    }
+}
+
 /// Polymorphic type scheme (with quantification)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PolyType {
@@ -153,43 +201,11 @@ impl TypeVarGenerator {
     }
 }
 
-/// Compute the free type variables in a type
-pub(super) fn free_type_vars(ty: &MonoType) -> Vec<TypeVarId> {
-    let mut vars = FxHashSet::default();
-    collect_free_vars(ty, &mut vars);
-    vars.into_iter().collect()
-}
-
-fn collect_free_vars(ty: &MonoType, vars: &mut FxHashSet<TypeVarId>) {
-    match ty {
-        MonoType::Unconstrained => {}
-        MonoType::Var(v) => {
-            vars.insert(*v);
-        }
-        MonoType::Function(arg, ret) => {
-            collect_free_vars(arg, vars);
-            collect_free_vars(ret, vars);
-        }
-        MonoType::Tuple(tys) => {
-            for t in tys {
-                collect_free_vars(t, vars);
-            }
-        }
-        MonoType::App { constructor, args } => {
-            collect_free_vars(constructor, vars);
-            for t in args {
-                collect_free_vars(t, vars);
-            }
-        }
-        MonoType::Concrete(_) | MonoType::TypeDef { .. } | MonoType::Unit => {}
-    }
-}
-
 impl PolyType {
     /// Generalize a monotype into a polytype by quantifying free variables
     /// that are not present in the environment
     pub(super) fn generalize(ty: MonoType, env_vars: &FxHashSet<TypeVarId>) -> Self {
-        let free_vars = free_type_vars(&ty);
+        let free_vars = ty.free_type_vars();
         let quantified: Vec<TypeVarId> = free_vars
             .into_iter()
             .filter(|v| !env_vars.contains(v))
@@ -203,7 +219,7 @@ impl PolyType {
     }
 
     pub(super) fn generalize_all(ty: MonoType) -> Self {
-        let quantified = free_type_vars(&ty);
+        let quantified = ty.free_type_vars();
 
         Self {
             quantified,

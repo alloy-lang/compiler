@@ -72,7 +72,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
             };
 
             if should_include {
-                ctx.env_type_vars.extend(super::free_type_vars(t));
+                ctx.env_type_vars.extend(t.free_type_vars());
             }
         }
 
@@ -176,7 +176,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
         let range = hir_module.get_expression_range(*value);
 
         if let Some(type_annotation) = type_annotation {
-            let _ = resolve_annotated_expression(db, module_id, *type_annotation, *value);
+            // let _ = resolve_annotated_expression(db, module_id, *type_annotation, *value);
             // Check for type annotation conflicts
             check_type_annotation(
                 db,

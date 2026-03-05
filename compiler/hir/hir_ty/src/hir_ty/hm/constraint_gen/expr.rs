@@ -266,17 +266,12 @@ fn infer_binary(
         }
         hir::BinaryOp::Custom(path) => {
             if let Ok(op_expr) = res::resolve_custom_binary_operator(ctx.db, &source_fql, &path) {
-                return infer_function_call(ctx, source_fql.clone(), op_expr.into(), vec![lhs, rhs]);
-                // let op_ty = infer_expr_hm(ctx, op_expr);
-                // if let MonoType::Function(arg1_ty, func_ty) = op_ty {
-                //     if let MonoType::Function(arg2_ty, ret_ty) = func_ty.deref() {
-                //         // Add equations to unify the operator type with arg1 -> arg2 -> result
-                //         ctx.add_equation(arg1_ty.deref().clone(), lhs_ty, lhs);
-                //         ctx.add_equation(arg2_ty.deref().clone(), rhs_ty, rhs);
-                //
-                //         return ctx.assign_type(source_fql, ret_ty.deref().clone());
-                //     }
-                // }
+                return infer_function_call(
+                    ctx,
+                    source_fql.clone(),
+                    op_expr.into(),
+                    vec![lhs, rhs],
+                );
             }
         }
         hir::BinaryOp::Missing => {}
@@ -496,7 +491,7 @@ fn infer_variant_constructor(
     let constructor_ty = build_constructor_type(ctx, &type_def_fql, &type_def, &member);
 
     // Check if this is a polymorphic constructor
-    let is_polymorphic = has_type_variables(&constructor_ty);
+    let is_polymorphic = constructor_ty.is_polymorphic();
 
     if is_polymorphic {
         // Generalize and store in poly_env for proper instantiation
@@ -558,10 +553,7 @@ fn infer_type_definition(
             // When you call Identity(...), it's the same as Id(...)
             let constructor_ty = build_constructor_type(ctx, &td_fql, &type_def, member);
 
-            // Check if this is a polymorphic constructor (has App with type variables)
-            let is_polymorphic = has_type_variables(&constructor_ty);
-
-            if is_polymorphic {
+            if constructor_ty.is_polymorphic() {
                 // Generalize and store in poly_env for proper instantiation
                 // For type definition constructors, quantify over ALL free variables
                 // since constructors are top-level polymorphic values
@@ -593,20 +585,4 @@ fn infer_type_definition(
     };
 
     ctx.assign_type(td_fql, ty)
-}
-
-/// Check if a MonoType contains type variables (is polymorphic)
-fn has_type_variables(ty: &MonoType) -> bool {
-    match ty {
-        MonoType::Var(_) => true,
-        MonoType::Function(arg, ret) => has_type_variables(arg) || has_type_variables(ret),
-        MonoType::Tuple(elements) => elements.iter().any(has_type_variables),
-        MonoType::App { constructor, args } => {
-            has_type_variables(constructor) || args.iter().any(has_type_variables)
-        }
-        MonoType::Unconstrained
-        | MonoType::Concrete(_)
-        | MonoType::TypeDef { .. }
-        | MonoType::Unit => false,
-    }
 }
