@@ -211,11 +211,11 @@ impl<'db> LoweringCtx<'db> {
                     ResolutionIdx::Trait(tid),
                 ));
             }
-            if let Some((tid, scope)) = self.type_definitions.get_id(&local_name, &self.scopes) {
+            if let Some((tid, _scope)) = self.type_definitions.get_id(&local_name, &self.scopes) {
                 return Some(Path::this_module(
                     rest,
                     first,
-                    scope,
+                    Scopes::ROOT,
                     ResolutionKind::TypeDefinition,
                     ResolutionIdx::TypeDefinition(tid),
                 ));

@@ -151,10 +151,10 @@ impl resolver::Resolver<hir::TypeDefinition> for TypeDefinitionResolver {
     fn lookup_in_module(
         hir_module: &hir::HirModule,
         name: &hir::Name,
-        scope: ScopeIdx,
+        _scope: ScopeIdx,
     ) -> Option<(Idx<hir::TypeDefinition>, hir::TypeDefinition)> {
         hir_module
-            .get_type_definition_by_name(name, scope)
+            .get_type_definition_by_name(name)
             .map(|(id, typedef)| (id, typedef.clone()))
     }
 

@@ -158,10 +158,9 @@ impl HirModule {
     pub fn get_type_definition_by_name(
         &self,
         name: &Name,
-        scope: ScopeIdx,
     ) -> Option<(TypeDefinitionIdx, &TypeDefinition)> {
         self.type_definitions
-            .get_by_scoped_name(name, scope, &self.scopes)
+            .get_by_scoped_name(name, Scopes::ROOT, &self.scopes)
     }
 
     pub fn get_type_variable_by_name(
@@ -215,12 +214,12 @@ impl HirModule {
         self.type_definitions.get(idx)
     }
 
-    pub fn get_type_variable(&self, idx: TypeVariableIdx) -> &TypeVariable {
-        self.type_variables.get(idx)
-    }
-
     pub fn get_type_definition_range(&self, idx: TypeDefinitionIdx) -> TextRange {
         self.type_definitions.get_range(idx)
+    }
+
+    pub fn get_type_variable(&self, idx: TypeVariableIdx) -> &TypeVariable {
+        self.type_variables.get(idx)
     }
 
     pub fn get_expression(&self, idx: ExpressionIdx) -> &Expression {

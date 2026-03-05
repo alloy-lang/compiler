@@ -108,7 +108,9 @@ pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirType
 
 #[cfg(test)]
 mod small_tests {
-    use crate::diagnostics::{ConflictingTypeAnnotationReason, TypeInferenceError, TypeInferenceErrorKind};
+    use crate::diagnostics::{
+        ConflictingTypeAnnotationReason, TypeInferenceError, TypeInferenceErrorKind,
+    };
     use crate::hir_ty::ResolvedType;
     use crate::tests::TestHirTyDatabase;
     use alloy_hir_def as hir;
@@ -202,7 +204,7 @@ mod small_tests {
         assert_eq!(parse_errors, &[]);
 
         let (id_expr, _) = hir_module
-            .get_type_definition_by_name(&hir::Name::new(name), Scopes::ROOT)
+            .get_type_definition_by_name(&hir::Name::new(name))
             .unwrap();
         let id_fql =
             EPTdFql::TypeDefinitionVariant(Fql::new(module_id, id_expr), hir::Name::new("Some"));
