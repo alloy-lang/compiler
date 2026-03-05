@@ -702,8 +702,6 @@ mod tests {
             let f = |a, b| -> test
             ",
         );
-        let (hir_module, _) = hir::lower_file(&db, module_id);
-        eprintln!("hir_module = {:#?}", hir_module);
 
         let actual_type = resolve_annotated_expression(&db, module_id, idx!(6), idx!(1));
 
