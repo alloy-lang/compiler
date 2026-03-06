@@ -182,6 +182,17 @@ impl From<TokenKind> for SyntaxKind {
     }
 }
 
+impl SyntaxKind {
+    #[must_use]
+    pub fn is_trivia(self) -> bool {
+        matches!(self, Self::Whitespace | Self::Comment | Self::DocComment)
+    }
+    #[must_use]
+    pub fn is_comment(self) -> bool {
+        matches!(self, Self::Comment | Self::DocComment)
+    }
+}
+
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum AlloyLanguage {}
 

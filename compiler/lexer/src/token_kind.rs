@@ -144,6 +144,10 @@ impl TokenKind {
     pub fn is_trivia(self) -> bool {
         matches!(self, Self::Whitespace | Self::Comment | Self::DocComment)
     }
+    #[must_use]
+    pub fn is_comment(self) -> bool {
+        matches!(self, Self::Comment | Self::DocComment)
+    }
 }
 
 impl fmt::Display for TokenKind {
