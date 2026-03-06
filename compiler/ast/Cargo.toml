@@ -12,6 +12,7 @@ alloy_workspace = { path = "../workspace" }
 salsa = { workspace = true }
 ordered-float = { workspace = true }
 text-size = { workspace = true }
+rowan = { workspace = true }
 
 [dev-dependencies]
 alloy_test_harness = {path = "../test_harness"}

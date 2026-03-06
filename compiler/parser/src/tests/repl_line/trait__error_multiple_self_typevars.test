@@ -1,0 +1,58 @@
+import std::{functor, debug}
+
+trait TestTrait1 where
+    self = functor::Functor -- first
+    self = debug::Debug     -- second
+end
+===
+SourceFile@0..131
+  ImportDef@0..30
+    ImportKw@0..6 "import"
+    Whitespace@6..7 " "
+    ImportDefSegment@7..10
+      Ident@7..10 "std"
+    DoubleColon@10..12 "::"
+    ImportDefGroup@12..30
+      LBrace@12..13 "{"
+      ImportDefSegment@13..20
+        Ident@13..20 "functor"
+      Comma@20..21 ","
+      Whitespace@21..22 " "
+      ImportDefSegment@22..27
+        Ident@22..27 "debug"
+      RBrace@27..28 "}"
+      Whitespace@28..30 "\n\n"
+  TraitDef@30..131
+    TraitKw@30..35 "trait"
+    Whitespace@35..36 " "
+    Ident@36..46 "TestTrait1"
+    Whitespace@46..47 " "
+    WhereKw@47..52 "where"
+    Whitespace@52..57 "\n    "
+    SelfTypeVariable@57..94
+      SelfKw@57..61 "self"
+      Whitespace@61..62 " "
+      Equals@62..63 "="
+      Whitespace@63..64 " "
+      TypeVariableTraitConstraint@64..94
+        Path@64..94
+          Ident@64..71 "functor"
+          DoubleColon@71..73 "::"
+          Ident@73..80 "Functor"
+          Whitespace@80..81 " "
+          Comment@81..89 "-- first"
+          Whitespace@89..94 "\n    "
+    SelfTypeVariable@94..128
+      SelfKw@94..98 "self"
+      Whitespace@98..99 " "
+      Equals@99..100 "="
+      Whitespace@100..101 " "
+      TypeVariableTraitConstraint@101..128
+        Path@101..128
+          Ident@101..106 "debug"
+          DoubleColon@106..108 "::"
+          Ident@108..113 "Debug"
+          Whitespace@113..118 "     "
+          Comment@118..127 "-- second"
+          Whitespace@127..128 "\n"
+    EndKw@128..131 "end"

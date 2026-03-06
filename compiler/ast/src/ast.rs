@@ -19,6 +19,10 @@ macro_rules! ast_token {
             fn syntax(&self) -> SyntaxElement {
                 self.0.clone().into()
             }
+
+            fn range(&self) -> TextRange {
+                self.syntax().text_range()
+            }
         }
 
         impl fmt::Debug for $kind {
@@ -48,6 +52,30 @@ macro_rules! ast_node {
 
             fn syntax(&self) -> SyntaxElement {
                 self.0.clone().into()
+            }
+
+            fn range(&self) -> TextRange {
+                let total_range = self.syntax().text_range();
+
+                self.0
+                    .preorder_with_tokens()
+                    .filter_map(|event| match event {
+                        rowan::WalkEvent::Enter(element) => {
+                            match element {
+                                SyntaxElement::Node(_) => None, // Skip nodes in this pass
+                                SyntaxElement::Token(t) => Some(t),
+                            }
+                        },
+                        _ => None,
+                    })
+                    .filter_map(|token| {
+                        if !token.kind().is_trivia() {
+                            return Some(token.text_range());
+                        }
+                        None
+                    })
+                    .reduce(|acc, range| acc.cover(range))
+                    .unwrap_or(total_range)
             }
         }
 
@@ -82,6 +110,12 @@ macro_rules! ast_union_node {
 					$( Self::$kind(s) => s.syntax(), )+
 				}
 			}
+
+            fn range(&self) -> TextRange {
+				match self {
+					$( Self::$kind(kind) => kind.range(), )+
+				}
+            }
 		}
 	};
 
@@ -107,6 +141,13 @@ macro_rules! ast_union_node {
 					$( Self::$kind(s) => s.syntax(), )+
 				}
 			}
+
+            fn range(&self) -> TextRange {
+				match self {
+                       Self::$else(kind) => kind.range(),
+					$( Self::$kind(kind) => kind.range(), )+
+				}
+            }
 		}
 	};
 }
@@ -165,9 +206,7 @@ pub trait AstElement: Sized {
         }
     }
 
-    fn range(&self) -> TextRange {
-        self.syntax().text_range()
-    }
+    fn range(&self) -> TextRange;
 }
 
 #[derive(Debug)]

@@ -1,8 +1,8 @@
 import std::{functor, debug}
 
 trait TestTrait1 where
-    self = functor::Functor
-    self = debug::Debug
+    self = functor::Functor -- first
+    self = debug::Debug     -- second
 end
 ===
 HirModule {
@@ -44,7 +44,7 @@ HirModule {
                 members: [],
             },
             "name": "TestTrait1",
-            "range": 30..108,
+            "range": 30..131,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -94,11 +94,11 @@ HirModule {
             kind: MultipleSelfTypeVariablesInTraitDefinition {
                 trait_name: "TestTrait1",
                 ranges: [
-                    57..85,
-                    85..105,
+                    57..80,
+                    94..113,
                 ],
             },
-            range: 30..108,
+            range: 30..131,
         },
     ],
 }

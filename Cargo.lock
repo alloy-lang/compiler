@@ -17,6 +17,7 @@ dependencies = [
  "alloy_test_harness",
  "alloy_workspace",
  "ordered-float",
+ "rowan",
  "salsa",
  "text-size",
 ]

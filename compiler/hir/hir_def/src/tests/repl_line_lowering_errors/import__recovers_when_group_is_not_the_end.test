@@ -55,7 +55,7 @@ HirModule {
                 position: 1,
                 num_segments: 3,
             },
-            range: 0..35,
+            range: 0..34,
         },
     ],
 }

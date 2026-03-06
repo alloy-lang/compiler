@@ -63,6 +63,10 @@ impl AstElement for BinaryOp {
     fn syntax(&self) -> SyntaxElement {
         self.0.clone().into()
     }
+
+    fn range(&self) -> TextRange {
+        self.syntax().text_range()
+    }
 }
 
 ast_node!(VariableRef, fields: [name]);

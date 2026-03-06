@@ -85,7 +85,7 @@ HirModule {
                 ),
                 current_scope: Idx::<Scope>(0),
             },
-            range: 3..8,
+            range: 3..7,
         },
     ],
 }

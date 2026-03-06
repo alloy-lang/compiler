@@ -63,7 +63,7 @@ HirModule {
     errors: [
         LoweringError {
             kind: CharLiteralInvalid,
-            range: 8..22,
+            range: 8..20,
         },
     ],
 }
