@@ -1,0 +1,14 @@
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[package]
+name = "alloy_hir"
+version = "0.1.0"
+authors = ["theochupp <tclchiam@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+alloy_hir_def = { workspace = true }
+alloy_hir_resolved = { workspace = true }
+alloy_hir_typed = { workspace = true }
+
+[dev-dependencies]
+alloy_test_harness = { workspace = true }

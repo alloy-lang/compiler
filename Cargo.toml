@@ -3,9 +3,10 @@ members = [
     "compiler",
     "compiler/ast",
     "compiler/diagnostics",
-    "compiler/hir_parent/hir_def",
-    "compiler/hir_parent/hir_resolved",
-    "compiler/hir_parent/hir_ty",
+    "compiler/hir",
+    "compiler/hir/hir_def",
+    "compiler/hir/hir_resolved",
+    "compiler/hir/hir_ty",
     "compiler/lexer",
     "compiler/parser",
     "compiler/project",
@@ -40,9 +41,9 @@ walkdir = "2"
 alloy_ast = { path = "compiler/ast" }
 alloy_compiler = { path = "compiler" }
 alloy_diagnostics = { path = "compiler/diagnostics" }
-alloy_hir_def = { path = "compiler/hir_parent/hir_def" }
-alloy_hir_resolved = { path = "compiler/hir_parent/hir_resolved" }
-alloy_hir_typed = { path = "compiler/hir_parent/hir_ty" }
+alloy_hir_def = { path = "compiler/hir/hir_def" }
+alloy_hir_resolved = { path = "compiler/hir/hir_resolved" }
+alloy_hir_typed = { path = "compiler/hir/hir_ty" }
 alloy_lexer = { path = "compiler/lexer" }
 alloy_parser = { path = "compiler/parser" }
 alloy_project = { path = "compiler/project" }

@@ -50,6 +50,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "alloy_hir"
+version = "0.1.0"
+dependencies = [
+ "alloy_hir_def",
+ "alloy_hir_resolved",
+ "alloy_hir_typed",
+ "alloy_test_harness",
+]
+
+[[package]]
 name = "alloy_hir_def"
 version = "0.1.0"
 dependencies = [
