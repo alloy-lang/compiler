@@ -3,7 +3,7 @@
 use super::{EPFql, MonoType, TypeEquation, TypeVarId};
 use crate::diagnostics::TypeInferenceError;
 use crate::{diagnostics, HirTyDatabase};
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use diagnostics::TypeInferenceErrorKind;
 use rustc_hash::FxHashMap;
 

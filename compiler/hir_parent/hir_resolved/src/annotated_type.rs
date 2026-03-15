@@ -1,7 +1,7 @@
 use crate::resolver::resolve_by_path;
 use crate::{Fql, TypeVariableResolver};
-use alloy_hir as hir;
-use alloy_hir::HirDatabase;
+use alloy_hir_def as hir;
+use alloy_hir_def::HirDefDatabase;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use std::convert::TryFrom;
@@ -150,7 +150,7 @@ impl std::fmt::Display for AnnotatedType {
 
 #[salsa::tracked]
 pub fn resolve_annotated_type(
-    db: &dyn HirDatabase,
+    db: &dyn HirDefDatabase,
     module_id: ModuleId,
     type_idx: hir::TypeIdx,
 ) -> AnnotatedType {
@@ -244,7 +244,7 @@ pub fn resolve_annotated_type(
 
 #[salsa::tracked]
 pub fn resolve_annotated_expression(
-    db: &dyn HirDatabase,
+    db: &dyn HirDefDatabase,
     module_id: ModuleId,
     type_idx: hir::TypeIdx,
     expr_idx: hir::ExpressionIdx,
@@ -256,7 +256,7 @@ pub fn resolve_annotated_expression(
 }
 
 fn resolve_annotated_expression_inner(
-    db: &dyn HirDatabase,
+    db: &dyn HirDefDatabase,
     module_id: ModuleId,
     type_idx: hir::TypeIdx,
     expr: &hir::Expression,
@@ -367,7 +367,7 @@ fn resolve_annotated_expression_inner(
 
 #[salsa::tracked]
 pub fn resolve_annotated_pattern(
-    db: &dyn HirDatabase,
+    db: &dyn HirDefDatabase,
     module_id: ModuleId,
     type_idx: hir::TypeIdx,
     pattern_idx: hir::PatternIdx,
@@ -439,7 +439,7 @@ pub fn resolve_annotated_pattern(
 }
 
 fn trait_constraints(
-    db: &dyn HirDatabase,
+    db: &dyn HirDefDatabase,
     module_id: ModuleId,
     c: &hir::TypeVariableConstraint,
 ) -> Option<(Fql<hir::Trait>, hir::Name)> {
@@ -465,7 +465,7 @@ fn kind_constraints(c: &hir::TypeVariableConstraint) -> Option<usize> {
 /// First tries to resolve as a type reference (finds TypeReference in target module),
 /// then falls back to resolving as a type definition (TypeDefinition directly).
 fn resolve_named_type_annotation(
-    db: &dyn HirDatabase,
+    db: &dyn HirDefDatabase,
     current_module_id: ModuleId,
     path: &hir::Path,
     type_idx: hir::TypeIdx,
@@ -498,7 +498,7 @@ fn resolve_named_type_annotation(
 
 #[salsa::tracked]
 pub fn resolve_type_definition_to_annotated(
-    db: &dyn HirDatabase,
+    db: &dyn HirDefDatabase,
     module_id: ModuleId,
     type_def_idx: hir::TypeDefinitionIdx,
 ) -> AnnotatedType {
@@ -529,7 +529,7 @@ pub fn resolve_type_definition_to_annotated(
 
 #[salsa::tracked]
 pub fn resolve_type_variable_to_annotated(
-    db: &dyn HirDatabase,
+    db: &dyn HirDefDatabase,
     module_id: ModuleId,
     type_var_idx: hir::TypeVariableIdx,
 ) -> AnnotatedType {
@@ -566,7 +566,7 @@ pub fn resolve_type_variable_to_annotated(
 mod tests {
     use super::*;
     use crate::tests::TestHirResDatabase;
-    use alloy_hir::BuiltInType;
+    use alloy_hir_def::BuiltInType;
     use alloy_test_harness::idx;
     use alloy_workspace::WorkspaceDatabase;
     use salsa::Database;

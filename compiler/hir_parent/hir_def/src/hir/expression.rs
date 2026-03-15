@@ -317,13 +317,13 @@ fn lower_match_expression(ctx: &mut LoweringCtx, e: &ast::MatchExpr) -> Expressi
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::TestHirDatabase;
+    use crate::tests::TestHirDefDatabase;
     use alloy_test_harness::idx;
     use alloy_workspace::WorkspaceDatabase;
 
     #[test]
     fn resolve_same_module_function_call_trait_reference() {
-        let mut db = TestHirDatabase::default();
+        let mut db = TestHirDefDatabase::default();
         let module_id = db.add_module(
             "test_stuff",
             camino::Utf8Path::new("./test_stuff.alloy"),
@@ -371,7 +371,7 @@ mod tests {
 
     #[test]
     fn resolve_same_module_trait_member_ref_outside_trait() {
-        let mut db = TestHirDatabase::default();
+        let mut db = TestHirDefDatabase::default();
         let module_id = db.add_module(
             "test_stuff",
             camino::Utf8Path::new("./test_stuff.alloy"),

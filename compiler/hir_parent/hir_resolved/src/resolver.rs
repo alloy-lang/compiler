@@ -1,5 +1,5 @@
 use crate::{EPTrFql, Fql, HirResolutionError};
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_scope::{ScopeIdx, Scopes};
 use alloy_workspace::ModuleId;
 use la_arena::Idx;
@@ -19,7 +19,7 @@ pub(crate) trait Resolver<T> {
     ) -> HirResolutionError;
 
     fn validate(
-        db: &dyn hir::HirDatabase,
+        db: &dyn hir::HirDefDatabase,
         source_ref: impl Into<EPTrFql>,
         item_fql: Fql<T>,
         subname: Option<hir::Name>,
@@ -27,7 +27,7 @@ pub(crate) trait Resolver<T> {
 }
 
 pub(crate) fn resolve_by_path<T, R>(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     current_module_id: ModuleId,
     path: &hir::Path,
     source_ref: impl Into<EPTrFql>,

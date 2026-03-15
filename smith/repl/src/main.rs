@@ -87,7 +87,7 @@ fn reedline_repl() {
                     // let source_file = alloy_ast::source_file(syntax).unwrap();
                     //
                     // let ast_statements = source_file.statements();
-                    // let hir_statements = alloy_hir::lower_repl_line(&source_file);
+                    // let hir_statements = alloy_hir_def::lower_repl_line(&source_file);
                     //
                     // dbg!(ast_statements);
                     // dbg!(hir_statements);

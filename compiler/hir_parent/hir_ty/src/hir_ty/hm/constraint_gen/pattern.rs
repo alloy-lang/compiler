@@ -1,5 +1,5 @@
 use super::{HMInferenceContext, MonoType};
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_hir_resolved as res;
 use alloy_hir_resolved::Fql;
 use non_empty_vec::NonEmpty;

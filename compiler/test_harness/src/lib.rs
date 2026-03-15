@@ -13,7 +13,7 @@ use std::{env, fs};
 /// # Example
 ///
 /// ```ignore
-/// alloy_test_harness::test_database!(pub(crate) TestDb: hir::HirDatabase, crate::MyDatabase);
+/// alloy_test_harness::test_database!(pub(crate) TestDb: hir::HirDefDatabase, crate::MyDatabase);
 /// ```
 #[macro_export]
 macro_rules! test_database {
@@ -128,9 +128,9 @@ macro_rules! idx {
 #[macro_export]
 macro_rules! expr_idx {
     ($db:expr, $module_id:expr, $name:expr) => {{
-        let (hir_module, _) = alloy_hir::lower_file($db, $module_id);
+        let (hir_module, _) = alloy_hir_def::lower_file($db, $module_id);
         hir_module
-            .get_expression_by_name(&alloy_hir::Name::new($name), alloy_scope::Scopes::ROOT)
+            .get_expression_by_name(&alloy_hir_def::Name::new($name), alloy_scope::Scopes::ROOT)
             .expect(&format!("failed to find '{}' in {:#?}", $name, hir_module))
             .0
     }};

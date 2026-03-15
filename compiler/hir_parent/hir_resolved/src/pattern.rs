@@ -1,6 +1,6 @@
 use crate::type_definition::resolve_type_definition_by_path_variant;
 use crate::{Fql, HirResolutionError};
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 
@@ -21,7 +21,7 @@ pub enum Pattern {
 
 #[salsa::tracked]
 pub fn resolve_pattern_by_id(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     module_id: ModuleId,
     pat_id: hir::PatternIdx,
 ) -> Result<Pattern, HirResolutionError> {
@@ -48,7 +48,7 @@ pub fn resolve_pattern_by_id(
 }
 
 pub(crate) fn resolve_pattern_by_path(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     module_id: ModuleId,
     path: &hir::Path,
 ) -> Option<Fql<hir::Pattern>> {
@@ -62,7 +62,7 @@ pub(crate) fn resolve_pattern_by_path(
 }
 
 fn resolve_destructure(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     source_ref: &Fql<hir::Pattern>,
     module_id: ModuleId,
     target: &hir::Path,

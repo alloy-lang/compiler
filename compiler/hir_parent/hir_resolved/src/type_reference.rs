@@ -1,12 +1,12 @@
 use crate::{resolver, EPTrFql, Fql, HirResolutionError};
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
 use la_arena::Idx;
 use non_empty_vec::{ne_vec, NonEmpty};
 
 pub fn resolve_type_reference_by_path(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     current_module_id: ModuleId,
     path: &hir::Path,
     source_ref: impl Into<EPTrFql>,
@@ -54,7 +54,7 @@ impl resolver::Resolver<hir::TypeReference> for TypeReferenceResolver {
     }
 
     fn validate(
-        _db: &dyn hir::HirDatabase,
+        _db: &dyn hir::HirDefDatabase,
         source_ref: impl Into<EPTrFql>,
         item_fql: Fql<hir::TypeReference>,
         subname: Option<hir::Name>,
@@ -79,7 +79,7 @@ impl resolver::Resolver<hir::TypeReference> for TypeReferenceResolver {
 mod tests {
     use super::*;
     use crate::tests::TestHirResDatabase;
-    use alloy_hir::{ResolutionIdx, ResolutionKind};
+    use alloy_hir_def::{ResolutionIdx, ResolutionKind};
     use alloy_scope::Scopes;
     use alloy_test_harness::idx;
     use alloy_workspace::WorkspaceDatabase;

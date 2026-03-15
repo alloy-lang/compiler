@@ -1,17 +1,17 @@
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [package]
-name = "alloy_hir"
+name = "alloy_hir_def"
 version = "0.1.0"
 authors = ["theochupp <tclchiam@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-alloy_ast = { path = "../../ast" }
-alloy_diagnostics = { path = "../../diagnostics" }
-alloy_parser = { path = "../../parser" }
-alloy_scope = { path = "../../scope" }
-alloy_syntax = { path = "../../syntax" }
-alloy_workspace = { path = "../../workspace" }
+alloy_ast = { workspace = true }
+alloy_diagnostics = { workspace = true }
+alloy_parser = { workspace = true }
+alloy_scope = { workspace = true }
+alloy_syntax = { workspace = true }
+alloy_workspace = { workspace = true }
 la-arena = { workspace = true }
 non-empty-vec = { workspace = true }
 ordered-float = { workspace = true }
@@ -21,7 +21,7 @@ text-size = { workspace = true }
 itertools = { workspace = true }
 
 [dev-dependencies]
-alloy_parser = {path = "../../parser"}
-alloy_project = { path = "../../project" }
-alloy_test_harness = {path = "../../test_harness"}
+alloy_parser = { workspace = true }
+alloy_project = { workspace = true }
+alloy_test_harness = { workspace = true }
 camino = { workspace = true }

@@ -1,11 +1,11 @@
 use alloy_diagnostics::DiagnosticsReporter;
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_workspace::WorkspaceDatabase;
 use salsa::Database;
 use std::env;
 use std::path::Path;
 
-alloy_test_harness::test_database!(TestHirTyDatabase: hir::HirDatabase, crate::HirTyDatabase);
+alloy_test_harness::test_database!(TestHirTyDatabase: hir::HirDefDatabase, crate::HirTyDatabase);
 
 #[test]
 fn repl_line() {

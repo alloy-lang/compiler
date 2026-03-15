@@ -2,7 +2,7 @@
 
 use crate::diagnostics::TypeInferenceErrorKind;
 use crate::{HirTyDatabase, HirTypedModule};
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_hir_resolved as res;
 use alloy_workspace::ModuleId;
 

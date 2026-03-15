@@ -9,9 +9,9 @@ edition = "2018"
 expect-test = { workspace = true }
 salsa = { workspace = true }
 pretty_assertions = { workspace = true }
-alloy_ast = { path = "../ast" }
-alloy_project = { path = "../project" }
-alloy_workspace = { path = "../workspace" }
+alloy_ast = { workspace = true }
+alloy_project = { workspace = true }
+alloy_workspace = { workspace = true }
 camino = { workspace = true }
 la-arena = { workspace = true }
 

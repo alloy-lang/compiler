@@ -1,4 +1,4 @@
-use crate::{HirDatabase, Name};
+use crate::{HirDefDatabase, Name};
 use alloy_workspace::{ModuleId, VirtualModuleId};
 use non_empty_vec::NonEmpty;
 
@@ -31,7 +31,7 @@ pub struct Fqn {
 
 impl Fqn {
     pub fn resolve(
-        db: &dyn HirDatabase,
+        db: &dyn HirDefDatabase,
         module: impl IntoIterator<Item = impl Into<Name>>,
         local_name: impl Into<Name>,
         sub_path: impl IntoIterator<Item = impl Into<Name>>,
@@ -125,7 +125,7 @@ impl Fqn {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tests::TestHirDatabase;
+    use crate::tests::TestHirDefDatabase;
     use alloy_workspace::WorkspaceDatabase;
     use salsa::Database;
 
@@ -135,7 +135,7 @@ mod tests {
 
     #[test]
     fn test_does_not_shift_into_module_when_subpath_empty() {
-        let mut db = TestHirDatabase::default();
+        let mut db = TestHirDefDatabase::default();
         let test_module_id = db.add_test_module("a::b::c", "");
 
         db.attach(|_| {
@@ -155,7 +155,7 @@ mod tests {
 
     #[test]
     fn test_does_not_shift_into_module_when_subpath_has_1() {
-        let mut db = TestHirDatabase::default();
+        let mut db = TestHirDefDatabase::default();
         let test_module_id = db.add_test_module("a::b::c", "");
 
         db.attach(|_| {
@@ -175,7 +175,7 @@ mod tests {
 
     #[test]
     fn test_shifts_into_module_when_short_module_is_not_found() {
-        let mut db = TestHirDatabase::default();
+        let mut db = TestHirDefDatabase::default();
         let test_module_id = db.add_test_module("a::b::c::d", "");
 
         db.attach(|_| {
@@ -195,7 +195,7 @@ mod tests {
 
     #[test]
     fn test_shifts_into_module_when_subpath_has_more_than_1() {
-        let mut db = TestHirDatabase::default();
+        let mut db = TestHirDefDatabase::default();
         let test_module_id = db.add_test_module("a::b::c::d", "");
 
         db.attach(|_| {
@@ -215,7 +215,7 @@ mod tests {
 
     #[test]
     fn test_matches_longest_module() {
-        let mut db = TestHirDatabase::default();
+        let mut db = TestHirDefDatabase::default();
         let _ = db.add_test_module("a", "");
         let _ = db.add_test_module("a::b", "");
         let _ = db.add_test_module("a::b::c", "");
@@ -239,7 +239,7 @@ mod tests {
 
     #[test]
     fn test_err_when_unable_to_find_root_module() {
-        let db = TestHirDatabase::default();
+        let db = TestHirDefDatabase::default();
 
         let expected_err = FqnResolutionError::UnknownRootModule {
             attempted_module_path: ne_vec(vec!["a"]),
@@ -257,7 +257,7 @@ mod tests {
 
     #[test]
     fn test_err_when_module_is_found_but_extra_subpath() {
-        let mut db = TestHirDatabase::default();
+        let mut db = TestHirDefDatabase::default();
         db.add_test_module("a::b", "");
 
         let expected_err = FqnResolutionError::ExtraSegments {
@@ -278,7 +278,7 @@ mod tests {
 
     #[test]
     fn test_err_when_parent_module_is_found_but_not_child() {
-        let mut db = TestHirDatabase::default();
+        let mut db = TestHirDefDatabase::default();
         let test_module_id = db.add_test_module("a::b::c::d::jk", "");
 
         let expected_err = FqnResolutionError::UnknownChildModule {

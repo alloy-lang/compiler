@@ -1,5 +1,5 @@
 use crate::{EPTrFql, Fql};
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use text_size::TextRange;
@@ -57,7 +57,7 @@ pub enum HirResolutionError {
 }
 
 impl HirResolutionError {
-    pub fn get_range(&self, db: &dyn hir::HirDatabase) -> TextRange {
+    pub fn get_range(&self, db: &dyn hir::HirDefDatabase) -> TextRange {
         match self {
             HirResolutionError::UnresolvedModule { source_ref, .. } => source_ref.text_range(db),
             HirResolutionError::UnknownExpressionReference { source_ref, .. } => {

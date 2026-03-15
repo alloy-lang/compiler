@@ -3,7 +3,7 @@ use salsa::Database;
 use std::env;
 use std::path::Path;
 
-alloy_test_harness::test_database!(TestHirDatabase: crate::HirDatabase);
+alloy_test_harness::test_database!(TestHirDefDatabase: crate::HirDefDatabase);
 
 #[test]
 fn source_file() {
@@ -65,7 +65,7 @@ fn run_hir_test(
     expect_parse_errors: bool,
     expect_lowering_errors: bool,
 ) -> String {
-    let mut db = TestHirDatabase::default();
+    let mut db = TestHirDefDatabase::default();
     db.add_test_module(
         "test_data",
         r"
@@ -124,7 +124,7 @@ fn run_hir_test(
 #[test]
 fn test_std_lib() {
     alloy_test_harness::run_std_lib_tests(
-        |_module_files| TestHirDatabase::default(),
+        |_module_files| TestHirDefDatabase::default(),
         |db, module_file| {
             let path = module_file.path();
             let source = module_file.contents();

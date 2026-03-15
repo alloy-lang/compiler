@@ -1,4 +1,4 @@
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_hir_resolved::EPTdFql;
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
@@ -15,7 +15,7 @@ use diagnostics::*;
 mod tests;
 
 #[salsa::db]
-pub trait HirTyDatabase: hir::HirDatabase {}
+pub trait HirTyDatabase: hir::HirDefDatabase {}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct HirTypedModule {
@@ -105,7 +105,7 @@ mod small_tests {
     };
     use crate::hir_ty::ResolvedType;
     use crate::tests::TestHirTyDatabase;
-    use alloy_hir as hir;
+    use alloy_hir_def as hir;
     use alloy_hir_resolved::{AnnotatedType, EPTdFql, Fql};
     use alloy_scope::Scopes;
     use alloy_test_harness::idx;

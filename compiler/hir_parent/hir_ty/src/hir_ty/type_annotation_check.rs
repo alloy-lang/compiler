@@ -6,8 +6,8 @@
 use crate::diagnostics::{ConflictingTypeAnnotationReason, TypeInferenceErrorKind};
 use crate::hir_ty::ResolvedType;
 use crate::{HirTyDatabase, HirTypedModule};
-use alloy_hir as hir;
-use alloy_hir::TypeIdx;
+use alloy_hir_def as hir;
+use alloy_hir_def::TypeIdx;
 use alloy_hir_resolved as res;
 use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType, Fql};
 use alloy_workspace::ModuleId;

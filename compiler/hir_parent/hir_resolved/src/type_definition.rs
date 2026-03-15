@@ -1,5 +1,5 @@
 use crate::{resolver, EPTrFql, Fql, HirResolutionError};
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
 use la_arena::Idx;
@@ -35,7 +35,7 @@ impl TypeDefinitionMember {
 }
 
 pub(crate) fn resolve_type_definition_by_path_variant(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     module_id: ModuleId,
     path: &hir::Path,
     source_ref: impl Into<EPTrFql> + Clone,
@@ -66,7 +66,7 @@ pub(crate) fn resolve_type_definition_by_path_variant(
 
 #[salsa::tracked]
 pub fn resolve_type_definition_by_ref_id(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     module_id: ModuleId,
     type_idx: hir::TypeIdx,
 ) -> Result<Fql<hir::TypeDefinition>, HirResolutionError> {
@@ -92,7 +92,7 @@ pub fn resolve_type_definition_by_ref_id(
 
 #[salsa::tracked]
 pub fn resolve_type_definition_by_id(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     module_id: ModuleId,
     type_def_idx: hir::TypeDefinitionIdx,
 ) -> Option<TypeDefinition> {
@@ -183,7 +183,7 @@ impl resolver::Resolver<hir::TypeDefinition> for TypeDefinitionResolver {
     }
 
     fn validate(
-        db: &dyn hir::HirDatabase,
+        db: &dyn hir::HirDefDatabase,
         source_ref: impl Into<EPTrFql>,
         type_def_fql: Fql<hir::TypeDefinition>,
         subname: Option<hir::Name>,
@@ -208,7 +208,7 @@ mod tests {
     use super::*;
     use crate::tests::TestHirResDatabase;
     use crate::EPTrFql;
-    use alloy_hir::TypeIdx;
+    use alloy_hir_def::TypeIdx;
     use alloy_test_harness::idx;
     use alloy_workspace::WorkspaceDatabase;
     use non_empty_vec::ne_vec;

@@ -6,10 +6,10 @@ authors = ["theochupp <tclchiam@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-alloy_compiler = { path = "../../compiler" }
-alloy_parser = { path = "../../compiler/parser" }
-alloy_ast = { path = "../../compiler/ast" }
-alloy_hir = { path = "../../compiler/hir_parent/hir" }
+alloy_compiler = { workspace = true }
+alloy_parser = { workspace = true }
+alloy_ast = { workspace = true }
+alloy_hir_def = { workspace = true }
 reedline = "0.32"
 nu-ansi-term = "0.50"
 dirs = "5.0"

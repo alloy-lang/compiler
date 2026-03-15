@@ -7,7 +7,7 @@
 //! - Support for type class constraints (infrastructure, not yet enforced)
 
 use super::Fql;
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_hir_resolved::{EPFql, EPTdFql, HirResolutionError};
 use rustc_hash::{FxHashMap, FxHashSet};
 

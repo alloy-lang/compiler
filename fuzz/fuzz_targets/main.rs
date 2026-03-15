@@ -7,6 +7,6 @@ fuzz_target!(|data: &[u8]| {
         let parse = alloy_parser::parse(s);
         let syntax = parse.syntax();
         let source_file = alloy_ast::SourceFile::cast(syntax).unwrap();
-        let (_database, _stmts) = alloy_hir::lower(&source_file);
+        let (_database, _stmts) = alloy_hir_def::lower(&source_file);
     }
 });

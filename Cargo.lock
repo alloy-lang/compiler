@@ -26,7 +26,7 @@ name = "alloy_compiler"
 version = "0.1.0"
 dependencies = [
  "alloy_ast",
- "alloy_hir",
+ "alloy_hir_def",
  "alloy_hir_typed",
  "alloy_parser",
  "alloy_project",
@@ -50,7 +50,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "alloy_hir"
+name = "alloy_hir_def"
 version = "0.1.0"
 dependencies = [
  "alloy_ast",
@@ -76,7 +76,7 @@ name = "alloy_hir_resolved"
 version = "0.1.0"
 dependencies = [
  "alloy_ast",
- "alloy_hir",
+ "alloy_hir_def",
  "alloy_project",
  "alloy_scope",
  "alloy_test_harness",
@@ -95,7 +95,7 @@ version = "0.1.0"
 dependencies = [
  "alloy_ast",
  "alloy_diagnostics",
- "alloy_hir",
+ "alloy_hir_def",
  "alloy_hir_resolved",
  "alloy_project",
  "alloy_scope",
@@ -160,7 +160,7 @@ version = "0.1.0"
 dependencies = [
  "alloy_ast",
  "alloy_compiler",
- "alloy_hir",
+ "alloy_hir_def",
  "alloy_parser",
  "dirs",
  "expect-test",

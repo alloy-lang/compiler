@@ -76,7 +76,7 @@ pub enum HirReferenceType {
 
 pub(crate) struct LoweringCtx<'db> {
     #[allow(dead_code)]
-    db: &'db dyn HirDatabase,
+    db: &'db dyn HirDefDatabase,
     glossary: AstGlossary,
     imports: Index<Import>,
     expressions: Index<Expression>,
@@ -94,7 +94,7 @@ pub(crate) struct LoweringCtx<'db> {
 }
 
 impl<'db> LoweringCtx<'db> {
-    pub(crate) fn new(db: &'db dyn HirDatabase, glossary: AstGlossary) -> Self {
+    pub(crate) fn new(db: &'db dyn HirDefDatabase, glossary: AstGlossary) -> Self {
         Self {
             db,
             glossary,
@@ -655,7 +655,7 @@ impl<'db> LoweringCtx<'db> {
 /// Returns both parse errors and the HIR module.
 #[salsa::tracked]
 pub fn lower_file<'db>(
-    db: &'db dyn HirDatabase,
+    db: &'db dyn HirDefDatabase,
     module_id: ModuleId,
 ) -> (HirModule, Vec<alloy_parser::ParseError>) {
     let (source_file, parse_errors) = ast::parse_source_file(db, module_id);
@@ -669,7 +669,7 @@ pub fn lower_file<'db>(
 
 #[must_use]
 pub fn lower_source_file<'db>(
-    db: &'db dyn HirDatabase,
+    db: &'db dyn HirDefDatabase,
     source_file: &'db ast::SourceFile,
 ) -> HirModule {
     let glossary = AstGlossary::summarize_source_file(source_file);
@@ -681,7 +681,7 @@ pub fn lower_source_file<'db>(
 
 #[cfg(test)]
 mod tests {
-    use crate::tests::TestHirDatabase;
+    use crate::tests::TestHirDefDatabase;
     use crate::{Expression, Name, Path, ResolutionIdx, ResolutionKind};
     use alloy_scope::Scopes;
     use alloy_test_harness::idx;
@@ -692,7 +692,7 @@ mod tests {
         let module_path = camino::Utf8Path::new("./test/test.alloy");
         let module_slug = "test";
 
-        let mut db = TestHirDatabase::default();
+        let mut db = TestHirDefDatabase::default();
         let module_id = db.add_module(
             module_slug,
             module_path,
@@ -724,7 +724,7 @@ mod tests {
 
     #[test]
     fn resolve_same_module_function_call_trait_reference() {
-        let mut db = TestHirDatabase::default();
+        let mut db = TestHirDefDatabase::default();
         let module_id = db.add_module(
             "test_stuff",
             camino::Utf8Path::new("./test_stuff.alloy"),

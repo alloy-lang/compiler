@@ -2,7 +2,7 @@ use super::super::inference::annotated_to_mono;
 use super::super::PolyType;
 use super::{HMInferenceContext, MonoType};
 use crate::hir_ty::hm::constraint_gen::pattern::infer_pattern_hm;
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_hir_resolved as res;
 use alloy_hir_resolved::{resolve_annotated_type, EPFql, EPTdFql, Fql, TypeDefinitionKind};
 use non_empty_vec::NonEmpty;

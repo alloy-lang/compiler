@@ -48,7 +48,7 @@ pub fn compile(
     let mut lowering_warnings = HashMap::new();
 
     for module_id in module_ids.iter() {
-        let (hir_module, module_parse_errors) = alloy_hir::lower_file(db, *module_id);
+        let (hir_module, module_parse_errors) = alloy_hir_def::lower_file(db, *module_id);
 
         // Collect parse errors
         if !module_parse_errors.is_empty() {

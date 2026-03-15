@@ -1,5 +1,5 @@
 use crate::{resolve_trait_by_ref_id, resolver, EPTrFql, Fql, HirResolutionError};
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_scope::ScopeIdx;
 use la_arena::Idx;
 use non_empty_vec::NonEmpty;
@@ -18,7 +18,7 @@ pub enum TypeVariableConstraint {
 
 #[salsa::tracked]
 pub fn resolve_type_variable_by_id(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     module_id: alloy_workspace::ModuleId,
     type_var_idx: hir::TypeVariableIdx,
 ) -> (TypeVariable, Vec<HirResolutionError>) {
@@ -103,7 +103,7 @@ impl resolver::Resolver<hir::TypeVariable> for TypeVariableResolver {
     }
 
     fn validate(
-        _db: &dyn hir::HirDatabase,
+        _db: &dyn hir::HirDefDatabase,
         _source_ref: impl Into<EPTrFql>,
         _type_def_fql: Fql<hir::TypeVariable>,
         _subname: Option<hir::Name>,

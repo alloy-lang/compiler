@@ -18,7 +18,7 @@
 mod expr;
 mod pattern;
 
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 
 use super::{HMInferenceContext, MonoType};
 

@@ -7,8 +7,8 @@ use super::TypeVarId;
 use super::{HMInferenceContext, MonoType};
 use crate::diagnostics::TypeInferenceErrorKind;
 use crate::{HirTyDatabase, HirTypedModule};
-use alloy_hir as hir;
-use alloy_hir::{Name, TypeDefinition};
+use alloy_hir_def as hir;
+use alloy_hir_def::{Name, TypeDefinition};
 use alloy_hir_resolved::{
     resolve_annotated_expression, resolve_annotated_type, AnnotatedType, EPTdFql, TypeVarReference,
 };

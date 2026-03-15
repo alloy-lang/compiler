@@ -1,7 +1,7 @@
 use crate::hir_ty::ResolvedType;
 use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, Severity};
-use alloy_hir as hir;
-use alloy_hir::FqnResolutionError;
+use alloy_hir_def as hir;
+use alloy_hir_def::FqnResolutionError;
 use alloy_hir_resolved::{AnnotatedType, HirResolutionError};
 use itertools::Itertools;
 use text_size::TextRange;

@@ -1,7 +1,7 @@
 use crate::type_definition::resolve_type_definition_by_ref_id;
 use crate::type_variable::{resolve_type_variable_by_id, TypeVariable};
 use crate::{resolve_trait_by_ref_id, Fql, HirResolutionError};
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
 use std::collections::hash_map::Iter;
@@ -37,7 +37,7 @@ impl Behavior {
 
 #[salsa::tracked]
 pub fn resolve_behavior_by_id(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     module_id: ModuleId,
     behavior_id: hir::BehaviorIdx,
 ) -> Behavior {

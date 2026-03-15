@@ -1,7 +1,7 @@
 mod behavior_validation;
 mod type_annotation_check;
 
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_hir_resolved::Fql;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;

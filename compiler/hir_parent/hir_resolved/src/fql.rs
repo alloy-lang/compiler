@@ -1,4 +1,4 @@
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_workspace::ModuleId;
 use la_arena::Idx;
 use std::hash::Hash;
@@ -20,45 +20,45 @@ impl<T> Fql<T> {
 }
 
 impl Fql<hir::Trait> {
-    pub fn trait_name(&self, db: &dyn hir::HirDatabase) -> hir::Name {
+    pub fn trait_name(&self, db: &dyn hir::HirDefDatabase) -> hir::Name {
         let (hir_module, _) = hir::lower_file(db, self.module_id);
         hir_module.get_trait(self.local_id).name().clone()
     }
 
-    pub fn text_range(&self, db: &dyn hir::HirDatabase) -> TextRange {
+    pub fn text_range(&self, db: &dyn hir::HirDefDatabase) -> TextRange {
         let (hir_module, _) = hir::lower_file(db, self.module_id);
         hir_module.get_trait_range(self.local_id)
     }
 }
 
 impl Fql<hir::TypeDefinition> {
-    pub fn type_def_name(&self, db: &dyn hir::HirDatabase) -> hir::Name {
+    pub fn type_def_name(&self, db: &dyn hir::HirDefDatabase) -> hir::Name {
         let (hir_module, _) = hir::lower_file(db, self.module_id);
         hir_module.get_type_definition(self.local_id).name.clone()
     }
 
-    pub fn text_range(&self, db: &dyn hir::HirDatabase) -> TextRange {
+    pub fn text_range(&self, db: &dyn hir::HirDefDatabase) -> TextRange {
         let (hir_module, _) = hir::lower_file(db, self.module_id);
         hir_module.get_type_definition_range(self.local_id)
     }
 }
 
 impl Fql<hir::Expression> {
-    pub fn text_range(&self, db: &dyn hir::HirDatabase) -> TextRange {
+    pub fn text_range(&self, db: &dyn hir::HirDefDatabase) -> TextRange {
         let (hir_module, _) = hir::lower_file(db, self.module_id);
         hir_module.get_expression_range(self.local_id)
     }
 }
 
 impl Fql<hir::Pattern> {
-    pub fn text_range(&self, db: &dyn hir::HirDatabase) -> TextRange {
+    pub fn text_range(&self, db: &dyn hir::HirDefDatabase) -> TextRange {
         let (hir_module, _) = hir::lower_file(db, self.module_id);
         hir_module.get_pattern_range(self.local_id)
     }
 }
 
 impl Fql<hir::TypeReference> {
-    pub fn text_range(&self, db: &dyn hir::HirDatabase) -> TextRange {
+    pub fn text_range(&self, db: &dyn hir::HirDefDatabase) -> TextRange {
         let (hir_module, _) = hir::lower_file(db, self.module_id);
         hir_module.get_type_reference_range(self.local_id)
     }
@@ -136,7 +136,7 @@ impl EPTrFql {
         }
     }
 
-    pub fn text_range(&self, db: &dyn hir::HirDatabase) -> TextRange {
+    pub fn text_range(&self, db: &dyn hir::HirDefDatabase) -> TextRange {
         match self {
             EPTrFql::Expression(fql) => fql.text_range(db),
             EPTrFql::Pattern(fql) => fql.text_range(db),
@@ -200,7 +200,7 @@ impl EPTdFql {
         }
     }
 
-    pub fn text_range(&self, db: &dyn hir::HirDatabase) -> TextRange {
+    pub fn text_range(&self, db: &dyn hir::HirDefDatabase) -> TextRange {
         match self {
             EPTdFql::Expression(fql) => fql.text_range(db),
             EPTdFql::Pattern(fql) => fql.text_range(db),

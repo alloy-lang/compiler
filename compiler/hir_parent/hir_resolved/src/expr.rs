@@ -6,7 +6,7 @@ use crate::r#trait::resolve_abstract_trait_member_by_path;
 use crate::resolver::resolve_by_path;
 use crate::type_definition::resolve_type_definition_by_path_variant;
 use crate::{EPFql, Fql};
-use alloy_hir as hir;
+use alloy_hir_def as hir;
 use alloy_scope::ScopeIdx;
 use alloy_workspace::ModuleId;
 use la_arena::Idx;
@@ -70,7 +70,7 @@ pub enum Expression {
 
 #[salsa::tracked]
 pub fn resolve_expression_by_id(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     module_id: ModuleId,
     expr_id: hir::ExpressionIdx,
 ) -> Result<Expression, HirResolutionError> {
@@ -133,7 +133,7 @@ pub fn resolve_expression_by_id(
 }
 
 fn resolve_variable_ref(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     source_ref: &Fql<hir::Expression>,
     module_id: ModuleId,
     path: &hir::Path,
@@ -165,7 +165,7 @@ fn resolve_variable_ref(
 }
 
 fn resolve_function_call(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     source_ref: &Fql<hir::Expression>,
     module_id: ModuleId,
     target: &hir::Path,
@@ -196,7 +196,7 @@ fn resolve_function_call(
 }
 
 fn find_function_target(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     source_ref: &Fql<hir::Expression>,
     module_id: ModuleId,
     target: &hir::Path,
@@ -256,7 +256,7 @@ impl resolver::Resolver<hir::Expression> for ExpressionResolver {
     }
 
     fn validate(
-        _db: &dyn hir::HirDatabase,
+        _db: &dyn hir::HirDefDatabase,
         source_ref: impl Into<EPTrFql>,
         item_fql: Fql<hir::Expression>,
         subname: Option<hir::Name>,
@@ -282,14 +282,14 @@ mod tests {
     use super::{resolve_expression_by_id, Expression};
     use crate::tests::TestHirResDatabase;
     use crate::{resolve_pattern_by_id, EPFql, EPTdFql, EPTrFql, Fql, HirResolutionError, Pattern};
-    use alloy_hir as hir;
-    use alloy_hir::Name;
+    use alloy_hir_def as hir;
+    use alloy_hir_def::Name;
     use alloy_test_harness::idx;
     use alloy_workspace::{ModuleId, VirtualModuleId, WorkspaceDatabase};
     use non_empty_vec::ne_vec;
 
     fn maybe_find_example(
-        db: &dyn hir::HirDatabase,
+        db: &dyn hir::HirDefDatabase,
         module_id: ModuleId,
     ) -> Result<Expression, HirResolutionError> {
         let (hir_module, _) = hir::lower_file(db, module_id);
@@ -299,7 +299,7 @@ mod tests {
         resolve_expression_by_id(db, module_id, idx)
     }
 
-    fn find_example(db: &dyn hir::HirDatabase, module_id: ModuleId) -> Expression {
+    fn find_example(db: &dyn hir::HirDefDatabase, module_id: ModuleId) -> Expression {
         let actual = maybe_find_example(db, module_id).expect("must find expression");
         let Expression::VariableRef(EPFql::Expression(fql)) = actual else {
             panic!("expected actual to be VariableRef, but was {:?}", actual);
