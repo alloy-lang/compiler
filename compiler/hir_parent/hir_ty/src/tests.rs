@@ -2,8 +2,8 @@ use alloy_diagnostics::DiagnosticsReporter;
 use alloy_hir as hir;
 use alloy_workspace::WorkspaceDatabase;
 use salsa::Database;
+use std::env;
 use std::path::Path;
-use std::{env, fs};
 
 alloy_test_harness::test_database!(TestHirTyDatabase: hir::HirDatabase, crate::HirTyDatabase);
 
@@ -77,20 +77,6 @@ fn run_hir_ty_test(
     let test = Test(0)
     let new = |t| -> Test(t)
     ",
-    );
-    db.add_module(
-        "std::option",
-        camino::Utf8Path::new("/std/src/option.alloy"),
-        fs::read_to_string("../../std/src/option.alloy")
-            .expect("Expected to read std/src/option.alloy")
-            .as_str(),
-    );
-    db.add_module(
-        "std::function",
-        camino::Utf8Path::new("/std/src/function.alloy"),
-        fs::read_to_string("../../std/src/function.alloy")
-            .expect("Expected to read std/src/function.alloy")
-            .as_str(),
     );
     let test_module_id = db.add_module("main", camino::Utf8Path::new("./test/main.alloy"), input);
 

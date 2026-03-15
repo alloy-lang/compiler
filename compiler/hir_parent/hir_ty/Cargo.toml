@@ -6,12 +6,12 @@ authors = ["theochupp <tclchiam@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-alloy_ast = { path = "../ast" }
-alloy_diagnostics = { path = "../diagnostics" }
+alloy_ast = { path = "../../ast" }
+alloy_diagnostics = { path = "../../diagnostics" }
 alloy_hir = {path = "../hir"}
 alloy_hir_resolved = {path = "../hir_resolved"}
-alloy_workspace = {path = "../workspace"}
-alloy_scope = { path = "../scope" }
+alloy_workspace = {path = "../../workspace"}
+alloy_scope = { path = "../../scope" }
 la-arena = { workspace = true }
 rustc-hash = { workspace = true }
 non-empty-vec = { workspace = true }
@@ -20,8 +20,8 @@ text-size = { workspace = true }
 itertools = { workspace = true }
 
 [dev-dependencies]
-alloy_test_harness = {path = "../test_harness"}
-alloy_project = { path = "../project" }
-alloy_workspace = {path = "../workspace"}
+alloy_test_harness = {path = "../../test_harness"}
+alloy_project = { path = "../../project" }
+alloy_workspace = {path = "../../workspace"}
 camino = { workspace = true }
 maplit = { workspace = true }

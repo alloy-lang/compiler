@@ -8,8 +8,8 @@ edition = "2018"
 
 [dependencies]
 alloy_ast = { path = "./ast" }
-alloy_hir = { path = "./hir" }
-alloy_hir_typed = { path = "./hir_ty" }
+alloy_hir = { path = "./hir_parent/hir" }
+alloy_hir_typed = { path = "./hir_parent/hir_ty" }
 alloy_parser = { path = "./parser" }
 alloy_project = { path = "./project" }
 alloy_workspace = { path = "./workspace" }

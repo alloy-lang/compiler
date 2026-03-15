@@ -16,6 +16,6 @@ path = "fuzz_targets/main.rs"
 
 [dependencies]
 alloy_ast = {path = "../compiler/ast"}
-alloy_hir = {path = "../compiler/hir"}
+alloy_hir = {path = "../compiler/hir_parent/hir"}
 alloy_parser = {path = "../compiler/parser"}
 libfuzzer-sys = "0.4"

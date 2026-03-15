@@ -33,7 +33,11 @@ macro_rules! test_database {
                     workspace: Default::default(),
                 };
 
-                let project = alloy_project::Project::new("../../std").expect("expected project to be created");
+                let project = alloy_project::Project::new("../../std")
+                .or_else(|_| {
+                    alloy_project::Project::new("../../../std")
+                })
+                .expect("expected project to be created");
                 for module in project.modules() {
                     let path = module.path();
                     let contents = std::fs::read_to_string(path).expect("expected to read module file");
@@ -209,7 +213,9 @@ pub fn run_std_lib_tests<C: RefUnwindSafe>(
     init: impl Fn(&[&ModuleFile]) -> C + RefUnwindSafe + UnwindSafe,
     test_fn: impl Fn(&mut C, &ModuleFile) + RefUnwindSafe + UnwindSafe,
 ) {
-    let project = Project::new("../../std").expect("expected project to be created");
+    let project = Project::new("../../std")
+        .or_else(|_| Project::new("../../../std"))
+        .expect("expected project to be created");
 
     let mut failed_tests = vec![];
     for module_file in project.modules() {

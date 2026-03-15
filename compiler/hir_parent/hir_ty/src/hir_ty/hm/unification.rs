@@ -147,7 +147,10 @@ fn unify_types(t1: &MonoType, t2: &MonoType) -> Result<Substitution, Unification
         (MonoType::Unit, MonoType::Unit) => Ok(Substitution::new()),
 
         // Mismatch
-        _ => Err(UnificationError::TypeMismatch(Box::new(t1.clone()), Box::new(t2.clone()))),
+        _ => Err(UnificationError::TypeMismatch(
+            Box::new(t1.clone()),
+            Box::new(t2.clone()),
+        )),
     }
 }
 
