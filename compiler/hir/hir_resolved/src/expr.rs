@@ -223,7 +223,7 @@ fn find_function_target(
 }
 
 pub fn resolve_custom_binary_operator(
-    db: &dyn hir::HirDatabase,
+    db: &dyn hir::HirDefDatabase,
     source_ref: &Fql<hir::Expression>,
     operator_path: &hir::Path,
 ) -> Result<Fql<hir::Expression>, HirResolutionError> {
