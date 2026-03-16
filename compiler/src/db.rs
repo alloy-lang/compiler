@@ -52,4 +52,7 @@ impl alloy_ast::AstDatabase for CompilerDatabase {}
 impl alloy_hir_def::HirDefDatabase for CompilerDatabase {}
 
 #[salsa::db]
+impl alloy_hir_infer::HirInferDatabase for CompilerDatabase {}
+
+#[salsa::db]
 impl alloy_hir_typed::HirTyDatabase for CompilerDatabase {}

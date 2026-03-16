@@ -1,0 +1,64 @@
+trait TestTrait where
+  self = #Type[_]
+  typeof test_func : (a -> self[b]) -> self[a] -> self[b] where
+    typevar a
+    typevar b
+end
+
+typeof (=<<) : (t1 -> m[t2]) -> m[t1] -> m[t2] where
+  typevar m = TestTrait
+  typevar t1
+  typevar t2
+let (=<<) = TestTrait::test_func
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): Lambda {
+            arg_type: Lambda {
+                arg_type: Generic(
+                    0,
+                ),
+                return_type: Bounded {
+                    base: Generic(
+                        1,
+                    ),
+                    args: [
+                        Generic(
+                            2,
+                        ),
+                    ],
+                },
+            },
+            return_type: Lambda {
+                arg_type: Bounded {
+                    base: Generic(
+                        1,
+                    ),
+                    args: [
+                        Generic(
+                            0,
+                        ),
+                    ],
+                },
+                return_type: Bounded {
+                    base: Generic(
+                        1,
+                    ),
+                    args: [
+                        Generic(
+                            2,
+                        ),
+                    ],
+                },
+            },
+        },
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [],
+    poly_instantiations: {},
+}
+[]

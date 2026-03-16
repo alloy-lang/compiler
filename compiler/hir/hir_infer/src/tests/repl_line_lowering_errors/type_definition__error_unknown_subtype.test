@@ -1,0 +1,57 @@
+typedef Either =
+  | Left
+  | Right
+
+let unknown = Either::Nothing
+
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): Generic(
+            0,
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: HirResolutionError(
+                UnknownTypeDefinitionVariant {
+                    source_ref: Expression(
+                        Fql {
+                            module_id: ModuleId {
+                                path: "main",
+                            },
+                            local_id: Idx::<Expression>(0),
+                        },
+                    ),
+                    target_type_fql: Fql {
+                        module_id: ModuleId {
+                            path: "main",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    variant_name: "Nothing",
+                },
+            ),
+            range: 37..67,
+        },
+    ],
+    poly_instantiations: {},
+}
+[]
+[E32006] Error: Unknown variant `Nothing`
+   ╭─[ ./test/main.alloy:5:1 ]
+   │
+ 5 │ let unknown = Either::Nothing
+   │ ───────────────┬──────────────  
+   │                ╰──────────────── variant `Nothing` not found
+   │ 
+   │ Help: No variant named `Nothing` exists on this type
+───╯
+
+
+

@@ -16,7 +16,7 @@ HirTypedModule {
     pattern_types: {},
     warnings: [],
     errors: [
-        TypeInferenceError {
+        TypeCheckingError {
             kind: HirResolutionError(
                 UnresolvedModule {
                     source_ref: TypeReference(
@@ -42,7 +42,7 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
-[E003] Error: Cannot find module 'other'
+[E21001] Error: Cannot find module 'other'
    ╭─[ ./test/main.alloy:7:1 ]
    │
  7 │ ╭─▶ behavior TestTrait1 for other::Type1 where

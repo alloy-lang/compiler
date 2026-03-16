@@ -83,6 +83,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "alloy_hir_infer"
+version = "0.1.0"
+dependencies = [
+ "alloy_ast",
+ "alloy_diagnostics",
+ "alloy_hir_def",
+ "alloy_hir_resolved",
+ "alloy_project",
+ "alloy_scope",
+ "alloy_test_harness",
+ "alloy_workspace",
+ "camino",
+ "itertools 0.14.0",
+ "la-arena",
+ "maplit",
+ "non-empty-vec",
+ "rustc-hash 1.1.0",
+ "salsa",
+ "text-size",
+]
+
+[[package]]
 name = "alloy_hir_resolved"
 version = "0.1.0"
 dependencies = [
@@ -107,6 +129,7 @@ dependencies = [
  "alloy_ast",
  "alloy_diagnostics",
  "alloy_hir_def",
+ "alloy_hir_infer",
  "alloy_hir_resolved",
  "alloy_project",
  "alloy_scope",

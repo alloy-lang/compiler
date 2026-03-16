@@ -1,0 +1,118 @@
+typedef Option[t] =
+  | None
+  | Some(t)
+end
+
+let constructor_example = Option::Some
+
+let string_example = constructor_example("hello")
+let int_example = constructor_example(10)
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): Lambda {
+            arg_type: BuiltIn(
+                String,
+            ),
+            return_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "main",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Option",
+                ),
+                args: [
+                    BuiltIn(
+                        String,
+                    ),
+                ],
+            },
+        },
+        Idx::<Expression>(2): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Option",
+            ),
+            args: [
+                BuiltIn(
+                    String,
+                ),
+            ],
+        },
+        Idx::<Expression>(4): Generic(
+            1,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnificationError(
+                TypeMismatch(
+                    Concrete(
+                        String,
+                    ),
+                    Concrete(
+                        Int,
+                    ),
+                ),
+            ),
+            range: 136..177,
+        },
+    ],
+    poly_instantiations: {
+        TypeDefinitionVariant(
+            Fql {
+                module_id: ModuleId {
+                    path: "main",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Some",
+        ): [
+            PolyInstantiation {
+                call_site: Fql {
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    local_id: Idx::<Expression>(0),
+                },
+                type_args: [
+                    BuiltIn(
+                        String,
+                    ),
+                ],
+            },
+        ],
+    },
+}
+[]
+[E33001] Error: Type mismatch: expected `String`, found `Int`
+   ╭─[ ./test/main.alloy:9:1 ]
+   │
+ 9 │ let int_example = constructor_example(10)
+   │ ────────────────────┬────────────────────  
+   │                     ╰────────────────────── expected `String`, found `Int`
+   │ 
+   │ Help: These types must be compatible
+───╯
+
+
+

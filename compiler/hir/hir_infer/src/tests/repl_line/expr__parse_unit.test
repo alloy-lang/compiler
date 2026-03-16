@@ -1,0 +1,15 @@
+()
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): Unit,
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [],
+    poly_instantiations: {},
+}
+[]

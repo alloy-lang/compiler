@@ -1,0 +1,52 @@
+(1+
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [],
+    poly_instantiations: {},
+}
+[
+    ParseError {
+        expected: [
+            Integer,
+            Fraction,
+            String,
+            Char,
+            Ident,
+            OpIdent,
+            Minus,
+            LParen,
+            IfKw,
+            MatchKw,
+            Pipe,
+        ],
+        kind: Missing {
+            offset: 3,
+        },
+        context: ParenExprExpr,
+    },
+    ParseError {
+        expected: [
+            RParen,
+        ],
+        kind: Missing {
+            offset: 3,
+        },
+        context: ParenExprRightParen,
+    },
+]

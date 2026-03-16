@@ -1,0 +1,31 @@
+import std::option::Option
+
+|Option::None| -> 5
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): Lambda {
+            arg_type: Generic(
+                0,
+            ),
+            return_type: BuiltIn(
+                Int,
+            ),
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+        ),
+    },
+    warnings: [],
+    errors: [],
+    poly_instantiations: {},
+}
+[]

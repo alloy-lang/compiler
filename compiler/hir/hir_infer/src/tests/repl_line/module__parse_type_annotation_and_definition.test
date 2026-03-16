@@ -1,0 +1,202 @@
+module TestModule1 where
+    import test_data
+    import test_data::Test
+    import std::function::(<|)
+
+    typeof testThing : (t2 -> t1) -> t2 -> t2 -> Test[(t1, t1)] where
+      typevar t1
+      typevar t2
+    let testThing = |funky, x, y| -> test_data::new <| (funky(x), funky(y))
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): Lambda {
+            arg_type: Tuple(
+                NonEmpty(
+                    [
+                        Generic(
+                            3,
+                        ),
+                        Generic(
+                            3,
+                        ),
+                    ],
+                ),
+            ),
+            return_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "test_data",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Test",
+                ),
+                args: [
+                    Tuple(
+                        NonEmpty(
+                            [
+                                Generic(
+                                    3,
+                                ),
+                                Generic(
+                                    3,
+                                ),
+                            ],
+                        ),
+                    ),
+                ],
+            },
+        },
+        Idx::<Expression>(7): Lambda {
+            arg_type: Lambda {
+                arg_type: Generic(
+                    2,
+                ),
+                return_type: Generic(
+                    3,
+                ),
+            },
+            return_type: Lambda {
+                arg_type: Generic(
+                    2,
+                ),
+                return_type: Lambda {
+                    arg_type: Generic(
+                        2,
+                    ),
+                    return_type: Bounded {
+                        base: TypeDef(
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "test_data",
+                                },
+                                local_id: Idx::<TypeDefinition>(0),
+                            },
+                            "Test",
+                        ),
+                        args: [
+                            Tuple(
+                                NonEmpty(
+                                    [
+                                        Generic(
+                                            3,
+                                        ),
+                                        Generic(
+                                            3,
+                                        ),
+                                    ],
+                                ),
+                            ),
+                        ],
+                    },
+                },
+            },
+        },
+        Idx::<Expression>(4): Generic(
+            3,
+        ),
+        Idx::<Expression>(1): Generic(
+            2,
+        ),
+        Idx::<Expression>(5): Tuple(
+            NonEmpty(
+                [
+                    Generic(
+                        3,
+                    ),
+                    Generic(
+                        3,
+                    ),
+                ],
+            ),
+        ),
+        Idx::<Expression>(2): Generic(
+            3,
+        ),
+        Idx::<Expression>(6): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                Tuple(
+                    NonEmpty(
+                        [
+                            Generic(
+                                3,
+                            ),
+                            Generic(
+                                3,
+                            ),
+                        ],
+                    ),
+                ),
+            ],
+        },
+        Idx::<Expression>(3): Generic(
+            2,
+        ),
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Lambda {
+            arg_type: Generic(
+                2,
+            ),
+            return_type: Generic(
+                3,
+            ),
+        },
+        Idx::<Pattern>(1): Generic(
+            2,
+        ),
+        Idx::<Pattern>(2): Generic(
+            2,
+        ),
+    },
+    warnings: [],
+    errors: [],
+    poly_instantiations: {
+        TypeDefinition(
+            Fql {
+                module_id: ModuleId {
+                    path: "test_data",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+        ): [
+            PolyInstantiation {
+                call_site: Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<Expression>(3),
+                },
+                type_args: [
+                    Tuple(
+                        NonEmpty(
+                            [
+                                Generic(
+                                    3,
+                                ),
+                                Generic(
+                                    3,
+                                ),
+                            ],
+                        ),
+                    ),
+                ],
+            },
+        ],
+    },
+}
+[]

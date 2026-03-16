@@ -18,7 +18,7 @@ HirTypedModule {
     pattern_types: {},
     warnings: [],
     errors: [
-        TypeInferenceError {
+        TypeCheckingError {
             kind: HirResolutionError(
                 BoundedTraitReference {
                     source_ref: Fql {
@@ -41,7 +41,7 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
-[E003] Error: Bounded trait reference resolution not yet implemented
+[E32010] Error: Bounded trait reference resolution not yet implemented
     ╭─[ ./test/main.alloy:7:1 ]
     │
   7 │ ╭─▶ behavior Trait1[t1, t2] for Type1 where

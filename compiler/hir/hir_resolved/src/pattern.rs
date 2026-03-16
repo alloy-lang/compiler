@@ -10,7 +10,11 @@ pub enum Pattern {
     Literal(hir::Literal),
     VariableDeclaration,
     Nil,
-    Destructure {
+    DataDestructure {
+        target: Fql<hir::TypeDefinition>,
+        args: Vec<Fql<hir::Pattern>>,
+    },
+    VariantDestructure {
         target: Fql<hir::TypeDefinition>,
         variant_name: hir::Name,
         args: Vec<Fql<hir::Pattern>>,
@@ -77,13 +81,13 @@ fn resolve_destructure(
         .collect::<Vec<_>>();
 
     let Some(variant_name) = variant_name else {
-        return Err(HirResolutionError::MissingTypeDefinitionVariant {
-            source_ref: source_ref.into(),
-            target_type_fql: type_def_fql,
+        return Ok(Pattern::DataDestructure {
+            target: type_def_fql,
+            args: fql_args,
         });
     };
 
-    Ok(Pattern::Destructure {
+    Ok(Pattern::VariantDestructure {
         target: type_def_fql,
         variant_name,
         args: fql_args,
@@ -100,7 +104,7 @@ mod tests {
     use non_empty_vec::ne_vec;
 
     #[test]
-    fn test_destructure_pattern_resolves() {
+    fn test_destructure_pattern_resolves_from_variant_constructor() {
         let mut db = TestHirResDatabase::new_with_stdlib();
         let module_id = db.add_module(
             "test",
@@ -118,7 +122,7 @@ mod tests {
         let actual_1 =
             resolve_pattern_by_id(&db, module_id, idx!(1)).expect("expected to resolve pattern");
         assert_eq!(
-            Pattern::Destructure {
+            Pattern::VariantDestructure {
                 target: Fql {
                     module_id: ModuleId::new(&db, "std::option"),
                     local_id: idx!(0),
@@ -130,6 +134,48 @@ mod tests {
                 }],
             },
             actual_1
+        );
+    }
+
+    #[test]
+    fn test_destructure_pattern_resolves_from_data_constructor() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+    typedef Point = Point(Int, Int)
+    let unwrap = |Point(x, y)| -> x + y
+            ",
+        );
+
+        let actual_0 =
+            resolve_pattern_by_id(&db, module_id, idx!(0)).expect("expected to resolve pattern");
+        assert_eq!(Pattern::VariableDeclaration, actual_0);
+
+        let actual_1 =
+            resolve_pattern_by_id(&db, module_id, idx!(1)).expect("expected to resolve pattern");
+
+        let actual_2 =
+            resolve_pattern_by_id(&db, module_id, idx!(2)).expect("expected to resolve pattern");
+        assert_eq!(
+            Pattern::DataDestructure {
+                target: Fql {
+                    module_id: ModuleId::new(&db, "test"),
+                    local_id: idx!(0),
+                },
+                args: vec![
+                    Fql {
+                        module_id,
+                        local_id: idx!(0),
+                    },
+                    Fql {
+                        module_id,
+                        local_id: idx!(1),
+                    }
+                ],
+            },
+            actual_2,
         );
     }
 

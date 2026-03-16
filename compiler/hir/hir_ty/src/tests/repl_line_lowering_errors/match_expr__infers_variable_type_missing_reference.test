@@ -30,23 +30,28 @@ HirTypedModule {
     },
     warnings: [],
     errors: [
-        TypeInferenceError {
-            kind: HirResolutionError(
-                UnknownExpressionReference {
-                    source_ref: Fql {
-                        module_id: ModuleId {
-                            path: "main",
+        TypeCheckingError {
+            kind: InferenceError(
+                TypeInferenceError {
+                    kind: HirResolutionError(
+                        UnknownExpressionReference {
+                            source_ref: Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<Expression>(0),
+                            },
+                            module_id: ModuleId {
+                                path: "main",
+                            },
+                            path: NonEmpty(
+                                [
+                                    "test",
+                                ],
+                            ),
                         },
-                        local_id: Idx::<Expression>(0),
-                    },
-                    module_id: ModuleId {
-                        path: "main",
-                    },
-                    path: NonEmpty(
-                        [
-                            "test",
-                        ],
                     ),
+                    range: 6..11,
                 },
             ),
             range: 6..11,
@@ -55,7 +60,7 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
-[E003] Error: Cannot find value `test` in this scope
+[E32002] Error: Cannot find value `test` in this scope
    ╭─[ ./test/main.alloy:1:7 ]
    │
  1 │ match test when

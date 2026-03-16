@@ -3,7 +3,7 @@
 //! This module handles checking that inferred types are compatible with their
 //! type annotations, including trait constraint verification.
 
-use crate::diagnostics::{ConflictingTypeAnnotationReason, TypeInferenceErrorKind};
+use crate::diagnostics::{ConflictingTypeAnnotationReason, TypeCheckingErrorKind};
 use crate::hir_ty::ResolvedType;
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir_def as hir;
@@ -14,7 +14,40 @@ use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use text_size::TextRange;
 
-pub fn check_type_annotation(
+pub(crate) fn validate_type_annotations(
+    db: &dyn HirTyDatabase,
+    module_id: ModuleId,
+    result: &mut HirTypedModule,
+) {
+    let (hir_module, _) = hir::lower_file(db, module_id);
+    for hir::ValueDefinition {
+        type_annotation,
+        value,
+        ..
+    } in hir_module.values()
+    {
+        let fql = Fql::new(module_id, *value);
+        let Some(resolved_type) = result.expression_types.get(&fql.local_id).cloned() else {
+            continue;
+        };
+        let range = hir_module.get_expression_range(*value);
+
+        if let Some(type_annotation) = type_annotation {
+            // let _ = resolve_annotated_expression(db, module_id, *type_annotation, *value);
+            // Check for type annotation conflicts
+            check_type_annotation(
+                db,
+                result,
+                module_id,
+                range,
+                *type_annotation,
+                resolved_type,
+            );
+        }
+    }
+}
+
+fn check_type_annotation(
     db: &dyn HirTyDatabase,
     result: &mut HirTypedModule,
     current_module_id: ModuleId,
@@ -35,7 +68,7 @@ pub fn check_type_annotation(
     // Check if the inferred type is compatible with the expected type
     if let Err(reason) = check_type_compatibility(db, &expected_type, &resolved_type) {
         result.error(
-            TypeInferenceErrorKind::ConflictingTypeAnnotation {
+            TypeCheckingErrorKind::ConflictingTypeAnnotation {
                 annotated_type: expected_type,
                 inferred_type: resolved_type,
                 reason,

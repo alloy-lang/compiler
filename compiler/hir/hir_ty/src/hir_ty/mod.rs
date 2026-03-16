@@ -1,26 +1,19 @@
-mod behavior_validation;
-mod type_annotation_check;
-
 use alloy_hir_def as hir;
+use alloy_hir_infer::InferredType;
 use alloy_hir_resolved::Fql;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use std::hash::Hash;
+use std::ops::Deref;
 
 mod hm;
 pub use hm::unification::UnificationError;
 
 // Re-export type annotation checking function for use by other modules
 use crate::HirTypedModule;
-pub(super) use type_annotation_check::check_type_annotation;
 
 pub(super) fn infer_types(db: &dyn crate::HirTyDatabase, module_id: ModuleId) -> HirTypedModule {
-    let mut result = hm::infer_types_hm(db, module_id);
-
-    // Validate that all behaviors implement their trait's abstract members
-    behavior_validation::validate_behaviors(db, module_id, &mut result);
-
-    result
+    hm::infer_types_hm(db, module_id)
 }
 
 // ============================================================================
@@ -66,6 +59,41 @@ pub enum ResolvedType {
     },
 }
 
+impl From<&InferredType> for ResolvedType {
+    fn from(inferred: &InferredType) -> Self {
+        match inferred {
+            InferredType::Unconstrained => ResolvedType::Unconstrained,
+            InferredType::Missing => ResolvedType::Missing,
+            InferredType::Unit => ResolvedType::Unit,
+            InferredType::TypeDef(fql, name) => ResolvedType::TypeDef(fql.clone(), name.clone()),
+            InferredType::BuiltIn(builtin) => ResolvedType::BuiltIn(builtin.clone()),
+            InferredType::Lambda {
+                arg_type,
+                return_type,
+            } => ResolvedType::Lambda {
+                arg_type: Box::new(arg_type.deref().into()),
+                return_type: Box::new(return_type.deref().into()),
+            },
+            InferredType::Tuple(elements) => ResolvedType::Tuple(unsafe {
+                NonEmpty::new_unchecked(elements.into_iter().map(Into::into).collect())
+            }),
+            InferredType::Bounded { base, args } => ResolvedType::Bounded {
+                base: Box::new(base.deref().into()),
+                args: args.into_iter().map(Into::into).collect(),
+            },
+            InferredType::Generic(id) => ResolvedType::Generic(*id),
+            InferredType::ConstrainedGeneric { id, constraints } => {
+                ResolvedType::ConstrainedGeneric {
+                    id: *id,
+                    constraints: unsafe {
+                        NonEmpty::new_unchecked(constraints.into_iter().cloned().collect())
+                    },
+                }
+            }
+        }
+    }
+}
+
 /// Represents a single instantiation of a polymorphic type at a specific call site
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PolyInstantiation {
@@ -74,6 +102,15 @@ pub struct PolyInstantiation {
     /// The concrete types that each quantified type variable was instantiated to
     /// The order matches the order of quantified variables in the PolyType
     pub type_args: Vec<ResolvedType>,
+}
+
+impl From<&alloy_hir_infer::PolyInstantiation> for PolyInstantiation {
+    fn from(infer_inst: &alloy_hir_infer::PolyInstantiation) -> Self {
+        PolyInstantiation {
+            call_site: infer_inst.call_site.clone(),
+            type_args: infer_inst.type_args.iter().map(Into::into).collect(),
+        }
+    }
 }
 
 impl ResolvedType {

@@ -27,24 +27,29 @@ HirTypedModule {
     },
     warnings: [],
     errors: [
-        TypeInferenceError {
-            kind: HirResolutionError(
-                UnknownPatternReference {
-                    source_ref: Fql {
-                        module_id: ModuleId {
-                            path: "main",
+        TypeCheckingError {
+            kind: InferenceError(
+                TypeInferenceError {
+                    kind: HirResolutionError(
+                        UnknownPatternReference {
+                            source_ref: Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<Pattern>(1),
+                            },
+                            module_id: ModuleId {
+                                path: "main",
+                            },
+                            path: NonEmpty(
+                                [
+                                    "Option",
+                                    "Some",
+                                ],
+                            ),
                         },
-                        local_id: Idx::<Pattern>(1),
-                    },
-                    module_id: ModuleId {
-                        path: "main",
-                    },
-                    path: NonEmpty(
-                        [
-                            "Option",
-                            "Some",
-                        ],
                     ),
+                    range: 1..16,
                 },
             ),
             range: 1..16,
@@ -53,12 +58,12 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
-[E003] Error: Cannot find pattern `Option::Some` in this scope
+[E32003] Error: Cannot find pattern `Option::Some` in this scope
    ╭─[ ./test/main.alloy:1:2 ]
    │
  1 │ |Option::Some(x)| -> x
    │  ───────┬───────  
-   │         ╰───────── cannot find `Option::Some`
+   │         ╰───────── cannot find pattern `Option::Some`
    │ 
    │ Help: No pattern named `Option::Some` found in module `main`
 ───╯

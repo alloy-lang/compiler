@@ -30,7 +30,10 @@ pub(super) fn infer_pattern_hm(
         res::Pattern::Unit => super::infer_unit(ctx, source_fql),
         res::Pattern::VariableDeclaration => infer_variable_declaration(ctx, source_fql),
         res::Pattern::Tuple(elements) => infer_tuple_pattern(ctx, source_fql, elements),
-        res::Pattern::Destructure { target, args, .. } => {
+        res::Pattern::DataDestructure { target, args, .. } => {
+            infer_destructure(ctx, source_fql, target, &args)
+        }
+        res::Pattern::VariantDestructure { target, args, .. } => {
             infer_destructure(ctx, source_fql, target, &args)
         }
         res::Pattern::Nil => infer_nil(ctx, source_fql),

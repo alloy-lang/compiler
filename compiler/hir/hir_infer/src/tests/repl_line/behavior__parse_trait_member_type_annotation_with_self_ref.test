@@ -1,0 +1,61 @@
+typedef Type1 = Thing
+
+trait TestTrait1 where
+    typeof test : self -> String -> Int
+
+    let thing = test
+end
+
+behavior TestTrait1 for Type1 where
+    typeof test : self -> String -> Int
+    let test = |sf, str| -> 0
+end
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): Lambda {
+            arg_type: Generic(
+                2,
+            ),
+            return_type: Lambda {
+                arg_type: BuiltIn(
+                    String,
+                ),
+                return_type: BuiltIn(
+                    Int,
+                ),
+            },
+        },
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(2): Lambda {
+            arg_type: Generic(
+                0,
+            ),
+            return_type: Lambda {
+                arg_type: Generic(
+                    1,
+                ),
+                return_type: BuiltIn(
+                    Int,
+                ),
+            },
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+        ),
+        Idx::<Pattern>(1): Generic(
+            1,
+        ),
+    },
+    warnings: [],
+    errors: [],
+    poly_instantiations: {},
+}
+[]

@@ -3,6 +3,7 @@ use crate::{Fql, TypeVariableResolver};
 use alloy_hir_def as hir;
 use alloy_hir_def::HirDefDatabase;
 use alloy_workspace::ModuleId;
+use itertools::Itertools;
 use non_empty_vec::NonEmpty;
 use std::convert::TryFrom;
 
@@ -59,6 +60,7 @@ pub struct TypeVarReference {
 
 impl AnnotatedType {
     /// Check if this type contains type variables (is polymorphic)
+    #[must_use]
     pub fn is_polymorphic(&self) -> bool {
         match self {
             AnnotatedType::TypeVar { .. }
@@ -90,36 +92,24 @@ impl std::fmt::Display for AnnotatedType {
             },
             AnnotatedType::Tuple(elements) => {
                 write!(f, "(")?;
-                for (i, elem) in elements.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    write!(f, "{elem}")?;
-                }
+                elements.iter().join(", ").fmt(f)?;
                 write!(f, ")")
             }
             AnnotatedType::Bounded { base, args } => {
                 write!(f, "{base}[")?;
-                for (i, arg) in args.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    write!(f, "{arg}")?;
-                }
+                args.iter().join(", ").fmt(f)?;
                 write!(f, "]")
             }
             AnnotatedType::TypeVar { name, .. } => write!(f, "{name}"),
             AnnotatedType::ConstrainedTypeVar {
                 name, constraints, ..
             } => {
-                write!(f, "{name}")?;
-                write!(f, " : ")?;
-                for (i, (_, trait_name)) in constraints.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, " + ")?;
-                    }
-                    write!(f, "{trait_name}")?;
-                }
+                write!(f, "{name} : ")?;
+                constraints
+                    .iter()
+                    .map(|(_, trait_name)| trait_name)
+                    .join(" + ")
+                    .fmt(f)?;
                 Ok(())
             }
             AnnotatedType::SelfType {
@@ -129,12 +119,11 @@ impl std::fmt::Display for AnnotatedType {
                 write!(f, "Self")?;
                 if !constraints.is_empty() {
                     write!(f, " : ")?;
-                    for (i, (_, trait_name)) in constraints.iter().enumerate() {
-                        if i > 0 {
-                            write!(f, " + ")?;
-                        }
-                        write!(f, "{trait_name}")?;
-                    }
+                    constraints
+                        .iter()
+                        .map(|(_, trait_name)| trait_name)
+                        .join(" + ")
+                        .fmt(f)?;
                 }
                 Ok(())
             }

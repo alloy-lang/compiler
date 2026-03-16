@@ -1,0 +1,22 @@
+let counter = 0
+
+counter
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [],
+    poly_instantiations: {},
+}
+[]

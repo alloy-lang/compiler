@@ -1,0 +1,136 @@
+import test_data::test
+
+typedef Either[l, r] =
+  | Left(l)
+  | Right(r)
+end
+
+match test when
+  \ Either::Left(l)  -> "hi"
+  \ Either::Right(r) -> 7
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(3): BuiltIn(
+            String,
+        ),
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            2,
+        ),
+        Idx::<Pattern>(2): Generic(
+            1,
+        ),
+        Idx::<Pattern>(1): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+        Idx::<Pattern>(3): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnificationError(
+                TypeMismatch(
+                    Concrete(
+                        String,
+                    ),
+                    Concrete(
+                        Int,
+                    ),
+                ),
+            ),
+            range: 146..147,
+        },
+    ],
+    poly_instantiations: {
+        TypeDefinition(
+            Fql {
+                module_id: ModuleId {
+                    path: "test_data",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+        ): [
+            PolyInstantiation {
+                call_site: Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<Expression>(1),
+                },
+                type_args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+        ],
+    },
+}
+[]
+[E33001] Error: Type mismatch: expected `String`, found `Int`
+    ╭─[ ./test/main.alloy:10:25 ]
+    │
+ 10 │   \ Either::Right(r) -> 7
+    │                         ┬  
+    │                         ╰── expected `String`, found `Int`
+    │ 
+    │ Help: These types must be compatible
+────╯
+
+
+

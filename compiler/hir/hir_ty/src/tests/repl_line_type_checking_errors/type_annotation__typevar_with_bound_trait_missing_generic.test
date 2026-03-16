@@ -67,7 +67,7 @@ HirTypedModule {
     },
     warnings: [],
     errors: [
-        TypeInferenceError {
+        TypeCheckingError {
             kind: ConflictingTypeAnnotation {
                 annotated_type: Lambda {
                     arg: ConstrainedTypeVar {
@@ -218,7 +218,7 @@ HirTypedModule {
     },
 }
 []
-[E001] Error: Type annotation conflict: expected `t1 : TestTrait1 -> t2 -> Test`, found `t0 -> t1 -> Test[Int]`
+[E34001] Error: Type annotation conflict: expected `t1 : TestTrait1 -> t2 -> Test`, found `t0 -> t1 -> Test[Int]`
     ╭─[ ./test/main.alloy:10:1 ]
     │
  10 │ let test_func = |a, b| -> test

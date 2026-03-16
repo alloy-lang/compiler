@@ -1,29 +1,33 @@
 use alloy_hir_def as hir;
-use alloy_hir_resolved::EPTdFql;
+use alloy_hir_infer as hir_infer;
+use alloy_hir_resolved::{EPTdFql, Fql};
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
 use std::collections::HashMap;
 use text_size::TextRange;
 
-mod hir_ty;
-use hir_ty::*;
-
 mod diagnostics;
-use diagnostics::*;
+mod hir_ty;
+mod validation;
+
+use diagnostics::{
+    TypeCheckingError, TypeCheckingErrorKind, TypeCheckingWarning, TypeCheckingWarningKind,
+};
+use hir_ty::{PolyInstantiation, ResolvedType};
 
 #[cfg(test)]
 mod tests;
 
 #[salsa::db]
-pub trait HirTyDatabase: hir::HirDefDatabase {}
+pub trait HirTyDatabase: hir::HirDefDatabase + hir_infer::HirInferDatabase {}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct HirTypedModule {
     module_id: ModuleId,
     expression_types: FxHashMap<hir::ExpressionIdx, ResolvedType>,
     pattern_types: FxHashMap<hir::PatternIdx, ResolvedType>,
-    warnings: Vec<TypeInferenceWarning>,
-    errors: Vec<TypeInferenceError>,
+    warnings: Vec<TypeCheckingWarning>,
+    errors: Vec<TypeCheckingError>,
     /// Track polymorphic instantiations: definition -> list of instantiations
     /// Each instantiation records where the polymorphic value was used and with what concrete types
     poly_instantiations: FxHashMap<EPTdFql, Vec<PolyInstantiation>>,
@@ -60,23 +64,23 @@ impl HirTypedModule {
         }
     }
 
-    fn warning(&mut self, kind: TypeInferenceWarningKind, range: TextRange) {
-        self.warnings.push(TypeInferenceWarning::new(kind, range));
+    fn warning(&mut self, kind: TypeCheckingWarningKind, range: TextRange) {
+        self.warnings.push(TypeCheckingWarning::new(kind, range));
     }
 
-    fn error(&mut self, kind: TypeInferenceErrorKind, range: TextRange) {
-        self.errors.push(TypeInferenceError::new(kind, range));
+    fn error(&mut self, kind: TypeCheckingErrorKind, range: TextRange) {
+        self.errors.push(TypeCheckingError::new(kind, range));
     }
 
-    fn push_error(&mut self, err: TypeInferenceError) {
+    fn push_error(&mut self, err: TypeCheckingError) {
         self.errors.push(err);
     }
 
-    pub fn warnings(&self) -> &[TypeInferenceWarning] {
+    pub fn warnings(&self) -> &[TypeCheckingWarning] {
         &self.warnings
     }
 
-    pub fn errors(&self) -> &[TypeInferenceError] {
+    pub fn errors(&self) -> &[TypeCheckingError] {
         &self.errors
     }
 
@@ -90,26 +94,43 @@ impl HirTypedModule {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct TypeResolutionResult {
-    resolved_type: Option<ResolvedType>,
-    warnings: Vec<TypeInferenceWarning>,
-    errors: Vec<TypeInferenceError>,
-}
-
 /// type checking for everything in a module
 /// stores resolved types for all module symbols, regardless of scope
 /// for the LSP implementation, we will want to generate errors and warnings for the current file
 /// during full compilation, we will want to generate errors and warnings for all modules
 #[salsa::tracked]
 pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedModule {
-    infer_types(db, module_id)
+    let result = alloy_hir_infer::infer_types_module(db, module_id);
+
+    let mut result = HirTypedModule {
+        module_id,
+        expression_types: result
+            .expression_types()
+            .map(|(a, b)| (*a, b.into()))
+            .collect(),
+        pattern_types: result
+            .pattern_types()
+            .map(|(a, b)| (*a, b.into()))
+            .collect(),
+        warnings: result.warnings().iter().map(Into::into).collect(),
+        errors: result.errors().iter().map(Into::into).collect(),
+        poly_instantiations: result
+            .all_instantiations()
+            .map(|(a, b)| (a.clone(), b.iter().map(Into::into).collect()))
+            .collect(),
+    };
+
+    // Validate that all behaviors implement their trait's abstract members
+    validation::validate_behaviors(db, module_id, &mut result);
+    validation::validate_type_annotations(db, module_id, &mut result);
+
+    result
 }
 
 #[cfg(test)]
 mod small_tests {
     use crate::diagnostics::{
-        ConflictingTypeAnnotationReason, TypeInferenceError, TypeInferenceErrorKind,
+        ConflictingTypeAnnotationReason, TypeCheckingError, TypeCheckingErrorKind,
     };
     use crate::hir_ty::ResolvedType;
     use crate::tests::TestHirTyDatabase;
@@ -238,7 +259,7 @@ mod small_tests {
         db.attach(|_| assert_eq!(type_args, expected));
     }
 
-    fn check_error(input: &str, expected: &[TypeInferenceError]) {
+    fn check_error(input: &str, expected: &[TypeCheckingError]) {
         let mut db = TestHirTyDatabase::default();
         let module_id = db.add_module(
             "test_data",
@@ -389,8 +410,8 @@ mod small_tests {
                 typeof x : String
                 let x = 1
             "#,
-            &[TypeInferenceError::new(
-                TypeInferenceErrorKind::ConflictingTypeAnnotation {
+            &[TypeCheckingError::new(
+                TypeCheckingErrorKind::ConflictingTypeAnnotation {
                     annotated_type: AnnotatedType::BuiltIn(hir::BuiltInType::String),
                     inferred_type: ResolvedType::BuiltIn(hir::BuiltInType::Int),
                     reason: ConflictingTypeAnnotationReason::DirectConflict {

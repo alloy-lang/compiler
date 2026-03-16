@@ -1,17 +1,15 @@
 //! Main type inference loop and result conversion
 
-use super::super::{check_type_annotation, Fql, ResolvedType};
+use super::super::{Fql, ResolvedType};
 use super::constraint_gen::infer_expr_hm;
 use super::unification::solve_equations;
 use super::TypeVarId;
 use super::{HMInferenceContext, MonoType};
-use crate::diagnostics::TypeInferenceErrorKind;
+use crate::diagnostics::TypeCheckingErrorKind;
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir_def as hir;
 use alloy_hir_def::{Name, TypeDefinition};
-use alloy_hir_resolved::{
-    resolve_annotated_expression, resolve_annotated_type, AnnotatedType, EPTdFql, TypeVarReference,
-};
+use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType, EPTdFql, TypeVarReference};
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
@@ -163,32 +161,6 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
         result.insert_type(fql.clone(), resolved_type.clone());
     }
 
-    for hir::ValueDefinition {
-        type_annotation,
-        value,
-        ..
-    } in hir_module.values()
-    {
-        let fql = Fql::new(module_id, *value);
-        let Some(resolved_type) = result.expression_types.get(&fql.local_id).cloned() else {
-            continue;
-        };
-        let range = hir_module.get_expression_range(*value);
-
-        if let Some(type_annotation) = type_annotation {
-            // let _ = resolve_annotated_expression(db, module_id, *type_annotation, *value);
-            // Check for type annotation conflicts
-            check_type_annotation(
-                db,
-                &mut result,
-                module_id,
-                range,
-                *type_annotation,
-                resolved_type,
-            );
-        }
-    }
-
     // Phase 4: Resolve instantiations to concrete types
     for (def_fql, instantiations) in ctx.instantiations {
         let mut resolved_instantiations = Vec::new();
@@ -217,7 +189,7 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
     // Convert resolution errors to diagnostics
     for err in ctx.resolution_errors {
         let range = err.get_range(db);
-        result.error(TypeInferenceErrorKind::HirResolutionError(err), range);
+        result.error(TypeCheckingErrorKind::HirResolutionError(err), range);
     }
 
     for err in unification_errors {

@@ -17,24 +17,29 @@ HirTypedModule {
     pattern_types: {},
     warnings: [],
     errors: [
-        TypeInferenceError {
-            kind: HirResolutionError(
-                UnknownTypeDefinitionVariant {
-                    source_ref: Expression(
-                        Fql {
-                            module_id: ModuleId {
-                                path: "main",
+        TypeCheckingError {
+            kind: InferenceError(
+                TypeInferenceError {
+                    kind: HirResolutionError(
+                        UnknownTypeDefinitionVariant {
+                            source_ref: Expression(
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "main",
+                                    },
+                                    local_id: Idx::<Expression>(0),
+                                },
+                            ),
+                            target_type_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<TypeDefinition>(0),
                             },
-                            local_id: Idx::<Expression>(0),
+                            variant_name: "Nothing",
                         },
                     ),
-                    target_type_fql: Fql {
-                        module_id: ModuleId {
-                            path: "main",
-                        },
-                        local_id: Idx::<TypeDefinition>(0),
-                    },
-                    variant_name: "Nothing",
+                    range: 37..67,
                 },
             ),
             range: 37..67,
@@ -43,7 +48,7 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
-[E003] Error: Unknown variant `Nothing`
+[E32006] Error: Unknown variant `Nothing`
    ╭─[ ./test/main.alloy:5:1 ]
    │
  5 │ let unknown = Either::Nothing

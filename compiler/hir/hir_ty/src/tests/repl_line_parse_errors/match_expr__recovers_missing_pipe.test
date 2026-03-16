@@ -45,65 +45,75 @@ HirTypedModule {
     },
     warnings: [],
     errors: [
-        TypeInferenceError {
-            kind: UnificationError(
-                TypeMismatch(
-                    App {
-                        constructor: TypeDef {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "test_data",
+        TypeCheckingError {
+            kind: InferenceError(
+                TypeInferenceError {
+                    kind: UnificationError(
+                        TypeMismatch(
+                            App {
+                                constructor: TypeDef {
+                                    fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "test_data",
+                                        },
+                                        local_id: Idx::<TypeDefinition>(0),
+                                    },
+                                    type_args: [
+                                        TypeVarId(
+                                            0,
+                                        ),
+                                    ],
+                                    type_def_name: "Test",
                                 },
-                                local_id: Idx::<TypeDefinition>(0),
+                                args: [
+                                    Concrete(
+                                        Int,
+                                    ),
+                                ],
                             },
-                            type_args: [
-                                TypeVarId(
-                                    0,
-                                ),
-                            ],
-                            type_def_name: "Test",
-                        },
-                        args: [
                             Concrete(
-                                Int,
+                                Bool,
                             ),
-                        ],
-                    },
-                    Concrete(
-                        Bool,
+                        ),
                     ),
-                ),
+                    range: 42..47,
+                },
             ),
             range: 42..47,
         },
-        TypeInferenceError {
-            kind: UnificationError(
-                TypeMismatch(
-                    App {
-                        constructor: TypeDef {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "test_data",
+        TypeCheckingError {
+            kind: InferenceError(
+                TypeInferenceError {
+                    kind: UnificationError(
+                        TypeMismatch(
+                            App {
+                                constructor: TypeDef {
+                                    fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "test_data",
+                                        },
+                                        local_id: Idx::<TypeDefinition>(0),
+                                    },
+                                    type_args: [
+                                        TypeVarId(
+                                            0,
+                                        ),
+                                    ],
+                                    type_def_name: "Test",
                                 },
-                                local_id: Idx::<TypeDefinition>(0),
+                                args: [
+                                    Concrete(
+                                        Int,
+                                    ),
+                                ],
                             },
-                            type_args: [
-                                TypeVarId(
-                                    0,
-                                ),
-                            ],
-                            type_def_name: "Test",
-                        },
-                        args: [
                             Concrete(
-                                Int,
+                                Bool,
                             ),
-                        ],
-                    },
-                    Concrete(
-                        Bool,
+                        ),
                     ),
-                ),
+                    range: 56..62,
+                },
             ),
             range: 56..62,
         },
@@ -144,7 +154,7 @@ HirTypedModule {
         context: MatchTargetPipe,
     },
 ]
-[E002] Error: Type mismatch: expected `Test[Int]`, found `Bool`
+[E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
    ╭─[ ./test/main.alloy:4:3 ]
    │
  4 │   True -> 0
@@ -154,7 +164,7 @@ HirTypedModule {
    │ Help: These types must be compatible
 ───╯
 
-[E002] Error: Type mismatch: expected `Test[Int]`, found `Bool`
+[E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
    ╭─[ ./test/main.alloy:5:5 ]
    │
  5 │   \ False -> 1

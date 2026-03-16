@@ -1,0 +1,108 @@
+import test_data::test
+
+if test then 2 else 3
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnificationError(
+                TypeMismatch(
+                    App {
+                        constructor: TypeDef {
+                            fql: Fql {
+                                module_id: ModuleId {
+                                    path: "test_data",
+                                },
+                                local_id: Idx::<TypeDefinition>(0),
+                            },
+                            type_args: [
+                                TypeVarId(
+                                    0,
+                                ),
+                            ],
+                            type_def_name: "Test",
+                        },
+                        args: [
+                            Concrete(
+                                Int,
+                            ),
+                        ],
+                    },
+                    Concrete(
+                        Bool,
+                    ),
+                ),
+            ),
+            range: 24..45,
+        },
+    ],
+    poly_instantiations: {
+        TypeDefinition(
+            Fql {
+                module_id: ModuleId {
+                    path: "test_data",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+        ): [
+            PolyInstantiation {
+                call_site: Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<Expression>(1),
+                },
+                type_args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+        ],
+    },
+}
+[]
+[E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
+   ╭─[ ./test/main.alloy:3:1 ]
+   │
+ 3 │ if test then 2 else 3
+   │ ──────────┬──────────  
+   │           ╰──────────── expected `Test[Int]`, found `Bool`
+   │ 
+   │ Help: These types must be compatible
+───╯
+
+
+

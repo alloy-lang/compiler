@@ -1,0 +1,95 @@
+import test_data::{Test, test}
+
+trait TestTrait1 where
+    self = #Type[_]
+end
+
+typeof test_func : t1 -> t2 -> Test[Int] where
+    typevar t1 = TestTrait1
+    typevar t2
+let test_func = |a, b| -> test
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+        Idx::<Expression>(1): Lambda {
+            arg_type: Generic(
+                0,
+            ),
+            return_type: Lambda {
+                arg_type: Generic(
+                    1,
+                ),
+                return_type: Bounded {
+                    base: TypeDef(
+                        Fql {
+                            module_id: ModuleId {
+                                path: "test_data",
+                            },
+                            local_id: Idx::<TypeDefinition>(0),
+                        },
+                        "Test",
+                    ),
+                    args: [
+                        BuiltIn(
+                            Int,
+                        ),
+                    ],
+                },
+            },
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+        ),
+        Idx::<Pattern>(1): Generic(
+            1,
+        ),
+    },
+    warnings: [],
+    errors: [],
+    poly_instantiations: {
+        TypeDefinition(
+            Fql {
+                module_id: ModuleId {
+                    path: "test_data",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+        ): [
+            PolyInstantiation {
+                call_site: Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<Expression>(1),
+                },
+                type_args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+        ],
+    },
+}
+[]

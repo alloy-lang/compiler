@@ -1,0 +1,67 @@
+|Option::Some(x)| -> x
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): Generic(
+            0,
+        ),
+        Idx::<Expression>(1): Lambda {
+            arg_type: Generic(
+                1,
+            ),
+            return_type: Generic(
+                0,
+            ),
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+        ),
+        Idx::<Pattern>(1): Generic(
+            1,
+        ),
+    },
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: HirResolutionError(
+                UnknownPatternReference {
+                    source_ref: Fql {
+                        module_id: ModuleId {
+                            path: "main",
+                        },
+                        local_id: Idx::<Pattern>(1),
+                    },
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    path: NonEmpty(
+                        [
+                            "Option",
+                            "Some",
+                        ],
+                    ),
+                },
+            ),
+            range: 1..16,
+        },
+    ],
+    poly_instantiations: {},
+}
+[]
+[E32003] Error: Cannot find pattern `Option::Some` in this scope
+   ╭─[ ./test/main.alloy:1:2 ]
+   │
+ 1 │ |Option::Some(x)| -> x
+   │  ───────┬───────  
+   │         ╰───────── cannot find `Option::Some`
+   │ 
+   │ Help: No pattern named `Option::Some` found in module `main`
+───╯
+
+
+

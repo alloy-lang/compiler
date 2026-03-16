@@ -1,0 +1,21 @@
+trait TestTrait1 where
+    typeof test : Int
+
+    let thing = "hi"
+end
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            String,
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [],
+    poly_instantiations: {},
+}
+[]

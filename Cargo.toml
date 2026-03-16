@@ -5,6 +5,7 @@ members = [
     "compiler/diagnostics",
     "compiler/hir",
     "compiler/hir/hir_def",
+    "compiler/hir/hir_infer",
     "compiler/hir/hir_resolved",
     "compiler/hir/hir_ty",
     "compiler/lexer",
@@ -42,6 +43,7 @@ alloy_ast = { path = "compiler/ast" }
 alloy_compiler = { path = "compiler" }
 alloy_diagnostics = { path = "compiler/diagnostics" }
 alloy_hir_def = { path = "compiler/hir/hir_def" }
+alloy_hir_infer = { path = "compiler/hir/hir_infer" }
 alloy_hir_resolved = { path = "compiler/hir/hir_resolved" }
 alloy_hir_typed = { path = "compiler/hir/hir_ty" }
 alloy_lexer = { path = "compiler/lexer" }

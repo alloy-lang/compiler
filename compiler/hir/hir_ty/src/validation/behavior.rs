@@ -1,13 +1,13 @@
 //! Validation for trait implementations in behaviors
 
-use crate::diagnostics::TypeInferenceErrorKind;
+use crate::diagnostics::TypeCheckingErrorKind;
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir_def as hir;
 use alloy_hir_resolved as res;
 use alloy_workspace::ModuleId;
 
 /// Validate that all behaviors implement all abstract members from their implemented traits
-pub(super) fn validate_behaviors(
+pub(crate) fn validate_behaviors(
     db: &dyn HirTyDatabase,
     module_id: ModuleId,
     result: &mut HirTypedModule,
@@ -31,7 +31,7 @@ fn validate_behavior(
         Ok(trait_fql) => trait_fql,
         Err(err) => {
             result.error(
-                TypeInferenceErrorKind::HirResolutionError(err.clone()),
+                TypeCheckingErrorKind::HirResolutionError(err.clone()),
                 behavior_range,
             );
             return;
@@ -41,7 +41,7 @@ fn validate_behavior(
         Ok(type_fql) => type_fql,
         Err(err) => {
             result.error(
-                TypeInferenceErrorKind::HirResolutionError(err.clone()),
+                TypeCheckingErrorKind::HirResolutionError(err.clone()),
                 behavior_range,
             );
             return;
@@ -59,7 +59,7 @@ fn validate_behavior(
         // Check if behavior has an implementation for this member
         if !behavior.has_implementation(member_name) {
             result.error(
-                TypeInferenceErrorKind::MissingTraitMemberImplementation {
+                TypeCheckingErrorKind::MissingTraitMemberImplementation {
                     trait_name: trait_def.name().clone(),
                     member_name: member_name.clone(),
                     type_name: type_name.clone(),

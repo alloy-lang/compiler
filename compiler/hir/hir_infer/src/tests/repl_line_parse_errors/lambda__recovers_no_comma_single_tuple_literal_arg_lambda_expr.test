@@ -1,0 +1,63 @@
+|(a b)| -> 5
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): Lambda {
+            arg_type: Tuple(
+                NonEmpty(
+                    [
+                        Generic(
+                            0,
+                        ),
+                        Generic(
+                            1,
+                        ),
+                    ],
+                ),
+            ),
+            return_type: BuiltIn(
+                Int,
+            ),
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+        ),
+        Idx::<Pattern>(1): Generic(
+            1,
+        ),
+        Idx::<Pattern>(2): Tuple(
+            NonEmpty(
+                [
+                    Generic(
+                        0,
+                    ),
+                    Generic(
+                        1,
+                    ),
+                ],
+            ),
+        ),
+    },
+    warnings: [],
+    errors: [],
+    poly_instantiations: {},
+}
+[
+    ParseError {
+        expected: [
+            Comma,
+        ],
+        kind: Missing {
+            offset: 4,
+        },
+        context: ParenExprComma,
+    },
+]

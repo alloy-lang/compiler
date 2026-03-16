@@ -1,0 +1,168 @@
+import test_data::test
+
+match test when
+  True -> 0
+  \ False -> 1
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): BuiltIn(
+            Bool,
+        ),
+        Idx::<Pattern>(1): BuiltIn(
+            Bool,
+        ),
+    },
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnificationError(
+                TypeMismatch(
+                    App {
+                        constructor: TypeDef {
+                            fql: Fql {
+                                module_id: ModuleId {
+                                    path: "test_data",
+                                },
+                                local_id: Idx::<TypeDefinition>(0),
+                            },
+                            type_args: [
+                                TypeVarId(
+                                    0,
+                                ),
+                            ],
+                            type_def_name: "Test",
+                        },
+                        args: [
+                            Concrete(
+                                Int,
+                            ),
+                        ],
+                    },
+                    Concrete(
+                        Bool,
+                    ),
+                ),
+            ),
+            range: 42..47,
+        },
+        TypeInferenceError {
+            kind: UnificationError(
+                TypeMismatch(
+                    App {
+                        constructor: TypeDef {
+                            fql: Fql {
+                                module_id: ModuleId {
+                                    path: "test_data",
+                                },
+                                local_id: Idx::<TypeDefinition>(0),
+                            },
+                            type_args: [
+                                TypeVarId(
+                                    0,
+                                ),
+                            ],
+                            type_def_name: "Test",
+                        },
+                        args: [
+                            Concrete(
+                                Int,
+                            ),
+                        ],
+                    },
+                    Concrete(
+                        Bool,
+                    ),
+                ),
+            ),
+            range: 56..62,
+        },
+    ],
+    poly_instantiations: {
+        TypeDefinition(
+            Fql {
+                module_id: ModuleId {
+                    path: "test_data",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+        ): [
+            PolyInstantiation {
+                call_site: Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<Expression>(1),
+                },
+                type_args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+        ],
+    },
+}
+[
+    ParseError {
+        expected: [
+            Backslash,
+        ],
+        kind: Missing {
+            offset: 42,
+        },
+        context: MatchTargetPipe,
+    },
+]
+[E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
+   ╭─[ ./test/main.alloy:4:3 ]
+   │
+ 4 │   True -> 0
+   │   ──┬──  
+   │     ╰──── expected `Test[Int]`, found `Bool`
+   │ 
+   │ Help: These types must be compatible
+───╯
+
+[E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
+   ╭─[ ./test/main.alloy:5:5 ]
+   │
+ 5 │   \ False -> 1
+   │     ───┬──  
+   │        ╰──── expected `Test[Int]`, found `Bool`
+   │ 
+   │ Help: These types must be compatible
+───╯
+
+
+

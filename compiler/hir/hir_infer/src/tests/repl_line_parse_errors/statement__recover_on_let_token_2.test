@@ -1,0 +1,58 @@
+let 1
+let b = 2
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [],
+    poly_instantiations: {},
+}
+[
+    ParseError {
+        expected: [
+            OpIdent,
+            Ident,
+        ],
+        kind: Unexpected {
+            found: Integer,
+            range: 4..5,
+        },
+        context: ValueDefIdent,
+    },
+    ParseError {
+        expected: [
+            Equals,
+        ],
+        kind: Missing {
+            offset: 6,
+        },
+        context: ValueDefEquals,
+    },
+    ParseError {
+        expected: [
+            Integer,
+            Fraction,
+            String,
+            Char,
+            Ident,
+            OpIdent,
+            Minus,
+            LParen,
+            IfKw,
+            MatchKw,
+            Pipe,
+        ],
+        kind: Missing {
+            offset: 6,
+        },
+        context: ValueDefExpr,
+    },
+]

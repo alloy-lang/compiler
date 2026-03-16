@@ -1,0 +1,69 @@
+match test when
+  \ True -> 0
+  \ False -> 1
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Bool,
+        ),
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): BuiltIn(
+            Bool,
+        ),
+        Idx::<Pattern>(1): BuiltIn(
+            Bool,
+        ),
+    },
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: HirResolutionError(
+                UnknownExpressionReference {
+                    source_ref: Fql {
+                        module_id: ModuleId {
+                            path: "main",
+                        },
+                        local_id: Idx::<Expression>(0),
+                    },
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    path: NonEmpty(
+                        [
+                            "test",
+                        ],
+                    ),
+                },
+            ),
+            range: 6..11,
+        },
+    ],
+    poly_instantiations: {},
+}
+[]
+[E32002] Error: Cannot find value `test` in this scope
+   ╭─[ ./test/main.alloy:1:7 ]
+   │
+ 1 │ match test when
+   │       ──┬──  
+   │         ╰──── cannot find `test`
+   │ 
+   │ Help: No value named `test` found in module `main`
+───╯
+
+
+

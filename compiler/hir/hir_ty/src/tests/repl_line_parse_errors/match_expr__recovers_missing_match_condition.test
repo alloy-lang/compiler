@@ -58,34 +58,39 @@ HirTypedModule {
     },
     warnings: [],
     errors: [
-        TypeInferenceError {
-            kind: UnificationError(
-                TypeMismatch(
-                    App {
-                        constructor: TypeDef {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "test_data",
+        TypeCheckingError {
+            kind: InferenceError(
+                TypeInferenceError {
+                    kind: UnificationError(
+                        TypeMismatch(
+                            App {
+                                constructor: TypeDef {
+                                    fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "test_data",
+                                        },
+                                        local_id: Idx::<TypeDefinition>(0),
+                                    },
+                                    type_args: [
+                                        TypeVarId(
+                                            0,
+                                        ),
+                                    ],
+                                    type_def_name: "Test",
                                 },
-                                local_id: Idx::<TypeDefinition>(0),
+                                args: [
+                                    Concrete(
+                                        Int,
+                                    ),
+                                ],
                             },
-                            type_args: [
-                                TypeVarId(
-                                    0,
-                                ),
-                            ],
-                            type_def_name: "Test",
-                        },
-                        args: [
                             Concrete(
-                                Int,
+                                Bool,
                             ),
-                        ],
-                    },
-                    Concrete(
-                        Bool,
+                        ),
                     ),
-                ),
+                    range: 53..59,
+                },
             ),
             range: 53..59,
         },
@@ -133,7 +138,7 @@ HirTypedModule {
         context: MatchTargetCondition,
     },
 ]
-[E002] Error: Type mismatch: expected `Test[Int]`, found `Bool`
+[E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
    ╭─[ ./test/main.alloy:5:5 ]
    │
  5 │   \ False -> 1

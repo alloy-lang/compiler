@@ -1,0 +1,29 @@
+typedef Type1 = Thing
+
+trait Trait1 where
+    typeof test : Int
+    let test = 0
+end
+
+behavior Trait1 for Type1 where
+    let test = 42
+end
+===
+HirInferredModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [],
+    poly_instantiations: {},
+}
+[]

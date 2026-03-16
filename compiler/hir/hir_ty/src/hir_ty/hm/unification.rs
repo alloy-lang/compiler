@@ -1,10 +1,10 @@
 //! Type unification algorithm with occurs check
 
 use super::{EPFql, MonoType, TypeEquation, TypeVarId};
-use crate::diagnostics::TypeInferenceError;
+use crate::diagnostics::TypeCheckingError;
 use crate::{diagnostics, HirTyDatabase};
 use alloy_hir_def as hir;
-use diagnostics::TypeInferenceErrorKind;
+use diagnostics::TypeCheckingErrorKind;
 use rustc_hash::FxHashMap;
 
 /// Substitution mapping type variables to types
@@ -180,7 +180,7 @@ pub enum UnificationError {
 pub(super) fn solve_equations(
     db: &dyn HirTyDatabase,
     equations: Vec<TypeEquation>,
-) -> (Substitution, Vec<TypeInferenceError>) {
+) -> (Substitution, Vec<TypeCheckingError>) {
     let mut subst = Substitution::new();
     let mut unification_errors = Vec::new();
 
@@ -197,11 +197,6 @@ pub(super) fn solve_equations(
                     EPFql::Expression(fql) => hir_module.get_expression_range(fql.local_id),
                     EPFql::Pattern(fql) => hir_module.get_pattern_range(fql.local_id),
                 };
-
-                unification_errors.push(TypeInferenceError::new(
-                    TypeInferenceErrorKind::UnificationError(err),
-                    range,
-                ));
             }
         };
     }
