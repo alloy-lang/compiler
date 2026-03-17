@@ -58,7 +58,7 @@ HirInferredModule {
    │
  1 │ |Option::Some(x)| -> x
    │  ───────┬───────  
-   │         ╰───────── cannot find `Option::Some`
+   │         ╰───────── cannot find pattern `Option::Some`
    │ 
    │ Help: No pattern named `Option::Some` found in module `main`
 ───╯

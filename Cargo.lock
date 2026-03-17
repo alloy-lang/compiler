@@ -28,6 +28,7 @@ version = "0.1.0"
 dependencies = [
  "alloy_ast",
  "alloy_hir_def",
+ "alloy_hir_infer",
  "alloy_hir_typed",
  "alloy_parser",
  "alloy_project",
@@ -109,12 +110,14 @@ name = "alloy_hir_resolved"
 version = "0.1.0"
 dependencies = [
  "alloy_ast",
+ "alloy_diagnostics",
  "alloy_hir_def",
  "alloy_project",
  "alloy_scope",
  "alloy_test_harness",
  "alloy_workspace",
  "camino",
+ "itertools 0.14.0",
  "la-arena",
  "non-empty-vec",
  "rustc-hash 1.1.0",

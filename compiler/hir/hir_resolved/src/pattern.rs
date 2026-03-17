@@ -155,6 +155,7 @@ mod tests {
 
         let actual_1 =
             resolve_pattern_by_id(&db, module_id, idx!(1)).expect("expected to resolve pattern");
+        assert_eq!(Pattern::VariableDeclaration, actual_1);
 
         let actual_2 =
             resolve_pattern_by_id(&db, module_id, idx!(2)).expect("expected to resolve pattern");

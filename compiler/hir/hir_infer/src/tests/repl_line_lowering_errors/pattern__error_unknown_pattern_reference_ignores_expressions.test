@@ -68,7 +68,7 @@ HirInferredModule {
    │
  3 │ |unknown(a)| -> a + "a"
    │  ─────┬────  
-   │       ╰────── cannot find `unknown`
+   │       ╰────── cannot find pattern `unknown`
    │ 
    │ Help: No pattern named `unknown` found in module `main`
 ───╯

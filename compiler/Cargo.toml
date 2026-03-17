@@ -9,6 +9,7 @@ edition = "2018"
 [dependencies]
 alloy_ast = { workspace = true }
 alloy_hir_def = { workspace = true }
+alloy_hir_infer = { workspace = true }
 alloy_hir_typed = { workspace = true }
 alloy_parser = { workspace = true }
 alloy_project = { workspace = true }

@@ -24,10 +24,9 @@ pub(crate) fn validate_type_annotations(
         type_annotation,
         value,
         ..
-    } in hir_module.values()
+    } in hir_module.values().map(|(_, v)| v)
     {
-        let fql = Fql::new(module_id, *value);
-        let Some(resolved_type) = result.expression_types.get(&fql.local_id).cloned() else {
+        let Some(resolved_type) = result.expression_types.get(value).cloned() else {
             continue;
         };
         let range = hir_module.get_expression_range(*value);
