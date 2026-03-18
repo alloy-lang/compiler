@@ -37,7 +37,7 @@ HirModule {
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
     value_definitions: {
-        "counter": ValueDefinition {
+        Idx::<Expression>(0): ValueDefinition {
             name: "counter",
             type_annotation: None,
             value: Idx::<Expression>(0),

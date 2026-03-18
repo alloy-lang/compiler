@@ -396,7 +396,7 @@ HirModule {
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
     value_definitions: {
-        "testThing": ValueDefinition {
+        Idx::<Expression>(7): ValueDefinition {
             name: "testThing",
             type_annotation: Some(
                 Idx::<TypeReference>(13),

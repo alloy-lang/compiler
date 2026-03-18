@@ -21,7 +21,7 @@ pub struct HirModule {
     type_variables: Index<TypeVariable>,
     traits: Index<Trait>,
     behaviors: Index<Behavior, (TypeIdx, TypeIdx)>,
-    value_definitions: FxHashMap<Name, ValueDefinition>,
+    value_definitions: FxHashMap<ExpressionIdx, ValueDefinition>,
     expression_groups: Vec<Vec<ExpressionIdx>>,
     scopes: Scopes,
     warnings: Vec<LoweringWarning>,
@@ -92,7 +92,7 @@ impl HirModule {
         type_variables: Index<TypeVariable>,
         traits: Index<Trait>,
         behaviors: Index<Behavior, (TypeIdx, TypeIdx)>,
-        value_definitions: FxHashMap<Name, ValueDefinition>,
+        value_definitions: FxHashMap<ExpressionIdx, ValueDefinition>,
         expression_groups: Vec<Vec<ExpressionIdx>>,
         scopes: Scopes,
         warnings: Vec<LoweringWarning>,
@@ -124,8 +124,8 @@ impl HirModule {
         self.expressions.iter()
     }
 
-    pub fn values(&'_ self) -> impl Iterator<Item = &ValueDefinition> {
-        self.value_definitions.values()
+    pub fn values(&'_ self) -> impl Iterator<Item = (&ExpressionIdx, &ValueDefinition)> {
+        self.value_definitions.iter()
     }
 
     pub fn expression_groups(&self) -> impl Iterator<Item = (usize, &Vec<ExpressionIdx>)> {
@@ -182,9 +182,7 @@ impl HirModule {
     }
 
     pub fn get_value_by_id(&'_ self, idx: &ExpressionIdx) -> Option<ValueDefinition> {
-        self.values()
-            .find(|value_def| value_def.value == *idx)
-            .cloned()
+        self.value_definitions.get(idx).cloned()
     }
 
     pub fn get_pattern_by_name(

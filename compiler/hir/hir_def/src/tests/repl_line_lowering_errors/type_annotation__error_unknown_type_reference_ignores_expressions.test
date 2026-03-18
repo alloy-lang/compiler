@@ -63,7 +63,7 @@ HirModule {
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
     value_definitions: {
-        "unknown": ValueDefinition {
+        Idx::<Expression>(0): ValueDefinition {
             name: "unknown",
             type_annotation: None,
             value: Idx::<Expression>(0),

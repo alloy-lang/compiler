@@ -416,7 +416,7 @@ HirModule {
     },
     behaviors: EmptyIndex::<Behavior>,
     value_definitions: {
-        "=<<": ValueDefinition {
+        Idx::<Expression>(0): ValueDefinition {
             name: "=<<",
             type_annotation: Some(
                 Idx::<TypeReference>(28),

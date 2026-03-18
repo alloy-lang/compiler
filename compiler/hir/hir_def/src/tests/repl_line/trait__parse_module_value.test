@@ -58,7 +58,7 @@ HirModule {
     },
     behaviors: EmptyIndex::<Behavior>,
     value_definitions: {
-        "test": ValueDefinition {
+        Idx::<Expression>(1): ValueDefinition {
             name: "test",
             type_annotation: None,
             value: Idx::<Expression>(1),

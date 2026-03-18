@@ -156,22 +156,22 @@ HirModule {
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
     value_definitions: {
-        "string_example": ValueDefinition {
-            name: "string_example",
-            type_annotation: None,
-            value: Idx::<Expression>(3),
-        },
-        "int_example": ValueDefinition {
-            name: "int_example",
-            type_annotation: None,
-            value: Idx::<Expression>(5),
-        },
-        "id": ValueDefinition {
+        Idx::<Expression>(1): ValueDefinition {
             name: "id",
             type_annotation: Some(
                 Idx::<TypeReference>(2),
             ),
             value: Idx::<Expression>(1),
+        },
+        Idx::<Expression>(5): ValueDefinition {
+            name: "int_example",
+            type_annotation: None,
+            value: Idx::<Expression>(5),
+        },
+        Idx::<Expression>(3): ValueDefinition {
+            name: "string_example",
+            type_annotation: None,
+            value: Idx::<Expression>(3),
         },
     },
     expression_groups: [

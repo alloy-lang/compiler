@@ -190,7 +190,7 @@ HirModule {
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
     value_definitions: {
-        "|>": ValueDefinition {
+        Idx::<Expression>(1): ValueDefinition {
             name: "|>",
             type_annotation: Some(
                 Idx::<TypeReference>(7),

@@ -85,7 +85,7 @@ HirModule {
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
     value_definitions: {
-        "funky": ValueDefinition {
+        Idx::<Expression>(1): ValueDefinition {
             name: "funky",
             type_annotation: None,
             value: Idx::<Expression>(1),

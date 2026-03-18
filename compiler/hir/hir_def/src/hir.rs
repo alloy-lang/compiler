@@ -126,7 +126,7 @@ impl<'db> LoweringCtx<'db> {
             }
         }
 
-        let mut value_definitions: FxHashMap<Name, ValueDefinition> = Default::default();
+        let mut value_definitions: FxHashMap<ExpressionIdx, ValueDefinition> = Default::default();
         for (expression_id, _, _, name, scope) in self.expressions.iter_by_scope(Scopes::ROOT) {
             let value_definition =
                 match self
@@ -134,18 +134,18 @@ impl<'db> LoweringCtx<'db> {
                     .get_by_scoped_name(&name, scope, &self.scopes)
                 {
                     None => ValueDefinition {
-                        name: name.clone(),
+                        name,
                         value: expression_id,
                         type_annotation: None,
                     },
                     Some((ta, _)) => ValueDefinition {
-                        name: name.clone(),
+                        name,
                         value: expression_id,
                         type_annotation: Some(ta),
                     },
                 };
 
-            value_definitions.insert(name, value_definition);
+            value_definitions.insert(expression_id, value_definition);
         }
 
         let dep_graph = dependency_graph::DependencyGraph::new(self.expression_deps);

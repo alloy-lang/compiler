@@ -110,12 +110,12 @@ HirModule {
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
     value_definitions: {
-        "add1": ValueDefinition {
+        Idx::<Expression>(1): ValueDefinition {
             name: "add1",
             type_annotation: None,
             value: Idx::<Expression>(1),
         },
-        "add2": ValueDefinition {
+        Idx::<Expression>(5): ValueDefinition {
             name: "add2",
             type_annotation: None,
             value: Idx::<Expression>(5),

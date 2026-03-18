@@ -116,12 +116,12 @@ HirModule {
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
     value_definitions: {
-        "string_example": ValueDefinition {
+        Idx::<Expression>(1): ValueDefinition {
             name: "string_example",
             type_annotation: None,
             value: Idx::<Expression>(1),
         },
-        "int_example": ValueDefinition {
+        Idx::<Expression>(3): ValueDefinition {
             name: "int_example",
             type_annotation: None,
             value: Idx::<Expression>(3),

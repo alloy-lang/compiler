@@ -165,22 +165,22 @@ HirModule {
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
     value_definitions: {
-        "func1": ValueDefinition {
+        Idx::<Expression>(0): ValueDefinition {
             name: "func1",
             type_annotation: None,
             value: Idx::<Expression>(0),
         },
-        ">>": ValueDefinition {
+        Idx::<Expression>(5): ValueDefinition {
             name: ">>",
             type_annotation: None,
             value: Idx::<Expression>(5),
         },
-        "func2": ValueDefinition {
+        Idx::<Expression>(2): ValueDefinition {
             name: "func2",
             type_annotation: None,
             value: Idx::<Expression>(2),
         },
-        "result": ValueDefinition {
+        Idx::<Expression>(8): ValueDefinition {
             name: "result",
             type_annotation: None,
             value: Idx::<Expression>(8),

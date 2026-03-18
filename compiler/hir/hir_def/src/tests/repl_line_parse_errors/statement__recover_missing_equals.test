@@ -54,15 +54,15 @@ HirModule {
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
     value_definitions: {
-        "b": ValueDefinition {
-            name: "b",
-            type_annotation: None,
-            value: Idx::<Expression>(3),
-        },
-        "a": ValueDefinition {
+        Idx::<Expression>(2): ValueDefinition {
             name: "a",
             type_annotation: None,
             value: Idx::<Expression>(2),
+        },
+        Idx::<Expression>(3): ValueDefinition {
+            name: "b",
+            type_annotation: None,
+            value: Idx::<Expression>(3),
         },
     },
     expression_groups: [
