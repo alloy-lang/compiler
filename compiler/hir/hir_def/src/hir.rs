@@ -148,7 +148,7 @@ impl<'db> LoweringCtx<'db> {
             value_definitions.insert(expression_id, value_definition);
         }
 
-        let dep_graph = dependency_graph::DependencyGraph::new(self.expression_deps);
+        let dep_graph = dependency_graph::DependencyGraph::new(self.expression_deps.clone());
         let expression_groups = dep_graph.topological_order();
 
         HirModule::new(
@@ -162,6 +162,7 @@ impl<'db> LoweringCtx<'db> {
             self.behaviors,
             value_definitions,
             expression_groups,
+            self.expression_deps,
             self.scopes,
             warnings,
             self.errors,
