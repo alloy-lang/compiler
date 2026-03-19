@@ -113,31 +113,7 @@ HirTypedModule {
             range: 123..160,
         },
     ],
-    poly_instantiations: {
-        TypeDefinitionVariant(
-            Fql {
-                module_id: ModuleId {
-                    path: "std::option",
-                },
-                local_id: Idx::<TypeDefinition>(0),
-            },
-            "Some",
-        ): [
-            PolyInstantiation {
-                call_site: Fql {
-                    module_id: ModuleId {
-                        path: "main",
-                    },
-                    local_id: Idx::<Expression>(3),
-                },
-                type_args: [
-                    BuiltIn(
-                        Int,
-                    ),
-                ],
-            },
-        ],
-    },
+    poly_instantiations: {},
 }
 []
 [E33001] Error: Type mismatch: expected `String`, found `Int`

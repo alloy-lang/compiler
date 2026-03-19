@@ -28,30 +28,6 @@ HirTypedModule {
     pattern_types: {},
     warnings: [],
     errors: [],
-    poly_instantiations: {
-        TypeDefinitionVariant(
-            Fql {
-                module_id: ModuleId {
-                    path: "std::option",
-                },
-                local_id: Idx::<TypeDefinition>(0),
-            },
-            "None",
-        ): [
-            PolyInstantiation {
-                call_site: Fql {
-                    module_id: ModuleId {
-                        path: "main",
-                    },
-                    local_id: Idx::<Expression>(0),
-                },
-                type_args: [
-                    Generic(
-                        1,
-                    ),
-                ],
-            },
-        ],
-    },
+    poly_instantiations: {},
 }
 []

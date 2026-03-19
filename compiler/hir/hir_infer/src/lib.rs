@@ -28,9 +28,6 @@ pub struct HirInferredModule {
     pattern_types: FxHashMap<hir::PatternIdx, InferredType>,
     warnings: Vec<TypeInferenceWarning>,
     errors: Vec<TypeInferenceError>,
-    /// Track polymorphic instantiations: definition -> list of instantiations
-    /// Each instantiation records where the polymorphic value was used and with what concrete types
-    poly_instantiations: FxHashMap<EPTdFql, Vec<PolyInstantiation>>,
 }
 
 impl HirInferredModule {
@@ -41,7 +38,6 @@ impl HirInferredModule {
             pattern_types: HashMap::default(),
             warnings: Vec::new(),
             errors: Vec::new(),
-            poly_instantiations: FxHashMap::default(),
         }
     }
 
@@ -91,19 +87,6 @@ impl HirInferredModule {
     pub fn pattern_types(&self) -> impl Iterator<Item = (&hir::PatternIdx, &InferredType)> {
         self.pattern_types.iter()
     }
-
-    #[must_use]
-    /// Get all instantiations for a polymorphic definition
-    pub fn instantiations(&self, def_fql: &EPTdFql) -> &[PolyInstantiation] {
-        // TODO: Add deduplication, if needed
-        self.poly_instantiations
-            .get(def_fql)
-            .map_or(&[], |v| v.as_slice())
-    }
-
-    pub fn all_instantiations(&self) -> impl Iterator<Item = (&EPTdFql, &Vec<PolyInstantiation>)> {
-        self.poly_instantiations.iter()
-    }
 }
 
 /// type checking for everything in a module
@@ -120,8 +103,7 @@ mod small_tests {
     use crate::hir_ty::InferredType;
     use crate::tests::TestHirInferDatabase;
     use alloy_hir_def as hir;
-    use alloy_hir_resolved::{EPTdFql, Fql};
-    use alloy_scope::Scopes;
+    use alloy_hir_resolved::Fql;
     use alloy_test_harness::idx;
     use alloy_workspace::{ModuleId, WorkspaceDatabase};
     use non_empty_vec::NonEmpty;
@@ -176,71 +158,6 @@ mod small_tests {
             assert_eq!(actual, expected);
             assert_eq!(ctx.errors, &[]);
         });
-    }
-
-    fn check_expr_instantiations(
-        db: &mut TestHirInferDatabase,
-        input: &str,
-        name: &str,
-        expected: &[&[InferredType]],
-    ) {
-        let module_id = db.add_test_module("test_data", input);
-
-        let (hir_module, parse_errors) = hir::lower_file(db, module_id);
-        assert_eq!(parse_errors, &[]);
-
-        let (id_expr, _) = hir_module
-            .get_expression_by_name(&hir::Name::new(name), Scopes::ROOT)
-            .unwrap();
-        let id_fql = EPTdFql::Expression(Fql::new(module_id, id_expr));
-
-        check_instantiations(db, module_id, id_fql, name, expected);
-    }
-
-    fn check_type_def_instantiations(
-        db: &mut TestHirInferDatabase,
-        input: &str,
-        name: &str,
-        expected: &[&[InferredType]],
-    ) {
-        let module_id = db.add_test_module("test_data", input);
-
-        let (hir_module, parse_errors) = hir::lower_file(db, module_id);
-        assert_eq!(parse_errors, &[]);
-
-        let (id_expr, _) = hir_module
-            .get_type_definition_by_name(&hir::Name::new(name))
-            .unwrap();
-        let id_fql =
-            EPTdFql::TypeDefinitionVariant(Fql::new(module_id, id_expr), hir::Name::new("Some"));
-
-        check_instantiations(db, module_id, id_fql, name, expected);
-    }
-
-    fn check_instantiations(
-        db: &mut TestHirInferDatabase,
-        module_id: ModuleId,
-        fql: EPTdFql,
-        name: &str,
-        expected: &[&[InferredType]],
-    ) {
-        let ctx = crate::infer_types_module(db, module_id);
-
-        assert_eq!(ctx.errors, &[]);
-
-        // Verify id was instantiated twice
-        let instantiations = ctx.instantiations(&fql);
-        assert_eq!(
-            instantiations.len(),
-            expected.len(),
-            "Expected matching instantiations of {}",
-            name
-        );
-
-        // Collect the type args
-        let type_args: Vec<_> = instantiations.iter().map(|inst| &inst.type_args).collect();
-
-        db.attach(|_| assert_eq!(type_args, expected));
     }
 
     #[test]
@@ -424,65 +341,6 @@ mod small_tests {
                     InferredType::BuiltIn(hir::BuiltInType::Int),
                 ),
             ],
-        );
-    }
-
-    #[test]
-    fn track_polymorphic_instantiation_direct() {
-        let mut db = TestHirInferDatabase::default();
-        check_expr_instantiations(
-            &mut db,
-            r#"
-                typeof id : t1 -> t1 where
-                  typevar t1
-                let id = |x| -> x
-
-                let string_result = id("hi")
-                let int_result = id(42)
-            "#,
-            "id",
-            &[
-                &[InferredType::BuiltIn(hir::BuiltInType::Int)],
-                &[InferredType::BuiltIn(hir::BuiltInType::String)],
-            ],
-        );
-    }
-
-    #[test]
-    fn track_polymorphic_type_def_usage() {
-        let mut db = TestHirInferDatabase::default();
-        check_type_def_instantiations(
-            &mut db,
-            r#"
-                typedef Option[t] =
-                  | None
-                  | Some(t)
-                end
-
-                let example = Option::Some("hello")
-            "#,
-            "Option",
-            &[&[InferredType::BuiltIn(hir::BuiltInType::String)]],
-        );
-    }
-
-    #[test]
-    fn track_polymorphic_type_def_usage_indirect() {
-        let mut db = TestHirInferDatabase::default();
-        check_type_def_instantiations(
-            &mut db,
-            r#"
-                typedef Option[t] =
-                  | None
-                  | Some(t)
-                end
-
-                let constructor_example = Option::Some
-
-                let example = constructor_example("hello")
-            "#,
-            "Option",
-            &[&[InferredType::BuiltIn(hir::BuiltInType::String)]],
         );
     }
 

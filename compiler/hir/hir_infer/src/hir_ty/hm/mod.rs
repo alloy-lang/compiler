@@ -255,10 +255,6 @@ pub(super) struct HMInferenceContext<'db> {
     /// Type variables that were active before the current group started
     /// (used for proper generalization in let-polymorphism)
     pub(super) env_type_vars: FxHashSet<TypeVarId>,
-    /// Track instantiations: polymorphic definition -> list of (call_site, fresh_vars)
-    /// The Vec<TypeVarId> contains the fresh type variables created during instantiation
-    /// in the same order as the quantified variables in the PolyType
-    pub(super) instantiations: FxHashMap<EPTdFql, Vec<(Fql<hir::Expression>, Vec<TypeVarId>)>>,
     /// Maps annotation type variable Fql → TypeVarId
     /// Ensures the same type variable declaration always maps to the same inference variable
     pub(super) annotation_type_vars: FxHashMap<Fql<hir::TypeVariable>, TypeVarId>,
@@ -285,7 +281,6 @@ impl<'db> HMInferenceContext<'db> {
             expr_to_group: FxHashMap::default(),
             current_group: None,
             env_type_vars: FxHashSet::default(),
-            instantiations: FxHashMap::default(),
             annotation_type_vars: FxHashMap::default(),
             self_type_vars: FxHashMap::default(),
             type_var_names: FxHashMap::default(),
@@ -307,38 +302,10 @@ impl<'db> HMInferenceContext<'db> {
     fn maybe_find_type(&mut self, fql: impl Into<EPTdFql>) -> Option<MonoType> {
         let fql = fql.into();
         if let Some(poly_ty) = self.poly_env.get(&fql).cloned() {
-            // Instantiate with fresh type variables (without tracking)
             let (instantiated, _fresh_vars) = poly_ty.instantiate(&mut self.type_var_gen);
             Some(instantiated)
         } else {
             self.type_env.get(&fql).cloned()
-        }
-    }
-
-    /// Find a type and track instantiation if it's polymorphic
-    /// call_site: The location where this type is being referenced
-    fn maybe_find_type_tracked(
-        &mut self,
-        def_fql: impl Into<EPTdFql>,
-        call_site: Fql<hir::Expression>,
-    ) -> Option<MonoType> {
-        let def_fql = def_fql.into();
-
-        if let Some(poly_ty) = self.poly_env.get(&def_fql).cloned() {
-            // Instantiate with fresh type variables
-            let (instantiated, fresh_vars) = poly_ty.instantiate(&mut self.type_var_gen);
-
-            // Track this instantiation
-            if !fresh_vars.is_empty() {
-                self.instantiations
-                    .entry(def_fql)
-                    .or_default()
-                    .push((call_site, fresh_vars));
-            }
-
-            Some(instantiated)
-        } else {
-            self.type_env.get(&def_fql).cloned()
         }
     }
 

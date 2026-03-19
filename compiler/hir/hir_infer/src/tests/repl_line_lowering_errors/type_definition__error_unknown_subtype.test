@@ -40,7 +40,6 @@ HirInferredModule {
             range: 37..67,
         },
     ],
-    poly_instantiations: {},
 }
 []
 [E32006] Error: Unknown variant `Nothing`

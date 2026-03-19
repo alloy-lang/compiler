@@ -60,7 +60,6 @@ HirInferredModule {
             range: 18..28,
         },
     ],
-    poly_instantiations: {},
 }
 []
 [E32003] Error: Cannot find pattern `unknown` in this scope

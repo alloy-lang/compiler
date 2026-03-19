@@ -60,55 +60,6 @@ HirTypedModule {
     },
     warnings: [],
     errors: [],
-    poly_instantiations: {
-        Expression(
-            Fql {
-                module_id: ModuleId {
-                    path: "main",
-                },
-                local_id: Idx::<Expression>(1),
-            },
-        ): [
-            PolyInstantiation {
-                call_site: Fql {
-                    module_id: ModuleId {
-                        path: "main",
-                    },
-                    local_id: Idx::<Expression>(6),
-                },
-                type_args: [
-                    BuiltIn(
-                        Bool,
-                    ),
-                ],
-            },
-            PolyInstantiation {
-                call_site: Fql {
-                    module_id: ModuleId {
-                        path: "main",
-                    },
-                    local_id: Idx::<Expression>(5),
-                },
-                type_args: [
-                    BuiltIn(
-                        Int,
-                    ),
-                ],
-            },
-            PolyInstantiation {
-                call_site: Fql {
-                    module_id: ModuleId {
-                        path: "main",
-                    },
-                    local_id: Idx::<Expression>(3),
-                },
-                type_args: [
-                    BuiltIn(
-                        String,
-                    ),
-                ],
-            },
-        ],
-    },
+    poly_instantiations: {},
 }
 []

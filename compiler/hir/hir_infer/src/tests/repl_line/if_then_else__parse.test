@@ -68,30 +68,6 @@ HirInferredModule {
             range: 24..45,
         },
     ],
-    poly_instantiations: {
-        TypeDefinition(
-            Fql {
-                module_id: ModuleId {
-                    path: "test_data",
-                },
-                local_id: Idx::<TypeDefinition>(0),
-            },
-        ): [
-            PolyInstantiation {
-                call_site: Fql {
-                    module_id: ModuleId {
-                        path: "test_data",
-                    },
-                    local_id: Idx::<Expression>(1),
-                },
-                type_args: [
-                    BuiltIn(
-                        Int,
-                    ),
-                ],
-            },
-        ],
-    },
 }
 []
 [E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`

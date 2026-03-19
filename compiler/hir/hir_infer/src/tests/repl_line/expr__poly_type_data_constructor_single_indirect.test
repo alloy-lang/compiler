@@ -76,31 +76,6 @@ HirInferredModule {
             range: 203..236,
         },
     ],
-    poly_instantiations: {
-        TypeDefinitionVariant(
-            Fql {
-                module_id: ModuleId {
-                    path: "main",
-                },
-                local_id: Idx::<TypeDefinition>(0),
-            },
-            "Id",
-        ): [
-            PolyInstantiation {
-                call_site: Fql {
-                    module_id: ModuleId {
-                        path: "main",
-                    },
-                    local_id: Idx::<Expression>(0),
-                },
-                type_args: [
-                    BuiltIn(
-                        String,
-                    ),
-                ],
-            },
-        ],
-    },
 }
 []
 [E33001] Error: Type mismatch: expected `String`, found `Int`

@@ -50,7 +50,6 @@ HirInferredModule {
             range: 1..16,
         },
     ],
-    poly_instantiations: {},
 }
 []
 [E32003] Error: Cannot find pattern `Option::Some` in this scope

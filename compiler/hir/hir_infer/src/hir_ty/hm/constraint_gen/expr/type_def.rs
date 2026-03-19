@@ -13,7 +13,7 @@ pub(super) fn infer_data_constructor(
     // Check if we already have this variant constructor type with tracking
     // This enables polymorphic instantiation tracking for union type variants
     let variant_fql = EPTdFql::TypeDefinition(type_def_fql.clone());
-    if let Some(tracked_ty) = ctx.maybe_find_type_tracked(variant_fql.clone(), source_fql.clone()) {
+    if let Some(tracked_ty) = ctx.maybe_find_type(variant_fql.clone()) {
         return ctx.assign_type(source_fql, tracked_ty);
     }
 
@@ -31,7 +31,7 @@ pub(super) fn infer_variant_constructor(
     // Check if we already have this variant constructor type with tracking
     // This enables polymorphic instantiation tracking for union type variants
     let variant_fql = EPTdFql::TypeDefinitionVariant(type_def_fql.clone(), variant_name.clone());
-    if let Some(tracked_ty) = ctx.maybe_find_type_tracked(variant_fql.clone(), source_fql.clone()) {
+    if let Some(tracked_ty) = ctx.maybe_find_type(variant_fql.clone()) {
         return ctx.assign_type(source_fql, tracked_ty);
     }
 
@@ -80,8 +80,7 @@ pub(super) fn infer_variant_constructor(
         let poly_ty = PolyType::generalize_all(constructor_ty.clone());
         ctx.poly_env.insert(variant_fql.clone(), poly_ty);
 
-        // Now get it again with tracking to record this instantiation
-        if let Some(tracked_ty) = ctx.maybe_find_type_tracked(variant_fql, source_fql.clone()) {
+        if let Some(tracked_ty) = ctx.maybe_find_type(variant_fql) {
             return ctx.assign_type(source_fql, tracked_ty);
         }
     }

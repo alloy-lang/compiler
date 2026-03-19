@@ -113,33 +113,6 @@ HirTypedModule {
     },
     warnings: [],
     errors: [],
-    poly_instantiations: {
-        TypeDefinitionVariant(
-            Fql {
-                module_id: ModuleId {
-                    path: "main",
-                },
-                local_id: Idx::<TypeDefinition>(0),
-            },
-            "Left",
-        ): [
-            PolyInstantiation {
-                call_site: Fql {
-                    module_id: ModuleId {
-                        path: "main",
-                    },
-                    local_id: Idx::<Expression>(1),
-                },
-                type_args: [
-                    BuiltIn(
-                        Int,
-                    ),
-                    Generic(
-                        3,
-                    ),
-                ],
-            },
-        ],
-    },
+    poly_instantiations: {},
 }
 []

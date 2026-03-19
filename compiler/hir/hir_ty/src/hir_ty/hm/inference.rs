@@ -180,10 +180,6 @@ pub fn infer_types_hm(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedMo
                 type_args,
             });
         }
-
-        result
-            .poly_instantiations
-            .insert(def_fql, resolved_instantiations);
     }
 
     // Convert resolution errors to diagnostics

@@ -108,30 +108,6 @@ HirInferredModule {
             range: 58..64,
         },
     ],
-    poly_instantiations: {
-        TypeDefinition(
-            Fql {
-                module_id: ModuleId {
-                    path: "test_data",
-                },
-                local_id: Idx::<TypeDefinition>(0),
-            },
-        ): [
-            PolyInstantiation {
-                call_site: Fql {
-                    module_id: ModuleId {
-                        path: "test_data",
-                    },
-                    local_id: Idx::<Expression>(1),
-                },
-                type_args: [
-                    BuiltIn(
-                        Int,
-                    ),
-                ],
-            },
-        ],
-    },
 }
 [
     ParseError {

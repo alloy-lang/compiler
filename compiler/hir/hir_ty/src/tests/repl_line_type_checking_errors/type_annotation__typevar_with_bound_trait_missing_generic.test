@@ -192,30 +192,7 @@ HirTypedModule {
             range: 165..195,
         },
     ],
-    poly_instantiations: {
-        TypeDefinition(
-            Fql {
-                module_id: ModuleId {
-                    path: "test_data",
-                },
-                local_id: Idx::<TypeDefinition>(0),
-            },
-        ): [
-            PolyInstantiation {
-                call_site: Fql {
-                    module_id: ModuleId {
-                        path: "test_data",
-                    },
-                    local_id: Idx::<Expression>(1),
-                },
-                type_args: [
-                    BuiltIn(
-                        Int,
-                    ),
-                ],
-            },
-        ],
-    },
+    poly_instantiations: {},
 }
 []
 [E34001] Error: Type annotation conflict: expected `t1 : TestTrait1 -> t2 -> Test`, found `t0 -> t1 -> Test[Int]`

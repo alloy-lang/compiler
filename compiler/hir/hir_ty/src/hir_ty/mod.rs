@@ -104,15 +104,6 @@ pub struct PolyInstantiation {
     pub type_args: Vec<ResolvedType>,
 }
 
-impl From<&alloy_hir_infer::PolyInstantiation> for PolyInstantiation {
-    fn from(infer_inst: &alloy_hir_infer::PolyInstantiation) -> Self {
-        PolyInstantiation {
-            call_site: infer_inst.call_site.clone(),
-            type_args: infer_inst.type_args.iter().map(Into::into).collect(),
-        }
-    }
-}
-
 impl ResolvedType {
     /// Check if this type contains type variables (is polymorphic)
     /// Returns true if the type contains Generic or ConstrainedGeneric variants

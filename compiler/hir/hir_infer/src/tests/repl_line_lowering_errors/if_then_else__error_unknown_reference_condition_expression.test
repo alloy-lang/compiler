@@ -43,7 +43,6 @@ HirInferredModule {
             range: 3..8,
         },
     ],
-    poly_instantiations: {},
 }
 []
 [E32002] Error: Cannot find value `test` in this scope

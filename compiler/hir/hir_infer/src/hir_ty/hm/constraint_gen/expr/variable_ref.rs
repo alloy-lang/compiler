@@ -12,7 +12,7 @@ pub(super) fn infer(
     // This enables let-polymorphism: if the variable has been generalized,
     // we'll instantiate it with fresh type variables
     // Use tracked version: source_fql is the call site, ref_fql is the definition
-    if let Some(existing_ty) = ctx.maybe_find_type_tracked(ref_fql.clone(), source_fql.clone()) {
+    if let Some(existing_ty) = ctx.maybe_find_type(ref_fql.clone()) {
         return ctx.assign_type(source_fql, existing_ty);
     }
 

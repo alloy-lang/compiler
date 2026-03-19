@@ -15,6 +15,5 @@ HirInferredModule {
     pattern_types: {},
     warnings: [],
     errors: [],
-    poly_instantiations: {},
 }
 []

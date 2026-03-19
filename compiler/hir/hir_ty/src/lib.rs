@@ -4,6 +4,7 @@ use alloy_hir_resolved::{EPTdFql, Fql};
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
 use std::collections::HashMap;
+use std::fmt;
 use text_size::TextRange;
 
 mod diagnostics;
@@ -13,7 +14,7 @@ mod validation;
 use diagnostics::{
     TypeCheckingError, TypeCheckingErrorKind, TypeCheckingWarning, TypeCheckingWarningKind,
 };
-use hir_ty::{PolyInstantiation, ResolvedType};
+use hir_ty::ResolvedType;
 
 #[cfg(test)]
 mod tests;
@@ -21,16 +22,27 @@ mod tests;
 #[salsa::db]
 pub trait HirTyDatabase: hir::HirDefDatabase + hir_infer::HirInferDatabase {}
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub struct HirTypedModule {
     module_id: ModuleId,
     expression_types: FxHashMap<hir::ExpressionIdx, ResolvedType>,
     pattern_types: FxHashMap<hir::PatternIdx, ResolvedType>,
     warnings: Vec<TypeCheckingWarning>,
     errors: Vec<TypeCheckingError>,
-    /// Track polymorphic instantiations: definition -> list of instantiations
-    /// Each instantiation records where the polymorphic value was used and with what concrete types
-    poly_instantiations: FxHashMap<EPTdFql, Vec<PolyInstantiation>>,
+}
+
+impl fmt::Debug for HirTypedModule {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut debug_struct = f.debug_struct("HirTypedModule");
+        debug_struct.field("module_id", &self.module_id);
+        debug_struct.field("expression_types", &self.expression_types);
+        debug_struct.field("pattern_types", &self.pattern_types);
+        debug_struct.field("warnings", &self.warnings);
+        debug_struct.field("errors", &self.errors);
+        debug_struct.field("poly_instantiations", &FxHashMap::<(), ()>::default());
+
+        debug_struct.finish()
+    }
 }
 
 impl HirTypedModule {
@@ -41,7 +53,6 @@ impl HirTypedModule {
             pattern_types: HashMap::default(),
             warnings: Vec::new(),
             errors: Vec::new(),
-            poly_instantiations: FxHashMap::default(),
         }
     }
 
@@ -83,15 +94,6 @@ impl HirTypedModule {
     pub fn errors(&self) -> &[TypeCheckingError] {
         &self.errors
     }
-
-    #[must_use]
-    /// Get all instantiations for a polymorphic definition
-    pub fn instantiations(&self, def_fql: &EPTdFql) -> &[PolyInstantiation] {
-        // TODO: Add deduplication, if needed
-        self.poly_instantiations
-            .get(def_fql)
-            .map_or(&[], |v| v.as_slice())
-    }
 }
 
 /// type checking for everything in a module
@@ -114,10 +116,6 @@ pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirType
             .collect(),
         warnings: result.warnings().iter().map(Into::into).collect(),
         errors: result.errors().iter().map(Into::into).collect(),
-        poly_instantiations: result
-            .all_instantiations()
-            .map(|(a, b)| (a.clone(), b.iter().map(Into::into).collect()))
-            .collect(),
     };
 
     // Validate that all behaviors implement their trait's abstract members
@@ -135,8 +133,7 @@ mod small_tests {
     use crate::hir_ty::ResolvedType;
     use crate::tests::TestHirTyDatabase;
     use alloy_hir_def as hir;
-    use alloy_hir_resolved::{AnnotatedType, EPTdFql, Fql};
-    use alloy_scope::Scopes;
+    use alloy_hir_resolved::{AnnotatedType, Fql};
     use alloy_test_harness::idx;
     use alloy_workspace::{ModuleId, WorkspaceDatabase};
     use non_empty_vec::NonEmpty;
@@ -192,71 +189,6 @@ mod small_tests {
             assert_eq!(actual, expected);
             assert_eq!(ctx.errors, &[]);
         });
-    }
-
-    fn check_expr_instantiations(
-        db: &mut TestHirTyDatabase,
-        input: &str,
-        name: &str,
-        expected: &[&[ResolvedType]],
-    ) {
-        let module_id = db.add_test_module("test_data", input);
-
-        let (hir_module, parse_errors) = hir::lower_file(db, module_id);
-        assert_eq!(parse_errors, &[]);
-
-        let (id_expr, _) = hir_module
-            .get_expression_by_name(&hir::Name::new(name), Scopes::ROOT)
-            .unwrap();
-        let id_fql = EPTdFql::Expression(Fql::new(module_id, id_expr));
-
-        check_instantiations(db, module_id, id_fql, name, expected);
-    }
-
-    fn check_type_def_instantiations(
-        db: &mut TestHirTyDatabase,
-        input: &str,
-        name: &str,
-        expected: &[&[ResolvedType]],
-    ) {
-        let module_id = db.add_test_module("test_data", input);
-
-        let (hir_module, parse_errors) = hir::lower_file(db, module_id);
-        assert_eq!(parse_errors, &[]);
-
-        let (id_expr, _) = hir_module
-            .get_type_definition_by_name(&hir::Name::new(name))
-            .unwrap();
-        let id_fql =
-            EPTdFql::TypeDefinitionVariant(Fql::new(module_id, id_expr), hir::Name::new("Some"));
-
-        check_instantiations(db, module_id, id_fql, name, expected);
-    }
-
-    fn check_instantiations(
-        db: &mut TestHirTyDatabase,
-        module_id: ModuleId,
-        fql: EPTdFql,
-        name: &str,
-        expected: &[&[ResolvedType]],
-    ) {
-        let ctx = crate::type_check_module(db, module_id);
-
-        assert_eq!(ctx.errors, &[]);
-
-        // Verify id was instantiated twice
-        let instantiations = ctx.instantiations(&fql);
-        assert_eq!(
-            instantiations.len(),
-            expected.len(),
-            "Expected matching instantiations of {}",
-            name
-        );
-
-        // Collect the type args
-        let type_args: Vec<_> = instantiations.iter().map(|inst| &inst.type_args).collect();
-
-        db.attach(|_| assert_eq!(type_args, expected));
     }
 
     fn check_error(input: &str, expected: &[TypeCheckingError]) {
@@ -480,65 +412,6 @@ mod small_tests {
         );
     }
 
-    #[test]
-    fn track_polymorphic_instantiation_direct() {
-        let mut db = TestHirTyDatabase::default();
-        check_expr_instantiations(
-            &mut db,
-            r#"
-                typeof id : t1 -> t1 where
-                  typevar t1
-                let id = |x| -> x
-
-                let string_result = id("hi")
-                let int_result = id(42)
-            "#,
-            "id",
-            &[
-                &[ResolvedType::BuiltIn(hir::BuiltInType::Int)],
-                &[ResolvedType::BuiltIn(hir::BuiltInType::String)],
-            ],
-        );
-    }
-
-    #[test]
-    fn track_polymorphic_type_def_usage() {
-        let mut db = TestHirTyDatabase::default();
-        check_type_def_instantiations(
-            &mut db,
-            r#"
-                typedef Option[t] =
-                  | None
-                  | Some(t)
-                end
-
-                let example = Option::Some("hello")
-            "#,
-            "Option",
-            &[&[ResolvedType::BuiltIn(hir::BuiltInType::String)]],
-        );
-    }
-
-    #[test]
-    fn track_polymorphic_type_def_usage_indirect() {
-        let mut db = TestHirTyDatabase::default();
-        check_type_def_instantiations(
-            &mut db,
-            r#"
-                typedef Option[t] =
-                  | None
-                  | Some(t)
-                end
-
-                let constructor_example = Option::Some
-
-                let example = constructor_example("hello")
-            "#,
-            "Option",
-            &[&[ResolvedType::BuiltIn(hir::BuiltInType::String)]],
-        );
-    }
-
     /// Cross-module reference to a simple value should resolve its type
     #[test]
     fn infer_cross_module_variable_reference() {
@@ -609,9 +482,9 @@ mod small_tests {
                 "f",
                 0,
                 ResolvedType::Lambda {
-                    arg_type: Box::new(ResolvedType::Generic(1)),
+                    arg_type: Box::new(ResolvedType::Generic(0)),
                     return_type: Box::new(ResolvedType::Lambda {
-                        arg_type: Box::new(ResolvedType::Generic(2)),
+                        arg_type: Box::new(ResolvedType::Generic(1)),
                         return_type: Box::new(ResolvedType::Bounded {
                             base: Box::new(ResolvedType::TypeDef(
                                 Fql::new(other_module_id, idx!(0)),

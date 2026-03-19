@@ -57,7 +57,6 @@ HirInferredModule {
     },
     warnings: [],
     errors: [],
-    poly_instantiations: {},
 }
 [
     ParseError {
