@@ -10,12 +10,12 @@ pub(super) fn infer(
     rhs: Fql<hir::Expression>,
     op: hir::BinaryOp,
 ) -> MonoType {
-    let lhs_ty = super::infer_expr_hm(ctx, lhs.clone());
-    let rhs_ty = super::infer_expr_hm(ctx, rhs.clone());
-
     match op {
         hir::BinaryOp::Add | hir::BinaryOp::Sub | hir::BinaryOp::Mul | hir::BinaryOp::Div => {
             // Arithmetic operators: both sides should be numeric (for simplicity, we'll just use a type variable)
+            let lhs_ty = super::infer_expr_hm(ctx, lhs.clone());
+            let rhs_ty = super::infer_expr_hm(ctx, rhs.clone());
+
             let num_ty = ctx.fresh_type_var();
             ctx.add_equation(lhs_ty.clone(), num_ty.clone(), source_fql.clone());
             ctx.add_equation(rhs_ty.clone(), num_ty.clone(), source_fql.clone());
