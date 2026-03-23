@@ -1,5 +1,4 @@
 use super::super::super::inference::annotated_to_mono;
-use super::super::super::PolyType;
 use super::{HMInferenceContext, MonoType};
 use alloy_hir_def as hir;
 use alloy_hir_resolved as res;
@@ -70,22 +69,8 @@ pub(super) fn infer_variant_constructor(
     // Build the constructor type using the shared helper
     let constructor_ty = build_constructor_type(ctx, &type_def_fql, &type_def, &member);
 
-    // Check if this is a polymorphic constructor
-    let is_polymorphic = has_type_variables(&constructor_ty);
-
-    if is_polymorphic {
-        // Generalize and store in poly_env for proper instantiation
-        // For variant constructors, quantify over ALL free variables (not filtered by env_type_vars)
-        // since constructors are top-level polymorphic values
-        let poly_ty = PolyType::generalize_all(constructor_ty.clone());
-        ctx.poly_env.insert(variant_fql.clone(), poly_ty);
-
-        if let Some(tracked_ty) = ctx.maybe_find_type(variant_fql) {
-            return ctx.assign_type(source_fql, tracked_ty);
-        }
-    }
-
-    ctx.assign_type(source_fql, constructor_ty)
+    let tracked_ty = ctx.generalize_to_poly(constructor_ty, variant_fql);
+    ctx.assign_type(source_fql, tracked_ty)
 }
 
 pub(super) fn infer_type_definition(
@@ -115,18 +100,7 @@ pub(super) fn infer_type_definition(
             // When you call Identity(...), it's the same as Id(...)
             let constructor_ty = build_constructor_type(ctx, &td_fql, &type_def, member);
 
-            // Check if this is a polymorphic constructor (has App with type variables)
-            let is_polymorphic = has_type_variables(&constructor_ty);
-
-            if is_polymorphic {
-                // Generalize and store in poly_env for proper instantiation
-                // For type definition constructors, quantify over ALL free variables
-                // since constructors are top-level polymorphic values
-                let poly_ty = PolyType::generalize_all(constructor_ty.clone());
-                ctx.poly_env.insert(td_fql.clone().into(), poly_ty);
-            }
-
-            constructor_ty
+            ctx.generalize_to_poly(constructor_ty, &td_fql)
         }
         TypeDefinitionKind::Union(_members) => {
             // Multi-variant type - cannot be called as a function directly
@@ -208,20 +182,4 @@ fn build_constructor_type(
         .fold(result_type, |acc, param_ty| {
             MonoType::Function(Box::new(param_ty), Box::new(acc))
         })
-}
-
-/// Check if a MonoType contains type variables (is polymorphic)
-fn has_type_variables(ty: &MonoType) -> bool {
-    match ty {
-        MonoType::Var(_) => true,
-        MonoType::Function(arg, ret) => has_type_variables(arg) || has_type_variables(ret),
-        MonoType::Tuple(elements) => elements.iter().any(has_type_variables),
-        MonoType::App { constructor, args } => {
-            has_type_variables(constructor) || args.iter().any(has_type_variables)
-        }
-        MonoType::Unconstrained
-        | MonoType::Concrete(_)
-        | MonoType::TypeDef { .. }
-        | MonoType::Unit => false,
-    }
 }

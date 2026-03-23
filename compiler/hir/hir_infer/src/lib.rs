@@ -99,7 +99,7 @@ pub fn infer_types_module(db: &dyn HirInferDatabase, module_id: ModuleId) -> Hir
 }
 
 #[cfg(test)]
-mod small_tests {
+mod hir_infer_small_tests {
     use crate::hir_ty::InferredType;
     use crate::tests::TestHirInferDatabase;
     use alloy_hir_def as hir;

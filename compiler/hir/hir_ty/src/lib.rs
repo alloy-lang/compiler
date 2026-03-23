@@ -126,7 +126,7 @@ pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirType
 }
 
 #[cfg(test)]
-mod small_tests {
+mod hir_ty_small_tests {
     use crate::diagnostics::{
         ConflictingTypeAnnotationReason, TypeCheckingError, TypeCheckingErrorKind,
     };

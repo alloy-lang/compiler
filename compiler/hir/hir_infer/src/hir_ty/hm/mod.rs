@@ -62,6 +62,54 @@ pub enum MonoType {
     Unit,
 }
 
+impl MonoType {
+    pub(crate) fn is_polymorphic(&self) -> bool {
+        match self {
+            MonoType::Var(_) => true,
+            MonoType::Function(arg, ret) => arg.is_polymorphic() || ret.is_polymorphic(),
+            MonoType::Tuple(elements) => elements.iter().any(Self::is_polymorphic),
+            MonoType::App { constructor, args } => {
+                constructor.is_polymorphic() || args.iter().any(Self::is_polymorphic)
+            }
+            MonoType::Unconstrained
+            | MonoType::Concrete(_)
+            | MonoType::TypeDef { .. }
+            | MonoType::Unit => false,
+        }
+    }
+
+    pub(crate) fn free_type_vars(&self) -> Vec<TypeVarId> {
+        let mut vars = FxHashSet::default();
+        self.collect_free_vars(&mut vars);
+        vars.into_iter().collect()
+    }
+
+    fn collect_free_vars(&self, vars: &mut FxHashSet<TypeVarId>) {
+        match self {
+            MonoType::Unconstrained => {}
+            MonoType::Var(v) => {
+                vars.insert(*v);
+            }
+            MonoType::Function(arg, ret) => {
+                arg.collect_free_vars(vars);
+                ret.collect_free_vars(vars);
+            }
+            MonoType::Tuple(tys) => {
+                for t in tys {
+                    t.collect_free_vars(vars);
+                }
+            }
+            MonoType::App { constructor, args } => {
+                constructor.collect_free_vars(vars);
+                for t in args {
+                    t.collect_free_vars(vars);
+                }
+            }
+            MonoType::Concrete(_) | MonoType::TypeDef { .. } | MonoType::Unit => {}
+        }
+    }
+}
+
 impl std::fmt::Display for MonoType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -153,57 +201,9 @@ impl TypeVarGenerator {
     }
 }
 
-/// Compute the free type variables in a type
-pub(super) fn free_type_vars(ty: &MonoType) -> Vec<TypeVarId> {
-    let mut vars = FxHashSet::default();
-    collect_free_vars(ty, &mut vars);
-    vars.into_iter().collect()
-}
-
-fn collect_free_vars(ty: &MonoType, vars: &mut FxHashSet<TypeVarId>) {
-    match ty {
-        MonoType::Unconstrained => {}
-        MonoType::Var(v) => {
-            vars.insert(*v);
-        }
-        MonoType::Function(arg, ret) => {
-            collect_free_vars(arg, vars);
-            collect_free_vars(ret, vars);
-        }
-        MonoType::Tuple(tys) => {
-            for t in tys {
-                collect_free_vars(t, vars);
-            }
-        }
-        MonoType::App { constructor, args } => {
-            collect_free_vars(constructor, vars);
-            for t in args {
-                collect_free_vars(t, vars);
-            }
-        }
-        MonoType::Concrete(_) | MonoType::TypeDef { .. } | MonoType::Unit => {}
-    }
-}
-
 impl PolyType {
-    /// Generalize a monotype into a polytype by quantifying free variables
-    /// that are not present in the environment
-    pub(super) fn generalize(ty: MonoType, env_vars: &FxHashSet<TypeVarId>) -> Self {
-        let free_vars = free_type_vars(&ty);
-        let quantified: Vec<TypeVarId> = free_vars
-            .into_iter()
-            .filter(|v| !env_vars.contains(v))
-            .collect();
-
-        Self {
-            quantified,
-            constraints: Vec::new(),
-            body: ty,
-        }
-    }
-
     pub(super) fn generalize_all(ty: MonoType) -> Self {
-        let quantified = free_type_vars(&ty);
+        let quantified = ty.free_type_vars();
 
         Self {
             quantified,
@@ -215,7 +215,7 @@ impl PolyType {
     /// Instantiate a polytype with fresh type variables
     /// Returns (instantiated_type, fresh_vars_in_order)
     /// The fresh_vars Vec contains the fresh variables in the same order as self.quantified
-    pub(super) fn instantiate(&self, gen: &mut TypeVarGenerator) -> (MonoType, Vec<TypeVarId>) {
+    fn instantiate(&self, gen: &mut TypeVarGenerator) -> (MonoType, Vec<TypeVarId>) {
         if self.quantified.is_empty() {
             return (self.body.clone(), Vec::new());
         }
@@ -309,6 +309,21 @@ impl<'db> HMInferenceContext<'db> {
         }
     }
 
+    fn generalize_to_poly(
+        &mut self,
+        mono_ty: MonoType,
+        source_fql: impl Into<EPTdFql> + Clone,
+    ) -> MonoType {
+        if mono_ty.is_polymorphic() {
+            let poly_ty = PolyType::generalize_all(mono_ty);
+            self.poly_env.insert(source_fql.clone().into(), poly_ty);
+            self.maybe_find_type(source_fql)
+                .expect("must find poly type just inserted")
+        } else {
+            self.assign_type(source_fql, mono_ty)
+        }
+    }
+
     /// Generate a fresh type variable
     pub(super) fn fresh_type_var(&mut self) -> MonoType {
         MonoType::Var(self.type_var_gen.fresh())
@@ -337,13 +352,6 @@ impl<'db> HMInferenceContext<'db> {
             right,
             source: fql.into(),
         });
-    }
-
-    /// Generalize a type for let-binding
-    pub(super) fn generalize_type(&self, ty: MonoType) -> PolyType {
-        // Use the environment type variables from before this group
-        // This ensures we quantify over type variables local to this expression
-        PolyType::generalize(ty, &self.env_type_vars)
     }
 
     /// Get or create a type variable for an annotation type variable (typevar declaration).
