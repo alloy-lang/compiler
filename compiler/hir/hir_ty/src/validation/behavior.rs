@@ -53,6 +53,7 @@ fn validate_behavior(
     let trait_def = trait_module.get_trait(trait_fql.local_id);
 
     let type_name = type_fql.type_def_name(db);
+    let trait_name = trait_fql.trait_name(db);
 
     // Check all abstract members of the trait
     for (member_name, _type_annotation) in trait_def.abstract_members() {
@@ -60,7 +61,7 @@ fn validate_behavior(
         if !behavior.has_implementation(member_name) {
             result.error(
                 TypeCheckingErrorKind::MissingTraitMemberImplementation {
-                    trait_name: trait_def.name().clone(),
+                    trait_name: trait_name.clone(),
                     member_name: member_name.clone(),
                     type_name: type_name.clone(),
                 },
