@@ -1,5 +1,7 @@
 typedef Identity[t] = Id t
 
+typeof constructor : t -> Identity[t] where
+  typevar t
 -- TODO: single type def data constructors referencable by top-level name
 -- let constructor = Identity
 let constructor = Identity::Id
@@ -13,8 +15,8 @@ HirTypedModule {
     },
     expression_types: {
         Idx::<Expression>(0): Lambda {
-            arg_type: BuiltIn(
-                String,
+            arg_type: Generic(
+                1,
             ),
             return_type: Bounded {
                 base: TypeDef(
@@ -27,8 +29,8 @@ HirTypedModule {
                     "Identity",
                 ),
                 args: [
-                    BuiltIn(
-                        String,
+                    Generic(
+                        1,
                     ),
                 ],
             },
@@ -49,9 +51,22 @@ HirTypedModule {
                 ),
             ],
         },
-        Idx::<Expression>(4): Generic(
-            1,
-        ),
+        Idx::<Expression>(4): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Identity",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
         Idx::<Expression>(1): BuiltIn(
             String,
         ),
@@ -61,38 +76,7 @@ HirTypedModule {
     },
     pattern_types: {},
     warnings: [],
-    errors: [
-        TypeCheckingError {
-            kind: InferenceError(
-                TypeInferenceError {
-                    kind: UnificationError(
-                        TypeMismatch(
-                            Concrete(
-                                String,
-                            ),
-                            Concrete(
-                                Int,
-                            ),
-                        ),
-                    ),
-                    range: 203..236,
-                },
-            ),
-            range: 203..236,
-        },
-    ],
+    errors: [],
     poly_instantiations: {},
 }
 []
-[E33001] Error: Type mismatch: expected `String`, found `Int`
-   ╭─[ ./test/main.alloy:8:1 ]
-   │
- 8 │ let int_example = constructor(10)
-   │ ────────────────┬────────────────  
-   │                 ╰────────────────── expected `String`, found `Int`
-   │ 
-   │ Help: These types must be compatible
-───╯
-
-
-

@@ -15,6 +15,7 @@ mod constraint_gen;
 mod inference;
 pub mod unification;
 
+use inference::infer_body_type;
 pub use inference::infer_types_hm;
 
 /// Unique identifier for a type variable
@@ -35,7 +36,7 @@ impl std::fmt::Display for TypeVarId {
 
 /// Monomorphic types (no quantification)
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MonoType {
+pub(crate) enum MonoType {
     Unconstrained,
     /// Type variable (e.g., `a`, `b`)
     Var(TypeVarId),
@@ -240,6 +241,10 @@ pub(super) struct HMInferenceContext<'db> {
     pub(super) module_id: alloy_workspace::ModuleId,
     /// Type variable generator
     pub(super) type_var_gen: TypeVarGenerator,
+    /// The expression currently being inferred by `infer_body_type`.
+    /// Used to skip the `infer_value_signature` shortcut for this expression
+    /// to prevent Salsa cycles.
+    pub(super) inferring_expr: Option<Fql<hir::Expression>>,
     /// Type equations to be solved
     pub(super) equations: Vec<TypeEquation>,
     /// Type environment (maps expressions/patterns to their types)
@@ -248,13 +253,6 @@ pub(super) struct HMInferenceContext<'db> {
     pub(super) poly_env: FxHashMap<EPTdFql, PolyType>,
     /// Resolution errors collected during inference (FQL + reference path + module_id)
     pub(super) resolution_errors: Vec<HirResolutionError>,
-    /// Map from expression ID to its dependency group index (for lazy constraint generation)
-    pub(super) expr_to_group: FxHashMap<hir::ExpressionIdx, usize>,
-    /// Current dependency group being processed (for lazy constraint generation)
-    pub(super) current_group: Option<usize>,
-    /// Type variables that were active before the current group started
-    /// (used for proper generalization in let-polymorphism)
-    pub(super) env_type_vars: FxHashSet<TypeVarId>,
     /// Maps annotation type variable Fql → TypeVarId
     /// Ensures the same type variable declaration always maps to the same inference variable
     pub(super) annotation_type_vars: FxHashMap<Fql<hir::TypeVariable>, TypeVarId>,
@@ -266,36 +264,19 @@ pub(super) struct HMInferenceContext<'db> {
 }
 
 impl<'db> HMInferenceContext<'db> {
-    pub(super) fn new(
-        db: &'db dyn crate::HirInferDatabase,
-        module_id: alloy_workspace::ModuleId,
-    ) -> Self {
+    fn new(db: &'db dyn crate::HirInferDatabase, module_id: alloy_workspace::ModuleId) -> Self {
         Self {
             db,
             module_id,
             type_var_gen: TypeVarGenerator::new(),
+            inferring_expr: None,
             equations: Vec::new(),
             type_env: FxHashMap::default(),
             poly_env: FxHashMap::default(),
             resolution_errors: Vec::new(),
-            expr_to_group: FxHashMap::default(),
-            current_group: None,
-            env_type_vars: FxHashSet::default(),
             annotation_type_vars: FxHashMap::default(),
             self_type_vars: FxHashMap::default(),
             type_var_names: FxHashMap::default(),
-        }
-    }
-
-    /// Check if an expression is in a later dependency group than the current one
-    /// Returns true if we should avoid inferring this expression now
-    pub(super) fn is_in_later_group(&self, expr_id: hir::ExpressionIdx) -> bool {
-        if let (Some(current), Some(&expr_group)) =
-            (self.current_group, self.expr_to_group.get(&expr_id))
-        {
-            expr_group > current
-        } else {
-            false
         }
     }
 
@@ -325,15 +306,11 @@ impl<'db> HMInferenceContext<'db> {
     }
 
     /// Generate a fresh type variable
-    pub(super) fn fresh_type_var(&mut self) -> MonoType {
+    fn fresh_type_var(&mut self) -> MonoType {
         MonoType::Var(self.type_var_gen.fresh())
     }
 
-    pub(super) fn unknown_reference(
-        &mut self,
-        err: HirResolutionError,
-        fql: impl Into<EPFql>,
-    ) -> MonoType {
+    fn unknown_reference(&mut self, err: HirResolutionError, fql: impl Into<EPFql>) -> MonoType {
         self.resolution_errors.push(err);
         let ty = self.fresh_type_var();
         self.assign_type(fql.into(), ty)
@@ -346,7 +323,7 @@ impl<'db> HMInferenceContext<'db> {
     }
 
     /// Add a type equation
-    pub(super) fn add_equation(&mut self, left: MonoType, right: MonoType, fql: impl Into<EPFql>) {
+    fn add_equation(&mut self, left: MonoType, right: MonoType, fql: impl Into<EPFql>) {
         self.equations.push(TypeEquation {
             left,
             right,
@@ -356,7 +333,7 @@ impl<'db> HMInferenceContext<'db> {
 
     /// Get or create a type variable for an annotation type variable (typevar declaration).
     /// Ensures the same Fql<TypeDefinition> always maps to the same TypeVarId.
-    pub(super) fn get_or_create_annotation_type_var(
+    fn get_or_create_annotation_type_var(
         &mut self,
         fql: Fql<hir::TypeVariable>,
         name: hir::Name,
@@ -372,7 +349,7 @@ impl<'db> HMInferenceContext<'db> {
 
     /// Get or create a type variable for a Self type in a trait context.
     /// Ensures the same Fql<Trait> always maps to the same TypeVarId.
-    pub(super) fn get_or_create_self_type_var(&mut self, trait_fql: Fql<hir::Trait>) -> TypeVarId {
+    fn get_or_create_self_type_var(&mut self, trait_fql: Fql<hir::Trait>) -> TypeVarId {
         if let Some(&var_id) = self.self_type_vars.get(&trait_fql) {
             return var_id;
         }

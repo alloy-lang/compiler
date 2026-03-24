@@ -16,172 +16,92 @@ use rustc_hash::FxHashMap;
 
 /// Main Hindley-Milner type inference function for a module
 ///
-/// This function performs HM type inference with let-polymorphism:
-/// 1. Dependency analysis: Build dependency graph and compute topological order
-/// 2. For each SCC (strongly-connected component):
-///    a. Constraint generation: Generate type equations for all expressions in the SCC
-///    b. Unification: Solve all accumulated type equations
-///    c. Generalization: For polymorphic type annotations, generalize and store in poly_env
-/// 3. Application: Apply final substitution to all types and convert to ResolvedType
+/// Uses a single shared HM context for all same-module definitions and
+/// expressions, so that call-site constraints flow back to definitions.
+///
+/// Cross-module references and same-module definitions with polymorphic type
+/// annotations use `infer_value_signature` (a Salsa tracked query) for
+/// caching and proper instantiation.
+///
+/// 1. Generate constraints for all expressions in a shared context
+/// 2. Solve all type equations
+/// 3. Generalize polymorphic-annotated definitions
+/// 4. Apply substitution and convert to the module result
 pub fn infer_types_hm(db: &dyn HirInferDatabase, module_id: ModuleId) -> HirInferredModule {
     let mut ctx = HMInferenceContext::new(db, module_id);
     let (hir_module, _) = hir::lower_file(db, module_id);
 
-    // Phase 1 & 2: Process expression groups in dependency order
-    for (group_idx, group) in hir_module.expression_groups() {
-        // Set the current group for lazy constraint generation
-        ctx.current_group = Some(group_idx);
+    // Phase 1: Generate constraints for all top-level definitions and bare expressions.
+    // Value definitions are inferred via their body expression; sub-expressions
+    // are recursively handled by the constraint generation.
+    // Set inferring_expr so that infer_expr_hm resolves the body directly
+    // instead of going through infer_value_signature (which would lose
+    // sub-expression types and error reporting).
+    for (&expr_id, value) in hir_module.values() {
+        ctx.inferring_expr = Some(Fql::new(module_id, expr_id));
+        infer_definition_constraints(&mut ctx, db, module_id, expr_id);
+        ctx.inferring_expr = None;
 
-        // Capture environment type variables before processing this group
-        // These are the type variables from all previous groups
-        // IMPORTANT: Skip variables from expressions that have been generalized (in poly_env)
-        // because those are now polymorphic and their type variables are quantified
-        ctx.env_type_vars.clear();
-
-        for (fql, t) in &ctx.type_env {
-            // Skip expressions that have been generalized to poly_env
-            if ctx.poly_env.contains_key(fql) {
-                continue;
-            }
-
-            // Only collect type variables from top-level named expressions (let-bindings)
-            // This excludes internal expressions like lambda parameters and bodies
-            let should_include = match fql {
-                EPTdFql::Expression(expr_fql) => {
-                    // Only include if this expression has a name AND is in the same module
-                    expr_fql.module_id == module_id
-                        && hir_module.get_value_by_id(&expr_fql.local_id).is_some()
-                }
-                // Patterns are internal to their expressions, don't include them
-                EPTdFql::Pattern(_) => false,
-                EPTdFql::TypeDefinition(td_fql) | EPTdFql::TypeDefinitionVariant(td_fql, _) => {
-                    // Type definitions can be polymorphic (e.g., List[t], Option[t])
-                    // Include them if they're in the same module
-                    // Unlike expressions, type definitions are always named by definition
-                    td_fql.module_id == module_id
-                }
-            };
-
-            if should_include {
-                ctx.env_type_vars.extend(super::free_type_vars(t));
-            }
-        }
-
-        // 1a. Generate constraints for all expressions in this group
-        for &expr_id in group {
-            ctx.expr_to_group.insert(expr_id, group_idx);
-
-            let expr_fql = Fql::new(module_id, expr_id);
-            infer_expr_hm(&mut ctx, expr_fql.clone());
-
-            // Add type annotation constraints
-            // For polymorphic annotations, we skip adding constraints here
-            // and instead just use the annotation to guide generalization
-            if let Some(value) = hir_module.get_value_by_id(&expr_id) {
-                if let Some(type_annotation) = value.type_annotation {
-                    // Get the inferred type for this expression
-                    if let Some(inferred_mono_ty) = ctx.maybe_find_type(&expr_fql) {
-                        let annotated = resolve_annotated_type(db, module_id, type_annotation);
-
-                        // Only add unification constraints for non-polymorphic annotations
-                        // Polymorphic annotations are used for generalization instead
-                        if !annotated.is_polymorphic() {
-                            if let Some(annotated_mono) = annotated_to_mono(&annotated, &mut ctx) {
-                                ctx.add_equation(
-                                    inferred_mono_ty,
-                                    annotated_mono,
-                                    expr_fql.clone(),
-                                );
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // 1b. Solve all accumulated type equations
-        let (substitution, _unification_errors) = solve_equations(db, ctx.equations.clone());
-
-        // 1c. Generalize polymorphic let-bindings
-        for &expr_id in group {
-            if let Some(value) = hir_module.get_value_by_id(&expr_id) {
-                if let Some(type_annotation) = value.type_annotation {
+        // For definitions with polymorphic annotations, store in poly_env.
+        // This ensures that subsequent references in the shared context get fresh instantiations, preserving let-polymorphism.
+        if let Some(type_annotation) = value.type_annotation {
+            let annotated = resolve_annotated_type(db, module_id, type_annotation);
+            if annotated.is_polymorphic() {
+                if let Some(anno_mono) = annotated_to_mono(&annotated, &mut ctx) {
                     let expr_fql = Fql::new(module_id, expr_id);
-                    let annotated = resolve_annotated_type(db, module_id, type_annotation);
-
-                    // Get the inferred type and apply substitution
-                    if let Some(mono_ty) = ctx.maybe_find_type(&expr_fql) {
-                        let resolved_ty = substitution.apply(&mono_ty);
-
-                        // Check if this should be generalized
-                        if annotated.is_polymorphic() {
-                            // Generalize the type and store in poly_env
-                            let poly_ty = ctx.generalize_type(resolved_ty.clone());
-                            ctx.poly_env.insert(expr_fql.clone().into(), poly_ty);
-                        }
-
-                        // Update type_env with the resolved type
-                        ctx.type_env.insert(expr_fql.into(), resolved_ty);
-                    }
+                    let poly_ty = super::PolyType::generalize_all(anno_mono);
+                    ctx.poly_env.insert(expr_fql.into(), poly_ty);
                 }
             }
         }
     }
 
-    // Phase 3: Solve all remaining equations to get final substitution
+    // Also infer bare top-level expressions (not associated with a value definition)
+    for (expr_id, _expr, _range, _name_scope) in hir_module.expressions() {
+        if hir_module.get_value_by_id(&expr_id).is_some() {
+            continue;
+        }
+        let expr_fql = Fql::new(module_id, expr_id);
+        infer_expr_hm(&mut ctx, expr_fql);
+    }
+
+    // Phase 2: Solve all type equations
     let (substitution, unification_errors) = solve_equations(db, ctx.equations.clone());
-    // Phase 3: Apply the substitution to all types in the environment
+
+    // Phase 3: Generalize polymorphic-annotated definitions
+    // Must read from type_env directly (not maybe_find_type) because poly_env
+    // may contain pre-solving generalizations from Phase 1 — instantiating those
+    // would produce fresh variables not present in the substitution.
+    for (&expr_id, _value) in hir_module.values() {
+        let expr_fql = Fql::new(module_id, expr_id);
+        let fql_key: EPTdFql = expr_fql.clone().into();
+
+        if let Some(mono_ty) = ctx.type_env.get(&fql_key).cloned() {
+            let resolved_ty = substitution.apply(&mono_ty);
+            ctx.generalize_to_poly(resolved_ty, fql_key);
+        }
+    }
+
+    // Phase 4: Apply substitution and collect results
     let mut result = HirInferredModule::empty(module_id);
 
-    // Create a shared type variable mapping for the entire module
-    // This ensures that the same TypeVarId gets the same Generic ID everywhere
     let mut type_var_map: FxHashMap<TypeVarId, usize> = FxHashMap::default();
     let mut next_generic_id = 0;
 
     for (fql, poly_type) in &ctx.poly_env {
-        // For polymorphic types, we only need to convert the body
-        let mono_ty = &poly_type.body;
+        let mono_ty = substitution.apply(&poly_type.body);
         let resolved_type =
-            mono_to_resolved_with_map(mono_ty, &mut type_var_map, &mut next_generic_id);
-
-        result.insert_type(fql.clone(), resolved_type.clone());
+            mono_to_resolved_with_map(&mono_ty, &mut type_var_map, &mut next_generic_id);
+        result.insert_type(fql.clone(), resolved_type);
     }
 
     for (fql, mono_type) in &ctx.type_env {
-        // For monomorphic types, apply substitution first
         let mono_ty = substitution.apply(mono_type);
         let resolved_type =
             mono_to_resolved_with_map(&mono_ty, &mut type_var_map, &mut next_generic_id);
-
-        result.insert_type(fql.clone(), resolved_type.clone());
+        result.insert_type(fql.clone(), resolved_type);
     }
 
-    // Phase 4: Resolve instantiations to concrete types
-    for (def_fql, instantiations) in ctx.instantiations {
-        let mut resolved_instantiations = Vec::new();
-
-        for (call_site, fresh_vars) in instantiations {
-            // Resolve each fresh variable to a concrete type using the final substitution
-            let type_args: Vec<InferredType> = fresh_vars
-                .iter()
-                .map(|&var_id| {
-                    let mono_ty = substitution.apply(&MonoType::Var(var_id));
-                    mono_to_resolved_with_map(&mono_ty, &mut type_var_map, &mut next_generic_id)
-                })
-                .collect();
-
-            resolved_instantiations.push(crate::hir_ty::PolyInstantiation {
-                call_site,
-                type_args,
-            });
-        }
-
-        result
-            .poly_instantiations
-            .insert(def_fql, resolved_instantiations);
-    }
-
-    // Convert resolution errors to diagnostics
     for err in ctx.resolution_errors {
         let range = err.get_range(db);
         result.error(TypeInferenceErrorKind::HirResolutionError(err), range);
@@ -192,6 +112,78 @@ pub fn infer_types_hm(db: &dyn HirInferDatabase, module_id: ModuleId) -> HirInfe
     }
 
     result
+}
+
+/// Run constraint generation for a single value definition.
+///
+/// Generates constraints for the body expression and adds annotation
+/// constraints if a non-polymorphic type annotation is present.
+fn infer_definition_constraints(
+    ctx: &mut HMInferenceContext,
+    db: &dyn HirInferDatabase,
+    module_id: ModuleId,
+    expr_id: hir::ExpressionIdx,
+) {
+    let expr_fql = Fql::new(module_id, expr_id);
+    infer_expr_hm(ctx, expr_fql.clone());
+
+    if let Some(value_def) = hir::module_value_def(db, module_id, expr_id) {
+        if let Some(type_annotation) = value_def.type_annotation(db) {
+            if let Some(inferred_mono_ty) = ctx.maybe_find_type(&expr_fql) {
+                let annotated = resolve_annotated_type(db, module_id, type_annotation);
+                if !annotated.is_polymorphic() {
+                    if let Some(annotated_mono) = annotated_to_mono(&annotated, ctx) {
+                        ctx.add_equation(inferred_mono_ty, annotated_mono, expr_fql);
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Infer the type of a single definition's body in isolation.
+///
+/// Creates a fresh HM inference context, runs constraint generation on the body,
+/// solves equations, and returns the inferred type.
+///
+/// This is a Salsa tracked query keyed on ValueDef. Thanks to field-level tracking,
+/// it only re-runs when `expression_idx` changes (not when `name` or `type_annotation` change).
+#[salsa::tracked(cycle_initial = infer_body_type_cycle_initial)]
+pub(super) fn infer_body_type<'db>(
+    db: &'db dyn HirInferDatabase,
+    value_def: hir::ValueDef<'db>,
+) -> InferredType {
+    let module_id = value_def.module_id(db);
+    let expr_idx = value_def.expression_idx(db);
+
+    let mut ctx = HMInferenceContext::new(db, module_id);
+
+    // Mark this expression as the one being inferred to prevent cycles:
+    // infer_expr_hm will skip the infer_value_signature shortcut for this
+    // expression and instead resolve it directly from its body.
+    ctx.inferring_expr = Some(Fql::new(module_id, expr_idx));
+
+    infer_definition_constraints(&mut ctx, db, module_id, expr_idx);
+
+    let (substitution, _) = solve_equations(db, ctx.equations.clone());
+
+    let fql_key: EPTdFql = Fql::new(module_id, expr_idx).into();
+    if let Some(mono_ty) = ctx.type_env.get(&fql_key) {
+        let resolved_ty = substitution.apply(mono_ty);
+        let mut type_var_map = FxHashMap::default();
+        let mut next_id = 0;
+        mono_to_resolved_with_map(&resolved_ty, &mut type_var_map, &mut next_id)
+    } else {
+        InferredType::Unconstrained
+    }
+}
+
+fn infer_body_type_cycle_initial(
+    _db: &dyn HirInferDatabase,
+    _id: salsa::Id,
+    _value_def: hir::ValueDef,
+) -> InferredType {
+    InferredType::Unconstrained
 }
 
 /// Convert an AnnotatedType to a MonoType for use in constraint generation.

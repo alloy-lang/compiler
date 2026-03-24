@@ -152,6 +152,10 @@ fn build_constructor_type(
         .filter(|var_id| type_args.contains(var_id))
         .map(|&var_id| MonoType::Var(var_id))
         .collect();
+    // let type_var_args: Vec<MonoType> = type_args
+    //     .iter()
+    //     .map(|&var_id| MonoType::Var(var_id))
+    //     .collect();
 
     let result_type = if type_args.is_empty() {
         MonoType::TypeDef {

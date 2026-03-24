@@ -7,56 +7,56 @@ HirTypedModule {
     },
     expression_types: {
         Idx::<Expression>(0): Generic(
-            0,
+            2,
         ),
         Idx::<Expression>(5): Lambda {
             arg_type: Generic(
-                1,
+                0,
             ),
             return_type: Lambda {
                 arg_type: Generic(
-                    1,
-                ),
-                return_type: Generic(
-                    1,
-                ),
-            },
-        },
-        Idx::<Expression>(2): Generic(
-            1,
-        ),
-        Idx::<Expression>(4): Generic(
-            1,
-        ),
-        Idx::<Expression>(1): Lambda {
-            arg_type: Generic(
-                2,
-            ),
-            return_type: Lambda {
-                arg_type: BuiltIn(
-                    Int,
+                    0,
                 ),
                 return_type: Generic(
                     0,
                 ),
             },
         },
+        Idx::<Expression>(2): Generic(
+            0,
+        ),
+        Idx::<Expression>(4): Generic(
+            0,
+        ),
+        Idx::<Expression>(1): Lambda {
+            arg_type: Generic(
+                1,
+            ),
+            return_type: Lambda {
+                arg_type: BuiltIn(
+                    Int,
+                ),
+                return_type: Generic(
+                    2,
+                ),
+            },
+        },
         Idx::<Expression>(3): Generic(
-            1,
+            0,
         ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            2,
+            1,
         ),
         Idx::<Pattern>(2): Generic(
-            1,
+            0,
         ),
         Idx::<Pattern>(1): BuiltIn(
             Int,
         ),
         Idx::<Pattern>(3): Generic(
-            1,
+            0,
         ),
     },
     warnings: [],

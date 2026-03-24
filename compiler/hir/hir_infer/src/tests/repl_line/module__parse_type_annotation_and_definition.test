@@ -18,10 +18,10 @@ HirInferredModule {
                 NonEmpty(
                     [
                         Generic(
-                            3,
+                            1,
                         ),
                         Generic(
-                            3,
+                            1,
                         ),
                     ],
                 ),
@@ -41,10 +41,10 @@ HirInferredModule {
                         NonEmpty(
                             [
                                 Generic(
-                                    3,
+                                    1,
                                 ),
                                 Generic(
-                                    3,
+                                    1,
                                 ),
                             ],
                         ),
@@ -55,19 +55,19 @@ HirInferredModule {
         Idx::<Expression>(7): Lambda {
             arg_type: Lambda {
                 arg_type: Generic(
-                    2,
+                    0,
                 ),
                 return_type: Generic(
-                    3,
+                    1,
                 ),
             },
             return_type: Lambda {
                 arg_type: Generic(
-                    2,
+                    0,
                 ),
                 return_type: Lambda {
                     arg_type: Generic(
-                        2,
+                        0,
                     ),
                     return_type: Bounded {
                         base: TypeDef(
@@ -84,10 +84,10 @@ HirInferredModule {
                                 NonEmpty(
                                     [
                                         Generic(
-                                            3,
+                                            1,
                                         ),
                                         Generic(
-                                            3,
+                                            1,
                                         ),
                                     ],
                                 ),
@@ -98,25 +98,25 @@ HirInferredModule {
             },
         },
         Idx::<Expression>(4): Generic(
-            3,
+            1,
         ),
         Idx::<Expression>(1): Generic(
-            2,
+            0,
         ),
         Idx::<Expression>(5): Tuple(
             NonEmpty(
                 [
                     Generic(
-                        3,
+                        1,
                     ),
                     Generic(
-                        3,
+                        1,
                     ),
                 ],
             ),
         ),
         Idx::<Expression>(2): Generic(
-            3,
+            1,
         ),
         Idx::<Expression>(6): Bounded {
             base: TypeDef(
@@ -133,10 +133,10 @@ HirInferredModule {
                     NonEmpty(
                         [
                             Generic(
-                                3,
+                                1,
                             ),
                             Generic(
-                                3,
+                                1,
                             ),
                         ],
                     ),
@@ -144,23 +144,23 @@ HirInferredModule {
             ],
         },
         Idx::<Expression>(3): Generic(
-            2,
+            0,
         ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Lambda {
             arg_type: Generic(
-                2,
+                0,
             ),
             return_type: Generic(
-                3,
+                1,
             ),
         },
         Idx::<Pattern>(1): Generic(
-            2,
+            0,
         ),
         Idx::<Pattern>(2): Generic(
-            2,
+            0,
         ),
     },
     warnings: [],

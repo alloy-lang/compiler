@@ -1,6 +1,6 @@
 use crate::HirInferredModule;
 use alloy_hir_def as hir;
-use alloy_hir_resolved::{AnnotatedType, EPFql, Fql, HirResolutionError};
+use alloy_hir_resolved::Fql;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use std::hash::Hash;
@@ -17,9 +17,6 @@ pub(super) fn infer_types(
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InferredType {
-    // ResolutionError(HirResolutionError),
-    // Annotated(AnnotatedType),
-    // Variable(EPFql),
     Unconstrained,
     Missing,
     Unit,

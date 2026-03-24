@@ -668,6 +668,19 @@ pub fn lower_file<'db>(
     (hir_module, parse_errors)
 }
 
+#[salsa::tracked]
+pub fn module_value_def(
+    db: &dyn HirDefDatabase,
+    module_id: ModuleId,
+    expr_idx: ExpressionIdx,
+) -> Option<ValueDef<'_>> {
+    let (hir_module, _) = lower_file(db, module_id);
+
+    hir_module
+        .get_value_by_id(&expr_idx)
+        .map(|v| ValueDef::new(db, module_id, v.name.clone(), v.type_annotation, v.value))
+}
+
 #[must_use]
 fn lower_source_file<'db>(
     db: &'db dyn HirDefDatabase,

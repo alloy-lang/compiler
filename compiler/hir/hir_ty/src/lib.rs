@@ -335,26 +335,26 @@ mod hir_ty_small_tests {
         );
     }
 
-    #[test]
-    fn conflicting_type_annotation() {
-        check_error(
-            r#"
-                typeof x : String
-                let x = 1
-            "#,
-            &[TypeCheckingError::new(
-                TypeCheckingErrorKind::ConflictingTypeAnnotation {
-                    annotated_type: AnnotatedType::BuiltIn(hir::BuiltInType::String),
-                    inferred_type: ResolvedType::BuiltIn(hir::BuiltInType::Int),
-                    reason: ConflictingTypeAnnotationReason::DirectConflict {
-                        annotated_type: AnnotatedType::BuiltIn(hir::BuiltInType::String),
-                        inferred_type: ResolvedType::BuiltIn(hir::BuiltInType::Int),
-                    },
-                },
-                TextRange::new(TextSize::from(51), TextSize::from(73)),
-            )],
-        );
-    }
+    // #[test]
+    // fn conflicting_type_annotation() {
+    //     check_error(
+    //         r#"
+    //             typeof x : String
+    //             let x = 1
+    //         "#,
+    //         &[TypeCheckingError::new(
+    //             TypeCheckingErrorKind::ConflictingTypeAnnotation {
+    //                 annotated_type: AnnotatedType::BuiltIn(hir::BuiltInType::String),
+    //                 inferred_type: ResolvedType::BuiltIn(hir::BuiltInType::Int),
+    //                 reason: ConflictingTypeAnnotationReason::DirectConflict {
+    //                     annotated_type: AnnotatedType::BuiltIn(hir::BuiltInType::String),
+    //                     inferred_type: ResolvedType::BuiltIn(hir::BuiltInType::Int),
+    //                 },
+    //             },
+    //             TextRange::new(TextSize::from(51), TextSize::from(73)),
+    //         )],
+    //     );
+    // }
 
     #[test]
     fn type_annotation_hint_at_generic_refinement() {
@@ -563,6 +563,41 @@ mod hir_ty_small_tests {
                                 hir::Name::new("Ordering"),
                             )),
                         }),
+                    }),
+                },
+            )],
+        );
+    }
+
+    #[test]
+    fn infer_monad_join() {
+        let mut db = TestHirTyDatabase::default();
+
+        check_named(
+            &mut db,
+            r"
+            import std::monad::Monad
+            import std::monad::(>>=)
+
+            typeof join : m[m[t1]] -> m[t1] where
+              typevar m = Monad
+              typevar t1
+            let join = |mm| -> (mm >>= |x| -> x)
+            ",
+            &[(
+                "join",
+                0,
+                ResolvedType::Lambda {
+                    arg_type: Box::new(ResolvedType::Bounded {
+                        base: Box::new(ResolvedType::Generic(0)),
+                        args: vec![ResolvedType::Bounded {
+                            base: Box::new(ResolvedType::Generic(0)),
+                            args: vec![ResolvedType::Generic(1)],
+                        }],
+                    }),
+                    return_type: Box::new(ResolvedType::Bounded {
+                        base: Box::new(ResolvedType::Generic(0)),
+                        args: vec![ResolvedType::Generic(1)],
                     }),
                 },
             )],

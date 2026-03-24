@@ -1,5 +1,5 @@
 use alloy_hir_def as hir;
-use alloy_hir_resolved::{EPTdFql, Fql};
+use alloy_hir_resolved::EPTdFql;
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
 use std::collections::HashMap;
@@ -7,12 +7,11 @@ use text_size::TextRange;
 
 mod hir_ty;
 pub use hir_ty::InferredType;
-pub use hir_ty::PolyInstantiation;
 use hir_ty::*;
 
 mod diagnostics;
-use diagnostics::*;
 pub use diagnostics::{TypeInferenceError, TypeInferenceWarning};
+use diagnostics::{TypeInferenceErrorKind, TypeInferenceWarningKind};
 
 #[cfg(test)]
 mod tests;
@@ -414,9 +413,9 @@ mod hir_infer_small_tests {
                 "f",
                 0,
                 InferredType::Lambda {
-                    arg_type: Box::new(InferredType::Generic(1)),
+                    arg_type: Box::new(InferredType::Generic(0)),
                     return_type: Box::new(InferredType::Lambda {
-                        arg_type: Box::new(InferredType::Generic(2)),
+                        arg_type: Box::new(InferredType::Generic(1)),
                         return_type: Box::new(InferredType::Bounded {
                             base: Box::new(InferredType::TypeDef(
                                 Fql::new(other_module_id, idx!(0)),
@@ -495,6 +494,41 @@ mod hir_infer_small_tests {
                                 hir::Name::new("Ordering"),
                             )),
                         }),
+                    }),
+                },
+            )],
+        );
+    }
+
+    #[test]
+    fn infer_monad_join() {
+        let mut db = TestHirInferDatabase::default();
+
+        check_named(
+            &mut db,
+            r"
+            import std::monad::Monad
+            import std::monad::(>>=)
+
+            typeof join : m[m[t1]] -> m[t1] where
+              typevar m = Monad
+              typevar t1
+            let join = |mm| -> (mm >>= |x| -> x)
+            ",
+            &[(
+                "join",
+                0,
+                InferredType::Lambda {
+                    arg_type: Box::new(InferredType::Bounded {
+                        base: Box::new(InferredType::Generic(0)),
+                        args: vec![InferredType::Bounded {
+                            base: Box::new(InferredType::Generic(0)),
+                            args: vec![InferredType::Generic(1)],
+                        }],
+                    }),
+                    return_type: Box::new(InferredType::Bounded {
+                        base: Box::new(InferredType::Generic(0)),
+                        args: vec![InferredType::Generic(1)],
                     }),
                 },
             )],

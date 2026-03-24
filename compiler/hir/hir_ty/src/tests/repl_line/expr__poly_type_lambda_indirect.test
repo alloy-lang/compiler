@@ -16,7 +16,7 @@ HirTypedModule {
     },
     expression_types: {
         Idx::<Expression>(0): Generic(
-            0,
+            1,
         ),
         Idx::<Expression>(7): BuiltIn(
             Bool,
@@ -55,7 +55,7 @@ HirTypedModule {
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            0,
+            1,
         ),
     },
     warnings: [],

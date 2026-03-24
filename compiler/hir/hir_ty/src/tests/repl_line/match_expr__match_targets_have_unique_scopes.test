@@ -18,7 +18,7 @@ HirTypedModule {
             Int,
         ),
         Idx::<Expression>(5): Generic(
-            2,
+            3,
         ),
         Idx::<Expression>(2): Bounded {
             base: TypeDef(
@@ -35,12 +35,12 @@ HirTypedModule {
                     Int,
                 ),
                 Generic(
-                    3,
+                    2,
                 ),
             ],
         },
         Idx::<Expression>(4): Generic(
-            2,
+            3,
         ),
         Idx::<Expression>(1): Bounded {
             base: TypeDef(
@@ -57,20 +57,20 @@ HirTypedModule {
                     Int,
                 ),
                 Generic(
-                    3,
+                    2,
                 ),
             ],
         },
         Idx::<Expression>(3): Generic(
-            2,
+            3,
         ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            2,
+            3,
         ),
         Idx::<Pattern>(2): Generic(
-            2,
+            3,
         ),
         Idx::<Pattern>(1): Bounded {
             base: TypeDef(
@@ -87,7 +87,7 @@ HirTypedModule {
                     Int,
                 ),
                 Generic(
-                    3,
+                    2,
                 ),
             ],
         },
@@ -106,7 +106,7 @@ HirTypedModule {
                     Int,
                 ),
                 Generic(
-                    3,
+                    2,
                 ),
             ],
         },

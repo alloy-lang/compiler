@@ -1,9 +1,9 @@
 use super::{HMInferenceContext, MonoType};
-use crate::hir_ty::hm::inference::annotated_to_mono;
-use crate::hir_ty::hm::PolyType;
+use crate::hir_ty::InferredType;
 use alloy_hir_def as hir;
 use alloy_hir_resolved as res;
-use alloy_hir_resolved::{resolve_annotated_type, Fql};
+use alloy_hir_resolved::Fql;
+use rustc_hash::FxHashMap;
 
 mod binary;
 mod function_call;
@@ -13,6 +13,7 @@ mod r#match;
 mod r#trait;
 mod tuple;
 mod type_def;
+mod value;
 mod variable_ref;
 
 pub(crate) fn infer_expr_hm(
@@ -23,50 +24,42 @@ pub(crate) fn infer_expr_hm(
         return existing_ty;
     }
 
-    // Lazy constraint generation: if this expression is in a later group,
-    // don't infer it now - just return a fresh type variable.
-    // Only applies to expressions in the current module — cross-module expressions
-    // have their own independent ordering and must always be inferred immediately.
-    // DON'T assign to type_env to avoid polluting env_type_vars for generalization
-    if source_fql.module_id == ctx.module_id && ctx.is_in_later_group(source_fql.local_id) {
-        return ctx.fresh_type_var();
-    }
+    // Use `infer_value_signature` for cross-module value definitions and same-module definitions with polymorphic annotations
+    // (when referenced from other definitions, not when being directly inferred).
+    //
+    // Skip the shortcut for:
+    // - The expression currently being inferred (inferring_expr) to prevent cycles
+    //   and ensure sub-expression types are collected
+    // - Same-module unannotated definitions, so call-site constraints flow back
+    let is_self = ctx
+        .inferring_expr
+        .as_ref()
+        .is_some_and(|e| *e == source_fql);
+    if !is_self {
+        if let Some(value_def) =
+            hir::module_value_def(ctx.db, source_fql.module_id, source_fql.local_id)
+        {
+            let is_cross_module = source_fql.module_id != ctx.module_id;
+            let has_poly_annotation = value_def.type_annotation(ctx.db).is_some_and(|ta| {
+                res::resolve_annotated_type(ctx.db, source_fql.module_id, ta).is_polymorphic()
+            });
 
-    // For cross-module expressions with polymorphic type annotations, use the annotation
-    // directly rather than re-inferring from the body. This ensures each use site gets
-    // fresh type variables via poly_env instantiation, avoiding stale specialization
-    // when a polymorphic cross-module function (e.g., <|) is used multiple times.
-    if source_fql.module_id != ctx.module_id {
-        let (other_hir_module, _) = hir::lower_file(ctx.db, source_fql.module_id);
-        if let Some(value) = other_hir_module.get_value_by_id(&source_fql.local_id) {
-            if let Some(type_annotation) = value.type_annotation {
-                let annotated =
-                    resolve_annotated_type(ctx.db, source_fql.module_id, type_annotation);
-                if annotated.is_polymorphic() {
-                    if let Some(mono_ty) = annotated_to_mono(&annotated, ctx) {
-                        let poly_ty = PolyType::generalize_all(mono_ty);
-                        ctx.poly_env.insert(source_fql.clone().into(), poly_ty);
-                        // Return a fresh instantiation
-                        if let Some(instantiated) = ctx.maybe_find_type(&source_fql) {
-                            return instantiated;
-                        }
-                    }
-                }
+            if is_cross_module || has_poly_annotation {
+                let sig = value::infer(ctx.db, value_def);
+                let mono_ty = inferred_to_mono(&sig, ctx);
+                return ctx.generalize_to_poly(mono_ty, &source_fql);
             }
         }
     }
 
-    let expr = match alloy_hir_resolved::resolve_expression_by_id(
-        ctx.db,
-        source_fql.module_id,
-        source_fql.local_id,
-    ) {
-        Ok(expr) => expr,
-        Err(err) => {
-            // Report the resolution error
-            return ctx.unknown_reference(err, source_fql);
-        }
-    };
+    let expr =
+        match res::resolve_expression_by_id(ctx.db, source_fql.module_id, source_fql.local_id) {
+            Ok(expr) => expr,
+            Err(err) => {
+                // Report the resolution error
+                return ctx.unknown_reference(err, source_fql);
+            }
+        };
 
     match expr {
         res::Expression::Literal(lit) => super::infer_literal(ctx, source_fql, &lit),
@@ -105,6 +98,80 @@ pub(crate) fn infer_expr_hm(
             type_annotation,
         } => r#trait::infer_abstract_member_ref(ctx, source_fql, type_annotation),
         res::Expression::Missing => infer_missing_expr(ctx, source_fql),
+    }
+}
+
+/// Convert an InferredType (from `infer_value_signature`) to a MonoType for use
+/// in constraint generation. Generic IDs are mapped to fresh type variables,
+/// with consistent mapping so the same Generic(id) produces the same TypeVarId.
+fn inferred_to_mono(inferred: &InferredType, ctx: &mut HMInferenceContext) -> MonoType {
+    let mut generic_map: FxHashMap<usize, super::super::TypeVarId> = FxHashMap::default();
+    inferred_to_mono_inner(inferred, ctx, &mut generic_map)
+}
+
+fn inferred_to_mono_inner(
+    inferred: &InferredType,
+    ctx: &mut HMInferenceContext,
+    generic_map: &mut FxHashMap<usize, super::super::TypeVarId>,
+) -> MonoType {
+    match inferred {
+        InferredType::Unconstrained => MonoType::Unconstrained,
+        InferredType::Missing => ctx.fresh_type_var(),
+        InferredType::Unit => MonoType::Unit,
+        InferredType::BuiltIn(b) => MonoType::Concrete(*b),
+        InferredType::TypeDef(fql, name) => MonoType::TypeDef {
+            fql: fql.clone(),
+            type_args: vec![],
+            type_def_name: name.clone(),
+        },
+        InferredType::Lambda {
+            arg_type,
+            return_type,
+        } => MonoType::Function(
+            Box::new(inferred_to_mono_inner(arg_type, ctx, generic_map)),
+            Box::new(inferred_to_mono_inner(return_type, ctx, generic_map)),
+        ),
+        InferredType::Tuple(elements) => MonoType::Tuple(
+            elements
+                .iter()
+                .map(|e| inferred_to_mono_inner(e, ctx, generic_map))
+                .collect(),
+        ),
+        InferredType::Bounded { base, args } => {
+            // When the base is a TypeDef, populate its type_args with fresh TypeVarIds
+            // to preserve arity information (used in error messages and display)
+            let constructor = match base.as_ref() {
+                InferredType::TypeDef(fql, name) => {
+                    let type_args = args.iter().map(|_| ctx.type_var_gen.fresh()).collect();
+                    MonoType::TypeDef {
+                        fql: fql.clone(),
+                        type_args,
+                        type_def_name: name.clone(),
+                    }
+                }
+                other => inferred_to_mono_inner(other, ctx, generic_map),
+            };
+            MonoType::App {
+                constructor: Box::new(constructor),
+                args: args
+                    .iter()
+                    .map(|a| inferred_to_mono_inner(a, ctx, generic_map))
+                    .collect(),
+            }
+        }
+        InferredType::Generic(id) => {
+            let var_id = *generic_map
+                .entry(*id)
+                .or_insert_with(|| ctx.type_var_gen.fresh());
+            MonoType::Var(var_id)
+        }
+        InferredType::ConstrainedGeneric { id, .. } => {
+            // TODO: Track constraints during solving
+            let var_id = *generic_map
+                .entry(*id)
+                .or_insert_with(|| ctx.type_var_gen.fresh());
+            MonoType::Var(var_id)
+        }
     }
 }
 

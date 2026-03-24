@@ -4,13 +4,6 @@ use alloy_scope::{ScopeIdx, Scopes};
 use rustc_hash::{FxHashMap, FxHashSet};
 use text_size::TextRange;
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct ValueDefinition {
-    pub name: Name,
-    pub type_annotation: Option<TypeIdx>,
-    pub value: ExpressionIdx,
-}
-
 #[derive(Clone, PartialEq)]
 pub struct HirModule {
     imports: Index<Import>,
