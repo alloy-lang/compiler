@@ -55,6 +55,8 @@ fn check_type_annotation(
     resolved_type: ResolvedType,
 ) {
     let expected_type = resolve_annotated_type(db, current_module_id, type_annotation_idx);
+    let (hir_module, _) = hir::lower_file(db, current_module_id);
+    let annotation_range = hir_module.get_type_reference_range(type_annotation_idx);
 
     // Skip check for missing/unconstrained annotations
     if matches!(
@@ -69,7 +71,9 @@ fn check_type_annotation(
         result.error(
             TypeCheckingErrorKind::ConflictingTypeAnnotation {
                 annotated_type: expected_type,
-                inferred_type: resolved_type,
+                annotation_range,
+                value_type: resolved_type,
+                value_range: range,
                 reason,
             },
             range,
@@ -84,13 +88,16 @@ fn check_type_compatibility(
     expected: &AnnotatedType,
     found: &ResolvedType,
 ) -> Result<(), ConflictingTypeAnnotationReason> {
+    // TODO: actual ranges for conflicts
     match (expected, found) {
         // Wildcards on either side
         (AnnotatedType::Unconstrained, _) | (_, ResolvedType::Unconstrained) => Ok(()),
         (AnnotatedType::Missing, _) | (_, ResolvedType::Missing) => {
             Err(ConflictingTypeAnnotationReason::DirectConflict {
-                annotated_type: expected.clone(),
-                inferred_type: found.clone(),
+                expected_type: expected.clone(),
+                expected_type_range: TextRange::default(),
+                actual_type: found.clone(),
+                actual_type_range: TextRange::default(),
             })
         }
         (_, ResolvedType::UnknownReference(_)) => Ok(()),
@@ -145,8 +152,10 @@ fn check_type_compatibility(
         (AnnotatedType::Tuple(exp_elems), ResolvedType::Tuple(found_elems)) => {
             if exp_elems.len() != found_elems.len() {
                 return Err(ConflictingTypeAnnotationReason::DirectConflict {
-                    annotated_type: expected.clone(),
-                    inferred_type: found.clone(),
+                    expected_type: expected.clone(),
+                    expected_type_range: TextRange::default(),
+                    actual_type: found.clone(),
+                    actual_type_range: TextRange::default(),
                 });
             }
             for (exp_elem, found_elem) in exp_elems.iter().zip(found_elems.iter()) {
@@ -169,8 +178,10 @@ fn check_type_compatibility(
             check_type_compatibility(db, exp_base, found_base)?;
             if exp_args.len() != found_args.len() {
                 return Err(ConflictingTypeAnnotationReason::DirectConflict {
-                    annotated_type: expected.clone(),
-                    inferred_type: found.clone(),
+                    expected_type: expected.clone(),
+                    expected_type_range: TextRange::default(),
+                    actual_type: found.clone(),
+                    actual_type_range: TextRange::default(),
                 });
             }
             for (exp_arg, found_arg) in exp_args.iter().zip(found_args.iter()) {
@@ -181,8 +192,10 @@ fn check_type_compatibility(
 
         // Everything else is incompatible
         _ => Err(ConflictingTypeAnnotationReason::DirectConflict {
-            annotated_type: expected.clone(),
-            inferred_type: found.clone(),
+            expected_type: expected.clone(),
+            expected_type_range: TextRange::default(),
+            actual_type: found.clone(),
+            actual_type_range: TextRange::default(),
         }),
     }
 }

@@ -1,9 +1,6 @@
-use crate::hir_ty::{InferredType, UnificationError};
+use crate::hir_ty::UnificationError;
 use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, Severity};
-use alloy_hir_def as hir;
-use alloy_hir_def::FqnResolutionError;
-use alloy_hir_resolved::{AnnotatedType, HirResolutionError};
-use itertools::Itertools;
+use alloy_hir_resolved::HirResolutionError;
 use text_size::TextRange;
 
 #[derive(Debug, Clone, PartialEq)]

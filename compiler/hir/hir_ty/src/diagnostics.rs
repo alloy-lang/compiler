@@ -1,5 +1,5 @@
 use crate::hir_ty::ResolvedType;
-use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, Severity};
+use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, DiagnosticLabel, Severity};
 use alloy_hir_def as hir;
 use alloy_hir_resolved::{AnnotatedType, HirResolutionError};
 use text_size::TextRange;
@@ -53,12 +53,8 @@ impl Diagnostic for TypeCheckingError {
 
     fn message(&self) -> String {
         match &self.kind {
-            TypeCheckingErrorKind::ConflictingTypeAnnotation {
-                annotated_type,
-                inferred_type,
-                ..
-            } => {
-                format!("Type annotation conflict: expected `{annotated_type}`, found `{inferred_type}`")
+            TypeCheckingErrorKind::ConflictingTypeAnnotation { .. } => {
+                "Inferred type does not match annotated type".to_string()
             }
             TypeCheckingErrorKind::InferenceError(err) => err.message(),
             TypeCheckingErrorKind::HirResolutionError(err) => err.message(),
@@ -80,14 +76,22 @@ impl Diagnostic for TypeCheckingError {
 
     fn build_report<'a>(&self, builder: DiagnosticBuilder<'a>) -> DiagnosticBuilder<'a> {
         match &self.kind {
-            TypeCheckingErrorKind::ConflictingTypeAnnotation { reason, .. } => {
+            TypeCheckingErrorKind::ConflictingTypeAnnotation { annotated_type, annotation_range, value_type, value_range, reason,  } => {
                 match reason {
-                    ConflictingTypeAnnotationReason::DirectConflict { annotated_type: inner_ea, inferred_type: inner_it } => {
+                    ConflictingTypeAnnotationReason::DirectConflict { expected_type, expected_type_range, actual_type, actual_type_range } => {
                         builder
-                            .with_primary_label(format!("expected `{inner_ea}`, found `{inner_it}`"))
-                            .with_help(format!(
-                                "The type annotation says this should be `{inner_ea}`, but type inference determined it to be `{inner_it}`",
-                            ))
+                            .with_label(
+                                DiagnosticLabel::new(*annotation_range, format!("The type annotation here says `{annotated_type}`"))
+                            )
+                            .with_label(
+                                DiagnosticLabel::new(*value_range, format!("but type inference determined this to be `{value_type}`"))
+                            )
+                            .with_label(
+                                DiagnosticLabel::new(*actual_type_range, format!("Specifically, the annotation expects `{actual_type}`"))
+                            )
+                            .with_label(
+                                DiagnosticLabel::new(*expected_type_range, format!("to be `{expected_type}`"))
+                            )
                     }
                     ConflictingTypeAnnotationReason::MissingBehaviorImplementation { trait_name, type_name } => {
                         builder
@@ -133,7 +137,9 @@ impl Diagnostic for TypeCheckingError {
 pub enum TypeCheckingErrorKind {
     ConflictingTypeAnnotation {
         annotated_type: AnnotatedType,
-        inferred_type: ResolvedType,
+        annotation_range: TextRange,
+        value_type: ResolvedType,
+        value_range: TextRange,
         reason: ConflictingTypeAnnotationReason,
     },
     InferenceError(alloy_hir_infer::TypeInferenceError),
@@ -148,8 +154,10 @@ pub enum TypeCheckingErrorKind {
 #[derive(Debug, Clone, PartialEq)]
 pub enum ConflictingTypeAnnotationReason {
     DirectConflict {
-        annotated_type: AnnotatedType,
-        inferred_type: ResolvedType,
+        expected_type: AnnotatedType,
+        expected_type_range: TextRange,
+        actual_type: ResolvedType,
+        actual_type_range: TextRange,
     },
     MissingBehaviorImplementation {
         trait_name: hir::Name,
