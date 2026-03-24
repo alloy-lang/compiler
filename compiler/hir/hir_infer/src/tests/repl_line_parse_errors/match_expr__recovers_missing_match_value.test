@@ -74,7 +74,7 @@ HirInferredModule {
                     ),
                 ),
             ),
-            range: 44..49,
+            range: 44..48,
         },
         TypeInferenceError {
             kind: UnificationError(
@@ -105,7 +105,7 @@ HirInferredModule {
                     ),
                 ),
             ),
-            range: 56..62,
+            range: 56..61,
         },
     ],
 }
@@ -134,8 +134,8 @@ HirInferredModule {
    ╭─[ ./test/main.alloy:4:5 ]
    │
  4 │   \ True ->
-   │     ──┬──  
-   │       ╰──── expected `Test[Int]`, found `Bool`
+   │     ──┬─  
+   │       ╰─── expected `Test[Int]`, found `Bool`
    │ 
    │ Help: These types must be compatible
 ───╯
@@ -144,8 +144,8 @@ HirInferredModule {
    ╭─[ ./test/main.alloy:5:5 ]
    │
  5 │   \ False -> 1
-   │     ───┬──  
-   │        ╰──── expected `Test[Int]`, found `Bool`
+   │     ──┬──  
+   │       ╰──── expected `Test[Int]`, found `Bool`
    │ 
    │ Help: These types must be compatible
 ───╯

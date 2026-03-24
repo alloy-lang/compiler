@@ -15,7 +15,7 @@ HirModule {
                 ),
             ),
             "name": "func1",
-            "range": 0..14,
+            "range": 0..13,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(1): {
@@ -24,7 +24,7 @@ HirModule {
                     1,
                 ),
             ),
-            "range": 33..36,
+            "range": 33..34,
         },
         Idx::<Expression>(2): {
             "item": Lambda {
@@ -34,7 +34,7 @@ HirModule {
                 body: Idx::<Expression>(1),
             },
             "name": "func2",
-            "range": 14..36,
+            "range": 14..34,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(3): {
@@ -68,7 +68,7 @@ HirModule {
                     Idx::<Expression>(3),
                 ],
             },
-            "range": 57..65,
+            "range": 57..63,
         },
         Idx::<Expression>(5): {
             "item": Lambda {
@@ -79,7 +79,7 @@ HirModule {
                 body: Idx::<Expression>(4),
             },
             "name": ">>",
-            "range": 36..65,
+            "range": 36..63,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(6): {

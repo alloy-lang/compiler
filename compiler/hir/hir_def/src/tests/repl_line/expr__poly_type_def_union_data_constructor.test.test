@@ -59,7 +59,7 @@ HirModule {
             "item": ParenthesizedType(
                 Idx::<TypeReference>(0),
             ),
-            "range": 41..45,
+            "range": 41..44,
         },
     },
     type_definitions: Index::<TypeDefinition> {
@@ -85,7 +85,7 @@ HirModule {
                 ),
             },
             "name": "Option",
-            "range": 0..50,
+            "range": 0..48,
             "scope_id": Idx::<Scope>(0),
         },
     },

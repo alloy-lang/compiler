@@ -17,7 +17,7 @@ HirModule {
                     resolution_idx: Unresolved,
                 },
             ),
-            "range": 24..29,
+            "range": 24..28,
         },
     },
     type_definitions: Index::<TypeDefinition> {

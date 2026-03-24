@@ -22,7 +22,7 @@ HirModule {
                 members: [],
             },
             "name": "TestTrait1",
-            "range": 0..41,
+            "range": 0..39,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -52,7 +52,7 @@ HirModule {
         LoweringError {
             kind: ConflictingTraitDefinitionName {
                 name: "TestTrait1",
-                first: 0..41,
+                first: 0..39,
                 second: 41..80,
             },
             range: 41..80,

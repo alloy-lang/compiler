@@ -14,7 +14,7 @@ HirModule {
                 last: "Test",
             },
             "name": "Test",
-            "range": 0..24,
+            "range": 0..22,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -56,7 +56,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 44..47,
+            "range": 44..46,
         },
         Idx::<TypeReference>(2): {
             "item": Named(
@@ -81,7 +81,7 @@ HirModule {
                 ],
             },
             "name": "apply",
-            "range": 39..51,
+            "range": 39..50,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -93,7 +93,7 @@ HirModule {
                 kind: Unbound,
             },
             "name": "t1",
-            "range": 61..76,
+            "range": 61..71,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeVariable>(1): {

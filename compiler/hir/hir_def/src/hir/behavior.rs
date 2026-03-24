@@ -74,5 +74,5 @@ pub(super) fn lower_behavior(ctx: &mut LoweringCtx, ast: &ast::BehaviorDef) {
         }
     });
 
-    ctx.add_behavior(behavior, &ast.syntax());
+    ctx.add_behavior(behavior, ast);
 }

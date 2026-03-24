@@ -89,10 +89,10 @@ HirTypedModule {
                             ),
                         ),
                     ),
-                    range: 53..59,
+                    range: 53..58,
                 },
             ),
-            range: 53..59,
+            range: 53..58,
         },
     ],
     poly_instantiations: {},
@@ -119,8 +119,8 @@ HirTypedModule {
    ╭─[ ./test/main.alloy:5:5 ]
    │
  5 │   \ False -> 1
-   │     ───┬──  
-   │        ╰──── expected `Test[Int]`, found `Bool`
+   │     ──┬──  
+   │       ╰──── expected `Test[Int]`, found `Bool`
    │ 
    │ Help: These types must be compatible
 ───╯

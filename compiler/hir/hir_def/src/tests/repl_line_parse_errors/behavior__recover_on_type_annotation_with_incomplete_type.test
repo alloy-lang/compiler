@@ -26,7 +26,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 73..84,
+            "range": 73..83,
         },
         Idx::<TypeReference>(1): {
             "item": Named(
@@ -40,38 +40,38 @@ HirModule {
                     ),
                 },
             ),
-            "range": 88..94,
+            "range": 88..93,
         },
         Idx::<TypeReference>(2): {
             "item": Missing,
             "name": "test1",
-            "range": 104..121,
+            "range": 104..116,
             "scope_id": Idx::<Scope>(3),
         },
         Idx::<TypeReference>(3): {
             "item": SelfRef(
                 Idx::<Scope>(5),
             ),
-            "range": 136..141,
+            "range": 136..140,
         },
         Idx::<TypeReference>(4): {
             "item": BuiltIn(
                 String,
             ),
-            "range": 144..151,
+            "range": 144..150,
         },
         Idx::<TypeReference>(5): {
             "item": BuiltIn(
                 Int,
             ),
-            "range": 154..158,
+            "range": 154..157,
         },
         Idx::<TypeReference>(6): {
             "item": Lambda {
                 arg_type: Idx::<TypeReference>(4),
                 return_type: Idx::<TypeReference>(5),
             },
-            "range": 144..158,
+            "range": 144..157,
         },
         Idx::<TypeReference>(7): {
             "item": Lambda {
@@ -79,7 +79,7 @@ HirModule {
                 return_type: Idx::<TypeReference>(6),
             },
             "name": "test2",
-            "range": 136..158,
+            "range": 136..157,
             "scope_id": Idx::<Scope>(3),
         },
     },
@@ -95,7 +95,7 @@ HirModule {
                 ),
             },
             "name": "Type1",
-            "range": 0..23,
+            "range": 0..21,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -109,7 +109,7 @@ HirModule {
                 members: [],
             },
             "name": "TestTrait1",
-            "range": 23..64,
+            "range": 23..62,
             "scope_id": Idx::<Scope>(0),
         },
     },

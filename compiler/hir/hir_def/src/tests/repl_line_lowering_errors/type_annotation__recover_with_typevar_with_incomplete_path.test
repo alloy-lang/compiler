@@ -15,7 +15,7 @@ HirModule {
                 last: "Test",
             },
             "name": "Test",
-            "range": 0..23,
+            "range": 0..22,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
@@ -26,7 +26,7 @@ HirModule {
                 last: "functor",
             },
             "name": "functor",
-            "range": 23..44,
+            "range": 23..42,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -43,7 +43,7 @@ HirModule {
                     },
                 ),
             ),
-            "range": 98..110,
+            "range": 98..105,
         },
         Idx::<TypeReference>(1): {
             "item": Named(
@@ -57,7 +57,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 58..61,
+            "range": 58..60,
         },
         Idx::<TypeReference>(2): {
             "item": Named(
@@ -71,7 +71,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 64..67,
+            "range": 64..66,
         },
         Idx::<TypeReference>(3): {
             "item": Named(
@@ -94,14 +94,14 @@ HirModule {
                     ],
                 ),
             ),
-            "range": 70..75,
+            "range": 70..74,
         },
         Idx::<TypeReference>(4): {
             "item": Lambda {
                 arg_type: Idx::<TypeReference>(2),
                 return_type: Idx::<TypeReference>(3),
             },
-            "range": 64..75,
+            "range": 64..74,
         },
         Idx::<TypeReference>(5): {
             "item": Lambda {
@@ -109,7 +109,7 @@ HirModule {
                 return_type: Idx::<TypeReference>(4),
             },
             "name": "test",
-            "range": 58..75,
+            "range": 58..74,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -129,7 +129,7 @@ HirModule {
                 ),
             },
             "name": "t1",
-            "range": 85..110,
+            "range": 85..105,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeVariable>(1): {

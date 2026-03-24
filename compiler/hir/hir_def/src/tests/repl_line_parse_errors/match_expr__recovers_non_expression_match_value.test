@@ -14,7 +14,7 @@ HirModule {
                 last: "test",
             },
             "name": "test",
-            "range": 0..24,
+            "range": 0..22,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -43,11 +43,11 @@ HirModule {
                 ),
                 scope: Idx::<Scope>(0),
             },
-            "range": 30..35,
+            "range": 30..34,
         },
         Idx::<Expression>(1): {
             "item": Missing,
-            "range": 42..56,
+            "range": 42..53,
         },
         Idx::<Expression>(2): {
             "item": Literal(
@@ -81,7 +81,7 @@ HirModule {
                     true,
                 ),
             ),
-            "range": 44..49,
+            "range": 44..48,
         },
         Idx::<Pattern>(1): {
             "item": Literal(
@@ -89,7 +89,7 @@ HirModule {
                     false,
                 ),
             ),
-            "range": 58..64,
+            "range": 58..63,
         },
     },
     type_references: EmptyIndex::<TypeReference>,

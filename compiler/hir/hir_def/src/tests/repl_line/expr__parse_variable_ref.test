@@ -12,7 +12,7 @@ HirModule {
                 ),
             ),
             "name": "counter",
-            "range": 0..17,
+            "range": 0..15,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(1): {

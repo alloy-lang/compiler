@@ -15,7 +15,7 @@ HirModule {
                 last: "functor",
             },
             "name": "functor",
-            "range": 0..30,
+            "range": 0..28,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
@@ -26,7 +26,7 @@ HirModule {
                 last: "debug",
             },
             "name": "debug",
-            "range": 0..30,
+            "range": 0..28,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -75,7 +75,7 @@ HirModule {
                     last: "functor",
                 },
             },
-            range: 0..30,
+            range: 0..28,
         },
         LoweringWarning {
             kind: UnusedImport {
@@ -86,7 +86,7 @@ HirModule {
                     last: "debug",
                 },
             },
-            range: 0..30,
+            range: 0..28,
         },
     ],
     errors: [

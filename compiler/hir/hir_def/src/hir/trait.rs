@@ -118,7 +118,7 @@ pub(super) fn lower_trait(ctx: &mut LoweringCtx, ast: &ast::TraitDef) {
         }
     });
 
-    ctx.add_trait(trait_, &ast.syntax());
+    ctx.add_trait(trait_, ast);
 }
 
 impl Trait {

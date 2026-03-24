@@ -25,7 +25,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 32..39,
+            "range": 32..38,
         },
         Idx::<TypeReference>(1): {
             "item": Named(
@@ -39,7 +39,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 39..45,
+            "range": 39..44,
         },
     },
     type_definitions: Index::<TypeDefinition> {
@@ -54,7 +54,7 @@ HirModule {
                 ),
             },
             "name": "Type1",
-            "range": 0..23,
+            "range": 0..21,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -86,7 +86,7 @@ HirModule {
                 Idx::<TypeReference>(1),
                 Idx::<TypeReference>(0),
             ),
-            "range": 23..91,
+            "range": 23..89,
             "scope_id": Idx::<Scope>(0),
         },
     },

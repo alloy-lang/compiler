@@ -39,7 +39,7 @@ HirModule {
                 ],
             },
             "name": "test",
-            "range": 53..82,
+            "range": 53..80,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(2): {
@@ -55,7 +55,7 @@ HirModule {
                 },
                 scope: Idx::<Scope>(0),
             },
-            "range": 88..93,
+            "range": 88..92,
         },
         Idx::<Expression>(3): {
             "item": VariableRef {
@@ -70,7 +70,7 @@ HirModule {
                 },
                 scope: Idx::<Scope>(2),
             },
-            "range": 122..126,
+            "range": 122..123,
         },
         Idx::<Expression>(4): {
             "item": VariableRef {
@@ -131,7 +131,7 @@ HirModule {
                     Idx::<Pattern>(0),
                 ],
             },
-            "range": 102..119,
+            "range": 102..117,
         },
         Idx::<Pattern>(2): {
             "item": VariableDeclaration {
@@ -159,7 +159,7 @@ HirModule {
                     Idx::<Pattern>(2),
                 ],
             },
-            "range": 128..145,
+            "range": 128..144,
         },
     },
     type_references: Index::<TypeReference> {
@@ -181,7 +181,7 @@ HirModule {
             "item": ParenthesizedType(
                 Idx::<TypeReference>(0),
             ),
-            "range": 31..37,
+            "range": 31..34,
         },
         Idx::<TypeReference>(2): {
             "item": Named(
@@ -201,7 +201,7 @@ HirModule {
             "item": ParenthesizedType(
                 Idx::<TypeReference>(2),
             ),
-            "range": 44..48,
+            "range": 44..47,
         },
     },
     type_definitions: Index::<TypeDefinition> {
@@ -230,7 +230,7 @@ HirModule {
                 ),
             },
             "name": "Either",
-            "range": 0..53,
+            "range": 0..51,
             "scope_id": Idx::<Scope>(0),
         },
     },

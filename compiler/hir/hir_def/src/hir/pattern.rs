@@ -23,7 +23,7 @@ pub enum Pattern {
 
 pub(super) fn lower_pattern(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> PatternIdx {
     let pattern = lower_pattern_inner(ctx, ast);
-    ctx.add_pattern(pattern, &ast.syntax())
+    ctx.add_pattern(pattern, ast)
 }
 
 fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
@@ -70,7 +70,7 @@ fn lower_pattern_inner(ctx: &mut LoweringCtx, ast: &ast::Pattern) -> Pattern {
                 .iter()
                 .map(|arg| match arg.arg() {
                     Some(arg) => lower_pattern(ctx, &arg),
-                    None => ctx.add_missing_pattern(&arg.syntax()),
+                    None => ctx.add_missing_pattern(arg),
                 })
                 .collect::<Vec<_>>();
 

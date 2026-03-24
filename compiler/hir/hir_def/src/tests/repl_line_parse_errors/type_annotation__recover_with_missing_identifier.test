@@ -13,7 +13,7 @@ HirModule {
                 last: "Test",
             },
             "name": "Test",
-            "range": 0..24,
+            "range": 0..22,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -24,7 +24,7 @@ HirModule {
             "item": BuiltIn(
                 String,
             ),
-            "range": 39..46,
+            "range": 39..45,
         },
         Idx::<TypeReference>(1): {
             "item": Named(
@@ -47,13 +47,13 @@ HirModule {
                     ],
                 ),
             ),
-            "range": 61..66,
+            "range": 61..65,
         },
         Idx::<TypeReference>(2): {
             "item": BuiltIn(
                 String,
             ),
-            "range": 69..76,
+            "range": 69..75,
         },
         Idx::<TypeReference>(3): {
             "item": BuiltIn(

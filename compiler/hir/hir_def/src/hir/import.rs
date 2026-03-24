@@ -41,7 +41,7 @@ pub(super) fn lower_import(ctx: &mut LoweringCtx, import: &ast::ImportDef) {
     match gather_all_import_segments(first, rest) {
         Ok(all_import_segments) => {
             for import_segments in all_import_segments {
-                ctx.add_import(&import_segments, &import.syntax());
+                ctx.add_import(&import_segments, import);
             }
         }
         Err(error) => {

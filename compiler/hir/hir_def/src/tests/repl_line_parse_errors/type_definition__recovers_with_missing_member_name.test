@@ -13,7 +13,7 @@ HirModule {
                 kind: Missing,
             },
             "name": "Test1",
-            "range": 0..18,
+            "range": 0..17,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<TypeDefinition>(1): {

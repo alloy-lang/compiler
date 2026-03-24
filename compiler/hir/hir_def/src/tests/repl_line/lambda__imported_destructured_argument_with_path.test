@@ -12,7 +12,7 @@ HirModule {
                 last: "option",
             },
             "name": "option",
-            "range": 0..20,
+            "range": 0..18,
             "scope_id": Idx::<Scope>(0),
         },
     },

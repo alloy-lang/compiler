@@ -16,7 +16,7 @@ HirModule {
                 kind: Unbound,
             },
             "name": "t1",
-            "range": 27..42,
+            "range": 27..37,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeVariable>(1): {
@@ -24,7 +24,7 @@ HirModule {
                 name: "t1",
                 kind: Unbound,
             },
-            "range": 42..53,
+            "range": 42..52,
         },
     },
     traits: Index::<Trait> {
@@ -65,10 +65,10 @@ HirModule {
         LoweringError {
             kind: ConflictingTypeVariableName {
                 name: "t1",
-                first: 27..42,
-                second: 42..53,
+                first: 27..37,
+                second: 42..52,
             },
-            range: 42..53,
+            range: 42..52,
         },
     ],
 }

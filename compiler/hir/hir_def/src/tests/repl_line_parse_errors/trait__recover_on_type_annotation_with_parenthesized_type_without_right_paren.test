@@ -13,32 +13,32 @@ HirModule {
             "item": SelfRef(
                 Idx::<Scope>(2),
             ),
-            "range": 42..47,
+            "range": 42..46,
         },
         Idx::<TypeReference>(1): {
             "item": BuiltIn(
                 String,
             ),
-            "range": 50..57,
+            "range": 50..56,
         },
         Idx::<TypeReference>(2): {
             "item": BuiltIn(
                 String,
             ),
-            "range": 61..73,
+            "range": 61..67,
         },
         Idx::<TypeReference>(3): {
             "item": ParenthesizedType(
                 Idx::<TypeReference>(2),
             ),
-            "range": 60..73,
+            "range": 60..67,
         },
         Idx::<TypeReference>(4): {
             "item": Lambda {
                 arg_type: Idx::<TypeReference>(1),
                 return_type: Idx::<TypeReference>(3),
             },
-            "range": 50..73,
+            "range": 50..67,
         },
         Idx::<TypeReference>(5): {
             "item": Lambda {
@@ -46,7 +46,7 @@ HirModule {
                 return_type: Idx::<TypeReference>(4),
             },
             "name": "test1",
-            "range": 42..73,
+            "range": 42..67,
             "scope_id": Idx::<Scope>(1),
         },
     },
@@ -58,7 +58,7 @@ HirModule {
                 kind: Unbound,
             },
             "name": "t1",
-            "range": 73..84,
+            "range": 73..83,
             "scope_id": Idx::<Scope>(1),
         },
     },

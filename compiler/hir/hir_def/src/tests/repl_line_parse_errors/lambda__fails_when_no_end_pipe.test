@@ -36,7 +36,7 @@ HirModule {
                 name: "arg2",
             },
             "name": "arg2",
-            "range": 7..12,
+            "range": 7..11,
             "scope_id": Idx::<Scope>(1),
         },
     },

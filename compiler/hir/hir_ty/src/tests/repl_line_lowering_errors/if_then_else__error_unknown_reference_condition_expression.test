@@ -42,10 +42,10 @@ HirTypedModule {
                             ),
                         },
                     ),
-                    range: 3..8,
+                    range: 3..7,
                 },
             ),
-            range: 3..8,
+            range: 3..7,
         },
     ],
     poly_instantiations: {},
@@ -55,8 +55,8 @@ HirTypedModule {
    ╭─[ ./test/main.alloy:1:4 ]
    │
  1 │ if test then 2 else 3
-   │    ──┬──  
-   │      ╰──── cannot find `test`
+   │    ──┬─  
+   │      ╰─── cannot find `test`
    │ 
    │ Help: No value named `test` found in module `main`
 ───╯

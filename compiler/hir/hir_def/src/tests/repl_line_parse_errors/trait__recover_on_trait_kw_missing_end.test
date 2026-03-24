@@ -22,7 +22,7 @@ HirModule {
                 kind: Unbound,
             },
             "name": "t1",
-            "range": 63..75,
+            "range": 63..73,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeVariable>(1): {
@@ -31,7 +31,7 @@ HirModule {
                 kind: Unbound,
             },
             "name": "t1",
-            "range": 138..149,
+            "range": 138..148,
             "scope_id": Idx::<Scope>(2),
         },
     },
@@ -47,7 +47,7 @@ HirModule {
                 members: [],
             },
             "name": "TestTrait1",
-            "range": 0..75,
+            "range": 0..73,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Trait>(1): {

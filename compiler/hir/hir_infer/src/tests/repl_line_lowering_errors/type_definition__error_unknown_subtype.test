@@ -37,7 +37,7 @@ HirInferredModule {
                     variant_name: "Nothing",
                 },
             ),
-            range: 37..67,
+            range: 37..66,
         },
     ],
 }
@@ -46,8 +46,8 @@ HirInferredModule {
    ╭─[ ./test/main.alloy:5:1 ]
    │
  5 │ let unknown = Either::Nothing
-   │ ───────────────┬──────────────  
-   │                ╰──────────────── variant `Nothing` not found
+   │ ──────────────┬──────────────  
+   │               ╰──────────────── variant `Nothing` not found
    │ 
    │ Help: No variant named `Nothing` exists on this type
 ───╯

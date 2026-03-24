@@ -9,7 +9,7 @@ HirModule {
             "item": BuiltIn(
                 Int,
             ),
-            "range": 21..25,
+            "range": 21..24,
         },
         Idx::<TypeReference>(1): {
             "item": BuiltIn(

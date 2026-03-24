@@ -12,7 +12,7 @@ HirModule {
                 String,
             ),
             "name": "test",
-            "range": 35..42,
+            "range": 35..41,
             "scope_id": Idx::<Scope>(1),
         },
     },

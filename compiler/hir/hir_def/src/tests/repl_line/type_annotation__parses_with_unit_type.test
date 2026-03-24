@@ -9,13 +9,13 @@ HirModule {
             "item": BuiltIn(
                 Int,
             ),
-            "range": 14..18,
+            "range": 14..17,
         },
         Idx::<TypeReference>(1): {
             "item": BuiltIn(
                 String,
             ),
-            "range": 21..28,
+            "range": 21..27,
         },
         Idx::<TypeReference>(2): {
             "item": Unit,

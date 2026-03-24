@@ -27,7 +27,7 @@ HirModule {
                 name: "a",
             },
             "name": "a",
-            "range": 2..4,
+            "range": 2..3,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<Pattern>(1): {

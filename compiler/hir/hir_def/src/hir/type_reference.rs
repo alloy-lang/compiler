@@ -62,7 +62,7 @@ pub enum TypeReference {
 
 pub(super) fn lower_type_reference(ctx: &mut LoweringCtx, ast: &ast::Type) -> TypeIdx {
     let type_ = lower_type_inner(ctx, ast);
-    ctx.add_type_reference(type_, &ast.syntax())
+    ctx.add_type_reference(type_, ast)
 }
 
 fn lower_type_inner(ctx: &mut LoweringCtx, ast: &ast::Type) -> TypeReference {

@@ -17,7 +17,7 @@ HirModule {
                 last: "True",
             },
             "name": "True",
-            "range": 0..24,
+            "range": 0..22,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -29,7 +29,7 @@ HirModule {
                 ),
             ),
             "name": "test",
-            "range": 24..41,
+            "range": 24..39,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(1): {
@@ -45,7 +45,7 @@ HirModule {
                 },
                 scope: Idx::<Scope>(0),
             },
-            "range": 47..52,
+            "range": 47..51,
         },
         Idx::<Expression>(2): {
             "item": Literal(
@@ -53,7 +53,7 @@ HirModule {
                     0,
                 ),
             ),
-            "range": 69..73,
+            "range": 69..70,
         },
         Idx::<Expression>(3): {
             "item": Literal(
@@ -87,7 +87,7 @@ HirModule {
                     true,
                 ),
             ),
-            "range": 61..66,
+            "range": 61..65,
         },
         Idx::<Pattern>(1): {
             "item": Nil,
@@ -153,7 +153,7 @@ HirModule {
                     last: "True",
                 },
             },
-            range: 0..24,
+            range: 0..22,
         },
     ],
     errors: [],

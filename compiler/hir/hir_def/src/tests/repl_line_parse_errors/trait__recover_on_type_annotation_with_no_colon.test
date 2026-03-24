@@ -12,26 +12,26 @@ HirModule {
             "item": SelfRef(
                 Idx::<Scope>(2),
             ),
-            "range": 42..47,
+            "range": 42..46,
         },
         Idx::<TypeReference>(1): {
             "item": BuiltIn(
                 String,
             ),
-            "range": 50..57,
+            "range": 50..56,
         },
         Idx::<TypeReference>(2): {
             "item": BuiltIn(
                 Int,
             ),
-            "range": 60..68,
+            "range": 60..63,
         },
         Idx::<TypeReference>(3): {
             "item": Lambda {
                 arg_type: Idx::<TypeReference>(1),
                 return_type: Idx::<TypeReference>(2),
             },
-            "range": 50..68,
+            "range": 50..63,
         },
         Idx::<TypeReference>(4): {
             "item": Lambda {
@@ -39,33 +39,33 @@ HirModule {
                 return_type: Idx::<TypeReference>(3),
             },
             "name": "test1",
-            "range": 42..68,
+            "range": 42..63,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeReference>(5): {
             "item": SelfRef(
                 Idx::<Scope>(3),
             ),
-            "range": 83..88,
+            "range": 83..87,
         },
         Idx::<TypeReference>(6): {
             "item": BuiltIn(
                 String,
             ),
-            "range": 91..98,
+            "range": 91..97,
         },
         Idx::<TypeReference>(7): {
             "item": BuiltIn(
                 Int,
             ),
-            "range": 101..105,
+            "range": 101..104,
         },
         Idx::<TypeReference>(8): {
             "item": Lambda {
                 arg_type: Idx::<TypeReference>(6),
                 return_type: Idx::<TypeReference>(7),
             },
-            "range": 91..105,
+            "range": 91..104,
         },
         Idx::<TypeReference>(9): {
             "item": Lambda {
@@ -73,7 +73,7 @@ HirModule {
                 return_type: Idx::<TypeReference>(8),
             },
             "name": "test2",
-            "range": 83..105,
+            "range": 83..104,
             "scope_id": Idx::<Scope>(1),
         },
     },

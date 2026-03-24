@@ -16,7 +16,7 @@ HirModule {
                     0,
                 ),
             ),
-            "range": 24..28,
+            "range": 24..25,
         },
         Idx::<Expression>(2): {
             "item": Literal(
@@ -50,7 +50,7 @@ HirModule {
                     true,
                 ),
             ),
-            "range": 16..21,
+            "range": 16..20,
         },
         Idx::<Pattern>(1): {
             "item": Literal(
@@ -58,7 +58,7 @@ HirModule {
                     false,
                 ),
             ),
-            "range": 30..36,
+            "range": 30..35,
         },
     },
     type_references: EmptyIndex::<TypeReference>,

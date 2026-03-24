@@ -17,5 +17,5 @@ pub(super) fn lower_value(
     };
     let name = Name::new(name.text());
 
-    Some((name.clone(), ctx.add_value(name, value, &ast.syntax())))
+    Some((name.clone(), ctx.add_value(name, value, ast)))
 }

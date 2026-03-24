@@ -14,7 +14,7 @@ HirModule {
                 last: "Option",
             },
             "name": "Option",
-            "range": 0..27,
+            "range": 0..26,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -84,10 +84,10 @@ HirModule {
         LoweringWarning {
             kind: DuplicateImport {
                 name: "Option",
-                first: 0..27,
-                second: 27..55,
+                first: 0..26,
+                second: 27..53,
             },
-            range: 27..55,
+            range: 27..53,
         },
     ],
     errors: [],

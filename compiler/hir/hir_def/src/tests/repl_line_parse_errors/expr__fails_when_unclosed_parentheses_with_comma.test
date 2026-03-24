@@ -12,7 +12,7 @@ HirModule {
                 ),
             ),
             "name": "foo",
-            "range": 0..13,
+            "range": 0..11,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(1): {

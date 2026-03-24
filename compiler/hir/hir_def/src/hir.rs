@@ -3,7 +3,6 @@ use crate::ast_glossary::AstGlossary;
 
 use alloy_ast as ast;
 use alloy_scope::{ScopeIdx, Scopes};
-use alloy_syntax::SyntaxElement;
 use alloy_workspace::ModuleId;
 use ast::AstElement;
 use la_arena::Idx;
@@ -62,10 +61,10 @@ pub use type_definition::*;
 
 mod value;
 
+pub use value::*;
+
 use crate::fqn::{Fqn, FqnResolutionError};
-pub use crate::hir_module::ValueDefinition;
 use crate::index::Index;
-use value::*;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum HirReferenceType {
@@ -378,17 +377,17 @@ impl<'db> LoweringCtx<'db> {
     pub(crate) fn add_expression(
         &mut self,
         expression: Expression,
-        element: &SyntaxElement,
+        element: &impl AstElement,
     ) -> ExpressionIdx {
         let deps = dependency_graph::extract_expression_deps(&expression);
         let idx = self
             .expressions
-            .insert_not_named(expression, element.text_range());
+            .insert_not_named(expression, element.range());
         self.expression_deps.insert(idx, deps);
         idx
     }
 
-    pub(crate) fn add_missing_expression(&mut self, element: &SyntaxElement) -> ExpressionIdx {
+    pub(crate) fn add_missing_expression(&mut self, element: &impl AstElement) -> ExpressionIdx {
         self.add_expression(Expression::Missing, element)
     }
 
@@ -396,12 +395,13 @@ impl<'db> LoweringCtx<'db> {
         &mut self,
         name: Name,
         expression: Expression,
-        element: &SyntaxElement,
+        element: &impl AstElement,
     ) -> ExpressionIdx {
         let deps = dependency_graph::extract_expression_deps(&expression);
-        let res =
-            self.expressions
-                .insert_named(name, expression, element.text_range(), &self.scopes);
+        // TODO: track expression and value ranges separately
+        let res = self
+            .expressions
+            .insert_named(name, expression, element.range(), &self.scopes);
 
         match res {
             Err(err) => {
@@ -410,7 +410,7 @@ impl<'db> LoweringCtx<'db> {
                     first: err.first,
                     second: err.second,
                 };
-                self.error(err, element.text_range());
+                self.error(err, element.range());
 
                 self.add_missing_expression(element)
             }
@@ -421,13 +421,17 @@ impl<'db> LoweringCtx<'db> {
         }
     }
 
-    pub(crate) fn add_pattern(&mut self, pattern: Pattern, element: &SyntaxElement) -> PatternIdx {
+    pub(crate) fn add_pattern(
+        &mut self,
+        pattern: Pattern,
+        element: &impl AstElement,
+    ) -> PatternIdx {
         match &pattern {
             Pattern::VariableDeclaration { name } => {
                 let res = self.patterns.insert_named(
                     name.clone(),
                     pattern,
-                    element.text_range(),
+                    element.range(),
                     &self.scopes,
                 );
 
@@ -438,33 +442,31 @@ impl<'db> LoweringCtx<'db> {
                             first: err.first,
                             second: err.second,
                         };
-                        self.error(err, element.text_range());
+                        self.error(err, element.range());
 
                         self.add_missing_pattern(element)
                     }
                     Ok(pid) => pid,
                 }
             }
-            _ => self
-                .patterns
-                .insert_not_named(pattern, element.text_range()),
+            _ => self.patterns.insert_not_named(pattern, element.range()),
         }
     }
 
-    pub(crate) fn add_missing_pattern(&mut self, element: &SyntaxElement) -> PatternIdx {
+    pub(crate) fn add_missing_pattern(&mut self, element: &impl AstElement) -> PatternIdx {
         self.add_pattern(Pattern::Missing, element)
     }
 
     pub(crate) fn add_type_reference(
         &mut self,
         type_: TypeReference,
-        element: &SyntaxElement,
+        element: &impl AstElement,
     ) -> TypeIdx {
         self.type_references
-            .insert_not_named(type_, element.text_range())
+            .insert_not_named(type_, element.range())
     }
 
-    pub(crate) fn add_missing_type_reference(&mut self, element: &SyntaxElement) -> TypeIdx {
+    pub(crate) fn add_missing_type_reference(&mut self, element: &impl AstElement) -> TypeIdx {
         self.add_type_reference(TypeReference::Missing, element)
     }
 
@@ -472,11 +474,12 @@ impl<'db> LoweringCtx<'db> {
         &mut self,
         name: Name,
         type_id: TypeIdx,
-        element: &SyntaxElement,
+        element: &impl AstElement,
     ) -> TypeIdx {
+        // TODO: track type annotation and type reference ranges separately
         let res = self
             .type_references
-            .add_name(name, type_id, element.text_range(), &self.scopes);
+            .add_name(name, type_id, element.range(), &self.scopes);
 
         match res {
             Err(err) => {
@@ -485,7 +488,7 @@ impl<'db> LoweringCtx<'db> {
                     first: err.first,
                     second: err.second,
                 };
-                self.error(err, element.text_range());
+                self.error(err, element.range());
 
                 self.add_missing_type_reference(element)
             }
@@ -496,12 +499,12 @@ impl<'db> LoweringCtx<'db> {
     pub(crate) fn add_type_definition(
         &mut self,
         type_definition: TypeDefinition,
-        element: &SyntaxElement,
+        element: &impl AstElement,
     ) {
         let res = self.type_definitions.insert_named(
             type_definition.name.clone(),
             type_definition,
-            element.text_range(),
+            element.range(),
             &self.scopes,
         );
 
@@ -511,7 +514,7 @@ impl<'db> LoweringCtx<'db> {
                 first: err.first,
                 second: err.second,
             };
-            self.error(err, element.text_range());
+            self.error(err, element.range());
         }
     }
 
@@ -519,7 +522,7 @@ impl<'db> LoweringCtx<'db> {
         &mut self,
         name: String,
         type_variable: TypeVariableKind,
-        element: &SyntaxElement,
+        element: &impl AstElement,
     ) -> TypeVariableIdx {
         let name = Name::new(name);
         let type_variable = TypeVariable {
@@ -530,7 +533,7 @@ impl<'db> LoweringCtx<'db> {
         let res = self.type_variables.insert_named(
             name.clone(),
             type_variable.clone(),
-            element.text_range(),
+            element.range(),
             &self.scopes,
         );
 
@@ -541,22 +544,19 @@ impl<'db> LoweringCtx<'db> {
                     first: err.first,
                     second: err.second,
                 };
-                self.error(err, element.text_range());
+                self.error(err, element.range());
 
                 self.type_variables
-                    .insert_not_named(type_variable, element.text_range())
+                    .insert_not_named(type_variable, element.range())
             }
             Ok(pid) => pid,
         }
     }
 
-    pub(crate) fn add_trait(&mut self, trait_: Trait, element: &SyntaxElement) {
-        let res = self.traits.insert_named(
-            trait_.name.clone(),
-            trait_,
-            element.text_range(),
-            &self.scopes,
-        );
+    pub(crate) fn add_trait(&mut self, trait_: Trait, element: &impl AstElement) {
+        let res =
+            self.traits
+                .insert_named(trait_.name.clone(), trait_, element.range(), &self.scopes);
 
         if let Err(err) = res {
             let err = LoweringErrorKind::ConflictingTraitDefinitionName {
@@ -564,15 +564,15 @@ impl<'db> LoweringCtx<'db> {
                 first: err.first,
                 second: err.second,
             };
-            self.error(err, element.text_range());
+            self.error(err, element.range());
         }
     }
 
-    pub(crate) fn add_behavior(&mut self, behavior: Behavior, element: &SyntaxElement) {
+    pub(crate) fn add_behavior(&mut self, behavior: Behavior, element: &impl AstElement) {
         let res = self.behaviors.insert_named(
             (behavior.attached_type, behavior.attached_trait),
             behavior.clone(),
-            element.text_range(),
+            element.range(),
             &self.scopes,
         );
 
@@ -583,11 +583,11 @@ impl<'db> LoweringCtx<'db> {
                 first: err.first,
                 second: err.second,
             };
-            self.error(err, element.text_range());
+            self.error(err, element.range());
         }
     }
 
-    pub(crate) fn add_import(&mut self, segments: &NonEmpty<Name>, element: &SyntaxElement) {
+    pub(crate) fn add_import(&mut self, segments: &NonEmpty<Name>, element: &impl AstElement) {
         let new_import = Import::new(segments);
         let last = segments.last();
 
@@ -599,9 +599,9 @@ impl<'db> LoweringCtx<'db> {
                 let warn = LoweringWarningKind::DuplicateImport {
                     name: last.clone(),
                     first: existing_import_range,
-                    second: element.text_range(),
+                    second: element.range(),
                 };
-                self.warning(warn, element.text_range());
+                self.warning(warn, element.range());
 
                 return;
             }
@@ -610,7 +610,7 @@ impl<'db> LoweringCtx<'db> {
         let res = self.imports.insert_named(
             last.clone(),
             new_import.clone(),
-            element.text_range(),
+            element.range(),
             &self.scopes,
         );
 
@@ -620,7 +620,7 @@ impl<'db> LoweringCtx<'db> {
                 first: err.first,
                 second: err.second,
             };
-            self.error(err, element.text_range());
+            self.error(err, element.range());
         }
     }
 }
@@ -669,7 +669,7 @@ pub fn lower_file<'db>(
 }
 
 #[must_use]
-pub fn lower_source_file<'db>(
+fn lower_source_file<'db>(
     db: &'db dyn HirDefDatabase,
     source_file: &'db ast::SourceFile,
 ) -> HirModule {
@@ -703,7 +703,6 @@ mod tests {
         );
 
         let (first_hir_module, _) = crate::lower_file(&db, module_id);
-        let first_values = first_hir_module.values();
 
         db.add_module(
             module_slug,
@@ -715,12 +714,8 @@ mod tests {
         );
 
         let (second_hir_module, _) = crate::lower_file(&db, module_id);
-        let second_values = second_hir_module.values();
 
-        assert_ne!(
-            first_values.collect::<Vec<_>>(),
-            second_values.collect::<Vec<_>>()
-        );
+        assert_ne!(first_hir_module, second_hir_module);
     }
 
     #[test]

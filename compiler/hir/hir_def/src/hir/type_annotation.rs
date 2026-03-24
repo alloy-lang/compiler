@@ -11,7 +11,7 @@ pub(super) fn lower_type_annotation(
         }
 
         match ast.type_() {
-            None => ctx.add_missing_type_reference(&ast.syntax()),
+            None => ctx.add_missing_type_reference(ast),
             Some(type_) => lower_type_reference(ctx, &type_),
         }
     });
@@ -23,8 +23,5 @@ pub(super) fn lower_type_annotation(
     };
     let name = Name::new(name.text());
 
-    Some((
-        name.clone(),
-        ctx.add_type_annotation(name, type_id, &ast.syntax()),
-    ))
+    Some((name.clone(), ctx.add_type_annotation(name, type_id, ast)))
 }

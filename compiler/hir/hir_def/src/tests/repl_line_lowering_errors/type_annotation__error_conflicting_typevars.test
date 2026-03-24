@@ -19,26 +19,26 @@ HirModule {
                     ),
                 },
             ),
-            "range": 14..17,
+            "range": 14..16,
         },
         Idx::<TypeReference>(1): {
             "item": BuiltIn(
                 Int,
             ),
-            "range": 20..24,
+            "range": 20..23,
         },
         Idx::<TypeReference>(2): {
             "item": BuiltIn(
                 String,
             ),
-            "range": 27..34,
+            "range": 27..33,
         },
         Idx::<TypeReference>(3): {
             "item": Lambda {
                 arg_type: Idx::<TypeReference>(1),
                 return_type: Idx::<TypeReference>(2),
             },
-            "range": 20..34,
+            "range": 20..33,
         },
         Idx::<TypeReference>(4): {
             "item": Lambda {
@@ -46,7 +46,7 @@ HirModule {
                 return_type: Idx::<TypeReference>(3),
             },
             "name": "test",
-            "range": 14..34,
+            "range": 14..33,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -58,7 +58,7 @@ HirModule {
                 kind: Unbound,
             },
             "name": "t1",
-            "range": 44..59,
+            "range": 44..54,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeVariable>(1): {
@@ -92,7 +92,7 @@ HirModule {
         LoweringError {
             kind: ConflictingTypeVariableName {
                 name: "t1",
-                first: 44..59,
+                first: 44..54,
                 second: 59..69,
             },
             range: 59..69,

@@ -14,7 +14,7 @@ HirModule {
                 ),
                 scope: Idx::<Scope>(0),
             },
-            "range": 3..8,
+            "range": 3..7,
         },
         Idx::<Expression>(1): {
             "item": Literal(
@@ -22,7 +22,7 @@ HirModule {
                     2,
                 ),
             ),
-            "range": 13..15,
+            "range": 13..14,
         },
         Idx::<Expression>(2): {
             "item": Literal(

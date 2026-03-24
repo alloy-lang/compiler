@@ -24,7 +24,7 @@ HirModule {
                 scope: Idx::<Scope>(0),
             },
             "name": "example",
-            "range": 0..30,
+            "range": 0..28,
             "scope_id": Idx::<Scope>(0),
         },
     },

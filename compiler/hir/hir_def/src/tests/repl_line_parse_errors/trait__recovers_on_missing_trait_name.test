@@ -21,7 +21,7 @@ HirModule {
                 kind: Unbound,
             },
             "name": "t1",
-            "range": 95..106,
+            "range": 95..105,
             "scope_id": Idx::<Scope>(1),
         },
     },

@@ -21,7 +21,7 @@ HirModule {
                 ),
             },
             "name": "Test1",
-            "range": 0..28,
+            "range": 0..27,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<TypeDefinition>(1): {

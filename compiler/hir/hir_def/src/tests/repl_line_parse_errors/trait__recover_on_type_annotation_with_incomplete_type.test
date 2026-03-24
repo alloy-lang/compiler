@@ -11,33 +11,33 @@ HirModule {
         Idx::<TypeReference>(0): {
             "item": Missing,
             "name": "test1",
-            "range": 27..44,
+            "range": 27..39,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeReference>(1): {
             "item": SelfRef(
                 Idx::<Scope>(3),
             ),
-            "range": 59..64,
+            "range": 59..63,
         },
         Idx::<TypeReference>(2): {
             "item": BuiltIn(
                 String,
             ),
-            "range": 67..74,
+            "range": 67..73,
         },
         Idx::<TypeReference>(3): {
             "item": BuiltIn(
                 Int,
             ),
-            "range": 77..81,
+            "range": 77..80,
         },
         Idx::<TypeReference>(4): {
             "item": Lambda {
                 arg_type: Idx::<TypeReference>(2),
                 return_type: Idx::<TypeReference>(3),
             },
-            "range": 67..81,
+            "range": 67..80,
         },
         Idx::<TypeReference>(5): {
             "item": Lambda {
@@ -45,7 +45,7 @@ HirModule {
                 return_type: Idx::<TypeReference>(4),
             },
             "name": "test2",
-            "range": 59..81,
+            "range": 59..80,
             "scope_id": Idx::<Scope>(1),
         },
     },

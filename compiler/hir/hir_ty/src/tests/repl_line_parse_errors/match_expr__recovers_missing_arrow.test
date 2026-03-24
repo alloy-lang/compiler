@@ -76,10 +76,10 @@ HirTypedModule {
                             ),
                         ),
                     ),
-                    range: 44..49,
+                    range: 44..48,
                 },
             ),
-            range: 44..49,
+            range: 44..48,
         },
         TypeCheckingError {
             kind: InferenceError(
@@ -112,10 +112,10 @@ HirTypedModule {
                             ),
                         ),
                     ),
-                    range: 55..61,
+                    range: 55..60,
                 },
             ),
-            range: 55..61,
+            range: 55..60,
         },
     ],
     poly_instantiations: {},
@@ -135,8 +135,8 @@ HirTypedModule {
    ╭─[ ./test/main.alloy:4:5 ]
    │
  4 │   \ True 0
-   │     ──┬──  
-   │       ╰──── expected `Test[Int]`, found `Bool`
+   │     ──┬─  
+   │       ╰─── expected `Test[Int]`, found `Bool`
    │ 
    │ Help: These types must be compatible
 ───╯
@@ -145,8 +145,8 @@ HirTypedModule {
    ╭─[ ./test/main.alloy:5:5 ]
    │
  5 │   \ False -> 1
-   │     ───┬──  
-   │        ╰──── expected `Test[Int]`, found `Bool`
+   │     ──┬──  
+   │       ╰──── expected `Test[Int]`, found `Bool`
    │ 
    │ Help: These types must be compatible
 ───╯

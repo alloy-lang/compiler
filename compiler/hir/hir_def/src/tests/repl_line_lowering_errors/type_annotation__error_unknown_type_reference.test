@@ -15,26 +15,26 @@ HirModule {
                     ),
                 ),
             ),
-            "range": 14..22,
+            "range": 14..21,
         },
         Idx::<TypeReference>(1): {
             "item": BuiltIn(
                 Int,
             ),
-            "range": 25..29,
+            "range": 25..28,
         },
         Idx::<TypeReference>(2): {
             "item": BuiltIn(
                 String,
             ),
-            "range": 32..39,
+            "range": 32..38,
         },
         Idx::<TypeReference>(3): {
             "item": Lambda {
                 arg_type: Idx::<TypeReference>(1),
                 return_type: Idx::<TypeReference>(2),
             },
-            "range": 25..39,
+            "range": 25..38,
         },
         Idx::<TypeReference>(4): {
             "item": Lambda {
@@ -42,7 +42,7 @@ HirModule {
                 return_type: Idx::<TypeReference>(3),
             },
             "name": "test",
-            "range": 14..39,
+            "range": 14..38,
             "scope_id": Idx::<Scope>(0),
         },
     },

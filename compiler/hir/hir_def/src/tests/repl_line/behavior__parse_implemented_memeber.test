@@ -24,7 +24,7 @@ HirModule {
                 last: "Eq",
             },
             "name": "Eq",
-            "range": 0..19,
+            "range": 0..18,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
@@ -36,7 +36,7 @@ HirModule {
                 last: "not",
             },
             "name": "not",
-            "range": 19..42,
+            "range": 19..40,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -54,7 +54,7 @@ HirModule {
                 },
                 scope: Idx::<Scope>(3),
             },
-            "range": 143..152,
+            "range": 143..147,
         },
         Idx::<Expression>(1): {
             "item": VariableRef {
@@ -69,7 +69,7 @@ HirModule {
                 },
                 scope: Idx::<Scope>(3),
             },
-            "range": 157..167,
+            "range": 157..162,
         },
         Idx::<Expression>(2): {
             "item": VariableRef {
@@ -114,7 +114,7 @@ HirModule {
                     Idx::<Expression>(2),
                 ],
             },
-            "range": 172..183,
+            "range": 172..182,
         },
         Idx::<Expression>(4): {
             "item": IfThenElse {
@@ -122,7 +122,7 @@ HirModule {
                 then: Idx::<Expression>(1),
                 else_: Idx::<Expression>(3),
             },
-            "range": 140..183,
+            "range": 140..182,
         },
         Idx::<Expression>(5): {
             "item": Lambda {
@@ -133,7 +133,7 @@ HirModule {
                 body: Idx::<Expression>(4),
             },
             "name": "eq",
-            "range": 110..183,
+            "range": 110..182,
             "scope_id": Idx::<Scope>(2),
         },
     },
@@ -178,13 +178,13 @@ HirModule {
                     ],
                 ),
             ),
-            "range": 90..93,
+            "range": 90..92,
         },
         Idx::<TypeReference>(1): {
             "item": BuiltIn(
                 Bool,
             ),
-            "range": 97..102,
+            "range": 97..101,
         },
     },
     type_definitions: Index::<TypeDefinition> {
@@ -205,7 +205,7 @@ HirModule {
                 ),
             },
             "name": "Bool",
-            "range": 42..81,
+            "range": 42..79,
             "scope_id": Idx::<Scope>(0),
         },
     },

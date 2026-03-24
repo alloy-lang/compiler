@@ -14,7 +14,7 @@ HirModule {
                 last: "Test",
             },
             "name": "Test",
-            "range": 0..24,
+            "range": 0..22,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -65,7 +65,7 @@ HirModule {
                     Idx::<TypeReference>(1),
                 ],
             },
-            "range": 39..48,
+            "range": 39..47,
         },
         Idx::<TypeReference>(3): {
             "item": Named(
@@ -79,7 +79,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 51..54,
+            "range": 51..53,
         },
         Idx::<TypeReference>(4): {
             "item": Named(
@@ -140,14 +140,14 @@ HirModule {
                     Idx::<TypeReference>(6),
                 ],
             },
-            "range": 57..70,
+            "range": 57..69,
         },
         Idx::<TypeReference>(8): {
             "item": Lambda {
                 arg_type: Idx::<TypeReference>(3),
                 return_type: Idx::<TypeReference>(7),
             },
-            "range": 51..70,
+            "range": 51..69,
         },
         Idx::<TypeReference>(9): {
             "item": Lambda {
@@ -155,7 +155,7 @@ HirModule {
                 return_type: Idx::<TypeReference>(8),
             },
             "name": "apply",
-            "range": 39..70,
+            "range": 39..69,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -167,7 +167,7 @@ HirModule {
                 kind: Unbound,
             },
             "name": "t1",
-            "range": 80..95,
+            "range": 80..90,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeVariable>(1): {

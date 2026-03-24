@@ -8,7 +8,7 @@ HirModule {
         Idx::<Expression>(0): {
             "item": Missing,
             "name": "counter",
-            "range": 0..36,
+            "range": 0..34,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(1): {

@@ -49,7 +49,7 @@ HirInferredModule {
                     ),
                 },
             ),
-            range: 6..11,
+            range: 6..10,
         },
     ],
 }
@@ -58,8 +58,8 @@ HirInferredModule {
    ╭─[ ./test/main.alloy:1:7 ]
    │
  1 │ match test when
-   │       ──┬──  
-   │         ╰──── cannot find `test`
+   │       ──┬─  
+   │         ╰─── cannot find `test`
    │ 
    │ Help: No value named `test` found in module `main`
 ───╯

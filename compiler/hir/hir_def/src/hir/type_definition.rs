@@ -81,7 +81,7 @@ pub(super) fn lower_type_definition(ctx: &mut LoweringCtx, ast: &ast::TypeDefini
             .iter()
             .map(|type_arg| {
                 let name = type_arg.text();
-                ctx.add_type_variable(name, TypeVariableKind::Unbound, &type_arg.syntax())
+                ctx.add_type_variable(name, TypeVariableKind::Unbound, type_arg)
             })
             .collect::<Vec<_>>();
 
@@ -117,7 +117,7 @@ pub(super) fn lower_type_definition(ctx: &mut LoweringCtx, ast: &ast::TypeDefini
         }
     });
 
-    ctx.add_type_definition(type_definition, &ast.syntax());
+    ctx.add_type_definition(type_definition, ast);
 }
 
 fn first<T>(v: &mut Vec<T>) -> T {

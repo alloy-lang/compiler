@@ -14,7 +14,7 @@ HirModule {
                 last: "Thing1",
             },
             "name": "Thing1",
-            "range": 17..57,
+            "range": 17..52,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
@@ -61,7 +61,7 @@ HirModule {
                     last: "Thing1",
                 },
             },
-            range: 17..57,
+            range: 17..52,
         },
         LoweringWarning {
             kind: UnusedImport {

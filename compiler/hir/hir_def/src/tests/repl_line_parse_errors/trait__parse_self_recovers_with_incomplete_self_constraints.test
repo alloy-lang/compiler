@@ -14,7 +14,7 @@ HirModule {
                 String,
             ),
             "name": "distraction",
-            "range": 58..65,
+            "range": 58..64,
             "scope_id": Idx::<Scope>(1),
         },
     },

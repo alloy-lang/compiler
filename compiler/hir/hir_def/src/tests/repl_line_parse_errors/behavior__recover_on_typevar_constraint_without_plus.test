@@ -26,7 +26,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 117..128,
+            "range": 117..127,
         },
         Idx::<TypeReference>(1): {
             "item": Named(
@@ -40,7 +40,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 128..143,
+            "range": 128..138,
         },
         Idx::<TypeReference>(2): {
             "item": Named(
@@ -54,7 +54,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 73..84,
+            "range": 73..83,
         },
         Idx::<TypeReference>(3): {
             "item": Named(
@@ -68,7 +68,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 88..94,
+            "range": 88..93,
         },
     },
     type_definitions: Index::<TypeDefinition> {
@@ -83,7 +83,7 @@ HirModule {
                 ),
             },
             "name": "Type1",
-            "range": 0..23,
+            "range": 0..21,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -105,7 +105,7 @@ HirModule {
                 ),
             },
             "name": "t1",
-            "range": 104..143,
+            "range": 104..138,
             "scope_id": Idx::<Scope>(3),
         },
         Idx::<TypeVariable>(1): {
@@ -114,7 +114,7 @@ HirModule {
                 kind: Unbound,
             },
             "name": "t2",
-            "range": 143..154,
+            "range": 143..153,
             "scope_id": Idx::<Scope>(3),
         },
     },
@@ -128,7 +128,7 @@ HirModule {
                 members: [],
             },
             "name": "TestTrait1",
-            "range": 23..64,
+            "range": 23..62,
             "scope_id": Idx::<Scope>(0),
         },
     },

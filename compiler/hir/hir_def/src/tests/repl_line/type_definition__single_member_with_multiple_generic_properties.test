@@ -17,7 +17,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 29..32,
+            "range": 29..31,
         },
         Idx::<TypeReference>(1): {
             "item": Named(

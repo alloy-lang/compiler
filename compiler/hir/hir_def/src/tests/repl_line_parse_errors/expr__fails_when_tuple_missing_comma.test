@@ -9,7 +9,7 @@ HirModule {
                     1,
                 ),
             ),
-            "range": 1..3,
+            "range": 1..2,
         },
         Idx::<Expression>(1): {
             "item": Literal(

@@ -69,7 +69,7 @@ pub enum UnaryOp {
 
 pub(super) fn lower_expression(ctx: &mut LoweringCtx, ast: &ast::Expression) -> ExpressionIdx {
     let expression = lower_expression_inner(ctx, ast);
-    ctx.add_expression(expression, &ast.syntax())
+    ctx.add_expression(expression, ast)
 }
 
 pub(super) fn lower_expression_inner(ctx: &mut LoweringCtx, ast: &ast::Expression) -> Expression {
@@ -185,11 +185,11 @@ fn lower_variable_ref(ctx: &mut LoweringCtx, var: &ast::VariableRef) -> Expressi
 fn lower_infix_expression(ctx: &mut LoweringCtx, e: &ast::InfixExpr) -> Expression {
     let lhs = match e.lhs() {
         Some(lhs) => lower_expression(ctx, &lhs),
-        None => ctx.add_missing_expression(&e.syntax()),
+        None => ctx.add_missing_expression(e),
     };
     let rhs = match e.rhs() {
         Some(rhs) => lower_expression(ctx, &rhs),
-        None => ctx.add_missing_expression(&e.syntax()),
+        None => ctx.add_missing_expression(e),
     };
     let op = match e.op() {
         Some(op) => {
@@ -220,15 +220,15 @@ fn lower_infix_expression(ctx: &mut LoweringCtx, e: &ast::InfixExpr) -> Expressi
 fn lower_if_then_else_expression(ctx: &mut LoweringCtx, e: &ast::IfThenElseExpr) -> Expression {
     let condition = match e.condition() {
         Some(condition) => lower_expression(ctx, &condition),
-        None => ctx.add_missing_expression(&e.syntax()),
+        None => ctx.add_missing_expression(e),
     };
     let then = match e.then() {
         Some(then) => lower_expression(ctx, &then),
-        None => ctx.add_missing_expression(&e.syntax()),
+        None => ctx.add_missing_expression(e),
     };
     let else_ = match e.else_() {
         Some(else_) => lower_expression(ctx, &else_),
-        None => ctx.add_missing_expression(&e.syntax()),
+        None => ctx.add_missing_expression(e),
     };
 
     Expression::IfThenElse {
@@ -245,12 +245,12 @@ fn lower_lambda_expression(ctx: &mut LoweringCtx, e: &ast::LambdaExpr) -> Expres
             .iter()
             .map(|arg| match arg.pattern() {
                 Some(arg) => lower_pattern(ctx, &arg),
-                None => ctx.add_missing_pattern(&arg.syntax()),
+                None => ctx.add_missing_pattern(arg),
             })
             .collect::<Vec<_>>();
         let body = match e.body() {
             Some(body) => lower_expression(ctx, &body),
-            None => ctx.add_missing_expression(&e.syntax()),
+            None => ctx.add_missing_expression(e),
         };
 
         Expression::Lambda { body, args }
@@ -285,7 +285,7 @@ fn lower_function_call(ctx: &mut LoweringCtx, e: &ast::FunctionCall) -> Expressi
 fn lower_match_expression(ctx: &mut LoweringCtx, e: &ast::MatchExpr) -> Expression {
     let condition = match e.condition() {
         Some(condition) => lower_expression(ctx, &condition),
-        None => ctx.add_missing_expression(&e.syntax()),
+        None => ctx.add_missing_expression(e),
     };
 
     let targets = e
@@ -298,13 +298,13 @@ fn lower_match_expression(ctx: &mut LoweringCtx, e: &ast::MatchExpr) -> Expressi
                 let condition = a
                     .condition()
                     .map(|c| lower_pattern(ctx, &c))
-                    .unwrap_or_else(|| ctx.add_missing_pattern(&a.syntax()));
+                    .unwrap_or_else(|| ctx.add_missing_pattern(a));
                 // map_or_else can't be used here due to a double borrow
                 #[allow(clippy::map_unwrap_or)]
                 let value = a
                     .value()
                     .map(|v| lower_expression(ctx, &v))
-                    .unwrap_or_else(|| ctx.add_missing_expression(&a.syntax()));
+                    .unwrap_or_else(|| ctx.add_missing_expression(a));
 
                 (condition, value)
             })

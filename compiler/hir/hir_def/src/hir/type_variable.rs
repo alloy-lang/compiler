@@ -40,7 +40,7 @@ pub(super) fn lower_named_type_variable(
 
     Some((
         Name::new(name.text()),
-        ctx.add_type_variable(name.text(), type_variable, &ast.syntax()),
+        ctx.add_type_variable(name.text(), type_variable, ast),
     ))
 }
 
@@ -71,7 +71,7 @@ fn lower_type_variable_constraints(
                     unreachable!("parsing error")
                 };
                 let type_reference =
-                    ctx.add_type_reference(TypeReference::Named(path.clone()), &ast_path.syntax());
+                    ctx.add_type_reference(TypeReference::Named(path.clone()), &ast_path);
                 TypeVariableConstraint::Trait(type_reference)
             }
         })

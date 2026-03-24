@@ -18,7 +18,7 @@ HirModule {
                 },
                 scope: Idx::<Scope>(1),
             },
-            "range": 19..22,
+            "range": 19..20,
         },
         Idx::<Expression>(1): {
             "item": Lambda {
@@ -28,7 +28,7 @@ HirModule {
                 body: Idx::<Expression>(0),
             },
             "name": "funky",
-            "range": 0..22,
+            "range": 0..20,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Expression>(2): {
@@ -37,11 +37,11 @@ HirModule {
                     1,
                 ),
             ),
-            "range": 28..30,
+            "range": 28..29,
         },
         Idx::<Expression>(3): {
             "item": Missing,
-            "range": 28..32,
+            "range": 28..31,
         },
         Idx::<Expression>(4): {
             "item": Binary {
@@ -49,7 +49,7 @@ HirModule {
                 lhs: Idx::<Expression>(2),
                 rhs: Idx::<Expression>(3),
             },
-            "range": 28..32,
+            "range": 28..31,
         },
         Idx::<Expression>(5): {
             "item": FunctionCall {

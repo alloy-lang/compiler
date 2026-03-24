@@ -13,7 +13,7 @@ HirModule {
                 last: "ResultThing",
             },
             "name": "ResultThing",
-            "range": 0..31,
+            "range": 0..29,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -24,7 +24,7 @@ HirModule {
             "item": BuiltIn(
                 String,
             ),
-            "range": 46..53,
+            "range": 46..52,
         },
         Idx::<TypeReference>(1): {
             "item": Named(
@@ -47,7 +47,7 @@ HirModule {
                     ],
                 ),
             ),
-            "range": 56..70,
+            "range": 56..69,
         },
         Idx::<TypeReference>(2): {
             "item": Lambda {
@@ -55,14 +55,14 @@ HirModule {
                 return_type: Idx::<TypeReference>(1),
             },
             "name": "test1",
-            "range": 46..70,
+            "range": 46..69,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<TypeReference>(3): {
             "item": BuiltIn(
                 String,
             ),
-            "range": 85..92,
+            "range": 85..91,
         },
         Idx::<TypeReference>(4): {
             "item": Named(

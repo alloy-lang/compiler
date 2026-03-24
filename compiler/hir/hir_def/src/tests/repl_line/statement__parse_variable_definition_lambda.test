@@ -16,7 +16,7 @@ HirModule {
                 },
                 scope: Idx::<Scope>(1),
             },
-            "range": 20..22,
+            "range": 20..21,
         },
         Idx::<Expression>(1): {
             "item": VariableRef {

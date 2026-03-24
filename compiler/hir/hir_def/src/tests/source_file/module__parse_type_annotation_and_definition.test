@@ -17,7 +17,7 @@ HirModule {
                 last: "Test",
             },
             "name": "Test",
-            "range": 29..56,
+            "range": 29..51,
             "scope_id": Idx::<Scope>(0),
         },
         Idx::<Import>(1): {
@@ -29,7 +29,7 @@ HirModule {
                 last: "<|",
             },
             "name": "<|",
-            "range": 56..88,
+            "range": 56..82,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -60,7 +60,7 @@ HirModule {
                 ),
                 scope: Idx::<Scope>(2),
             },
-            "range": 225..235,
+            "range": 225..234,
         },
         Idx::<Expression>(1): {
             "item": VariableRef {
@@ -222,7 +222,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 108..111,
+            "range": 108..110,
         },
         Idx::<TypeReference>(1): {
             "item": Named(
@@ -249,7 +249,7 @@ HirModule {
             "item": ParenthesizedType(
                 Idx::<TypeReference>(2),
             ),
-            "range": 107..118,
+            "range": 107..117,
         },
         Idx::<TypeReference>(4): {
             "item": Named(
@@ -263,7 +263,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 121..124,
+            "range": 121..123,
         },
         Idx::<TypeReference>(5): {
             "item": Named(
@@ -277,7 +277,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 127..130,
+            "range": 127..129,
         },
         Idx::<TypeReference>(6): {
             "item": Named(
@@ -346,21 +346,21 @@ HirModule {
                     Idx::<TypeReference>(9),
                 ],
             },
-            "range": 133..148,
+            "range": 133..147,
         },
         Idx::<TypeReference>(11): {
             "item": Lambda {
                 arg_type: Idx::<TypeReference>(5),
                 return_type: Idx::<TypeReference>(10),
             },
-            "range": 127..148,
+            "range": 127..147,
         },
         Idx::<TypeReference>(12): {
             "item": Lambda {
                 arg_type: Idx::<TypeReference>(4),
                 return_type: Idx::<TypeReference>(11),
             },
-            "range": 121..148,
+            "range": 121..147,
         },
         Idx::<TypeReference>(13): {
             "item": Lambda {
@@ -368,7 +368,7 @@ HirModule {
                 return_type: Idx::<TypeReference>(12),
             },
             "name": "testThing",
-            "range": 107..148,
+            "range": 107..147,
             "scope_id": Idx::<Scope>(0),
         },
     },
@@ -380,7 +380,7 @@ HirModule {
                 kind: Unbound,
             },
             "name": "t1",
-            "range": 160..177,
+            "range": 160..170,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<TypeVariable>(1): {
@@ -389,7 +389,7 @@ HirModule {
                 kind: Unbound,
             },
             "name": "t2",
-            "range": 177..192,
+            "range": 177..187,
             "scope_id": Idx::<Scope>(1),
         },
     },

@@ -29,7 +29,7 @@ HirModule {
                 name: "arg1",
             },
             "name": "arg1",
-            "range": 1..6,
+            "range": 1..5,
             "scope_id": Idx::<Scope>(1),
         },
         Idx::<Pattern>(1): {
@@ -38,7 +38,7 @@ HirModule {
                     1001,
                 ),
             ),
-            "range": 6..11,
+            "range": 6..10,
         },
         Idx::<Pattern>(2): {
             "item": Literal(

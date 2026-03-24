@@ -23,7 +23,7 @@ HirModule {
                     ),
                 },
             ),
-            "range": 50..61,
+            "range": 50..60,
         },
         Idx::<TypeReference>(1): {
             "item": Named(
@@ -35,7 +35,7 @@ HirModule {
                     ),
                 ),
             ),
-            "range": 65..71,
+            "range": 65..70,
         },
     },
     type_definitions: EmptyIndex::<TypeDefinition>,
@@ -49,7 +49,7 @@ HirModule {
                 members: [],
             },
             "name": "TestTrait1",
-            "range": 0..41,
+            "range": 0..39,
             "scope_id": Idx::<Scope>(0),
         },
     },
