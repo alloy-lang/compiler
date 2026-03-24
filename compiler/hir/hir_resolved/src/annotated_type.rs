@@ -12,6 +12,7 @@ pub enum AnnotatedType {
     Unit,
     BuiltIn(hir::BuiltInType),
     /// Concrete named type (Single/Union type definition)
+    /// TODO: bounded vs unbounded type defs
     TypeDef {
         fql: Fql<hir::TypeDefinition>,
         name: hir::Name,
@@ -25,6 +26,7 @@ pub enum AnnotatedType {
     /// Tuple type
     Tuple(NonEmpty<AnnotatedType>),
     /// Parameterized type (e.g., List[Int])
+    /// TODO: bounded vs unbounded type defs
     Bounded {
         base: Box<AnnotatedType>,
         args: Vec<AnnotatedType>,
@@ -86,6 +88,23 @@ impl std::fmt::Display for AnnotatedType {
             AnnotatedType::Unit => write!(f, "()"),
             AnnotatedType::BuiltIn(builtin) => write!(f, "{builtin:?}"),
             AnnotatedType::TypeDef { name, .. } => write!(f, "{name}"),
+            // TODO: display type args on bounded type defs
+            // AnnotatedType::TypeDef {
+            //     name, type_args, ..
+            // } => {
+            //     write!(f, "{name}")?;
+            //
+            //     if !type_args.is_empty() {
+            //         write!(f, "[")?;
+            //         type_args
+            //             .iter()
+            //             .map(|type_arg| type_arg.name.clone())
+            //             .join(", ")
+            //             .fmt(f)?;
+            //         write!(f, "]")?;
+            //     }
+            //     Ok(())
+            // }
             AnnotatedType::Lambda { arg, ret } => match arg.as_ref() {
                 AnnotatedType::Lambda { .. } => write!(f, "({arg}) -> {ret}"),
                 _ => write!(f, "{arg} -> {ret}"),
@@ -459,6 +478,12 @@ fn resolve_named_type_annotation(
     path: &hir::Path,
     type_idx: hir::TypeIdx,
 ) -> AnnotatedType {
+    if let hir::Path::OtherModule(fqn, resolution_kinds) = path {
+        if fqn.name == hir::Name::new("Test") {
+            println!("fdsafdsa");
+        }
+    }
+
     let source_fql = Fql::new(current_module_id, type_idx);
 
     // First try: resolve via type reference path
