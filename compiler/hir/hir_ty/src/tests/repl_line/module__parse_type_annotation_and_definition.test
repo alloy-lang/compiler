@@ -18,10 +18,10 @@ HirTypedModule {
                 NonEmpty(
                     [
                         Generic(
-                            1,
+                            0,
                         ),
                         Generic(
-                            1,
+                            0,
                         ),
                     ],
                 ),
@@ -41,10 +41,10 @@ HirTypedModule {
                         NonEmpty(
                             [
                                 Generic(
-                                    1,
+                                    0,
                                 ),
                                 Generic(
-                                    1,
+                                    0,
                                 ),
                             ],
                         ),
@@ -98,25 +98,25 @@ HirTypedModule {
             },
         },
         Idx::<Expression>(4): Generic(
-            1,
+            0,
         ),
         Idx::<Expression>(1): Generic(
-            0,
+            1,
         ),
         Idx::<Expression>(5): Tuple(
             NonEmpty(
                 [
                     Generic(
-                        1,
+                        0,
                     ),
                     Generic(
-                        1,
+                        0,
                     ),
                 ],
             ),
         ),
         Idx::<Expression>(2): Generic(
-            1,
+            0,
         ),
         Idx::<Expression>(6): Bounded {
             base: TypeDef(
@@ -133,10 +133,10 @@ HirTypedModule {
                     NonEmpty(
                         [
                             Generic(
-                                1,
+                                0,
                             ),
                             Generic(
-                                1,
+                                0,
                             ),
                         ],
                     ),
@@ -144,23 +144,23 @@ HirTypedModule {
             ],
         },
         Idx::<Expression>(3): Generic(
-            0,
+            1,
         ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Lambda {
             arg_type: Generic(
-                0,
-            ),
-            return_type: Generic(
                 1,
             ),
+            return_type: Generic(
+                0,
+            ),
         },
-        Idx::<Pattern>(1): Generic(
-            0,
-        ),
         Idx::<Pattern>(2): Generic(
-            0,
+            1,
+        ),
+        Idx::<Pattern>(1): Generic(
+            1,
         ),
     },
     warnings: [],

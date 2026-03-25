@@ -16,8 +16,8 @@ mod constraint_gen;
 mod inference;
 pub mod unification;
 
-use inference::infer_body_type;
-pub use inference::infer_types_hm;
+pub(crate) use inference::infer_body_type;
+pub(crate) use inference::infer_expressions;
 
 /// Unique identifier for a type variable
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -238,14 +238,12 @@ impl PolyType {
 /// Inference context for HM type inference
 pub(super) struct HMInferenceContext<'db> {
     pub(super) db: &'db dyn crate::HirInferDatabase,
-    /// The module currently being type-checked
-    pub(super) module_id: alloy_workspace::ModuleId,
     /// Type variable generator
     pub(super) type_var_gen: TypeVarGenerator,
     /// The expression currently being inferred by `infer_body_type`.
     /// Used to skip the `infer_value_signature` shortcut for this expression
     /// to prevent Salsa cycles.
-    pub(super) inferring_expr: Option<Fql<hir::Expression>>,
+    inferring_expr: Option<Fql<hir::Expression>>,
     /// Type equations to be solved
     pub(super) equations: Vec<TypeEquation>,
     /// Type environment (maps expressions/patterns to their types)
@@ -264,11 +262,22 @@ pub(super) struct HMInferenceContext<'db> {
     pub(super) type_var_names: FxHashMap<TypeVarId, hir::Name>,
 }
 
+
+
 impl<'db> HMInferenceContext<'db> {
-    fn new(db: &'db dyn crate::HirInferDatabase, module_id: alloy_workspace::ModuleId) -> Self {
+    /// Get the user-visible name for a type variable (for error messages)
+    fn get_type_var_name(&self, var_id: TypeVarId) -> String {
+        self.type_var_names
+            .get(&var_id)
+            .map(|name| name.to_string())
+            .unwrap_or_else(|| format!("t{}", var_id.0))
+    }
+}
+
+impl<'db> HMInferenceContext<'db> {
+    fn new(db: &'db dyn crate::HirInferDatabase) -> Self {
         Self {
             db,
-            module_id,
             type_var_gen: TypeVarGenerator::new(),
             inferring_expr: None,
             equations: Vec::new(),
@@ -279,6 +288,12 @@ impl<'db> HMInferenceContext<'db> {
             self_type_vars: FxHashMap::default(),
             type_var_names: FxHashMap::default(),
         }
+    }
+
+    fn matches_root(&self, fql: &Fql<hir::Expression>) -> bool {
+        self.inferring_expr
+            .as_ref()
+            .map_or(false, |root| root == fql)
     }
 
     fn maybe_find_type(&mut self, fql: impl Into<EPTdFql>) -> Option<MonoType> {

@@ -14,15 +14,15 @@ HirTypedModule {
             Int,
         ),
         Idx::<Expression>(7): Lambda {
-            arg_type: BuiltIn(
-                Int,
+            arg_type: Generic(
+                1,
             ),
             return_type: BuiltIn(
                 Int,
             ),
         },
-        Idx::<Expression>(4): BuiltIn(
-            Int,
+        Idx::<Expression>(4): Generic(
+            0,
         ),
         Idx::<Expression>(1): BuiltIn(
             Int,
@@ -31,26 +31,26 @@ HirTypedModule {
             Int,
         ),
         Idx::<Expression>(5): Lambda {
-            arg_type: BuiltIn(
-                Int,
+            arg_type: Generic(
+                0,
             ),
             return_type: Lambda {
                 arg_type: Lambda {
-                    arg_type: BuiltIn(
-                        Int,
+                    arg_type: Generic(
+                        0,
                     ),
-                    return_type: BuiltIn(
-                        Int,
+                    return_type: Generic(
+                        1,
                     ),
                 },
-                return_type: BuiltIn(
-                    Int,
+                return_type: Generic(
+                    1,
                 ),
             },
         },
         Idx::<Expression>(2): Lambda {
-            arg_type: BuiltIn(
-                Int,
+            arg_type: Generic(
+                0,
             ),
             return_type: BuiltIn(
                 Int,
@@ -59,25 +59,25 @@ HirTypedModule {
         Idx::<Expression>(6): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(3): BuiltIn(
-            Int,
+        Idx::<Expression>(3): Generic(
+            2,
         ),
     },
     pattern_types: {
-        Idx::<Pattern>(0): BuiltIn(
-            Int,
-        ),
-        Idx::<Pattern>(1): BuiltIn(
-            Int,
+        Idx::<Pattern>(0): Generic(
+            0,
         ),
         Idx::<Pattern>(2): Lambda {
-            arg_type: BuiltIn(
-                Int,
+            arg_type: Generic(
+                2,
             ),
-            return_type: BuiltIn(
-                Int,
+            return_type: Generic(
+                0,
             ),
         },
+        Idx::<Pattern>(1): Generic(
+            2,
+        ),
     },
     warnings: [],
     errors: [],

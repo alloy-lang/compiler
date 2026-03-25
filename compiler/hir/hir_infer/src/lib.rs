@@ -2,16 +2,12 @@ use alloy_hir_def as hir;
 use alloy_hir_resolved::EPTdFql;
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
-use std::collections::HashMap;
-use text_size::TextRange;
 
 mod hir_ty;
 pub use hir_ty::InferredType;
-use hir_ty::*;
 
 mod diagnostics;
 pub use diagnostics::{TypeInferenceError, TypeInferenceWarning};
-use diagnostics::{TypeInferenceErrorKind, TypeInferenceWarningKind};
 
 #[cfg(test)]
 mod tests;
@@ -20,86 +16,68 @@ mod tests;
 pub trait HirInferDatabase: hir::HirDefDatabase {}
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct HirInferredModule {
-    module_id: ModuleId,
-    expression_types: FxHashMap<hir::ExpressionIdx, InferredType>,
-    pattern_types: FxHashMap<hir::PatternIdx, InferredType>,
-    warnings: Vec<TypeInferenceWarning>,
-    errors: Vec<TypeInferenceError>,
+pub struct DefinitionInferenceResult {
+    pub definition_type: InferredType,
+    pub expression_types: FxHashMap<hir::ExpressionIdx, InferredType>,
+    pub pattern_types: FxHashMap<hir::PatternIdx, InferredType>,
+    pub errors: Vec<TypeInferenceError>,
 }
 
-impl HirInferredModule {
-    pub(crate) fn empty(module_id: ModuleId) -> Self {
+impl DefinitionInferenceResult {
+    pub(crate) fn empty() -> Self {
         Self {
-            module_id,
-            expression_types: HashMap::default(),
-            pattern_types: HashMap::default(),
-            warnings: Vec::new(),
+            definition_type: InferredType::Unconstrained,
+            expression_types: FxHashMap::default(),
+            pattern_types: FxHashMap::default(),
             errors: Vec::new(),
         }
     }
 
-    pub(crate) fn insert_type(&mut self, fql: EPTdFql, resolved_type: InferredType) {
-        // Only include types for the current module to avoid cross-module collisions
-        // (different modules can have the same Idx<Expression> values)
-        if fql.module_id() != self.module_id {
-            return;
-        }
-
-        match fql {
-            EPTdFql::Expression(fql) => {
-                self.expression_types.insert(fql.local_id, resolved_type);
+    pub(crate) fn insert_type(&mut self, fql: impl Into<EPTdFql>, ty: InferredType) {
+        match fql.into() {
+            EPTdFql::Expression(e) => {
+                self.expression_types.insert(e.local_id, ty);
             }
-            EPTdFql::Pattern(fql) => {
-                self.pattern_types
-                    .insert(fql.local_id, resolved_type.clone());
+            EPTdFql::Pattern(p) => {
+                self.pattern_types.insert(p.local_id, ty);
             }
-            EPTdFql::TypeDefinition(_) | EPTdFql::TypeDefinitionVariant(_, _) => {}
+            EPTdFql::TypeDefinition(_) | EPTdFql::TypeDefinitionVariant(_, _) => {
+                // Type definitions don't have inferred types in this context
+            }
         }
     }
 
-    fn warning(&mut self, kind: TypeInferenceWarningKind, range: TextRange) {
-        self.warnings.push(TypeInferenceWarning::new(kind, range));
+    pub(crate) fn extend_errors(&mut self, errs: &[TypeInferenceError]) {
+        self.errors.extend_from_slice(errs);
     }
 
-    fn error(&mut self, kind: TypeInferenceErrorKind, range: TextRange) {
-        self.errors.push(TypeInferenceError::new(kind, range));
-    }
-
-    fn push_error(&mut self, err: TypeInferenceError) {
-        self.errors.push(err);
-    }
-
-    pub fn warnings(&self) -> &[TypeInferenceWarning] {
-        &self.warnings
-    }
-
-    pub fn errors(&self) -> &[TypeInferenceError] {
-        &self.errors
-    }
-
-    pub fn expression_types(&self) -> impl Iterator<Item = (&hir::ExpressionIdx, &InferredType)> {
-        self.expression_types.iter()
-    }
-
-    pub fn pattern_types(&self) -> impl Iterator<Item = (&hir::PatternIdx, &InferredType)> {
-        self.pattern_types.iter()
+    #[cfg(test)]
+    pub(crate) fn compose(mut self, other: Self) -> Self {
+        self.expression_types.extend(other.expression_types);
+        self.pattern_types.extend(other.pattern_types);
+        self.errors.extend(other.errors);
+        self
     }
 }
 
-/// type checking for everything in a module
-/// stores resolved types for all module symbols, regardless of scope
-/// for the LSP implementation, we will want to generate errors and warnings for the current file
-/// during full compilation, we will want to generate errors and warnings for all modules
-#[salsa::tracked]
-pub fn infer_types_module(db: &dyn HirInferDatabase, module_id: ModuleId) -> HirInferredModule {
-    infer_types(db, module_id)
+pub fn infer_body_type(
+    db: &'_ dyn HirInferDatabase,
+    value_def: hir::ValueDef<'_>,
+) -> DefinitionInferenceResult {
+    hir_ty::infer_body_type(db, value_def)
+}
+
+pub fn infer_expressions(
+    db: &dyn HirInferDatabase,
+    module_id: ModuleId,
+) -> DefinitionInferenceResult {
+    hir_ty::infer_expressions(db, module_id)
 }
 
 #[cfg(test)]
 mod hir_infer_small_tests {
     use crate::hir_ty::InferredType;
-    use crate::tests::TestHirInferDatabase;
+    use crate::tests::{infer_module, TestHirInferDatabase};
     use alloy_hir_def as hir;
     use alloy_hir_resolved::Fql;
     use alloy_test_harness::idx;
@@ -117,17 +95,17 @@ mod hir_infer_small_tests {
 
         let (_, parse_errors) = hir::lower_file(&db, module_id);
 
-        let ctx = crate::infer_types_module(&db, module_id);
+        let res = infer_module(&db, module_id);
 
         assert_eq!(parse_errors, &[]);
-        assert_eq!(ctx.errors, &[]);
+        assert_eq!(res.errors, &[]);
 
         let expected = expected
             .into_iter()
             .map(|(id, ty)| (idx!(*id), ty.clone()))
             .collect();
 
-        db.attach(|_| assert_eq!(ctx.expression_types, expected));
+        db.attach(|_| assert_eq!(res.expression_types, expected));
     }
 
     fn check_named(
@@ -140,7 +118,7 @@ mod hir_infer_small_tests {
         let (hir_module, parse_errors) = hir::lower_file(db, module_id);
         assert_eq!(parse_errors, &[]);
 
-        let ctx = crate::infer_types_module(db, module_id);
+        let res = infer_module(db, module_id);
 
         let actual = expected
             .into_iter()
@@ -148,13 +126,13 @@ mod hir_infer_small_tests {
                 let (expression_id, _expression) = hir_module
                     .get_expression_by_name(&hir::Name::new(*name), idx!(*scope))
                     .expect("expression not found");
-                (*name, *scope, ctx.expression_types[&expression_id].clone())
+                (*name, *scope, res.expression_types[&expression_id].clone())
             })
             .collect::<Vec<_>>();
 
         db.attach(|_| {
             assert_eq!(actual, expected);
-            assert_eq!(ctx.errors, &[]);
+            assert_eq!(res.errors, &[]);
         });
     }
 
@@ -166,11 +144,11 @@ mod hir_infer_small_tests {
         let mut db = TestHirInferDatabase::default();
         let module_id = db.add_module(module_slug, module_path, "let x = 1");
 
-        let first = crate::infer_types_module(&db, module_id);
+        let first = infer_module(&db, module_id);
 
         db.add_module(module_slug, module_path, "let x = 1\nlet y = 2");
 
-        let second = crate::infer_types_module(&db, module_id);
+        let second = infer_module(&db, module_id);
         assert_ne!(first, second);
     }
 
@@ -263,6 +241,8 @@ mod hir_infer_small_tests {
     #[test]
     fn infer_lambda_based_on_usage() {
         let mut db = TestHirInferDatabase::default();
+        // With per-definition inference, x's type is its principal type from its
+        // body alone (generic). y's call-site constraints don't refine x.
         check_named(
             &mut db,
             r#"
@@ -274,10 +254,10 @@ mod hir_infer_small_tests {
                     "x",
                     0,
                     InferredType::Lambda {
-                        arg_type: Box::new(InferredType::BuiltIn(hir::BuiltInType::Int)),
+                        arg_type: Box::new(InferredType::Generic(0)),
                         return_type: Box::new(InferredType::Lambda {
-                            arg_type: Box::new(InferredType::BuiltIn(hir::BuiltInType::Int)),
-                            return_type: Box::new(InferredType::BuiltIn(hir::BuiltInType::Int)),
+                            arg_type: Box::new(InferredType::Generic(0)),
+                            return_type: Box::new(InferredType::Generic(0)),
                         }),
                     },
                 ),
@@ -481,13 +461,13 @@ mod hir_infer_small_tests {
                 0,
                 InferredType::Lambda {
                     arg_type: Box::new(InferredType::Lambda {
-                        arg_type: Box::new(InferredType::Generic(2)),
-                        return_type: Box::new(InferredType::Generic(3)),
+                        arg_type: Box::new(InferredType::Generic(0)),
+                        return_type: Box::new(InferredType::Generic(1)),
                     }),
                     return_type: Box::new(InferredType::Lambda {
-                        arg_type: Box::new(InferredType::Generic(2)),
+                        arg_type: Box::new(InferredType::Generic(0)),
                         return_type: Box::new(InferredType::Lambda {
-                            arg_type: Box::new(InferredType::Generic(2)),
+                            arg_type: Box::new(InferredType::Generic(0)),
                             return_type: Box::new(InferredType::TypeDef(
                                 Fql::new(stdlib_order, idx!(0)),
                                 hir::Name::new("Ordering"),

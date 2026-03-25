@@ -1,7 +1,14 @@
+use crate::{
+    DefinitionInferenceResult, HirInferDatabase, InferredType, TypeInferenceError,
+    TypeInferenceWarning,
+};
 use alloy_diagnostics::DiagnosticsReporter;
 use alloy_hir_def as hir;
-use alloy_workspace::WorkspaceDatabase;
+use alloy_hir_resolved::{EPTdFql, Fql};
+use alloy_workspace::{ModuleId, WorkspaceDatabase};
+use rustc_hash::FxHashMap;
 use salsa::Database;
+use std::collections::HashMap;
 use std::env;
 use std::path::Path;
 
@@ -81,7 +88,12 @@ fn run_hir_ty_test(
     let test_module_id = db.add_module("main", camino::Utf8Path::new("./test/main.alloy"), input);
 
     let (_hir_module, parse_errors) = hir::lower_file(&db, test_module_id);
-    let typed_module = crate::infer_types_module(&db, test_module_id);
+    let mut typed_module = HirInferredModule::empty(test_module_id);
+    merge_into_module(
+        &mut typed_module,
+        &infer_module(&db, test_module_id),
+        test_module_id,
+    );
 
     // let file_name = path.to_str().expect("Expected filename");
     // if expect_parse_errors {
@@ -151,6 +163,40 @@ fn run_hir_ty_test(
     })
 }
 
+#[track_caller]
+pub(crate) fn infer_module(
+    db: &dyn HirInferDatabase,
+    module_id: ModuleId,
+) -> DefinitionInferenceResult {
+    let (hir_module, _) = hir::lower_file(db, module_id);
+    let mut result = DefinitionInferenceResult::empty();
+
+    for (_, value_def) in hir_module.values() {
+        let value_def = hir::module_value_def(db, module_id, value_def.expr_idx).expect("");
+        let def_result = crate::infer_body_type(db, value_def);
+        result = result.compose(def_result);
+    }
+
+    let expressions_result = crate::infer_expressions(db, module_id);
+    result = result.compose(expressions_result);
+
+    result
+}
+
+fn merge_into_module(
+    module: &mut HirInferredModule,
+    def_result: &DefinitionInferenceResult,
+    module_id: ModuleId,
+) {
+    for (&eid, ty) in &def_result.expression_types {
+        module.insert_type(EPTdFql::Expression(Fql::new(module_id, eid)), ty.clone());
+    }
+    for (&pid, ty) in &def_result.pattern_types {
+        module.insert_type(EPTdFql::Pattern(Fql::new(module_id, pid)), ty.clone());
+    }
+    module.extend_errors(&def_result.errors);
+}
+
 // TODO: continue fixing lowering errors in std lib
 #[test]
 fn test_std_lib() {
@@ -161,10 +207,15 @@ fn test_std_lib() {
 
             let test_module_id = db.find_module_by_slug(module_file.slug()).expect("");
 
-            let type_map = crate::infer_types_module(db, test_module_id);
+            let mut typed_module = HirInferredModule::empty(test_module_id);
+            merge_into_module(
+                &mut typed_module,
+                &infer_module(db, test_module_id),
+                test_module_id,
+            );
 
-            let type_inference_warnings = type_map.warnings();
-            let type_inference_errors = type_map.errors();
+            let type_inference_warnings = typed_module.warnings();
+            let type_inference_errors = typed_module.errors();
 
             let mut reporter = DiagnosticsReporter::new();
             reporter.add_all(test_module_id, type_inference_errors.into_iter().cloned());
@@ -183,4 +234,65 @@ fn test_std_lib() {
             });
         },
     );
+}
+
+#[derive(Debug, Clone, PartialEq)]
+struct HirInferredModule {
+    module_id: ModuleId,
+    expression_types: FxHashMap<hir::ExpressionIdx, InferredType>,
+    pattern_types: FxHashMap<hir::PatternIdx, InferredType>,
+    warnings: Vec<TypeInferenceWarning>,
+    errors: Vec<TypeInferenceError>,
+}
+
+impl HirInferredModule {
+    fn empty(module_id: ModuleId) -> Self {
+        Self {
+            module_id,
+            expression_types: HashMap::default(),
+            pattern_types: HashMap::default(),
+            warnings: Vec::new(),
+            errors: Vec::new(),
+        }
+    }
+
+    fn insert_type(&mut self, fql: EPTdFql, resolved_type: InferredType) {
+        if fql.module_id() != self.module_id {
+            return;
+        }
+
+        match fql {
+            EPTdFql::Expression(fql) => {
+                self.expression_types
+                    .entry(fql.local_id)
+                    .or_insert(resolved_type);
+            }
+            EPTdFql::Pattern(fql) => {
+                self.pattern_types
+                    .entry(fql.local_id)
+                    .or_insert(resolved_type);
+            }
+            EPTdFql::TypeDefinition(_) | EPTdFql::TypeDefinitionVariant(_, _) => {}
+        }
+    }
+
+    fn extend_errors(&mut self, errs: &[TypeInferenceError]) {
+        self.errors.extend_from_slice(errs);
+    }
+
+    fn warnings(&self) -> &[TypeInferenceWarning] {
+        &self.warnings
+    }
+
+    fn errors(&self) -> &[TypeInferenceError] {
+        &self.errors
+    }
+
+    fn expression_types(&self) -> impl Iterator<Item = (&hir::ExpressionIdx, &InferredType)> {
+        self.expression_types.iter()
+    }
+
+    fn pattern_types(&self) -> impl Iterator<Item = (&hir::PatternIdx, &InferredType)> {
+        self.pattern_types.iter()
+    }
 }

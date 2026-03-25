@@ -11,9 +11,6 @@ HirTypedModule {
         Idx::<Expression>(0): Generic(
             0,
         ),
-        Idx::<Expression>(1): Generic(
-            1,
-        ),
         Idx::<Expression>(2): Lambda {
             arg_type: Generic(
                 0,
@@ -32,6 +29,9 @@ HirTypedModule {
                 ),
             },
         },
+        Idx::<Expression>(1): Generic(
+            1,
+        ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(

@@ -19,7 +19,7 @@ HirInferredModule {
             ),
             args: [
                 Generic(
-                    1,
+                    0,
                 ),
             ],
         },

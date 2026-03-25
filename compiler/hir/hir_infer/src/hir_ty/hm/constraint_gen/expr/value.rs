@@ -30,7 +30,7 @@ pub fn infer<'db>(db: &'db dyn HirInferDatabase, value_def: hir::ValueDef<'db>) 
     }
 
     // Otherwise, infer from the body
-    infer_body_type(db, value_def)
+    infer_body_type(db, value_def).definition_type
 }
 
 fn infer_value_signature_cycle_initial(

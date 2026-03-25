@@ -16,7 +16,7 @@ HirInferredModule {
     },
     expression_types: {
         Idx::<Expression>(0): Generic(
-            1,
+            0,
         ),
         Idx::<Expression>(7): BuiltIn(
             Bool,
@@ -42,11 +42,11 @@ HirInferredModule {
             String,
         ),
         Idx::<Expression>(6): Lambda {
-            arg_type: BuiltIn(
-                Bool,
+            arg_type: Generic(
+                0,
             ),
-            return_type: BuiltIn(
-                Bool,
+            return_type: Generic(
+                0,
             ),
         },
         Idx::<Expression>(3): BuiltIn(
@@ -55,7 +55,7 @@ HirInferredModule {
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            1,
+            0,
         ),
     },
     warnings: [],

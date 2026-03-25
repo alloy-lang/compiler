@@ -15,7 +15,7 @@ HirInferredModule {
             Int,
         ),
         Idx::<Expression>(5): Generic(
-            1,
+            0,
         ),
         Idx::<Expression>(2): BuiltIn(
             Int,

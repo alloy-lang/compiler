@@ -1,6 +1,7 @@
 use alloy_hir_def as hir;
 use alloy_hir_infer as hir_infer;
-use alloy_hir_resolved::EPTdFql;
+use alloy_hir_infer::DefinitionInferenceResult;
+use alloy_hir_resolved::{EPTdFql, Fql};
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
 use std::collections::HashMap;
@@ -83,8 +84,8 @@ impl HirTypedModule {
         self.errors.push(TypeCheckingError::new(kind, range));
     }
 
-    fn push_error(&mut self, err: TypeCheckingError) {
-        self.errors.push(err);
+    fn extend_errors(&mut self, errs: &[TypeCheckingError]) {
+        self.errors.extend_from_slice(errs);
     }
 
     pub fn warnings(&self) -> &[TypeCheckingWarning] {
@@ -102,27 +103,42 @@ impl HirTypedModule {
 /// during full compilation, we will want to generate errors and warnings for all modules
 #[salsa::tracked]
 pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirTypedModule {
-    let result = alloy_hir_infer::infer_types_module(db, module_id);
+    let (hir_module, _) = hir::lower_file(db, module_id);
+    let mut result = HirTypedModule::empty(module_id);
 
-    let mut result = HirTypedModule {
-        module_id,
-        expression_types: result
-            .expression_types()
-            .map(|(a, b)| (*a, b.into()))
-            .collect(),
-        pattern_types: result
-            .pattern_types()
-            .map(|(a, b)| (*a, b.into()))
-            .collect(),
-        warnings: result.warnings().iter().map(Into::into).collect(),
-        errors: result.errors().iter().map(Into::into).collect(),
-    };
+    for (_, value_def) in hir_module.values() {
+        let value_def = hir::module_value_def(db, module_id, value_def.expr_idx).expect("");
+        let def_result = hir_infer::infer_body_type(db, value_def);
+        merge_into_module(&mut result, &def_result, module_id);
+    }
 
-    // Validate that all behaviors implement their trait's abstract members
+    let expressions_result = hir_infer::infer_expressions(db, module_id);
+    merge_into_module(&mut result, &expressions_result, module_id);
+
     validation::validate_behaviors(db, module_id, &mut result);
     validation::validate_type_annotations(db, module_id, &mut result);
 
     result
+}
+
+fn merge_into_module(
+    module: &mut HirTypedModule,
+    def_result: &DefinitionInferenceResult,
+    module_id: ModuleId,
+) {
+    for (&eid, ty) in &def_result.expression_types {
+        module.insert_type(EPTdFql::Expression(Fql::new(module_id, eid)), ty.into());
+    }
+    for (&pid, ty) in &def_result.pattern_types {
+        module.insert_type(EPTdFql::Pattern(Fql::new(module_id, pid)), ty.into());
+    }
+    module.extend_errors(
+        &def_result
+            .errors
+            .iter()
+            .map(|err| err.into())
+            .collect::<Vec<_>>(),
+    );
 }
 
 #[cfg(test)]
@@ -323,10 +339,10 @@ mod hir_ty_small_tests {
                     "x",
                     0,
                     ResolvedType::Lambda {
-                        arg_type: Box::new(ResolvedType::BuiltIn(hir::BuiltInType::Int)),
+                        arg_type: Box::new(ResolvedType::Generic(0)),
                         return_type: Box::new(ResolvedType::Lambda {
-                            arg_type: Box::new(ResolvedType::BuiltIn(hir::BuiltInType::Int)),
-                            return_type: Box::new(ResolvedType::BuiltIn(hir::BuiltInType::Int)),
+                            arg_type: Box::new(ResolvedType::Generic(0)),
+                            return_type: Box::new(ResolvedType::Generic(0)),
                         }),
                     },
                 ),
@@ -551,13 +567,13 @@ mod hir_ty_small_tests {
                 0,
                 ResolvedType::Lambda {
                     arg_type: Box::new(ResolvedType::Lambda {
-                        arg_type: Box::new(ResolvedType::Generic(2)),
-                        return_type: Box::new(ResolvedType::Generic(3)),
+                        arg_type: Box::new(ResolvedType::Generic(0)),
+                        return_type: Box::new(ResolvedType::Generic(1)),
                     }),
                     return_type: Box::new(ResolvedType::Lambda {
-                        arg_type: Box::new(ResolvedType::Generic(2)),
+                        arg_type: Box::new(ResolvedType::Generic(0)),
                         return_type: Box::new(ResolvedType::Lambda {
-                            arg_type: Box::new(ResolvedType::Generic(2)),
+                            arg_type: Box::new(ResolvedType::Generic(0)),
                             return_type: Box::new(ResolvedType::TypeDef(
                                 Fql::new(stdlib_order, idx!(0)),
                                 hir::Name::new("Ordering"),

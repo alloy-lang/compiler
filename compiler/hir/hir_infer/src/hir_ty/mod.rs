@@ -1,19 +1,12 @@
-use crate::HirInferredModule;
 use alloy_hir_def as hir;
 use alloy_hir_resolved::Fql;
-use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use std::hash::Hash;
 
 mod hm;
+pub(crate) use hm::infer_body_type;
+pub(crate) use hm::infer_expressions;
 pub use hm::unification::UnificationError;
-
-pub(super) fn infer_types(
-    db: &dyn crate::HirInferDatabase,
-    module_id: ModuleId,
-) -> HirInferredModule {
-    hm::infer_types_hm(db, module_id)
-}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InferredType {

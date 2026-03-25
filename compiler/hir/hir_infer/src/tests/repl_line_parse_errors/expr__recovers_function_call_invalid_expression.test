@@ -7,8 +7,8 @@ HirInferredModule {
         path: "main",
     },
     expression_types: {
-        Idx::<Expression>(0): BuiltIn(
-            Int,
+        Idx::<Expression>(0): Generic(
+            0,
         ),
         Idx::<Expression>(5): BuiltIn(
             Int,
@@ -20,11 +20,11 @@ HirInferredModule {
             Int,
         ),
         Idx::<Expression>(1): Lambda {
-            arg_type: BuiltIn(
-                Int,
+            arg_type: Generic(
+                0,
             ),
-            return_type: BuiltIn(
-                Int,
+            return_type: Generic(
+                0,
             ),
         },
         Idx::<Expression>(3): BuiltIn(
@@ -32,8 +32,8 @@ HirInferredModule {
         ),
     },
     pattern_types: {
-        Idx::<Pattern>(0): BuiltIn(
-            Int,
+        Idx::<Pattern>(0): Generic(
+            0,
         ),
     },
     warnings: [],

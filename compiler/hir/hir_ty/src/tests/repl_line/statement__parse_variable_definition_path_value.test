@@ -19,7 +19,7 @@ HirTypedModule {
             ),
             args: [
                 Generic(
-                    1,
+                    0,
                 ),
             ],
         },

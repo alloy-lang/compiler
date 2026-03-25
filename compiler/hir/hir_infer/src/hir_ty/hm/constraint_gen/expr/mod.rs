@@ -25,42 +25,25 @@ pub(crate) fn infer_expr_hm(
         return existing_ty;
     }
 
-    // Use `infer_value_signature` for cross-module value definitions and same-module definitions with polymorphic annotations
-    // (when referenced from other definitions, not when being directly inferred).
-    //
-    // Skip the shortcut for:
-    // - The expression currently being inferred (inferring_expr) to prevent cycles
-    //   and ensure sub-expression types are collected
-    // - Same-module unannotated definitions, so call-site constraints flow back
-    let is_self = ctx
-        .inferring_expr
-        .as_ref()
-        .is_some_and(|e| *e == source_fql);
-    if !is_self {
-        if let Some(value_def) =
-            hir::module_value_def(ctx.db, source_fql.module_id, source_fql.local_id)
-        {
-            let is_cross_module = source_fql.module_id != ctx.module_id;
-            let has_poly_annotation = value_def.type_annotation(ctx.db).is_some_and(|ta| {
-                res::resolve_annotated_type(ctx.db, source_fql.module_id, ta).is_polymorphic()
-            });
+    let Fql {
+        module_id,
+        local_id,
+    } = &source_fql;
 
-            if is_cross_module || has_poly_annotation {
-                let sig = value::infer(ctx.db, value_def);
-                let mono_ty = inferred_to_mono(&sig, ctx);
-                return ctx.generalize_to_poly(mono_ty, &source_fql);
-            }
+    if !ctx.matches_root(&source_fql) {
+        if let Some(value_def) = hir::module_value_def(ctx.db, *module_id, *local_id) {
+            let sig = value::infer(ctx.db, value_def);
+            return inferred_to_mono(&sig, ctx);
         }
     }
 
-    let expr =
-        match res::resolve_expression_by_id(ctx.db, source_fql.module_id, source_fql.local_id) {
-            Ok(expr) => expr,
-            Err(err) => {
-                // Report the resolution error
-                return ctx.unknown_reference(err, source_fql);
-            }
-        };
+    let expr = match res::resolve_expression_by_id(ctx.db, *module_id, *local_id) {
+        Ok(expr) => expr,
+        Err(err) => {
+            // Report the resolution error
+            return ctx.unknown_reference(err, source_fql);
+        }
+    };
 
     match expr {
         res::Expression::Literal(lit) => super::infer_literal(ctx, source_fql, &lit),
