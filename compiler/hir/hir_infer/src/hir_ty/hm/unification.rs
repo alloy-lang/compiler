@@ -47,6 +47,7 @@ impl Substitution {
                 constructor: Box::new(self.apply(constructor)),
                 args: args.iter().map(|t| self.apply(t)).collect(),
             },
+            // TODO: unify type definitions with the same FQL but different type_args (e.g., `Option<T>` and `Option<U>`)
             MonoType::Concrete(_) | MonoType::TypeDef { .. } | MonoType::Unit => ty.clone(),
         }
     }

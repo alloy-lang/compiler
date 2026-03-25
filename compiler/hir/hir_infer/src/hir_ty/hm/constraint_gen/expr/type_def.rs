@@ -1,4 +1,4 @@
-use super::super::super::inference::annotated_to_mono;
+use super::super::super::annotated_to_mono;
 use super::{HMInferenceContext, MonoType};
 use alloy_hir_def as hir;
 use alloy_hir_resolved as res;

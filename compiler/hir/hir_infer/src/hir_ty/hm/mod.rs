@@ -8,7 +8,8 @@
 
 use super::Fql;
 use alloy_hir_def as hir;
-use alloy_hir_resolved::{EPFql, EPTdFql, HirResolutionError};
+use alloy_hir_def::{Name, TypeDefinition};
+use alloy_hir_resolved::{AnnotatedType, EPFql, EPTdFql, HirResolutionError, TypeVarReference};
 use rustc_hash::{FxHashMap, FxHashSet};
 
 mod constraint_gen;
@@ -356,5 +357,77 @@ impl<'db> HMInferenceContext<'db> {
         self.self_type_vars.insert(trait_fql, var_id);
         self.type_var_names.insert(var_id, hir::Name::new("Self"));
         var_id
+    }
+}
+
+/// Convert an AnnotatedType to a MonoType for use in constraint generation.
+/// Uses stable Fql<TypeDefinition> identities for type variables, ensuring
+/// the same type variable declaration always maps to the same TypeVarId.
+pub(self) fn annotated_to_mono(
+    annotated: &AnnotatedType,
+    ctx: &mut HMInferenceContext,
+) -> Option<MonoType> {
+    match annotated {
+        AnnotatedType::Missing => None,
+        AnnotatedType::Unconstrained => Some(MonoType::Unconstrained),
+        AnnotatedType::Unit => Some(MonoType::Unit),
+        AnnotatedType::BuiltIn(builtin) => Some(MonoType::Concrete(*builtin)),
+        AnnotatedType::TypeDef {
+            fql,
+            name,
+            type_args,
+        } => Some(type_def_to_mono(ctx, fql, name, type_args)),
+        AnnotatedType::Lambda { arg, ret } => {
+            let arg_mono = annotated_to_mono(arg, ctx)?;
+            let ret_mono = annotated_to_mono(ret, ctx)?;
+            Some(MonoType::Function(Box::new(arg_mono), Box::new(ret_mono)))
+        }
+        AnnotatedType::Tuple(elements) => {
+            let mono_elements: Option<Vec<_>> =
+                elements.iter().map(|e| annotated_to_mono(e, ctx)).collect();
+            mono_elements.map(MonoType::Tuple)
+        }
+        AnnotatedType::Bounded { base, args } => {
+            let base_mono = annotated_to_mono(base, ctx)?;
+            let args_mono: Option<Vec<_>> =
+                args.iter().map(|a| annotated_to_mono(a, ctx)).collect();
+            Some(MonoType::App {
+                constructor: Box::new(base_mono),
+                args: args_mono?,
+            })
+        }
+        AnnotatedType::TypeVar { fql, name } => {
+            let var_id = ctx.get_or_create_annotation_type_var(fql.clone(), name.clone());
+            Some(MonoType::Var(var_id))
+        }
+        AnnotatedType::ConstrainedTypeVar { fql, name, .. } => {
+            // TODO: Track the constraints and enforce them during solving
+            let var_id = ctx.get_or_create_annotation_type_var(fql.clone(), name.clone());
+            Some(MonoType::Var(var_id))
+        }
+        AnnotatedType::SelfType { trait_fql, .. } => {
+            let var_id = ctx.get_or_create_self_type_var(trait_fql.clone());
+            Some(MonoType::Var(var_id))
+        }
+    }
+}
+
+fn type_def_to_mono(
+    ctx: &mut HMInferenceContext,
+    fql: &Fql<TypeDefinition>,
+    name: &Name,
+    type_args: &[TypeVarReference],
+) -> MonoType {
+    let type_args = type_args
+        .iter()
+        .map(|ty_arg| {
+            ctx.get_or_create_annotation_type_var(ty_arg.fql.clone(), ty_arg.name.clone())
+        })
+        .collect::<Vec<_>>();
+
+    MonoType::TypeDef {
+        fql: fql.clone(),
+        type_args,
+        type_def_name: name.clone(),
     }
 }
