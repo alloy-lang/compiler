@@ -195,7 +195,7 @@ HirModule {
             type_annotation: Some(
                 Idx::<TypeReference>(7),
             ),
-            value: Idx::<Expression>(1),
+            expr_idx: Idx::<Expression>(1),
         },
     },
     expression_groups: [

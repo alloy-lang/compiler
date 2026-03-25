@@ -134,12 +134,12 @@ impl<'db> LoweringCtx<'db> {
                 {
                     None => ValueDefinition {
                         name,
-                        value: expression_id,
+                        expr_idx: expression_id,
                         type_annotation: None,
                     },
                     Some((ta, _)) => ValueDefinition {
                         name,
-                        value: expression_id,
+                        expr_idx: expression_id,
                         type_annotation: Some(ta),
                     },
                 };
@@ -678,7 +678,7 @@ pub fn module_value_def(
 
     hir_module
         .get_value_by_id(&expr_idx)
-        .map(|v| ValueDef::new(db, module_id, v.name.clone(), v.type_annotation, v.value))
+        .map(|v| ValueDef::new(db, module_id, v.name.clone(), v.type_annotation, v.expr_idx))
 }
 
 #[must_use]

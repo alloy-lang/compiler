@@ -113,12 +113,12 @@ HirModule {
         Idx::<Expression>(1): ValueDefinition {
             name: "add1",
             type_annotation: None,
-            value: Idx::<Expression>(1),
+            expr_idx: Idx::<Expression>(1),
         },
         Idx::<Expression>(5): ValueDefinition {
             name: "add2",
             type_annotation: None,
-            value: Idx::<Expression>(5),
+            expr_idx: Idx::<Expression>(5),
         },
     },
     expression_groups: [

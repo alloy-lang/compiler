@@ -5,7 +5,7 @@ use super::*;
 pub struct ValueDefinition {
     pub name: Name,
     pub type_annotation: Option<TypeIdx>,
-    pub value: ExpressionIdx,
+    pub expr_idx: ExpressionIdx,
 }
 
 #[salsa::tracked(debug)]

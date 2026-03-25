@@ -161,17 +161,17 @@ HirModule {
             type_annotation: Some(
                 Idx::<TypeReference>(2),
             ),
-            value: Idx::<Expression>(1),
+            expr_idx: Idx::<Expression>(1),
         },
         Idx::<Expression>(5): ValueDefinition {
             name: "int_example",
             type_annotation: None,
-            value: Idx::<Expression>(5),
+            expr_idx: Idx::<Expression>(5),
         },
         Idx::<Expression>(3): ValueDefinition {
             name: "string_example",
             type_annotation: None,
-            value: Idx::<Expression>(3),
+            expr_idx: Idx::<Expression>(3),
         },
     },
     expression_groups: [

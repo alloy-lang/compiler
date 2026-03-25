@@ -36,7 +36,7 @@ HirModule {
         Idx::<Expression>(0): ValueDefinition {
             name: "counter",
             type_annotation: None,
-            value: Idx::<Expression>(0),
+            expr_idx: Idx::<Expression>(0),
         },
     },
     expression_groups: [

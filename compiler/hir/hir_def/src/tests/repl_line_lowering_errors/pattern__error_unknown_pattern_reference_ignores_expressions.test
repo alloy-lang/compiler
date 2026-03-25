@@ -90,7 +90,7 @@ HirModule {
         Idx::<Expression>(0): ValueDefinition {
             name: "unknown",
             type_annotation: None,
-            value: Idx::<Expression>(0),
+            expr_idx: Idx::<Expression>(0),
         },
     },
     expression_groups: [

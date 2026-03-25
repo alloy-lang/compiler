@@ -61,7 +61,7 @@ HirModule {
         Idx::<Expression>(1): ValueDefinition {
             name: "test",
             type_annotation: None,
-            value: Idx::<Expression>(1),
+            expr_idx: Idx::<Expression>(1),
         },
     },
     expression_groups: [

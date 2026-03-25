@@ -120,7 +120,7 @@ HirModule {
         Idx::<Expression>(3): ValueDefinition {
             name: "funky",
             type_annotation: None,
-            value: Idx::<Expression>(3),
+            expr_idx: Idx::<Expression>(3),
         },
     },
     expression_groups: [

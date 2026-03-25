@@ -212,22 +212,22 @@ HirModule {
         Idx::<Expression>(8): ValueDefinition {
             name: "z",
             type_annotation: None,
-            value: Idx::<Expression>(8),
+            expr_idx: Idx::<Expression>(8),
         },
         Idx::<Expression>(5): ValueDefinition {
             name: "funky",
             type_annotation: None,
-            value: Idx::<Expression>(5),
+            expr_idx: Idx::<Expression>(5),
         },
         Idx::<Expression>(7): ValueDefinition {
             name: "y",
             type_annotation: None,
-            value: Idx::<Expression>(7),
+            expr_idx: Idx::<Expression>(7),
         },
         Idx::<Expression>(6): ValueDefinition {
             name: "x",
             type_annotation: None,
-            value: Idx::<Expression>(6),
+            expr_idx: Idx::<Expression>(6),
         },
     },
     expression_groups: [
