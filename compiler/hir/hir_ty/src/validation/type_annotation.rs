@@ -20,28 +20,17 @@ pub(crate) fn validate_type_annotations(
     result: &mut HirTypedModule,
 ) {
     let (hir_module, _) = hir::lower_file(db, module_id);
-    for hir::ValueDefinition {
-        type_annotation,
-        value,
-        ..
-    } in hir_module.values().map(|(_, v)| v)
-    {
-        let Some(resolved_type) = result.expression_types.get(value).cloned() else {
+    for value_def in hir_module.values().map(|(_, v)| v) {
+        let idx = value_def.expr_idx;
+        let Some(resolved_type) = result.expression_types.get(&idx).cloned() else {
             continue;
         };
-        let range = hir_module.get_expression_range(*value);
+        let range = hir_module.get_expression_range(idx);
 
-        if let Some(type_annotation) = type_annotation {
+        if let Some(type_annotation) = value_def.type_annotation {
             // let _ = resolve_annotated_expression(db, module_id, *type_annotation, *value);
             // Check for type annotation conflicts
-            check_type_annotation(
-                db,
-                result,
-                module_id,
-                range,
-                *type_annotation,
-                resolved_type,
-            );
+            check_type_annotation(db, result, module_id, range, type_annotation, resolved_type);
         }
     }
 }
