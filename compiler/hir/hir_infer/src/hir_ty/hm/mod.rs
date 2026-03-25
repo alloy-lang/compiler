@@ -305,7 +305,6 @@ impl<'db> HMInferenceContext<'db> {
         }
     }
 
-    /// Generate a fresh type variable
     fn fresh_type_var(&mut self) -> MonoType {
         MonoType::Var(self.type_var_gen.fresh())
     }

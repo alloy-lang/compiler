@@ -146,16 +146,10 @@ fn build_constructor_type(
         .collect::<Vec<_>>();
 
     let type_name = type_def_fql.type_def_name(ctx.db);
-    let type_var_args: Vec<MonoType> = ctx
-        .annotation_type_vars
-        .values()
-        .filter(|var_id| type_args.contains(var_id))
+    let type_var_args: Vec<MonoType> = type_args
+        .iter()
         .map(|&var_id| MonoType::Var(var_id))
         .collect();
-    // let type_var_args: Vec<MonoType> = type_args
-    //     .iter()
-    //     .map(|&var_id| MonoType::Var(var_id))
-    //     .collect();
 
     let result_type = if type_args.is_empty() {
         MonoType::TypeDef {

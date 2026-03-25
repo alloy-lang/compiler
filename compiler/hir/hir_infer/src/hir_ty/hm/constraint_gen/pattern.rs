@@ -14,16 +14,13 @@ pub(super) fn infer_pattern_hm(
         return existing_ty;
     }
 
-    let pattern = match alloy_hir_resolved::resolve_pattern_by_id(
-        ctx.db,
-        source_fql.module_id,
-        source_fql.local_id,
-    ) {
-        Ok(p) => p,
-        Err(err) => {
-            return ctx.unknown_reference(err, source_fql);
-        }
-    };
+    let pattern =
+        match res::resolve_pattern_by_id(ctx.db, source_fql.module_id, source_fql.local_id) {
+            Ok(p) => p,
+            Err(err) => {
+                return ctx.unknown_reference(err, source_fql);
+            }
+        };
 
     match pattern {
         res::Pattern::Literal(lit) => super::infer_literal(ctx, source_fql, &lit),

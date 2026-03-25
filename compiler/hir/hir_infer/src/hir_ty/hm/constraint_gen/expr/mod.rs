@@ -1,3 +1,4 @@
+use super::super::TypeVarId;
 use super::{HMInferenceContext, MonoType};
 use crate::hir_ty::InferredType;
 use alloy_hir_def as hir;
@@ -105,14 +106,14 @@ pub(crate) fn infer_expr_hm(
 /// in constraint generation. Generic IDs are mapped to fresh type variables,
 /// with consistent mapping so the same Generic(id) produces the same TypeVarId.
 fn inferred_to_mono(inferred: &InferredType, ctx: &mut HMInferenceContext) -> MonoType {
-    let mut generic_map: FxHashMap<usize, super::super::TypeVarId> = FxHashMap::default();
+    let mut generic_map: FxHashMap<usize, TypeVarId> = FxHashMap::default();
     inferred_to_mono_inner(inferred, ctx, &mut generic_map)
 }
 
 fn inferred_to_mono_inner(
     inferred: &InferredType,
     ctx: &mut HMInferenceContext,
-    generic_map: &mut FxHashMap<usize, super::super::TypeVarId>,
+    generic_map: &mut FxHashMap<usize, TypeVarId>,
 ) -> MonoType {
     match inferred {
         InferredType::Unconstrained => MonoType::Unconstrained,
