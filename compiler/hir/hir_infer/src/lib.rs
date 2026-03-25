@@ -15,7 +15,6 @@ use diagnostics::{TypeInferenceErrorKind, TypeInferenceWarningKind};
 
 #[cfg(test)]
 mod tests;
-// mod infer;
 
 #[salsa::db]
 pub trait HirInferDatabase: hir::HirDefDatabase {}

@@ -478,12 +478,6 @@ fn resolve_named_type_annotation(
     path: &hir::Path,
     type_idx: hir::TypeIdx,
 ) -> AnnotatedType {
-    if let hir::Path::OtherModule(fqn, resolution_kinds) = path {
-        if fqn.name == hir::Name::new("Test") {
-            println!("fdsafdsa");
-        }
-    }
-
     let source_fql = Fql::new(current_module_id, type_idx);
 
     // First try: resolve via type reference path

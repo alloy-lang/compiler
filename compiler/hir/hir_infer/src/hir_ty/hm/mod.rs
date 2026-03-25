@@ -36,7 +36,7 @@ impl std::fmt::Display for TypeVarId {
 
 /// Monomorphic types (no quantification)
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub(crate) enum MonoType {
+pub enum MonoType {
     Unconstrained,
     /// Type variable (e.g., `a`, `b`)
     Var(TypeVarId),

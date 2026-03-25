@@ -1,6 +1,6 @@
 use alloy_hir_def as hir;
 use alloy_hir_infer as hir_infer;
-use alloy_hir_resolved::{EPTdFql, Fql};
+use alloy_hir_resolved::EPTdFql;
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
 use std::collections::HashMap;
