@@ -598,12 +598,8 @@ mod tests {
 ",
         );
 
-        let (hir_module, _) = hir::lower_file(&db, module_id);
-        let (idx, _expr) = hir_module
-            .get_expression_by_name(&Name::new("example"), idx!(1))
-            .unwrap_or_else(|| panic!("expected expression. hir_module: {:#?}", hir_module));
-
-        let actual = resolve_expression_by_id(&db, module_id, idx).expect("must find expression");
+        let actual =
+            resolve_expression_by_id(&db, module_id, idx!(3)).expect("must find expression");
 
         assert_eq!(
             Expression::Lambda {
@@ -625,19 +621,31 @@ mod tests {
             actual,
         );
 
-        // TODO: resolve function body
-        // let body = resolve_expression_by_id(&db, module_id, idx!(2)).expect("must find expression");
-        // assert_eq!(
-        //     Expression::FunctionCall {
-        //         target: EPTdFql::Expression(Fql {
-        //             module_id,
-        //             local_id: idx!(0),
-        //         }),
-        //         variant_name: None,
-        //         args: vec![],
-        //     },
-        //     body,
-        // );
+        let body = resolve_expression_by_id(&db, module_id, idx!(2)).expect("must find expression");
+        assert_eq!(
+            Expression::AbstractTraitFunctionCall {
+                trait_fql: Fql {
+                    module_id,
+                    local_id: idx!(0),
+                },
+                member_name: Name::new("test_func"),
+                args: vec![
+                    Fql {
+                        module_id,
+                        local_id: idx!(0),
+                    },
+                    Fql {
+                        module_id,
+                        local_id: idx!(1),
+                    }
+                ],
+                type_annotation: Fql {
+                    module_id,
+                    local_id: idx!(13),
+                },
+            },
+            body,
+        );
     }
 
     //
