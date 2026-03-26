@@ -29,4 +29,3 @@ let foo = std::option::Option::None
         },
     ),
 ]
-[]

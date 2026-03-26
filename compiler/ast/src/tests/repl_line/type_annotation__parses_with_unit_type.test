@@ -57,4 +57,3 @@ typeof test : Int -> String -> ()
         },
     ),
 ]
-[]

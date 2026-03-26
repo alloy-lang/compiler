@@ -32,8 +32,7 @@ fn run_ast_test<T: fmt::Debug>(path: &Path, input: &str, thing_fn: fn(&SourceFil
         );
     }
 
-    // todo: ast validation was moved to hir lowering
-    format!("{:#?}\n{:#?}", thing_fn(&source_file), Vec::<String>::new())
+    format!("{:#?}", thing_fn(&source_file))
 }
 
 #[test]

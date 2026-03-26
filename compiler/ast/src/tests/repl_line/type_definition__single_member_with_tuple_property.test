@@ -51,4 +51,3 @@ typedef Test = Thing (Int, String)
         },
     ),
 ]
-[]
