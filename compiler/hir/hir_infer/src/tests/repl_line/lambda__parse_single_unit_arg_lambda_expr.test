@@ -1,9 +1,7 @@
 |()| -> 5
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,
@@ -18,6 +16,7 @@ HirInferredModule {
     pattern_types: {
         Idx::<Pattern>(0): Unit,
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

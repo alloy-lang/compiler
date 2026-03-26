@@ -9,10 +9,8 @@ typeof test_func : t1 -> t2 -> Test[Int] where
     typevar t2
 let test_func = |a, b| -> test
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): Bounded {
             base: TypeDef(
@@ -65,6 +63,7 @@ HirInferredModule {
             1,
         ),
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

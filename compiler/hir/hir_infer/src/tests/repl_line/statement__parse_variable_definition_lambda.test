@@ -1,17 +1,15 @@
 let add = |a, b| -> a + b
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,
         ),
-        Idx::<Expression>(2): Generic(
+        Idx::<Expression>(1): Generic(
             0,
         ),
-        Idx::<Expression>(1): Generic(
+        Idx::<Expression>(2): Generic(
             0,
         ),
         Idx::<Expression>(3): Lambda {
@@ -36,6 +34,7 @@ HirInferredModule {
             0,
         ),
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

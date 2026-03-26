@@ -5,30 +5,28 @@ let >> = |f1, f2| -> f2(f1)
 
 let result = >>(func1, func2)
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(7): Lambda {
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(2): Lambda {
             arg_type: Generic(
-                1,
+                0,
             ),
             return_type: BuiltIn(
                 Int,
             ),
         },
+        Idx::<Expression>(3): Generic(
+            2,
+        ),
         Idx::<Expression>(4): Generic(
             0,
-        ),
-        Idx::<Expression>(1): BuiltIn(
-            Int,
-        ),
-        Idx::<Expression>(8): BuiltIn(
-            Int,
         ),
         Idx::<Expression>(5): Lambda {
             arg_type: Generic(
@@ -48,19 +46,19 @@ HirInferredModule {
                 ),
             },
         },
-        Idx::<Expression>(2): Lambda {
+        Idx::<Expression>(6): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(7): Lambda {
             arg_type: Generic(
-                0,
+                1,
             ),
             return_type: BuiltIn(
                 Int,
             ),
         },
-        Idx::<Expression>(6): BuiltIn(
+        Idx::<Expression>(8): BuiltIn(
             Int,
-        ),
-        Idx::<Expression>(3): Generic(
-            2,
         ),
     },
     pattern_types: {
@@ -79,6 +77,7 @@ HirInferredModule {
             ),
         },
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

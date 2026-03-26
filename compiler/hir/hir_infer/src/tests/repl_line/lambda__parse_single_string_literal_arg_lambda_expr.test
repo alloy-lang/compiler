@@ -1,9 +1,7 @@
 |"hello"| -> 5
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,
@@ -22,6 +20,7 @@ HirInferredModule {
             String,
         ),
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

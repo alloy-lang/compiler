@@ -3,10 +3,8 @@ import std::option::Option
 
 let thing = Option::None
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): Bounded {
             base: TypeDef(
@@ -26,6 +24,7 @@ HirInferredModule {
         },
     },
     pattern_types: {},
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

@@ -6,28 +6,32 @@ let funky = |x1, y1, z1| -> x1 + y1 + z1
 
 funky(x, y, z)
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(10): BuiltIn(
+        Idx::<Expression>(1): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(7): Generic(
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(3): Generic(
             0,
         ),
         Idx::<Expression>(4): Generic(
             0,
         ),
-        Idx::<Expression>(1): BuiltIn(
-            Int,
+        Idx::<Expression>(5): Generic(
+            0,
         ),
-        Idx::<Expression>(11): BuiltIn(
-            Int,
+        Idx::<Expression>(6): Generic(
+            0,
+        ),
+        Idx::<Expression>(7): Generic(
+            0,
         ),
         Idx::<Expression>(8): Lambda {
             arg_type: Generic(
@@ -47,23 +51,17 @@ HirInferredModule {
                 },
             },
         },
-        Idx::<Expression>(5): Generic(
-            0,
+        Idx::<Expression>(9): BuiltIn(
+            Int,
         ),
-        Idx::<Expression>(2): BuiltIn(
+        Idx::<Expression>(10): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(11): BuiltIn(
             Int,
         ),
         Idx::<Expression>(12): BuiltIn(
             Int,
-        ),
-        Idx::<Expression>(9): BuiltIn(
-            Int,
-        ),
-        Idx::<Expression>(6): Generic(
-            0,
-        ),
-        Idx::<Expression>(3): Generic(
-            0,
         ),
     },
     pattern_types: {
@@ -77,6 +75,7 @@ HirInferredModule {
             0,
         ),
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

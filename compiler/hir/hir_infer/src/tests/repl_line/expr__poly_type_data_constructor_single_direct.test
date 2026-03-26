@@ -4,16 +4,11 @@ let string_example = Identity("hi")
 let int_example = Identity(10)
 
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
             String,
-        ),
-        Idx::<Expression>(2): BuiltIn(
-            Int,
         ),
         Idx::<Expression>(1): Bounded {
             base: TypeDef(
@@ -31,6 +26,9 @@ HirInferredModule {
                 ),
             ],
         },
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
         Idx::<Expression>(3): Bounded {
             base: TypeDef(
                 Fql {
@@ -49,6 +47,29 @@ HirInferredModule {
         },
     },
     pattern_types: {},
+    variant_constructor_types: {
+        Idx::<TypeDefinition>(0): Lambda {
+            arg_type: Generic(
+                1,
+            ),
+            return_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "main",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Identity",
+                ),
+                args: [
+                    Generic(
+                        1,
+                    ),
+                ],
+            },
+        },
+    },
     warnings: [],
     errors: [],
 }

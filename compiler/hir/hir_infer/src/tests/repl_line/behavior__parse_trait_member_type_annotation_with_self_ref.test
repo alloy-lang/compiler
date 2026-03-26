@@ -11,10 +11,8 @@ behavior TestTrait1 for Type1 where
     let test = |sf, str| -> 0
 end
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): Lambda {
             arg_type: Generic(
@@ -54,6 +52,7 @@ HirInferredModule {
             1,
         ),
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

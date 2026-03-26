@@ -10,10 +10,8 @@ let constructor_example = Option::Some
 let string_example = constructor_example("hello")
 let int_example = constructor_example(10)
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): Lambda {
             arg_type: Generic(
@@ -36,6 +34,9 @@ HirInferredModule {
                 ],
             },
         },
+        Idx::<Expression>(1): BuiltIn(
+            String,
+        ),
         Idx::<Expression>(2): Bounded {
             base: TypeDef(
                 Fql {
@@ -52,6 +53,9 @@ HirInferredModule {
                 ),
             ],
         },
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
         Idx::<Expression>(4): Bounded {
             base: TypeDef(
                 Fql {
@@ -68,14 +72,31 @@ HirInferredModule {
                 ),
             ],
         },
-        Idx::<Expression>(1): BuiltIn(
-            String,
-        ),
-        Idx::<Expression>(3): BuiltIn(
-            Int,
-        ),
     },
     pattern_types: {},
+    variant_constructor_types: {
+        Idx::<TypeDefinition>(0): Lambda {
+            arg_type: Generic(
+                1,
+            ),
+            return_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "main",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Option",
+                ),
+                args: [
+                    Generic(
+                        1,
+                    ),
+                ],
+            },
+        },
+    },
     warnings: [],
     errors: [],
 }

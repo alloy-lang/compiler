@@ -11,10 +11,8 @@ typeof (=<<) : (t1 -> m[t2]) -> m[t1] -> m[t2] where
   typevar t2
 let (=<<) = TestTrait::test_func
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): Lambda {
             arg_type: Lambda {
@@ -57,6 +55,7 @@ HirInferredModule {
         },
     },
     pattern_types: {},
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

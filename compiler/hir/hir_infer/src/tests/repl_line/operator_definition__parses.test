@@ -3,10 +3,8 @@ typeof (|>) : t1 -> (t1 -> t2) -> t2 where
     typevar t2
 let (|>) = |x, f| -> f(x)
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,
@@ -46,6 +44,7 @@ HirInferredModule {
             ),
         },
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

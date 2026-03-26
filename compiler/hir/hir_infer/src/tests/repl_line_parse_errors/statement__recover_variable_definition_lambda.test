@@ -1,32 +1,11 @@
 let add1 = |a, 9| -
 let add2 = |a, b| -> a + b
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): Generic(
             1,
-        ),
-        Idx::<Expression>(5): Lambda {
-            arg_type: Generic(
-                0,
-            ),
-            return_type: Lambda {
-                arg_type: Generic(
-                    0,
-                ),
-                return_type: Generic(
-                    0,
-                ),
-            },
-        },
-        Idx::<Expression>(2): Generic(
-            0,
-        ),
-        Idx::<Expression>(4): Generic(
-            0,
         ),
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
@@ -41,24 +20,44 @@ HirInferredModule {
                 ),
             },
         },
+        Idx::<Expression>(2): Generic(
+            0,
+        ),
         Idx::<Expression>(3): Generic(
             0,
         ),
+        Idx::<Expression>(4): Generic(
+            0,
+        ),
+        Idx::<Expression>(5): Lambda {
+            arg_type: Generic(
+                0,
+            ),
+            return_type: Lambda {
+                arg_type: Generic(
+                    0,
+                ),
+                return_type: Generic(
+                    0,
+                ),
+            },
+        },
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             0,
         ),
-        Idx::<Pattern>(2): Generic(
-            0,
-        ),
         Idx::<Pattern>(1): BuiltIn(
             Int,
+        ),
+        Idx::<Pattern>(2): Generic(
+            0,
         ),
         Idx::<Pattern>(3): Generic(
             0,
         ),
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

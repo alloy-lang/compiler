@@ -1,15 +1,31 @@
 |arg1, arg2, arg3| -> (arg1, arg2, arg3)
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,
         ),
+        Idx::<Expression>(1): Generic(
+            2,
+        ),
         Idx::<Expression>(2): Generic(
             1,
+        ),
+        Idx::<Expression>(3): Tuple(
+            NonEmpty(
+                [
+                    Generic(
+                        0,
+                    ),
+                    Generic(
+                        2,
+                    ),
+                    Generic(
+                        1,
+                    ),
+                ],
+            ),
         ),
         Idx::<Expression>(4): Lambda {
             arg_type: Generic(
@@ -41,24 +57,6 @@ HirInferredModule {
                 },
             },
         },
-        Idx::<Expression>(1): Generic(
-            2,
-        ),
-        Idx::<Expression>(3): Tuple(
-            NonEmpty(
-                [
-                    Generic(
-                        0,
-                    ),
-                    Generic(
-                        2,
-                    ),
-                    Generic(
-                        1,
-                    ),
-                ],
-            ),
-        ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
@@ -71,6 +69,7 @@ HirInferredModule {
             1,
         ),
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

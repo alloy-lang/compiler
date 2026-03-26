@@ -5,10 +5,8 @@ typedef Things =
   | ThingB
 end
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): TypeDef(
             Fql {
@@ -21,6 +19,17 @@ HirInferredModule {
         ),
     },
     pattern_types: {},
+    variant_constructor_types: {
+        Idx::<TypeDefinition>(0): TypeDef(
+            Fql {
+                module_id: ModuleId {
+                    path: "main",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Things",
+        ),
+    },
     warnings: [],
     errors: [],
 }

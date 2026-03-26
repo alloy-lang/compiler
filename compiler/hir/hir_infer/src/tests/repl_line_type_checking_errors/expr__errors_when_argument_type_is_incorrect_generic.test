@@ -6,36 +6,12 @@ let test = |arg| -> 0
 let incorrect_arg = Option::Some(0)
 let test_result = test(incorrect_arg)
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(5): Generic(
-            0,
-        ),
-        Idx::<Expression>(2): BuiltIn(
-            Int,
-        ),
-        Idx::<Expression>(4): Bounded {
-            base: TypeDef(
-                Fql {
-                    module_id: ModuleId {
-                        path: "std::option",
-                    },
-                    local_id: Idx::<TypeDefinition>(0),
-                },
-                "Option",
-            ),
-            args: [
-                BuiltIn(
-                    Int,
-                ),
-            ],
-        },
         Idx::<Expression>(1): Lambda {
             arg_type: Bounded {
                 base: TypeDef(
@@ -57,6 +33,9 @@ HirInferredModule {
                 Int,
             ),
         },
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
         Idx::<Expression>(3): Bounded {
             base: TypeDef(
                 Fql {
@@ -73,6 +52,25 @@ HirInferredModule {
                 ),
             ],
         },
+        Idx::<Expression>(4): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "std::option",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Option",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+        Idx::<Expression>(5): Generic(
+            0,
+        ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Bounded {
@@ -92,6 +90,7 @@ HirInferredModule {
             ],
         },
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [
         TypeInferenceError {

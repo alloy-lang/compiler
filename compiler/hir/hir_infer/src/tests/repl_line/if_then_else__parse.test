@@ -2,10 +2,8 @@ import test_data::test
 
 if test then 2 else 3
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): Bounded {
             base: TypeDef(
@@ -23,10 +21,10 @@ HirInferredModule {
                 ),
             ],
         },
-        Idx::<Expression>(2): BuiltIn(
+        Idx::<Expression>(1): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(1): BuiltIn(
+        Idx::<Expression>(2): BuiltIn(
             Int,
         ),
         Idx::<Expression>(3): BuiltIn(
@@ -34,6 +32,7 @@ HirInferredModule {
         ),
     },
     pattern_types: {},
+    variant_constructor_types: {},
     warnings: [],
     errors: [
         TypeInferenceError {

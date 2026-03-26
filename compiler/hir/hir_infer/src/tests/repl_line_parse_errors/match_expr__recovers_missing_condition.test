@@ -2,18 +2,16 @@ match when
   \ True -> 0
   \ False -> 1
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Bool,
         ),
-        Idx::<Expression>(2): BuiltIn(
+        Idx::<Expression>(1): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(1): BuiltIn(
+        Idx::<Expression>(2): BuiltIn(
             Int,
         ),
         Idx::<Expression>(3): BuiltIn(
@@ -28,6 +26,7 @@ HirInferredModule {
             Bool,
         ),
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

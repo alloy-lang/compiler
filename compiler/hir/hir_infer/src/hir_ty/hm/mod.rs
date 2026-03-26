@@ -262,8 +262,6 @@ pub(super) struct HMInferenceContext<'db> {
     pub(super) type_var_names: FxHashMap<TypeVarId, hir::Name>,
 }
 
-
-
 impl<'db> HMInferenceContext<'db> {
     /// Get the user-visible name for a type variable (for error messages)
     fn get_type_var_name(&self, var_id: TypeVarId) -> String {

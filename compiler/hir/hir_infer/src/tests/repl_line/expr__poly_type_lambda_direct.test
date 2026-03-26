@@ -6,22 +6,11 @@ let string_example = id("hi")
 let int_example = id(10)
 
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,
-        ),
-        Idx::<Expression>(5): BuiltIn(
-            Int,
-        ),
-        Idx::<Expression>(2): BuiltIn(
-            String,
-        ),
-        Idx::<Expression>(4): BuiltIn(
-            Int,
         ),
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
@@ -31,8 +20,17 @@ HirInferredModule {
                 0,
             ),
         },
+        Idx::<Expression>(2): BuiltIn(
+            String,
+        ),
         Idx::<Expression>(3): BuiltIn(
             String,
+        ),
+        Idx::<Expression>(4): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(5): BuiltIn(
+            Int,
         ),
     },
     pattern_types: {
@@ -40,6 +38,7 @@ HirInferredModule {
             0,
         ),
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

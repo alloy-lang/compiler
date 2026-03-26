@@ -2,15 +2,19 @@ let unknown = 1
 
 |unknown(a)| -> a + "a"
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
+        Idx::<Expression>(1): BuiltIn(
+            String,
+        ),
         Idx::<Expression>(2): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(3): BuiltIn(
             String,
         ),
         Idx::<Expression>(4): Lambda {
@@ -21,12 +25,6 @@ HirInferredModule {
                 String,
             ),
         },
-        Idx::<Expression>(1): BuiltIn(
-            String,
-        ),
-        Idx::<Expression>(3): BuiltIn(
-            String,
-        ),
     },
     pattern_types: {
         Idx::<Pattern>(0): BuiltIn(
@@ -36,6 +34,7 @@ HirInferredModule {
             0,
         ),
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [
         TypeInferenceError {

@@ -2,6 +2,7 @@ use alloy_hir_def as hir;
 use alloy_hir_resolved::EPTdFql;
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
+use std::collections::BTreeMap;
 
 mod hir_ty;
 pub use hir_ty::InferredType;
@@ -15,12 +16,39 @@ mod tests;
 #[salsa::db]
 pub trait HirInferDatabase: hir::HirDefDatabase {}
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub struct DefinitionInferenceResult {
     pub definition_type: InferredType,
     pub expression_types: FxHashMap<hir::ExpressionIdx, InferredType>,
     pub pattern_types: FxHashMap<hir::PatternIdx, InferredType>,
+    pub variant_constructor_types: FxHashMap<hir::TypeDefinitionIdx, InferredType>,
+    pub warnings: Vec<TypeInferenceWarning>,
     pub errors: Vec<TypeInferenceError>,
+}
+
+impl std::fmt::Debug for DefinitionInferenceResult {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("DefinitionInferenceResult")
+            .field("definition_type", &self.definition_type)
+            .field(
+                "expression_types",
+                &self.expression_types.iter().collect::<BTreeMap<_, _>>(),
+            )
+            .field(
+                "pattern_types",
+                &self.pattern_types.iter().collect::<BTreeMap<_, _>>(),
+            )
+            .field(
+                "variant_constructor_types",
+                &self
+                    .variant_constructor_types
+                    .iter()
+                    .collect::<BTreeMap<_, _>>(),
+            )
+            .field("warnings", &self.warnings)
+            .field("errors", &self.errors)
+            .finish()
+    }
 }
 
 impl DefinitionInferenceResult {
@@ -29,6 +57,8 @@ impl DefinitionInferenceResult {
             definition_type: InferredType::Unconstrained,
             expression_types: FxHashMap::default(),
             pattern_types: FxHashMap::default(),
+            variant_constructor_types: FxHashMap::default(),
+            warnings: Vec::new(),
             errors: Vec::new(),
         }
     }
@@ -41,8 +71,8 @@ impl DefinitionInferenceResult {
             EPTdFql::Pattern(p) => {
                 self.pattern_types.insert(p.local_id, ty);
             }
-            EPTdFql::TypeDefinition(_) | EPTdFql::TypeDefinitionVariant(_, _) => {
-                // Type definitions don't have inferred types in this context
+            EPTdFql::TypeDefinition(td) | EPTdFql::TypeDefinitionVariant(td, _) => {
+                self.variant_constructor_types.insert(td.local_id, ty);
             }
         }
     }
@@ -55,8 +85,19 @@ impl DefinitionInferenceResult {
     pub(crate) fn compose(mut self, other: Self) -> Self {
         self.expression_types.extend(other.expression_types);
         self.pattern_types.extend(other.pattern_types);
+        self.variant_constructor_types
+            .extend(other.variant_constructor_types);
+        self.warnings.extend(other.warnings);
         self.errors.extend(other.errors);
         self
+    }
+
+    pub fn warnings(&self) -> &[TypeInferenceWarning] {
+        &self.warnings
+    }
+
+    pub fn errors(&self) -> &[TypeInferenceError] {
+        &self.errors
     }
 }
 

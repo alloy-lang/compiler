@@ -1,15 +1,14 @@
 -where
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,
         ),
     },
     pattern_types: {},
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

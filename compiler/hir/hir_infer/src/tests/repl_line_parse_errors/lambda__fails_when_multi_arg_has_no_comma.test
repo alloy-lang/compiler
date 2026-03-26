@@ -1,9 +1,7 @@
 |arg1 1001 'c'| -> 8
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
             Int,
@@ -38,6 +36,7 @@ HirInferredModule {
             Char,
         ),
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }

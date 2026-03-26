@@ -8,10 +8,8 @@ module TestModule1 where
       typevar t2
     let testThing = |funky, x, y| -> test_data::new <| (funky(x), funky(y))
 ===
-HirInferredModule {
-    module_id: ModuleId {
-        path: "main",
-    },
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): Lambda {
             arg_type: Tuple(
@@ -51,6 +49,55 @@ HirInferredModule {
                     ),
                 ],
             },
+        },
+        Idx::<Expression>(1): Generic(
+            1,
+        ),
+        Idx::<Expression>(2): Generic(
+            0,
+        ),
+        Idx::<Expression>(3): Generic(
+            1,
+        ),
+        Idx::<Expression>(4): Generic(
+            0,
+        ),
+        Idx::<Expression>(5): Tuple(
+            NonEmpty(
+                [
+                    Generic(
+                        0,
+                    ),
+                    Generic(
+                        0,
+                    ),
+                ],
+            ),
+        ),
+        Idx::<Expression>(6): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                Tuple(
+                    NonEmpty(
+                        [
+                            Generic(
+                                0,
+                            ),
+                            Generic(
+                                0,
+                            ),
+                        ],
+                    ),
+                ),
+            ],
         },
         Idx::<Expression>(7): Lambda {
             arg_type: Lambda {
@@ -97,55 +144,6 @@ HirInferredModule {
                 },
             },
         },
-        Idx::<Expression>(4): Generic(
-            0,
-        ),
-        Idx::<Expression>(1): Generic(
-            1,
-        ),
-        Idx::<Expression>(5): Tuple(
-            NonEmpty(
-                [
-                    Generic(
-                        0,
-                    ),
-                    Generic(
-                        0,
-                    ),
-                ],
-            ),
-        ),
-        Idx::<Expression>(2): Generic(
-            0,
-        ),
-        Idx::<Expression>(6): Bounded {
-            base: TypeDef(
-                Fql {
-                    module_id: ModuleId {
-                        path: "test_data",
-                    },
-                    local_id: Idx::<TypeDefinition>(0),
-                },
-                "Test",
-            ),
-            args: [
-                Tuple(
-                    NonEmpty(
-                        [
-                            Generic(
-                                0,
-                            ),
-                            Generic(
-                                0,
-                            ),
-                        ],
-                    ),
-                ),
-            ],
-        },
-        Idx::<Expression>(3): Generic(
-            1,
-        ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Lambda {
@@ -163,6 +161,7 @@ HirInferredModule {
             1,
         ),
     },
+    variant_constructor_types: {},
     warnings: [],
     errors: [],
 }
