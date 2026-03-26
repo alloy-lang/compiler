@@ -17,31 +17,6 @@ HirTypedModule {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(5): Generic(
-            0,
-        ),
-        Idx::<Expression>(2): Bounded {
-            base: TypeDef(
-                Fql {
-                    module_id: ModuleId {
-                        path: "main",
-                    },
-                    local_id: Idx::<TypeDefinition>(0),
-                },
-                "Either",
-            ),
-            args: [
-                BuiltIn(
-                    Int,
-                ),
-                Generic(
-                    1,
-                ),
-            ],
-        },
-        Idx::<Expression>(4): Generic(
-            0,
-        ),
         Idx::<Expression>(1): Bounded {
             base: TypeDef(
                 Fql {
@@ -61,15 +36,37 @@ HirTypedModule {
                 ),
             ],
         },
+        Idx::<Expression>(2): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Either",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+                Generic(
+                    1,
+                ),
+            ],
+        },
         Idx::<Expression>(3): Generic(
+            0,
+        ),
+        Idx::<Expression>(4): Generic(
+            0,
+        ),
+        Idx::<Expression>(5): Generic(
             0,
         ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            0,
-        ),
-        Idx::<Pattern>(2): Generic(
             0,
         ),
         Idx::<Pattern>(1): Bounded {
@@ -91,6 +88,9 @@ HirTypedModule {
                 ),
             ],
         },
+        Idx::<Pattern>(2): Generic(
+            0,
+        ),
         Idx::<Pattern>(3): Bounded {
             base: TypeDef(
                 Fql {

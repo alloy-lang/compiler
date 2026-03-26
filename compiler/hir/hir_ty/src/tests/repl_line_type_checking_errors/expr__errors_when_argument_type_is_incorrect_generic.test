@@ -14,28 +14,6 @@ HirTypedModule {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(5): Generic(
-            0,
-        ),
-        Idx::<Expression>(2): BuiltIn(
-            Int,
-        ),
-        Idx::<Expression>(4): Bounded {
-            base: TypeDef(
-                Fql {
-                    module_id: ModuleId {
-                        path: "std::option",
-                    },
-                    local_id: Idx::<TypeDefinition>(0),
-                },
-                "Option",
-            ),
-            args: [
-                BuiltIn(
-                    Int,
-                ),
-            ],
-        },
         Idx::<Expression>(1): Lambda {
             arg_type: Bounded {
                 base: TypeDef(
@@ -57,6 +35,9 @@ HirTypedModule {
                 Int,
             ),
         },
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
         Idx::<Expression>(3): Bounded {
             base: TypeDef(
                 Fql {
@@ -73,6 +54,25 @@ HirTypedModule {
                 ),
             ],
         },
+        Idx::<Expression>(4): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "std::option",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Option",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+        Idx::<Expression>(5): Generic(
+            0,
+        ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Bounded {

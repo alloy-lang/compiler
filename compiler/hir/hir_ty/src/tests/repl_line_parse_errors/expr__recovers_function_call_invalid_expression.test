@@ -10,15 +10,6 @@ HirTypedModule {
         Idx::<Expression>(0): Generic(
             0,
         ),
-        Idx::<Expression>(5): BuiltIn(
-            Int,
-        ),
-        Idx::<Expression>(2): BuiltIn(
-            Int,
-        ),
-        Idx::<Expression>(4): BuiltIn(
-            Int,
-        ),
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
                 0,
@@ -27,7 +18,16 @@ HirTypedModule {
                 0,
             ),
         },
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
         Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(4): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(5): BuiltIn(
             Int,
         ),
     },

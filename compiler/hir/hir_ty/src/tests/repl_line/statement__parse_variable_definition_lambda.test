@@ -8,10 +8,10 @@ HirTypedModule {
         Idx::<Expression>(0): Generic(
             0,
         ),
-        Idx::<Expression>(2): Generic(
+        Idx::<Expression>(1): Generic(
             0,
         ),
-        Idx::<Expression>(1): Generic(
+        Idx::<Expression>(2): Generic(
             0,
         ),
         Idx::<Expression>(3): Lambda {

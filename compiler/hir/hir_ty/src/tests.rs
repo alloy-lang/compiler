@@ -152,7 +152,6 @@ fn run_hir_ty_test(
     })
 }
 
-// TODO: continue fixing lowering errors in std lib
 #[test]
 fn test_std_lib() {
     alloy_test_harness::run_std_lib_tests(

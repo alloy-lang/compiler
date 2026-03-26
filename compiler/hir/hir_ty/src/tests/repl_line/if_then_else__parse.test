@@ -23,10 +23,10 @@ HirTypedModule {
                 ),
             ],
         },
-        Idx::<Expression>(2): BuiltIn(
+        Idx::<Expression>(1): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(1): BuiltIn(
+        Idx::<Expression>(2): BuiltIn(
             Int,
         ),
         Idx::<Expression>(3): BuiltIn(

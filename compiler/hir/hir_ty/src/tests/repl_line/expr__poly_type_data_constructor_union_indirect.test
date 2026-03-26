@@ -36,6 +36,9 @@ HirTypedModule {
                 ],
             },
         },
+        Idx::<Expression>(1): BuiltIn(
+            String,
+        ),
         Idx::<Expression>(2): Bounded {
             base: TypeDef(
                 Fql {
@@ -52,6 +55,9 @@ HirTypedModule {
                 ),
             ],
         },
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
         Idx::<Expression>(4): Bounded {
             base: TypeDef(
                 Fql {
@@ -68,12 +74,6 @@ HirTypedModule {
                 ),
             ],
         },
-        Idx::<Expression>(1): BuiltIn(
-            String,
-        ),
-        Idx::<Expression>(3): BuiltIn(
-            Int,
-        ),
     },
     pattern_types: {},
     warnings: [],

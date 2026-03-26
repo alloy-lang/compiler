@@ -52,6 +52,55 @@ HirTypedModule {
                 ],
             },
         },
+        Idx::<Expression>(1): Generic(
+            1,
+        ),
+        Idx::<Expression>(2): Generic(
+            0,
+        ),
+        Idx::<Expression>(3): Generic(
+            1,
+        ),
+        Idx::<Expression>(4): Generic(
+            0,
+        ),
+        Idx::<Expression>(5): Tuple(
+            NonEmpty(
+                [
+                    Generic(
+                        0,
+                    ),
+                    Generic(
+                        0,
+                    ),
+                ],
+            ),
+        ),
+        Idx::<Expression>(6): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                Tuple(
+                    NonEmpty(
+                        [
+                            Generic(
+                                0,
+                            ),
+                            Generic(
+                                0,
+                            ),
+                        ],
+                    ),
+                ),
+            ],
+        },
         Idx::<Expression>(7): Lambda {
             arg_type: Lambda {
                 arg_type: Generic(
@@ -97,55 +146,6 @@ HirTypedModule {
                 },
             },
         },
-        Idx::<Expression>(4): Generic(
-            0,
-        ),
-        Idx::<Expression>(1): Generic(
-            1,
-        ),
-        Idx::<Expression>(5): Tuple(
-            NonEmpty(
-                [
-                    Generic(
-                        0,
-                    ),
-                    Generic(
-                        0,
-                    ),
-                ],
-            ),
-        ),
-        Idx::<Expression>(2): Generic(
-            0,
-        ),
-        Idx::<Expression>(6): Bounded {
-            base: TypeDef(
-                Fql {
-                    module_id: ModuleId {
-                        path: "test_data",
-                    },
-                    local_id: Idx::<TypeDefinition>(0),
-                },
-                "Test",
-            ),
-            args: [
-                Tuple(
-                    NonEmpty(
-                        [
-                            Generic(
-                                0,
-                            ),
-                            Generic(
-                                0,
-                            ),
-                        ],
-                    ),
-                ),
-            ],
-        },
-        Idx::<Expression>(3): Generic(
-            1,
-        ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Lambda {
@@ -156,10 +156,10 @@ HirTypedModule {
                 0,
             ),
         },
-        Idx::<Pattern>(2): Generic(
+        Idx::<Pattern>(1): Generic(
             1,
         ),
-        Idx::<Pattern>(1): Generic(
+        Idx::<Pattern>(2): Generic(
             1,
         ),
     },

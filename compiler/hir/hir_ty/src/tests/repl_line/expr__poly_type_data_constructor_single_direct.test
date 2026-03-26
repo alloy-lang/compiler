@@ -12,9 +12,6 @@ HirTypedModule {
         Idx::<Expression>(0): BuiltIn(
             String,
         ),
-        Idx::<Expression>(2): BuiltIn(
-            Int,
-        ),
         Idx::<Expression>(1): Bounded {
             base: TypeDef(
                 Fql {
@@ -31,6 +28,9 @@ HirTypedModule {
                 ),
             ],
         },
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
         Idx::<Expression>(3): Bounded {
             base: TypeDef(
                 Fql {

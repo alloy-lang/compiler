@@ -14,20 +14,26 @@ HirTypedModule {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(10): BuiltIn(
+        Idx::<Expression>(1): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(7): Generic(
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(3): Generic(
             0,
         ),
         Idx::<Expression>(4): Generic(
             0,
         ),
-        Idx::<Expression>(1): BuiltIn(
-            Int,
+        Idx::<Expression>(5): Generic(
+            0,
         ),
-        Idx::<Expression>(11): BuiltIn(
-            Int,
+        Idx::<Expression>(6): Generic(
+            0,
+        ),
+        Idx::<Expression>(7): Generic(
+            0,
         ),
         Idx::<Expression>(8): Lambda {
             arg_type: Generic(
@@ -47,33 +53,27 @@ HirTypedModule {
                 },
             },
         },
-        Idx::<Expression>(5): Generic(
-            0,
+        Idx::<Expression>(9): BuiltIn(
+            Int,
         ),
-        Idx::<Expression>(2): BuiltIn(
+        Idx::<Expression>(10): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(11): BuiltIn(
             Int,
         ),
         Idx::<Expression>(12): BuiltIn(
             Int,
-        ),
-        Idx::<Expression>(9): BuiltIn(
-            Int,
-        ),
-        Idx::<Expression>(6): Generic(
-            0,
-        ),
-        Idx::<Expression>(3): Generic(
-            0,
         ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             0,
         ),
-        Idx::<Pattern>(2): Generic(
+        Idx::<Pattern>(1): Generic(
             0,
         ),
-        Idx::<Pattern>(1): Generic(
+        Idx::<Pattern>(2): Generic(
             0,
         ),
     },

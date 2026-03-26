@@ -4,7 +4,7 @@ use alloy_hir_infer::DefinitionInferenceResult;
 use alloy_hir_resolved::{EPTdFql, Fql};
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::fmt;
 use text_size::TextRange;
 
@@ -36,8 +36,14 @@ impl fmt::Debug for HirTypedModule {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut debug_struct = f.debug_struct("HirTypedModule");
         debug_struct.field("module_id", &self.module_id);
-        debug_struct.field("expression_types", &self.expression_types);
-        debug_struct.field("pattern_types", &self.pattern_types);
+        debug_struct.field(
+            "expression_types",
+            &self.expression_types.iter().collect::<BTreeMap<_, _>>(),
+        );
+        debug_struct.field(
+            "pattern_types",
+            &self.pattern_types.iter().collect::<BTreeMap<_, _>>(),
+        );
         debug_struct.field("warnings", &self.warnings);
         debug_struct.field("errors", &self.errors);
         debug_struct.field("poly_instantiations", &FxHashMap::<(), ()>::default());

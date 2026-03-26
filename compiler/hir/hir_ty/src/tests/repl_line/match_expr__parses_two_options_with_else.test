@@ -12,16 +12,16 @@ HirTypedModule {
         Idx::<Expression>(0): BuiltIn(
             Bool,
         ),
-        Idx::<Expression>(2): BuiltIn(
-            Int,
-        ),
-        Idx::<Expression>(4): BuiltIn(
-            Int,
-        ),
         Idx::<Expression>(1): BuiltIn(
             Bool,
         ),
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
         Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(4): BuiltIn(
             Int,
         ),
     },
