@@ -1,28 +1,15 @@
-import test_data::test
+let test = False
 
 if test then 2 else 3
 ===
 DefinitionInferenceResult {
     definition_type: Unconstrained,
     expression_types: {
-        Idx::<Expression>(0): Bounded {
-            base: TypeDef(
-                Fql {
-                    module_id: ModuleId {
-                        path: "test_data",
-                    },
-                    local_id: Idx::<TypeDefinition>(0),
-                },
-                "Test",
-            ),
-            args: [
-                BuiltIn(
-                    Int,
-                ),
-            ],
-        },
+        Idx::<Expression>(0): BuiltIn(
+            Bool,
+        ),
         Idx::<Expression>(1): BuiltIn(
-            Int,
+            Bool,
         ),
         Idx::<Expression>(2): BuiltIn(
             Int,
@@ -30,54 +17,13 @@ DefinitionInferenceResult {
         Idx::<Expression>(3): BuiltIn(
             Int,
         ),
+        Idx::<Expression>(4): BuiltIn(
+            Int,
+        ),
     },
     pattern_types: {},
     variant_constructor_types: {},
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: UnificationError(
-                TypeMismatch(
-                    App {
-                        constructor: TypeDef {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "test_data",
-                                },
-                                local_id: Idx::<TypeDefinition>(0),
-                            },
-                            type_args: [
-                                TypeVarId(
-                                    0,
-                                ),
-                            ],
-                            type_def_name: "Test",
-                        },
-                        args: [
-                            Concrete(
-                                Int,
-                            ),
-                        ],
-                    },
-                    Concrete(
-                        Bool,
-                    ),
-                ),
-            ),
-            range: 24..45,
-        },
-    ],
+    errors: [],
 }
 []
-[E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
-   ╭─[ ./test/main.alloy:3:1 ]
-   │
- 3 │ if test then 2 else 3
-   │ ──────────┬──────────  
-   │           ╰──────────── expected `Test[Int]`, found `Bool`
-   │ 
-   │ Help: These types must be compatible
-───╯
-
-
-

@@ -1,4 +1,4 @@
-import test_data::test
+let test = False
 
 match test when
   \ -> 0
@@ -7,24 +7,11 @@ match test when
 DefinitionInferenceResult {
     definition_type: Unconstrained,
     expression_types: {
-        Idx::<Expression>(0): Bounded {
-            base: TypeDef(
-                Fql {
-                    module_id: ModuleId {
-                        path: "test_data",
-                    },
-                    local_id: Idx::<TypeDefinition>(0),
-                },
-                "Test",
-            ),
-            args: [
-                BuiltIn(
-                    Int,
-                ),
-            ],
-        },
+        Idx::<Expression>(0): BuiltIn(
+            Bool,
+        ),
         Idx::<Expression>(1): BuiltIn(
-            Int,
+            Bool,
         ),
         Idx::<Expression>(2): BuiltIn(
             Int,
@@ -32,63 +19,21 @@ DefinitionInferenceResult {
         Idx::<Expression>(3): BuiltIn(
             Int,
         ),
+        Idx::<Expression>(4): BuiltIn(
+            Int,
+        ),
     },
     pattern_types: {
-        Idx::<Pattern>(0): Bounded {
-            base: TypeDef(
-                Fql {
-                    module_id: ModuleId {
-                        path: "test_data",
-                    },
-                    local_id: Idx::<TypeDefinition>(0),
-                },
-                "Test",
-            ),
-            args: [
-                BuiltIn(
-                    Int,
-                ),
-            ],
-        },
+        Idx::<Pattern>(0): BuiltIn(
+            Bool,
+        ),
         Idx::<Pattern>(1): BuiltIn(
             Bool,
         ),
     },
     variant_constructor_types: {},
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: UnificationError(
-                TypeMismatch(
-                    App {
-                        constructor: TypeDef {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "test_data",
-                                },
-                                local_id: Idx::<TypeDefinition>(0),
-                            },
-                            type_args: [
-                                TypeVarId(
-                                    0,
-                                ),
-                            ],
-                            type_def_name: "Test",
-                        },
-                        args: [
-                            Concrete(
-                                Int,
-                            ),
-                        ],
-                    },
-                    Concrete(
-                        Bool,
-                    ),
-                ),
-            ),
-            range: 53..58,
-        },
-    ],
+    errors: [],
 }
 [
     ParseError {
@@ -103,20 +48,8 @@ DefinitionInferenceResult {
             NilIdentifier,
         ],
         kind: Missing {
-            offset: 44,
+            offset: 38,
         },
         context: MatchTargetCondition,
     },
 ]
-[E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
-   ╭─[ ./test/main.alloy:5:5 ]
-   │
- 5 │   \ False -> 1
-   │     ──┬──  
-   │       ╰──── expected `Test[Int]`, found `Bool`
-   │ 
-   │ Help: These types must be compatible
-───╯
-
-
-

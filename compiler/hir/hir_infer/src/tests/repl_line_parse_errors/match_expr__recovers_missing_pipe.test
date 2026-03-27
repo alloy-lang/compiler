@@ -1,4 +1,4 @@
-import test_data::test
+let test = False
 
 match test when
   True -> 0
@@ -7,29 +7,19 @@ match test when
 DefinitionInferenceResult {
     definition_type: Unconstrained,
     expression_types: {
-        Idx::<Expression>(0): Bounded {
-            base: TypeDef(
-                Fql {
-                    module_id: ModuleId {
-                        path: "test_data",
-                    },
-                    local_id: Idx::<TypeDefinition>(0),
-                },
-                "Test",
-            ),
-            args: [
-                BuiltIn(
-                    Int,
-                ),
-            ],
-        },
+        Idx::<Expression>(0): BuiltIn(
+            Bool,
+        ),
         Idx::<Expression>(1): BuiltIn(
-            Int,
+            Bool,
         ),
         Idx::<Expression>(2): BuiltIn(
             Int,
         ),
         Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(4): BuiltIn(
             Int,
         ),
     },
@@ -43,70 +33,7 @@ DefinitionInferenceResult {
     },
     variant_constructor_types: {},
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: UnificationError(
-                TypeMismatch(
-                    App {
-                        constructor: TypeDef {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "test_data",
-                                },
-                                local_id: Idx::<TypeDefinition>(0),
-                            },
-                            type_args: [
-                                TypeVarId(
-                                    0,
-                                ),
-                            ],
-                            type_def_name: "Test",
-                        },
-                        args: [
-                            Concrete(
-                                Int,
-                            ),
-                        ],
-                    },
-                    Concrete(
-                        Bool,
-                    ),
-                ),
-            ),
-            range: 42..46,
-        },
-        TypeInferenceError {
-            kind: UnificationError(
-                TypeMismatch(
-                    App {
-                        constructor: TypeDef {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "test_data",
-                                },
-                                local_id: Idx::<TypeDefinition>(0),
-                            },
-                            type_args: [
-                                TypeVarId(
-                                    0,
-                                ),
-                            ],
-                            type_def_name: "Test",
-                        },
-                        args: [
-                            Concrete(
-                                Int,
-                            ),
-                        ],
-                    },
-                    Concrete(
-                        Bool,
-                    ),
-                ),
-            ),
-            range: 56..61,
-        },
-    ],
+    errors: [],
 }
 [
     ParseError {
@@ -114,30 +41,8 @@ DefinitionInferenceResult {
             Backslash,
         ],
         kind: Missing {
-            offset: 42,
+            offset: 36,
         },
         context: MatchTargetPipe,
     },
 ]
-[E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
-   ╭─[ ./test/main.alloy:4:3 ]
-   │
- 4 │   True -> 0
-   │   ──┬─  
-   │     ╰─── expected `Test[Int]`, found `Bool`
-   │ 
-   │ Help: These types must be compatible
-───╯
-
-[E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
-   ╭─[ ./test/main.alloy:5:5 ]
-   │
- 5 │   \ False -> 1
-   │     ──┬──  
-   │       ╰──── expected `Test[Int]`, found `Bool`
-   │ 
-   │ Help: These types must be compatible
-───╯
-
-
-
