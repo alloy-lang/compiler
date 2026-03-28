@@ -1,5 +1,6 @@
 use super::super::pattern::infer_pattern_hm;
-use super::{type_def, HMInferenceContext, MonoType};
+use super::type_def;
+use super::{HMInferenceContext, MonoType};
 use alloy_hir_def as hir;
 use alloy_hir_resolved::{EPTdFql, Fql};
 
@@ -42,13 +43,13 @@ fn find_function_type(
         EPTdFql::Expression(expr_fql) => super::infer_expr_hm(ctx, expr_fql.clone()),
         EPTdFql::Pattern(pat_fql) => infer_pattern_hm(ctx, pat_fql.clone()),
         EPTdFql::TypeDefinition(td_fql) => {
-            type_def::infer_data_constructor(ctx, source_fql.clone(), &td_fql)
+            type_def::infer_data_constructor(ctx, source_fql.clone(), td_fql)
         }
         EPTdFql::TypeDefinitionVariant(td_fql, variant_name) => {
             type_def::infer_variant_constructor(
                 ctx,
                 source_fql.clone(),
-                td_fql.clone(),
+                td_fql,
                 variant_name.clone(),
             )
         }

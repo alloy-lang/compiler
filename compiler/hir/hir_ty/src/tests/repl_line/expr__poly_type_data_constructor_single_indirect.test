@@ -2,9 +2,7 @@ typedef Identity[t] = Id t
 
 typeof constructor : t -> Identity[t] where
   typevar t
--- TODO: single type def data constructors referencable by top-level name
--- let constructor = Identity
-let constructor = Identity::Id
+let constructor = Identity
 
 let string_example = constructor("hi")
 let int_example = constructor(10)

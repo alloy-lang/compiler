@@ -6,65 +6,25 @@ Two TODOs related to type-checking patterns: looking up constructor type schemes
 
 ---
 
-## TODO 1: Look up constructor type scheme from target and scope
+## TODO 1: Look up constructor type scheme from target and scope ✅ DONE
 
 **File:** `compiler/hir/hir_infer/src/hir_ty/hm/constraint_gen/pattern.rs` — `infer_destructure()`
 
-### Problem
+### Implementation
 
-`infer_destructure()` receives `target: Fql<hir::TypeDefinition>` and `args: &[Fql<hir::Pattern>]` but ignores the target entirely. It returns a fresh type variable with no constraints — the type of the pattern is completely unknown to the solver.
-
-### Current behavior
-
-```rust
-fn infer_destructure(ctx, fql, _target, args) -> MonoType {
-    let _field_types = args.iter()
-        .map(|field_id| infer_pattern_hm(ctx, field_id.clone()))
-        .collect::<Vec<_>>();
-    // TODO: look up the constructor's type scheme from target and scope
-    let ty = ctx.fresh_type_var();
-    ctx.assign_type(fql, ty)
-}
-```
-
-A pattern like `Option::Some(x)` gets a fresh variable instead of `Option[t]` with `x: t`.
-
-### Existing infrastructure
-
-The expression-side variant constructor logic already does what's needed:
-- `infer_data_constructor()` and `infer_variant_constructor()` in `constraint_gen/expr/type_def.rs` build constructor types with proper generic mappings.
-
-### Plan
-
-1. **Look up the type definition** using `target`:
-   ```rust
-   let type_def = res::resolve_type_definition_by_id(db, target);
-   ```
-
-2. **Build the constructor type** using logic similar to expression-side constructors:
-   - Map generic parameters to fresh type variables.
-   - Resolve each member field's type as a `MonoType`.
-
-3. **Decompose the constructor type** to get individual field types and the overall result type.
-
-4. **Constrain each argument pattern:**
-   ```rust
-   for (arg_pattern, field_type) in args.iter().zip(field_types) {
-       let arg_ty = infer_pattern_hm(ctx, *arg_pattern);
-       ctx.add_equation(arg_ty, field_type, fql.clone());
-   }
-   ```
-
-5. **Return the result type** (e.g., `Option[t]`).
-
-6. **Handle arity mismatch** — if `args.len() != field_types.len()`, report an error.
+`infer_destructure()` now:
+1. Resolves the type definition and finds the correct member (single or named variant)
+2. Reuses `build_constructor_type()` from the expression side to build the curried constructor type
+3. Generalizes and instantiates to get fresh type vars per pattern occurrence (prevents sharing between multiple destructure patterns in the same scope)
+4. Decomposes the function type into field types and result type
+5. Constrains each pattern arg against the corresponding field type
 
 ### Tests
 
-- `Some(x)` matching `Option[Int]` — `x` should infer as `Int`.
-- `Pair(a, b)` matching `Pair[Int, String]` — `a: Int`, `b: String`.
-- Nested: `Some(Some(x))` — `x` should infer correctly through two layers.
-- Wrong arity: `Some(a, b)` — should error.
+- `match_variant_destructure_constrains_field_type` — union variant field → Int
+- `match_data_destructure_constrains_field_type` — single variant field → Int
+- `match_destructure_propagates_type_across_arms` — arm agreement constrains both variants
+- Stdlib `option.alloy` and `either.alloy` now pass with correct types
 
 ---
 

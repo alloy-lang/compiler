@@ -1,5 +1,5 @@
 use super::super::TypeVarId;
-use super::{HMInferenceContext, MonoType};
+use super::{type_def, HMInferenceContext, MonoType};
 use crate::hir_ty::InferredType;
 use alloy_hir_def as hir;
 use alloy_hir_resolved as res;
@@ -13,7 +13,6 @@ mod lambda;
 mod r#match;
 mod r#trait;
 mod tuple;
-mod type_def;
 mod value;
 mod variable_ref;
 
@@ -75,7 +74,7 @@ pub(crate) fn infer_expr_hm(
         res::Expression::VariantConstructor {
             type_def,
             variant_name,
-        } => type_def::infer_variant_constructor(ctx, source_fql, type_def, variant_name),
+        } => type_def::infer_variant_constructor(ctx, source_fql, &type_def, variant_name),
         res::Expression::AbstractTraitMemberRef {
             trait_fql: _,
             member_name: _,

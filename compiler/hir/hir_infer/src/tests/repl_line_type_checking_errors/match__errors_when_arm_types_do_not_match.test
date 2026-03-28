@@ -1,9 +1,9 @@
-import test_data::test
-
 typedef Either[l, r] =
   | Left(l)
   | Right(r)
 end
+
+let test = Either::Right(True)
 
 match test when
   \ Either::Left(l)  -> "hi"
@@ -12,73 +12,163 @@ match test when
 DefinitionInferenceResult {
     definition_type: Unconstrained,
     expression_types: {
-        Idx::<Expression>(0): Bounded {
+        Idx::<Expression>(0): BuiltIn(
+            Bool,
+        ),
+        Idx::<Expression>(1): Bounded {
             base: TypeDef(
                 Fql {
                     module_id: ModuleId {
-                        path: "test_data",
+                        path: "main",
                     },
                     local_id: Idx::<TypeDefinition>(0),
                 },
-                "Test",
+                "Either",
             ),
             args: [
+                Generic(
+                    0,
+                ),
                 BuiltIn(
-                    Int,
+                    Bool,
                 ),
             ],
         },
-        Idx::<Expression>(1): BuiltIn(
+        Idx::<Expression>(2): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Either",
+            ),
+            args: [
+                Generic(
+                    2,
+                ),
+                BuiltIn(
+                    Bool,
+                ),
+            ],
+        },
+        Idx::<Expression>(3): BuiltIn(
             String,
         ),
-        Idx::<Expression>(2): BuiltIn(
+        Idx::<Expression>(4): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(3): BuiltIn(
+        Idx::<Expression>(5): BuiltIn(
             String,
         ),
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            1,
+            2,
         ),
         Idx::<Pattern>(1): Bounded {
             base: TypeDef(
                 Fql {
                     module_id: ModuleId {
-                        path: "test_data",
+                        path: "main",
                     },
                     local_id: Idx::<TypeDefinition>(0),
                 },
-                "Test",
+                "Either",
             ),
             args: [
+                Generic(
+                    2,
+                ),
                 BuiltIn(
-                    Int,
+                    Bool,
                 ),
             ],
         },
-        Idx::<Pattern>(2): Generic(
-            0,
+        Idx::<Pattern>(2): BuiltIn(
+            Bool,
         ),
         Idx::<Pattern>(3): Bounded {
             base: TypeDef(
                 Fql {
                     module_id: ModuleId {
-                        path: "test_data",
+                        path: "main",
                     },
                     local_id: Idx::<TypeDefinition>(0),
                 },
-                "Test",
+                "Either",
             ),
             args: [
+                Generic(
+                    2,
+                ),
                 BuiltIn(
-                    Int,
+                    Bool,
                 ),
             ],
         },
     },
-    variant_constructor_types: {},
+    variant_constructor_types: {
+        (
+            Idx::<TypeDefinition>(0),
+            Some(
+                "Left",
+            ),
+        ): Lambda {
+            arg_type: Generic(
+                0,
+            ),
+            return_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "main",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Either",
+                ),
+                args: [
+                    Generic(
+                        0,
+                    ),
+                    Generic(
+                        1,
+                    ),
+                ],
+            },
+        },
+        (
+            Idx::<TypeDefinition>(0),
+            Some(
+                "Right",
+            ),
+        ): Lambda {
+            arg_type: Generic(
+                1,
+            ),
+            return_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "main",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Either",
+                ),
+                args: [
+                    Generic(
+                        0,
+                    ),
+                    Generic(
+                        1,
+                    ),
+                ],
+            },
+        },
+    },
     warnings: [],
     errors: [
         TypeInferenceError {
@@ -92,7 +182,7 @@ DefinitionInferenceResult {
                     ),
                 ),
             ),
-            range: 146..147,
+            range: 154..155,
         },
     ],
 }

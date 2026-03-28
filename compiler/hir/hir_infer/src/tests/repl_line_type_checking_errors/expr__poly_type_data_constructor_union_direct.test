@@ -1,0 +1,57 @@
+typedef Option[t] =
+  | None
+  | Some(t)
+end
+
+let string_example = Option("hello")
+===
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(1): Generic(
+            0,
+        ),
+    },
+    pattern_types: {},
+    variant_constructor_types: {},
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: HirResolutionError(
+                MissingTypeDefinitionVariant {
+                    source_ref: Expression(
+                        Fql {
+                            module_id: ModuleId {
+                                path: "main",
+                            },
+                            local_id: Idx::<Expression>(1),
+                        },
+                    ),
+                    target_type_fql: Fql {
+                        module_id: ModuleId {
+                            path: "main",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                },
+            ),
+            range: 46..82,
+        },
+    ],
+}
+[]
+[E32007] Error: Missing variant name for multi-variant type
+   ╭─[ ./test/main.alloy:6:1 ]
+   │
+ 6 │ let string_example = Option("hello")
+   │ ──────────────────┬─────────────────  
+   │                   ╰─────────────────── missing variant name
+   │ 
+   │ Help: Multi-variant types require specifying a variant (e.g., `Type::Variant`)
+───╯
+
+
+

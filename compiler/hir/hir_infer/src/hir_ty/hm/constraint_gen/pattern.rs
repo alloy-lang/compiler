@@ -1,7 +1,7 @@
-use super::{HMInferenceContext, MonoType};
+use super::{type_def, HMInferenceContext, MonoType};
 use alloy_hir_def as hir;
 use alloy_hir_resolved as res;
-use alloy_hir_resolved::Fql;
+use alloy_hir_resolved::{EPTdFql, Fql};
 use non_empty_vec::NonEmpty;
 
 /// Generate constraints for a pattern using HM inference
@@ -27,12 +27,14 @@ pub(super) fn infer_pattern_hm(
         res::Pattern::Unit => super::infer_unit(ctx, source_fql),
         res::Pattern::VariableDeclaration => infer_variable_declaration(ctx, source_fql),
         res::Pattern::Tuple(elements) => infer_tuple_pattern(ctx, source_fql, elements),
-        res::Pattern::DataDestructure { target, args, .. } => {
-            infer_destructure(ctx, source_fql, target, &args)
+        res::Pattern::DataDestructure { target, args } => {
+            infer_destructure(ctx, source_fql, &target, None, &args)
         }
-        res::Pattern::VariantDestructure { target, args, .. } => {
-            infer_destructure(ctx, source_fql, target, &args)
-        }
+        res::Pattern::VariantDestructure {
+            target,
+            variant_name,
+            args,
+        } => infer_destructure(ctx, source_fql, &target, Some(&variant_name), &args),
         res::Pattern::Nil => infer_nil(ctx, source_fql),
         res::Pattern::Missing => infer_missing_pattern(ctx, source_fql),
     }
@@ -60,26 +62,50 @@ fn infer_tuple_pattern(
 
 fn infer_destructure(
     ctx: &mut HMInferenceContext,
-    fql: Fql<hir::Pattern>,
-    _target: Fql<hir::TypeDefinition>,
+    source_fql: Fql<hir::Pattern>,
+    target: &Fql<hir::TypeDefinition>,
+    variant_name: Option<&hir::Name>,
     args: &[Fql<hir::Pattern>],
 ) -> MonoType {
-    // Infer types for all fields
-    let _field_types = args
+    let field_pattern_types = args
         .iter()
         .map(|field_id| infer_pattern_hm(ctx, field_id.clone()))
         .collect::<Vec<_>>();
 
-    // For now, create a fresh type variable for the constructor application
-    // TODO: In a full implementation, we'd look up the constructor's type scheme from target and scope
-    let ty = ctx.fresh_type_var();
-    ctx.assign_type(fql, ty)
+    let constructor_ty = match variant_name {
+        Some(variant_name) => {
+            type_def::infer_variant_constructor(ctx, &source_fql, target, variant_name.clone())
+        }
+        None => type_def::infer_data_constructor(ctx, &source_fql, target),
+    };
+
+    let (field_types, result_type) = decompose_function_type(constructor_ty);
+
+    for (pattern_ty, field_ty) in field_pattern_types.iter().zip(field_types.iter()) {
+        ctx.add_equation(pattern_ty.clone(), field_ty.clone(), source_fql.clone());
+    }
+
+    ctx.assign_type(source_fql, result_type)
+}
+
+/// Decompose a curried function type `a -> b -> ... -> result` into
+/// `([a, b, ...], result)`. If the type is not a function, returns empty args.
+fn decompose_function_type(ty: MonoType) -> (Vec<MonoType>, MonoType) {
+    let mut args = Vec::new();
+    let mut current = ty;
+    loop {
+        match current {
+            MonoType::Function(arg, ret) => {
+                args.push(*arg);
+                current = *ret;
+            }
+            _ => break,
+        }
+    }
+    (args, current)
 }
 
 fn infer_nil(ctx: &mut HMInferenceContext, fql: Fql<hir::Pattern>) -> MonoType {
-    // Nil pattern represents an empty list
-    // In a full implementation, this would be `List[a]` where `a` is fresh
-    // For now, just use a fresh type variable
     let ty = MonoType::Unconstrained;
     ctx.assign_type(fql, ty)
 }

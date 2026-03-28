@@ -109,6 +109,13 @@ pub fn resolve_type_definition_by_ref_id(
     }
 }
 
+pub fn resolve_type_definition_by_fql(
+    db: &dyn hir::HirDefDatabase,
+    type_def_fql: &Fql<hir::TypeDefinition>,
+) -> Option<TypeDefinition> {
+    resolve_type_definition_by_id(db, type_def_fql.module_id, type_def_fql.local_id)
+}
+
 #[salsa::tracked]
 pub fn resolve_type_definition_by_id(
     db: &dyn hir::HirDefDatabase,

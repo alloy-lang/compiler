@@ -5,8 +5,8 @@ end
 
 let test = Either::Left(42)
 
-match test when
-  \ Either::Left(x)  -> x
+let result = match test when
+  \ Either::Left("hi") -> 0
   \ Either::Right(x) -> x
 ===
 DefinitionInferenceResult {
@@ -48,16 +48,16 @@ DefinitionInferenceResult {
                 BuiltIn(
                     Int,
                 ),
-                BuiltIn(
-                    Int,
+                Generic(
+                    0,
                 ),
             ],
         },
         Idx::<Expression>(3): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(4): BuiltIn(
-            Int,
+        Idx::<Expression>(4): Generic(
+            1,
         ),
         Idx::<Expression>(5): BuiltIn(
             Int,
@@ -65,7 +65,7 @@ DefinitionInferenceResult {
     },
     pattern_types: {
         Idx::<Pattern>(0): BuiltIn(
-            Int,
+            String,
         ),
         Idx::<Pattern>(1): Bounded {
             base: TypeDef(
@@ -79,15 +79,15 @@ DefinitionInferenceResult {
             ),
             args: [
                 BuiltIn(
-                    Int,
+                    String,
                 ),
-                BuiltIn(
-                    Int,
+                Generic(
+                    2,
                 ),
             ],
         },
-        Idx::<Pattern>(2): BuiltIn(
-            Int,
+        Idx::<Pattern>(2): Generic(
+            1,
         ),
         Idx::<Pattern>(3): Bounded {
             base: TypeDef(
@@ -170,6 +170,32 @@ DefinitionInferenceResult {
         },
     },
     warnings: [],
-    errors: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnificationError(
+                TypeMismatch(
+                    Concrete(
+                        Int,
+                    ),
+                    Concrete(
+                        String,
+                    ),
+                ),
+            ),
+            range: 115..133,
+        },
+    ],
 }
 []
+[E33001] Error: Type mismatch: expected `Int`, found `String`
+   ╭─[ ./test/main.alloy:9:5 ]
+   │
+ 9 │   \ Either::Left("hi") -> 0
+   │     ─────────┬────────  
+   │              ╰────────── expected `Int`, found `String`
+   │ 
+   │ Help: These types must be compatible
+───╯
+
+
+

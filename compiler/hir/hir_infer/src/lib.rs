@@ -488,6 +488,23 @@ mod hir_infer_small_tests {
     }
 
     #[test]
+    fn match_data_destructure_constrains_field_type() {
+        let mut db = TestHirInferDatabase::default();
+        check_named(
+            &mut db,
+            r"
+            typedef Identity[t] = Identity t
+
+            let boxed = Identity(42)
+
+            let result = match boxed when
+              \ Identity(x) -> x
+            ",
+            &[("result", 0, InferredType::BuiltIn(hir::BuiltInType::Int))],
+        );
+    }
+
+    #[test]
     fn infer_chained_binary_op() {
         let mut db = TestHirInferDatabase::default();
         let stdlib_order = ModuleId::new(&db, "std::order");
