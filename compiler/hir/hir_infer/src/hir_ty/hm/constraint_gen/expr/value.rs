@@ -1,6 +1,6 @@
 use alloy_hir_def as hir;
 use alloy_hir_resolved as res;
-use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType};
+use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType, AnnotatedTypeVar};
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
 
@@ -102,12 +102,14 @@ impl ConversionContext {
                 base: Box::new(self.convert(db, base)),
                 args: args.iter().map(|a| self.convert(db, a)).collect(),
             },
-            AnnotatedType::TypeVar { fql, .. } => {
+            AnnotatedType::TypeVar(AnnotatedTypeVar { fql, .. }) => {
                 let id = self.type_var_id(fql);
                 InferredType::Generic(id)
             }
             AnnotatedType::ConstrainedTypeVar {
-                fql, constraints, ..
+                base: AnnotatedTypeVar { fql, .. },
+                constraints,
+                ..
             } => {
                 let id = self.type_var_id(fql);
                 InferredType::ConstrainedGeneric {

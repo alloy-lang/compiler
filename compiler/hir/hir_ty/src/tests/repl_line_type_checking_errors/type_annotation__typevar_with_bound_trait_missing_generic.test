@@ -71,13 +71,16 @@ HirTypedModule {
             kind: ConflictingTypeAnnotation {
                 annotated_type: Lambda {
                     arg: ConstrainedTypeVar {
-                        fql: Fql {
-                            module_id: ModuleId {
-                                path: "main",
+                        base: AnnotatedTypeVar {
+                            fql: Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<TypeVariable>(0),
                             },
-                            local_id: Idx::<TypeVariable>(0),
+                            name: "t1",
+                            type_arity: 1,
                         },
-                        name: "t1",
                         constraints: NonEmpty(
                             [
                                 (
@@ -93,15 +96,18 @@ HirTypedModule {
                         ),
                     },
                     ret: Lambda {
-                        arg: TypeVar {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "main",
+                        arg: TypeVar(
+                            AnnotatedTypeVar {
+                                fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "main",
+                                    },
+                                    local_id: Idx::<TypeVariable>(1),
                                 },
-                                local_id: Idx::<TypeVariable>(1),
+                                name: "t2",
+                                type_arity: 0,
                             },
-                            name: "t2",
-                        },
+                        ),
                         ret: TypeDef {
                             fql: Fql {
                                 module_id: ModuleId {

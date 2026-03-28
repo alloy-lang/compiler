@@ -8,6 +8,13 @@ use non_empty_vec::NonEmpty;
 use std::convert::TryFrom;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AnnotatedTypeVar {
+    pub fql: Fql<hir::TypeVariable>,
+    pub name: hir::Name,
+    pub type_arity: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AnnotatedType {
     Unit,
     BuiltIn(hir::BuiltInType),
@@ -32,14 +39,10 @@ pub enum AnnotatedType {
         args: Vec<AnnotatedType>,
     },
     /// Unconstrained type variable (from typevar declaration)
-    TypeVar {
-        fql: Fql<hir::TypeVariable>,
-        name: hir::Name,
-    },
+    TypeVar(AnnotatedTypeVar),
     /// Constrained type variable (typevar with trait bounds)
     ConstrainedTypeVar {
-        fql: Fql<hir::TypeVariable>,
-        name: hir::Name,
+        base: AnnotatedTypeVar,
         constraints: NonEmpty<(Fql<hir::Trait>, hir::Name)>,
     },
     /// Self type in a trait context
@@ -65,7 +68,7 @@ impl AnnotatedType {
     #[must_use]
     pub fn is_polymorphic(&self) -> bool {
         match self {
-            AnnotatedType::TypeVar { .. }
+            AnnotatedType::TypeVar(_)
             | AnnotatedType::ConstrainedTypeVar { .. }
             | AnnotatedType::SelfType { .. } => true,
             AnnotatedType::Lambda { arg, ret } => arg.is_polymorphic() || ret.is_polymorphic(),
@@ -119,9 +122,11 @@ impl std::fmt::Display for AnnotatedType {
                 args.iter().join(", ").fmt(f)?;
                 write!(f, "]")
             }
-            AnnotatedType::TypeVar { name, .. } => write!(f, "{name}"),
+            AnnotatedType::TypeVar(AnnotatedTypeVar { name, .. }) => write!(f, "{name}"),
             AnnotatedType::ConstrainedTypeVar {
-                name, constraints, ..
+                base: AnnotatedTypeVar { name, .. },
+                constraints,
+                ..
             } => {
                 write!(f, "{name} : ")?;
                 constraints
@@ -349,27 +354,50 @@ pub fn resolve_type_variable_to_annotated(
     let hir::TypeVariable { name, kind } = hir_module.get_type_variable(type_var_idx);
 
     let fql = Fql::new(module_id, type_var_idx);
+    let type_var = AnnotatedTypeVar {
+        fql,
+        name: name.clone(),
+        type_arity: 0,
+    };
+
     match kind {
-        hir::TypeVariableKind::Unbound => AnnotatedType::TypeVar {
-            fql,
-            name: name.clone(),
-        },
+        hir::TypeVariableKind::Unbound => AnnotatedType::TypeVar(type_var),
         hir::TypeVariableKind::Constrained(constraints) => {
             let trait_constraints: Vec<_> = constraints
                 .iter()
                 .filter_map(|constraint| trait_constraints(db, module_id, constraint))
                 .collect();
 
+            let type_arity = {
+                if let Some(arity) = constraints.iter().find_map(kind_constraints) {
+                    arity
+                } else {
+                    trait_constraints
+                        .iter()
+                        .filter_map(|(trait_fql, _)| {
+                            let (trait_module, _) = hir::lower_file(db, trait_fql.module_id);
+                            let trait_def = trait_module.get_trait(trait_fql.local_id);
+                            trait_def
+                                .self_constraints()
+                                .iter()
+                                .find_map(kind_constraints)
+                        })
+                        .next()
+                        .unwrap_or(0)
+                }
+            };
+
+            let type_var = AnnotatedTypeVar {
+                type_arity,
+                ..type_var
+            };
+
             NonEmpty::try_from(trait_constraints)
                 .map(|constraints| AnnotatedType::ConstrainedTypeVar {
-                    fql: fql.clone(),
-                    name: name.clone(),
+                    base: type_var.clone(),
                     constraints,
                 })
-                .unwrap_or_else(|_| AnnotatedType::TypeVar {
-                    fql,
-                    name: name.clone(),
-                })
+                .unwrap_or_else(|_| AnnotatedType::TypeVar(type_var))
         }
     }
 }
@@ -433,29 +461,28 @@ mod tests {
 
         let actual_type = resolve_annotated_type(&db, module_id, idx!(13));
 
+        let type_var_t1 = AnnotatedType::TypeVar(AnnotatedTypeVar {
+            fql: Fql::new(module_id, idx!(0)),
+            name: hir::Name::from("t1"),
+            type_arity: 0,
+        });
+        let type_var_t2 = AnnotatedType::TypeVar(AnnotatedTypeVar {
+            fql: Fql::new(module_id, idx!(1)),
+            name: hir::Name::from("t2"),
+            type_arity: 0,
+        });
+
         db.attach(|_| {
             assert_eq!(
                 AnnotatedType::Lambda {
                     arg: Box::new(AnnotatedType::Lambda {
-                        arg: Box::new(AnnotatedType::TypeVar {
-                            fql: Fql::new(module_id, idx!(1)),
-                            name: hir::Name::from("t2"),
-                        }),
-                        ret: Box::new(AnnotatedType::TypeVar {
-                            fql: Fql::new(module_id, idx!(0)),
-                            name: hir::Name::from("t1"),
-                        }),
+                        arg: Box::new(type_var_t2.clone()),
+                        ret: Box::new(type_var_t1.clone()),
                     }),
                     ret: Box::new(AnnotatedType::Lambda {
-                        arg: Box::new(AnnotatedType::TypeVar {
-                            fql: Fql::new(module_id, idx!(1)),
-                            name: hir::Name::from("t2"),
-                        }),
+                        arg: Box::new(type_var_t2.clone()),
                         ret: Box::new(AnnotatedType::Lambda {
-                            arg: Box::new(AnnotatedType::TypeVar {
-                                fql: Fql::new(module_id, idx!(1)),
-                                name: hir::Name::from("t2"),
-                            }),
+                            arg: Box::new(type_var_t2.clone()),
                             ret: Box::new(AnnotatedType::Bounded {
                                 base: Box::new(AnnotatedType::TypeDef {
                                     fql: Fql::new(test_data_module_id, idx!(0)),
@@ -470,14 +497,8 @@ mod tests {
                                 }),
                                 args: vec![AnnotatedType::Tuple(
                                     NonEmpty::try_from(vec![
-                                        AnnotatedType::TypeVar {
-                                            fql: Fql::new(module_id, idx!(0)),
-                                            name: hir::Name::from("t1"),
-                                        },
-                                        AnnotatedType::TypeVar {
-                                            fql: Fql::new(module_id, idx!(0)),
-                                            name: hir::Name::from("t1"),
-                                        },
+                                        type_var_t1.clone(),
+                                        type_var_t1.clone(),
                                     ])
                                     .unwrap()
                                 )],
@@ -517,18 +538,23 @@ mod tests {
 
         let actual_type = resolve_annotated_type(&db, module_id, idx!(6));
 
+        let type_var_t1 = AnnotatedType::TypeVar(AnnotatedTypeVar {
+            fql: Fql::new(module_id, idx!(0)),
+            name: hir::Name::from("t1"),
+            type_arity: 0,
+        });
+        let type_var_t2 = AnnotatedType::TypeVar(AnnotatedTypeVar {
+            fql: Fql::new(module_id, idx!(1)),
+            name: hir::Name::from("t2"),
+            type_arity: 0,
+        });
+
         db.attach(|_| {
             assert_eq!(
                 AnnotatedType::Lambda {
-                    arg: Box::new(AnnotatedType::TypeVar {
-                        fql: Fql::new(module_id, idx!(0)),
-                        name: hir::Name::from("t1"),
-                    }),
+                    arg: Box::new(type_var_t1),
                     ret: Box::new(AnnotatedType::Lambda {
-                        arg: Box::new(AnnotatedType::TypeVar {
-                            fql: Fql::new(module_id, idx!(1)),
-                            name: hir::Name::from("t2"),
-                        }),
+                        arg: Box::new(type_var_t2),
                         ret: Box::new(AnnotatedType::Bounded {
                             base: Box::new(AnnotatedType::TypeDef {
                                 fql: Fql::new(test_data_module_id, idx!(0)),

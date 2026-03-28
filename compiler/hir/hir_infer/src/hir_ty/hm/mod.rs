@@ -9,7 +9,9 @@
 use super::Fql;
 use alloy_hir_def as hir;
 use alloy_hir_def::{Name, TypeDefinition};
-use alloy_hir_resolved::{AnnotatedType, EPFql, EPTdFql, HirResolutionError, TypeVarReference};
+use alloy_hir_resolved::{
+    AnnotatedType, AnnotatedTypeVar, EPFql, EPTdFql, HirResolutionError, TypeVarReference,
+};
 use itertools::Itertools;
 use rustc_hash::{FxHashMap, FxHashSet};
 
@@ -400,11 +402,14 @@ pub(self) fn annotated_to_mono(
                 args: args_mono?,
             })
         }
-        AnnotatedType::TypeVar { fql, name } => {
+        AnnotatedType::TypeVar(AnnotatedTypeVar { name, fql, .. }) => {
             let var_id = ctx.get_or_create_annotation_type_var(fql.clone(), name.clone());
             Some(MonoType::Var(var_id))
         }
-        AnnotatedType::ConstrainedTypeVar { fql, name, .. } => {
+        AnnotatedType::ConstrainedTypeVar {
+            base: AnnotatedTypeVar { name, fql, .. },
+            ..
+        } => {
             // TODO: Track the constraints and enforce them during solving
             let var_id = ctx.get_or_create_annotation_type_var(fql.clone(), name.clone());
             Some(MonoType::Var(var_id))

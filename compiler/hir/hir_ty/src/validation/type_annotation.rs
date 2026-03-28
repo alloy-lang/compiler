@@ -9,7 +9,7 @@ use alloy_hir_def as hir;
 use alloy_hir_def::TypeIdx;
 use alloy_hir_infer::InferredType;
 use alloy_hir_resolved as res;
-use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType, Fql};
+use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType, AnnotatedTypeVar, Fql};
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use text_size::TextRange;
