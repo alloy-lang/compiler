@@ -48,7 +48,10 @@ DefinitionInferenceResult {
     },
     pattern_types: {},
     variant_constructor_types: {
-        Idx::<TypeDefinition>(0): Lambda {
+        (
+            Idx::<TypeDefinition>(0),
+            None,
+        ): Lambda {
             arg_type: Generic(
                 1,
             ),

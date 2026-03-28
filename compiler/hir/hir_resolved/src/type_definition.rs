@@ -12,6 +12,25 @@ pub struct TypeDefinition {
     pub kind: TypeDefinitionKind,
 }
 
+impl TypeDefinition {
+    pub fn get_variant(&self, variant_name: Option<&hir::Name>) -> Option<&TypeDefinitionMember> {
+        match (&self.kind, variant_name) {
+            (TypeDefinitionKind::Single(member), Some(variant_name)) => {
+                if &member.name == variant_name {
+                    Some(member)
+                } else {
+                    None
+                }
+            }
+            (TypeDefinitionKind::Single(member), None) => Some(member),
+            (TypeDefinitionKind::Union(members), Some(variant_name)) => {
+                members.iter().find(|m| &m.name == variant_name)
+            }
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum TypeDefinitionKind {
     Single(TypeDefinitionMember),

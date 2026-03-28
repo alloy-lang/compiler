@@ -110,7 +110,12 @@ DefinitionInferenceResult {
         },
     },
     variant_constructor_types: {
-        Idx::<TypeDefinition>(0): Lambda {
+        (
+            Idx::<TypeDefinition>(0),
+            Some(
+                "Left",
+            ),
+        ): Lambda {
             arg_type: Generic(
                 1,
             ),

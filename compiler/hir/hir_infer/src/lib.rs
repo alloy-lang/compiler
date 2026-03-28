@@ -21,7 +21,8 @@ pub struct DefinitionInferenceResult {
     pub definition_type: InferredType,
     pub expression_types: FxHashMap<hir::ExpressionIdx, InferredType>,
     pub pattern_types: FxHashMap<hir::PatternIdx, InferredType>,
-    pub variant_constructor_types: FxHashMap<hir::TypeDefinitionIdx, InferredType>,
+    pub variant_constructor_types:
+        FxHashMap<(hir::TypeDefinitionIdx, Option<hir::Name>), InferredType>,
     pub warnings: Vec<TypeInferenceWarning>,
     pub errors: Vec<TypeInferenceError>,
 }
@@ -71,8 +72,13 @@ impl DefinitionInferenceResult {
             EPTdFql::Pattern(p) => {
                 self.pattern_types.insert(p.local_id, ty);
             }
-            EPTdFql::TypeDefinition(td) | EPTdFql::TypeDefinitionVariant(td, _) => {
-                self.variant_constructor_types.insert(td.local_id, ty);
+            EPTdFql::TypeDefinition(td) => {
+                self.variant_constructor_types
+                    .insert((td.local_id, None), ty);
+            }
+            EPTdFql::TypeDefinitionVariant(td, name) => {
+                self.variant_constructor_types
+                    .insert((td.local_id, Some(name)), ty);
             }
         }
     }
@@ -458,11 +464,11 @@ mod hir_infer_small_tests {
         db.add_module(
             "other",
             camino::Utf8Path::new("./other.alloy"),
-            r"
-            let a = 1
-            let b = 2
+            r#"
+            let a = "hello"
+            let b = "there"
             let c = 3
-            ",
+            "#,
         );
 
         check_named(

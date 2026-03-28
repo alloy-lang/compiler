@@ -20,7 +20,12 @@ DefinitionInferenceResult {
     },
     pattern_types: {},
     variant_constructor_types: {
-        Idx::<TypeDefinition>(0): TypeDef(
+        (
+            Idx::<TypeDefinition>(0),
+            Some(
+                "ThingA",
+            ),
+        ): TypeDef(
             Fql {
                 module_id: ModuleId {
                     path: "main",
