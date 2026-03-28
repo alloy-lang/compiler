@@ -9,16 +9,25 @@ pub(super) fn infer_data_constructor(
     source_fql: Fql<hir::Expression>,
     type_def_fql: &Fql<hir::TypeDefinition>,
 ) -> MonoType {
-    // Check if we already have this variant constructor type with tracking
-    // This enables polymorphic instantiation tracking for union type variants
-    let variant_fql = EPTdFql::TypeDefinition(type_def_fql.clone());
-    if let Some(tracked_ty) = ctx.maybe_find_type(variant_fql.clone()) {
+    if let Some(tracked_ty) = ctx.maybe_find_type(type_def_fql) {
         return ctx.assign_type(source_fql, tracked_ty);
     }
 
-    // Variant not found - return fresh type variable
-    let ty = ctx.fresh_type_var();
-    ctx.assign_type(source_fql, ty)
+    let Some(type_def) =
+        res::resolve_type_definition_by_id(ctx.db, type_def_fql.module_id, type_def_fql.local_id)
+    else {
+        let ty = ctx.fresh_type_var();
+        return ctx.assign_type(source_fql, ty);
+    };
+
+    let Some(member) = type_def.get_variant(None) else {
+        let ty = ctx.fresh_type_var();
+        return ctx.assign_type(source_fql, ty);
+    };
+
+    let constructor_ty = build_constructor_type(ctx, &type_def_fql, &type_def, member);
+    let tracked_ty = ctx.generalize_to_poly(constructor_ty, type_def_fql);
+    ctx.assign_type(source_fql, tracked_ty)
 }
 
 pub(super) fn infer_variant_constructor(
@@ -27,103 +36,26 @@ pub(super) fn infer_variant_constructor(
     type_def_fql: Fql<hir::TypeDefinition>,
     variant_name: hir::Name,
 ) -> MonoType {
-    // Check if we already have this variant constructor type with tracking
-    // This enables polymorphic instantiation tracking for union type variants
     let variant_fql = EPTdFql::TypeDefinitionVariant(type_def_fql.clone(), variant_name.clone());
     if let Some(tracked_ty) = ctx.maybe_find_type(variant_fql.clone()) {
         return ctx.assign_type(source_fql, tracked_ty);
     }
 
-    // Find the variant member
-    let fdsa = {
-        let type_def = res::resolve_type_definition_by_id(
-            ctx.db,
-            type_def_fql.module_id,
-            type_def_fql.local_id,
-        );
-
-        match type_def {
-            Some(type_def) => match type_def.kind.clone() {
-                TypeDefinitionKind::Single(member) => {
-                    if member.name() == &variant_name {
-                        Some((type_def, member))
-                    } else {
-                        None
-                    }
-                }
-                TypeDefinitionKind::Union(members) => members
-                    .iter()
-                    .find(|m| m.name() == &variant_name)
-                    .map(|member| (type_def, member.clone())),
-            },
-            None => None,
-        }
-    };
-
-    let Some((type_def, member)) = fdsa else {
-        // Variant not found - return fresh type variable
+    let Some(type_def) =
+        res::resolve_type_definition_by_id(ctx.db, type_def_fql.module_id, type_def_fql.local_id)
+    else {
         let ty = ctx.fresh_type_var();
         return ctx.assign_type(source_fql, ty);
     };
 
-    // Build the constructor type using the shared helper
-    let constructor_ty = build_constructor_type(ctx, &type_def_fql, &type_def, &member);
+    let Some(member) = type_def.get_variant(Some(&variant_name)) else {
+        let ty = ctx.fresh_type_var();
+        return ctx.assign_type(source_fql, ty);
+    };
 
+    let constructor_ty = build_constructor_type(ctx, &type_def_fql, &type_def, &member);
     let tracked_ty = ctx.generalize_to_poly(constructor_ty, variant_fql);
     ctx.assign_type(source_fql, tracked_ty)
-}
-
-pub(super) fn infer_type_definition(
-    ctx: &mut HMInferenceContext,
-    td_fql: Fql<hir::TypeDefinition>,
-) -> MonoType {
-    // Check if already inferred - don't use cached polymorphic types
-    // Polymorphic types are stored in poly_env and instantiated with fresh variables
-    if let Some(existing) = ctx.maybe_find_type(&td_fql) {
-        return existing;
-    }
-
-    // Resolve the type definition to get its kind
-    let Some(type_def) =
-        res::resolve_type_definition_by_id(ctx.db, td_fql.module_id, td_fql.local_id)
-    else {
-        let ty = ctx.fresh_type_var();
-        return ctx.assign_type(td_fql, ty);
-    };
-
-    let (hir_module, _) = hir::lower_file(ctx.db, td_fql.module_id);
-
-    let ty = match &type_def.kind {
-        TypeDefinitionKind::Single(member) => {
-            // Single-variant type - treat as a variant constructor
-            // For example: typedef Identity[t] = Id t
-            // When you call Identity(...), it's the same as Id(...)
-            let constructor_ty = build_constructor_type(ctx, &td_fql, &type_def, member);
-
-            ctx.generalize_to_poly(constructor_ty, &td_fql)
-        }
-        TypeDefinitionKind::Union(_members) => {
-            // Multi-variant type - cannot be called as a function directly
-            // You must use the specific variant constructor (e.g., Some, None)
-            // Return the TypeDef, which will cause a unification error if used as a function
-            MonoType::TypeDef {
-                fql: td_fql.clone(),
-                type_args: type_def
-                    .type_args
-                    .iter()
-                    .map(|ty_arg| {
-                        ctx.get_or_create_annotation_type_var(
-                            ty_arg.clone(),
-                            hir_module.get_type_variable(ty_arg.local_id).name.clone(),
-                        )
-                    })
-                    .collect::<Vec<_>>(),
-                type_def_name: type_def.name,
-            }
-        }
-    };
-
-    ctx.assign_type(td_fql, ty)
 }
 
 fn build_constructor_type(
