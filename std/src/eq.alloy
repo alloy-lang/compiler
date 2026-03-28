@@ -11,3 +11,14 @@ trait Eq where
   --#[infix(left, 4)]
   let (!=) = |left, right| -> not(eq(left, right))
 end
+
+trait PartialEq where
+  typevar t1
+
+  typeof eq : self -> t1 -> Bool
+
+  --#[infix(left, 4)]
+  let (==) = eq
+  --#[infix(left, 4)]
+  let (!=) = |left, right| -> not(eq(left, right))
+end
