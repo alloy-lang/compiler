@@ -1,6 +1,7 @@
 use alloy_hir_def as hir;
 use alloy_hir_infer::InferredType;
 use alloy_hir_resolved::Fql;
+use itertools::Itertools;
 use non_empty_vec::NonEmpty;
 use std::hash::Hash;
 use std::ops::Deref;
@@ -128,22 +129,12 @@ impl std::fmt::Display for ResolvedType {
             }
             ResolvedType::Tuple(elements) => {
                 write!(f, "(")?;
-                for (i, elem) in elements.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    write!(f, "{elem}")?;
-                }
+                elements.iter().join(", ").fmt(f)?;
                 write!(f, ")")
             }
             ResolvedType::Bounded { base, args } => {
                 write!(f, "{base}[")?;
-                for (i, arg) in args.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    write!(f, "{arg}")?;
-                }
+                args.iter().join(", ").fmt(f)?;
                 write!(f, "]")
             }
             ResolvedType::Generic(id) => write!(f, "t{id}"),
@@ -151,12 +142,11 @@ impl std::fmt::Display for ResolvedType {
                 write!(f, "t{id}")?;
                 if !constraints.is_empty() {
                     write!(f, " : ")?;
-                    for (i, (_, trait_name)) in constraints.iter().enumerate() {
-                        if i > 0 {
-                            write!(f, " + ")?;
-                        }
-                        write!(f, "{trait_name}")?;
-                    }
+                    constraints
+                        .iter()
+                        .map(|(_, trait_name)| trait_name)
+                        .join(", ")
+                        .fmt(f)?;
                 }
                 Ok(())
             }

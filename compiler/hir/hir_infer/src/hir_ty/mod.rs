@@ -1,5 +1,6 @@
 use alloy_hir_def as hir;
 use alloy_hir_resolved::Fql;
+use itertools::Itertools;
 use non_empty_vec::NonEmpty;
 use std::hash::Hash;
 
@@ -35,7 +36,6 @@ impl InferredType {
     pub fn is_polymorphic(&self) -> bool {
         match self {
             InferredType::Generic(_) | InferredType::ConstrainedGeneric { .. } => true,
-            // InferredType::Annotated(annot) => annot.is_polymorphic(),
             InferredType::Lambda {
                 arg_type,
                 return_type,
@@ -44,8 +44,6 @@ impl InferredType {
             InferredType::Bounded { base, args } => {
                 base.is_polymorphic() || args.iter().any(|a| a.is_polymorphic())
             }
-            // InferredType::ResolutionError(_)
-            // |
             InferredType::Unconstrained
             | InferredType::Missing
             | InferredType::Unit
@@ -58,8 +56,6 @@ impl InferredType {
 impl std::fmt::Display for InferredType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            // InferredType::ResolutionError(_) => write!(f, "<error>"),
-            // InferredType::Annotated(annot) => write!(f, "{annot}"),
             InferredType::Unconstrained => write!(f, "_"),
             InferredType::Missing => write!(f, "<missing>"),
             InferredType::Unit => write!(f, "()"),
@@ -77,36 +73,22 @@ impl std::fmt::Display for InferredType {
             }
             InferredType::Tuple(elements) => {
                 write!(f, "(")?;
-                for (i, elem) in elements.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    write!(f, "{elem}")?;
-                }
+                elements.iter().join(", ").fmt(f)?;
                 write!(f, ")")
             }
             InferredType::Bounded { base, args } => {
                 write!(f, "{base}[")?;
-                for (i, arg) in args.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    write!(f, "{arg}")?;
-                }
+                args.iter().join(", ").fmt(f)?;
                 write!(f, "]")
             }
             InferredType::Generic(id) => write!(f, "t{id}"),
             InferredType::ConstrainedGeneric { id, constraints } => {
                 write!(f, "t{id}")?;
-                if !constraints.is_empty() {
-                    write!(f, " : ")?;
-                    for (i, (_, trait_name)) in constraints.iter().enumerate() {
-                        if i > 0 {
-                            write!(f, " + ")?;
-                        }
-                        write!(f, "{trait_name}")?;
-                    }
-                }
+                constraints
+                    .iter()
+                    .map(|(_, trait_name)| trait_name)
+                    .join(" + ")
+                    .fmt(f)?;
                 Ok(())
             }
         }

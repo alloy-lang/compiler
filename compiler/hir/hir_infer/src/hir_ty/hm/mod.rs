@@ -10,6 +10,7 @@ use super::Fql;
 use alloy_hir_def as hir;
 use alloy_hir_def::{Name, TypeDefinition};
 use alloy_hir_resolved::{AnnotatedType, EPFql, EPTdFql, HirResolutionError, TypeVarReference};
+use itertools::Itertools;
 use rustc_hash::{FxHashMap, FxHashSet};
 
 mod constraint_gen;
@@ -130,24 +131,14 @@ impl std::fmt::Display for MonoType {
             }
             MonoType::Tuple(elements) => {
                 write!(f, "(")?;
-                for (i, elem) in elements.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    write!(f, "{elem}")?;
-                }
+                elements.iter().join(", ").fmt(f)?;
                 write!(f, ")")
             }
             MonoType::App { constructor, args } => {
                 write!(f, "{}", constructor)?;
                 if !args.is_empty() {
                     write!(f, "[")?;
-                    for (i, arg) in args.iter().enumerate() {
-                        if i > 0 {
-                            write!(f, ", ")?;
-                        }
-                        write!(f, "{arg}")?;
-                    }
+                    args.iter().join(", ").fmt(f)?;
                     write!(f, "]")?;
                 }
                 Ok(())
