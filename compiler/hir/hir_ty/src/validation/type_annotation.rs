@@ -4,10 +4,10 @@
 //! type annotations, including trait constraint verification.
 
 use crate::diagnostics::{ConflictingTypeAnnotationReason, TypeCheckingErrorKind};
-use crate::hir_ty::ResolvedType;
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir_def as hir;
 use alloy_hir_def::TypeIdx;
+use alloy_hir_infer::InferredType;
 use alloy_hir_resolved as res;
 use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType, Fql};
 use alloy_workspace::ModuleId;
@@ -41,7 +41,7 @@ fn check_type_annotation(
     current_module_id: ModuleId,
     range: TextRange,
     type_annotation_idx: TypeIdx,
-    resolved_type: ResolvedType,
+    resolved_type: InferredType,
 ) {
     let expected_type = resolve_annotated_type(db, current_module_id, type_annotation_idx);
     let (hir_module, _) = hir::lower_file(db, current_module_id);
@@ -71,17 +71,17 @@ fn check_type_annotation(
 }
 
 /// Check if the `found` type is compatible with the `expected` annotation type.
-/// This compares an AnnotatedType (what the user wrote) against a ResolvedType (what inference produced).
+/// This compares an AnnotatedType (what the user wrote) against a InferredType (what inference produced).
 fn check_type_compatibility(
     db: &dyn HirTyDatabase,
     expected: &AnnotatedType,
-    found: &ResolvedType,
+    found: &InferredType,
 ) -> Result<(), ConflictingTypeAnnotationReason> {
     // TODO: actual ranges for conflicts
     match (expected, found) {
         // Wildcards on either side
-        (AnnotatedType::Unconstrained, _) | (_, ResolvedType::Unconstrained) => Ok(()),
-        (AnnotatedType::Missing, _) | (_, ResolvedType::Missing) => {
+        (AnnotatedType::Unconstrained, _) | (_, InferredType::Unconstrained) => Ok(()),
+        (AnnotatedType::Missing, _) | (_, InferredType::Missing) => {
             Err(ConflictingTypeAnnotationReason::DirectConflict {
                 expected_type: expected.clone(),
                 expected_type_range: TextRange::default(),
@@ -89,20 +89,19 @@ fn check_type_compatibility(
                 actual_type_range: TextRange::default(),
             })
         }
-        (_, ResolvedType::UnknownReference(_)) => Ok(()),
 
         // Unit
-        (AnnotatedType::Unit, ResolvedType::Unit) => Ok(()),
+        (AnnotatedType::Unit, InferredType::Unit) => Ok(()),
 
         // Built-in types
-        (AnnotatedType::BuiltIn(a), ResolvedType::BuiltIn(b)) if a == b => Ok(()),
+        (AnnotatedType::BuiltIn(a), InferredType::BuiltIn(b)) if a == b => Ok(()),
 
         // Nominal type definitions
-        (AnnotatedType::TypeDef { fql: a, .. }, ResolvedType::TypeDef(b, _)) if a == b => Ok(()),
+        (AnnotatedType::TypeDef { fql: a, .. }, InferredType::TypeDef(b, _)) if a == b => Ok(()),
 
         // Type variables in annotation match any generic in inference result
-        (AnnotatedType::TypeVar { .. }, ResolvedType::Generic(_)) => Ok(()),
-        (AnnotatedType::TypeVar { .. }, ResolvedType::ConstrainedGeneric { .. }) => Ok(()),
+        (AnnotatedType::TypeVar { .. }, InferredType::Generic(_)) => Ok(()),
+        (AnnotatedType::TypeVar { .. }, InferredType::ConstrainedGeneric { .. }) => Ok(()),
 
         // Constrained type variables - check trait constraints
         (AnnotatedType::ConstrainedTypeVar { constraints, .. }, found_ty) => {
@@ -110,7 +109,7 @@ fn check_type_compatibility(
         }
 
         // Self type in annotation matches generics
-        (AnnotatedType::SelfType { .. }, ResolvedType::Generic(_)) => Ok(()),
+        (AnnotatedType::SelfType { .. }, InferredType::Generic(_)) => Ok(()),
         (
             AnnotatedType::SelfType {
                 trait_constraints: constraints,
@@ -127,7 +126,7 @@ fn check_type_compatibility(
         // Lambda types
         (
             AnnotatedType::Lambda { arg, ret },
-            ResolvedType::Lambda {
+            InferredType::Lambda {
                 arg_type,
                 return_type,
             },
@@ -138,7 +137,7 @@ fn check_type_compatibility(
         }
 
         // Tuple types
-        (AnnotatedType::Tuple(exp_elems), ResolvedType::Tuple(found_elems)) => {
+        (AnnotatedType::Tuple(exp_elems), InferredType::Tuple(found_elems)) => {
             if exp_elems.len() != found_elems.len() {
                 return Err(ConflictingTypeAnnotationReason::DirectConflict {
                     expected_type: expected.clone(),
@@ -159,7 +158,7 @@ fn check_type_compatibility(
                 base: exp_base,
                 args: exp_args,
             },
-            ResolvedType::Bounded {
+            InferredType::Bounded {
                 base: found_base,
                 args: found_args,
             },
@@ -192,11 +191,11 @@ fn check_type_compatibility(
 /// Check if a type satisfies the given trait constraints
 fn check_trait_constraints(
     db: &dyn HirTyDatabase,
-    ty: &ResolvedType,
+    ty: &InferredType,
     constraints: &NonEmpty<(Fql<hir::Trait>, hir::Name)>,
 ) -> Result<(), ConflictingTypeAnnotationReason> {
     match ty {
-        ResolvedType::TypeDef(type_fql, _) => {
+        InferredType::TypeDef(type_fql, _) => {
             for (required_trait, _) in constraints {
                 if !has_behavior_for_trait(db, type_fql, required_trait) {
                     return Err(
@@ -209,7 +208,7 @@ fn check_trait_constraints(
             }
             Ok(())
         }
-        ResolvedType::Generic(_) | ResolvedType::ConstrainedGeneric { .. } => Ok(()),
+        InferredType::Generic(_) | InferredType::ConstrainedGeneric { .. } => Ok(()),
         _ => Ok(()),
     }
 }

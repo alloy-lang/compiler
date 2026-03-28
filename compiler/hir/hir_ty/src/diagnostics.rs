@@ -1,6 +1,6 @@
-use crate::hir_ty::ResolvedType;
 use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, DiagnosticLabel, Severity};
 use alloy_hir_def as hir;
+use alloy_hir_infer::InferredType;
 use alloy_hir_resolved::{AnnotatedType, HirResolutionError};
 use text_size::TextRange;
 
@@ -128,7 +128,7 @@ impl Diagnostic for TypeCheckingError {
 //
 // Potential solutions:
 // - Short-term: Deduplicate errors based on range after collection
-// - Medium-term: Use ResolvedType::Error sentinel to prevent cascading errors
+// - Medium-term: Use InferredType::Error sentinel to prevent cascading errors
 // - Long-term: Implement proper error recovery strategy that tracks which expressions already have errors
 //
 // For now, having both errors is useful for debugging the type checker itself, but this should be
@@ -138,7 +138,7 @@ pub enum TypeCheckingErrorKind {
     ConflictingTypeAnnotation {
         annotated_type: AnnotatedType,
         annotation_range: TextRange,
-        value_type: ResolvedType,
+        value_type: InferredType,
         value_range: TextRange,
         reason: ConflictingTypeAnnotationReason,
     },
@@ -156,7 +156,7 @@ pub enum ConflictingTypeAnnotationReason {
     DirectConflict {
         expected_type: AnnotatedType,
         expected_type_range: TextRange,
-        actual_type: ResolvedType,
+        actual_type: InferredType,
         actual_type_range: TextRange,
     },
     MissingBehaviorImplementation {

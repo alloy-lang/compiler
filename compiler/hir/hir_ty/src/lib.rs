@@ -1,6 +1,6 @@
 use alloy_hir_def as hir;
 use alloy_hir_infer as hir_infer;
-use alloy_hir_infer::DefinitionInferenceResult;
+use alloy_hir_infer::{DefinitionInferenceResult, InferredType};
 use alloy_hir_resolved::{EPTdFql, Fql};
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
@@ -9,13 +9,11 @@ use std::fmt;
 use text_size::TextRange;
 
 mod diagnostics;
-mod hir_ty;
 mod validation;
 
 use diagnostics::{
     TypeCheckingError, TypeCheckingErrorKind, TypeCheckingWarning, TypeCheckingWarningKind,
 };
-use hir_ty::ResolvedType;
 
 #[cfg(test)]
 mod tests;
@@ -26,8 +24,8 @@ pub trait HirTyDatabase: hir::HirDefDatabase + hir_infer::HirInferDatabase {}
 #[derive(Clone, PartialEq)]
 pub struct HirTypedModule {
     module_id: ModuleId,
-    expression_types: FxHashMap<hir::ExpressionIdx, ResolvedType>,
-    pattern_types: FxHashMap<hir::PatternIdx, ResolvedType>,
+    expression_types: FxHashMap<hir::ExpressionIdx, InferredType>,
+    pattern_types: FxHashMap<hir::PatternIdx, InferredType>,
     warnings: Vec<TypeCheckingWarning>,
     errors: Vec<TypeCheckingError>,
 }
@@ -63,7 +61,7 @@ impl HirTypedModule {
         }
     }
 
-    pub(crate) fn insert_type(&mut self, fql: EPTdFql, resolved_type: ResolvedType) {
+    pub(crate) fn insert_type(&mut self, fql: EPTdFql, resolved_type: InferredType) {
         // Only include types for the current module to avoid cross-module collisions
         // (different modules can have the same Idx<Expression> values)
         if fql.module_id() != self.module_id {
@@ -133,10 +131,10 @@ fn merge_into_module(
     module_id: ModuleId,
 ) {
     for (&eid, ty) in &def_result.expression_types {
-        module.insert_type(EPTdFql::Expression(Fql::new(module_id, eid)), ty.into());
+        module.insert_type(EPTdFql::Expression(Fql::new(module_id, eid)), ty.clone());
     }
     for (&pid, ty) in &def_result.pattern_types {
-        module.insert_type(EPTdFql::Pattern(Fql::new(module_id, pid)), ty.into());
+        module.insert_type(EPTdFql::Pattern(Fql::new(module_id, pid)), ty.clone());
     }
     module.extend_errors(
         &def_result
@@ -152,9 +150,9 @@ mod hir_ty_small_tests {
     use crate::diagnostics::{
         ConflictingTypeAnnotationReason, TypeCheckingError, TypeCheckingErrorKind,
     };
-    use crate::hir_ty::ResolvedType;
     use crate::tests::TestHirTyDatabase;
     use alloy_hir_def as hir;
+    use alloy_hir_infer::InferredType;
     use alloy_hir_resolved::{AnnotatedType, Fql};
     use alloy_test_harness::idx;
     use alloy_workspace::{ModuleId, WorkspaceDatabase};
@@ -162,7 +160,7 @@ mod hir_ty_small_tests {
     use salsa::Database;
     use text_size::{TextRange, TextSize};
 
-    fn check(input: &str, expected: &[(u32, ResolvedType)]) {
+    fn check(input: &str, expected: &[(u32, InferredType)]) {
         let mut db = TestHirTyDatabase::default();
         let module_id = db.add_module(
             "test_data",
@@ -188,7 +186,7 @@ mod hir_ty_small_tests {
     fn check_named(
         db: &mut TestHirTyDatabase,
         input: &str,
-        expected: &[(&str, u32, ResolvedType)],
+        expected: &[(&str, u32, InferredType)],
     ) {
         let module_id = db.add_test_module("test_data", input);
 
@@ -247,27 +245,27 @@ mod hir_ty_small_tests {
 
     #[test]
     fn infer_literals() {
-        check("1", &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Int))]);
+        check("1", &[(0, InferredType::BuiltIn(hir::BuiltInType::Int))]);
         check(
             "1.1",
-            &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Fraction))],
+            &[(0, InferredType::BuiltIn(hir::BuiltInType::Fraction))],
         );
         check(
             r#""hello""#,
-            &[(0, ResolvedType::BuiltIn(hir::BuiltInType::String))],
+            &[(0, InferredType::BuiltIn(hir::BuiltInType::String))],
         );
-        check("'c'", &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Char))]);
+        check("'c'", &[(0, InferredType::BuiltIn(hir::BuiltInType::Char))]);
         check(
             "True",
-            &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Bool))],
+            &[(0, InferredType::BuiltIn(hir::BuiltInType::Bool))],
         );
         check(
             "False",
-            &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Bool))],
+            &[(0, InferredType::BuiltIn(hir::BuiltInType::Bool))],
         );
         check(
             "let test = True",
-            &[(0, ResolvedType::BuiltIn(hir::BuiltInType::Bool))],
+            &[(0, InferredType::BuiltIn(hir::BuiltInType::Bool))],
         );
     }
 
@@ -280,7 +278,7 @@ mod hir_ty_small_tests {
                 let x = 1
                 let y = x
             ",
-            &[("y", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int))],
+            &[("y", 0, InferredType::BuiltIn(hir::BuiltInType::Int))],
         );
     }
 
@@ -296,14 +294,14 @@ mod hir_ty_small_tests {
                 let z = (x, y)
             "#,
                 &[
-                    ("x", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int)),
-                    ("y", 0, ResolvedType::BuiltIn(hir::BuiltInType::String)),
+                    ("x", 0, InferredType::BuiltIn(hir::BuiltInType::Int)),
+                    ("y", 0, InferredType::BuiltIn(hir::BuiltInType::String)),
                     (
                         "z",
                         0,
-                        ResolvedType::Tuple(NonEmpty::new_unchecked(vec![
-                            ResolvedType::BuiltIn(hir::BuiltInType::Int),
-                            ResolvedType::BuiltIn(hir::BuiltInType::String),
+                        InferredType::Tuple(NonEmpty::new_unchecked(vec![
+                            InferredType::BuiltIn(hir::BuiltInType::Int),
+                            InferredType::BuiltIn(hir::BuiltInType::String),
                         ])),
                     ),
                 ],
@@ -320,11 +318,11 @@ mod hir_ty_small_tests {
             &[(
                 "x",
                 0,
-                ResolvedType::Lambda {
-                    arg_type: Box::new(ResolvedType::Generic(0)),
-                    return_type: Box::new(ResolvedType::Lambda {
-                        arg_type: Box::new(ResolvedType::Generic(0)),
-                        return_type: Box::new(ResolvedType::Generic(0)),
+                InferredType::Lambda {
+                    arg_type: Box::new(InferredType::Generic(0)),
+                    return_type: Box::new(InferredType::Lambda {
+                        arg_type: Box::new(InferredType::Generic(0)),
+                        return_type: Box::new(InferredType::Generic(0)),
                     }),
                 },
             )],
@@ -344,15 +342,15 @@ mod hir_ty_small_tests {
                 (
                     "x",
                     0,
-                    ResolvedType::Lambda {
-                        arg_type: Box::new(ResolvedType::Generic(0)),
-                        return_type: Box::new(ResolvedType::Lambda {
-                            arg_type: Box::new(ResolvedType::Generic(0)),
-                            return_type: Box::new(ResolvedType::Generic(0)),
+                    InferredType::Lambda {
+                        arg_type: Box::new(InferredType::Generic(0)),
+                        return_type: Box::new(InferredType::Lambda {
+                            arg_type: Box::new(InferredType::Generic(0)),
+                            return_type: Box::new(InferredType::Generic(0)),
                         }),
                     },
                 ),
-                ("y", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int)),
+                ("y", 0, InferredType::BuiltIn(hir::BuiltInType::Int)),
             ],
         );
     }
@@ -367,10 +365,10 @@ mod hir_ty_small_tests {
     //         &[TypeCheckingError::new(
     //             TypeCheckingErrorKind::ConflictingTypeAnnotation {
     //                 annotated_type: AnnotatedType::BuiltIn(hir::BuiltInType::String),
-    //                 inferred_type: ResolvedType::BuiltIn(hir::BuiltInType::Int),
+    //                 inferred_type: InferredType::BuiltIn(hir::BuiltInType::Int),
     //                 reason: ConflictingTypeAnnotationReason::DirectConflict {
     //                     annotated_type: AnnotatedType::BuiltIn(hir::BuiltInType::String),
-    //                     inferred_type: ResolvedType::BuiltIn(hir::BuiltInType::Int),
+    //                     inferred_type: InferredType::BuiltIn(hir::BuiltInType::Int),
     //                 },
     //             },
     //             TextRange::new(TextSize::from(51), TextSize::from(73)),
@@ -390,9 +388,9 @@ mod hir_ty_small_tests {
             &[(
                 "x",
                 0,
-                ResolvedType::Lambda {
-                    arg_type: Box::new(ResolvedType::BuiltIn(hir::BuiltInType::String)),
-                    return_type: Box::new(ResolvedType::BuiltIn(hir::BuiltInType::String)),
+                InferredType::Lambda {
+                    arg_type: Box::new(InferredType::BuiltIn(hir::BuiltInType::String)),
+                    return_type: Box::new(InferredType::BuiltIn(hir::BuiltInType::String)),
                 },
             )],
         );
@@ -415,20 +413,20 @@ mod hir_ty_small_tests {
                 (
                     "id",
                     0,
-                    ResolvedType::Lambda {
-                        arg_type: Box::new(ResolvedType::Generic(0)),
-                        return_type: Box::new(ResolvedType::Generic(0)),
+                    InferredType::Lambda {
+                        arg_type: Box::new(InferredType::Generic(0)),
+                        return_type: Box::new(InferredType::Generic(0)),
                     },
                 ),
                 (
                     "string_example",
                     0,
-                    ResolvedType::BuiltIn(hir::BuiltInType::String),
+                    InferredType::BuiltIn(hir::BuiltInType::String),
                 ),
                 (
                     "int_example",
                     0,
-                    ResolvedType::BuiltIn(hir::BuiltInType::Int),
+                    InferredType::BuiltIn(hir::BuiltInType::Int),
                 ),
             ],
         );
@@ -450,7 +448,7 @@ mod hir_ty_small_tests {
             import other::value
             let x = value
             ",
-            &[("x", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int))],
+            &[("x", 0, InferredType::BuiltIn(hir::BuiltInType::Int))],
         );
     }
 
@@ -473,9 +471,9 @@ mod hir_ty_small_tests {
             &[(
                 "f",
                 0,
-                ResolvedType::Lambda {
-                    arg_type: Box::new(ResolvedType::Generic(0)),
-                    return_type: Box::new(ResolvedType::BuiltIn(hir::BuiltInType::Int)),
+                InferredType::Lambda {
+                    arg_type: Box::new(InferredType::Generic(0)),
+                    return_type: Box::new(InferredType::BuiltIn(hir::BuiltInType::Int)),
                 },
             )],
         );
@@ -503,16 +501,16 @@ mod hir_ty_small_tests {
             &[(
                 "f",
                 0,
-                ResolvedType::Lambda {
-                    arg_type: Box::new(ResolvedType::Generic(0)),
-                    return_type: Box::new(ResolvedType::Lambda {
-                        arg_type: Box::new(ResolvedType::Generic(1)),
-                        return_type: Box::new(ResolvedType::Bounded {
-                            base: Box::new(ResolvedType::TypeDef(
+                InferredType::Lambda {
+                    arg_type: Box::new(InferredType::Generic(0)),
+                    return_type: Box::new(InferredType::Lambda {
+                        arg_type: Box::new(InferredType::Generic(1)),
+                        return_type: Box::new(InferredType::Bounded {
+                            base: Box::new(InferredType::TypeDef(
                                 Fql::new(other_module_id, idx!(0)),
                                 hir::Name::new("Test"),
                             )),
-                            args: vec![ResolvedType::BuiltIn(hir::BuiltInType::Int)],
+                            args: vec![InferredType::BuiltIn(hir::BuiltInType::Int)],
                         }),
                     }),
                 },
@@ -545,9 +543,9 @@ mod hir_ty_small_tests {
             let z = c
             ",
             &[
-                ("x", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int)),
-                ("y", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int)),
-                ("z", 0, ResolvedType::BuiltIn(hir::BuiltInType::Int)),
+                ("x", 0, InferredType::BuiltIn(hir::BuiltInType::Int)),
+                ("y", 0, InferredType::BuiltIn(hir::BuiltInType::Int)),
+                ("z", 0, InferredType::BuiltIn(hir::BuiltInType::Int)),
             ],
         );
     }
@@ -571,16 +569,16 @@ mod hir_ty_small_tests {
             &[(
                 "comparing",
                 0,
-                ResolvedType::Lambda {
-                    arg_type: Box::new(ResolvedType::Lambda {
-                        arg_type: Box::new(ResolvedType::Generic(0)),
-                        return_type: Box::new(ResolvedType::Generic(1)),
+                InferredType::Lambda {
+                    arg_type: Box::new(InferredType::Lambda {
+                        arg_type: Box::new(InferredType::Generic(0)),
+                        return_type: Box::new(InferredType::Generic(1)),
                     }),
-                    return_type: Box::new(ResolvedType::Lambda {
-                        arg_type: Box::new(ResolvedType::Generic(0)),
-                        return_type: Box::new(ResolvedType::Lambda {
-                            arg_type: Box::new(ResolvedType::Generic(0)),
-                            return_type: Box::new(ResolvedType::TypeDef(
+                    return_type: Box::new(InferredType::Lambda {
+                        arg_type: Box::new(InferredType::Generic(0)),
+                        return_type: Box::new(InferredType::Lambda {
+                            arg_type: Box::new(InferredType::Generic(0)),
+                            return_type: Box::new(InferredType::TypeDef(
                                 Fql::new(stdlib_order, idx!(0)),
                                 hir::Name::new("Ordering"),
                             )),
@@ -609,17 +607,17 @@ mod hir_ty_small_tests {
             &[(
                 "join",
                 0,
-                ResolvedType::Lambda {
-                    arg_type: Box::new(ResolvedType::Bounded {
-                        base: Box::new(ResolvedType::Generic(0)),
-                        args: vec![ResolvedType::Bounded {
-                            base: Box::new(ResolvedType::Generic(0)),
-                            args: vec![ResolvedType::Generic(1)],
+                InferredType::Lambda {
+                    arg_type: Box::new(InferredType::Bounded {
+                        base: Box::new(InferredType::Generic(0)),
+                        args: vec![InferredType::Bounded {
+                            base: Box::new(InferredType::Generic(0)),
+                            args: vec![InferredType::Generic(1)],
                         }],
                     }),
-                    return_type: Box::new(ResolvedType::Bounded {
-                        base: Box::new(ResolvedType::Generic(0)),
-                        args: vec![ResolvedType::Generic(1)],
+                    return_type: Box::new(InferredType::Bounded {
+                        base: Box::new(InferredType::Generic(0)),
+                        args: vec![InferredType::Generic(1)],
                     }),
                 },
             )],

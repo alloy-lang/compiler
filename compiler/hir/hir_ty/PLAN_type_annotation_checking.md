@@ -49,7 +49,7 @@ Then reuse the existing `has_behavior_for_trait()` lookup.
 
 Lambda types should reject all trait constraints for now:
 ```rust
-ResolvedType::Lambda { .. } => {
+InferredType::Lambda { .. } => {
     Err(ConflictingTypeAnnotationReason::TraitNotSatisfied { .. })
 }
 ```
@@ -58,7 +58,7 @@ ResolvedType::Lambda { .. } => {
 
 Recursively check each element against the same constraints:
 ```rust
-ResolvedType::Tuple(elements) => {
+InferredType::Tuple(elements) => {
     for element in elements {
         check_trait_constraints(db, element, constraints)?;
     }

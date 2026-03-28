@@ -4,7 +4,7 @@
 
 Four TODOs related to tracking generic type variables and their constraints through inference, annotation checking, and output.
 
-The codebase has `ConstrainedGeneric` variants in both `InferredType` (hir_infer) and `ResolvedType` (hir_ty), and a `TypeConstraint` struct in the HM inference context — but the constraint tracking infrastructure is not yet functional.
+The codebase has `ConstrainedGeneric` variants in both `InferredType` (hir_infer) and `InferredType` (hir_ty), and a `TypeConstraint` struct in the HM inference context — but the constraint tracking infrastructure is not yet functional.
 
 ---
 
