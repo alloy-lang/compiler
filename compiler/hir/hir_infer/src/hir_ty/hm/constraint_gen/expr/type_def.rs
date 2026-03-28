@@ -1,8 +1,8 @@
-use super::super::super::annotated_to_mono;
+use super::super::build_constructor_type;
 use super::{HMInferenceContext, MonoType};
 use alloy_hir_def as hir;
 use alloy_hir_resolved as res;
-use alloy_hir_resolved::{resolve_annotated_type, EPTdFql, Fql, TypeDefinitionKind};
+use alloy_hir_resolved::{EPTdFql, Fql};
 
 pub(super) fn infer_data_constructor(
     ctx: &mut HMInferenceContext,
@@ -56,60 +56,4 @@ pub(super) fn infer_variant_constructor(
     let constructor_ty = build_constructor_type(ctx, &type_def_fql, &type_def, &member);
     let tracked_ty = ctx.generalize_to_poly(constructor_ty, variant_fql);
     ctx.assign_type(source_fql, tracked_ty)
-}
-
-fn build_constructor_type(
-    ctx: &mut HMInferenceContext,
-    type_def_fql: &Fql<hir::TypeDefinition>,
-    type_def: &res::TypeDefinition,
-    member: &res::TypeDefinitionMember,
-) -> MonoType {
-    let (hir_module, _) = hir::lower_file(ctx.db, type_def_fql.module_id);
-
-    let type_args: Vec<_> = type_def
-        .type_args
-        .iter()
-        .map(|ty_arg| {
-            ctx.get_or_create_annotation_type_var(
-                ty_arg.clone(),
-                hir_module.get_type_variable(ty_arg.local_id).name.clone(),
-            )
-        })
-        .collect::<Vec<_>>();
-
-    let type_name = type_def_fql.type_def_name(ctx.db);
-    let type_var_args: Vec<MonoType> = type_args
-        .iter()
-        .map(|&var_id| MonoType::Var(var_id))
-        .collect();
-
-    let result_type = if type_args.is_empty() {
-        MonoType::TypeDef {
-            fql: type_def_fql.clone(),
-            type_args,
-            type_def_name: type_name,
-        }
-    } else {
-        MonoType::App {
-            constructor: Box::new(MonoType::TypeDef {
-                fql: type_def_fql.clone(),
-                type_args,
-                type_def_name: type_name,
-            }),
-            args: type_var_args,
-        }
-    };
-
-    // Build curried function type: param1 -> (param2 -> (... -> result))
-    member
-        .properties()
-        .iter()
-        .map(|type_idx| {
-            let annotated = resolve_annotated_type(ctx.db, type_idx.module_id, type_idx.local_id);
-            annotated_to_mono(&annotated, ctx).unwrap_or_else(|| ctx.fresh_type_var())
-        })
-        .rev()
-        .fold(result_type, |acc, param_ty| {
-            MonoType::Function(Box::new(param_ty), Box::new(acc))
-        })
 }
