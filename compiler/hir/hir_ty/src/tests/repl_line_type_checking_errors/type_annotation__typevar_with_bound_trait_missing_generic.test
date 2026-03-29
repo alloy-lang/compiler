@@ -4,7 +4,7 @@ trait TestTrait1 where
     self = #Type[_]
 end
 
-typeof test_func : t1 -> t2 -> Test where
+typeof test_func : t1[t2] -> t2 -> Test where
     typevar t1 = TestTrait1
     typevar t2
 let test_func = |a, b| -> test
@@ -68,32 +68,57 @@ HirTypedModule {
     warnings: [],
     errors: [
         TypeCheckingError {
+            kind: BoundedTypeArityMismatch {
+                type_name: "Test",
+                expected_arity: 1,
+                actual_arity: 0,
+                annotation_range: 115..119,
+            },
+            range: 115..119,
+        },
+        TypeCheckingError {
             kind: ConflictingTypeAnnotation {
                 annotated_type: Lambda {
-                    arg: ConstrainedTypeVar {
-                        base: AnnotatedTypeVar {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "main",
+                    arg: Bounded {
+                        base: ConstrainedTypeVar {
+                            base: AnnotatedTypeVar {
+                                fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "main",
+                                    },
+                                    local_id: Idx::<TypeVariable>(0),
                                 },
-                                local_id: Idx::<TypeVariable>(0),
+                                name: "t1",
+                                type_arity: 1,
                             },
-                            name: "t1",
-                            type_arity: 1,
+                            constraints: NonEmpty(
+                                [
+                                    (
+                                        Fql {
+                                            module_id: ModuleId {
+                                                path: "main",
+                                            },
+                                            local_id: Idx::<Trait>(0),
+                                        },
+                                        "TestTrait1",
+                                    ),
+                                ],
+                            ),
                         },
-                        constraints: NonEmpty(
-                            [
-                                (
-                                    Fql {
+                        args: [
+                            TypeVar(
+                                AnnotatedTypeVar {
+                                    fql: Fql {
                                         module_id: ModuleId {
                                             path: "main",
                                         },
-                                        local_id: Idx::<Trait>(0),
+                                        local_id: Idx::<TypeVariable>(1),
                                     },
-                                    "TestTrait1",
-                                ),
-                            ],
-                        ),
+                                    name: "t2",
+                                    type_arity: 0,
+                                },
+                            ),
+                        ],
                     },
                     ret: Lambda {
                         arg: TypeVar(
@@ -130,7 +155,7 @@ HirTypedModule {
                         },
                     },
                 },
-                annotation_range: 99..115,
+                annotation_range: 99..119,
                 value_type: Lambda {
                     arg_type: Generic(
                         0,
@@ -157,60 +182,76 @@ HirTypedModule {
                         },
                     },
                 },
-                value_range: 165..195,
+                value_range: 169..199,
                 reason: DirectConflict {
-                    expected_type: TypeDef {
-                        fql: Fql {
-                            module_id: ModuleId {
-                                path: "test_data",
-                            },
-                            local_id: Idx::<TypeDefinition>(0),
-                        },
-                        name: "Test",
-                        type_args: [
-                            TypeVarReference {
+                    expected_type: Bounded {
+                        base: ConstrainedTypeVar {
+                            base: AnnotatedTypeVar {
                                 fql: Fql {
                                     module_id: ModuleId {
-                                        path: "test_data",
+                                        path: "main",
                                     },
                                     local_id: Idx::<TypeVariable>(0),
                                 },
-                                name: "t",
+                                name: "t1",
+                                type_arity: 1,
                             },
-                        ],
-                    },
-                    expected_type_range: 0..0,
-                    actual_type: Bounded {
-                        base: TypeDef(
-                            Fql {
-                                module_id: ModuleId {
-                                    path: "test_data",
-                                },
-                                local_id: Idx::<TypeDefinition>(0),
-                            },
-                            "Test",
-                        ),
+                            constraints: NonEmpty(
+                                [
+                                    (
+                                        Fql {
+                                            module_id: ModuleId {
+                                                path: "main",
+                                            },
+                                            local_id: Idx::<Trait>(0),
+                                        },
+                                        "TestTrait1",
+                                    ),
+                                ],
+                            ),
+                        },
                         args: [
-                            BuiltIn(
-                                Int,
+                            TypeVar(
+                                AnnotatedTypeVar {
+                                    fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "main",
+                                        },
+                                        local_id: Idx::<TypeVariable>(1),
+                                    },
+                                    name: "t2",
+                                    type_arity: 0,
+                                },
                             ),
                         ],
                     },
+                    expected_type_range: 0..0,
+                    actual_type: Generic(
+                        0,
+                    ),
                     actual_type_range: 0..0,
                 },
             },
-            range: 165..195,
+            range: 169..199,
         },
     ],
     poly_instantiations: {},
 }
 []
+[E34003] Error: Type `Test` expects 1 type argument(s), but 0 were provided
+   ╭─[ ./test/main.alloy:7:36 ]
+   │
+ 7 │ typeof test_func : t1[t2] -> t2 -> Test where
+   │                                    ──┬─  
+   │                                      ╰─── `Test` expects 1 type argument(s), but 0 were provided
+───╯
+
 [E34001] Error: Inferred type does not match annotated type
     ╭─[ ./test/main.alloy:10:1 ]
     │
-  7 │ typeof test_func : t1 -> t2 -> Test where
-    │                    ────────┬───────  
-    │                            ╰───────── The type annotation here says `t1 : TestTrait1 -> t2 -> Test`
+  7 │ typeof test_func : t1[t2] -> t2 -> Test where
+    │                    ──────────┬─────────  
+    │                              ╰─────────── The type annotation here says `t1 : TestTrait1[t2] -> t2 -> Test`
     │ 
  10 │ let test_func = |a, b| -> test
     │ ───────────────┬──────────────  
@@ -220,9 +261,9 @@ HirTypedModule {
     │
   1 │ import test_data::{Test, test}
     │ │ 
-    │ ╰─ Specifically, the annotation expects `Test[Int]`
+    │ ╰─ Specifically, the annotation expects `t0`
     │ │ 
-    │ ╰─ to be `Test`
+    │ ╰─ to be `t1 : TestTrait1[t2]`
 ────╯
 
 

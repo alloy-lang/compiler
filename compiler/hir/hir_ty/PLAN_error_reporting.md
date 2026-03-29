@@ -25,11 +25,21 @@ Both errors point to the same source range and describe the same underlying prob
 
 In `infer_definition_constraints()`, non-polymorphic annotations are added as type equations (`ctx.add_equation(inferred, annotated, fql)`), producing `UnificationError` on failure. Then `validate_type_annotations()` in the `alloy_hir_typed` layer also checks annotations against inferred types, producing `ConflictingTypeAnnotation` on failure.
 
+### Error precedence
+
+When multiple errors cover the same annotation range, keep only the highest-priority error:
+
+1. **BoundedTypeArityMismatch (E34003)** — most specific. If present, suppress ConflictingTypeAnnotation and UnificationError for the same annotation.
+2. **ConflictingTypeAnnotation (E34001)** — show if no arity error covers this annotation.
+3. **UnificationError (E33001)** — least specific, show only if no higher-level error covers this range.
+
+Example: `typeof wrong : Box` with `typedef Box[t]` currently produces all three errors. After de-dup, only E34003 should remain.
+
 ### Plan — Three-phase approach
 
-**Phase 1 (Short-term): Range-based deduplication**
+**Phase 1 (Short-term): Range-based deduplication with precedence**
 
-After collecting all errors in `type_check_module()`, filter out inference `UnificationError`s that share a `TextRange` with a `ConflictingTypeAnnotation`:
+After collecting all errors in `type_check_module()`, apply precedence-based filtering. Higher-priority errors suppress lower-priority errors at the same range:
 
 ```rust
 fn deduplicate_errors(errors: &mut Vec<TypeCheckingError>) {

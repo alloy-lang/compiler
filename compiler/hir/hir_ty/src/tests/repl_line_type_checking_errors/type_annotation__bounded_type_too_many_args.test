@@ -1,0 +1,56 @@
+typedef Box[t] = Box t
+
+typeof wrong : Box[Int, String]
+let wrong = Box(42)
+===
+HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Box",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [
+        TypeCheckingError {
+            kind: BoundedTypeArityMismatch {
+                type_name: "Box",
+                expected_arity: 1,
+                actual_arity: 2,
+                annotation_range: 39..55,
+            },
+            range: 39..55,
+        },
+    ],
+    poly_instantiations: {},
+}
+[]
+[E34003] Error: Type `Box` expects 1 type argument(s), but 2 were provided
+   ╭─[ ./test/main.alloy:3:16 ]
+   │
+ 3 │ typeof wrong : Box[Int, String]
+   │                ────────┬───────  
+   │                        ╰───────── `Box` expects 1 type argument(s), but 2 were provided
+───╯
+
+
+

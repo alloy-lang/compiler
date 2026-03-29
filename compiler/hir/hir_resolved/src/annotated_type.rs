@@ -83,6 +83,25 @@ impl AnnotatedType {
             | AnnotatedType::Missing => false,
         }
     }
+
+    pub fn type_arity(&self) -> usize {
+        match self {
+            AnnotatedType::TypeDef { type_args, .. } => type_args.len(),
+            AnnotatedType::BuiltIn(_) => 0,
+            AnnotatedType::SelfType { type_arity, .. } => *type_arity,
+            AnnotatedType::TypeVar(AnnotatedTypeVar { type_arity, .. }) => *type_arity,
+            AnnotatedType::ConstrainedTypeVar {
+                base: AnnotatedTypeVar { type_arity, .. },
+                ..
+            } => *type_arity,
+            AnnotatedType::Unit => 0,
+            AnnotatedType::Lambda { .. } => 0,
+            AnnotatedType::Tuple(_) => 0,
+            AnnotatedType::Bounded { args, .. } => args.len(),
+            AnnotatedType::Unconstrained => 0,
+            AnnotatedType::Missing => 0,
+        }
+    }
 }
 
 impl std::fmt::Display for AnnotatedType {
@@ -247,11 +266,30 @@ pub fn resolve_annotated_type(
                 .map(|arg| resolve_annotated_type(db, module_id, *arg))
                 .collect();
 
-            AnnotatedType::Bounded {
-                base: Box::new(base_resolved),
-                args: args_resolved,
+            let expected_arity = base_resolved.type_arity();
+            let corrected_args = correct_arity(args_resolved, expected_arity);
+
+            if corrected_args.is_empty() {
+                base_resolved
+            } else {
+                AnnotatedType::Bounded {
+                    base: Box::new(base_resolved),
+                    args: corrected_args,
+                }
             }
         }
+    }
+}
+
+fn correct_arity(args: Vec<AnnotatedType>, expected_arity: usize) -> Vec<AnnotatedType> {
+    if args.len() > expected_arity {
+        args[..expected_arity].to_vec()
+    } else if args.len() < expected_arity {
+        let mut padded = args;
+        padded.resize(expected_arity, AnnotatedType::Unconstrained);
+        padded
+    } else {
+        args
     }
 }
 
@@ -406,7 +444,6 @@ pub fn resolve_type_variable_to_annotated(
 mod tests {
     use super::*;
     use crate::tests::TestHirResDatabase;
-    use alloy_hir_def::BuiltInType;
     use alloy_test_harness::idx;
     use alloy_workspace::WorkspaceDatabase;
     use salsa::Database;
@@ -431,7 +468,7 @@ mod tests {
     }
 
     #[test]
-    fn resolve_lambda() {
+    fn resolve_cross_module_lambda_with_no_type_annotation_uses_body() {
         let mut db = TestHirResDatabase::new_with_stdlib();
         let test_data_module_id = db.add_test_module(
             "test_data",
@@ -439,10 +476,6 @@ mod tests {
             typedef Test[t] = Thing t
             let test = Test(0)
             let new = |t| -> Test(t)
-
-            trait Trait1 where
-                -- empty
-            end
             ",
         );
         let module_id = db.add_test_module(
@@ -512,7 +545,7 @@ mod tests {
     }
 
     #[test]
-    fn infer_cross_module_typedef_in_lambda() {
+    fn resolve_cross_module_value_with_no_type_annotation_uses_body() {
         let mut db = TestHirResDatabase::new_with_stdlib();
         let test_data_module_id = db.add_module(
             "test_data",
@@ -567,7 +600,211 @@ mod tests {
                                     name: hir::Name::from("t"),
                                 }],
                             }),
-                            args: vec![AnnotatedType::BuiltIn(BuiltInType::Int)],
+                            args: vec![AnnotatedType::BuiltIn(hir::BuiltInType::Int)],
+                        }),
+                    }),
+                },
+                actual_type,
+            );
+        });
+    }
+
+    #[test]
+    fn resolve_unbound_typedef_reference_when_typedef_has_type_args() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let test_data_module_id = db.add_module(
+            "test_data",
+            camino::Utf8Path::new("./test/test_data.alloy"),
+            r"
+            typedef Test[t] = Thing t
+            let test = Test(0)
+            ",
+        );
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+            import test_data::test
+            import test_data
+
+            typeof f : t1 -> t2 -> test_data::Test where
+              typevar t1
+              typevar t2
+            let f = |a, b| -> test
+            ",
+        );
+
+        let actual_type = resolve_annotated_type(&db, module_id, idx!(4));
+
+        let type_var_t1 = AnnotatedType::TypeVar(AnnotatedTypeVar {
+            fql: Fql::new(module_id, idx!(0)),
+            name: hir::Name::from("t1"),
+            type_arity: 0,
+        });
+        let type_var_t2 = AnnotatedType::TypeVar(AnnotatedTypeVar {
+            fql: Fql::new(module_id, idx!(1)),
+            name: hir::Name::from("t2"),
+            type_arity: 0,
+        });
+
+        db.attach(|_| {
+            assert_eq!(
+                AnnotatedType::Lambda {
+                    arg: Box::new(type_var_t1),
+                    ret: Box::new(AnnotatedType::Lambda {
+                        arg: Box::new(type_var_t2),
+                        ret: Box::new(AnnotatedType::TypeDef {
+                            fql: Fql::new(test_data_module_id, idx!(0)),
+                            name: hir::Name::from("Test"),
+                            type_args: vec![TypeVarReference {
+                                fql: Fql {
+                                    module_id: test_data_module_id,
+                                    local_id: idx!(0),
+                                },
+                                name: hir::Name::from("t"),
+                            }],
+                        }),
+                    }),
+                },
+                actual_type,
+            );
+        });
+    }
+
+    #[test]
+    fn resolve_bounded_typedef_reference_with_too_many_args_removes_extras() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let test_data_module_id = db.add_module(
+            "test_data",
+            camino::Utf8Path::new("./test/test_data.alloy"),
+            r"
+            typedef Test[t] = Thing t
+            let test = Test(0)
+            ",
+        );
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+            import test_data::test
+            import test_data
+
+            typeof f : t1 -> t2 -> test_data::Test[Int, Int] where
+              typevar t1
+              typevar t2
+            let f = |a, b| -> test
+            ",
+        );
+
+        let actual_type = resolve_annotated_type(&db, module_id, idx!(7));
+
+        let type_var_t1 = AnnotatedType::TypeVar(AnnotatedTypeVar {
+            fql: Fql::new(module_id, idx!(0)),
+            name: hir::Name::from("t1"),
+            type_arity: 0,
+        });
+        let type_var_t2 = AnnotatedType::TypeVar(AnnotatedTypeVar {
+            fql: Fql::new(module_id, idx!(1)),
+            name: hir::Name::from("t2"),
+            type_arity: 0,
+        });
+
+        db.attach(|_| {
+            assert_eq!(
+                AnnotatedType::Lambda {
+                    arg: Box::new(type_var_t1),
+                    ret: Box::new(AnnotatedType::Lambda {
+                        arg: Box::new(type_var_t2),
+                        ret: Box::new(AnnotatedType::Bounded {
+                            base: Box::new(AnnotatedType::TypeDef {
+                                fql: Fql::new(test_data_module_id, idx!(0)),
+                                name: hir::Name::from("Test"),
+                                type_args: vec![TypeVarReference {
+                                    fql: Fql {
+                                        module_id: test_data_module_id,
+                                        local_id: idx!(0),
+                                    },
+                                    name: hir::Name::from("t"),
+                                }],
+                            }),
+                            args: vec![AnnotatedType::BuiltIn(hir::BuiltInType::Int)],
+                        }),
+                    }),
+                },
+                actual_type,
+            );
+        });
+    }
+
+    #[test]
+    fn resolve_bounded_typedef_reference_with_too_few_args_pads_with_unbounded() {
+        let mut db = TestHirResDatabase::new_with_stdlib();
+        let test_data_module_id = db.add_module(
+            "test_data",
+            camino::Utf8Path::new("./test/test_data.alloy"),
+            r"
+            typedef Pair[t1, t2] = Pair t1 t2
+            let test = Pair(0, 0)
+            ",
+        );
+        let module_id = db.add_module(
+            "test",
+            camino::Utf8Path::new("./test.alloy"),
+            r"
+            import test_data::test
+            import test_data
+
+            typeof f : t1 -> t2 -> test_data::Pair[Int] where
+              typevar t1
+              typevar t2
+            let f = |a, b| -> test
+            ",
+        );
+
+        let actual_type = resolve_annotated_type(&db, module_id, idx!(6));
+
+        let type_var_t1 = AnnotatedType::TypeVar(AnnotatedTypeVar {
+            fql: Fql::new(module_id, idx!(0)),
+            name: hir::Name::from("t1"),
+            type_arity: 0,
+        });
+        let type_var_t2 = AnnotatedType::TypeVar(AnnotatedTypeVar {
+            fql: Fql::new(module_id, idx!(1)),
+            name: hir::Name::from("t2"),
+            type_arity: 0,
+        });
+
+        db.attach(|_| {
+            assert_eq!(
+                AnnotatedType::Lambda {
+                    arg: Box::new(type_var_t1),
+                    ret: Box::new(AnnotatedType::Lambda {
+                        arg: Box::new(type_var_t2),
+                        ret: Box::new(AnnotatedType::Bounded {
+                            base: Box::new(AnnotatedType::TypeDef {
+                                fql: Fql::new(test_data_module_id, idx!(0)),
+                                name: hir::Name::from("Pair"),
+                                type_args: vec![
+                                    TypeVarReference {
+                                        fql: Fql {
+                                            module_id: test_data_module_id,
+                                            local_id: idx!(0),
+                                        },
+                                        name: hir::Name::from("t1"),
+                                    },
+                                    TypeVarReference {
+                                        fql: Fql {
+                                            module_id: test_data_module_id,
+                                            local_id: idx!(1),
+                                        },
+                                        name: hir::Name::from("t2"),
+                                    }
+                                ],
+                            }),
+                            args: vec![
+                                AnnotatedType::BuiltIn(hir::BuiltInType::Int),
+                                AnnotatedType::Unconstrained
+                            ],
                         }),
                     }),
                 },

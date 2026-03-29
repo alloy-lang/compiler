@@ -369,7 +369,7 @@ impl<'db> HMInferenceContext<'db> {
 /// Convert an AnnotatedType to a MonoType for use in constraint generation.
 /// Uses stable Fql<TypeDefinition> identities for type variables, ensuring
 /// the same type variable declaration always maps to the same TypeVarId.
-pub(self) fn annotated_to_mono(
+fn annotated_to_mono(
     annotated: &AnnotatedType,
     ctx: &mut HMInferenceContext,
 ) -> Option<MonoType> {

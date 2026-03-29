@@ -247,6 +247,110 @@ mod tests {
         );
     }
 
+    /// Bounded type annotation with wrong arity (too many args) gets corrected
+    /// by truncating excess args. The corrected annotation is used as the signature.
+    #[test]
+    fn bounded_annotation_too_many_args_uses_corrected_annotation() {
+        let mut db = TestHirInferDatabase::default();
+        let module_id = db.add_test_module(
+            "test",
+            r"
+            typedef Box[t] = Box t
+
+            typeof wrong : Box[Int, String]
+            let wrong = Box(42)
+            ",
+        );
+
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+
+        let value_defs = hir_module.values().collect::<Vec<_>>();
+        let value_def = hir::module_value_def(&db, module_id, *value_defs[0].0).unwrap();
+
+        let sig = infer(&db, value_def);
+        // Annotation Box[Int, String] corrected to Box[Int] (excess args truncated)
+        assert_eq!(
+            sig,
+            InferredType::Bounded {
+                base: Box::new(InferredType::TypeDef(
+                    res::Fql::new(module_id, alloy_test_harness::idx!(0)),
+                    hir::Name::new("Box"),
+                )),
+                args: vec![InferredType::BuiltIn(hir::BuiltInType::Int)],
+            }
+        );
+    }
+
+    /// Bounded type annotation with wrong arity (too few args) gets corrected
+    /// by padding with Unconstrained. The corrected annotation is used as the signature.
+    #[test]
+    fn bounded_annotation_too_few_args_uses_corrected_annotation() {
+        let mut db = TestHirInferDatabase::default();
+        let module_id = db.add_test_module(
+            "test",
+            r"
+            typedef Pair[a, b] = Pair a b
+
+            typeof wrong : Pair[Int]
+            let wrong = Pair(1, 2)
+            ",
+        );
+
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+
+        let value_defs = hir_module.values().collect::<Vec<_>>();
+        let value_def = hir::module_value_def(&db, module_id, *value_defs[0].0).unwrap();
+
+        let sig = infer(&db, value_def);
+        // Annotation Pair[Int] corrected to Pair[Int, _] (missing args padded with Unconstrained)
+        assert_eq!(
+            sig,
+            InferredType::Bounded {
+                base: Box::new(InferredType::TypeDef(
+                    res::Fql::new(module_id, alloy_test_harness::idx!(0)),
+                    hir::Name::new("Pair"),
+                )),
+                args: vec![
+                    InferredType::BuiltIn(hir::BuiltInType::Int),
+                    InferredType::Unconstrained,
+                ],
+            }
+        );
+    }
+
+    /// Valid bounded type annotation should still work correctly.
+    #[test]
+    fn bounded_annotation_correct_arity_uses_annotation() {
+        let mut db = TestHirInferDatabase::default();
+        let module_id = db.add_test_module(
+            "test",
+            r"
+            typedef Box[t] = Box t
+
+            typeof correct : Box[Int]
+            let correct = Box(42)
+            ",
+        );
+
+        let (hir_module, _) = hir::lower_file(&db, module_id);
+
+        let value_defs = hir_module.values().collect::<Vec<_>>();
+        let value_def = hir::module_value_def(&db, module_id, *value_defs[0].0).unwrap();
+
+        let sig = infer(&db, value_def);
+        // Box[Int] has correct arity (1 arg, 1 param) → use annotation
+        assert_eq!(
+            sig,
+            InferredType::Bounded {
+                base: Box::new(InferredType::TypeDef(
+                    res::Fql::new(module_id, alloy_test_harness::idx!(0)),
+                    hir::Name::new("Box"),
+                )),
+                args: vec![InferredType::BuiltIn(hir::BuiltInType::Int)],
+            }
+        );
+    }
+
     #[test]
     fn shared_type_vars_get_same_id() {
         let mut db = TestHirInferDatabase::default();

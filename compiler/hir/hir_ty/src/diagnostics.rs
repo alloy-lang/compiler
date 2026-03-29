@@ -45,6 +45,7 @@ impl Diagnostic for TypeCheckingError {
     fn code(&self) -> Option<&str> {
         match &self.kind {
             TypeCheckingErrorKind::ConflictingTypeAnnotation { .. } => Some("E34001"),
+            TypeCheckingErrorKind::BoundedTypeArityMismatch { .. } => Some("E34003"),
             TypeCheckingErrorKind::InferenceError(err) => err.code(),
             TypeCheckingErrorKind::HirResolutionError(err) => err.code(),
             TypeCheckingErrorKind::MissingTraitMemberImplementation { .. } => Some("E34002"),
@@ -55,6 +56,16 @@ impl Diagnostic for TypeCheckingError {
         match &self.kind {
             TypeCheckingErrorKind::ConflictingTypeAnnotation { .. } => {
                 "Inferred type does not match annotated type".to_string()
+            }
+            TypeCheckingErrorKind::BoundedTypeArityMismatch {
+                type_name,
+                expected_arity,
+                actual_arity,
+                ..
+            } => {
+                format!(
+                    "Type `{type_name}` expects {expected_arity} type argument(s), but {actual_arity} were provided"
+                )
             }
             TypeCheckingErrorKind::InferenceError(err) => err.message(),
             TypeCheckingErrorKind::HirResolutionError(err) => err.message(),
@@ -100,6 +111,17 @@ impl Diagnostic for TypeCheckingError {
                     }
                 }
             }
+            TypeCheckingErrorKind::BoundedTypeArityMismatch {
+                type_name,
+                expected_arity,
+                actual_arity,
+                annotation_range,
+            } => builder.with_label(DiagnosticLabel::new(
+                *annotation_range,
+                format!(
+                    "`{type_name}` expects {expected_arity} type argument(s), but {actual_arity} were provided"
+                ),
+            )),
             TypeCheckingErrorKind::InferenceError(err) => err.build_report(builder),
             TypeCheckingErrorKind::HirResolutionError(err) => err.build_report(builder),
             TypeCheckingErrorKind::MissingTraitMemberImplementation {
@@ -144,6 +166,12 @@ pub enum TypeCheckingErrorKind {
     },
     InferenceError(alloy_hir_infer::TypeInferenceError),
     HirResolutionError(HirResolutionError),
+    BoundedTypeArityMismatch {
+        type_name: hir::Name,
+        expected_arity: usize,
+        actual_arity: usize,
+        annotation_range: TextRange,
+    },
     MissingTraitMemberImplementation {
         trait_name: hir::Name,
         member_name: hir::Name,

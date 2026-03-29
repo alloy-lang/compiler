@@ -1,0 +1,38 @@
+typeof wrong : Int[String]
+let wrong = 42
+===
+HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [
+        TypeCheckingError {
+            kind: BoundedTypeArityMismatch {
+                type_name: "Int",
+                expected_arity: 0,
+                actual_arity: 1,
+                annotation_range: 15..26,
+            },
+            range: 15..26,
+        },
+    ],
+    poly_instantiations: {},
+}
+[]
+[E34003] Error: Type `Int` expects 0 type argument(s), but 1 were provided
+   ╭─[ ./test/main.alloy:1:16 ]
+   │
+ 1 │ typeof wrong : Int[String]
+   │                ─────┬─────  
+   │                     ╰─────── `Int` expects 0 type argument(s), but 1 were provided
+───╯
+
+
+

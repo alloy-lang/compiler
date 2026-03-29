@@ -28,7 +28,8 @@ pub(crate) fn validate_type_annotations(
         let range = hir_module.get_expression_range(idx);
 
         if let Some(type_annotation) = value_def.type_annotation {
-            // let _ = resolve_annotated_expression(db, module_id, *type_annotation, *value);
+            // Validate arity of bounded types in the annotation
+            validate_type_reference_arity(db, result, module_id, type_annotation);
             // Check for type annotation conflicts
             check_type_annotation(db, result, module_id, range, type_annotation, resolved_type);
         }
@@ -253,4 +254,80 @@ fn does_behavior_match(
     };
 
     attached_type_fql != expected_type_fql && required_trait != attached_trait_fql
+}
+
+/// Walk a type reference tree and report arity errors at each Bounded node.
+fn validate_type_reference_arity(
+    db: &dyn HirTyDatabase,
+    result: &mut HirTypedModule,
+    module_id: ModuleId,
+    type_idx: TypeIdx,
+) {
+    let (hir_module, _) = hir::lower_file(db, module_id);
+    let type_ref = hir_module.get_type_reference(type_idx);
+
+    match type_ref {
+        hir::TypeReference::Bounded { base, args } => {
+            let base_annotated = resolve_annotated_type(db, module_id, *base);
+            let expected_arity = base_annotated.type_arity();
+
+            if expected_arity != args.len() {
+                let annotation_range = hir_module.get_type_reference_range(type_idx);
+                let type_name = hir::Name::new(format!("{}", base_annotated));
+                result.error(
+                    TypeCheckingErrorKind::BoundedTypeArityMismatch {
+                        type_name,
+                        expected_arity,
+                        actual_arity: args.len(),
+                        annotation_range,
+                    },
+                    annotation_range,
+                );
+            }
+
+            // Recurse into args only — base is expected to have arity
+            for arg in args {
+                validate_type_reference_arity(db, result, module_id, *arg);
+            }
+        }
+        hir::TypeReference::Lambda {
+            arg_type,
+            return_type,
+        } => {
+            validate_type_reference_arity(db, result, module_id, *arg_type);
+            validate_type_reference_arity(db, result, module_id, *return_type);
+        }
+        hir::TypeReference::Tuple(types) => {
+            for t in types {
+                validate_type_reference_arity(db, result, module_id, *t);
+            }
+        }
+        hir::TypeReference::ParenthesizedType(inner) => {
+            validate_type_reference_arity(db, result, module_id, *inner);
+        }
+        // Bare type reference — check if it expects type args
+        hir::TypeReference::Named(_) => {
+            let resolved = resolve_annotated_type(db, module_id, type_idx);
+            let expected_arity = resolved.type_arity();
+            if expected_arity > 0 {
+                let annotation_range = hir_module.get_type_reference_range(type_idx);
+                let type_name = hir::Name::new(format!("{}", resolved));
+                result.error(
+                    TypeCheckingErrorKind::BoundedTypeArityMismatch {
+                        type_name,
+                        expected_arity,
+                        actual_arity: 0,
+                        annotation_range,
+                    },
+                    annotation_range,
+                );
+            }
+        }
+        // Leaf nodes — nothing to check
+        hir::TypeReference::Unconstrained
+        | hir::TypeReference::Missing
+        | hir::TypeReference::SelfRef(_)
+        | hir::TypeReference::Unit
+        | hir::TypeReference::BuiltIn(_) => {}
+    }
 }
