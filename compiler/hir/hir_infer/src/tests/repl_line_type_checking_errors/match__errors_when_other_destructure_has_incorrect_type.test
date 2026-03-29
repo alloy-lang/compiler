@@ -196,10 +196,8 @@ DefinitionInferenceResult {
                             Concrete(
                                 Int,
                             ),
-                            Var(
-                                TypeVarId(
-                                    2,
-                                ),
+                            Concrete(
+                                Int,
                             ),
                         ],
                     },
@@ -225,10 +223,8 @@ DefinitionInferenceResult {
                             Concrete(
                                 String,
                             ),
-                            Var(
-                                TypeVarId(
-                                    7,
-                                ),
+                            Concrete(
+                                Int,
                             ),
                         ],
                     },
@@ -239,12 +235,12 @@ DefinitionInferenceResult {
     ],
 }
 []
-[E33001] Error: Type mismatch: expected `Either[Int, t2]`, found `Either[String, t7]`
+[E33001] Error: Type mismatch: expected `Either[Int, Int]`, found `Either[String, Int]`
    ╭─[ ./test/main.alloy:9:5 ]
    │
  9 │   \ Either::Left("hi") -> 0
    │     ─────────┬────────  
-   │              ╰────────── expected `Either[Int, t2]`, found `Either[String, t7]`
+   │              ╰────────── expected `Either[Int, Int]`, found `Either[String, Int]`
    │ 
    │ Help: These types must be compatible
 ───╯

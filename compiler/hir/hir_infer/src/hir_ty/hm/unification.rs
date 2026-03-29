@@ -143,21 +143,27 @@ fn unify_types(t1: &MonoType, t2: &MonoType) -> Result<Substitution, Unification
             // First unify the constructors
             let mut subst = unify_types(c1, c2)?;
             // Then unify the arguments
+            let mut error = false;
             for (arg_t1, arg_t2) in args1.iter().zip(args2.iter()) {
                 let arg_t1_subst = subst.apply(arg_t1);
                 let arg_t2_subst = subst.apply(arg_t2);
                 let new_arg_subst = match unify_types(&arg_t1_subst, &arg_t2_subst) {
                     Ok(s) => s,
-                    Err(e) => {
-                        return Err(UnificationError::TypeMismatch(
-                            Box::new(subst.apply(t1)),
-                            Box::new(subst.apply(t2)),
-                        ));
+                    Err(_) => {
+                        error = true;
+                        Substitution::new()
                     }
                 };
                 subst = subst.compose(&new_arg_subst);
             }
-            Ok(subst)
+            if error {
+                Err(UnificationError::TypeMismatch(
+                    Box::new(subst.apply(t1)),
+                    Box::new(subst.apply(t2)),
+                ))
+            } else {
+                Ok(subst)
+            }
         }
 
         // Type definitions
@@ -210,25 +216,27 @@ pub(super) fn solve_equations(
     let mut subst = Substitution::new();
     let mut unification_errors = Vec::new();
 
+    for equation in &equations {
+        let left = subst.apply(&equation.left);
+        let right = subst.apply(&equation.right);
+        if let Ok(new_subst) = unify_types(&left, &right) {
+            subst = subst.compose(&new_subst);
+        }
+    }
     for equation in equations {
         let left = subst.apply(&equation.left);
         let right = subst.apply(&equation.right);
-        match unify_types(&left, &right) {
-            Ok(new_subst) => {
-                subst = subst.compose(&new_subst);
-            }
-            Err(err) => {
-                let (hir_module, _) = hir::lower_file(db, equation.source.module_id());
-                let range = match equation.source {
-                    EPFql::Expression(fql) => hir_module.get_expression_range(fql.local_id),
-                    EPFql::Pattern(fql) => hir_module.get_pattern_range(fql.local_id),
-                };
+        if let Err(err) = unify_types(&left, &right) {
+            let (hir_module, _) = hir::lower_file(db, equation.source.module_id());
+            let range = match equation.source {
+                EPFql::Expression(fql) => hir_module.get_expression_range(fql.local_id),
+                EPFql::Pattern(fql) => hir_module.get_pattern_range(fql.local_id),
+            };
 
-                unification_errors.push(TypeInferenceError::new(
-                    TypeInferenceErrorKind::UnificationError(err),
-                    range,
-                ));
-            }
+            unification_errors.push(TypeInferenceError::new(
+                TypeInferenceErrorKind::UnificationError(err),
+                range,
+            ));
         };
     }
 
