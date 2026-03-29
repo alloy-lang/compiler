@@ -47,9 +47,27 @@ impl Substitution {
                 constructor: Box::new(self.apply(constructor)),
                 args: args.iter().map(|t| self.apply(t)).collect(),
             },
-            // TODO: unify type definitions with the same FQL but different type_args (e.g., `Option<T>` and `Option<U>`)
-            MonoType::Concrete(_) | MonoType::TypeDef { .. } | MonoType::Unit => ty.clone(),
+            MonoType::TypeDef {
+                fql,
+                type_args,
+                type_def_name,
+            } => MonoType::TypeDef {
+                fql: fql.clone(),
+                type_def_name: type_def_name.clone(),
+                type_args: type_args.iter().map(|t| self.apply_type_var(*t)).collect(),
+            },
+            MonoType::Concrete(_) | MonoType::Unit => ty.clone(),
         }
+    }
+
+    fn apply_type_var(&self, var: TypeVarId) -> TypeVarId {
+        if let Some(substituted) = self.get(var) {
+            if let MonoType::Var(inner_var) = self.apply(substituted) {
+                return inner_var;
+            }
+        }
+
+        var
     }
 
     /// Compose two substitutions
@@ -125,11 +143,19 @@ fn unify_types(t1: &MonoType, t2: &MonoType) -> Result<Substitution, Unification
             // First unify the constructors
             let mut subst = unify_types(c1, c2)?;
             // Then unify the arguments
-            for (t1, t2) in args1.iter().zip(args2.iter()) {
-                let t1_subst = subst.apply(t1);
-                let t2_subst = subst.apply(t2);
-                let new_subst = unify_types(&t1_subst, &t2_subst)?;
-                subst = subst.compose(&new_subst);
+            for (arg_t1, arg_t2) in args1.iter().zip(args2.iter()) {
+                let arg_t1_subst = subst.apply(arg_t1);
+                let arg_t2_subst = subst.apply(arg_t2);
+                let new_arg_subst = match unify_types(&arg_t1_subst, &arg_t2_subst) {
+                    Ok(s) => s,
+                    Err(e) => {
+                        return Err(UnificationError::TypeMismatch(
+                            Box::new(subst.apply(t1)),
+                            Box::new(subst.apply(t2)),
+                        ));
+                    }
+                };
+                subst = subst.compose(&new_arg_subst);
             }
             Ok(subst)
         }

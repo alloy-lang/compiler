@@ -46,7 +46,7 @@ HirTypedModule {
                                     },
                                     type_args: [
                                         TypeVarId(
-                                            0,
+                                            1,
                                         ),
                                     ],
                                     type_def_name: "Box",

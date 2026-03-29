@@ -99,12 +99,48 @@ HirTypedModule {
                 TypeInferenceError {
                     kind: UnificationError(
                         TypeMismatch(
-                            Concrete(
-                                String,
-                            ),
-                            Concrete(
-                                Int,
-                            ),
+                            App {
+                                constructor: TypeDef {
+                                    fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "std::option",
+                                        },
+                                        local_id: Idx::<TypeDefinition>(0),
+                                    },
+                                    type_args: [
+                                        TypeVarId(
+                                            0,
+                                        ),
+                                    ],
+                                    type_def_name: "Option",
+                                },
+                                args: [
+                                    Concrete(
+                                        String,
+                                    ),
+                                ],
+                            },
+                            App {
+                                constructor: TypeDef {
+                                    fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "std::option",
+                                        },
+                                        local_id: Idx::<TypeDefinition>(0),
+                                    },
+                                    type_args: [
+                                        TypeVarId(
+                                            1,
+                                        ),
+                                    ],
+                                    type_def_name: "Option",
+                                },
+                                args: [
+                                    Concrete(
+                                        Int,
+                                    ),
+                                ],
+                            },
                         ),
                     ),
                     range: 123..160,
@@ -116,12 +152,12 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
-[E33001] Error: Type mismatch: expected `String`, found `Int`
+[E33001] Error: Type mismatch: expected `Option[String]`, found `Option[Int]`
    ╭─[ ./test/main.alloy:7:1 ]
    │
  7 │ let test_result = test(incorrect_arg)
    │ ──────────────────┬──────────────────  
-   │                   ╰──────────────────── expected `String`, found `Int`
+   │                   ╰──────────────────── expected `Option[String]`, found `Option[Int]`
    │ 
    │ Help: These types must be compatible
 ───╯

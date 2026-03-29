@@ -174,12 +174,64 @@ DefinitionInferenceResult {
         TypeInferenceError {
             kind: UnificationError(
                 TypeMismatch(
-                    Concrete(
-                        Int,
-                    ),
-                    Concrete(
-                        String,
-                    ),
+                    App {
+                        constructor: TypeDef {
+                            fql: Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<TypeDefinition>(0),
+                            },
+                            type_args: [
+                                TypeVarId(
+                                    0,
+                                ),
+                                TypeVarId(
+                                    1,
+                                ),
+                            ],
+                            type_def_name: "Either",
+                        },
+                        args: [
+                            Concrete(
+                                Int,
+                            ),
+                            Var(
+                                TypeVarId(
+                                    2,
+                                ),
+                            ),
+                        ],
+                    },
+                    App {
+                        constructor: TypeDef {
+                            fql: Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<TypeDefinition>(0),
+                            },
+                            type_args: [
+                                TypeVarId(
+                                    6,
+                                ),
+                                TypeVarId(
+                                    7,
+                                ),
+                            ],
+                            type_def_name: "Either",
+                        },
+                        args: [
+                            Concrete(
+                                String,
+                            ),
+                            Var(
+                                TypeVarId(
+                                    7,
+                                ),
+                            ),
+                        ],
+                    },
                 ),
             ),
             range: 115..133,
@@ -187,12 +239,12 @@ DefinitionInferenceResult {
     ],
 }
 []
-[E33001] Error: Type mismatch: expected `Int`, found `String`
+[E33001] Error: Type mismatch: expected `Either[Int, t2]`, found `Either[String, t7]`
    ╭─[ ./test/main.alloy:9:5 ]
    │
  9 │   \ Either::Left("hi") -> 0
    │     ─────────┬────────  
-   │              ╰────────── expected `Int`, found `String`
+   │              ╰────────── expected `Either[Int, t2]`, found `Either[String, t7]`
    │ 
    │ Help: These types must be compatible
 ───╯
