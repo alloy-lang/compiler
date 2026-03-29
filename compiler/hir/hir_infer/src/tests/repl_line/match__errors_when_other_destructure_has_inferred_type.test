@@ -6,8 +6,8 @@ end
 let test = Either::Left(42)
 
 let result = match test when
-  \ Either::Left("hi") -> 0
-  \ Either::Right(x) -> x
+  \ Either::Left(x) -> x
+  \ Either::Right("hi") -> 0
 ===
 DefinitionInferenceResult {
     definition_type: Unconstrained,
@@ -53,19 +53,19 @@ DefinitionInferenceResult {
                 ),
             ],
         },
-        Idx::<Expression>(3): BuiltIn(
-            Int,
-        ),
-        Idx::<Expression>(4): Generic(
+        Idx::<Expression>(3): Generic(
             1,
+        ),
+        Idx::<Expression>(4): BuiltIn(
+            Int,
         ),
         Idx::<Expression>(5): BuiltIn(
             Int,
         ),
     },
     pattern_types: {
-        Idx::<Pattern>(0): BuiltIn(
-            String,
+        Idx::<Pattern>(0): Generic(
+            1,
         ),
         Idx::<Pattern>(1): Bounded {
             base: TypeDef(
@@ -79,15 +79,15 @@ DefinitionInferenceResult {
             ),
             args: [
                 BuiltIn(
-                    String,
+                    Int,
                 ),
-                Generic(
-                    2,
+                BuiltIn(
+                    String,
                 ),
             ],
         },
-        Idx::<Pattern>(2): Generic(
-            1,
+        Idx::<Pattern>(2): BuiltIn(
+            String,
         ),
         Idx::<Pattern>(3): Bounded {
             base: TypeDef(
@@ -104,7 +104,7 @@ DefinitionInferenceResult {
                     Int,
                 ),
                 BuiltIn(
-                    Int,
+                    String,
                 ),
             ],
         },
@@ -170,80 +170,6 @@ DefinitionInferenceResult {
         },
     },
     warnings: [],
-    errors: [
-        TypeInferenceError {
-            kind: UnificationError(
-                TypeMismatch(
-                    App {
-                        constructor: TypeDef {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "main",
-                                },
-                                local_id: Idx::<TypeDefinition>(0),
-                            },
-                            type_args: [
-                                TypeVarId(
-                                    0,
-                                ),
-                                TypeVarId(
-                                    1,
-                                ),
-                            ],
-                            type_def_name: "Either",
-                        },
-                        args: [
-                            Concrete(
-                                Int,
-                            ),
-                            Concrete(
-                                Int,
-                            ),
-                        ],
-                    },
-                    App {
-                        constructor: TypeDef {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "main",
-                                },
-                                local_id: Idx::<TypeDefinition>(0),
-                            },
-                            type_args: [
-                                TypeVarId(
-                                    6,
-                                ),
-                                TypeVarId(
-                                    7,
-                                ),
-                            ],
-                            type_def_name: "Either",
-                        },
-                        args: [
-                            Concrete(
-                                String,
-                            ),
-                            Concrete(
-                                Int,
-                            ),
-                        ],
-                    },
-                ),
-            ),
-            range: 115..133,
-        },
-    ],
+    errors: [],
 }
 []
-[E33001] Error: Type mismatch: expected `Either[Int, Int]`, found `Either[String, Int]`
-   ╭─[ ./test/main.alloy:9:5 ]
-   │
- 9 │   \ Either::Left("hi") -> 0
-   │     ─────────┬────────  
-   │              ╰────────── expected `Either[Int, Int]`, found `Either[String, Int]`
-   │ 
-   │ Help: These types must be compatible
-───╯
-
-
-
