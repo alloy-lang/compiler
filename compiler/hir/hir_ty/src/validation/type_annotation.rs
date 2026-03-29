@@ -153,6 +153,19 @@ fn check_type_compatibility(
             Ok(())
         }
 
+        (
+            AnnotatedType::Bounded { base, .. },
+            InferredType::Generic(_) | InferredType::ConstrainedGeneric { .. },
+        ) if matches!(
+            base.as_ref(),
+            AnnotatedType::TypeVar(_)
+                | AnnotatedType::ConstrainedTypeVar { .. }
+                | AnnotatedType::SelfType { .. }
+        ) =>
+        {
+            Ok(())
+        }
+
         // Bounded types
         (
             AnnotatedType::Bounded {

@@ -184,51 +184,43 @@ HirTypedModule {
                 },
                 value_range: 169..199,
                 reason: DirectConflict {
-                    expected_type: Bounded {
-                        base: ConstrainedTypeVar {
-                            base: AnnotatedTypeVar {
+                    expected_type: TypeDef {
+                        fql: Fql {
+                            module_id: ModuleId {
+                                path: "test_data",
+                            },
+                            local_id: Idx::<TypeDefinition>(0),
+                        },
+                        name: "Test",
+                        type_args: [
+                            TypeVarReference {
                                 fql: Fql {
                                     module_id: ModuleId {
-                                        path: "main",
+                                        path: "test_data",
                                     },
                                     local_id: Idx::<TypeVariable>(0),
                                 },
-                                name: "t1",
-                                type_arity: 1,
+                                name: "t",
                             },
-                            constraints: NonEmpty(
-                                [
-                                    (
-                                        Fql {
-                                            module_id: ModuleId {
-                                                path: "main",
-                                            },
-                                            local_id: Idx::<Trait>(0),
-                                        },
-                                        "TestTrait1",
-                                    ),
-                                ],
-                            ),
-                        },
-                        args: [
-                            TypeVar(
-                                AnnotatedTypeVar {
-                                    fql: Fql {
-                                        module_id: ModuleId {
-                                            path: "main",
-                                        },
-                                        local_id: Idx::<TypeVariable>(1),
-                                    },
-                                    name: "t2",
-                                    type_arity: 0,
-                                },
-                            ),
                         ],
                     },
                     expected_type_range: 0..0,
-                    actual_type: Generic(
-                        0,
-                    ),
+                    actual_type: Bounded {
+                        base: TypeDef(
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "test_data",
+                                },
+                                local_id: Idx::<TypeDefinition>(0),
+                            },
+                            "Test",
+                        ),
+                        args: [
+                            BuiltIn(
+                                Int,
+                            ),
+                        ],
+                    },
                     actual_type_range: 0..0,
                 },
             },
@@ -261,9 +253,9 @@ HirTypedModule {
     │
   1 │ import test_data::{Test, test}
     │ │ 
-    │ ╰─ Specifically, the annotation expects `t0`
+    │ ╰─ Specifically, the annotation expects `Test[Int]`
     │ │ 
-    │ ╰─ to be `t1 : TestTrait1[t2]`
+    │ ╰─ to be `Test`
 ────╯
 
 
