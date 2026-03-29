@@ -11,7 +11,7 @@ pub(in crate::hir_ty::hm::constraint_gen) fn infer_data_constructor(
     let variant_fql = EPTdFql::TypeDefinition(type_def_fql.clone());
     let variant_name = None;
 
-    inner(ctx, source_fql, &type_def_fql, variant_name, variant_fql)
+    inner(ctx, source_fql, type_def_fql, variant_name, variant_fql)
 }
 
 pub(in crate::hir_ty::hm::constraint_gen) fn infer_variant_constructor(
@@ -23,7 +23,7 @@ pub(in crate::hir_ty::hm::constraint_gen) fn infer_variant_constructor(
     let variant_fql = EPTdFql::TypeDefinitionVariant(type_def_fql.clone(), variant_name.clone());
     let variant_name = Some(&variant_name);
 
-    inner(ctx, source_fql, &type_def_fql, variant_name, variant_fql)
+    inner(ctx, source_fql, type_def_fql, variant_name, variant_fql)
 }
 
 fn inner(
@@ -47,7 +47,7 @@ fn inner(
         return ctx.assign_type(source_fql, ty);
     };
 
-    let constructor_ty = build_constructor_type(ctx, &type_def_fql, &type_def, member);
+    let constructor_ty = build_constructor_type(ctx, type_def_fql, &type_def, member);
     let tracked_ty = ctx.generalize_to_poly(constructor_ty, variant_fql);
     ctx.assign_type(source_fql, tracked_ty)
 }
