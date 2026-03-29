@@ -70,8 +70,8 @@ HirTypedModule {
                 ),
             ],
         },
-        Idx::<Expression>(5): Generic(
-            0,
+        Idx::<Expression>(5): BuiltIn(
+            Int,
         ),
     },
     pattern_types: {

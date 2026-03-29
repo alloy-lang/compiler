@@ -91,42 +91,48 @@ impl Substitution {
 }
 
 /// Unification algorithm with occurs check
-fn unify_types(t1: &MonoType, t2: &MonoType) -> Result<Substitution, UnificationError> {
+fn unify_types(t1: &MonoType, t2: &MonoType) -> (Substitution, Vec<UnificationError>) {
     match (t1, t2) {
         // Same type variable
-        (MonoType::Unconstrained, _) | (_, MonoType::Unconstrained) => Ok(Substitution::new()),
-        (MonoType::Var(v1), MonoType::Var(v2)) if v1 == v2 => Ok(Substitution::new()),
+        (MonoType::Unconstrained, _) | (_, MonoType::Unconstrained) => {
+            (Substitution::new(), Vec::new())
+        }
+        (MonoType::Var(v1), MonoType::Var(v2)) if v1 == v2 => (Substitution::new(), Vec::new()),
 
         // Bind type variable to type
         (MonoType::Var(v), t) | (t, MonoType::Var(v)) => {
             if occurs(*v, t) {
-                Err(UnificationError::OccursCheck(*v, t.clone()))
+                (
+                    Substitution::new(),
+                    vec![UnificationError::OccursCheck(*v, t.clone())],
+                )
             } else {
                 let mut subst = Substitution::new();
                 subst.insert(*v, t.clone());
-                Ok(subst)
+                (subst, Vec::new())
             }
         }
 
         // Function types
         (MonoType::Function(arg1, ret1), MonoType::Function(arg2, ret2)) => {
-            let subst1 = unify_types(arg1, arg2)?;
+            let (subst1, err1) = unify_types(arg1, arg2);
             let ret1_subst = subst1.apply(ret1);
             let ret2_subst = subst1.apply(ret2);
-            let subst2 = unify_types(&ret1_subst, &ret2_subst)?;
-            Ok(subst1.compose(&subst2))
+            let (subst2, err2) = unify_types(&ret1_subst, &ret2_subst);
+            (subst1.compose(&subst2), [err1, err2].concat())
         }
 
         // Tuple types
         (MonoType::Tuple(ts1), MonoType::Tuple(ts2)) if ts1.len() == ts2.len() => {
-            let mut subst = Substitution::new();
-            for (t1, t2) in ts1.iter().zip(ts2.iter()) {
-                let t1_subst = subst.apply(t1);
-                let t2_subst = subst.apply(t2);
-                let new_subst = unify_types(&t1_subst, &t2_subst)?;
-                subst = subst.compose(&new_subst);
+            let (subst, mut errors) = unify_many(ts1, ts2);
+            if !errors.is_empty() {
+                // override member errors with the applied types for better error messages
+                errors = vec![UnificationError::TypeMismatch(
+                    Box::new(subst.apply(t1)),
+                    Box::new(subst.apply(t2)),
+                )];
             }
-            Ok(subst)
+            (subst, errors)
         }
 
         // Type constructor application
@@ -141,50 +147,59 @@ fn unify_types(t1: &MonoType, t2: &MonoType) -> Result<Substitution, Unification
             },
         ) if args1.len() == args2.len() => {
             // First unify the constructors
-            let mut subst = unify_types(c1, c2)?;
-            // Then unify the arguments
-            let mut error = false;
-            for (arg_t1, arg_t2) in args1.iter().zip(args2.iter()) {
-                let arg_t1_subst = subst.apply(arg_t1);
-                let arg_t2_subst = subst.apply(arg_t2);
-                let new_arg_subst = match unify_types(&arg_t1_subst, &arg_t2_subst) {
-                    Ok(s) => s,
-                    Err(_) => {
-                        error = true;
-                        Substitution::new()
-                    }
-                };
-                subst = subst.compose(&new_arg_subst);
-            }
-            if error {
-                Err(UnificationError::TypeMismatch(
+            let (constructor_subst, errors) = unify_types(c1, c2);
+            let (args_subst, mut args_errors) = unify_many(args1, args2);
+            let subst = constructor_subst.compose(&args_subst);
+
+            if !args_errors.is_empty() {
+                // override argument errors with the applied types for better error messages
+                args_errors = vec![UnificationError::TypeMismatch(
                     Box::new(subst.apply(t1)),
                     Box::new(subst.apply(t2)),
-                ))
-            } else {
-                Ok(subst)
+                )];
             }
+            (subst, [errors, args_errors].concat())
         }
 
         // Type definitions
         (MonoType::TypeDef { fql: fql1, .. }, MonoType::TypeDef { fql: fql2, .. })
             if fql1 == fql2 =>
         {
-            Ok(Substitution::new())
+            (Substitution::new(), Vec::new())
         }
 
         // Concrete types
-        (MonoType::Concrete(c1), MonoType::Concrete(c2)) if c1 == c2 => Ok(Substitution::new()),
+        (MonoType::Concrete(c1), MonoType::Concrete(c2)) if c1 == c2 => {
+            (Substitution::new(), Vec::new())
+        }
 
         // Unit types
-        (MonoType::Unit, MonoType::Unit) => Ok(Substitution::new()),
+        (MonoType::Unit, MonoType::Unit) => (Substitution::new(), Vec::new()),
 
         // Mismatch
-        _ => Err(UnificationError::TypeMismatch(
-            Box::new(t1.clone()),
-            Box::new(t2.clone()),
-        )),
+        _ => (
+            Substitution::new(),
+            vec![UnificationError::TypeMismatch(
+                Box::new(t1.clone()),
+                Box::new(t2.clone()),
+            )],
+        ),
     }
+}
+
+fn unify_many(ts1: &[MonoType], ts2: &[MonoType]) -> (Substitution, Vec<UnificationError>) {
+    let mut subst = Substitution::new();
+    let mut errors = Vec::new();
+
+    for (t1, t2) in ts1.iter().zip(ts2.iter()) {
+        let t1_subst = subst.apply(t1);
+        let t2_subst = subst.apply(t2);
+        let (new_subst, sub_errors) = unify_types(&t1_subst, &t2_subst);
+        subst = subst.compose(&new_subst);
+        errors.extend(sub_errors);
+    }
+
+    (subst, errors)
 }
 
 /// Check if a type variable occurs in a type (prevents infinite types)
@@ -219,16 +234,17 @@ pub(super) fn solve_equations(
     for equation in &equations {
         let left = subst.apply(&equation.left);
         let right = subst.apply(&equation.right);
-        if let Ok(new_subst) = unify_types(&left, &right) {
-            subst = subst.compose(&new_subst);
-        }
+        let (new_subst, _errors) = unify_types(&left, &right);
+        subst = subst.compose(&new_subst);
     }
-    for equation in equations {
+    for equation in &equations {
         let left = subst.apply(&equation.left);
         let right = subst.apply(&equation.right);
-        if let Err(err) = unify_types(&left, &right) {
+        let (_, errors) = unify_types(&left, &right);
+
+        for err in errors {
             let (hir_module, _) = hir::lower_file(db, equation.source.module_id());
-            let range = match equation.source {
+            let range = match &equation.source {
                 EPFql::Expression(fql) => hir_module.get_expression_range(fql.local_id),
                 EPFql::Pattern(fql) => hir_module.get_pattern_range(fql.local_id),
             };
@@ -237,7 +253,7 @@ pub(super) fn solve_equations(
                 TypeInferenceErrorKind::UnificationError(err),
                 range,
             ));
-        };
+        }
     }
 
     (subst, unification_errors)

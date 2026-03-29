@@ -10,9 +10,7 @@ HirTypedModule {
         path: "main",
     },
     expression_types: {
-        Idx::<Expression>(0): Generic(
-            0,
-        ),
+        Idx::<Expression>(0): Missing,
     },
     pattern_types: {},
     warnings: [],

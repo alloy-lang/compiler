@@ -245,6 +245,9 @@ pub(super) struct HMInferenceContext<'db> {
     pub(super) poly_env: FxHashMap<EPTdFql, PolyType>,
     /// Resolution errors collected during inference (FQL + reference path + module_id)
     pub(super) resolution_errors: Vec<HirResolutionError>,
+    /// Type variables created for unknown references (resolution errors).
+    /// These should be treated as `Missing` rather than `Generic`.
+    pub(super) resolution_error_vars: FxHashSet<TypeVarId>,
     /// Maps annotation type variable Fql → TypeVarId
     /// Ensures the same type variable declaration always maps to the same inference variable
     pub(super) annotation_type_vars: FxHashMap<Fql<hir::TypeVariable>, TypeVarId>,
@@ -275,6 +278,7 @@ impl<'db> HMInferenceContext<'db> {
             type_env: FxHashMap::default(),
             poly_env: FxHashMap::default(),
             resolution_errors: Vec::new(),
+            resolution_error_vars: FxHashSet::default(),
             annotation_type_vars: FxHashMap::default(),
             self_type_vars: FxHashMap::default(),
             type_var_names: FxHashMap::default(),
@@ -318,7 +322,9 @@ impl<'db> HMInferenceContext<'db> {
 
     fn unknown_reference(&mut self, err: HirResolutionError, fql: impl Into<EPFql>) -> MonoType {
         self.resolution_errors.push(err);
-        let ty = self.fresh_type_var();
+        let var_id = self.type_var_gen.fresh();
+        self.resolution_error_vars.insert(var_id);
+        let ty = MonoType::Var(var_id);
         self.assign_type(fql.into(), ty)
     }
 

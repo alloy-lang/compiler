@@ -18,9 +18,7 @@ DefinitionInferenceResult {
             String,
         ),
         Idx::<Expression>(4): Lambda {
-            arg_type: Generic(
-                0,
-            ),
+            arg_type: Missing,
             return_type: BuiltIn(
                 String,
             ),
@@ -30,9 +28,7 @@ DefinitionInferenceResult {
         Idx::<Pattern>(0): BuiltIn(
             String,
         ),
-        Idx::<Pattern>(1): Generic(
-            0,
-        ),
+        Idx::<Pattern>(1): Missing,
     },
     variant_constructor_types: {},
     warnings: [],

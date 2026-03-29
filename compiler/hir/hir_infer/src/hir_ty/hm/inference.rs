@@ -12,6 +12,7 @@ use alloy_hir_resolved::resolve_annotated_type;
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
+use rustc_hash::FxHashSet;
 
 #[salsa::tracked(cycle_initial = infer_body_type_cycle_initial)]
 pub(crate) fn infer_body_type<'db>(
@@ -99,12 +100,19 @@ fn collect_inference_results(
     let mut type_var_map: FxHashMap<TypeVarId, usize> = FxHashMap::default();
     let mut next_generic_id = 0;
 
+    // collect all type variables that appear in unification errors
+
     // Get the definition type from type_env
     let definition_type = {
         if let Some(def_fql) = definition_fql {
             if let Some(mono_ty) = ctx.type_env.get(&def_fql.into()) {
                 let resolved_ty = substitution.apply(mono_ty);
-                mono_to_resolved_with_map(&resolved_ty, &mut type_var_map, &mut next_generic_id)
+                mono_to_resolved_with_map(
+                    &resolved_ty,
+                    &mut type_var_map,
+                    &mut next_generic_id,
+                    &ctx.resolution_error_vars,
+                )
             } else {
                 InferredType::Unconstrained
             }
@@ -125,7 +133,12 @@ fn collect_inference_results(
         .map(|(fql, mono)| {
             (
                 fql,
-                mono_to_resolved_with_map(&mono, &mut type_var_map, &mut next_generic_id),
+                mono_to_resolved_with_map(
+                    &mono,
+                    &mut type_var_map,
+                    &mut next_generic_id,
+                    &ctx.resolution_error_vars,
+                ),
             )
         })
         .for_each(|(fql, resolved)| result.insert_type(fql, resolved));
@@ -150,17 +163,18 @@ fn collect_inference_results(
     }
 }
 
-/// Convert a MonoType to a ResolvedType with a shared type variable mapping
-/// This ensures that the same TypeVarId gets the same Generic ID across all
-/// expressions and patterns in a module, preserving polymorphic type structure
 fn mono_to_resolved_with_map(
     mono: &MonoType,
     type_var_map: &mut FxHashMap<TypeVarId, usize>,
     next_generic_id: &mut usize,
+    failed_vars: &FxHashSet<TypeVarId>,
 ) -> InferredType {
     match mono {
         MonoType::Unconstrained => InferredType::Unconstrained,
         MonoType::Var(var_id) => {
+            if failed_vars.contains(var_id) {
+                return InferredType::Missing;
+            }
             // Get or assign a canonical ID for this type variable
             let generic_id = *type_var_map.entry(*var_id).or_insert_with(|| {
                 let id = *next_generic_id;
@@ -177,17 +191,19 @@ fn mono_to_resolved_with_map(
                 arg,
                 type_var_map,
                 next_generic_id,
+                failed_vars,
             )),
             return_type: Box::new(mono_to_resolved_with_map(
                 ret,
                 type_var_map,
                 next_generic_id,
+                failed_vars,
             )),
         },
         MonoType::Tuple(elements) => {
             let resolved_elements: Vec<_> = elements
                 .iter()
-                .map(|e| mono_to_resolved_with_map(e, type_var_map, next_generic_id))
+                .map(|e| mono_to_resolved_with_map(e, type_var_map, next_generic_id, failed_vars))
                 .collect();
             if resolved_elements.is_empty() {
                 InferredType::Unit
@@ -201,10 +217,11 @@ fn mono_to_resolved_with_map(
             fql, type_def_name, ..
         } => InferredType::TypeDef(fql.clone(), type_def_name.clone()),
         MonoType::App { constructor, args } => {
-            let base = mono_to_resolved_with_map(constructor, type_var_map, next_generic_id);
+            let base =
+                mono_to_resolved_with_map(constructor, type_var_map, next_generic_id, failed_vars);
             let resolved_args: Vec<_> = args
                 .iter()
-                .map(|a| mono_to_resolved_with_map(a, type_var_map, next_generic_id))
+                .map(|a| mono_to_resolved_with_map(a, type_var_map, next_generic_id, failed_vars))
                 .collect();
             InferredType::Bounded {
                 base: Box::new(base),

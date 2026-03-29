@@ -81,8 +81,8 @@ DefinitionInferenceResult {
                 BuiltIn(
                     String,
                 ),
-                Generic(
-                    2,
+                BuiltIn(
+                    Int,
                 ),
             ],
         },

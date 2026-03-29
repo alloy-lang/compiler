@@ -9,9 +9,7 @@ HirTypedModule {
             0,
         ),
         Idx::<Expression>(1): Lambda {
-            arg_type: Generic(
-                1,
-            ),
+            arg_type: Missing,
             return_type: Generic(
                 0,
             ),
@@ -21,9 +19,7 @@ HirTypedModule {
         Idx::<Pattern>(0): Generic(
             0,
         ),
-        Idx::<Pattern>(1): Generic(
-            1,
-        ),
+        Idx::<Pattern>(1): Missing,
     },
     warnings: [],
     errors: [

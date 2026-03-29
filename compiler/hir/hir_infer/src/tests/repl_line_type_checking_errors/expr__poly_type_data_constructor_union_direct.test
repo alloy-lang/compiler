@@ -11,9 +11,7 @@ DefinitionInferenceResult {
         Idx::<Expression>(0): BuiltIn(
             String,
         ),
-        Idx::<Expression>(1): Generic(
-            0,
-        ),
+        Idx::<Expression>(1): Missing,
     },
     pattern_types: {},
     variant_constructor_types: {},
