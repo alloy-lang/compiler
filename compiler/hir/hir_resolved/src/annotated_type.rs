@@ -205,7 +205,7 @@ pub fn resolve_annotated_type(
                 hir_module.find_trait_containing_scope(*scope)
             {
                 let trait_fql = Fql::new(module_id, trait_idx);
-                let trait_constraints: Vec<_> = trait_def
+                let trait_constraints = trait_def
                     .self_constraints()
                     .iter()
                     .filter_map(|constraint| trait_constraints(db, module_id, constraint))

@@ -99,6 +99,25 @@ impl HirTypedModule {
     pub fn errors(&self) -> &[TypeCheckingError] {
         &self.errors
     }
+
+    pub(crate) fn merge_inference_result(&mut self, def_result: &DefinitionInferenceResult) {
+        for (&eid, ty) in &def_result.expression_types {
+            self.insert_type(
+                EPTdFql::Expression(Fql::new(self.module_id, eid)),
+                ty.clone(),
+            );
+        }
+        for (&pid, ty) in &def_result.pattern_types {
+            self.insert_type(EPTdFql::Pattern(Fql::new(self.module_id, pid)), ty.clone());
+        }
+        self.extend_errors(
+            &def_result
+                .errors
+                .iter()
+                .map(|err| err.into())
+                .collect::<Vec<_>>(),
+        );
+    }
 }
 
 /// type checking for everything in a module
@@ -113,36 +132,16 @@ pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirType
     for (_, value_def) in hir_module.values() {
         let value_def = hir::module_value_def(db, module_id, value_def.expr_idx).expect("");
         let def_result = hir_infer::infer_body_type(db, value_def);
-        merge_into_module(&mut result, &def_result, module_id);
+        result.merge_inference_result(&def_result);
     }
 
     let expressions_result = hir_infer::infer_expressions(db, module_id);
-    merge_into_module(&mut result, &expressions_result, module_id);
+    result.merge_inference_result(&expressions_result);
 
     validation::validate_behaviors(db, module_id, &mut result);
     validation::validate_type_annotations(db, module_id, &mut result);
 
     result
-}
-
-fn merge_into_module(
-    module: &mut HirTypedModule,
-    def_result: &DefinitionInferenceResult,
-    module_id: ModuleId,
-) {
-    for (&eid, ty) in &def_result.expression_types {
-        module.insert_type(EPTdFql::Expression(Fql::new(module_id, eid)), ty.clone());
-    }
-    for (&pid, ty) in &def_result.pattern_types {
-        module.insert_type(EPTdFql::Pattern(Fql::new(module_id, pid)), ty.clone());
-    }
-    module.extend_errors(
-        &def_result
-            .errors
-            .iter()
-            .map(|err| err.into())
-            .collect::<Vec<_>>(),
-    );
 }
 
 #[cfg(test)]
