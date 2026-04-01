@@ -1,0 +1,63 @@
+typeof pair : a -> a -> (a, a) where
+    typevar a
+let pair = |x, y| -> (x, y)
+===
+HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): Generic(
+            0,
+        ),
+        Idx::<Expression>(1): Generic(
+            1,
+        ),
+        Idx::<Expression>(2): Tuple(
+            NonEmpty(
+                [
+                    Generic(
+                        0,
+                    ),
+                    Generic(
+                        1,
+                    ),
+                ],
+            ),
+        ),
+        Idx::<Expression>(3): Lambda {
+            arg_type: Generic(
+                0,
+            ),
+            return_type: Lambda {
+                arg_type: Generic(
+                    1,
+                ),
+                return_type: Tuple(
+                    NonEmpty(
+                        [
+                            Generic(
+                                0,
+                            ),
+                            Generic(
+                                1,
+                            ),
+                        ],
+                    ),
+                ),
+            },
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+        ),
+        Idx::<Pattern>(1): Generic(
+            1,
+        ),
+    },
+    warnings: [],
+    errors: [],
+    poly_instantiations: {},
+}
+[]

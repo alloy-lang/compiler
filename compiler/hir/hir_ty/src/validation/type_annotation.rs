@@ -9,9 +9,9 @@ use alloy_hir_def as hir;
 use alloy_hir_def::TypeIdx;
 use alloy_hir_infer::InferredType;
 use alloy_hir_resolved as res;
-use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType, AnnotatedTypeVar, Fql};
+use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType, Fql};
 use alloy_workspace::ModuleId;
-use non_empty_vec::NonEmpty;
+use rustc_hash::FxHashMap;
 use text_size::TextRange;
 
 pub(crate) fn validate_type_annotations(
@@ -57,7 +57,8 @@ fn check_type_annotation(
     }
 
     // Check if the inferred type is compatible with the expected type
-    if let Err(reason) = check_type_compatibility(db, &expected_type, &resolved_type) {
+    let mut checker = TypeAnnotationChecker::new(db);
+    if let Err(reason) = checker.check_type_compatibility(&expected_type, &resolved_type) {
         result.error(
             TypeCheckingErrorKind::ConflictingTypeAnnotation {
                 annotated_type: expected_type,
@@ -71,75 +72,222 @@ fn check_type_annotation(
     }
 }
 
-/// Check if the `found` type is compatible with the `expected` annotation type.
-/// This compares an AnnotatedType (what the user wrote) against a InferredType (what inference produced).
-fn check_type_compatibility(
-    db: &dyn HirTyDatabase,
-    expected: &AnnotatedType,
-    found: &InferredType,
-) -> Result<(), ConflictingTypeAnnotationReason> {
-    // TODO: actual ranges for conflicts
-    match (expected, found) {
-        // Wildcards on either side
-        (AnnotatedType::Unconstrained, _) | (_, InferredType::Unconstrained) => Ok(()),
-        (AnnotatedType::Missing, _) | (_, InferredType::Missing) => {
-            Err(ConflictingTypeAnnotationReason::DirectConflict {
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+enum AnnotationVarId {
+    TypeVar(Fql<hir::TypeVariable>),
+    SelfType(Fql<hir::Trait>),
+}
+
+type GenericMapping = FxHashMap<usize, AnnotationVarId>;
+
+struct TypeAnnotationChecker<'db> {
+    db: &'db dyn HirTyDatabase,
+    generic_mapping: GenericMapping,
+}
+
+impl<'db> TypeAnnotationChecker<'db> {
+    fn new(db: &'db dyn HirTyDatabase) -> Self {
+        Self {
+            db,
+            generic_mapping: GenericMapping::default(),
+        }
+    }
+
+    /// Check if the `found` type is compatible with the `expected` annotation type.
+    /// This compares an AnnotatedType (what the user wrote) against a InferredType (what inference produced).
+    fn check_type_compatibility(
+        &mut self,
+        expected: &AnnotatedType,
+        found: &InferredType,
+    ) -> Result<(), ConflictingTypeAnnotationReason> {
+        // TODO: actual ranges for conflicts
+        match (expected, found) {
+            // Wildcards on either side
+            (AnnotatedType::Unconstrained, _) | (_, InferredType::Unconstrained) => Ok(()),
+            (AnnotatedType::Missing, _) | (_, InferredType::Missing) => {
+                Err(ConflictingTypeAnnotationReason::DirectConflict {
+                    expected_type: expected.clone(),
+                    expected_type_range: TextRange::default(),
+                    actual_type: found.clone(),
+                    actual_type_range: TextRange::default(),
+                })
+            }
+
+            // Unit
+            (AnnotatedType::Unit, InferredType::Unit) => Ok(()),
+
+            // Built-in types
+            (AnnotatedType::BuiltIn(a), InferredType::BuiltIn(b)) if a == b => Ok(()),
+
+            // Nominal type definitions
+            (AnnotatedType::TypeDef { fql: a, .. }, InferredType::TypeDef(b, _)) if a == b => {
+                Ok(())
+            }
+
+            // Type variables in annotation match any generic in inference result
+            (AnnotatedType::TypeVar(atv), InferredType::Generic(id)) => self
+                .check_generic_consistency(
+                    AnnotationVarId::TypeVar(atv.fql.clone()),
+                    *id,
+                    expected,
+                    found,
+                ),
+            (AnnotatedType::TypeVar(atv), InferredType::ConstrainedGeneric { id, .. }) => self
+                .check_generic_consistency(
+                    AnnotationVarId::TypeVar(atv.fql.clone()),
+                    *id,
+                    expected,
+                    found,
+                ),
+
+            // Constrained type variables - check consistency + trait constraints
+            (
+                AnnotatedType::ConstrainedTypeVar { base, constraints },
+                InferredType::Generic(id),
+            ) => {
+                self.check_generic_consistency(
+                    AnnotationVarId::TypeVar(base.fql.clone()),
+                    *id,
+                    expected,
+                    found,
+                )?;
+                check_trait_constraints(self.db, found, constraints)
+            }
+            (
+                AnnotatedType::ConstrainedTypeVar { base, constraints },
+                InferredType::ConstrainedGeneric { id, .. },
+            ) => {
+                self.check_generic_consistency(
+                    AnnotationVarId::TypeVar(base.fql.clone()),
+                    *id,
+                    expected,
+                    found,
+                )?;
+                check_trait_constraints(self.db, found, constraints)
+            }
+            (AnnotatedType::ConstrainedTypeVar { constraints, .. }, found_ty) => {
+                check_trait_constraints(self.db, found_ty, constraints)
+            }
+
+            // Self type in annotation matches generics
+            (AnnotatedType::SelfType { trait_fql, .. }, InferredType::Generic(id)) => self
+                .check_generic_consistency(
+                    AnnotationVarId::SelfType(trait_fql.clone()),
+                    *id,
+                    expected,
+                    found,
+                ),
+            (
+                AnnotatedType::SelfType { trait_fql, .. },
+                InferredType::ConstrainedGeneric { id, .. },
+            ) => self.check_generic_consistency(
+                AnnotationVarId::SelfType(trait_fql.clone()),
+                *id,
+                expected,
+                found,
+            ),
+            (
+                AnnotatedType::SelfType {
+                    trait_constraints: constraints,
+                    ..
+                },
+                found_ty,
+            ) if !constraints.is_empty() => {
+                check_trait_constraints(self.db, found_ty, &constraints)
+            }
+
+            // Lambda types
+            (
+                AnnotatedType::Lambda { arg, ret },
+                InferredType::Lambda {
+                    arg_type,
+                    return_type,
+                },
+            ) => {
+                self.check_type_compatibility(arg, arg_type)?;
+                self.check_type_compatibility(ret, return_type)?;
+                Ok(())
+            }
+
+            // Tuple types
+            (AnnotatedType::Tuple(exp_elems), InferredType::Tuple(found_elems)) => {
+                if exp_elems.len() != found_elems.len() {
+                    return Err(ConflictingTypeAnnotationReason::DirectConflict {
+                        expected_type: expected.clone(),
+                        expected_type_range: TextRange::default(),
+                        actual_type: found.clone(),
+                        actual_type_range: TextRange::default(),
+                    });
+                }
+                for (exp_elem, found_elem) in exp_elems.iter().zip(found_elems.iter()) {
+                    self.check_type_compatibility(exp_elem, found_elem)?;
+                }
+                Ok(())
+            }
+
+            (
+                AnnotatedType::Bounded { base, .. },
+                InferredType::Generic(_) | InferredType::ConstrainedGeneric { .. },
+            ) if matches!(
+                base.as_ref(),
+                AnnotatedType::TypeVar(_)
+                    | AnnotatedType::ConstrainedTypeVar { .. }
+                    | AnnotatedType::SelfType { .. }
+            ) =>
+            {
+                Ok(())
+            }
+
+            // Bounded types
+            (
+                AnnotatedType::Bounded {
+                    base: exp_base,
+                    args: exp_args,
+                },
+                InferredType::Bounded {
+                    base: found_base,
+                    args: found_args,
+                },
+            ) => {
+                self.check_type_compatibility(exp_base, found_base)?;
+                if exp_args.len() != found_args.len() {
+                    return Err(ConflictingTypeAnnotationReason::DirectConflict {
+                        expected_type: expected.clone(),
+                        expected_type_range: TextRange::default(),
+                        actual_type: found.clone(),
+                        actual_type_range: TextRange::default(),
+                    });
+                }
+                for (exp_arg, found_arg) in exp_args.iter().zip(found_args.iter()) {
+                    self.check_type_compatibility(exp_arg, found_arg)?;
+                }
+                Ok(())
+            }
+
+            // Everything else is incompatible
+            _ => Err(ConflictingTypeAnnotationReason::DirectConflict {
                 expected_type: expected.clone(),
                 expected_type_range: TextRange::default(),
                 actual_type: found.clone(),
                 actual_type_range: TextRange::default(),
-            })
+            }),
         }
+    }
 
-        // Unit
-        (AnnotatedType::Unit, InferredType::Unit) => Ok(()),
-
-        // Built-in types
-        (AnnotatedType::BuiltIn(a), InferredType::BuiltIn(b)) if a == b => Ok(()),
-
-        // Nominal type definitions
-        (AnnotatedType::TypeDef { fql: a, .. }, InferredType::TypeDef(b, _)) if a == b => Ok(()),
-
-        // Type variables in annotation match any generic in inference result
-        (AnnotatedType::TypeVar { .. }, InferredType::Generic(_)) => Ok(()),
-        (AnnotatedType::TypeVar { .. }, InferredType::ConstrainedGeneric { .. }) => Ok(()),
-
-        // Constrained type variables - check trait constraints
-        (AnnotatedType::ConstrainedTypeVar { constraints, .. }, found_ty) => {
-            check_trait_constraints(db, found_ty, constraints)
-        }
-
-        // Self type in annotation matches generics
-        (AnnotatedType::SelfType { .. }, InferredType::Generic(_)) => Ok(()),
-        (
-            AnnotatedType::SelfType {
-                trait_constraints: constraints,
-                ..
-            },
-            found_ty,
-        ) if !constraints.is_empty() => {
-            // Self type with constraints — check that the found type satisfies them
-            // SAFETY: We just checked non-empty
-            let constraints_ne = unsafe { NonEmpty::new_unchecked(constraints.clone()) };
-            check_trait_constraints(db, found_ty, &constraints_ne)
-        }
-
-        // Lambda types
-        (
-            AnnotatedType::Lambda { arg, ret },
-            InferredType::Lambda {
-                arg_type,
-                return_type,
-            },
-        ) => {
-            check_type_compatibility(db, arg, arg_type)?;
-            check_type_compatibility(db, ret, return_type)?;
-            Ok(())
-        }
-
-        // Tuple types
-        (AnnotatedType::Tuple(exp_elems), InferredType::Tuple(found_elems)) => {
-            if exp_elems.len() != found_elems.len() {
+    /// Check that different annotation type variables don't claim the same inferred generic ID.
+    ///
+    /// If `Generic(0)` was already claimed by annotation var `a`, then annotation var `b`
+    /// cannot also claim it — that would mean the annotation treats them as independent
+    /// when inference says they're the same.
+    fn check_generic_consistency(
+        &mut self,
+        var_id: AnnotationVarId,
+        generic_id: usize,
+        expected: &AnnotatedType,
+        found: &InferredType,
+    ) -> Result<(), ConflictingTypeAnnotationReason> {
+        if let Some(prev_var) = self.generic_mapping.get(&generic_id) {
+            if *prev_var != var_id {
                 return Err(ConflictingTypeAnnotationReason::DirectConflict {
                     expected_type: expected.clone(),
                     expected_type_range: TextRange::default(),
@@ -147,58 +295,10 @@ fn check_type_compatibility(
                     actual_type_range: TextRange::default(),
                 });
             }
-            for (exp_elem, found_elem) in exp_elems.iter().zip(found_elems.iter()) {
-                check_type_compatibility(db, exp_elem, found_elem)?;
-            }
-            Ok(())
+        } else {
+            self.generic_mapping.insert(generic_id, var_id);
         }
-
-        (
-            AnnotatedType::Bounded { base, .. },
-            InferredType::Generic(_) | InferredType::ConstrainedGeneric { .. },
-        ) if matches!(
-            base.as_ref(),
-            AnnotatedType::TypeVar(_)
-                | AnnotatedType::ConstrainedTypeVar { .. }
-                | AnnotatedType::SelfType { .. }
-        ) =>
-        {
-            Ok(())
-        }
-
-        // Bounded types
-        (
-            AnnotatedType::Bounded {
-                base: exp_base,
-                args: exp_args,
-            },
-            InferredType::Bounded {
-                base: found_base,
-                args: found_args,
-            },
-        ) => {
-            check_type_compatibility(db, exp_base, found_base)?;
-            if exp_args.len() != found_args.len() {
-                return Err(ConflictingTypeAnnotationReason::DirectConflict {
-                    expected_type: expected.clone(),
-                    expected_type_range: TextRange::default(),
-                    actual_type: found.clone(),
-                    actual_type_range: TextRange::default(),
-                });
-            }
-            for (exp_arg, found_arg) in exp_args.iter().zip(found_args.iter()) {
-                check_type_compatibility(db, exp_arg, found_arg)?;
-            }
-            Ok(())
-        }
-
-        // Everything else is incompatible
-        _ => Err(ConflictingTypeAnnotationReason::DirectConflict {
-            expected_type: expected.clone(),
-            expected_type_range: TextRange::default(),
-            actual_type: found.clone(),
-            actual_type_range: TextRange::default(),
-        }),
+        Ok(())
     }
 }
 
@@ -206,7 +306,7 @@ fn check_type_compatibility(
 fn check_trait_constraints(
     db: &dyn HirTyDatabase,
     ty: &InferredType,
-    constraints: &NonEmpty<(Fql<hir::Trait>, hir::Name)>,
+    constraints: &[(Fql<hir::Trait>, hir::Name)],
 ) -> Result<(), ConflictingTypeAnnotationReason> {
     match ty {
         InferredType::TypeDef(type_fql, _) => {
