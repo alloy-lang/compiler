@@ -15,12 +15,9 @@ mod expr;
 mod pattern;
 mod type_def;
 
+use super::{HMInferenceContext, MonoType};
 use alloy_hir_def as hir;
-use alloy_hir_resolved as res;
-
-use super::{annotated_to_mono, HMInferenceContext, MonoType};
-
-use alloy_hir_resolved::{resolve_annotated_type, EPTdFql, Fql};
+use alloy_hir_resolved::EPTdFql;
 pub(crate) use expr::infer_expr_hm;
 
 fn infer_literal(

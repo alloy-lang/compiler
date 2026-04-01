@@ -1,7 +1,7 @@
 use super::*;
 use crate::index::{Index, IndexItem};
 use alloy_scope::{ScopeIdx, Scopes};
-use rustc_hash::{FxHashMap, FxHashSet};
+use rustc_hash::FxHashMap;
 use text_size::TextRange;
 
 #[derive(Clone, PartialEq)]
@@ -15,8 +15,6 @@ pub struct HirModule {
     traits: Index<Trait>,
     behaviors: Index<Behavior, (TypeIdx, TypeIdx)>,
     value_definitions: FxHashMap<ExpressionIdx, ValueDefinition>,
-    expression_groups: Vec<Vec<ExpressionIdx>>,
-    expression_dependencies: FxHashMap<ExpressionIdx, FxHashSet<ExpressionIdx>>,
     scopes: Scopes,
     warnings: Vec<LoweringWarning>,
     errors: Vec<LoweringError>,
@@ -37,9 +35,6 @@ impl fmt::Debug for HirModule {
         debug_struct.field("behaviors", &self.behaviors);
         if !self.value_definitions.is_empty() {
             debug_struct.field("value_definitions", &self.value_definitions);
-        }
-        if !self.expression_groups.is_empty() {
-            debug_struct.field("expression_groups", &self.expression_groups);
         }
         debug_struct.field("scopes", &self.scopes);
         debug_struct.field("warnings", &self.warnings);
@@ -69,8 +64,6 @@ impl HirModule {
             traits: Default::default(),
             behaviors: Default::default(),
             value_definitions: Default::default(),
-            expression_groups: Vec::new(),
-            expression_dependencies: Default::default(),
             scopes: Default::default(),
             warnings: Vec::new(),
             errors: Vec::new(),
@@ -88,8 +81,6 @@ impl HirModule {
         traits: Index<Trait>,
         behaviors: Index<Behavior, (TypeIdx, TypeIdx)>,
         value_definitions: FxHashMap<ExpressionIdx, ValueDefinition>,
-        expression_groups: Vec<Vec<ExpressionIdx>>,
-        expression_dependencies: FxHashMap<ExpressionIdx, FxHashSet<ExpressionIdx>>,
         scopes: Scopes,
         warnings: Vec<LoweringWarning>,
         errors: Vec<LoweringError>,
@@ -104,8 +95,6 @@ impl HirModule {
             traits,
             behaviors,
             value_definitions,
-            expression_groups,
-            expression_dependencies,
             scopes,
             warnings,
             errors,
@@ -123,10 +112,6 @@ impl HirModule {
 
     pub fn values(&'_ self) -> impl Iterator<Item = (&ExpressionIdx, &ValueDefinition)> {
         self.value_definitions.iter()
-    }
-
-    pub fn expression_groups(&self) -> impl Iterator<Item = (usize, &Vec<ExpressionIdx>)> {
-        self.expression_groups.iter().enumerate()
     }
 
     pub fn patterns(&'_ self) -> impl Iterator<Item = IndexItem<'_, Pattern, Name>> {
@@ -219,13 +204,6 @@ impl HirModule {
 
     pub fn get_expression(&self, idx: ExpressionIdx) -> &Expression {
         self.expressions.get(idx)
-    }
-
-    pub fn get_expression_dependencies(&self, idx: ExpressionIdx) -> FxHashSet<ExpressionIdx> {
-        self.expression_dependencies
-            .get(&idx)
-            .cloned()
-            .unwrap_or_default()
     }
 
     pub fn get_expression_range(&self, idx: ExpressionIdx) -> TextRange {

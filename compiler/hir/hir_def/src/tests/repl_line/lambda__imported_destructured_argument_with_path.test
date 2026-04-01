@@ -86,14 +86,6 @@ HirModule {
     type_definitions: EmptyIndex::<TypeDefinition>,
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
-    expression_groups: [
-        [
-            Idx::<Expression>(0),
-        ],
-        [
-            Idx::<Expression>(1),
-        ],
-    ],
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

@@ -109,14 +109,6 @@ HirModule {
             expr_idx: Idx::<Expression>(1),
         },
     },
-    expression_groups: [
-        [
-            Idx::<Expression>(0),
-        ],
-        [
-            Idx::<Expression>(1),
-        ],
-    ],
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

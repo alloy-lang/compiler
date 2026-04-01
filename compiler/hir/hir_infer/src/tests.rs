@@ -1,18 +1,12 @@
-use crate::{
-    DefinitionInferenceResult, HirInferDatabase, InferredType, TypeInferenceError,
-    TypeInferenceWarning,
-};
+use crate::{DefinitionInferenceResult, HirInferDatabase};
 use alloy_diagnostics::DiagnosticsReporter;
 use alloy_hir_def as hir;
-use alloy_hir_resolved::{EPTdFql, Fql};
 use alloy_workspace::{ModuleId, WorkspaceDatabase};
-use rustc_hash::FxHashMap;
 use salsa::Database;
-use std::collections::HashMap;
 use std::env;
 use std::path::Path;
 
-alloy_test_harness::test_database!(TestHirInferDatabase: hir::HirDefDatabase, crate::HirInferDatabase);
+alloy_test_harness::test_database!(TestHirInferDatabase: hir::HirDefDatabase, HirInferDatabase);
 
 #[test]
 fn repl_line() {

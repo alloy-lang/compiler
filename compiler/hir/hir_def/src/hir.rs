@@ -8,7 +8,7 @@ use ast::AstElement;
 use la_arena::Idx;
 use non_empty_vec::NonEmpty;
 use ordered_float::NotNan;
-use rustc_hash::{FxHashMap, FxHashSet};
+use rustc_hash::FxHashMap;
 use std::collections::HashSet;
 use std::convert::TryFrom;
 use text_size::TextRange;
@@ -85,7 +85,6 @@ pub(crate) struct LoweringCtx<'db> {
     type_variables: Index<TypeVariable>,
     traits: Index<Trait>,
     behaviors: Index<Behavior, (/* type */ TypeIdx, /* trait */ TypeIdx)>,
-    expression_deps: FxHashMap<ExpressionIdx, FxHashSet<ExpressionIdx>>,
     scopes: Scopes,
     used_imports: HashSet<ImportIdx>,
     warnings: Vec<LoweringWarning>,
@@ -105,7 +104,6 @@ impl<'db> LoweringCtx<'db> {
             type_variables: Index::new(),
             traits: Index::new(),
             behaviors: Index::new(),
-            expression_deps: FxHashMap::default(),
             scopes: Scopes::default(),
             used_imports: HashSet::new(),
             warnings: vec![],
@@ -147,9 +145,6 @@ impl<'db> LoweringCtx<'db> {
             value_definitions.insert(expression_id, value_definition);
         }
 
-        let dep_graph = dependency_graph::DependencyGraph::new(self.expression_deps.clone());
-        let expression_groups = dep_graph.topological_order();
-
         HirModule::new(
             self.imports,
             self.expressions,
@@ -160,8 +155,6 @@ impl<'db> LoweringCtx<'db> {
             self.traits,
             self.behaviors,
             value_definitions,
-            expression_groups,
-            self.expression_deps,
             self.scopes,
             warnings,
             self.errors,
@@ -379,12 +372,8 @@ impl<'db> LoweringCtx<'db> {
         expression: Expression,
         element: &impl AstElement,
     ) -> ExpressionIdx {
-        let deps = dependency_graph::extract_expression_deps(&expression);
-        let idx = self
-            .expressions
-            .insert_not_named(expression, element.range());
-        self.expression_deps.insert(idx, deps);
-        idx
+        self.expressions
+            .insert_not_named(expression, element.range())
     }
 
     pub(crate) fn add_missing_expression(&mut self, element: &impl AstElement) -> ExpressionIdx {
@@ -397,7 +386,6 @@ impl<'db> LoweringCtx<'db> {
         expression: Expression,
         element: &impl AstElement,
     ) -> ExpressionIdx {
-        let deps = dependency_graph::extract_expression_deps(&expression);
         // TODO: track expression and value ranges separately
         let res = self
             .expressions
@@ -414,10 +402,7 @@ impl<'db> LoweringCtx<'db> {
 
                 self.add_missing_expression(element)
             }
-            Ok(id) => {
-                self.expression_deps.insert(id, deps);
-                id
-            }
+            Ok(id) => id,
         }
     }
 
