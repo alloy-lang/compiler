@@ -1,4 +1,4 @@
-typeof wrong : m[t1] -> t1 where
+typeof wrong : m[t1] -> m[t1] where
     typevar m
     typevar t1
 let wrong = |x| -> x
@@ -36,6 +36,15 @@ HirTypedModule {
             },
             range: 15..20,
         },
+        TypeCheckingError {
+            kind: BoundedTypeArityMismatch {
+                type_name: "m",
+                expected_arity: 0,
+                actual_arity: 1,
+                annotation_range: 24..29,
+            },
+            range: 24..29,
+        },
     ],
     poly_instantiations: {},
 }
@@ -43,9 +52,17 @@ HirTypedModule {
 [E34003] Error: Type `m` expects 0 type argument(s), but 1 were provided
    ╭─[ ./test/main.alloy:1:16 ]
    │
- 1 │ typeof wrong : m[t1] -> t1 where
+ 1 │ typeof wrong : m[t1] -> m[t1] where
    │                ──┬──  
    │                  ╰──── `m` expects 0 type argument(s), but 1 were provided
+───╯
+
+[E34003] Error: Type `m` expects 0 type argument(s), but 1 were provided
+   ╭─[ ./test/main.alloy:1:25 ]
+   │
+ 1 │ typeof wrong : m[t1] -> m[t1] where
+   │                         ──┬──  
+   │                           ╰──── `m` expects 0 type argument(s), but 1 were provided
 ───╯
 
 
