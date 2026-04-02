@@ -366,7 +366,7 @@ fn does_behavior_match(
         return false;
     };
 
-    attached_type_fql != expected_type_fql && required_trait != attached_trait_fql
+    attached_type_fql == expected_type_fql && attached_trait_fql == required_trait
 }
 
 /// Walk a type reference tree and report arity errors at each Bounded node.

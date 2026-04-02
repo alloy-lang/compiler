@@ -1,0 +1,207 @@
+import std::function::(<|)
+import std::order::{Ord, Ordering}
+
+typeof comparing : (t2 -> t1) -> t2 -> t2 -> Ordering where
+  typevar t1
+  typevar t2
+let comparing = |convert, x, y| -> Ord::compare <| convert(x) <| convert(y)
+===
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
+    expression_types: {
+        Idx::<Expression>(0): Lambda {
+            arg_type: ConstrainedGeneric {
+                id: 0,
+                constraints: NonEmpty(
+                    [
+                        (
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "std::eq",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            "Eq",
+                        ),
+                    ],
+                ),
+            },
+            return_type: Lambda {
+                arg_type: ConstrainedGeneric {
+                    id: 0,
+                    constraints: NonEmpty(
+                        [
+                            (
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "std::eq",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                "Eq",
+                            ),
+                        ],
+                    ),
+                },
+                return_type: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "std::order",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Ordering",
+                ),
+            },
+        },
+        Idx::<Expression>(1): Generic(
+            1,
+        ),
+        Idx::<Expression>(2): ConstrainedGeneric {
+            id: 0,
+            constraints: NonEmpty(
+                [
+                    (
+                        Fql {
+                            module_id: ModuleId {
+                                path: "std::eq",
+                            },
+                            local_id: Idx::<Trait>(0),
+                        },
+                        "Eq",
+                    ),
+                ],
+            ),
+        },
+        Idx::<Expression>(3): Lambda {
+            arg_type: ConstrainedGeneric {
+                id: 0,
+                constraints: NonEmpty(
+                    [
+                        (
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "std::eq",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            "Eq",
+                        ),
+                    ],
+                ),
+            },
+            return_type: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "std::order",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Ordering",
+            ),
+        },
+        Idx::<Expression>(4): Generic(
+            1,
+        ),
+        Idx::<Expression>(5): ConstrainedGeneric {
+            id: 0,
+            constraints: NonEmpty(
+                [
+                    (
+                        Fql {
+                            module_id: ModuleId {
+                                path: "std::eq",
+                            },
+                            local_id: Idx::<Trait>(0),
+                        },
+                        "Eq",
+                    ),
+                ],
+            ),
+        },
+        Idx::<Expression>(6): TypeDef(
+            Fql {
+                module_id: ModuleId {
+                    path: "std::order",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Ordering",
+        ),
+        Idx::<Expression>(7): Lambda {
+            arg_type: Lambda {
+                arg_type: Generic(
+                    0,
+                ),
+                return_type: ConstrainedGeneric {
+                    id: 1,
+                    constraints: NonEmpty(
+                        [
+                            (
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "std::eq",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                "Eq",
+                            ),
+                        ],
+                    ),
+                },
+            },
+            return_type: Lambda {
+                arg_type: Generic(
+                    0,
+                ),
+                return_type: Lambda {
+                    arg_type: Generic(
+                        0,
+                    ),
+                    return_type: TypeDef(
+                        Fql {
+                            module_id: ModuleId {
+                                path: "std::order",
+                            },
+                            local_id: Idx::<TypeDefinition>(0),
+                        },
+                        "Ordering",
+                    ),
+                },
+            },
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Lambda {
+            arg_type: Generic(
+                1,
+            ),
+            return_type: ConstrainedGeneric {
+                id: 0,
+                constraints: NonEmpty(
+                    [
+                        (
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "std::eq",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            "Eq",
+                        ),
+                    ],
+                ),
+            },
+        },
+        Idx::<Pattern>(1): Generic(
+            1,
+        ),
+        Idx::<Pattern>(2): Generic(
+            1,
+        ),
+    },
+    variant_constructor_types: {},
+    warnings: [],
+    errors: [],
+}
+[]

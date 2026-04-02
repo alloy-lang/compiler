@@ -8,7 +8,7 @@
 
 use super::Fql;
 use alloy_hir_def as hir;
-use alloy_hir_def::{Name, TypeDefinition};
+use alloy_hir_def::TypeDefinition;
 use alloy_hir_resolved::{
     AnnotatedType, AnnotatedTypeVar, EPFql, EPTdFql, HirResolutionError, TypeVarReference,
 };
@@ -256,6 +256,11 @@ pub(super) struct HMInferenceContext<'db> {
     pub(super) self_type_vars: FxHashMap<Fql<hir::Trait>, TypeVarId>,
     /// Maps TypeVarId → user-visible name (for error messages)
     pub(super) type_var_names: FxHashMap<TypeVarId, hir::Name>,
+    /// Maps TypeVarId → trait constraints from annotations.
+    /// When a constrained type variable (e.g., `typevar m = Functor`) is converted
+    /// to a MonoType::Var, its constraints are recorded here for use during
+    /// output (to produce ConstrainedGeneric instead of Generic).
+    pub(super) constraint_store: FxHashMap<TypeVarId, Vec<(Fql<hir::Trait>, hir::Name)>>,
 }
 
 impl<'db> HMInferenceContext<'db> {
@@ -282,6 +287,7 @@ impl<'db> HMInferenceContext<'db> {
             annotation_type_vars: FxHashMap::default(),
             self_type_vars: FxHashMap::default(),
             type_var_names: FxHashMap::default(),
+            constraint_store: FxHashMap::default(),
         }
     }
 
@@ -411,14 +417,29 @@ fn annotated_to_mono(annotated: &AnnotatedType, ctx: &mut HMInferenceContext) ->
         }
         AnnotatedType::ConstrainedTypeVar {
             base: AnnotatedTypeVar { name, fql, .. },
-            ..
+            constraints,
         } => {
-            // TODO: Track the constraints and enforce them during solving
             let var_id = ctx.get_or_create_annotation_type_var(fql.clone(), name.clone());
+            let store = ctx.constraint_store.entry(var_id).or_default();
+            for constraint in constraints.iter() {
+                if !store.contains(constraint) {
+                    store.push(constraint.clone());
+                }
+            }
             Some(MonoType::Var(var_id))
         }
-        AnnotatedType::SelfType { trait_fql, .. } => {
+        AnnotatedType::SelfType {
+            trait_fql,
+            trait_constraints,
+            ..
+        } => {
             let var_id = ctx.get_or_create_self_type_var(trait_fql.clone());
+            let store = ctx.constraint_store.entry(var_id).or_default();
+            for constraint in trait_constraints {
+                if !store.contains(constraint) {
+                    store.push(constraint.clone());
+                }
+            }
             Some(MonoType::Var(var_id))
         }
     }
@@ -427,7 +448,7 @@ fn annotated_to_mono(annotated: &AnnotatedType, ctx: &mut HMInferenceContext) ->
 fn type_def_to_mono(
     ctx: &mut HMInferenceContext,
     fql: &Fql<TypeDefinition>,
-    name: &Name,
+    name: &hir::Name,
     type_args: &[TypeVarReference],
 ) -> MonoType {
     let type_args = type_args

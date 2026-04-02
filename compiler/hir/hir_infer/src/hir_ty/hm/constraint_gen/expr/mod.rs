@@ -148,11 +148,16 @@ fn inferred_to_mono_inner(
                 .or_insert_with(|| ctx.type_var_gen.fresh());
             MonoType::Var(var_id)
         }
-        InferredType::ConstrainedGeneric { id, .. } => {
-            // TODO: Track constraints during solving
+        InferredType::ConstrainedGeneric { id, constraints } => {
             let var_id = *generic_map
                 .entry(*id)
                 .or_insert_with(|| ctx.type_var_gen.fresh());
+            let store = ctx.constraint_store.entry(var_id).or_default();
+            for constraint in constraints.iter() {
+                if !store.contains(constraint) {
+                    store.push(constraint.clone());
+                }
+            }
             MonoType::Var(var_id)
         }
     }

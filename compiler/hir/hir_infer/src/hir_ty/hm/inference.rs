@@ -100,18 +100,37 @@ fn collect_inference_results(
     let mut type_var_map: FxHashMap<TypeVarId, usize> = FxHashMap::default();
     let mut next_generic_id = 0;
 
-    // collect all type variables that appear in unification errors
+    // Propagate constraints through substitution: if v1 has constraints and
+    // v1 → v2 in the substitution, v2 should inherit v1's constraints.
+    let constraint_keys: Vec<_> = ctx.constraint_store.keys().copied().collect();
+    for var_id in constraint_keys {
+        let target_id = substitution.apply_type_var(var_id);
+        if target_id != var_id {
+            let source_constraints = ctx
+                .constraint_store
+                .get(&var_id)
+                .cloned()
+                .unwrap_or_default();
+            let store = ctx.constraint_store.entry(target_id).or_default();
+            for constraint in source_constraints {
+                if !store.contains(&constraint) {
+                    store.push(constraint);
+                }
+            }
+        }
+    }
 
     // Get the definition type from type_env
     let definition_type = {
         if let Some(def_fql) = definition_fql {
             if let Some(mono_ty) = ctx.type_env.get(&def_fql.into()) {
                 let resolved_ty = substitution.apply(mono_ty);
-                mono_to_resolved_with_map(
+                mono_to_inferred_with_map(
                     &resolved_ty,
                     &mut type_var_map,
                     &mut next_generic_id,
                     &ctx.resolution_error_vars,
+                    &ctx.constraint_store,
                 )
             } else {
                 InferredType::Unconstrained
@@ -133,11 +152,12 @@ fn collect_inference_results(
         .map(|(fql, mono)| {
             (
                 fql,
-                mono_to_resolved_with_map(
+                mono_to_inferred_with_map(
                     &mono,
                     &mut type_var_map,
                     &mut next_generic_id,
                     &ctx.resolution_error_vars,
+                    &ctx.constraint_store,
                 ),
             )
         })
@@ -163,11 +183,12 @@ fn collect_inference_results(
     }
 }
 
-fn mono_to_resolved_with_map(
+fn mono_to_inferred_with_map(
     mono: &MonoType,
     type_var_map: &mut FxHashMap<TypeVarId, usize>,
     next_generic_id: &mut usize,
     failed_vars: &FxHashSet<TypeVarId>,
+    constraint_store: &FxHashMap<TypeVarId, Vec<(Fql<hir::Trait>, hir::Name)>>,
 ) -> InferredType {
     match mono {
         MonoType::Unconstrained => InferredType::Unconstrained,
@@ -181,29 +202,46 @@ fn mono_to_resolved_with_map(
                 *next_generic_id += 1;
                 id
             });
-            // TODO: If the type variable has trait constraints in the inference context,
-            // create a ConstrainedGeneric instead
+            // If the type variable has trait constraints, create a ConstrainedGeneric
+            if let Some(constraints) = constraint_store.get(var_id) {
+                if let Some((first, rest)) = constraints.split_first() {
+                    return InferredType::ConstrainedGeneric {
+                        id: generic_id,
+                        constraints: NonEmpty::from((first.clone(), rest.to_vec())),
+                    };
+                }
+            }
             InferredType::Generic(generic_id)
         }
         MonoType::Concrete(builtin) => InferredType::BuiltIn(*builtin),
         MonoType::Function(arg, ret) => InferredType::Lambda {
-            arg_type: Box::new(mono_to_resolved_with_map(
+            arg_type: Box::new(mono_to_inferred_with_map(
                 arg,
                 type_var_map,
                 next_generic_id,
                 failed_vars,
+                constraint_store,
             )),
-            return_type: Box::new(mono_to_resolved_with_map(
+            return_type: Box::new(mono_to_inferred_with_map(
                 ret,
                 type_var_map,
                 next_generic_id,
                 failed_vars,
+                constraint_store,
             )),
         },
         MonoType::Tuple(elements) => {
             let resolved_elements: Vec<_> = elements
                 .iter()
-                .map(|e| mono_to_resolved_with_map(e, type_var_map, next_generic_id, failed_vars))
+                .map(|e| {
+                    mono_to_inferred_with_map(
+                        e,
+                        type_var_map,
+                        next_generic_id,
+                        failed_vars,
+                        constraint_store,
+                    )
+                })
                 .collect();
             if resolved_elements.is_empty() {
                 InferredType::Unit
@@ -217,11 +255,24 @@ fn mono_to_resolved_with_map(
             fql, type_def_name, ..
         } => InferredType::TypeDef(fql.clone(), type_def_name.clone()),
         MonoType::App { constructor, args } => {
-            let base =
-                mono_to_resolved_with_map(constructor, type_var_map, next_generic_id, failed_vars);
+            let base = mono_to_inferred_with_map(
+                constructor,
+                type_var_map,
+                next_generic_id,
+                failed_vars,
+                constraint_store,
+            );
             let resolved_args: Vec<_> = args
                 .iter()
-                .map(|a| mono_to_resolved_with_map(a, type_var_map, next_generic_id, failed_vars))
+                .map(|a| {
+                    mono_to_inferred_with_map(
+                        a,
+                        type_var_map,
+                        next_generic_id,
+                        failed_vars,
+                        constraint_store,
+                    )
+                })
                 .collect();
             InferredType::Bounded {
                 base: Box::new(base),

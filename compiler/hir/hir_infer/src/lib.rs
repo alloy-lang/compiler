@@ -507,8 +507,15 @@ mod hir_infer_small_tests {
     #[test]
     fn infer_chained_binary_op() {
         let mut db = TestHirInferDatabase::default();
+        let stdlib_eq = ModuleId::new(&db, "std::eq");
         let stdlib_order = ModuleId::new(&db, "std::order");
+        let eq_constraint = (Fql::new(stdlib_eq, idx!(0)), hir::Name::new("Eq"));
+        let constrained_t1 = InferredType::ConstrainedGeneric {
+            id: 1,
+            constraints: NonEmpty::new(eq_constraint),
+        };
 
+        // TODO: new test, should fail if t1 doesn't constrain on Ord
         check_named(
             &mut db,
             r"
@@ -526,7 +533,7 @@ mod hir_infer_small_tests {
                 InferredType::Lambda {
                     arg_type: Box::new(InferredType::Lambda {
                         arg_type: Box::new(InferredType::Generic(0)),
-                        return_type: Box::new(InferredType::Generic(1)),
+                        return_type: Box::new(constrained_t1),
                     }),
                     return_type: Box::new(InferredType::Lambda {
                         arg_type: Box::new(InferredType::Generic(0)),
@@ -546,6 +553,12 @@ mod hir_infer_small_tests {
     #[test]
     fn infer_monad_join() {
         let mut db = TestHirInferDatabase::default();
+        let stdlib_monad = ModuleId::new(&db, "std::monad");
+        let monad_constraint = (Fql::new(stdlib_monad, idx!(0)), hir::Name::new("Monad"));
+        let constrained_m = InferredType::ConstrainedGeneric {
+            id: 0,
+            constraints: NonEmpty::new(monad_constraint),
+        };
 
         check_named(
             &mut db,
@@ -563,14 +576,14 @@ mod hir_infer_small_tests {
                 0,
                 InferredType::Lambda {
                     arg_type: Box::new(InferredType::Bounded {
-                        base: Box::new(InferredType::Generic(0)),
+                        base: Box::new(constrained_m.clone()),
                         args: vec![InferredType::Bounded {
-                            base: Box::new(InferredType::Generic(0)),
+                            base: Box::new(constrained_m.clone()),
                             args: vec![InferredType::Generic(1)],
                         }],
                     }),
                     return_type: Box::new(InferredType::Bounded {
-                        base: Box::new(InferredType::Generic(0)),
+                        base: Box::new(constrained_m),
                         args: vec![InferredType::Generic(1)],
                     }),
                 },

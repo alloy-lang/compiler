@@ -60,7 +60,7 @@ impl Substitution {
         }
     }
 
-    fn apply_type_var(&self, var: TypeVarId) -> TypeVarId {
+    pub(super) fn apply_type_var(&self, var: TypeVarId) -> TypeVarId {
         if let Some(substituted) = self.get(var) {
             if let MonoType::Var(inner_var) = self.apply(substituted) {
                 return inner_var;

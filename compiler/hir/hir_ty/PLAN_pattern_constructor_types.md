@@ -28,19 +28,12 @@ Two TODOs related to type-checking patterns: looking up constructor type schemes
 
 ---
 
-## TODO 2: Pattern type annotations from expressions
+## TODO 2: Pattern type annotations from expressions ✅ DONE (no changes needed)
 
-**File:** `compiler/hir/hir_ty/src/validation/type_annotation.rs`
+**Conclusion:** Pattern types are already correctly constrained. No explicit pattern-level validation is needed.
 
-### Problem
-
-Patterns cannot have type annotations directly in the syntax, but their types can be specified by annotations on the enclosing expression. The interaction between expression annotations and pattern types needs clarification.
-
-### Plan
-
-1. **Audit** whether pattern types are already constrained through the shared HM context (expression annotations propagate to patterns via unification).
-2. **If redundant**: document that pattern types are constrained through expression annotations via unification, no explicit check needed.
-3. **If needed**: ensure the validation layer handles the indirection correctly.
+- **Monomorphic annotations**: Added as equations in `infer_body_type`. Unification propagates annotation arg types to pattern variables (e.g., `typeof x : String -> String` makes pattern `s` in `|s| -> ""` resolve to `String`).
+- **Polymorphic annotations**: Skipped at inference level (`is_polymorphic()` guard). Patterns get types from body inference. `validate_type_annotations` compares the full expression type (which includes pattern-derived arg types) against the annotation — mismatches are caught at the function type level.
 
 ---
 

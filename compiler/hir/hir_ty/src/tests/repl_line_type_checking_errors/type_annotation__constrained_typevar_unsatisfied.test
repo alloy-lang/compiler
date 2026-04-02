@@ -1,0 +1,106 @@
+import std::eq::Eq
+import std::order::Ord
+
+typedef Foo =
+  | Bar
+end
+
+behavior Eq for Foo where
+  let eq = True
+end
+
+typeof foo : t where
+  typevar t = Eq + Ord
+let foo = Foo::Bar
+===
+HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Bool,
+        ),
+        Idx::<Expression>(1): TypeDef(
+            Fql {
+                module_id: ModuleId {
+                    path: "main",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Foo",
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [
+        TypeCheckingError {
+            kind: ConflictingTypeAnnotation {
+                annotated_type: ConstrainedTypeVar {
+                    base: AnnotatedTypeVar {
+                        fql: Fql {
+                            module_id: ModuleId {
+                                path: "main",
+                            },
+                            local_id: Idx::<TypeVariable>(0),
+                        },
+                        name: "t",
+                        type_arity: 0,
+                    },
+                    constraints: NonEmpty(
+                        [
+                            (
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "std::eq",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                "Eq",
+                            ),
+                            (
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "std::order",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                "Ord",
+                            ),
+                        ],
+                    ),
+                },
+                annotation_range: 130..131,
+                value_type: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "main",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Foo",
+                ),
+                value_range: 161..179,
+                reason: MissingBehaviorImplementation {
+                    trait_name: "Ord",
+                    type_name: "Foo",
+                },
+            },
+            range: 161..179,
+        },
+    ],
+    poly_instantiations: {},
+}
+[]
+[E34001] Error: Inferred type does not match annotated type
+    ╭─[ ./test/main.alloy:14:1 ]
+    │
+ 14 │ let foo = Foo::Bar
+    │ ─────────┬────────  
+    │          ╰────────── missing implementation of trait `Ord`
+    │ 
+    │ Help: Type `Foo` must implement trait `Ord`
+────╯
+
+
+

@@ -1,0 +1,290 @@
+import std::monad::Monad
+import std::monad::(>>=)
+
+typeof join : m[m[t1]] -> m[t1] where
+  typevar m = Monad
+  typevar t1
+let join = |mm| -> (mm >>= |x| -> x)
+===
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
+    expression_types: {
+        Idx::<Expression>(0): Bounded {
+            base: ConstrainedGeneric {
+                id: 0,
+                constraints: NonEmpty(
+                    [
+                        (
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            "Monad",
+                        ),
+                    ],
+                ),
+            },
+            args: [
+                Bounded {
+                    base: ConstrainedGeneric {
+                        id: 0,
+                        constraints: NonEmpty(
+                            [
+                                (
+                                    Fql {
+                                        module_id: ModuleId {
+                                            path: "std::monad",
+                                        },
+                                        local_id: Idx::<Trait>(0),
+                                    },
+                                    "Monad",
+                                ),
+                            ],
+                        ),
+                    },
+                    args: [
+                        Generic(
+                            1,
+                        ),
+                    ],
+                },
+            ],
+        },
+        Idx::<Expression>(1): Bounded {
+            base: ConstrainedGeneric {
+                id: 0,
+                constraints: NonEmpty(
+                    [
+                        (
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            "Monad",
+                        ),
+                    ],
+                ),
+            },
+            args: [
+                Generic(
+                    1,
+                ),
+            ],
+        },
+        Idx::<Expression>(2): Lambda {
+            arg_type: Bounded {
+                base: ConstrainedGeneric {
+                    id: 0,
+                    constraints: NonEmpty(
+                        [
+                            (
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                "Monad",
+                            ),
+                        ],
+                    ),
+                },
+                args: [
+                    Generic(
+                        1,
+                    ),
+                ],
+            },
+            return_type: Bounded {
+                base: ConstrainedGeneric {
+                    id: 0,
+                    constraints: NonEmpty(
+                        [
+                            (
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                "Monad",
+                            ),
+                        ],
+                    ),
+                },
+                args: [
+                    Generic(
+                        1,
+                    ),
+                ],
+            },
+        },
+        Idx::<Expression>(3): Bounded {
+            base: ConstrainedGeneric {
+                id: 0,
+                constraints: NonEmpty(
+                    [
+                        (
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            "Monad",
+                        ),
+                    ],
+                ),
+            },
+            args: [
+                Generic(
+                    1,
+                ),
+            ],
+        },
+        Idx::<Expression>(4): Lambda {
+            arg_type: Bounded {
+                base: ConstrainedGeneric {
+                    id: 0,
+                    constraints: NonEmpty(
+                        [
+                            (
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                "Monad",
+                            ),
+                        ],
+                    ),
+                },
+                args: [
+                    Bounded {
+                        base: ConstrainedGeneric {
+                            id: 0,
+                            constraints: NonEmpty(
+                                [
+                                    (
+                                        Fql {
+                                            module_id: ModuleId {
+                                                path: "std::monad",
+                                            },
+                                            local_id: Idx::<Trait>(0),
+                                        },
+                                        "Monad",
+                                    ),
+                                ],
+                            ),
+                        },
+                        args: [
+                            Generic(
+                                1,
+                            ),
+                        ],
+                    },
+                ],
+            },
+            return_type: Bounded {
+                base: ConstrainedGeneric {
+                    id: 0,
+                    constraints: NonEmpty(
+                        [
+                            (
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                "Monad",
+                            ),
+                        ],
+                    ),
+                },
+                args: [
+                    Generic(
+                        1,
+                    ),
+                ],
+            },
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Bounded {
+            base: ConstrainedGeneric {
+                id: 0,
+                constraints: NonEmpty(
+                    [
+                        (
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            "Monad",
+                        ),
+                    ],
+                ),
+            },
+            args: [
+                Bounded {
+                    base: ConstrainedGeneric {
+                        id: 0,
+                        constraints: NonEmpty(
+                            [
+                                (
+                                    Fql {
+                                        module_id: ModuleId {
+                                            path: "std::monad",
+                                        },
+                                        local_id: Idx::<Trait>(0),
+                                    },
+                                    "Monad",
+                                ),
+                            ],
+                        ),
+                    },
+                    args: [
+                        Generic(
+                            1,
+                        ),
+                    ],
+                },
+            ],
+        },
+        Idx::<Pattern>(1): Bounded {
+            base: ConstrainedGeneric {
+                id: 0,
+                constraints: NonEmpty(
+                    [
+                        (
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            "Monad",
+                        ),
+                    ],
+                ),
+            },
+            args: [
+                Generic(
+                    1,
+                ),
+            ],
+        },
+    },
+    variant_constructor_types: {},
+    warnings: [],
+    errors: [],
+}
+[]

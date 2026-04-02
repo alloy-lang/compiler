@@ -60,8 +60,8 @@ AnnotatedType ──annotated_to_mono──→ MonoType (hir_ty, dead fork)
 AnnotatedType ──annotated_to_inferred──→ InferredType
 
 InferredType ──inferred_to_mono──→ MonoType (importing cross-module signatures)
-MonoType ──mono_to_resolved_with_map──→ InferredType (hir_infer, after solving)
-MonoType ──mono_to_resolved_with_map──→ ResolvedType (hir_ty, dead fork)
+MonoType ──mono_to_inferred_with_map──→ InferredType (hir_infer, after solving)
+MonoType ──mono_to_inferred_with_map──→ ResolvedType (hir_ty, dead fork)
 
 InferredType ──From impl──→ ResolvedType (1:1 mechanical deep clone)
 ```
@@ -79,7 +79,7 @@ This removes:
 - Forked `HMInferenceContext` (with extra fields not in hir_infer)
 - Forked `unification.rs` (Substitution, unify_types, solve_equations)
 - Forked `constraint_gen/` (expr.rs, pattern.rs, mod.rs)
-- Forked `inference.rs` (infer_types_hm, annotated_to_mono, mono_to_resolved_with_map)
+- Forked `inference.rs` (infer_types_hm, annotated_to_mono, mono_to_inferred_with_map)
 
 **Update:** `compiler/hir/hir_ty/src/hir_ty/mod.rs` -- remove `mod hm` and the `infer_types` function that called `hm::infer_types_hm`. This function is already unused by `type_check_module`.
 
@@ -125,7 +125,7 @@ This removes:
 These conversions cross representation boundaries and can't be eliminated without merging the internal and external representations (which would be worse):
 
 - `annotated_to_mono` -- enters the HM world (Fql identity -> TypeVarId)
-- `mono_to_resolved_with_map` -- exits the HM world (TypeVarId -> Generic(usize))
+- `mono_to_inferred_with_map` -- exits the HM world (TypeVarId -> Generic(usize))
 - `inferred_to_mono` -- re-enters the HM world (importing cross-module signatures)
 - `annotated_to_inferred` -- direct annotation-to-output (skips HM for annotated signatures)
 

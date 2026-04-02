@@ -74,15 +74,15 @@ When matching `(ConstrainedTypeVar, Generic)`, constraints are not recorded. The
 
 ## TODO 4: Create ConstrainedGeneric on output
 
-**File:** `compiler/hir/hir_infer/src/hir_ty/hm/inference.rs` — `mono_to_resolved_with_map()`
+**File:** `compiler/hir/hir_infer/src/hir_ty/hm/inference.rs` — `mono_to_inferred_with_map()`
 
 ### Problem
 
-`mono_to_resolved_with_map()` always converts `MonoType::Var(id)` to `InferredType::Generic(n)`, even when the variable has constraints in the store. There is a TODO comment at line ~289 noting this.
+`mono_to_inferred_with_map()` always converts `MonoType::Var(id)` to `InferredType::Generic(n)`, even when the variable has constraints in the store. There is a TODO comment at line ~289 noting this.
 
 ### Plan
 
-1. Pass `&constraint_store` into `mono_to_resolved_with_map()`.
+1. Pass `&constraint_store` into `mono_to_inferred_with_map()`.
 2. When converting `MonoType::Var(id)`, check for constraints:
    ```rust
    if let Some(constraints) = constraint_store.get(&id) {
@@ -101,8 +101,8 @@ When matching `(ConstrainedTypeVar, Generic)`, constraints are not recorded. The
 
 ## Implementation Order
 
-1. **TODO 3** — Add constraint store and preserve constraints during mono conversion.
-2. **TODO 4** — Output `ConstrainedGeneric` in `mono_to_resolved_with_map()`.
+1. ✅ **TODO 3 (part 1)** — Add constraint store and preserve constraints during mono conversion.
+2. ✅ **TODO 4** — Output `ConstrainedGeneric` in `mono_to_inferred_with_map()`.
 3. **TODO 3 (part 2)** — Enforce constraints during unification.
-4. **TODO 1** — Add generic variable assignment tracking in annotation checking.
+4. ✅ **TODO 1** — Add generic variable assignment tracking in annotation checking.
 5. **TODO 2** — Propagate constraints from annotation checking back to inferred types.

@@ -1,0 +1,38 @@
+import std::eq::Eq
+
+typedef Foo =
+  | Bar
+end
+
+behavior Eq for Foo where
+  let eq = True
+end
+
+typeof foo : t where
+  typevar t = Eq
+let foo = Foo::Bar
+===
+HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Bool,
+        ),
+        Idx::<Expression>(1): TypeDef(
+            Fql {
+                module_id: ModuleId {
+                    path: "main",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Foo",
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [],
+    poly_instantiations: {},
+}
+[]
