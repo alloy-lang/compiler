@@ -20,9 +20,22 @@ DefinitionInferenceResult {
                     0,
                 ),
                 return_type: Bounded {
-                    base: Generic(
-                        1,
-                    ),
+                    base: ConstrainedGeneric {
+                        id: 1,
+                        constraints: NonEmpty(
+                            [
+                                (
+                                    Fql {
+                                        module_id: ModuleId {
+                                            path: "main",
+                                        },
+                                        local_id: Idx::<Trait>(0),
+                                    },
+                                    "TestTrait",
+                                ),
+                            ],
+                        ),
+                    },
                     args: [
                         Generic(
                             2,
@@ -32,9 +45,22 @@ DefinitionInferenceResult {
             },
             return_type: Lambda {
                 arg_type: Bounded {
-                    base: Generic(
-                        1,
-                    ),
+                    base: ConstrainedGeneric {
+                        id: 1,
+                        constraints: NonEmpty(
+                            [
+                                (
+                                    Fql {
+                                        module_id: ModuleId {
+                                            path: "main",
+                                        },
+                                        local_id: Idx::<Trait>(0),
+                                    },
+                                    "TestTrait",
+                                ),
+                            ],
+                        ),
+                    },
                     args: [
                         Generic(
                             0,
@@ -42,9 +68,22 @@ DefinitionInferenceResult {
                     ],
                 },
                 return_type: Bounded {
-                    base: Generic(
-                        1,
-                    ),
+                    base: ConstrainedGeneric {
+                        id: 1,
+                        constraints: NonEmpty(
+                            [
+                                (
+                                    Fql {
+                                        module_id: ModuleId {
+                                            path: "main",
+                                        },
+                                        local_id: Idx::<Trait>(0),
+                                    },
+                                    "TestTrait",
+                                ),
+                            ],
+                        ),
+                    },
                     args: [
                         Generic(
                             2,

@@ -83,7 +83,7 @@ impl std::fmt::Display for InferredType {
             }
             InferredType::Generic(id) => write!(f, "t{id}"),
             InferredType::ConstrainedGeneric { id, constraints } => {
-                write!(f, "t{id}")?;
+                write!(f, "t{id} : ")?;
                 constraints
                     .iter()
                     .map(|(_, trait_name)| trait_name)

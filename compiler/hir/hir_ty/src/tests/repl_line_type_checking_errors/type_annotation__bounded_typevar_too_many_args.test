@@ -15,12 +15,52 @@ HirTypedModule {
             0,
         ),
         Idx::<Expression>(1): Lambda {
-            arg_type: Generic(
-                0,
-            ),
-            return_type: Generic(
-                0,
-            ),
+            arg_type: Bounded {
+                base: ConstrainedGeneric {
+                    id: 0,
+                    constraints: NonEmpty(
+                        [
+                            (
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "std::functor",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                "Functor",
+                            ),
+                        ],
+                    ),
+                },
+                args: [
+                    Generic(
+                        1,
+                    ),
+                ],
+            },
+            return_type: Bounded {
+                base: ConstrainedGeneric {
+                    id: 0,
+                    constraints: NonEmpty(
+                        [
+                            (
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "std::functor",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                "Functor",
+                            ),
+                        ],
+                    ),
+                },
+                args: [
+                    Generic(
+                        1,
+                    ),
+                ],
+            },
         },
     },
     pattern_types: {

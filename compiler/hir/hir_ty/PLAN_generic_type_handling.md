@@ -105,4 +105,4 @@ When matching `(ConstrainedTypeVar, Generic)`, constraints are not recorded. The
 2. ✅ **TODO 4** — Output `ConstrainedGeneric` in `mono_to_inferred_with_map()`.
 3. **TODO 3 (part 2)** — Enforce constraints during unification.
 4. ✅ **TODO 1** — Add generic variable assignment tracking in annotation checking.
-5. **TODO 2** — Propagate constraints from annotation checking back to inferred types.
+5. ✅ **TODO 2** — Propagate constraints from annotation checking back to inferred types.

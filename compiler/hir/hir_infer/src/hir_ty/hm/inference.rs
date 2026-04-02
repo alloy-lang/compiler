@@ -31,10 +31,8 @@ pub(crate) fn infer_body_type<'db>(
 
     if let Some(type_annotation) = value_def.type_annotation(db) {
         let annotated = resolve_annotated_type(db, module_id, type_annotation);
-        if !annotated.is_polymorphic() {
-            if let Some(annotated_mono) = annotated_to_mono(&annotated, &mut ctx) {
-                ctx.add_equation(inferred_mono, annotated_mono, expr_fql);
-            }
+        if let Some(annotated_mono) = annotated_to_mono(&annotated, &mut ctx) {
+            ctx.add_equation(inferred_mono, annotated_mono, expr_fql);
         }
     }
 

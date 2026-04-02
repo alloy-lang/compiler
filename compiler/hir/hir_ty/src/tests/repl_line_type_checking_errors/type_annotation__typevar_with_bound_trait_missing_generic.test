@@ -31,9 +31,29 @@ HirTypedModule {
             ],
         },
         Idx::<Expression>(1): Lambda {
-            arg_type: Generic(
-                0,
-            ),
+            arg_type: Bounded {
+                base: ConstrainedGeneric {
+                    id: 0,
+                    constraints: NonEmpty(
+                        [
+                            (
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "main",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                "TestTrait1",
+                            ),
+                        ],
+                    ),
+                },
+                args: [
+                    Generic(
+                        1,
+                    ),
+                ],
+            },
             return_type: Lambda {
                 arg_type: Generic(
                     1,
@@ -58,15 +78,82 @@ HirTypedModule {
         },
     },
     pattern_types: {
-        Idx::<Pattern>(0): Generic(
-            0,
-        ),
+        Idx::<Pattern>(0): Bounded {
+            base: ConstrainedGeneric {
+                id: 0,
+                constraints: NonEmpty(
+                    [
+                        (
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            "TestTrait1",
+                        ),
+                    ],
+                ),
+            },
+            args: [
+                Generic(
+                    1,
+                ),
+            ],
+        },
         Idx::<Pattern>(1): Generic(
             1,
         ),
     },
     warnings: [],
     errors: [
+        TypeCheckingError {
+            kind: InferenceError(
+                TypeInferenceError {
+                    kind: UnificationError(
+                        TypeMismatch(
+                            App {
+                                constructor: TypeDef {
+                                    fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "test_data",
+                                        },
+                                        local_id: Idx::<TypeDefinition>(0),
+                                    },
+                                    type_args: [
+                                        TypeVarId(
+                                            2,
+                                        ),
+                                    ],
+                                    type_def_name: "Test",
+                                },
+                                args: [
+                                    Concrete(
+                                        Int,
+                                    ),
+                                ],
+                            },
+                            TypeDef {
+                                fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "test_data",
+                                    },
+                                    local_id: Idx::<TypeDefinition>(0),
+                                },
+                                type_args: [
+                                    TypeVarId(
+                                        5,
+                                    ),
+                                ],
+                                type_def_name: "Test",
+                            },
+                        ),
+                    ),
+                    range: 169..199,
+                },
+            ),
+            range: 169..199,
+        },
         TypeCheckingError {
             kind: BoundedTypeArityMismatch {
                 type_name: "Test",
@@ -157,9 +244,29 @@ HirTypedModule {
                 },
                 annotation_range: 99..119,
                 value_type: Lambda {
-                    arg_type: Generic(
-                        0,
-                    ),
+                    arg_type: Bounded {
+                        base: ConstrainedGeneric {
+                            id: 0,
+                            constraints: NonEmpty(
+                                [
+                                    (
+                                        Fql {
+                                            module_id: ModuleId {
+                                                path: "main",
+                                            },
+                                            local_id: Idx::<Trait>(0),
+                                        },
+                                        "TestTrait1",
+                                    ),
+                                ],
+                            ),
+                        },
+                        args: [
+                            Generic(
+                                1,
+                            ),
+                        ],
+                    },
                     return_type: Lambda {
                         arg_type: Generic(
                             1,
@@ -230,6 +337,16 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
+[E33001] Error: Type mismatch: expected `Test[Int]`, found `Test`
+    ╭─[ ./test/main.alloy:10:1 ]
+    │
+ 10 │ let test_func = |a, b| -> test
+    │ ───────────────┬──────────────  
+    │                ╰──────────────── expected `Test[Int]`, found `Test`
+    │ 
+    │ Help: These types must be compatible
+────╯
+
 [E34003] Error: Type `Test` expects 1 type argument(s), but 0 were provided
    ╭─[ ./test/main.alloy:7:36 ]
    │
@@ -247,7 +364,7 @@ HirTypedModule {
     │ 
  10 │ let test_func = |a, b| -> test
     │ ───────────────┬──────────────  
-    │                ╰──────────────── but type inference determined this to be `t0 -> t1 -> Test[Int]`
+    │                ╰──────────────── but type inference determined this to be `t0 : TestTrait1[t1] -> t1 -> Test[Int]`
     │
     ├─[ ./test/main.alloy:10:1 ]
     │

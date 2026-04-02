@@ -29,9 +29,22 @@ DefinitionInferenceResult {
             ],
         },
         Idx::<Expression>(1): Lambda {
-            arg_type: Generic(
-                0,
-            ),
+            arg_type: ConstrainedGeneric {
+                id: 0,
+                constraints: NonEmpty(
+                    [
+                        (
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            "TestTrait1",
+                        ),
+                    ],
+                ),
+            },
             return_type: Lambda {
                 arg_type: Generic(
                     1,
@@ -56,9 +69,22 @@ DefinitionInferenceResult {
         },
     },
     pattern_types: {
-        Idx::<Pattern>(0): Generic(
-            0,
-        ),
+        Idx::<Pattern>(0): ConstrainedGeneric {
+            id: 0,
+            constraints: NonEmpty(
+                [
+                    (
+                        Fql {
+                            module_id: ModuleId {
+                                path: "main",
+                            },
+                            local_id: Idx::<Trait>(0),
+                        },
+                        "TestTrait1",
+                    ),
+                ],
+            ),
+        },
         Idx::<Pattern>(1): Generic(
             1,
         ),

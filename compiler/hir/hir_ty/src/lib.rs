@@ -155,7 +155,7 @@ mod hir_ty_small_tests {
     use alloy_hir_resolved::{AnnotatedType, Fql};
     use alloy_test_harness::idx;
     use alloy_workspace::{ModuleId, WorkspaceDatabase};
-    use non_empty_vec::NonEmpty;
+    use non_empty_vec::{ne_vec, NonEmpty};
     use salsa::Database;
     use text_size::{TextRange, TextSize};
 
@@ -554,10 +554,11 @@ mod hir_ty_small_tests {
         let mut db = TestHirTyDatabase::default();
         let stdlib_eq = ModuleId::new(&db, "std::eq");
         let stdlib_order = ModuleId::new(&db, "std::order");
+        let ord_constraint = (Fql::new(stdlib_order, idx!(0)), hir::Name::new("Ord"));
         let eq_constraint = (Fql::new(stdlib_eq, idx!(0)), hir::Name::new("Eq"));
         let constrained_t1 = InferredType::ConstrainedGeneric {
             id: 1,
-            constraints: NonEmpty::new(eq_constraint),
+            constraints: ne_vec![ord_constraint, eq_constraint],
         };
 
         check_named(
