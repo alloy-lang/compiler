@@ -1,7 +1,7 @@
 use super::{type_def, HMInferenceContext, MonoType};
 use alloy_hir_def as hir;
 use alloy_hir_resolved as res;
-use alloy_hir_resolved::{EPTdFql, Fql};
+use alloy_hir_resolved::Fql;
 use non_empty_vec::NonEmpty;
 
 /// Generate constraints for a pattern using HM inference
@@ -93,14 +93,9 @@ fn infer_destructure(
 fn decompose_function_type(ty: MonoType) -> (Vec<MonoType>, MonoType) {
     let mut args = Vec::new();
     let mut current = ty;
-    loop {
-        match current {
-            MonoType::Function(arg, ret) => {
-                args.push(*arg);
-                current = *ret;
-            }
-            _ => break,
-        }
+    while let MonoType::Function(arg, ret) = current {
+        args.push(*arg);
+        current = *ret;
     }
     (args, current)
 }

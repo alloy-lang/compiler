@@ -10,7 +10,7 @@ pub(super) fn infer(
     target: &EPTdFql,
     args: &[Fql<hir::Expression>],
 ) -> MonoType {
-    let func_ty = find_function_type(ctx, &source_fql, &target);
+    let func_ty = find_function_type(ctx, &source_fql, target);
 
     let arg_types = args
         .iter()

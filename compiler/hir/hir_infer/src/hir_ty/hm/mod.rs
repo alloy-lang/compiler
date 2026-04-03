@@ -297,9 +297,7 @@ impl<'db> HMInferenceContext<'db> {
     }
 
     fn matches_root(&self, fql: &Fql<hir::Expression>) -> bool {
-        self.inferring_expr
-            .as_ref()
-            .map_or(false, |root| root == fql)
+        self.inferring_expr.as_ref() == Some(fql)
     }
 
     fn maybe_find_type(&mut self, fql: impl Into<EPTdFql>) -> Option<MonoType> {
