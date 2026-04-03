@@ -1,5 +1,6 @@
 use crate::hir_ty::UnificationError;
 use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, Severity};
+use alloy_hir_def as hir;
 use alloy_hir_resolved::HirResolutionError;
 use text_size::TextRange;
 
@@ -30,6 +31,7 @@ impl Diagnostic for TypeInferenceError {
         match &self.kind {
             TypeInferenceErrorKind::UnificationError(_) => Some("E33001"),
             TypeInferenceErrorKind::HirResolutionError(err) => err.code(),
+            TypeInferenceErrorKind::UnsatisfiedConstraint { .. } => Some("E33002"),
         }
     }
 
@@ -44,6 +46,12 @@ impl Diagnostic for TypeInferenceError {
                 }
             },
             TypeInferenceErrorKind::HirResolutionError(err) => err.message(),
+            TypeInferenceErrorKind::UnsatisfiedConstraint {
+                trait_name,
+                type_name,
+            } => {
+                format!("Type `{type_name}` does not implement trait `{trait_name}`")
+            }
         }
     }
 
@@ -62,6 +70,14 @@ impl Diagnostic for TypeInferenceError {
                     .with_help("This would create an infinite type, which is not allowed"),
             },
             TypeInferenceErrorKind::HirResolutionError(err) => err.build_report(builder),
+            TypeInferenceErrorKind::UnsatisfiedConstraint {
+                trait_name,
+                type_name,
+            } => builder
+                .with_primary_label(format!("missing implementation of trait `{trait_name}`"))
+                .with_help(format!(
+                    "Type `{type_name}` must implement trait `{trait_name}`"
+                )),
         }
     }
 }
@@ -70,6 +86,10 @@ impl Diagnostic for TypeInferenceError {
 pub enum TypeInferenceErrorKind {
     UnificationError(UnificationError),
     HirResolutionError(HirResolutionError),
+    UnsatisfiedConstraint {
+        trait_name: hir::Name,
+        type_name: hir::Name,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq)]

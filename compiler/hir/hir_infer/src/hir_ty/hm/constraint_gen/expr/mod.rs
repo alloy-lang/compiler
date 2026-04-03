@@ -152,13 +152,7 @@ fn inferred_to_mono_inner(
             let var_id = *generic_map
                 .entry(*id)
                 .or_insert_with(|| ctx.type_var_gen.fresh());
-            let store = ctx.constraint_store.entry(var_id).or_default();
-            for constraint in constraints.iter() {
-                if !store.contains(constraint) {
-                    store.push(constraint.clone());
-                }
-            }
-            MonoType::Var(var_id)
+            MonoType::ConstrainedVar(var_id, constraints.iter().cloned().collect())
         }
     }
 }

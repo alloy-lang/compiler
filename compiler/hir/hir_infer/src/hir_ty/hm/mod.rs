@@ -63,6 +63,9 @@ pub enum MonoType {
         constructor: Box<MonoType>,
         args: Vec<MonoType>,
     },
+    /// Type variable with trait constraints (e.g., `a : Eq`).
+    /// Carries constraints inline, eliminating the need for a separate constraint store.
+    ConstrainedVar(TypeVarId, Vec<(Fql<hir::Trait>, hir::Name)>),
     /// Unit type
     Unit,
 }
@@ -70,7 +73,7 @@ pub enum MonoType {
 impl MonoType {
     pub(crate) fn is_polymorphic(&self) -> bool {
         match self {
-            MonoType::Var(_) => true,
+            MonoType::Var(_) | MonoType::ConstrainedVar(_, _) => true,
             MonoType::Function(arg, ret) => arg.is_polymorphic() || ret.is_polymorphic(),
             MonoType::Tuple(elements) => elements.iter().any(Self::is_polymorphic),
             MonoType::App { constructor, args } => {
@@ -92,7 +95,7 @@ impl MonoType {
     fn collect_free_vars(&self, vars: &mut FxHashSet<TypeVarId>) {
         match self {
             MonoType::Unconstrained => {}
-            MonoType::Var(v) => {
+            MonoType::Var(v) | MonoType::ConstrainedVar(v, _) => {
                 vars.insert(*v);
             }
             MonoType::Function(arg, ret) => {
@@ -120,6 +123,14 @@ impl std::fmt::Display for MonoType {
         match self {
             MonoType::Unconstrained => write!(f, "_"),
             MonoType::Var(var) => write!(f, "t{}", var.0),
+            MonoType::ConstrainedVar(var, constraints) => {
+                write!(f, "t{}", var.0)?;
+                let names: Vec<_> = constraints.iter().map(|(_, name)| name.to_string()).collect();
+                if !names.is_empty() {
+                    write!(f, " : {}", names.join(" + "))?;
+                }
+                Ok(())
+            }
             MonoType::Concrete(builtin) => write!(f, "{builtin:?}"),
             MonoType::TypeDef { type_def_name, .. } => {
                 write!(f, "{type_def_name}")
@@ -256,11 +267,6 @@ pub(super) struct HMInferenceContext<'db> {
     pub(super) self_type_vars: FxHashMap<Fql<hir::Trait>, TypeVarId>,
     /// Maps TypeVarId → user-visible name (for error messages)
     pub(super) type_var_names: FxHashMap<TypeVarId, hir::Name>,
-    /// Maps TypeVarId → trait constraints from annotations.
-    /// When a constrained type variable (e.g., `typevar m = Functor`) is converted
-    /// to a MonoType::Var, its constraints are recorded here for use during
-    /// output (to produce ConstrainedGeneric instead of Generic).
-    pub(super) constraint_store: FxHashMap<TypeVarId, Vec<(Fql<hir::Trait>, hir::Name)>>,
 }
 
 impl<'db> HMInferenceContext<'db> {
@@ -287,7 +293,6 @@ impl<'db> HMInferenceContext<'db> {
             annotation_type_vars: FxHashMap::default(),
             self_type_vars: FxHashMap::default(),
             type_var_names: FxHashMap::default(),
-            constraint_store: FxHashMap::default(),
         }
     }
 
@@ -420,13 +425,10 @@ fn annotated_to_mono(annotated: &AnnotatedType, ctx: &mut HMInferenceContext) ->
             constraints,
         } => {
             let var_id = ctx.get_or_create_annotation_type_var(fql.clone(), name.clone());
-            let store = ctx.constraint_store.entry(var_id).or_default();
-            for constraint in constraints.iter() {
-                if !store.contains(constraint) {
-                    store.push(constraint.clone());
-                }
-            }
-            Some(MonoType::Var(var_id))
+            Some(MonoType::ConstrainedVar(
+                var_id,
+                constraints.iter().cloned().collect(),
+            ))
         }
         AnnotatedType::SelfType {
             trait_fql,
@@ -434,13 +436,13 @@ fn annotated_to_mono(annotated: &AnnotatedType, ctx: &mut HMInferenceContext) ->
             ..
         } => {
             let var_id = ctx.get_or_create_self_type_var(trait_fql.clone());
-            let store = ctx.constraint_store.entry(var_id).or_default();
+            let mut constraints = vec![(trait_fql.clone(), trait_fql.trait_name(ctx.db))];
             for constraint in trait_constraints {
-                if !store.contains(constraint) {
-                    store.push(constraint.clone());
+                if !constraints.contains(constraint) {
+                    constraints.push(constraint.clone());
                 }
             }
-            Some(MonoType::Var(var_id))
+            Some(MonoType::ConstrainedVar(var_id, constraints))
         }
     }
 }

@@ -1,0 +1,98 @@
+import std::eq::Eq
+import std::eq::(==)
+
+typedef Foo =
+  | Bar
+end
+
+let x = Eq::eq(Foo::Bar, Foo::Bar)
+-- TODO: `==` should resolve, as it's attached to `Foo` and `std::eq::Eq` is in scope
+let y = Foo::Bar == Foo::Bar
+===
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
+    expression_types: {
+        Idx::<Expression>(0): TypeDef(
+            Fql {
+                module_id: ModuleId {
+                    path: "main",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Foo",
+        ),
+        Idx::<Expression>(1): TypeDef(
+            Fql {
+                module_id: ModuleId {
+                    path: "main",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Foo",
+        ),
+        Idx::<Expression>(2): BuiltIn(
+            Bool,
+        ),
+        Idx::<Expression>(3): TypeDef(
+            Fql {
+                module_id: ModuleId {
+                    path: "main",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Foo",
+        ),
+        Idx::<Expression>(4): TypeDef(
+            Fql {
+                module_id: ModuleId {
+                    path: "main",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Foo",
+        ),
+        Idx::<Expression>(5): Generic(
+            0,
+        ),
+    },
+    pattern_types: {},
+    variant_constructor_types: {
+        (
+            Idx::<TypeDefinition>(0),
+            Some(
+                "Bar",
+            ),
+        ): TypeDef(
+            Fql {
+                module_id: ModuleId {
+                    path: "main",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Foo",
+        ),
+    },
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnsatisfiedConstraint {
+                trait_name: "Eq",
+                type_name: "Foo",
+            },
+            range: 68..102,
+        },
+    ],
+}
+[]
+[E33002] Error: Type `Foo` does not implement trait `Eq`
+   ╭─[ ./test/main.alloy:8:1 ]
+   │
+ 8 │ let x = Eq::eq(Foo::Bar, Foo::Bar)
+   │ ─────────────────┬────────────────  
+   │                  ╰────────────────── missing implementation of trait `Eq`
+   │ 
+   │ Help: Type `Foo` must implement trait `Eq`
+───╯
+
+
+

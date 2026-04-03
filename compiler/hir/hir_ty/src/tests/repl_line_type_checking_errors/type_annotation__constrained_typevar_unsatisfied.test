@@ -35,6 +35,18 @@ HirTypedModule {
     warnings: [],
     errors: [
         TypeCheckingError {
+            kind: InferenceError(
+                TypeInferenceError {
+                    kind: UnsatisfiedConstraint {
+                        trait_name: "Ord",
+                        type_name: "Foo",
+                    },
+                    range: 161..179,
+                },
+            ),
+            range: 161..179,
+        },
+        TypeCheckingError {
             kind: ConflictingTypeAnnotation {
                 annotated_type: ConstrainedTypeVar {
                     base: AnnotatedTypeVar {
@@ -92,6 +104,16 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
+[E33002] Error: Type `Foo` does not implement trait `Ord`
+    ╭─[ ./test/main.alloy:14:1 ]
+    │
+ 14 │ let foo = Foo::Bar
+    │ ─────────┬────────  
+    │          ╰────────── missing implementation of trait `Ord`
+    │ 
+    │ Help: Type `Foo` must implement trait `Ord`
+────╯
+
 [E34001] Error: Inferred type does not match annotated type
     ╭─[ ./test/main.alloy:14:1 ]
     │

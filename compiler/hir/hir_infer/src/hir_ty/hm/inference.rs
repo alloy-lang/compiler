@@ -2,7 +2,7 @@
 
 use super::super::{Fql, InferredType};
 use super::constraint_gen::infer_expr_hm;
-use super::unification::{solve_equations, Substitution};
+use super::unification::solve_equations;
 use super::{annotated_to_mono, TypeVarId};
 use super::{HMInferenceContext, MonoType};
 use crate::diagnostics::TypeInferenceErrorKind;
@@ -36,15 +36,7 @@ pub(crate) fn infer_body_type<'db>(
         }
     }
 
-    let (substitution, unification_errors) = solve_equations(db, ctx.equations.clone());
-
-    collect_inference_results(
-        &mut ctx,
-        substitution,
-        unification_errors,
-        module_id,
-        Some(Fql::new(module_id, expr_idx)),
-    )
+    collect_inference_results(&mut ctx, module_id, Some(Fql::new(module_id, expr_idx)))
 }
 
 fn infer_body_type_cycle_initial(
@@ -72,51 +64,25 @@ pub(crate) fn infer_expressions(
         let expr_fql = Fql::new(module_id, expr_id);
         infer_expr_hm(&mut ctx, expr_fql);
     }
-    let (bare_substitution, bare_unification_errors) = solve_equations(db, ctx.equations.clone());
 
-    collect_inference_results(
-        &mut ctx,
-        bare_substitution,
-        bare_unification_errors,
-        module_id,
-        None,
-    )
+    collect_inference_results(&mut ctx, module_id, None)
 }
 
 /// Collect inference results from a completed inference context.
 ///
-/// Applies the substitution to all types in the context, converts MonoTypes
+/// Solves type equations, checks trait constraints, converts MonoTypes
 /// to InferredTypes, and collects errors.
 fn collect_inference_results(
     ctx: &mut HMInferenceContext<'_>,
-    substitution: Substitution,
-    unification_errors: Vec<TypeInferenceError>,
     module_id: ModuleId,
     definition_fql: Option<Fql<hir::Expression>>,
 ) -> DefinitionInferenceResult {
     let db = ctx.db;
+    let (substitution, constraint_map, solve_errors) =
+        solve_equations(db, ctx.equations.clone());
+
     let mut type_var_map: FxHashMap<TypeVarId, usize> = FxHashMap::default();
     let mut next_generic_id = 0;
-
-    // Propagate constraints through substitution: if v1 has constraints and
-    // v1 → v2 in the substitution, v2 should inherit v1's constraints.
-    let constraint_keys: Vec<_> = ctx.constraint_store.keys().copied().collect();
-    for var_id in constraint_keys {
-        let target_id = substitution.apply_type_var(var_id);
-        if target_id != var_id {
-            let source_constraints = ctx
-                .constraint_store
-                .get(&var_id)
-                .cloned()
-                .unwrap_or_default();
-            let store = ctx.constraint_store.entry(target_id).or_default();
-            for constraint in source_constraints {
-                if !store.contains(&constraint) {
-                    store.push(constraint);
-                }
-            }
-        }
-    }
 
     // Get the definition type from type_env
     let definition_type = {
@@ -128,7 +94,7 @@ fn collect_inference_results(
                     &mut type_var_map,
                     &mut next_generic_id,
                     &ctx.resolution_error_vars,
-                    &ctx.constraint_store,
+                    &constraint_map,
                 )
             } else {
                 InferredType::Unconstrained
@@ -155,7 +121,7 @@ fn collect_inference_results(
                     &mut type_var_map,
                     &mut next_generic_id,
                     &ctx.resolution_error_vars,
-                    &ctx.constraint_store,
+                    &constraint_map,
                 ),
             )
         })
@@ -173,7 +139,7 @@ fn collect_inference_results(
         })
         .collect::<Vec<_>>();
     result.extend_errors(&resolution_errors);
-    result.extend_errors(&unification_errors);
+    result.extend_errors(&solve_errors);
 
     DefinitionInferenceResult {
         definition_type,
@@ -186,7 +152,7 @@ fn mono_to_inferred_with_map(
     type_var_map: &mut FxHashMap<TypeVarId, usize>,
     next_generic_id: &mut usize,
     failed_vars: &FxHashSet<TypeVarId>,
-    constraint_store: &FxHashMap<TypeVarId, Vec<(Fql<hir::Trait>, hir::Name)>>,
+    constraint_map: &FxHashMap<TypeVarId, Vec<(Fql<hir::Trait>, hir::Name)>>,
 ) -> InferredType {
     match mono {
         MonoType::Unconstrained => InferredType::Unconstrained,
@@ -194,14 +160,13 @@ fn mono_to_inferred_with_map(
             if failed_vars.contains(var_id) {
                 return InferredType::Missing;
             }
-            // Get or assign a canonical ID for this type variable
             let generic_id = *type_var_map.entry(*var_id).or_insert_with(|| {
                 let id = *next_generic_id;
                 *next_generic_id += 1;
                 id
             });
-            // If the type variable has trait constraints, create a ConstrainedGeneric
-            if let Some(constraints) = constraint_store.get(var_id) {
+            // Check the constraint map for constraints inherited through unification
+            if let Some(constraints) = constraint_map.get(var_id) {
                 if let Some((first, rest)) = constraints.split_first() {
                     return InferredType::ConstrainedGeneric {
                         id: generic_id,
@@ -211,6 +176,33 @@ fn mono_to_inferred_with_map(
             }
             InferredType::Generic(generic_id)
         }
+        MonoType::ConstrainedVar(var_id, constraints) => {
+            if failed_vars.contains(var_id) {
+                return InferredType::Missing;
+            }
+            let generic_id = *type_var_map.entry(*var_id).or_insert_with(|| {
+                let id = *next_generic_id;
+                *next_generic_id += 1;
+                id
+            });
+            // Merge inline constraints with any from the constraint map
+            let mut all_constraints = constraints.clone();
+            if let Some(map_constraints) = constraint_map.get(var_id) {
+                for c in map_constraints {
+                    if !all_constraints.contains(c) {
+                        all_constraints.push(c.clone());
+                    }
+                }
+            }
+            if let Some((first, rest)) = all_constraints.split_first() {
+                InferredType::ConstrainedGeneric {
+                    id: generic_id,
+                    constraints: NonEmpty::from((first.clone(), rest.to_vec())),
+                }
+            } else {
+                InferredType::Generic(generic_id)
+            }
+        }
         MonoType::Concrete(builtin) => InferredType::BuiltIn(*builtin),
         MonoType::Function(arg, ret) => InferredType::Lambda {
             arg_type: Box::new(mono_to_inferred_with_map(
@@ -218,14 +210,14 @@ fn mono_to_inferred_with_map(
                 type_var_map,
                 next_generic_id,
                 failed_vars,
-                constraint_store,
+                constraint_map,
             )),
             return_type: Box::new(mono_to_inferred_with_map(
                 ret,
                 type_var_map,
                 next_generic_id,
                 failed_vars,
-                constraint_store,
+                constraint_map,
             )),
         },
         MonoType::Tuple(elements) => {
@@ -237,7 +229,7 @@ fn mono_to_inferred_with_map(
                         type_var_map,
                         next_generic_id,
                         failed_vars,
-                        constraint_store,
+                        constraint_map,
                     )
                 })
                 .collect();
@@ -258,7 +250,7 @@ fn mono_to_inferred_with_map(
                 type_var_map,
                 next_generic_id,
                 failed_vars,
-                constraint_store,
+                constraint_map,
             );
             let resolved_args: Vec<_> = args
                 .iter()
@@ -268,7 +260,7 @@ fn mono_to_inferred_with_map(
                         type_var_map,
                         next_generic_id,
                         failed_vars,
-                        constraint_store,
+                        constraint_map,
                     )
                 })
                 .collect();

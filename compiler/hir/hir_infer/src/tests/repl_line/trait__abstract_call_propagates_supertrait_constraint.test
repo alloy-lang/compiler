@@ -17,6 +17,15 @@ DefinitionInferenceResult {
                         (
                             Fql {
                                 module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            "Ord",
+                        ),
+                        (
+                            Fql {
+                                module_id: ModuleId {
                                     path: "std::eq",
                                 },
                                 local_id: Idx::<Trait>(0),
@@ -31,6 +40,15 @@ DefinitionInferenceResult {
                     id: 0,
                     constraints: NonEmpty(
                         [
+                            (
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "std::order",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                "Ord",
+                            ),
                             (
                                 Fql {
                                     module_id: ModuleId {
@@ -64,6 +82,15 @@ DefinitionInferenceResult {
                     (
                         Fql {
                             module_id: ModuleId {
+                                path: "std::order",
+                            },
+                            local_id: Idx::<Trait>(0),
+                        },
+                        "Ord",
+                    ),
+                    (
+                        Fql {
+                            module_id: ModuleId {
                                 path: "std::eq",
                             },
                             local_id: Idx::<Trait>(0),
@@ -78,6 +105,15 @@ DefinitionInferenceResult {
                 id: 0,
                 constraints: NonEmpty(
                     [
+                        (
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            "Ord",
+                        ),
                         (
                             Fql {
                                 module_id: ModuleId {
@@ -110,6 +146,15 @@ DefinitionInferenceResult {
                     (
                         Fql {
                             module_id: ModuleId {
+                                path: "std::order",
+                            },
+                            local_id: Idx::<Trait>(0),
+                        },
+                        "Ord",
+                    ),
+                    (
+                        Fql {
+                            module_id: ModuleId {
                                 path: "std::eq",
                             },
                             local_id: Idx::<Trait>(0),
@@ -137,6 +182,15 @@ DefinitionInferenceResult {
                     id: 1,
                     constraints: NonEmpty(
                         [
+                            (
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "std::order",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                "Ord",
+                            ),
                             (
                                 Fql {
                                     module_id: ModuleId {
@@ -180,6 +234,15 @@ DefinitionInferenceResult {
                 id: 0,
                 constraints: NonEmpty(
                     [
+                        (
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            "Ord",
+                        ),
                         (
                             Fql {
                                 module_id: ModuleId {
