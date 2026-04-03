@@ -122,7 +122,11 @@ impl ConversionContext {
                 trait_constraints,
                 ..
             } => {
-                let mut constraints = NonEmpty::new((trait_fql.clone(), trait_fql.trait_name(db)));
+                let primary = res::TraitConstraint {
+                    trait_fql: trait_fql.clone(),
+                    trait_name: trait_fql.trait_name(db),
+                };
+                let mut constraints = NonEmpty::new(primary);
                 for trait_constraint in trait_constraints {
                     constraints.push(trait_constraint.clone());
                 }

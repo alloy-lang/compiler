@@ -14,24 +14,24 @@ DefinitionInferenceResult {
                 id: 0,
                 constraints: NonEmpty(
                     [
-                        (
-                            Fql {
+                        TraitConstraint {
+                            trait_fql: Fql {
                                 module_id: ModuleId {
                                     path: "std::order",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            "Ord",
-                        ),
-                        (
-                            Fql {
+                            trait_name: "Ord",
+                        },
+                        TraitConstraint {
+                            trait_fql: Fql {
                                 module_id: ModuleId {
                                     path: "std::eq",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            "Eq",
-                        ),
+                            trait_name: "Eq",
+                        },
                     ],
                 ),
             },
@@ -40,24 +40,24 @@ DefinitionInferenceResult {
                     id: 0,
                     constraints: NonEmpty(
                         [
-                            (
-                                Fql {
+                            TraitConstraint {
+                                trait_fql: Fql {
                                     module_id: ModuleId {
                                         path: "std::order",
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                "Ord",
-                            ),
-                            (
-                                Fql {
+                                trait_name: "Ord",
+                            },
+                            TraitConstraint {
+                                trait_fql: Fql {
                                     module_id: ModuleId {
                                         path: "std::eq",
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                "Eq",
-                            ),
+                                trait_name: "Eq",
+                            },
                         ],
                     ),
                 },
@@ -79,24 +79,24 @@ DefinitionInferenceResult {
             id: 0,
             constraints: NonEmpty(
                 [
-                    (
-                        Fql {
+                    TraitConstraint {
+                        trait_fql: Fql {
                             module_id: ModuleId {
                                 path: "std::order",
                             },
                             local_id: Idx::<Trait>(0),
                         },
-                        "Ord",
-                    ),
-                    (
-                        Fql {
+                        trait_name: "Ord",
+                    },
+                    TraitConstraint {
+                        trait_fql: Fql {
                             module_id: ModuleId {
                                 path: "std::eq",
                             },
                             local_id: Idx::<Trait>(0),
                         },
-                        "Eq",
-                    ),
+                        trait_name: "Eq",
+                    },
                 ],
             ),
         },
@@ -105,24 +105,24 @@ DefinitionInferenceResult {
                 id: 0,
                 constraints: NonEmpty(
                     [
-                        (
-                            Fql {
+                        TraitConstraint {
+                            trait_fql: Fql {
                                 module_id: ModuleId {
                                     path: "std::order",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            "Ord",
-                        ),
-                        (
-                            Fql {
+                            trait_name: "Ord",
+                        },
+                        TraitConstraint {
+                            trait_fql: Fql {
                                 module_id: ModuleId {
                                     path: "std::eq",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            "Eq",
-                        ),
+                            trait_name: "Eq",
+                        },
                     ],
                 ),
             },
@@ -143,24 +143,24 @@ DefinitionInferenceResult {
             id: 0,
             constraints: NonEmpty(
                 [
-                    (
-                        Fql {
+                    TraitConstraint {
+                        trait_fql: Fql {
                             module_id: ModuleId {
                                 path: "std::order",
                             },
                             local_id: Idx::<Trait>(0),
                         },
-                        "Ord",
-                    ),
-                    (
-                        Fql {
+                        trait_name: "Ord",
+                    },
+                    TraitConstraint {
+                        trait_fql: Fql {
                             module_id: ModuleId {
                                 path: "std::eq",
                             },
                             local_id: Idx::<Trait>(0),
                         },
-                        "Eq",
-                    ),
+                        trait_name: "Eq",
+                    },
                 ],
             ),
         },
@@ -182,24 +182,24 @@ DefinitionInferenceResult {
                     id: 1,
                     constraints: NonEmpty(
                         [
-                            (
-                                Fql {
+                            TraitConstraint {
+                                trait_fql: Fql {
                                     module_id: ModuleId {
                                         path: "std::order",
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                "Ord",
-                            ),
-                            (
-                                Fql {
+                                trait_name: "Ord",
+                            },
+                            TraitConstraint {
+                                trait_fql: Fql {
                                     module_id: ModuleId {
                                         path: "std::eq",
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                "Eq",
-                            ),
+                                trait_name: "Eq",
+                            },
                         ],
                     ),
                 },
@@ -234,24 +234,24 @@ DefinitionInferenceResult {
                 id: 0,
                 constraints: NonEmpty(
                     [
-                        (
-                            Fql {
+                        TraitConstraint {
+                            trait_fql: Fql {
                                 module_id: ModuleId {
                                     path: "std::order",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            "Ord",
-                        ),
-                        (
-                            Fql {
+                            trait_name: "Ord",
+                        },
+                        TraitConstraint {
+                            trait_fql: Fql {
                                 module_id: ModuleId {
                                     path: "std::eq",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            "Eq",
-                        ),
+                            trait_name: "Eq",
+                        },
                     ],
                 ),
             },

@@ -4,7 +4,7 @@ use super::{EPFql, MonoType, TypeEquation, TypeVarId};
 use crate::diagnostics::TypeInferenceError;
 use crate::{diagnostics, HirInferDatabase};
 use alloy_hir_def as hir;
-use alloy_hir_resolved::{resolve_behavior_by_id, Fql};
+use alloy_hir_resolved::{resolve_behavior_by_id, Fql, TraitConstraint};
 use diagnostics::TypeInferenceErrorKind;
 use rustc_hash::FxHashMap;
 
@@ -45,9 +45,7 @@ impl Substitution {
                     let resolved = self.apply(substituted);
                     match resolved {
                         // Propagate constraints through var chains
-                        MonoType::Var(v2) => {
-                            MonoType::ConstrainedVar(v2, constraints.clone())
-                        }
+                        MonoType::Var(v2) => MonoType::ConstrainedVar(v2, constraints.clone()),
                         // Merge constraints when chaining through another constrained var
                         MonoType::ConstrainedVar(v2, c2) => {
                             let mut merged = constraints.clone();
@@ -280,7 +278,7 @@ pub(super) fn solve_equations(
     equations: Vec<TypeEquation>,
 ) -> (
     Substitution,
-    FxHashMap<TypeVarId, Vec<(Fql<hir::Trait>, hir::Name)>>,
+    FxHashMap<TypeVarId, Vec<TraitConstraint>>,
     Vec<TypeInferenceError>,
 ) {
     let mut subst = Substitution::new();
@@ -308,13 +306,13 @@ pub(super) fn solve_equations(
             ..
         } = &resolved
         {
-            for (trait_fql, trait_name) in constraints {
-                if !has_behavior_for_trait(db, type_fql, trait_fql) {
+            for c in constraints {
+                if !c.has_behavior_for_trait(db, type_fql) {
                     // Find the equation that caused this binding for a precise range
                     let range = find_equation_range(db, &equations, *var_id, &subst);
                     errors.push(TypeInferenceError::new(
                         TypeInferenceErrorKind::UnsatisfiedConstraint {
-                            trait_name: trait_name.clone(),
+                            trait_name: c.trait_name.clone(),
                             type_name: type_def_name.clone(),
                         },
                         range,
@@ -352,7 +350,7 @@ pub(super) fn solve_equations(
 fn collect_constraints(
     equations: &[TypeEquation],
     subst: &Substitution,
-) -> FxHashMap<TypeVarId, Vec<(Fql<hir::Trait>, hir::Name)>> {
+) -> FxHashMap<TypeVarId, Vec<TraitConstraint>> {
     let mut constraints = FxHashMap::default();
     for equation in equations {
         collect_constrained_vars(&equation.left, subst, &mut constraints);
@@ -364,7 +362,7 @@ fn collect_constraints(
 fn collect_constrained_vars(
     ty: &MonoType,
     subst: &Substitution,
-    constraints: &mut FxHashMap<TypeVarId, Vec<(Fql<hir::Trait>, hir::Name)>>,
+    constraints: &mut FxHashMap<TypeVarId, Vec<TraitConstraint>>,
 ) {
     match ty {
         MonoType::ConstrainedVar(v, c) => {
@@ -441,26 +439,4 @@ fn mentions_type_var(ty: &MonoType, target: TypeVarId, subst: &Substitution) -> 
         | MonoType::TypeDef { .. }
         | MonoType::Unit => false,
     }
-}
-
-/// Check if a type has a behavior implementation for the required trait.
-fn has_behavior_for_trait(
-    db: &dyn HirInferDatabase,
-    type_fql: &Fql<hir::TypeDefinition>,
-    required_trait: &Fql<hir::Trait>,
-) -> bool {
-    let (hir_module, _) = hir::lower_file(db, type_fql.module_id);
-    for (behavior_idx, _, _, _) in hir_module.behaviors() {
-        let behavior = resolve_behavior_by_id(db, type_fql.module_id, behavior_idx);
-        let Ok(attached_type) = &behavior.attached_type else {
-            continue;
-        };
-        let Ok(attached_trait) = &behavior.attached_trait else {
-            continue;
-        };
-        if attached_type == type_fql && attached_trait == required_trait {
-            return true;
-        }
-    }
-    false
 }

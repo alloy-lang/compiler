@@ -1,4 +1,5 @@
 use alloy_hir_def as hir;
+use alloy_hir_resolved as res;
 use alloy_hir_resolved::Fql;
 use itertools::Itertools;
 use non_empty_vec::NonEmpty;
@@ -28,7 +29,7 @@ pub enum InferredType {
     Generic(usize),
     ConstrainedGeneric {
         id: usize,
-        constraints: NonEmpty<(Fql<hir::Trait>, hir::Name)>,
+        constraints: NonEmpty<res::TraitConstraint>,
     },
 }
 
@@ -86,7 +87,7 @@ impl std::fmt::Display for InferredType {
                 write!(f, "t{id} : ")?;
                 constraints
                     .iter()
-                    .map(|(_, trait_name)| trait_name)
+                    .map(|c| &c.trait_name)
                     .join(" + ")
                     .fmt(f)?;
                 Ok(())

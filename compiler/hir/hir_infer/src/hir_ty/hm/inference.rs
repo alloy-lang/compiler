@@ -8,7 +8,7 @@ use super::{HMInferenceContext, MonoType};
 use crate::diagnostics::TypeInferenceErrorKind;
 use crate::{DefinitionInferenceResult, HirInferDatabase, TypeInferenceError};
 use alloy_hir_def as hir;
-use alloy_hir_resolved::resolve_annotated_type;
+use alloy_hir_resolved::{resolve_annotated_type, TraitConstraint};
 use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
@@ -78,8 +78,7 @@ fn collect_inference_results(
     definition_fql: Option<Fql<hir::Expression>>,
 ) -> DefinitionInferenceResult {
     let db = ctx.db;
-    let (substitution, constraint_map, solve_errors) =
-        solve_equations(db, ctx.equations.clone());
+    let (substitution, constraint_map, solve_errors) = solve_equations(db, ctx.equations.clone());
 
     let mut type_var_map: FxHashMap<TypeVarId, usize> = FxHashMap::default();
     let mut next_generic_id = 0;
@@ -152,7 +151,7 @@ fn mono_to_inferred_with_map(
     type_var_map: &mut FxHashMap<TypeVarId, usize>,
     next_generic_id: &mut usize,
     failed_vars: &FxHashSet<TypeVarId>,
-    constraint_map: &FxHashMap<TypeVarId, Vec<(Fql<hir::Trait>, hir::Name)>>,
+    constraint_map: &FxHashMap<TypeVarId, Vec<TraitConstraint>>,
 ) -> InferredType {
     match mono {
         MonoType::Unconstrained => InferredType::Unconstrained,

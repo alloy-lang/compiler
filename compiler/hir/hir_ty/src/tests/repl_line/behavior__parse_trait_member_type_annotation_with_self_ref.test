@@ -21,15 +21,15 @@ HirTypedModule {
                 id: 2,
                 constraints: NonEmpty(
                     [
-                        (
-                            Fql {
+                        TraitConstraint {
+                            trait_fql: Fql {
                                 module_id: ModuleId {
                                     path: "main",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            "TestTrait1",
-                        ),
+                            trait_name: "TestTrait1",
+                        },
                     ],
                 ),
             },

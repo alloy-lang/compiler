@@ -20,15 +20,15 @@ HirTypedModule {
                     id: 0,
                     constraints: NonEmpty(
                         [
-                            (
-                                Fql {
+                            TraitConstraint {
+                                trait_fql: Fql {
                                     module_id: ModuleId {
                                         path: "std::functor",
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                "Functor",
-                            ),
+                                trait_name: "Functor",
+                            },
                         ],
                     ),
                 },
@@ -43,15 +43,15 @@ HirTypedModule {
                     id: 0,
                     constraints: NonEmpty(
                         [
-                            (
-                                Fql {
+                            TraitConstraint {
+                                trait_fql: Fql {
                                     module_id: ModuleId {
                                         path: "std::functor",
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                "Functor",
-                            ),
+                                trait_name: "Functor",
+                            },
                         ],
                     ),
                 },

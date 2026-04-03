@@ -192,9 +192,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                     ..
                 },
                 found_ty,
-            ) if !constraints.is_empty() => {
-                check_trait_constraints(self.db, found_ty, &constraints)
-            }
+            ) if !constraints.is_empty() => check_trait_constraints(self.db, found_ty, constraints),
 
             // Lambda types
             (
@@ -306,15 +304,15 @@ impl<'db> TypeAnnotationChecker<'db> {
 fn check_trait_constraints(
     db: &dyn HirTyDatabase,
     ty: &InferredType,
-    constraints: &[(Fql<hir::Trait>, hir::Name)],
+    constraints: &[res::TraitConstraint],
 ) -> Result<(), ConflictingTypeAnnotationReason> {
     match ty {
         InferredType::TypeDef(type_fql, _) => {
-            for (required_trait, _) in constraints {
-                if !has_behavior_for_trait(db, type_fql, required_trait) {
+            for c in constraints {
+                if !c.has_behavior_for_trait(db, type_fql) {
                     return Err(
                         ConflictingTypeAnnotationReason::MissingBehaviorImplementation {
-                            trait_name: required_trait.trait_name(db),
+                            trait_name: c.trait_fql.trait_name(db),
                             type_name: type_fql.type_def_name(db),
                         },
                     );
@@ -325,48 +323,6 @@ fn check_trait_constraints(
         InferredType::Generic(_) | InferredType::ConstrainedGeneric { .. } => Ok(()),
         _ => Ok(()),
     }
-}
-
-/// Check if a type has a behavior implementation for the required trait
-fn has_behavior_for_trait(
-    db: &dyn HirTyDatabase,
-    expected_type_fql: &Fql<hir::TypeDefinition>,
-    required_trait: &Fql<hir::Trait>,
-) -> bool {
-    let (hir_module, _) = hir::lower_file(db, expected_type_fql.module_id);
-
-    for (behavior_idx, _behavior, _range, _name) in hir_module.behaviors() {
-        if does_behavior_match(
-            db,
-            expected_type_fql.module_id,
-            behavior_idx,
-            expected_type_fql,
-            required_trait,
-        ) {
-            return true;
-        }
-    }
-
-    false
-}
-
-/// Check if a behavior implements the required trait for the given type
-fn does_behavior_match(
-    db: &dyn HirTyDatabase,
-    behavior_module_id: ModuleId,
-    behavior_idx: hir::BehaviorIdx,
-    expected_type_fql: &Fql<hir::TypeDefinition>,
-    required_trait: &Fql<hir::Trait>,
-) -> bool {
-    let behavior = res::resolve_behavior_by_id(db, behavior_module_id, behavior_idx);
-    let Ok(attached_type_fql) = &behavior.attached_type else {
-        return false;
-    };
-    let Ok(attached_trait_fql) = &behavior.attached_trait else {
-        return false;
-    };
-
-    attached_type_fql == expected_type_fql && attached_trait_fql == required_trait
 }
 
 /// Walk a type reference tree and report arity errors at each Bounded node.

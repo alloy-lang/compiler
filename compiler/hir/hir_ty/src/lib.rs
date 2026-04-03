@@ -146,18 +146,15 @@ pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirType
 
 #[cfg(test)]
 mod hir_ty_small_tests {
-    use crate::diagnostics::{
-        ConflictingTypeAnnotationReason, TypeCheckingError, TypeCheckingErrorKind,
-    };
+    use crate::diagnostics::TypeCheckingError;
     use crate::tests::TestHirTyDatabase;
     use alloy_hir_def as hir;
     use alloy_hir_infer::InferredType;
-    use alloy_hir_resolved::{AnnotatedType, Fql};
+    use alloy_hir_resolved::{Fql, TraitConstraint};
     use alloy_test_harness::idx;
     use alloy_workspace::{ModuleId, WorkspaceDatabase};
     use non_empty_vec::{ne_vec, NonEmpty};
     use salsa::Database;
-    use text_size::{TextRange, TextSize};
 
     fn check(input: &str, expected: &[(u32, InferredType)]) {
         let mut db = TestHirTyDatabase::default();
@@ -554,8 +551,14 @@ mod hir_ty_small_tests {
         let mut db = TestHirTyDatabase::default();
         let stdlib_eq = ModuleId::new(&db, "std::eq");
         let stdlib_order = ModuleId::new(&db, "std::order");
-        let ord_constraint = (Fql::new(stdlib_order, idx!(0)), hir::Name::new("Ord"));
-        let eq_constraint = (Fql::new(stdlib_eq, idx!(0)), hir::Name::new("Eq"));
+        let ord_constraint = TraitConstraint {
+            trait_fql: Fql::new(stdlib_order, idx!(0)),
+            trait_name: hir::Name::new("Ord"),
+        };
+        let eq_constraint = TraitConstraint {
+            trait_fql: Fql::new(stdlib_eq, idx!(0)),
+            trait_name: hir::Name::new("Eq"),
+        };
         let constrained_t1 = InferredType::ConstrainedGeneric {
             id: 1,
             constraints: ne_vec![ord_constraint, eq_constraint],
@@ -599,7 +602,10 @@ mod hir_ty_small_tests {
     fn infer_monad_join() {
         let mut db = TestHirTyDatabase::default();
         let stdlib_monad = ModuleId::new(&db, "std::monad");
-        let monad_constraint = (Fql::new(stdlib_monad, idx!(0)), hir::Name::new("Monad"));
+        let monad_constraint = TraitConstraint {
+            trait_fql: Fql::new(stdlib_monad, idx!(0)),
+            trait_name: hir::Name::new("Monad"),
+        };
         let constrained_m = InferredType::ConstrainedGeneric {
             id: 0,
             constraints: NonEmpty::new(monad_constraint),

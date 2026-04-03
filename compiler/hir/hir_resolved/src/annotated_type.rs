@@ -1,11 +1,40 @@
 use crate::resolver::resolve_by_path;
-use crate::{Fql, TypeVariableResolver};
+use crate::{resolve_behavior_by_id, Fql, TypeVariableResolver};
 use alloy_hir_def as hir;
 use alloy_hir_def::HirDefDatabase;
 use alloy_workspace::ModuleId;
 use itertools::Itertools;
 use non_empty_vec::NonEmpty;
 use std::convert::TryFrom;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TraitConstraint {
+    pub trait_fql: Fql<hir::Trait>,
+    pub trait_name: hir::Name,
+}
+
+impl TraitConstraint {
+    pub fn has_behavior_for_trait(
+        &self,
+        db: &dyn HirDefDatabase,
+        type_fql: &Fql<hir::TypeDefinition>,
+    ) -> bool {
+        let (hir_module, _) = hir::lower_file(db, type_fql.module_id);
+        for (behavior_idx, _, _, _) in hir_module.behaviors() {
+            let behavior = resolve_behavior_by_id(db, type_fql.module_id, behavior_idx);
+            let Ok(attached_type) = &behavior.attached_type else {
+                continue;
+            };
+            let Ok(attached_trait) = &behavior.attached_trait else {
+                continue;
+            };
+            if attached_type == type_fql && attached_trait == &self.trait_fql {
+                return true;
+            }
+        }
+        false
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AnnotatedTypeVar {
@@ -43,13 +72,13 @@ pub enum AnnotatedType {
     /// Constrained type variable (typevar with trait bounds)
     ConstrainedTypeVar {
         base: AnnotatedTypeVar,
-        constraints: NonEmpty<(Fql<hir::Trait>, hir::Name)>,
+        constraints: NonEmpty<TraitConstraint>,
     },
     /// Self type in a trait context
     SelfType {
         trait_fql: Fql<hir::Trait>,
         type_arity: usize,
-        trait_constraints: Vec<(Fql<hir::Trait>, hir::Name)>,
+        trait_constraints: Vec<TraitConstraint>,
     },
     /// Explicitly unconstrained (wildcard)
     Unconstrained,
@@ -150,7 +179,7 @@ impl std::fmt::Display for AnnotatedType {
                 write!(f, "{name} : ")?;
                 constraints
                     .iter()
-                    .map(|(_, trait_name)| trait_name)
+                    .map(|c| &c.trait_name)
                     .join(" + ")
                     .fmt(f)?;
                 Ok(())
@@ -164,7 +193,7 @@ impl std::fmt::Display for AnnotatedType {
                     write!(f, " : ")?;
                     constraints
                         .iter()
-                        .map(|(_, trait_name)| trait_name)
+                        .map(|c| &c.trait_name)
                         .join(" + ")
                         .fmt(f)?;
                 }
@@ -205,7 +234,7 @@ pub fn resolve_annotated_type(
                 hir_module.find_trait_containing_scope(*scope)
             {
                 let trait_fql = Fql::new(module_id, trait_idx);
-                let trait_constraints = trait_def
+                let trait_constraints: Vec<TraitConstraint> = trait_def
                     .self_constraints()
                     .iter()
                     .filter_map(|constraint| trait_constraints(db, module_id, constraint))
@@ -297,12 +326,15 @@ fn trait_constraints(
     db: &dyn HirDefDatabase,
     module_id: ModuleId,
     c: &hir::TypeVariableConstraint,
-) -> Option<(Fql<hir::Trait>, hir::Name)> {
+) -> Option<TraitConstraint> {
     match c {
         hir::TypeVariableConstraint::Trait(type_idx) => {
             let trait_fql = crate::resolve_trait_by_ref_id(db, module_id, *type_idx).ok()?;
-            let name = trait_fql.trait_name(db);
-            Some((trait_fql, name))
+            let trait_name = trait_fql.trait_name(db);
+            Some(TraitConstraint {
+                trait_fql,
+                trait_name,
+            })
         }
         hir::TypeVariableConstraint::Kind(_) => None,
     }
@@ -401,7 +433,7 @@ pub fn resolve_type_variable_to_annotated(
     match kind {
         hir::TypeVariableKind::Unbound => AnnotatedType::TypeVar(type_var),
         hir::TypeVariableKind::Constrained(constraints) => {
-            let trait_constraints: Vec<_> = constraints
+            let trait_constraints: Vec<TraitConstraint> = constraints
                 .iter()
                 .filter_map(|constraint| trait_constraints(db, module_id, constraint))
                 .collect();
@@ -412,9 +444,9 @@ pub fn resolve_type_variable_to_annotated(
                 } else {
                     trait_constraints
                         .iter()
-                        .filter_map(|(trait_fql, _)| {
-                            let (trait_module, _) = hir::lower_file(db, trait_fql.module_id);
-                            let trait_def = trait_module.get_trait(trait_fql.local_id);
+                        .filter_map(|c| {
+                            let (trait_module, _) = hir::lower_file(db, c.trait_fql.module_id);
+                            let trait_def = trait_module.get_trait(c.trait_fql.local_id);
                             trait_def
                                 .self_constraints()
                                 .iter()

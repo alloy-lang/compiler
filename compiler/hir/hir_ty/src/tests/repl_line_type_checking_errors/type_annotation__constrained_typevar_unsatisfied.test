@@ -61,24 +61,24 @@ HirTypedModule {
                     },
                     constraints: NonEmpty(
                         [
-                            (
-                                Fql {
+                            TraitConstraint {
+                                trait_fql: Fql {
                                     module_id: ModuleId {
                                         path: "std::eq",
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                "Eq",
-                            ),
-                            (
-                                Fql {
+                                trait_name: "Eq",
+                            },
+                            TraitConstraint {
+                                trait_fql: Fql {
                                     module_id: ModuleId {
                                         path: "std::order",
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                "Ord",
-                            ),
+                                trait_name: "Ord",
+                            },
                         ],
                     ),
                 },

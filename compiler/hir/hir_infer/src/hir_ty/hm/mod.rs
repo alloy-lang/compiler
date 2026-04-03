@@ -10,7 +10,8 @@ use super::Fql;
 use alloy_hir_def as hir;
 use alloy_hir_def::TypeDefinition;
 use alloy_hir_resolved::{
-    AnnotatedType, AnnotatedTypeVar, EPFql, EPTdFql, HirResolutionError, TypeVarReference,
+    AnnotatedType, AnnotatedTypeVar, EPFql, EPTdFql, HirResolutionError, TraitConstraint,
+    TypeVarReference,
 };
 use itertools::Itertools;
 use rustc_hash::{FxHashMap, FxHashSet};
@@ -65,7 +66,7 @@ pub enum MonoType {
     },
     /// Type variable with trait constraints (e.g., `a : Eq`).
     /// Carries constraints inline, eliminating the need for a separate constraint store.
-    ConstrainedVar(TypeVarId, Vec<(Fql<hir::Trait>, hir::Name)>),
+    ConstrainedVar(TypeVarId, Vec<TraitConstraint>),
     /// Unit type
     Unit,
 }
@@ -125,7 +126,10 @@ impl std::fmt::Display for MonoType {
             MonoType::Var(var) => write!(f, "t{}", var.0),
             MonoType::ConstrainedVar(var, constraints) => {
                 write!(f, "t{}", var.0)?;
-                let names: Vec<_> = constraints.iter().map(|(_, name)| name.to_string()).collect();
+                let names: Vec<_> = constraints
+                    .iter()
+                    .map(|c| c.trait_name.to_string())
+                    .collect();
                 if !names.is_empty() {
                     write!(f, " : {}", names.join(" + "))?;
                 }
@@ -434,7 +438,11 @@ fn annotated_to_mono(annotated: &AnnotatedType, ctx: &mut HMInferenceContext) ->
             ..
         } => {
             let var_id = ctx.get_or_create_self_type_var(trait_fql.clone());
-            let mut constraints = vec![(trait_fql.clone(), trait_fql.trait_name(ctx.db))];
+            let primary = TraitConstraint {
+                trait_fql: trait_fql.clone(),
+                trait_name: trait_fql.trait_name(ctx.db),
+            };
+            let mut constraints = vec![primary];
             for constraint in trait_constraints {
                 if !constraints.contains(constraint) {
                     constraints.push(constraint.clone());

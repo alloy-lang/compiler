@@ -14,15 +14,15 @@ DefinitionInferenceResult {
                 id: 0,
                 constraints: NonEmpty(
                     [
-                        (
-                            Fql {
+                        TraitConstraint {
+                            trait_fql: Fql {
                                 module_id: ModuleId {
                                     path: "std::monad",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            "Monad",
-                        ),
+                            trait_name: "Monad",
+                        },
                     ],
                 ),
             },
@@ -32,15 +32,15 @@ DefinitionInferenceResult {
                         id: 0,
                         constraints: NonEmpty(
                             [
-                                (
-                                    Fql {
+                                TraitConstraint {
+                                    trait_fql: Fql {
                                         module_id: ModuleId {
                                             path: "std::monad",
                                         },
                                         local_id: Idx::<Trait>(0),
                                     },
-                                    "Monad",
-                                ),
+                                    trait_name: "Monad",
+                                },
                             ],
                         ),
                     },
@@ -57,15 +57,15 @@ DefinitionInferenceResult {
                 id: 0,
                 constraints: NonEmpty(
                     [
-                        (
-                            Fql {
+                        TraitConstraint {
+                            trait_fql: Fql {
                                 module_id: ModuleId {
                                     path: "std::monad",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            "Monad",
-                        ),
+                            trait_name: "Monad",
+                        },
                     ],
                 ),
             },
@@ -81,15 +81,15 @@ DefinitionInferenceResult {
                     id: 0,
                     constraints: NonEmpty(
                         [
-                            (
-                                Fql {
+                            TraitConstraint {
+                                trait_fql: Fql {
                                     module_id: ModuleId {
                                         path: "std::monad",
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                "Monad",
-                            ),
+                                trait_name: "Monad",
+                            },
                         ],
                     ),
                 },
@@ -104,15 +104,15 @@ DefinitionInferenceResult {
                     id: 0,
                     constraints: NonEmpty(
                         [
-                            (
-                                Fql {
+                            TraitConstraint {
+                                trait_fql: Fql {
                                     module_id: ModuleId {
                                         path: "std::monad",
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                "Monad",
-                            ),
+                                trait_name: "Monad",
+                            },
                         ],
                     ),
                 },
@@ -128,15 +128,15 @@ DefinitionInferenceResult {
                 id: 0,
                 constraints: NonEmpty(
                     [
-                        (
-                            Fql {
+                        TraitConstraint {
+                            trait_fql: Fql {
                                 module_id: ModuleId {
                                     path: "std::monad",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            "Monad",
-                        ),
+                            trait_name: "Monad",
+                        },
                     ],
                 ),
             },
@@ -152,15 +152,15 @@ DefinitionInferenceResult {
                     id: 0,
                     constraints: NonEmpty(
                         [
-                            (
-                                Fql {
+                            TraitConstraint {
+                                trait_fql: Fql {
                                     module_id: ModuleId {
                                         path: "std::monad",
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                "Monad",
-                            ),
+                                trait_name: "Monad",
+                            },
                         ],
                     ),
                 },
@@ -170,15 +170,15 @@ DefinitionInferenceResult {
                             id: 0,
                             constraints: NonEmpty(
                                 [
-                                    (
-                                        Fql {
+                                    TraitConstraint {
+                                        trait_fql: Fql {
                                             module_id: ModuleId {
                                                 path: "std::monad",
                                             },
                                             local_id: Idx::<Trait>(0),
                                         },
-                                        "Monad",
-                                    ),
+                                        trait_name: "Monad",
+                                    },
                                 ],
                             ),
                         },
@@ -195,15 +195,15 @@ DefinitionInferenceResult {
                     id: 0,
                     constraints: NonEmpty(
                         [
-                            (
-                                Fql {
+                            TraitConstraint {
+                                trait_fql: Fql {
                                     module_id: ModuleId {
                                         path: "std::monad",
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                "Monad",
-                            ),
+                                trait_name: "Monad",
+                            },
                         ],
                     ),
                 },
@@ -221,15 +221,15 @@ DefinitionInferenceResult {
                 id: 0,
                 constraints: NonEmpty(
                     [
-                        (
-                            Fql {
+                        TraitConstraint {
+                            trait_fql: Fql {
                                 module_id: ModuleId {
                                     path: "std::monad",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            "Monad",
-                        ),
+                            trait_name: "Monad",
+                        },
                     ],
                 ),
             },
@@ -239,15 +239,15 @@ DefinitionInferenceResult {
                         id: 0,
                         constraints: NonEmpty(
                             [
-                                (
-                                    Fql {
+                                TraitConstraint {
+                                    trait_fql: Fql {
                                         module_id: ModuleId {
                                             path: "std::monad",
                                         },
                                         local_id: Idx::<Trait>(0),
                                     },
-                                    "Monad",
-                                ),
+                                    trait_name: "Monad",
+                                },
                             ],
                         ),
                     },
@@ -264,15 +264,15 @@ DefinitionInferenceResult {
                 id: 0,
                 constraints: NonEmpty(
                     [
-                        (
-                            Fql {
+                        TraitConstraint {
+                            trait_fql: Fql {
                                 module_id: ModuleId {
                                     path: "std::monad",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            "Monad",
-                        ),
+                            trait_name: "Monad",
+                        },
                     ],
                 ),
             },
