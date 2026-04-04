@@ -43,7 +43,7 @@ HirTypedModule {
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                trait_name: "TestTrait1",
+                                trait_fql_name: "main::TestTrait1",
                             },
                         ],
                     ),
@@ -90,7 +90,7 @@ HirTypedModule {
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            trait_name: "TestTrait1",
+                            trait_fql_name: "main::TestTrait1",
                         },
                     ],
                 ),
@@ -187,7 +187,7 @@ HirTypedModule {
                                             },
                                             local_id: Idx::<Trait>(0),
                                         },
-                                        trait_name: "TestTrait1",
+                                        trait_fql_name: "main::TestTrait1",
                                     },
                                 ],
                             ),
@@ -256,7 +256,7 @@ HirTypedModule {
                                             },
                                             local_id: Idx::<Trait>(0),
                                         },
-                                        trait_name: "TestTrait1",
+                                        trait_fql_name: "main::TestTrait1",
                                     },
                                 ],
                             ),
@@ -360,11 +360,11 @@ HirTypedModule {
     │
   7 │ typeof test_func : t1[t2] -> t2 -> Test where
     │                    ──────────┬─────────  
-    │                              ╰─────────── The type annotation here says `t1 : TestTrait1[t2] -> t2 -> Test`
+    │                              ╰─────────── The type annotation here says `t1 : main::TestTrait1[t2] -> t2 -> Test`
     │ 
  10 │ let test_func = |a, b| -> test
     │ ───────────────┬──────────────  
-    │                ╰──────────────── but type inference determined this to be `t0 : TestTrait1[t1] -> t1 -> Test[Int]`
+    │                ╰──────────────── but type inference determined this to be `t0 : main::TestTrait1[t1] -> t1 -> Test[Int]`
     │
     ├─[ ./test/main.alloy:10:1 ]
     │

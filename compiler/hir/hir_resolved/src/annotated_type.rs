@@ -10,7 +10,7 @@ use std::convert::TryFrom;
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TraitConstraint {
     pub trait_fql: Fql<hir::Trait>,
-    pub trait_name: hir::Name,
+    pub trait_fql_name: String,
 }
 
 impl TraitConstraint {
@@ -179,7 +179,7 @@ impl std::fmt::Display for AnnotatedType {
                 write!(f, "{name} : ")?;
                 constraints
                     .iter()
-                    .map(|c| &c.trait_name)
+                    .map(|c| &c.trait_fql_name)
                     .join(" + ")
                     .fmt(f)?;
                 Ok(())
@@ -193,7 +193,7 @@ impl std::fmt::Display for AnnotatedType {
                     write!(f, " : ")?;
                     constraints
                         .iter()
-                        .map(|c| &c.trait_name)
+                        .map(|c| &c.trait_fql_name)
                         .join(" + ")
                         .fmt(f)?;
                 }
@@ -330,10 +330,9 @@ fn trait_constraints(
     match c {
         hir::TypeVariableConstraint::Trait(type_idx) => {
             let trait_fql = crate::resolve_trait_by_ref_id(db, module_id, *type_idx).ok()?;
-            let trait_name = trait_fql.trait_name(db);
             Some(TraitConstraint {
+                trait_fql_name: trait_fql.trait_fql_name(db),
                 trait_fql,
-                trait_name,
             })
         }
         hir::TypeVariableConstraint::Kind(_) => None,

@@ -38,7 +38,7 @@ HirTypedModule {
             kind: InferenceError(
                 TypeInferenceError {
                     kind: UnsatisfiedConstraint {
-                        trait_name: "Ord",
+                        trait_fql_name: "std::order::Ord",
                         type_name: "Foo",
                     },
                     range: 161..179,
@@ -68,7 +68,7 @@ HirTypedModule {
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                trait_name: "Eq",
+                                trait_fql_name: "std::eq::Eq",
                             },
                             TraitConstraint {
                                 trait_fql: Fql {
@@ -77,7 +77,7 @@ HirTypedModule {
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                trait_name: "Ord",
+                                trait_fql_name: "std::order::Ord",
                             },
                         ],
                     ),
@@ -104,14 +104,14 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
-[E33002] Error: Type `Foo` does not implement trait `Ord`
+[E33002] Error: Type `Foo` does not implement trait `std::order::Ord`
     ╭─[ ./test/main.alloy:14:1 ]
     │
  14 │ let foo = Foo::Bar
     │ ─────────┬────────  
-    │          ╰────────── missing implementation of trait `Ord`
+    │          ╰────────── missing implementation of trait `std::order::Ord`
     │ 
-    │ Help: Type `Foo` must implement trait `Ord`
+    │ Help: Type `Foo` must implement trait `std::order::Ord`
 ────╯
 
 [E34001] Error: Inferred type does not match annotated type

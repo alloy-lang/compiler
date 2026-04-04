@@ -553,11 +553,11 @@ mod hir_ty_small_tests {
         let stdlib_order = ModuleId::new(&db, "std::order");
         let ord_constraint = TraitConstraint {
             trait_fql: Fql::new(stdlib_order, idx!(0)),
-            trait_name: hir::Name::new("Ord"),
+            trait_fql_name: "std::order::Ord".to_string(),
         };
         let eq_constraint = TraitConstraint {
             trait_fql: Fql::new(stdlib_eq, idx!(0)),
-            trait_name: hir::Name::new("Eq"),
+            trait_fql_name: "std::eq::Eq".to_string(),
         };
         let constrained_t1 = InferredType::ConstrainedGeneric {
             id: 1,
@@ -604,7 +604,7 @@ mod hir_ty_small_tests {
         let stdlib_monad = ModuleId::new(&db, "std::monad");
         let monad_constraint = TraitConstraint {
             trait_fql: Fql::new(stdlib_monad, idx!(0)),
-            trait_name: hir::Name::new("Monad"),
+            trait_fql_name: "std::monad::Monad".to_string(),
         };
         let constrained_m = InferredType::ConstrainedGeneric {
             id: 0,

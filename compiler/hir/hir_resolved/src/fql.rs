@@ -25,6 +25,15 @@ impl Fql<hir::Trait> {
         hir_module.get_trait(self.local_id).name().clone()
     }
 
+    pub fn trait_fql_name(&self, db: &dyn hir::HirDefDatabase) -> String {
+        let (hir_module, _) = hir::lower_file(db, self.module_id);
+        format!(
+            "{}::{}",
+            self.module_id,
+            hir_module.get_trait(self.local_id).name()
+        )
+    }
+
     pub fn text_range(&self, db: &dyn hir::HirDefDatabase) -> TextRange {
         let (hir_module, _) = hir::lower_file(db, self.module_id);
         hir_module.get_trait_range(self.local_id)

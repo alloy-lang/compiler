@@ -312,7 +312,7 @@ pub(super) fn solve_equations(
                     let range = find_equation_range(db, &equations, *var_id, &subst);
                     errors.push(TypeInferenceError::new(
                         TypeInferenceErrorKind::UnsatisfiedConstraint {
-                            trait_name: c.trait_name.clone(),
+                            trait_fql_name: c.trait_fql_name.clone(),
                             type_name: type_def_name.clone(),
                         },
                         range,

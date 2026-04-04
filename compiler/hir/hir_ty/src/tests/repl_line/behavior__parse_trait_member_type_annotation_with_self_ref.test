@@ -28,7 +28,7 @@ HirTypedModule {
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            trait_name: "TestTrait1",
+                            trait_fql_name: "main::TestTrait1",
                         },
                     ],
                 ),

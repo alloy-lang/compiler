@@ -27,7 +27,7 @@ HirTypedModule {
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                trait_name: "Functor",
+                                trait_fql_name: "std::functor::Functor",
                             },
                         ],
                     ),
@@ -50,7 +50,7 @@ HirTypedModule {
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                trait_name: "Functor",
+                                trait_fql_name: "std::functor::Functor",
                             },
                         ],
                     ),
@@ -72,7 +72,7 @@ HirTypedModule {
     errors: [
         TypeCheckingError {
             kind: BoundedTypeArityMismatch {
-                type_name: "m : Functor",
+                type_name: "m : std::functor::Functor",
                 expected_arity: 1,
                 actual_arity: 2,
                 annotation_range: 45..54,
@@ -83,12 +83,12 @@ HirTypedModule {
     poly_instantiations: {},
 }
 []
-[E34003] Error: Type `m : Functor` expects 1 type argument(s), but 2 were provided
+[E34003] Error: Type `m : std::functor::Functor` expects 1 type argument(s), but 2 were provided
    ╭─[ ./test/main.alloy:3:16 ]
    │
  3 │ typeof wrong : m[t1, t2] -> m[t1] where
    │                ────┬────  
-   │                    ╰────── `m : Functor` expects 1 type argument(s), but 2 were provided
+   │                    ╰────── `m : std::functor::Functor` expects 1 type argument(s), but 2 were provided
 ───╯
 
 

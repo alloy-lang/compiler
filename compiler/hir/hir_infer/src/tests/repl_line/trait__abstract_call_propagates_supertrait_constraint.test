@@ -21,7 +21,7 @@ DefinitionInferenceResult {
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            trait_name: "Ord",
+                            trait_fql_name: "ModuleId(Id(9))::Ord",
                         },
                         TraitConstraint {
                             trait_fql: Fql {
@@ -30,7 +30,7 @@ DefinitionInferenceResult {
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            trait_name: "Eq",
+                            trait_fql_name: "std::eq::Eq",
                         },
                     ],
                 ),
@@ -47,7 +47,7 @@ DefinitionInferenceResult {
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                trait_name: "Ord",
+                                trait_fql_name: "ModuleId(Id(9))::Ord",
                             },
                             TraitConstraint {
                                 trait_fql: Fql {
@@ -56,7 +56,7 @@ DefinitionInferenceResult {
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                trait_name: "Eq",
+                                trait_fql_name: "std::eq::Eq",
                             },
                         ],
                     ),
@@ -86,7 +86,7 @@ DefinitionInferenceResult {
                             },
                             local_id: Idx::<Trait>(0),
                         },
-                        trait_name: "Ord",
+                        trait_fql_name: "ModuleId(Id(9))::Ord",
                     },
                     TraitConstraint {
                         trait_fql: Fql {
@@ -95,7 +95,7 @@ DefinitionInferenceResult {
                             },
                             local_id: Idx::<Trait>(0),
                         },
-                        trait_name: "Eq",
+                        trait_fql_name: "std::eq::Eq",
                     },
                 ],
             ),
@@ -112,7 +112,7 @@ DefinitionInferenceResult {
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            trait_name: "Ord",
+                            trait_fql_name: "ModuleId(Id(9))::Ord",
                         },
                         TraitConstraint {
                             trait_fql: Fql {
@@ -121,7 +121,7 @@ DefinitionInferenceResult {
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            trait_name: "Eq",
+                            trait_fql_name: "std::eq::Eq",
                         },
                     ],
                 ),
@@ -150,7 +150,7 @@ DefinitionInferenceResult {
                             },
                             local_id: Idx::<Trait>(0),
                         },
-                        trait_name: "Ord",
+                        trait_fql_name: "ModuleId(Id(9))::Ord",
                     },
                     TraitConstraint {
                         trait_fql: Fql {
@@ -159,7 +159,7 @@ DefinitionInferenceResult {
                             },
                             local_id: Idx::<Trait>(0),
                         },
-                        trait_name: "Eq",
+                        trait_fql_name: "std::eq::Eq",
                     },
                 ],
             ),
@@ -189,7 +189,7 @@ DefinitionInferenceResult {
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                trait_name: "Ord",
+                                trait_fql_name: "std::order::Ord",
                             },
                             TraitConstraint {
                                 trait_fql: Fql {
@@ -198,7 +198,7 @@ DefinitionInferenceResult {
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
-                                trait_name: "Eq",
+                                trait_fql_name: "std::eq::Eq",
                             },
                         ],
                     ),
@@ -241,7 +241,7 @@ DefinitionInferenceResult {
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            trait_name: "Ord",
+                            trait_fql_name: "ModuleId(Id(9))::Ord",
                         },
                         TraitConstraint {
                             trait_fql: Fql {
@@ -250,7 +250,7 @@ DefinitionInferenceResult {
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
-                            trait_name: "Eq",
+                            trait_fql_name: "std::eq::Eq",
                         },
                     ],
                 ),

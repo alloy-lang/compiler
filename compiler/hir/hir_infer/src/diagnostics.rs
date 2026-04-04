@@ -47,7 +47,7 @@ impl Diagnostic for TypeInferenceError {
             },
             TypeInferenceErrorKind::HirResolutionError(err) => err.message(),
             TypeInferenceErrorKind::UnsatisfiedConstraint {
-                trait_name,
+                trait_fql_name: trait_name,
                 type_name,
             } => {
                 format!("Type `{type_name}` does not implement trait `{trait_name}`")
@@ -71,7 +71,7 @@ impl Diagnostic for TypeInferenceError {
             },
             TypeInferenceErrorKind::HirResolutionError(err) => err.build_report(builder),
             TypeInferenceErrorKind::UnsatisfiedConstraint {
-                trait_name,
+                trait_fql_name: trait_name,
                 type_name,
             } => builder
                 .with_primary_label(format!("missing implementation of trait `{trait_name}`"))
@@ -87,7 +87,7 @@ pub enum TypeInferenceErrorKind {
     UnificationError(UnificationError),
     HirResolutionError(HirResolutionError),
     UnsatisfiedConstraint {
-        trait_name: hir::Name,
+        trait_fql_name: String,
         type_name: hir::Name,
     },
 }

@@ -87,7 +87,7 @@ impl std::fmt::Display for InferredType {
                 write!(f, "t{id} : ")?;
                 constraints
                     .iter()
-                    .map(|c| &c.trait_name)
+                    .map(|c| &c.trait_fql_name)
                     .join(" + ")
                     .fmt(f)?;
                 Ok(())

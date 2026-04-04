@@ -128,7 +128,7 @@ impl std::fmt::Display for MonoType {
                 write!(f, "t{}", var.0)?;
                 let names: Vec<_> = constraints
                     .iter()
-                    .map(|c| c.trait_name.to_string())
+                    .map(|c| c.trait_fql_name.to_string())
                     .collect();
                 if !names.is_empty() {
                     write!(f, " : {}", names.join(" + "))?;
@@ -440,7 +440,7 @@ fn annotated_to_mono(annotated: &AnnotatedType, ctx: &mut HMInferenceContext) ->
             let var_id = ctx.get_or_create_self_type_var(trait_fql.clone());
             let primary = TraitConstraint {
                 trait_fql: trait_fql.clone(),
-                trait_name: trait_fql.trait_name(ctx.db),
+                trait_fql_name: trait_fql.trait_fql_name(ctx.db),
             };
             let mut constraints = vec![primary];
             for constraint in trait_constraints {
