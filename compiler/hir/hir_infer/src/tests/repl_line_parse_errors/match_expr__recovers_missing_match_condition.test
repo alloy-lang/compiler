@@ -35,21 +35,14 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Integer,
-            Fraction,
-            String,
-            Char,
-            Ident,
-            Minus,
-            LParen,
-            NilIdentifier,
-        ],
-        kind: Missing {
-            offset: 38,
-        },
-        context: MatchTargetCondition,
-    },
-]
+[E11001] Error: Missing expected token while parsing the condition in a match expression branch
+   ╭─[ ./test/main.alloy:4:5 ]
+   │
+ 4 │   \ -> 0
+   │     │ 
+   │     ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `‘-’`, `‘(’` or `‘_’`
+   │ 
+   │ Help: While parsing the condition in a match expression branch, expected `integer`, `fraction`, `string`, `char`, `identifier`, `‘-’`, `‘(’` or `‘_’`
+───╯
+
+

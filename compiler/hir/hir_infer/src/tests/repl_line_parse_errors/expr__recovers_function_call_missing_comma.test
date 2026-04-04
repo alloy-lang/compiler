@@ -78,23 +78,24 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Comma,
-        ],
-        kind: Missing {
-            offset: 80,
-        },
-        context: FunctionCallArgComma,
-    },
-    ParseError {
-        expected: [
-            Comma,
-        ],
-        kind: Missing {
-            offset: 82,
-        },
-        context: FunctionCallArgComma,
-    },
-]
+[E11001] Error: Missing expected token while parsing a comma between arguments in a function call
+   ╭─[ ./test/main.alloy:6:9 ]
+   │
+ 6 │ funky(x y z)
+   │         │ 
+   │         ╰─ expected `‘,’`
+   │ 
+   │ Help: While parsing a comma between arguments in a function call, expected `‘,’`
+───╯
+
+[E11001] Error: Missing expected token while parsing a comma between arguments in a function call
+   ╭─[ ./test/main.alloy:6:11 ]
+   │
+ 6 │ funky(x y z)
+   │           │ 
+   │           ╰─ expected `‘,’`
+   │ 
+   │ Help: While parsing a comma between arguments in a function call, expected `‘,’`
+───╯
+
+

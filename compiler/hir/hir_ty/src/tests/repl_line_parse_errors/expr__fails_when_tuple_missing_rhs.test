@@ -29,14 +29,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            RParen,
-        ],
-        kind: Missing {
-            offset: 5,
-        },
-        context: ParenExprRightParen,
-    },
-]
+[E11001] Error: Missing expected token while parsing a close parenthesis after an expression
+   ╭─[ ./test/main.alloy:1:6 ]
+   │
+ 1 │ (1, 2
+   │      │ 
+   │      ╰─ expected `‘)’`
+   │ 
+   │ Help: While parsing a close parenthesis after an expression, expected `‘)’`
+───╯
+
+

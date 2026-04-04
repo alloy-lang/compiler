@@ -40,7 +40,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E32010] Error: Bounded trait reference resolution not yet implemented
     ╭─[ ./test/main.alloy:7:1 ]
     │
@@ -52,6 +51,5 @@ HirTypedModule {
     │     
     │     Help: Bounded trait references are not yet fully implemented
 ────╯
-
 
 

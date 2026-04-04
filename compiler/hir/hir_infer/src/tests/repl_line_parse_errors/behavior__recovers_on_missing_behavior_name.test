@@ -32,15 +32,14 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-            LParen,
-        ],
-        kind: Missing {
-            offset: 101,
-        },
-        context: BehaviorTraitName,
-    },
-]
+[E11001] Error: Missing expected token while parsing the name of a trait at the start of a behavior definition
+   ╭─[ ./test/main.alloy:9:10 ]
+   │
+ 9 │ behavior for Type1 where
+   │          │ 
+   │          ╰─ expected `identifier` or `‘(’`
+   │ 
+   │ Help: While parsing the name of a trait at the start of a behavior definition, expected `identifier` or `‘(’`
+───╯
+
+

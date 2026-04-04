@@ -18,14 +18,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Missing {
-            offset: 139,
-        },
-        context: TypeVariableConstraint,
-    },
-]
+[E11001] Error: Missing expected token while parsing the constraints for a type variable
+   ╭─[ ./test/main.alloy:9:1 ]
+   │
+ 9 │ end
+   │ │ 
+   │ ╰─ expected `identifier`
+   │ 
+   │ Help: While parsing the constraints for a type variable, expected `identifier`
+───╯
+
+

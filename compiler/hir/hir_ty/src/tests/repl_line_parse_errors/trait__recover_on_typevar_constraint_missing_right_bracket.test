@@ -13,14 +13,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            RBracket,
-        ],
-        kind: Missing {
-            offset: 46,
-        },
-        context: TypeVariableKindConstraintRBracket,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `]` at the end of the [_] pattern thingy
+   ╭─[ ./test/main.alloy:3:5 ]
+   │
+ 3 │     typevar t1
+   │     │ 
+   │     ╰─ expected `‘]’`
+   │ 
+   │ Help: While parsing the `]` at the end of the [_] pattern thingy, expected `‘]’`
+───╯
+
+

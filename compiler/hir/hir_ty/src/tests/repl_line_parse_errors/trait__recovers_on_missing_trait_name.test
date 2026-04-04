@@ -18,14 +18,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Missing {
-            offset: 6,
-        },
-        context: TraitName,
-    },
-]
+[E11001] Error: Missing expected token while parsing the name of the trait in a trait definition
+   ╭─[ ./test/main.alloy:1:7 ]
+   │
+ 1 │ trait where
+   │       │ 
+   │       ╰─ expected `identifier`
+   │ 
+   │ Help: While parsing the name of the trait in a trait definition, expected `identifier`
+───╯
+
+

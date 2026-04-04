@@ -19,14 +19,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            EndKw,
-        ],
-        kind: Missing {
-            offset: 75,
-        },
-        context: TraitEnd,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `end` keyword after a trait definition
+   ╭─[ ./test/main.alloy:6:1 ]
+   │
+ 6 │ trait TestTrait2 where
+   │ │ 
+   │ ╰─ expected `‘end‘`
+   │ 
+   │ Help: While parsing the `end` keyword after a trait definition, expected `‘end‘`
+───╯
+
+

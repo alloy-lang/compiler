@@ -11,14 +11,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Equals,
-        ],
-        kind: Missing {
-            offset: 16,
-        },
-        context: TypeDefEquals,
-    },
-]
+[E11001] Error: Missing expected token while parsing the equals sign in a type definition
+   ╭─[ ./test/main.alloy:1:17 ]
+   │
+ 1 │ typedef Test1   Empty
+   │                 │ 
+   │                 ╰─ expected `‘=’`
+   │ 
+   │ Help: While parsing the equals sign in a type definition, expected `‘=’`
+───╯
+
+

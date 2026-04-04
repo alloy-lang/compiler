@@ -35,14 +35,14 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Backslash,
-        ],
-        kind: Missing {
-            offset: 36,
-        },
-        context: MatchTargetPipe,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `|` at the start of a match expression branch
+   ╭─[ ./test/main.alloy:4:3 ]
+   │
+ 4 │   True -> 0
+   │   │ 
+   │   ╰─ expected `’\’`
+   │ 
+   │ Help: While parsing the `|` at the start of a match expression branch, expected `’\’`
+───╯
+
+

@@ -24,14 +24,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Equals,
-        ],
-        kind: Missing {
-            offset: 6,
-        },
-        context: ValueDefEquals,
-    },
-]
+[E11001] Error: Missing expected token while parsing the ‘=’ in a value definition
+   ╭─[ ./test/main.alloy:1:7 ]
+   │
+ 1 │ let a (1 + 2)
+   │       │ 
+   │       ╰─ expected `‘=’`
+   │ 
+   │ Help: While parsing the ‘=’ in a value definition, expected `‘=’`
+───╯
+
+

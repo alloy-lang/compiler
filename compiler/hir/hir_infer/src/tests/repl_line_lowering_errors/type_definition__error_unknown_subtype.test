@@ -38,7 +38,6 @@ DefinitionInferenceResult {
         },
     ],
 }
-[]
 [E32006] Error: Unknown variant `Nothing`
    ╭─[ ./test/main.alloy:5:1 ]
    │
@@ -48,6 +47,5 @@ DefinitionInferenceResult {
    │ 
    │ Help: No variant named `Nothing` exists on this type
 ───╯
-
 
 

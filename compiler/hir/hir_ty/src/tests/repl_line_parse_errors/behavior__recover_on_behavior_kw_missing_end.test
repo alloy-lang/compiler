@@ -28,14 +28,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            EndKw,
-        ],
-        kind: Missing {
-            offset: 236,
-        },
-        context: BehaviorEnd,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `end` keyword after a behavior definition
+    ╭─[ ./test/main.alloy:15:1 ]
+    │
+ 15 │ behavior TestTrait2 for Type1 where
+    │ │ 
+    │ ╰─ expected `‘end‘`
+    │ 
+    │ Help: While parsing the `end` keyword after a behavior definition, expected `‘end‘`
+────╯
+
+

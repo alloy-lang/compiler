@@ -14,15 +14,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-            LParen,
-        ],
-        kind: Missing {
-            offset: 44,
-        },
-        context: BoundedTypeArgType,
-    },
-]
+[E11001] Error: Missing expected token while parsing the type of a bounded type argument
+   ╭─[ ./test/main.alloy:3:21 ]
+   │
+ 3 │ typeof apply : Test[, t2] where
+   │                     │ 
+   │                     ╰─ expected `identifier` or `‘(’`
+   │ 
+   │ Help: While parsing the type of a bounded type argument, expected `identifier` or `‘(’`
+───╯
+
+

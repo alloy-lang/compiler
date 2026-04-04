@@ -18,24 +18,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Integer,
-            Fraction,
-            String,
-            Char,
-            Ident,
-            OpIdent,
-            Minus,
-            LParen,
-            IfKw,
-            MatchKw,
-            Pipe,
-        ],
-        kind: Missing {
-            offset: 8,
-        },
-        context: ValueDefExpr,
-    },
-]
+[E11001] Error: Missing expected token while parsing the expression in a value definition
+   ╭─[ ./test/main.alloy:2:1 ]
+   │
+ 2 │ let b = a
+   │ │ 
+   │ ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+   │ 
+   │ Help: While parsing the expression in a value definition, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+───╯
+
+

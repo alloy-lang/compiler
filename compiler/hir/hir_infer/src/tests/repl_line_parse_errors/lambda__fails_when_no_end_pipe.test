@@ -32,14 +32,14 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Pipe,
-        ],
-        kind: Missing {
-            offset: 12,
-        },
-        context: LambdaArgPipe,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `|` at the end of a lambda expression's argument list
+   ╭─[ ./test/main.alloy:1:13 ]
+   │
+ 1 │ |arg1, arg2 -> 8
+   │             │ 
+   │             ╰─ expected `‘|’`
+   │ 
+   │ Help: While parsing the `|` at the end of a lambda expression's argument list, expected `‘|’`
+───╯
+
+

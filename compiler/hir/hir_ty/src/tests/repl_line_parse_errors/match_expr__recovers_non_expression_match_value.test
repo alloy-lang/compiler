@@ -120,28 +120,16 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Integer,
-            Fraction,
-            String,
-            Char,
-            Ident,
-            OpIdent,
-            Minus,
-            LParen,
-            IfKw,
-            MatchKw,
-            Pipe,
-        ],
-        kind: Unexpected {
-            found: NilIdentifier,
-            range: 52..53,
-        },
-        context: MatchTargetValue,
-    },
-]
+[E11002] Error: Unexpected token `‘_’` while parsing the value in a match expression branch
+   ╭─[ ./test/main.alloy:4:13 ]
+   │
+ 4 │   \ True -> _
+   │             ┬  
+   │             ╰── unexpected `‘_’`, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+   │ 
+   │ Help: While parsing the value in a match expression branch, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’` but found `‘_’`
+───╯
+
 [E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
    ╭─[ ./test/main.alloy:4:5 ]
    │
@@ -161,6 +149,5 @@ HirTypedModule {
    │ 
    │ Help: These types must be compatible
 ───╯
-
 
 

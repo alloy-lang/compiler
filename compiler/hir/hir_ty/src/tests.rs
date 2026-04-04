@@ -138,17 +138,13 @@ fn run_hir_ty_test(
     // }
 
     db.attach(|_| {
-        if typed_module.errors().is_empty() {
-            format!("{typed_module:#?}\n{parse_errors:#?}")
-        } else {
-            let mut reporter = DiagnosticsReporter::new();
-            reporter.add_all(test_module_id, typed_module.errors().into_iter().cloned());
+        let mut reporter = DiagnosticsReporter::new();
+        reporter.add_all(test_module_id, parse_errors);
+        // TODO: warnings implement Diagnostic
+        // reporter.add_all(test_module_id, typed_module.warnings().iter().cloned());
+        reporter.add_all(test_module_id, typed_module.errors().iter().cloned());
 
-            format!(
-                "{typed_module:#?}\n{parse_errors:#?}\n{}\n",
-                reporter.render_no_color(&db),
-            )
-        }
+        format!("{typed_module:#?}\n{}", reporter.render_no_color(&db),)
     })
 }
 

@@ -35,15 +35,14 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            RightArrow,
-        ],
-        kind: Unexpected {
-            found: RAngle,
-            range: 43..44,
-        },
-        context: MatchTargetRightArrow,
-    },
-]
+[E11002] Error: Unexpected token `‘>’` while parsing the `->` in a match expression branch
+   ╭─[ ./test/main.alloy:4:10 ]
+   │
+ 4 │   \ True > 0
+   │          ┬  
+   │          ╰── unexpected `‘>’`, expected `‘->’`
+   │ 
+   │ Help: While parsing the `->` in a match expression branch, expected `‘->’` but found `‘>’`
+───╯
+
+

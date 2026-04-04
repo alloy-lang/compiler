@@ -32,7 +32,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E34002] Error: Behavior must implement abstract member `foo` from trait `Trait1`
     ╭─[ ./test/main.alloy:8:1 ]
     │
@@ -44,6 +43,5 @@ HirTypedModule {
     │     
     │     Help: Trait `Trait1` requires an implementation of `foo` for type `Type1`
 ────╯
-
 
 

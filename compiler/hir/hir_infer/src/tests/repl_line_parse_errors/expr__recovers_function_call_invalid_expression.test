@@ -38,24 +38,14 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Integer,
-            Fraction,
-            String,
-            Char,
-            Ident,
-            OpIdent,
-            Minus,
-            LParen,
-            IfKw,
-            MatchKw,
-            Pipe,
-        ],
-        kind: Missing {
-            offset: 32,
-        },
-        context: FunctionCallArgExpr,
-    },
-]
+[E11001] Error: Missing expected token while parsing a function call argument
+   ╭─[ ./test/main.alloy:3:11 ]
+   │
+ 3 │ funky(1 + )
+   │           │ 
+   │           ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+   │ 
+   │ Help: While parsing a function call argument, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+───╯
+
+

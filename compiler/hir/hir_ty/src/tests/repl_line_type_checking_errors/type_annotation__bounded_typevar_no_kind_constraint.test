@@ -48,7 +48,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E34003] Error: Type `m` expects 0 type argument(s), but 1 were provided
    ╭─[ ./test/main.alloy:1:16 ]
    │
@@ -64,6 +63,5 @@ HirTypedModule {
    │                         ──┬──  
    │                           ╰──── `m` expects 0 type argument(s), but 1 were provided
 ───╯
-
 
 

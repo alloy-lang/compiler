@@ -336,7 +336,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E33001] Error: Type mismatch: expected `Test[Int]`, found `Test`
     ╭─[ ./test/main.alloy:10:1 ]
     │
@@ -374,6 +373,5 @@ HirTypedModule {
     │ │ 
     │ ╰─ to be `Test`
 ────╯
-
 
 

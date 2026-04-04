@@ -13,27 +13,24 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-            LParen,
-        ],
-        kind: Unexpected {
-            found: Integer,
-            range: 27..28,
-        },
-        context: TypeDefMemberPropertyType,
-    },
-    ParseError {
-        expected: [
-            Ident,
-            LParen,
-        ],
-        kind: Unexpected {
-            found: String,
-            range: 44..48,
-        },
-        context: TypeDefMemberPropertyType,
-    },
-]
+[E11002] Error: Unexpected token `integer` while parsing the type of a type definition member
+   ╭─[ ./test/main.alloy:2:12 ]
+   │
+ 2 │   | Thing1 0 Int
+   │            ┬  
+   │            ╰── unexpected `integer`, expected `identifier` or `‘(’`
+   │ 
+   │ Help: While parsing the type of a type definition member, expected `identifier` or `‘(’` but found `integer`
+───╯
+
+[E11002] Error: Unexpected token `string` while parsing the type of a type definition member
+   ╭─[ ./test/main.alloy:3:12 ]
+   │
+ 3 │   | Thing2 "hi"
+   │            ──┬─  
+   │              ╰─── unexpected `string`, expected `identifier` or `‘(’`
+   │ 
+   │ Help: While parsing the type of a type definition member, expected `identifier` or `‘(’` but found `string`
+───╯
+
+

@@ -35,25 +35,14 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Integer,
-            Fraction,
-            String,
-            Char,
-            Ident,
-            OpIdent,
-            Minus,
-            LParen,
-            IfKw,
-            MatchKw,
-            Pipe,
-        ],
-        kind: Unexpected {
-            found: NilIdentifier,
-            range: 46..47,
-        },
-        context: MatchTargetValue,
-    },
-]
+[E11002] Error: Unexpected token `‘_’` while parsing the value in a match expression branch
+   ╭─[ ./test/main.alloy:4:13 ]
+   │
+ 4 │   \ True -> _
+   │             ┬  
+   │             ╰── unexpected `‘_’`, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+   │ 
+   │ Help: While parsing the value in a match expression branch, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’` but found `‘_’`
+───╯
+
+

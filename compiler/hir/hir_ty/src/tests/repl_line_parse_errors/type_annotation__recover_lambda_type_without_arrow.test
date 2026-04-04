@@ -13,14 +13,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            RightArrow,
-        ],
-        kind: Missing {
-            offset: 64,
-        },
-        context: LambdaTypeRightArrow,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `->` in a lambda type
+   ╭─[ ./test/main.alloy:3:41 ]
+   │
+ 3 │ typeof test1 : Test -> String -> String String
+   │                                         │ 
+   │                                         ╰─ expected `‘->’`
+   │ 
+   │ Help: While parsing the `->` in a lambda type, expected `‘->’`
+───╯
+
+

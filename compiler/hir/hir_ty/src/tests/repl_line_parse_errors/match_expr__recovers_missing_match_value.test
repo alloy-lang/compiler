@@ -120,27 +120,16 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Integer,
-            Fraction,
-            String,
-            Char,
-            Ident,
-            OpIdent,
-            Minus,
-            LParen,
-            IfKw,
-            MatchKw,
-            Pipe,
-        ],
-        kind: Missing {
-            offset: 54,
-        },
-        context: MatchTargetValue,
-    },
-]
+[E11001] Error: Missing expected token while parsing the value in a match expression branch
+   ╭─[ ./test/main.alloy:5:3 ]
+   │
+ 5 │   \ False -> 1
+   │   │ 
+   │   ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+   │ 
+   │ Help: While parsing the value in a match expression branch, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+───╯
+
 [E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
    ╭─[ ./test/main.alloy:4:5 ]
    │
@@ -160,6 +149,5 @@ HirTypedModule {
    │ 
    │ Help: These types must be compatible
 ───╯
-
 
 

@@ -48,14 +48,14 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Comma,
-        ],
-        kind: Missing {
-            offset: 4,
-        },
-        context: ParenExprComma,
-    },
-]
+[E11001] Error: Missing expected token while parsing a comma between expressions inside parentheses
+   ╭─[ ./test/main.alloy:1:5 ]
+   │
+ 1 │ |(a b)| -> 5
+   │     │ 
+   │     ╰─ expected `‘,’`
+   │ 
+   │ Help: While parsing a comma between expressions inside parentheses, expected `‘,’`
+───╯
+
+

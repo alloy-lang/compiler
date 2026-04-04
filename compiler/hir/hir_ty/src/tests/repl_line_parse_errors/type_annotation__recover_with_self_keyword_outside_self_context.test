@@ -13,14 +13,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Missing {
-            offset: 39,
-        },
-        context: SelfTypeOutsideContext,
-    },
-]
+[E11001] Error: Missing expected token while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context
+   ╭─[ ./test/main.alloy:3:16 ]
+   │
+ 3 │ typeof test1 : self -> String
+   │                │ 
+   │                ╰─ expected `identifier`
+   │ 
+   │ Help: While parsing a type, encountered an unexpected `self` reference outside a trait or behavior context, expected `identifier`
+───╯
+
+

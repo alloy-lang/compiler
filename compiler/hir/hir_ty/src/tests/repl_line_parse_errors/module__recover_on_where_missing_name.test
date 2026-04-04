@@ -12,14 +12,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Missing {
-            offset: 7,
-        },
-        context: ModuleName,
-    },
-]
+[E11001] Error: Missing expected token while parsing the name of the module in a module definition
+   ╭─[ ./test/main.alloy:1:8 ]
+   │
+ 1 │ module where
+   │        │ 
+   │        ╰─ expected `identifier`
+   │ 
+   │ Help: While parsing the name of the module in a module definition, expected `identifier`
+───╯
+
+

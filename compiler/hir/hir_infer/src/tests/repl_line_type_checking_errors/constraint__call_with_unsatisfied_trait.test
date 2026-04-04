@@ -83,7 +83,6 @@ DefinitionInferenceResult {
         },
     ],
 }
-[]
 [E33002] Error: Type `Foo` does not implement trait `std::eq::Eq`
    ╭─[ ./test/main.alloy:8:1 ]
    │
@@ -93,6 +92,5 @@ DefinitionInferenceResult {
    │ 
    │ Help: Type `Foo` must implement trait `std::eq::Eq`
 ───╯
-
 
 

@@ -11,15 +11,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Unexpected {
-            found: NilIdentifier,
-            range: 18..19,
-        },
-        context: BoundedTypeArgName,
-    },
-]
+[E11002] Error: Unexpected token `‘_’` while parsing the name of a bounded type argument
+   ╭─[ ./test/main.alloy:1:19 ]
+   │
+ 1 │ typedef Test1[t1, _] = Empty
+   │                   ┬  
+   │                   ╰── unexpected `‘_’`, expected `identifier`
+   │ 
+   │ Help: While parsing the name of a bounded type argument, expected `identifier` but found `‘_’`
+───╯
+
+

@@ -14,14 +14,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            RBracket,
-        ],
-        kind: Missing {
-            offset: 51,
-        },
-        context: BoundedTypeRBracket,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `]` at the end of the bounded type arguments
+   ╭─[ ./test/main.alloy:3:28 ]
+   │
+ 3 │ typeof apply : Test[t1, t2 where
+   │                            │ 
+   │                            ╰─ expected `‘]’`
+   │ 
+   │ Help: While parsing the `]` at the end of the bounded type arguments, expected `‘]’`
+───╯
+
+

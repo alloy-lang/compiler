@@ -103,7 +103,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E33002] Error: Type `Foo` does not implement trait `std::order::Ord`
     ╭─[ ./test/main.alloy:14:1 ]
     │
@@ -123,6 +122,5 @@ HirTypedModule {
     │ 
     │ Help: Type `Foo` must implement trait `Ord`
 ────╯
-
 
 

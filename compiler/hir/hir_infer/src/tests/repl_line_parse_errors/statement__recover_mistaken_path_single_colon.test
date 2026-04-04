@@ -27,35 +27,34 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            DoubleColon,
-        ],
-        kind: Unexpected {
-            found: Colon,
-            range: 25..26,
-        },
-        context: VariableRef,
-    },
-    ParseError {
-        expected: [
-            DoubleColon,
-        ],
-        kind: Unexpected {
-            found: Colon,
-            range: 32..33,
-        },
-        context: VariableRef,
-    },
-    ParseError {
-        expected: [
-            DoubleColon,
-        ],
-        kind: Unexpected {
-            found: Colon,
-            range: 39..40,
-        },
-        context: VariableRef,
-    },
-]
+[E11002] Error: Unexpected token `‘:’` while parsing a variable reference
+   ╭─[ ./test/main.alloy:3:14 ]
+   │
+ 3 │ let foo = std:option:Option:None
+   │              ┬  
+   │              ╰── unexpected `‘:’`, expected `‘::’`
+   │ 
+   │ Help: While parsing a variable reference, expected `‘::’` but found `‘:’`
+───╯
+
+[E11002] Error: Unexpected token `‘:’` while parsing a variable reference
+   ╭─[ ./test/main.alloy:3:21 ]
+   │
+ 3 │ let foo = std:option:Option:None
+   │                     ┬  
+   │                     ╰── unexpected `‘:’`, expected `‘::’`
+   │ 
+   │ Help: While parsing a variable reference, expected `‘::’` but found `‘:’`
+───╯
+
+[E11002] Error: Unexpected token `‘:’` while parsing a variable reference
+   ╭─[ ./test/main.alloy:3:28 ]
+   │
+ 3 │ let foo = std:option:Option:None
+   │                            ┬  
+   │                            ╰── unexpected `‘:’`, expected `‘::’`
+   │ 
+   │ Help: While parsing a variable reference, expected `‘::’` but found `‘:’`
+───╯
+
+

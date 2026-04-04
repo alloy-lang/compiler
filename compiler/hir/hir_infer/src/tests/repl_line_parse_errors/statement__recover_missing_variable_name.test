@@ -13,15 +13,14 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            OpIdent,
-            Ident,
-        ],
-        kind: Missing {
-            offset: 4,
-        },
-        context: ValueDefIdent,
-    },
-]
+[E11001] Error: Missing expected token while parsing the name in a value definition
+   ╭─[ ./test/main.alloy:1:5 ]
+   │
+ 1 │ let = 1
+   │     │ 
+   │     ╰─ expected `operator identifier` or `identifier`
+   │ 
+   │ Help: While parsing the name in a value definition, expected `operator identifier` or `identifier`
+───╯
+
+

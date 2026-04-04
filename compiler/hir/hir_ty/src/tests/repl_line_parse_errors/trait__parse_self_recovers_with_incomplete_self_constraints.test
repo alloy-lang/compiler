@@ -14,24 +14,24 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Equals,
-        ],
-        kind: Missing {
-            offset: 37,
-        },
-        context: TraitSelfConstraintsEquals,
-    },
-    ParseError {
-        expected: [
-            Hash,
-            Ident,
-        ],
-        kind: Missing {
-            offset: 37,
-        },
-        context: TypeVariableConstraint,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `=` sign in a trait `self` constraint
+   ╭─[ ./test/main.alloy:4:5 ]
+   │
+ 4 │     typeof distraction : String
+   │     │ 
+   │     ╰─ expected `‘=’`
+   │ 
+   │ Help: While parsing the `=` sign in a trait `self` constraint, expected `‘=’`
+───╯
+
+[E11001] Error: Missing expected token while parsing the constraints for a type variable
+   ╭─[ ./test/main.alloy:4:5 ]
+   │
+ 4 │     typeof distraction : String
+   │     │ 
+   │     ╰─ expected `‘#’` or `identifier`
+   │ 
+   │ Help: While parsing the constraints for a type variable, expected `‘#’` or `identifier`
+───╯
+
+

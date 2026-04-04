@@ -13,14 +13,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Colon,
-        ],
-        kind: Missing {
-            offset: 39,
-        },
-        context: TypeOfColon,
-    },
-]
+[E11001] Error: Missing expected token while parsing the colon after the name of a type
+   ╭─[ ./test/main.alloy:3:16 ]
+   │
+ 3 │ typeof test1   String
+   │                │ 
+   │                ╰─ expected `‘:’`
+   │ 
+   │ Help: While parsing the colon after the name of a type, expected `‘:’`
+───╯
+
+

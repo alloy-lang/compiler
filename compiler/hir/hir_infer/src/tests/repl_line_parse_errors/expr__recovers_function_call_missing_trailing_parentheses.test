@@ -78,14 +78,14 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            RParen,
-        ],
-        kind: Missing {
-            offset: 85,
-        },
-        context: FunctionCallRightParen,
-    },
-]
+[E11001] Error: Missing expected token while parsing a close parenthesis after a function call
+   ╭─[ ./test/main.alloy:6:14 ]
+   │
+ 6 │ funky(x, y, z
+   │              │ 
+   │              ╰─ expected `‘)’`
+   │ 
+   │ Help: While parsing a close parenthesis after a function call, expected `‘)’`
+───╯
+
+

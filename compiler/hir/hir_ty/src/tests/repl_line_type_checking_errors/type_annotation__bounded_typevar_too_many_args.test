@@ -82,7 +82,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E34003] Error: Type `m : std::functor::Functor` expects 1 type argument(s), but 2 were provided
    ╭─[ ./test/main.alloy:3:16 ]
    │
@@ -90,6 +89,5 @@ HirTypedModule {
    │                ────┬────  
    │                    ╰────── `m : std::functor::Functor` expects 1 type argument(s), but 2 were provided
 ───╯
-
 
 

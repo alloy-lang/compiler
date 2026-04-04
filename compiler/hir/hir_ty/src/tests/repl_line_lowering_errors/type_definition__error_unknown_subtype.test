@@ -45,7 +45,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E32006] Error: Unknown variant `Nothing`
    ╭─[ ./test/main.alloy:5:1 ]
    │
@@ -55,6 +54,5 @@ HirTypedModule {
    │ 
    │ Help: No variant named `Nothing` exists on this type
 ───╯
-
 
 

@@ -400,7 +400,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E34001] Error: Inferred type does not match annotated type
    ╭─[ ./test/main.alloy:7:1 ]
    │
@@ -414,6 +413,5 @@ HirTypedModule {
    │ 
    │ Help: Add the missing constraint(s) to the type annotation: `std::order::Ord`, `std::eq::Eq`
 ───╯
-
 
 

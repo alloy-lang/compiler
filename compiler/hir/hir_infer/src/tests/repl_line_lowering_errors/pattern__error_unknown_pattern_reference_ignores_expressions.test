@@ -56,7 +56,6 @@ DefinitionInferenceResult {
         },
     ],
 }
-[]
 [E32003] Error: Cannot find pattern `unknown` in this scope
    ╭─[ ./test/main.alloy:3:2 ]
    │
@@ -66,6 +65,5 @@ DefinitionInferenceResult {
    │ 
    │ Help: No pattern named `unknown` found in module `main`
 ───╯
-
 
 

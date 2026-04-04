@@ -11,14 +11,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Comma,
-        ],
-        kind: Missing {
-            offset: 17,
-        },
-        context: BoundedTypeComma,
-    },
-]
+[E11001] Error: Missing expected token while parsing the comma between arguments in a bounded type
+   ╭─[ ./test/main.alloy:1:18 ]
+   │
+ 1 │ typedef Test1[t1 t2] = Empty
+   │                  │ 
+   │                  ╰─ expected `‘,’`
+   │ 
+   │ Help: While parsing the comma between arguments in a bounded type, expected `‘,’`
+───╯
+
+

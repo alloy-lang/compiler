@@ -18,14 +18,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            WhereKw,
-        ],
-        kind: Missing {
-            offset: 120,
-        },
-        context: BehaviorWhere,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `where` keyword at the start of a behavior definition
+   ╭─[ ./test/main.alloy:8:5 ]
+   │
+ 8 │     typevar t1
+   │     │ 
+   │     ╰─ expected `‘where‘`
+   │ 
+   │ Help: While parsing the `where` keyword at the start of a behavior definition, expected `‘where‘`
+───╯
+
+

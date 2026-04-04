@@ -15,14 +15,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Plus,
-        ],
-        kind: Missing {
-            offset: 72,
-        },
-        context: TypeVariableConstraintPlus,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `+` between type constraints
+   ╭─[ ./test/main.alloy:4:20 ]
+   │
+ 4 │     self = Functor #Type[_]
+   │                    │ 
+   │                    ╰─ expected `‘+’`
+   │ 
+   │ Help: While parsing the `+` between type constraints, expected `‘+’`
+───╯
+
+

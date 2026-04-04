@@ -63,7 +63,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E32003] Error: Cannot find pattern `unknown` in this scope
    ╭─[ ./test/main.alloy:3:2 ]
    │
@@ -73,6 +72,5 @@ HirTypedModule {
    │ 
    │ Help: No pattern named `unknown` found in module `main`
 ───╯
-
 
 

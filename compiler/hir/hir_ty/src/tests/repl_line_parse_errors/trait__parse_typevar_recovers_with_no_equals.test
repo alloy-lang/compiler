@@ -14,15 +14,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Equals,
-            Equals,
-        ],
-        kind: Missing {
-            offset: 59,
-        },
-        context: TypeVariableConstraint,
-    },
-]
+[E11001] Error: Missing expected token while parsing the constraints for a type variable
+   ╭─[ ./test/main.alloy:4:16 ]
+   │
+ 4 │     typevar t1 functor::Functor
+   │                │ 
+   │                ╰─ expected `‘=’`
+   │ 
+   │ Help: While parsing the constraints for a type variable, expected `‘=’`
+───╯
+
+

@@ -13,14 +13,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Missing {
-            offset: 70,
-        },
-        context: TypeOfType,
-    },
-]
+[E11001] Error: Missing expected token while parsing a type in a type annotation
+   ╭─[ ./test/main.alloy:4:1 ]
+   │
+ 4 │ typeof test2 : String -> ResultThing::More
+   │ │ 
+   │ ╰─ expected `identifier`
+   │ 
+   │ Help: While parsing a type in a type annotation, expected `identifier`
+───╯
+
+

@@ -151,7 +151,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E33001] Error: Type mismatch: expected `Option[String]`, found `Option[Int]`
    ╭─[ ./test/main.alloy:7:1 ]
    │
@@ -161,6 +160,5 @@ HirTypedModule {
    │ 
    │ Help: These types must be compatible
 ───╯
-
 
 

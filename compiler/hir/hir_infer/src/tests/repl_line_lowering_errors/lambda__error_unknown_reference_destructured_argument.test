@@ -46,7 +46,6 @@ DefinitionInferenceResult {
         },
     ],
 }
-[]
 [E32003] Error: Cannot find pattern `Option::Some` in this scope
    ╭─[ ./test/main.alloy:1:2 ]
    │
@@ -56,6 +55,5 @@ DefinitionInferenceResult {
    │ 
    │ Help: No pattern named `Option::Some` found in module `main`
 ───╯
-
 
 

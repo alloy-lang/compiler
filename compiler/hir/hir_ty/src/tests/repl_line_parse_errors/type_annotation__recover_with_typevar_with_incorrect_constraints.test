@@ -14,15 +14,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Unexpected {
-            found: Integer,
-            range: 78..79,
-        },
-        context: TypeVariableConstraint,
-    },
-]
+[E11002] Error: Unexpected token `integer` while parsing the constraints for a type variable
+   ╭─[ ./test/main.alloy:4:18 ]
+   │
+ 4 │     typevar t1 = 0
+   │                  ┬  
+   │                  ╰── unexpected `integer`, expected `identifier`
+   │ 
+   │ Help: While parsing the constraints for a type variable, expected `identifier` but found `integer`
+───╯
+
+

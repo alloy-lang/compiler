@@ -144,7 +144,6 @@ DefinitionInferenceResult {
         },
     ],
 }
-[]
 [E33001] Error: Type mismatch: expected `Option[String]`, found `Option[Int]`
    ╭─[ ./test/main.alloy:7:1 ]
    │
@@ -154,6 +153,5 @@ DefinitionInferenceResult {
    │ 
    │ Help: These types must be compatible
 ───╯
-
 
 

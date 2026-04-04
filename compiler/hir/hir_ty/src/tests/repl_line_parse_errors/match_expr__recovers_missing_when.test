@@ -120,17 +120,16 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            WhenKw,
-        ],
-        kind: Missing {
-            offset: 37,
-        },
-        context: MatchExprWhenKw,
-    },
-]
+[E11001] Error: Missing expected token while parsing the when keyword of a match expression
+   ╭─[ ./test/main.alloy:4:3 ]
+   │
+ 4 │   \ True -> 0
+   │   │ 
+   │   ╰─ expected `‘when‘`
+   │ 
+   │ Help: While parsing the when keyword of a match expression, expected `‘when‘`
+───╯
+
 [E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
    ╭─[ ./test/main.alloy:4:5 ]
    │
@@ -150,6 +149,5 @@ HirTypedModule {
    │ 
    │ Help: These types must be compatible
 ───╯
-
 
 

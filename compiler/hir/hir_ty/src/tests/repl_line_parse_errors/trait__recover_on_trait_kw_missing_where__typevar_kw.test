@@ -12,14 +12,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            WhereKw,
-        ],
-        kind: Missing {
-            offset: 21,
-        },
-        context: TraitWhere,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `where` keyword at the start of a trait definition
+   ╭─[ ./test/main.alloy:2:5 ]
+   │
+ 2 │     typevar t1
+   │     │ 
+   │     ╰─ expected `‘where‘`
+   │ 
+   │ Help: While parsing the `where` keyword at the start of a trait definition, expected `‘where‘`
+───╯
+
+

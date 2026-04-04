@@ -35,14 +35,14 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            RightArrow,
-        ],
-        kind: Missing {
-            offset: 43,
-        },
-        context: MatchTargetRightArrow,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `->` in a match expression branch
+   ╭─[ ./test/main.alloy:4:10 ]
+   │
+ 4 │   \ True 0
+   │          │ 
+   │          ╰─ expected `‘->’`
+   │ 
+   │ Help: While parsing the `->` in a match expression branch, expected `‘->’`
+───╯
+
+

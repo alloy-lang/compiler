@@ -75,7 +75,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
    ╭─[ ./test/main.alloy:3:1 ]
    │
@@ -85,6 +84,5 @@ HirTypedModule {
    │ 
    │ Help: These types must be compatible
 ───╯
-
 
 

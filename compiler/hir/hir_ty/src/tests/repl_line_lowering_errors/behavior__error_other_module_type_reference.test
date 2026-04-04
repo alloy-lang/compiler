@@ -41,7 +41,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E21001] Error: Cannot find module 'other'
    ╭─[ ./test/main.alloy:7:1 ]
    │
@@ -53,6 +52,5 @@ HirTypedModule {
    │     
    │     Help: Make sure the module path is correct
 ───╯
-
 
 

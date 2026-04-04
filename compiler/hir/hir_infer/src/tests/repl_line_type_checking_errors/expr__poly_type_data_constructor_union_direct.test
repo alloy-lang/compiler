@@ -40,7 +40,6 @@ DefinitionInferenceResult {
         },
     ],
 }
-[]
 [E32007] Error: Missing variant name for multi-variant type
    ╭─[ ./test/main.alloy:6:1 ]
    │
@@ -50,6 +49,5 @@ DefinitionInferenceResult {
    │ 
    │ Help: Multi-variant types require specifying a variant (e.g., `Type::Variant`)
 ───╯
-
 
 

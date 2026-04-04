@@ -43,7 +43,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E34003] Error: Type `Box` expects 1 type argument(s), but 2 were provided
    ╭─[ ./test/main.alloy:3:16 ]
    │
@@ -51,6 +50,5 @@ HirTypedModule {
    │                ────────┬───────  
    │                        ╰───────── `Box` expects 1 type argument(s), but 2 were provided
 ───╯
-
 
 

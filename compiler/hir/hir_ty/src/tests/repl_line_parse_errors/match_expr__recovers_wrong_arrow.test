@@ -120,18 +120,16 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            RightArrow,
-        ],
-        kind: Unexpected {
-            found: RAngle,
-            range: 49..50,
-        },
-        context: MatchTargetRightArrow,
-    },
-]
+[E11002] Error: Unexpected token `‘>’` while parsing the `->` in a match expression branch
+   ╭─[ ./test/main.alloy:4:10 ]
+   │
+ 4 │   \ True > 0
+   │          ┬  
+   │          ╰── unexpected `‘>’`, expected `‘->’`
+   │ 
+   │ Help: While parsing the `->` in a match expression branch, expected `‘->’` but found `‘>’`
+───╯
+
 [E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
    ╭─[ ./test/main.alloy:4:5 ]
    │
@@ -151,6 +149,5 @@ HirTypedModule {
    │ 
    │ Help: These types must be compatible
 ───╯
-
 
 

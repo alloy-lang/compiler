@@ -13,14 +13,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            NilIdentifier,
-        ],
-        kind: Missing {
-            offset: 40,
-        },
-        context: TypeVariableKindConstraintUnderscore,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `_` in the [_] pattern thingy
+   ╭─[ ./test/main.alloy:2:18 ]
+   │
+ 2 │     self = #Type[]
+   │                  │ 
+   │                  ╰─ expected `‘_’`
+   │ 
+   │ Help: While parsing the `_` in the [_] pattern thingy, expected `‘_’`
+───╯
+
+

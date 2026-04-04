@@ -11,14 +11,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Missing {
-            offset: 14,
-        },
-        context: BoundedTypeArgName,
-    },
-]
+[E11001] Error: Missing expected token while parsing the name of a bounded type argument
+   ╭─[ ./test/main.alloy:1:15 ]
+   │
+ 1 │ typedef Test1[] = Empty
+   │               │ 
+   │               ╰─ expected `identifier`
+   │ 
+   │ Help: While parsing the name of a bounded type argument, expected `identifier`
+───╯
+
+

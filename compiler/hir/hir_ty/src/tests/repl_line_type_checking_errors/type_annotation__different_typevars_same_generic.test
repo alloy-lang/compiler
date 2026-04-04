@@ -90,7 +90,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E34001] Error: Inferred type does not match annotated type
    ╭─[ ./test/main.alloy:4:1 ]
    │
@@ -110,6 +109,5 @@ HirTypedModule {
    │ │ 
    │ ╰─ to be `b`
 ───╯
-
 
 

@@ -11,14 +11,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Missing {
-            offset: 14,
-        },
-        context: TypeDefName,
-    },
-]
+[E11001] Error: Missing expected token while parsing the name in a type definition
+   ╭─[ ./test/main.alloy:1:15 ]
+   │
+ 1 │ typedef       = Empty
+   │               │ 
+   │               ╰─ expected `identifier`
+   │ 
+   │ Help: While parsing the name in a type definition, expected `identifier`
+───╯
+
+

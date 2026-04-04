@@ -59,7 +59,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E32002] Error: Cannot find value `test` in this scope
    ╭─[ ./test/main.alloy:1:7 ]
    │
@@ -69,6 +68,5 @@ HirTypedModule {
    │ 
    │ Help: No value named `test` found in module `main`
 ───╯
-
 
 

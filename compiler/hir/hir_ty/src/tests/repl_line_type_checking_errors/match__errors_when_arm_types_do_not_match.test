@@ -134,7 +134,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E33001] Error: Type mismatch: expected `String`, found `Int`
     ╭─[ ./test/main.alloy:10:25 ]
     │
@@ -144,6 +143,5 @@ HirTypedModule {
     │ 
     │ Help: These types must be compatible
 ────╯
-
 
 

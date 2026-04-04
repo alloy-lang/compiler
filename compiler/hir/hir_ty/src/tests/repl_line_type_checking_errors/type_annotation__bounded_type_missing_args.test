@@ -173,7 +173,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[]
 [E33001] Error: Type mismatch: expected `Box[Int]`, found `Box`
    ╭─[ ./test/main.alloy:4:1 ]
    │
@@ -210,6 +209,5 @@ HirTypedModule {
    │ │ 
    │ ╰─ to be `Box`
 ───╯
-
 
 

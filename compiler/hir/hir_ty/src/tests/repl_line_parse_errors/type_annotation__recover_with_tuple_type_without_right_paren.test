@@ -13,14 +13,14 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
-[
-    ParseError {
-        expected: [
-            RParen,
-        ],
-        kind: Missing {
-            offset: 73,
-        },
-        context: TupleTypeRightParen,
-    },
-]
+[E11001] Error: Missing expected token while parsing the right parenthesis of a tuple type
+   ╭─[ ./test/main.alloy:4:1 ]
+   │
+ 4 │ typeof test2 : Test -> String
+   │ │ 
+   │ ╰─ expected `‘)’`
+   │ 
+   │ Help: While parsing the right parenthesis of a tuple type, expected `‘)’`
+───╯
+
+
