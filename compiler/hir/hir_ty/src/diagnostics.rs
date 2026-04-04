@@ -109,6 +109,17 @@ impl Diagnostic for TypeCheckingError {
                             .with_primary_label(format!("missing implementation of trait `{trait_name}`"))
                             .with_help(format!("Type `{type_name}` must implement trait `{trait_name}`"))
                     }
+                    ConflictingTypeAnnotationReason::InsufficientConstraints { missing_constraints } => {
+                        let missing = missing_constraints.iter().map(|c| format!("`{c}`")).collect::<Vec<_>>().join(", ");
+                        builder
+                            .with_label(
+                                DiagnosticLabel::new(*annotation_range, format!("type annotation is missing required constraint(s): {missing}"))
+                            )
+                            .with_label(
+                                DiagnosticLabel::new(*value_range, format!("but the body requires {missing}"))
+                            )
+                            .with_help(format!("Add the missing constraint(s) to the type annotation: {missing}"))
+                    }
                 }
             }
             TypeCheckingErrorKind::BoundedTypeArityMismatch {
@@ -190,6 +201,9 @@ pub enum ConflictingTypeAnnotationReason {
     MissingBehaviorImplementation {
         trait_name: hir::Name,
         type_name: hir::Name,
+    },
+    InsufficientConstraints {
+        missing_constraints: Vec<String>,
     },
 }
 

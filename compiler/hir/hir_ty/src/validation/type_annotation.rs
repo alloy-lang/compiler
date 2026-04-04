@@ -11,6 +11,7 @@ use alloy_hir_infer::InferredType;
 use alloy_hir_resolved as res;
 use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType, Fql};
 use alloy_workspace::ModuleId;
+use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
 use text_size::TextRange;
 
@@ -132,13 +133,16 @@ impl<'db> TypeAnnotationChecker<'db> {
                     expected,
                     found,
                 ),
-            (AnnotatedType::TypeVar(atv), InferredType::ConstrainedGeneric { id, .. }) => self
-                .check_generic_consistency(
+            // Unconstrained annotation type var vs constrained inferred generic — insufficient
+            (AnnotatedType::TypeVar(atv), InferredType::ConstrainedGeneric { id, constraints }) => {
+                self.check_generic_consistency(
                     AnnotationVarId::TypeVar(atv.fql.clone()),
                     *id,
                     expected,
                     found,
-                ),
+                )?;
+                check_constraint_sufficiency(self.db, &[], constraints)
+            }
 
             // Constrained type variables - check consistency + trait constraints
             (
@@ -154,8 +158,14 @@ impl<'db> TypeAnnotationChecker<'db> {
                 check_trait_constraints(self.db, found, constraints)
             }
             (
-                AnnotatedType::ConstrainedTypeVar { base, constraints },
-                InferredType::ConstrainedGeneric { id, .. },
+                AnnotatedType::ConstrainedTypeVar {
+                    base,
+                    constraints: annotation_constraints,
+                },
+                InferredType::ConstrainedGeneric {
+                    id,
+                    constraints: inferred_constraints,
+                },
             ) => {
                 self.check_generic_consistency(
                     AnnotationVarId::TypeVar(base.fql.clone()),
@@ -163,7 +173,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                     expected,
                     found,
                 )?;
-                check_trait_constraints(self.db, found, constraints)
+                check_constraint_sufficiency(self.db, annotation_constraints, inferred_constraints)
             }
             (AnnotatedType::ConstrainedTypeVar { constraints, .. }, found_ty) => {
                 check_trait_constraints(self.db, found_ty, constraints)
@@ -297,6 +307,40 @@ impl<'db> TypeAnnotationChecker<'db> {
             self.generic_mapping.insert(generic_id, var_id);
         }
         Ok(())
+    }
+}
+
+/// Check that the annotation declares all constraints the body requires.
+///
+/// `annotation_constraints` are the traits declared on the type variable in the annotation.
+/// `inferred_constraints` are the traits required by the function body (from inference).
+/// Any inferred constraint not present in the annotation (or implied by its supertraits)
+/// is reported as missing.
+fn check_constraint_sufficiency(
+    db: &dyn HirTyDatabase,
+    annotation_constraints: &[res::TraitConstraint],
+    inferred_constraints: &NonEmpty<res::TraitConstraint>,
+) -> Result<(), ConflictingTypeAnnotationReason> {
+    let mut satisfied: Vec<Fql<hir::Trait>> = Vec::new();
+    for ac in annotation_constraints {
+        for fql in res::resolve_supertraits(db, ac.trait_fql.module_id, ac.trait_fql.local_id) {
+            if !satisfied.contains(&fql) {
+                satisfied.push(fql);
+            }
+        }
+    }
+
+    let missing: Vec<_> = inferred_constraints
+        .iter()
+        .filter(|ic| !satisfied.contains(&ic.trait_fql))
+        .map(|c| c.trait_fql_name.clone())
+        .collect();
+    if missing.is_empty() {
+        Ok(())
+    } else {
+        Err(ConflictingTypeAnnotationReason::InsufficientConstraints {
+            missing_constraints: missing,
+        })
     }
 }
 

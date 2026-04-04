@@ -8,6 +8,34 @@ use non_empty_vec::NonEmpty;
 
 pub struct Trait {}
 
+/// Collect a trait and all its supertraits (transitively), returning
+/// the full set of trait FQLs that are implied by this trait.
+///
+/// This is a Salsa tracked query so it's cached per (module, trait) pair.
+#[salsa::tracked]
+pub fn resolve_supertraits(
+    db: &dyn hir::HirDefDatabase,
+    module_id: ModuleId,
+    trait_idx: hir::TraitIdx,
+) -> Vec<Fql<hir::Trait>> {
+    let trait_fql = Fql::new(module_id, trait_idx);
+    let mut result = vec![trait_fql];
+    let (hir_module, _) = hir::lower_file(db, module_id);
+    let trait_def = hir_module.get_trait(trait_idx);
+    for constraint in trait_def.self_constraints() {
+        if let hir::TypeVariableConstraint::Trait(type_idx) = constraint {
+            if let Ok(super_fql) = resolve_trait_by_ref_id(db, module_id, *type_idx) {
+                for fql in resolve_supertraits(db, super_fql.module_id, super_fql.local_id) {
+                    if !result.contains(&fql) {
+                        result.push(fql);
+                    }
+                }
+            }
+        }
+    }
+    result
+}
+
 #[salsa::tracked]
 pub fn resolve_trait_by_ref_id(
     db: &dyn hir::HirDefDatabase,
