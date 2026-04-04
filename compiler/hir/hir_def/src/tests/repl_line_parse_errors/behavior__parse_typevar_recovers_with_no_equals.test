@@ -176,15 +176,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Equals,
-            Equals,
-        ],
-        kind: Missing {
-            offset: 136,
-        },
-        context: TypeVariableConstraint,
-    },
-]
+[E11001] Error: Missing expected token while parsing the constraints for a type variable
+    ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/behavior__parse_typevar_recovers_with_no_equals.test:10:16 ]
+    │
+ 10 │     typevar t1 functor::Functor
+    │                │ 
+    │                ╰─ expected `‘=’`
+    │ 
+    │ Help: While parsing the constraints for a type variable, expected `‘=’`
+────╯
+
+

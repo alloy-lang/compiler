@@ -62,24 +62,24 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Equals,
-        ],
-        kind: Missing {
-            offset: 37,
-        },
-        context: TraitSelfConstraintsEquals,
-    },
-    ParseError {
-        expected: [
-            Hash,
-            Ident,
-        ],
-        kind: Missing {
-            offset: 37,
-        },
-        context: TypeVariableConstraint,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `=` sign in a trait `self` constraint
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__parse_self_recovers_with_incomplete_self_constraints.test:4:5 ]
+   │
+ 4 │     typeof distraction : String
+   │     │ 
+   │     ╰─ expected `‘=’`
+   │ 
+   │ Help: While parsing the `=` sign in a trait `self` constraint, expected `‘=’`
+───╯
+
+[E11001] Error: Missing expected token while parsing the constraints for a type variable
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__parse_self_recovers_with_incomplete_self_constraints.test:4:5 ]
+   │
+ 4 │     typeof distraction : String
+   │     │ 
+   │     ╰─ expected `‘#’` or `identifier`
+   │ 
+   │ Help: While parsing the constraints for a type variable, expected `‘#’` or `identifier`
+───╯
+
+

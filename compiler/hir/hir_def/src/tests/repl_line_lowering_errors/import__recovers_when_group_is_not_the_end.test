@@ -59,4 +59,22 @@ HirModule {
         },
     ],
 }
-[]
+[W22002] Warning: Unused import `Functor`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/import__recovers_when_group_is_not_the_end.test:2:1 ]
+   │
+ 2 │ import std::functor::Functor
+   │ ──────────────┬─────────────  
+   │               ╰─────────────── unused import `Functor`
+───╯
+
+[E22003] Error: Import group must be the last segment in an import path
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/import__recovers_when_group_is_not_the_end.test:1:1 ]
+   │
+ 1 │ import std::{functor, option}::map
+   │             ────────┬────────  
+   │                     ╰────────── import group at position 1 of 3, must be last
+   │ 
+   │ Help: Move the import group `{{...}}` to the end of the import path
+───╯
+
+

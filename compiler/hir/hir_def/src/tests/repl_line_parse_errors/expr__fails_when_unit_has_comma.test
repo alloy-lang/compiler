@@ -28,25 +28,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Integer,
-            Fraction,
-            String,
-            Char,
-            Ident,
-            OpIdent,
-            Minus,
-            LParen,
-            IfKw,
-            MatchKw,
-            Pipe,
-        ],
-        kind: Unexpected {
-            found: Comma,
-            range: 1..2,
-        },
-        context: ParenExprExpr,
-    },
-]
+[E11002] Error: Unexpected token `‘,’` while parsing an expression inside parentheses
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/expr__fails_when_unit_has_comma.test:1:2 ]
+   │
+ 1 │ (,)
+   │  ┬  
+   │  ╰── unexpected `‘,’`, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+   │ 
+   │ Help: While parsing an expression inside parentheses, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’` but found `‘,’`
+───╯
+
+

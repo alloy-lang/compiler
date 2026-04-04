@@ -63,14 +63,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Missing {
-            offset: 22,
-        },
-        context: TypeDefMemberName,
-    },
-]
+[E11001] Error: Missing expected token while parsing the name of a type definition member
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_definition__recovers_with_multiple_pipes.test:3:3 ]
+   │
+ 3 │   | Empty
+   │   │ 
+   │   ╰─ expected `identifier`
+   │ 
+   │ Help: While parsing the name of a type definition member, expected `identifier`
+───╯
+
+

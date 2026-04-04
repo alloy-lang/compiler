@@ -82,4 +82,12 @@ HirModule {
         },
     ],
 }
-[]
+[E22009] Error: Unknown type reference `Unknown`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/type_annotation__error_unknown_type_reference.test:1:15 ]
+   │
+ 1 │ typeof test : Unknown -> Int -> String where
+   │               ───┬───  
+   │                  ╰───── cannot find type `Unknown` in this scope
+───╯
+
+

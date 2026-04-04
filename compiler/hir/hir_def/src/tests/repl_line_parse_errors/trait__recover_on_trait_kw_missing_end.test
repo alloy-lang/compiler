@@ -89,14 +89,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            EndKw,
-        ],
-        kind: Missing {
-            offset: 75,
-        },
-        context: TraitEnd,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `end` keyword after a trait definition
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_trait_kw_missing_end.test:6:1 ]
+   │
+ 6 │ trait TestTrait2 where
+   │ │ 
+   │ ╰─ expected `‘end‘`
+   │ 
+   │ Help: While parsing the `end` keyword after a trait definition, expected `‘end‘`
+───╯
+
+

@@ -44,33 +44,24 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Integer,
-            Fraction,
-            String,
-            Char,
-            Ident,
-            OpIdent,
-            Minus,
-            LParen,
-            IfKw,
-            MatchKw,
-            Pipe,
-        ],
-        kind: Missing {
-            offset: 3,
-        },
-        context: ParenExprExpr,
-    },
-    ParseError {
-        expected: [
-            RParen,
-        ],
-        kind: Missing {
-            offset: 3,
-        },
-        context: ParenExprRightParen,
-    },
-]
+[E11001] Error: Missing expected token while parsing an expression inside parentheses
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/expr__fails_when_missing_rhs.test:1:4 ]
+   │
+ 1 │ (1+
+   │    │ 
+   │    ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+   │ 
+   │ Help: While parsing an expression inside parentheses, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+───╯
+
+[E11001] Error: Missing expected token while parsing a close parenthesis after an expression
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/expr__fails_when_missing_rhs.test:1:4 ]
+   │
+ 1 │ (1+
+   │    │ 
+   │    ╰─ expected `‘)’`
+   │ 
+   │ Help: While parsing a close parenthesis after an expression, expected `‘)’`
+───╯
+
+

@@ -74,35 +74,34 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            DoubleColon,
-        ],
-        kind: Unexpected {
-            found: Colon,
-            range: 25..26,
-        },
-        context: VariableRef,
-    },
-    ParseError {
-        expected: [
-            DoubleColon,
-        ],
-        kind: Unexpected {
-            found: Colon,
-            range: 32..33,
-        },
-        context: VariableRef,
-    },
-    ParseError {
-        expected: [
-            DoubleColon,
-        ],
-        kind: Unexpected {
-            found: Colon,
-            range: 39..40,
-        },
-        context: VariableRef,
-    },
-]
+[E11002] Error: Unexpected token `‘:’` while parsing a variable reference
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/statement__recover_mistaken_path_single_colon.test:3:14 ]
+   │
+ 3 │ let foo = std:option:Option:None
+   │              ┬  
+   │              ╰── unexpected `‘:’`, expected `‘::’`
+   │ 
+   │ Help: While parsing a variable reference, expected `‘::’` but found `‘:’`
+───╯
+
+[E11002] Error: Unexpected token `‘:’` while parsing a variable reference
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/statement__recover_mistaken_path_single_colon.test:3:21 ]
+   │
+ 3 │ let foo = std:option:Option:None
+   │                     ┬  
+   │                     ╰── unexpected `‘:’`, expected `‘::’`
+   │ 
+   │ Help: While parsing a variable reference, expected `‘::’` but found `‘:’`
+───╯
+
+[E11002] Error: Unexpected token `‘:’` while parsing a variable reference
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/statement__recover_mistaken_path_single_colon.test:3:28 ]
+   │
+ 3 │ let foo = std:option:Option:None
+   │                            ┬  
+   │                            ╰── unexpected `‘:’`, expected `‘::’`
+   │ 
+   │ Help: While parsing a variable reference, expected `‘::’` but found `‘:’`
+───╯
+
+

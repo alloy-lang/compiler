@@ -130,14 +130,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Missing {
-            offset: 117,
-        },
-        context: TypeVariableConstraint,
-    },
-]
+[E11001] Error: Missing expected token while parsing the constraints for a type variable
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/behavior__recover_on_incomplete_typevar.test:9:1 ]
+   │
+ 9 │ end
+   │ │ 
+   │ ╰─ expected `identifier`
+   │ 
+   │ Help: While parsing the constraints for a type variable, expected `identifier`
+───╯
+
+

@@ -55,4 +55,12 @@ HirModule {
         },
     ],
 }
-[]
+[E22011] Error: Number literal is too large
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/pattern__int_literal_too_large.test:1:2 ]
+   │
+ 1 │ |99999999999999999999| -> 0
+   │  ──────────┬─────────  
+   │            ╰─────────── number literal exceeds maximum value
+───╯
+
+

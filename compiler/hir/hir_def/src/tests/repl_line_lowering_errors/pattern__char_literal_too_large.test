@@ -55,4 +55,12 @@ HirModule {
         },
     ],
 }
-[]
+[E22012] Error: Invalid character literal
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/pattern__char_literal_too_large.test:1:2 ]
+   │
+ 1 │ |'characters'| -> 0
+   │  ──────┬─────  
+   │        ╰─────── invalid character literal
+───╯
+
+

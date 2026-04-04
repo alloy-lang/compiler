@@ -42,15 +42,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            OpIdent,
-            Ident,
-        ],
-        kind: Missing {
-            offset: 4,
-        },
-        context: ValueDefIdent,
-    },
-]
+[E11001] Error: Missing expected token while parsing the name in a value definition
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/statement__recover_missing_variable_name.test:1:5 ]
+   │
+ 1 │ let = 1
+   │     │ 
+   │     ╰─ expected `operator identifier` or `identifier`
+   │ 
+   │ Help: While parsing the name in a value definition, expected `operator identifier` or `identifier`
+───╯
+
+

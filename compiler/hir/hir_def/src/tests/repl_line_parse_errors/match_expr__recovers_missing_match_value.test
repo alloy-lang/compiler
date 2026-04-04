@@ -119,24 +119,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Integer,
-            Fraction,
-            String,
-            Char,
-            Ident,
-            OpIdent,
-            Minus,
-            LParen,
-            IfKw,
-            MatchKw,
-            Pipe,
-        ],
-        kind: Missing {
-            offset: 54,
-        },
-        context: MatchTargetValue,
-    },
-]
+[E11001] Error: Missing expected token while parsing the value in a match expression branch
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/match_expr__recovers_missing_match_value.test:5:3 ]
+   │
+ 5 │   \ False -> 1
+   │   │ 
+   │   ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+   │ 
+   │ Help: While parsing the value in a match expression branch, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+───╯
+
+

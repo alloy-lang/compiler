@@ -102,4 +102,33 @@ HirModule {
         },
     ],
 }
-[]
+[W22002] Warning: Unused import `functor`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/trait__error_multiple_self_typevars.test:1:1 ]
+   │
+ 1 │ import std::{functor, debug}
+   │ ──────────────┬─────────────  
+   │               ╰─────────────── unused import `functor`
+───╯
+
+[W22002] Warning: Unused import `debug`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/trait__error_multiple_self_typevars.test:1:1 ]
+   │
+ 1 │ import std::{functor, debug}
+   │ ──────────────┬─────────────  
+   │               ╰─────────────── unused import `debug`
+───╯
+
+[E22010] Error: Multiple `self` type variables in trait `TestTrait1`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/trait__error_multiple_self_typevars.test:3:1 ]
+   │
+ 4 │     self = functor::Functor -- first
+   │     ───────────┬───────────  
+   │                ╰───────────── first `self` type variable here
+ 5 │     self = debug::Debug     -- second
+   │     ─────────┬─────────  
+   │              ╰─────────── additional `self` type variable here
+   │ 
+   │ Help: A trait can only have one `self` type variable
+───╯
+
+

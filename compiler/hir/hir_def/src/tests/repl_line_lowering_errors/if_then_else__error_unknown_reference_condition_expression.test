@@ -75,4 +75,12 @@ HirModule {
         },
     ],
 }
-[]
+[E22009] Error: Unknown value reference `test`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/if_then_else__error_unknown_reference_condition_expression.test:1:4 ]
+   │
+ 1 │ if test then 2 else 3
+   │    ──┬─  
+   │      ╰─── cannot find value `test` in this scope
+───╯
+
+

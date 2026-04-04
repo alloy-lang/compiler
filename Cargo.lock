@@ -161,6 +161,7 @@ dependencies = [
 name = "alloy_parser"
 version = "0.1.0"
 dependencies = [
+ "alloy_diagnostics",
  "alloy_lexer",
  "alloy_syntax",
  "alloy_test_harness",

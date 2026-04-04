@@ -12,6 +12,7 @@ text-size = { workspace = true }
 itertools = { workspace = true }
 alloy_lexer = { workspace = true }
 alloy_syntax = { workspace = true }
+alloy_diagnostics = { workspace = true }
 
 [dev-dependencies]
 alloy_test_harness = {path = "../test_harness"}

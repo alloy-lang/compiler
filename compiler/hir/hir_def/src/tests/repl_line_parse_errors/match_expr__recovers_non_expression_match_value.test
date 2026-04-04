@@ -119,25 +119,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Integer,
-            Fraction,
-            String,
-            Char,
-            Ident,
-            OpIdent,
-            Minus,
-            LParen,
-            IfKw,
-            MatchKw,
-            Pipe,
-        ],
-        kind: Unexpected {
-            found: NilIdentifier,
-            range: 52..53,
-        },
-        context: MatchTargetValue,
-    },
-]
+[E11002] Error: Unexpected token `‘_’` while parsing the value in a match expression branch
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/match_expr__recovers_non_expression_match_value.test:4:13 ]
+   │
+ 4 │   \ True -> _
+   │             ┬  
+   │             ╰── unexpected `‘_’`, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+   │ 
+   │ Help: While parsing the value in a match expression branch, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’` but found `‘_’`
+───╯
+
+

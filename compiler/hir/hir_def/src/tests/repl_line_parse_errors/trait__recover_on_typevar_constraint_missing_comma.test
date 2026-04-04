@@ -60,14 +60,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Comma,
-        ],
-        kind: Missing {
-            offset: 42,
-        },
-        context: TypeVariableKindConstraintUnderscoreComma,
-    },
-]
+[E11001] Error: Missing expected token while parsing the comma between `_` in the [_] pattern thingy
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_typevar_constraint_missing_comma.test:2:20 ]
+   │
+ 2 │     self = #Type[_ _]
+   │                    │ 
+   │                    ╰─ expected `‘,’`
+   │ 
+   │ Help: While parsing the comma between `_` in the [_] pattern thingy, expected `‘,’`
+───╯
+
+

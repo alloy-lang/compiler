@@ -149,14 +149,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            RightArrow,
-        ],
-        kind: Missing {
-            offset: 64,
-        },
-        context: LambdaTypeRightArrow,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `->` in a lambda type
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_lambda_type_without_arrow.test:3:41 ]
+   │
+ 3 │ typeof test1 : Test -> String -> String String
+   │                                         │ 
+   │                                         ╰─ expected `‘->’`
+   │ 
+   │ Help: While parsing the `->` in a lambda type, expected `‘->’`
+───╯
+
+

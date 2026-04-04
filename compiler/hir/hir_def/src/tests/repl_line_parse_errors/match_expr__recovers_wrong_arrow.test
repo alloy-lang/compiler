@@ -123,15 +123,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            RightArrow,
-        ],
-        kind: Unexpected {
-            found: RAngle,
-            range: 49..50,
-        },
-        context: MatchTargetRightArrow,
-    },
-]
+[E11002] Error: Unexpected token `‘>’` while parsing the `->` in a match expression branch
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/match_expr__recovers_wrong_arrow.test:4:10 ]
+   │
+ 4 │   \ True > 0
+   │          ┬  
+   │          ╰── unexpected `‘>’`, expected `‘->’`
+   │ 
+   │ Help: While parsing the `->` in a match expression branch, expected `‘->’` but found `‘>’`
+───╯
+
+

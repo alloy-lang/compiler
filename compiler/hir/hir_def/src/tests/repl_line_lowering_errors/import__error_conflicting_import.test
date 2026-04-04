@@ -59,4 +59,23 @@ HirModule {
         },
     ],
 }
-[]
+[W22002] Warning: Unused import `map`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/import__error_conflicting_import.test:1:1 ]
+   │
+ 1 │ import std::option::map
+   │ ───────────┬───────────  
+   │            ╰───────────── unused import `map`
+───╯
+
+[E22002] Error: Conflicting import for `map`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/import__error_conflicting_import.test:2:1 ]
+   │
+ 1 │ import std::option::map
+   │ ───────────┬───────────  
+   │            ╰───────────── `map` first imported here
+ 2 │ import std::functor::map
+   │ ────────────┬───────────  
+   │             ╰───────────── `map` imported again here
+───╯
+
+

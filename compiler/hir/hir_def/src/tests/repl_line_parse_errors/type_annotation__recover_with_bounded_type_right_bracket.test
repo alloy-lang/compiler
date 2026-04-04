@@ -165,14 +165,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            LBracket,
-        ],
-        kind: Missing {
-            offset: 56,
-        },
-        context: BoundedTypeLBracket,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `[` at the start of the bounded type arguments
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_bounded_type_right_bracket.test:3:33 ]
+   │
+ 3 │ typeof apply : Test[t1] -> Test t2] where
+   │                                 │ 
+   │                                 ╰─ expected `‘[’`
+   │ 
+   │ Help: While parsing the `[` at the start of the bounded type arguments, expected `‘[’`
+───╯
+
+

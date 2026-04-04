@@ -1,3 +1,4 @@
+use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, Severity};
 use alloy_lexer::TokenKind;
 use itertools::Itertools;
 use std::fmt;
@@ -228,6 +229,68 @@ impl fmt::Display for ParseError {
         }
 
         Ok(())
+    }
+}
+
+impl Diagnostic for ParseError {
+    fn severity(&self) -> Severity {
+        Severity::Error
+    }
+
+    fn code(&self) -> Option<&str> {
+        match &self.kind {
+            ParseErrorKind::Missing { .. } => Some("E11001"),
+            ParseErrorKind::Unexpected { .. } => Some("E11002"),
+        }
+    }
+
+    fn message(&self) -> String {
+        let context_name = self.context.context_name();
+        match &self.kind {
+            ParseErrorKind::Missing { .. } => {
+                format!("Missing expected token while parsing {context_name}")
+            }
+            ParseErrorKind::Unexpected { found, .. } => {
+                format!("Unexpected token `{found}` while parsing {context_name}")
+            }
+        }
+    }
+
+    fn primary_span(&self) -> TextRange {
+        match &self.kind {
+            ParseErrorKind::Missing { offset } => TextRange::new(*offset, *offset),
+            ParseErrorKind::Unexpected { range, .. } => *range,
+        }
+    }
+
+    fn build_report<'a>(&self, builder: DiagnosticBuilder<'a>) -> DiagnosticBuilder<'a> {
+        let expected_str = {
+            let unique: Vec<_> = self.expected.iter().unique().collect();
+            let parts: Vec<String> = unique.iter().map(|k| format!("`{k}`")).collect();
+            match parts.len() {
+                0 => String::new(),
+                1 => parts[0].clone(),
+                _ => {
+                    let (last, rest) = parts.split_last().unwrap();
+                    format!("{} or {last}", rest.join(", "))
+                }
+            }
+        };
+
+        match &self.kind {
+            ParseErrorKind::Missing { .. } => builder
+                .with_primary_label(format!("expected {expected_str}"))
+                .with_help(format!(
+                    "While parsing {}, expected {expected_str}",
+                    self.context.context_name()
+                )),
+            ParseErrorKind::Unexpected { found, .. } => builder
+                .with_primary_label(format!("unexpected `{found}`, expected {expected_str}"))
+                .with_help(format!(
+                    "While parsing {}, expected {expected_str} but found `{found}`",
+                    self.context.context_name()
+                )),
+        }
     }
 }
 

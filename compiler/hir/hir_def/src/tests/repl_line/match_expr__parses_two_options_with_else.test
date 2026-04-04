@@ -141,4 +141,12 @@ HirModule {
     ],
     errors: [],
 }
-[]
+[W22002] Warning: Unused import `True`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line/match_expr__parses_two_options_with_else.test:1:1 ]
+   │
+ 1 │ import std::bool::True
+   │ ───────────┬──────────  
+   │            ╰──────────── unused import `True`
+───╯
+
+

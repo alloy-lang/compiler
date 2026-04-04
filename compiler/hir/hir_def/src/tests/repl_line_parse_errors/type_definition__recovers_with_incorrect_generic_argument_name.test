@@ -75,15 +75,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Unexpected {
-            found: NilIdentifier,
-            range: 18..19,
-        },
-        context: BoundedTypeArgName,
-    },
-]
+[E11002] Error: Unexpected token `‘_’` while parsing the name of a bounded type argument
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_definition__recovers_with_incorrect_generic_argument_name.test:1:19 ]
+   │
+ 1 │ typedef Test1[t1, _] = Empty
+   │                   ┬  
+   │                   ╰── unexpected `‘_’`, expected `identifier`
+   │ 
+   │ Help: While parsing the name of a bounded type argument, expected `identifier` but found `‘_’`
+───╯
+
+

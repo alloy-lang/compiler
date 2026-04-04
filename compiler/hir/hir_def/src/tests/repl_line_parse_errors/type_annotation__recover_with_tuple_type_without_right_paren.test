@@ -151,14 +151,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            RParen,
-        ],
-        kind: Missing {
-            offset: 73,
-        },
-        context: TupleTypeRightParen,
-    },
-]
+[E11001] Error: Missing expected token while parsing the right parenthesis of a tuple type
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_tuple_type_without_right_paren.test:4:1 ]
+   │
+ 4 │ typeof test2 : Test -> String
+   │ │ 
+   │ ╰─ expected `‘)’`
+   │ 
+   │ Help: While parsing the right parenthesis of a tuple type, expected `‘)’`
+───╯
+
+

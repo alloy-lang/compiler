@@ -99,4 +99,15 @@ HirModule {
         },
     ],
 }
-[]
+[E22008] Error: Conflicting type variable `t1`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/type_annotation__error_conflicting_typevars.test:3:5 ]
+   │
+ 2 │     typevar t1
+   │     ─────┬────  
+   │          ╰────── type variable `t1` first declared here
+ 3 │     typevar t1
+   │     ─────┬────  
+   │          ╰────── type variable `t1` redeclared here
+───╯
+
+

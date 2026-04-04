@@ -132,17 +132,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            TypeOfKw,
-            LetKw,
-            TypevarKw,
-        ],
-        kind: Unexpected {
-            found: Ident,
-            range: 104..111,
-        },
-        context: BehaviorMemberFirst,
-    },
-]
+[E11002] Error: Unexpected token `identifier` while parsing the start of a behavior member, are you missing a keyword?
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/behavior__recover_on_unknown_token.test:8:5 ]
+   │
+ 8 │     unknown
+   │     ───┬───  
+   │        ╰───── unexpected `identifier`, expected `‘typeof‘`, `‘let’` or `‘typevar‘`
+   │ 
+   │ Help: While parsing the start of a behavior member, are you missing a keyword?, expected `‘typeof‘`, `‘let’` or `‘typevar‘` but found `identifier`
+───╯
+
+

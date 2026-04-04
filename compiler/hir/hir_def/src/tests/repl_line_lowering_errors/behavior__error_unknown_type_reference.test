@@ -108,4 +108,12 @@ HirModule {
         },
     ],
 }
-[]
+[E22009] Error: Unknown type reference `Type1`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/behavior__error_unknown_type_reference.test:5:25 ]
+   │
+ 5 │ behavior TestTrait1 for Type1 where
+   │                         ──┬──  
+   │                           ╰──── cannot find type `Type1` in this scope
+───╯
+
+

@@ -87,4 +87,15 @@ HirModule {
     ],
     errors: [],
 }
-[]
+[W22001] Warning: Duplicate import of `Option`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/import__warn_duplicate_import.test:2:1 ]
+   │
+ 1 │ import std::option::Option
+   │ ─────────────┬────────────  
+   │              ╰────────────── `Option` first imported here
+ 2 │ import std::option::Option
+   │ ─────────────┬────────────  
+   │              ╰────────────── duplicate import
+───╯
+
+

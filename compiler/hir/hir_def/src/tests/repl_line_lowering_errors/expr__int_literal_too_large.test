@@ -59,4 +59,12 @@ HirModule {
         },
     ],
 }
-[]
+[E22011] Error: Number literal is too large
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/expr__int_literal_too_large.test:1:15 ]
+   │
+ 1 │ let counter = 99999999999999999999
+   │               ──────────┬─────────  
+   │                         ╰─────────── number literal exceeds maximum value
+───╯
+
+

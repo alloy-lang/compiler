@@ -49,4 +49,12 @@ HirModule {
     ],
     errors: [],
 }
-[]
+[W22002] Warning: Unused import `<|`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line/import__parse_longer_single_path_with_symbols.test:1:1 ]
+   │
+ 1 │ import std::function::(<|)
+   │ ─────────────┬────────────  
+   │              ╰────────────── unused import `<|`
+───╯
+
+

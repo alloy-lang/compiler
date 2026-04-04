@@ -249,14 +249,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            RParen,
-        ],
-        kind: Missing {
-            offset: 85,
-        },
-        context: FunctionCallRightParen,
-    },
-]
+[E11001] Error: Missing expected token while parsing a close parenthesis after a function call
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/expr__recovers_function_call_missing_trailing_parentheses.test:6:14 ]
+   │
+ 6 │ funky(x, y, z
+   │              │ 
+   │              ╰─ expected `‘)’`
+   │ 
+   │ Help: While parsing a close parenthesis after a function call, expected `‘)’`
+───╯
+
+

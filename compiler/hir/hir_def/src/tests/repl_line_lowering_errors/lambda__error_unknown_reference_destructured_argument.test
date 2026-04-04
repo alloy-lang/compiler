@@ -93,4 +93,12 @@ HirModule {
         },
     ],
 }
-[]
+[E22009] Error: Unknown pattern reference `Option`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/lambda__error_unknown_reference_destructured_argument.test:1:2 ]
+   │
+ 1 │ |Option::Some(x)| -> x
+   │  ──────┬─────  
+   │        ╰─────── cannot find pattern `Option` in this scope
+───╯
+
+

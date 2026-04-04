@@ -129,14 +129,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Colon,
-        ],
-        kind: Missing {
-            offset: 42,
-        },
-        context: TypeOfColon,
-    },
-]
+[E11001] Error: Missing expected token while parsing the colon after the name of a type
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_type_annotation_with_no_colon.test:2:20 ]
+   │
+ 2 │     typeof test1   self -> String -> Int
+   │                    │ 
+   │                    ╰─ expected `‘:’`
+   │ 
+   │ Help: While parsing the colon after the name of a type, expected `‘:’`
+───╯
+
+

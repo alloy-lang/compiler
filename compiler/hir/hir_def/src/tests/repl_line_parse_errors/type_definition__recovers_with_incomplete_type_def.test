@@ -56,23 +56,24 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Equals,
-        ],
-        kind: Missing {
-            offset: 14,
-        },
-        context: TypeDefEquals,
-    },
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Missing {
-            offset: 14,
-        },
-        context: TypeDefMemberName,
-    },
-]
+[E11001] Error: Missing expected token while parsing the equals sign in a type definition
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_definition__recovers_with_incomplete_type_def.test:2:1 ]
+   │
+ 2 │ typedef Test2 = Empty
+   │ │ 
+   │ ╰─ expected `‘=’`
+   │ 
+   │ Help: While parsing the equals sign in a type definition, expected `‘=’`
+───╯
+
+[E11001] Error: Missing expected token while parsing the name of a type definition member
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_definition__recovers_with_incomplete_type_def.test:2:1 ]
+   │
+ 2 │ typedef Test2 = Empty
+   │ │ 
+   │ ╰─ expected `identifier`
+   │ 
+   │ Help: While parsing the name of a type definition member, expected `identifier`
+───╯
+
+

@@ -85,14 +85,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-        ],
-        kind: Missing {
-            offset: 18,
-        },
-        context: BoundedTypeArgName,
-    },
-]
+[E11001] Error: Missing expected token while parsing the name of a bounded type argument
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_definition__recovers_with_extra_commas_in_generic_argument_name.test:1:19 ]
+   │
+ 1 │ typedef Test1[t1, , t3] = Empty
+   │                   │ 
+   │                   ╰─ expected `identifier`
+   │ 
+   │ Help: While parsing the name of a bounded type argument, expected `identifier`
+───╯
+
+

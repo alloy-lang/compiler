@@ -123,14 +123,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            RightArrow,
-        ],
-        kind: Missing {
-            offset: 49,
-        },
-        context: MatchTargetRightArrow,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `->` in a match expression branch
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/match_expr__recovers_missing_arrow.test:4:10 ]
+   │
+ 4 │   \ True 0
+   │          │ 
+   │          ╰─ expected `‘->’`
+   │ 
+   │ Help: While parsing the `->` in a match expression branch, expected `‘->’`
+───╯
+
+

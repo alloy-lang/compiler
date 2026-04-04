@@ -57,18 +57,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            TypeOfKw,
-            LetKw,
-            TypevarKw,
-            SelfKw,
-        ],
-        kind: Unexpected {
-            found: Ident,
-            range: 27..34,
-        },
-        context: TraitMemberFirst,
-    },
-]
+[E11002] Error: Unexpected token `identifier` while parsing the start of a trait member, are you missing a keyword?
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_unknown_token.test:2:5 ]
+   │
+ 2 │     unknown
+   │     ───┬───  
+   │        ╰───── unexpected `identifier`, expected `‘typeof‘`, `‘let’`, `‘typevar‘` or `‘self‘`
+   │ 
+   │ Help: While parsing the start of a trait member, are you missing a keyword?, expected `‘typeof‘`, `‘let’`, `‘typevar‘` or `‘self‘` but found `identifier`
+───╯
+
+

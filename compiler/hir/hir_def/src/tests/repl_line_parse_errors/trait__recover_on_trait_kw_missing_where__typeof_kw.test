@@ -60,14 +60,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            WhereKw,
-        ],
-        kind: Missing {
-            offset: 21,
-        },
-        context: TraitWhere,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `where` keyword at the start of a trait definition
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_trait_kw_missing_where__typeof_kw.test:2:5 ]
+   │
+ 2 │     typeof test : String
+   │     │ 
+   │     ╰─ expected `‘where‘`
+   │ 
+   │ Help: While parsing the `where` keyword at the start of a trait definition, expected `‘where‘`
+───╯
+
+

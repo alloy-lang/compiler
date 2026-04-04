@@ -60,14 +60,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            NilIdentifier,
-        ],
-        kind: Missing {
-            offset: 40,
-        },
-        context: TypeVariableKindConstraintUnderscore,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `_` in the [_] pattern thingy
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_typevar_constraint_missing_underscore.test:2:18 ]
+   │
+ 2 │     self = #Type[]
+   │                  │ 
+   │                  ╰─ expected `‘_’`
+   │ 
+   │ Help: While parsing the `_` in the [_] pattern thingy, expected `‘_’`
+───╯
+
+

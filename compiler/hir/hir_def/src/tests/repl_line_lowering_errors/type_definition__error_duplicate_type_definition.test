@@ -56,4 +56,15 @@ HirModule {
         },
     ],
 }
-[]
+[E22005] Error: Conflicting type definition for `TestConflict`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/type_definition__error_duplicate_type_definition.test:2:1 ]
+   │
+ 1 │ typedef TestConflict = Empty
+   │ ──────────────┬─────────────  
+   │               ╰─────────────── type `TestConflict` first defined here
+ 2 │ typedef TestConflict = Empty
+   │ ──────────────┬─────────────  
+   │               ╰─────────────── type `TestConflict` redefined here
+───╯
+
+

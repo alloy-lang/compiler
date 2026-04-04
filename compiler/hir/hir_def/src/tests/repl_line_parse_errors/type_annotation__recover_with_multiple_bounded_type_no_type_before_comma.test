@@ -112,15 +112,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Ident,
-            LParen,
-        ],
-        kind: Missing {
-            offset: 44,
-        },
-        context: BoundedTypeArgType,
-    },
-]
+[E11001] Error: Missing expected token while parsing the type of a bounded type argument
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_multiple_bounded_type_no_type_before_comma.test:3:21 ]
+   │
+ 3 │ typeof apply : Test[, t2] where
+   │                     │ 
+   │                     ╰─ expected `identifier` or `‘(’`
+   │ 
+   │ Help: While parsing the type of a bounded type argument, expected `identifier` or `‘(’`
+───╯
+
+

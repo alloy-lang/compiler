@@ -103,14 +103,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Plus,
-        ],
-        kind: Missing {
-            offset: 72,
-        },
-        context: TypeVariableConstraintPlus,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `+` between type constraints
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_typevar_constraint_without_plus_reversed.test:4:20 ]
+   │
+ 4 │     self = Functor #Type[_]
+   │                    │ 
+   │                    ╰─ expected `‘+’`
+   │ 
+   │ Help: While parsing the `+` between type constraints, expected `‘+’`
+───╯
+
+

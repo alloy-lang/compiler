@@ -175,4 +175,14 @@ HirModule {
         },
     ],
 }
-[]
+[E21003] Error: Module 'std::functor' found but missing local name
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/type_annotation__recover_with_typevar_with_incomplete_path.test:5:18 ]
+   │
+ 5 │     typevar t1 = functor
+   │                  ───┬───  
+   │                     ╰───── module 'std::functor' found but missing local name
+   │ 
+   │ Help: Trying to import a specific item from module 'std::functor'
+───╯
+
+

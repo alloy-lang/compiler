@@ -216,14 +216,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            EndKw,
-        ],
-        kind: Missing {
-            offset: 193,
-        },
-        context: BehaviorEnd,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `end` keyword after a behavior definition
+    ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/behavior__recover_on_behavior_kw_missing_end.test:16:1 ]
+    │
+ 16 │ behavior TestTrait2 for Type1 where
+    │ │ 
+    │ ╰─ expected `‘end‘`
+    │ 
+    │ Help: While parsing the `end` keyword after a behavior definition, expected `‘end‘`
+────╯
+
+

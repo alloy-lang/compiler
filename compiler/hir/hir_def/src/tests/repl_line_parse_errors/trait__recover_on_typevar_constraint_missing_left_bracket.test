@@ -60,24 +60,24 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            TypeKw,
-        ],
-        kind: Unexpected {
-            found: Ident,
-            range: 35..39,
-        },
-        context: TypeVariableKindConstraintTypeKw,
-    },
-    ParseError {
-        expected: [
-            LBracket,
-        ],
-        kind: Missing {
-            offset: 39,
-        },
-        context: TypeVariableKindConstraintLBracket,
-    },
-]
+[E11002] Error: Unexpected token `identifier` while parsing the `Type` keyword before the [_] pattern thingy
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_typevar_constraint_missing_left_bracket.test:2:13 ]
+   │
+ 2 │     self = #Type_]
+   │             ──┬─  
+   │               ╰─── unexpected `identifier`, expected `‘Type‘`
+   │ 
+   │ Help: While parsing the `Type` keyword before the [_] pattern thingy, expected `‘Type‘` but found `identifier`
+───╯
+
+[E11001] Error: Missing expected token while parsing the `[` at the start of the [_] pattern thingy
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_typevar_constraint_missing_left_bracket.test:2:17 ]
+   │
+ 2 │     self = #Type_]
+   │                 │ 
+   │                 ╰─ expected `‘[’`
+   │ 
+   │ Help: While parsing the `[` at the start of the [_] pattern thingy, expected `‘[’`
+───╯
+
+

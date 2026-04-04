@@ -127,14 +127,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Comma,
-        ],
-        kind: Missing {
-            offset: 47,
-        },
-        context: BoundedTypeComma,
-    },
-]
+[E11001] Error: Missing expected token while parsing the comma between arguments in a bounded type
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_multiple_bounded_type_no_comma.test:3:24 ]
+   │
+ 3 │ typeof apply : Test[t1 t2] where
+   │                        │ 
+   │                        ╰─ expected `‘,’`
+   │ 
+   │ Help: While parsing the comma between arguments in a bounded type, expected `‘,’`
+───╯
+
+

@@ -59,4 +59,12 @@ HirModule {
         },
     ],
 }
-[]
+[E22012] Error: Invalid character literal
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/expr__char_literal_too_large.test:1:9 ]
+   │
+ 1 │ let c = 'characters'
+   │         ──────┬─────  
+   │               ╰─────── invalid character literal
+───╯
+
+

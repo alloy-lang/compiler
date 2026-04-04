@@ -79,4 +79,20 @@ HirModule {
     ],
     errors: [],
 }
-[]
+[W22002] Warning: Unused import `Thing1`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/source_file/module__parse_multiple_imports.test:2:5 ]
+   │
+ 2 │     import really::really::real::Thing1
+   │     ─────────────────┬─────────────────  
+   │                      ╰─────────────────── unused import `Thing1`
+───╯
+
+[W22002] Warning: Unused import `Thing2`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/source_file/module__parse_multiple_imports.test:3:5 ]
+   │
+ 3 │     import really::real::other::Thing2
+   │     ─────────────────┬────────────────  
+   │                      ╰────────────────── unused import `Thing2`
+───╯
+
+

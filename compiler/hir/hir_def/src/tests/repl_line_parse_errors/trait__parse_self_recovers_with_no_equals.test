@@ -85,14 +85,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Equals,
-        ],
-        kind: Missing {
-            offset: 53,
-        },
-        context: TraitSelfConstraintsEquals,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `=` sign in a trait `self` constraint
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__parse_self_recovers_with_no_equals.test:4:10 ]
+   │
+ 4 │     self functor::Functor
+   │          │ 
+   │          ╰─ expected `‘=’`
+   │ 
+   │ Help: While parsing the `=` sign in a trait `self` constraint, expected `‘=’`
+───╯
+
+

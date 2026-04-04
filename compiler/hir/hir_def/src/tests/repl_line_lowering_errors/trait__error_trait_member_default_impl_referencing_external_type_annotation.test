@@ -108,4 +108,12 @@ HirModule {
         },
     ],
 }
-[]
+[E22009] Error: Unknown value reference `test`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/trait__error_trait_member_default_impl_referencing_external_type_annotation.test:5:20 ]
+   │
+ 5 │     let thing    = test
+   │                    ──┬─  
+   │                      ╰─── cannot find value `test` in this scope
+───╯
+
+

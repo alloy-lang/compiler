@@ -123,14 +123,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Backslash,
-        ],
-        kind: Missing {
-            offset: 42,
-        },
-        context: MatchTargetPipe,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `|` at the start of a match expression branch
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/match_expr__recovers_missing_pipe.test:4:3 ]
+   │
+ 4 │   True -> 0
+   │   │ 
+   │   ╰─ expected `’\’`
+   │ 
+   │ Help: While parsing the `|` at the start of a match expression branch, expected `’\’`
+───╯
+
+

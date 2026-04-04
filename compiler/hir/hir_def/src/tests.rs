@@ -1,3 +1,4 @@
+use alloy_diagnostics::DiagnosticsReporter;
 use alloy_workspace::WorkspaceDatabase;
 use salsa::Database;
 use std::env;
@@ -117,7 +118,14 @@ fn run_hir_test(
             // );
         }
 
-        format!("{:#?}\n{parse_errors:#?}", module)
+        db.attach(|_| {
+            let mut reporter = DiagnosticsReporter::new();
+            reporter.add_all(module_id, parse_errors);
+            reporter.add_all(module_id, module.warnings().iter().cloned());
+            reporter.add_all(module_id, module.errors().iter().cloned());
+
+            format!("{module:#?}\n{}", reporter.render_no_color(&db),)
+        })
     })
 }
 

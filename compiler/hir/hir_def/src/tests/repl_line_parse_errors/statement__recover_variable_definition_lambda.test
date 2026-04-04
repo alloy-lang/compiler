@@ -144,34 +144,24 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            RightArrow,
-        ],
-        kind: Unexpected {
-            found: Minus,
-            range: 18..19,
-        },
-        context: LambdaExprRightArrow,
-    },
-    ParseError {
-        expected: [
-            Integer,
-            Fraction,
-            String,
-            Char,
-            Ident,
-            OpIdent,
-            Minus,
-            LParen,
-            IfKw,
-            MatchKw,
-            Pipe,
-        ],
-        kind: Missing {
-            offset: 20,
-        },
-        context: LambdaExprExpr,
-    },
-]
+[E11002] Error: Unexpected token `‘-’` while parsing the `->` in a lambda expression
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/statement__recover_variable_definition_lambda.test:1:19 ]
+   │
+ 1 │ let add1 = |a, 9| -
+   │                   ┬  
+   │                   ╰── unexpected `‘-’`, expected `‘->’`
+   │ 
+   │ Help: While parsing the `->` in a lambda expression, expected `‘->’` but found `‘-’`
+───╯
+
+[E11001] Error: Missing expected token while parsing the body of a lambda expression
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/statement__recover_variable_definition_lambda.test:2:1 ]
+   │
+ 2 │ let add2 = |a, b| -> a + b
+   │ │ 
+   │ ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+   │ 
+   │ Help: While parsing the body of a lambda expression, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+───╯
+
+

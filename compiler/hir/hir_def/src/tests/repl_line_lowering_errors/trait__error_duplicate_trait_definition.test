@@ -59,4 +59,20 @@ HirModule {
         },
     ],
 }
-[]
+[E22006] Error: Conflicting trait definition for `TestTrait1`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/trait__error_duplicate_trait_definition.test:5:1 ]
+   │
+ 1 │ ╭───▶ trait TestTrait1 where
+   ┆ ┆     
+ 3 │ ├───▶ end
+   │ │           
+   │ ╰─────────── trait `TestTrait1` first defined here
+   │ 
+ 5 │   ╭─▶ trait TestTrait1 where
+   ┆   ┆   
+ 7 │   ├─▶ end
+   │   │        
+   │   ╰──────── trait `TestTrait1` redefined here
+───╯
+
+

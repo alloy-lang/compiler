@@ -58,14 +58,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            RParen,
-        ],
-        kind: Missing {
-            offset: 18,
-        },
-        context: ParenExprRightParen,
-    },
-]
+[E11001] Error: Missing expected token while parsing a close parenthesis after an expression
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/expr__fails_when_unclosed_parentheses_with_comma.test:3:6 ]
+   │
+ 3 │ (foo,
+   │      │ 
+   │      ╰─ expected `‘)’`
+   │ 
+   │ Help: While parsing a close parenthesis after an expression, expected `‘)’`
+───╯
+
+

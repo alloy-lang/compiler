@@ -60,14 +60,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            TypeKw,
-        ],
-        kind: Missing {
-            offset: 35,
-        },
-        context: TypeVariableKindConstraintTypeKw,
-    },
-]
+[E11001] Error: Missing expected token while parsing the `Type` keyword before the [_] pattern thingy
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_typevar_constraint_missing_type_keyword.test:2:13 ]
+   │
+ 2 │     self = #[_]
+   │             │ 
+   │             ╰─ expected `‘Type‘`
+   │ 
+   │ Help: While parsing the `Type` keyword before the [_] pattern thingy, expected `‘Type‘`
+───╯
+
+

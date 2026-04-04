@@ -126,4 +126,12 @@ HirModule {
         },
     ],
 }
-[]
+[E22009] Error: Unknown pattern reference `unknown`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/pattern__error_unknown_pattern_reference_ignores_expressions.test:3:2 ]
+   │
+ 3 │ |unknown(a)| -> a + "a"
+   │  ───┬───  
+   │     ╰───── cannot find pattern `unknown` in this scope
+───╯
+
+

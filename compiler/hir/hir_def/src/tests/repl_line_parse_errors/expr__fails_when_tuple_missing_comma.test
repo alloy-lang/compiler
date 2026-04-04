@@ -51,14 +51,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Comma,
-        ],
-        kind: Missing {
-            offset: 3,
-        },
-        context: ParenExprComma,
-    },
-]
+[E11001] Error: Missing expected token while parsing a comma between expressions inside parentheses
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/expr__fails_when_tuple_missing_comma.test:1:4 ]
+   │
+ 1 │ (1 2)
+   │    │ 
+   │    ╰─ expected `‘,’`
+   │ 
+   │ Help: While parsing a comma between expressions inside parentheses, expected `‘,’`
+───╯
+
+

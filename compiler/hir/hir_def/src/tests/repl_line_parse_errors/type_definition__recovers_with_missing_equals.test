@@ -61,14 +61,14 @@ HirModule {
     warnings: [],
     errors: [],
 }
-[
-    ParseError {
-        expected: [
-            Equals,
-        ],
-        kind: Missing {
-            offset: 16,
-        },
-        context: TypeDefEquals,
-    },
-]
+[E11001] Error: Missing expected token while parsing the equals sign in a type definition
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_definition__recovers_with_missing_equals.test:1:17 ]
+   │
+ 1 │ typedef Test1   Empty
+   │                 │ 
+   │                 ╰─ expected `‘=’`
+   │ 
+   │ Help: While parsing the equals sign in a type definition, expected `‘=’`
+───╯
+
+
