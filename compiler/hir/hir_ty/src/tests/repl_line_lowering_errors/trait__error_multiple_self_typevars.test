@@ -15,4 +15,33 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
+[W22002] Warning: Unused import `functor`
+   ╭─[ ./test/main.alloy:1:1 ]
+   │
+ 1 │ import std::{functor, debug}
+   │ ──────────────┬─────────────  
+   │               ╰─────────────── unused import `functor`
+───╯
+
+[W22002] Warning: Unused import `debug`
+   ╭─[ ./test/main.alloy:1:1 ]
+   │
+ 1 │ import std::{functor, debug}
+   │ ──────────────┬─────────────  
+   │               ╰─────────────── unused import `debug`
+───╯
+
+[E22010] Error: Multiple `self` type variables in trait `TestTrait1`
+   ╭─[ ./test/main.alloy:3:1 ]
+   │
+ 4 │     self = functor::Functor
+   │     ───────────┬───────────  
+   │                ╰───────────── first `self` type variable here
+ 5 │     self = debug::Debug
+   │     ─────────┬─────────  
+   │              ╰─────────── additional `self` type variable here
+   │ 
+   │ Help: A trait can only have one `self` type variable
+───╯
+
 

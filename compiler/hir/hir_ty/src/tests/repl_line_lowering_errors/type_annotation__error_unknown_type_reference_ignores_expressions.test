@@ -16,4 +16,12 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
+[E22009] Error: Unknown type reference `unknown`
+   ╭─[ ./test/main.alloy:3:15 ]
+   │
+ 3 │ typeof test : unknown -> Int -> String where
+   │               ───┬───  
+   │                  ╰───── cannot find type `unknown` in this scope
+───╯
+
 

@@ -50,6 +50,14 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
+[E22009] Error: Unknown value reference `test`
+   ╭─[ ./test/main.alloy:1:4 ]
+   │
+ 1 │ if test then 2 else 3
+   │    ──┬─  
+   │      ╰─── cannot find value `test` in this scope
+───╯
+
 [E32002] Error: Cannot find value `test` in this scope
    ╭─[ ./test/main.alloy:1:4 ]
    │

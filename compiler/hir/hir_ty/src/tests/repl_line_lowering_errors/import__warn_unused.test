@@ -10,4 +10,12 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
+[W22002] Warning: Unused import `map`
+   ╭─[ ./test/main.alloy:1:1 ]
+   │
+ 1 │ import std::functor::map
+   │ ────────────┬───────────  
+   │             ╰───────────── unused import `map`
+───╯
+
 

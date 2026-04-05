@@ -11,4 +11,15 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
+[E22005] Error: Conflicting type definition for `TestConflict`
+   ╭─[ ./test/main.alloy:2:1 ]
+   │
+ 1 │ typedef TestConflict = Empty
+   │ ──────────────┬─────────────  
+   │               ╰─────────────── type `TestConflict` first defined here
+ 2 │ typedef TestConflict = Empty
+   │ ──────────────┬─────────────  
+   │               ╰─────────────── type `TestConflict` redefined here
+───╯
+
 

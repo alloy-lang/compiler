@@ -29,4 +29,20 @@ HirTypedModule {
    │ Help: While parsing the `+` between type constraints, expected `‘+’`
 ───╯
 
+[E22009] Error: Unknown type reference `Functor1`
+   ╭─[ ./test/main.alloy:8:18 ]
+   │
+ 8 │     typevar t1 = Functor1 Functor2
+   │                  ────┬───  
+   │                      ╰───── cannot find type `Functor1` in this scope
+───╯
+
+[E22009] Error: Unknown type reference `Functor2`
+   ╭─[ ./test/main.alloy:8:27 ]
+   │
+ 8 │     typevar t1 = Functor1 Functor2
+   │                           ────┬───  
+   │                               ╰───── cannot find type `Functor2` in this scope
+───╯
+
 

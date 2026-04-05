@@ -13,4 +13,15 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
+[E22008] Error: Conflicting type variable `t1`
+   ╭─[ ./test/main.alloy:3:5 ]
+   │
+ 2 │     typevar t1
+   │     ─────┬────  
+   │          ╰────── type variable `t1` first declared here
+ 3 │     typevar t1
+   │     ─────┬────  
+   │          ╰────── type variable `t1` redeclared here
+───╯
+
 

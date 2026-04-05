@@ -56,6 +56,14 @@ DefinitionInferenceResult {
         },
     ],
 }
+[E22009] Error: Unknown pattern reference `unknown`
+   ╭─[ ./test/main.alloy:3:2 ]
+   │
+ 3 │ |unknown(a)| -> a + "a"
+   │  ───┬───  
+   │     ╰───── cannot find pattern `unknown` in this scope
+───╯
+
 [E32003] Error: Cannot find pattern `unknown` in this scope
    ╭─[ ./test/main.alloy:3:2 ]
    │

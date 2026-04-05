@@ -28,4 +28,12 @@ HirTypedModule {
    │ Help: While parsing the constraints for a type variable, expected `‘=’`
 ───╯
 
+[E22009] Error: Unknown type reference `functor`
+   ╭─[ ./test/main.alloy:8:16 ]
+   │
+ 8 │     typevar t1 functor::Functor
+   │                ────────┬───────  
+   │                        ╰───────── cannot find type `functor` in this scope
+───╯
+
 

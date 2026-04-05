@@ -25,4 +25,14 @@ HirTypedModule {
    │ Help: While parsing the trait name in a type variable constraint, expected `identifier`
 ───╯
 
+[E21003] Error: Module 'std::functor' found but missing local name
+   ╭─[ ./test/main.alloy:5:18 ]
+   │
+ 5 │     typevar t1 = functor::
+   │                  ────┬────  
+   │                      ╰────── module 'std::functor' found but missing local name
+   │ 
+   │ Help: Trying to import a specific item from module 'std::functor'
+───╯
+
 

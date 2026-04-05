@@ -81,7 +81,7 @@ fn run_hir_ty_test(
     );
     let test_module_id = db.add_module("main", camino::Utf8Path::new("./test/main.alloy"), input);
 
-    let (_hir_module, parse_errors) = hir::lower_file(&db, test_module_id);
+    let (hir_module, parse_errors) = hir::lower_file(&db, test_module_id);
     let typed_module = crate::type_check_module(&db, test_module_id);
 
     // let file_name = path.to_str().expect("Expected filename");
@@ -140,6 +140,8 @@ fn run_hir_ty_test(
     db.attach(|_| {
         let mut reporter = DiagnosticsReporter::new();
         reporter.add_all(test_module_id, parse_errors);
+        reporter.add_all(test_module_id, hir_module.warnings().iter().cloned());
+        reporter.add_all(test_module_id, hir_module.errors().iter().cloned());
         // TODO: warnings implement Diagnostic
         // reporter.add_all(test_module_id, typed_module.warnings().iter().cloned());
         reporter.add_all(test_module_id, typed_module.errors().iter().cloned());

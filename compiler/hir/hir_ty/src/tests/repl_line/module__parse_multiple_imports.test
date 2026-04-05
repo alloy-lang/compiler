@@ -12,4 +12,20 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
+[W22002] Warning: Unused import `Thing1`
+   ╭─[ ./test/main.alloy:2:5 ]
+   │
+ 2 │     import really::really::real::Thing1
+   │     ─────────────────┬─────────────────  
+   │                      ╰─────────────────── unused import `Thing1`
+───╯
+
+[W22002] Warning: Unused import `Thing2`
+   ╭─[ ./test/main.alloy:3:5 ]
+   │
+ 3 │     import really::real::other::Thing2
+   │     ─────────────────┬────────────────  
+   │                      ╰────────────────── unused import `Thing2`
+───╯
+
 

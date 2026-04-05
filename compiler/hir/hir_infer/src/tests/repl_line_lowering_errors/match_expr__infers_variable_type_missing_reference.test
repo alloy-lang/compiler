@@ -52,6 +52,14 @@ DefinitionInferenceResult {
         },
     ],
 }
+[E22009] Error: Unknown value reference `test`
+   ╭─[ ./test/main.alloy:1:7 ]
+   │
+ 1 │ match test when
+   │       ──┬─  
+   │         ╰─── cannot find value `test` in this scope
+───╯
+
 [E32002] Error: Cannot find value `test` in this scope
    ╭─[ ./test/main.alloy:1:7 ]
    │

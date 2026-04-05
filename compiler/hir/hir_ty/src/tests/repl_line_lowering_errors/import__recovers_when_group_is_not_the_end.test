@@ -11,4 +11,22 @@ HirTypedModule {
     errors: [],
     poly_instantiations: {},
 }
+[W22002] Warning: Unused import `Functor`
+   ╭─[ ./test/main.alloy:2:1 ]
+   │
+ 2 │ import std::functor::Functor
+   │ ──────────────┬─────────────  
+   │               ╰─────────────── unused import `Functor`
+───╯
+
+[E22003] Error: Import group must be the last segment in an import path
+   ╭─[ ./test/main.alloy:1:1 ]
+   │
+ 1 │ import std::{functor, option}::map
+   │             ────────┬────────  
+   │                     ╰────────── import group at position 1 of 3, must be last
+   │ 
+   │ Help: Move the import group `{{...}}` to the end of the import path
+───╯
+
 

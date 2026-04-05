@@ -28,4 +28,15 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [],
 }
+[W22001] Warning: Duplicate import of `Option`
+   ╭─[ ./test/main.alloy:2:1 ]
+   │
+ 1 │ import std::option::Option
+   │ ─────────────┬────────────  
+   │              ╰────────────── `Option` first imported here
+ 2 │ import std::option::Option
+   │ ─────────────┬────────────  
+   │              ╰────────────── duplicate import
+───╯
+
 
