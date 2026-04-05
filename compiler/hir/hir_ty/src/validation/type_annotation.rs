@@ -145,15 +145,13 @@ impl<'db> TypeAnnotationChecker<'db> {
             }
 
             // Constrained type variables - check consistency + trait constraints
-            (
-                AnnotatedType::ConstrainedTypeVar { base, .. },
-                InferredType::Generic(id),
-            ) => self.check_generic_consistency(
-                AnnotationVarId::TypeVar(base.fql.clone()),
-                *id,
-                expected,
-                found,
-            ),
+            (AnnotatedType::ConstrainedTypeVar { base, .. }, InferredType::Generic(id)) => self
+                .check_generic_consistency(
+                    AnnotationVarId::TypeVar(base.fql.clone()),
+                    *id,
+                    expected,
+                    found,
+                ),
             (
                 AnnotatedType::ConstrainedTypeVar {
                     base,
@@ -318,10 +316,8 @@ fn check_constraint_sufficiency(
 ) -> Result<(), ConflictingTypeAnnotationReason> {
     let mut satisfied: Vec<Fql<hir::Trait>> = Vec::new();
     for ac in annotation_constraints {
-        for fql in res::resolve_supertraits(db, ac.trait_fql.module_id, ac.trait_fql.local_id) {
-            if !satisfied.contains(&fql) {
-                satisfied.push(fql);
-            }
+        if !satisfied.contains(&ac.trait_fql) {
+            satisfied.push(ac.trait_fql.clone());
         }
     }
 

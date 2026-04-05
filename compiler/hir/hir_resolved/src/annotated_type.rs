@@ -261,7 +261,8 @@ pub fn resolve_annotated_type(
                 let trait_constraints: Vec<TraitConstraint> = trait_def
                     .self_constraints()
                     .iter()
-                    .filter_map(|constraint| trait_constraints(db, module_id, constraint))
+                    .flat_map(|constraint| trait_constraints(db, module_id, constraint))
+                    .unique()
                     .collect();
                 let kind_constraints = trait_def
                     .self_constraints()
@@ -350,17 +351,30 @@ fn trait_constraints(
     db: &dyn HirDefDatabase,
     module_id: ModuleId,
     c: &hir::TypeVariableConstraint,
-) -> Option<TraitConstraint> {
-    match c {
-        hir::TypeVariableConstraint::Trait(type_idx) => {
-            let trait_fql = crate::resolve_trait_by_ref_id(db, module_id, *type_idx).ok()?;
-            Some(TraitConstraint {
-                trait_fql_name: trait_fql.trait_fql_name(db),
-                trait_fql,
+) -> Vec<TraitConstraint> {
+    let mut results = Vec::new();
+
+    if let hir::TypeVariableConstraint::Trait(type_idx) = c {
+        let Ok(trait_fql) = crate::resolve_trait_by_ref_id(db, module_id, *type_idx) else {
+            return results;
+        };
+
+        for super_trait_fql in
+            crate::resolve_super_traits(db, trait_fql.module_id, trait_fql.local_id)
+        {
+            results.push(TraitConstraint {
+                trait_fql_name: super_trait_fql.trait_fql_name(db),
+                trait_fql: super_trait_fql,
             })
         }
-        hir::TypeVariableConstraint::Kind(_) => None,
+
+        results.push(TraitConstraint {
+            trait_fql_name: trait_fql.trait_fql_name(db),
+            trait_fql,
+        });
     }
+
+    results
 }
 
 fn kind_constraints(c: &hir::TypeVariableConstraint) -> Option<usize> {
@@ -458,7 +472,8 @@ pub fn resolve_type_variable_to_annotated(
         hir::TypeVariableKind::Constrained(constraints) => {
             let trait_constraints: Vec<TraitConstraint> = constraints
                 .iter()
-                .filter_map(|constraint| trait_constraints(db, module_id, constraint))
+                .flat_map(|constraint| trait_constraints(db, module_id, constraint))
+                .unique()
                 .collect();
 
             let type_arity = {

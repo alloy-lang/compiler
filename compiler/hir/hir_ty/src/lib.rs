@@ -602,13 +602,23 @@ mod hir_ty_small_tests {
     fn infer_monad_join() {
         let mut db = TestHirTyDatabase::default();
         let stdlib_monad = ModuleId::new(&db, "std::monad");
+        let stdlib_applicative = ModuleId::new(&db, "std::applicative");
+        let stdlib_functor = ModuleId::new(&db, "std::functor");
         let monad_constraint = TraitConstraint {
             trait_fql: Fql::new(stdlib_monad, idx!(0)),
             trait_fql_name: "std::monad::Monad".to_string(),
         };
+        let applicative_constraint = TraitConstraint {
+            trait_fql: Fql::new(stdlib_applicative, idx!(0)),
+            trait_fql_name: "std::applicative::Applicative".to_string(),
+        };
+        let functor_constraint = TraitConstraint {
+            trait_fql: Fql::new(stdlib_functor, idx!(0)),
+            trait_fql_name: "std::functor::Functor".to_string(),
+        };
         let constrained_m = InferredType::ConstrainedGeneric {
             id: 0,
-            constraints: NonEmpty::new(monad_constraint),
+            constraints: ne_vec![monad_constraint, applicative_constraint, functor_constraint],
         };
 
         check_named(

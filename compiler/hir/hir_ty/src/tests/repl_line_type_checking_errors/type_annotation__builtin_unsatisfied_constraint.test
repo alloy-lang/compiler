@@ -106,6 +106,18 @@ HirTypedModule {
             ),
             range: 213..241,
         },
+        TypeCheckingError {
+            kind: InferenceError(
+                TypeInferenceError {
+                    kind: UnsatisfiedConstraint {
+                        trait_fql_name: "std::eq::Eq",
+                        type_name: "t0 -> t0",
+                    },
+                    range: 213..241,
+                },
+            ),
+            range: 213..241,
+        },
     ],
     poly_instantiations: {},
 }
@@ -147,6 +159,16 @@ HirTypedModule {
     │               ╰─────────────── missing implementation of trait `std::order::Ord`
     │ 
     │ Help: Type `t0 -> t0` must implement trait `std::order::Ord`
+────╯
+
+[E33002] Error: Type `t0 -> t0` does not implement trait `std::eq::Eq`
+    ╭─[ ./test/main.alloy:13:1 ]
+    │
+ 13 │ let lambda_traits = |x| -> x
+    │ ──────────────┬─────────────  
+    │               ╰─────────────── missing implementation of trait `std::eq::Eq`
+    │ 
+    │ Help: Type `t0 -> t0` must implement trait `std::eq::Eq`
 ────╯
 
 

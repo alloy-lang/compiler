@@ -1,0 +1,75 @@
+import std::order::{Ord, Ordering}
+
+typedef Foo =
+  | Bar
+end
+
+behavior Ord for Foo where
+  let compare = Ordering::EQ
+end
+
+typeof foo : t where
+  typevar t = Ord
+let foo = Foo::Bar
+===
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
+    expression_types: {
+        Idx::<Expression>(0): TypeDef(
+            Fql {
+                module_id: ModuleId {
+                    path: "std::order",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Ordering",
+        ),
+        Idx::<Expression>(1): TypeDef(
+            Fql {
+                module_id: ModuleId {
+                    path: "main",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Foo",
+        ),
+    },
+    pattern_types: {},
+    variant_constructor_types: {
+        (
+            Idx::<TypeDefinition>(0),
+            Some(
+                "Bar",
+            ),
+        ): TypeDef(
+            Fql {
+                module_id: ModuleId {
+                    path: "main",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Foo",
+        ),
+    },
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnsatisfiedConstraint {
+                trait_fql_name: "std::eq::Eq",
+                type_name: "Foo",
+            },
+            range: 163..181,
+        },
+    ],
+}
+[E33002] Error: Type `Foo` does not implement trait `std::eq::Eq`
+    ╭─[ ./test/main.alloy:13:1 ]
+    │
+ 13 │ let foo = Foo::Bar
+    │ ─────────┬────────  
+    │          ╰────────── missing implementation of trait `std::eq::Eq`
+    │ 
+    │ Help: Type `Foo` must implement trait `std::eq::Eq`
+────╯
+
+
