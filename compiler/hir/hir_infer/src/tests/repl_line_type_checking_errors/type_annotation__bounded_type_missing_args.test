@@ -1,0 +1,112 @@
+typedef Box[t] = Box t
+
+typeof wrong : Box
+let wrong = Box(42)
+===
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Box",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+    },
+    pattern_types: {},
+    variant_constructor_types: {
+        (
+            Idx::<TypeDefinition>(0),
+            None,
+        ): Lambda {
+            arg_type: Generic(
+                0,
+            ),
+            return_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "main",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Box",
+                ),
+                args: [
+                    Generic(
+                        0,
+                    ),
+                ],
+            },
+        },
+    },
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnificationError(
+                TypeMismatch(
+                    App {
+                        constructor: TypeDef {
+                            fql: Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<TypeDefinition>(0),
+                            },
+                            type_args: [
+                                TypeVarId(
+                                    1,
+                                ),
+                            ],
+                            type_def_name: "Box",
+                        },
+                        args: [
+                            Concrete(
+                                Int,
+                            ),
+                        ],
+                    },
+                    TypeDef {
+                        fql: Fql {
+                            module_id: ModuleId {
+                                path: "main",
+                            },
+                            local_id: Idx::<TypeDefinition>(0),
+                        },
+                        type_args: [
+                            TypeVarId(
+                                0,
+                            ),
+                        ],
+                        type_def_name: "Box",
+                    },
+                ),
+            ),
+            range: 43..62,
+        },
+    ],
+}
+[E33001] Error: Type mismatch: expected `Box[Int]`, found `Box`
+   ╭─[ ./test/main.alloy:4:1 ]
+   │
+ 4 │ let wrong = Box(42)
+   │ ─────────┬─────────  
+   │          ╰─────────── expected `Box[Int]`, found `Box`
+   │ 
+   │ Help: These types must be compatible
+───╯
+
+
