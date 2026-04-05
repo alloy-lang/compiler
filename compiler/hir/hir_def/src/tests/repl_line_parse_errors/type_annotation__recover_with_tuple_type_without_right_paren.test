@@ -1,7 +1,9 @@
 import test_data::Test
 
 typeof test1 : Test -> String -> (String, String
+let test1 = |x, y| -> (y, "hi")
 typeof test2 : Test -> String
+let test2 = |x| -> "hi"
 ===
 HirModule {
     imports: Index::<Import> {
@@ -17,8 +19,99 @@ HirModule {
             "scope_id": Idx::<Scope>(0),
         },
     },
-    expressions: EmptyIndex::<Expression>,
-    patterns: EmptyIndex::<Pattern>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: ThisModule {
+                    name: "y",
+                    subname: None,
+                    scope: Idx::<Scope>(3),
+                    resolution_kind: Pattern,
+                    resolution_idx: Pattern(
+                        Idx::<Pattern>(1),
+                    ),
+                },
+                scope: Idx::<Scope>(3),
+            },
+            "range": 96..97,
+        },
+        Idx::<Expression>(1): {
+            "item": Literal(
+                String(
+                    "hi",
+                ),
+            ),
+            "range": 99..103,
+        },
+        Idx::<Expression>(2): {
+            "item": Tuple(
+                NonEmpty(
+                    [
+                        Idx::<Expression>(0),
+                        Idx::<Expression>(1),
+                    ],
+                ),
+            ),
+            "range": 95..104,
+        },
+        Idx::<Expression>(3): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                ],
+                body: Idx::<Expression>(2),
+            },
+            "name": "test1",
+            "range": 73..104,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(4): {
+            "item": Literal(
+                String(
+                    "hi",
+                ),
+            ),
+            "range": 154..158,
+        },
+        Idx::<Expression>(5): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(2),
+                ],
+                body: Idx::<Expression>(4),
+            },
+            "name": "test2",
+            "range": 135..158,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "x",
+            },
+            "name": "x",
+            "range": 86..87,
+            "scope_id": Idx::<Scope>(3),
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableDeclaration {
+                name: "y",
+            },
+            "name": "y",
+            "range": 89..90,
+            "scope_id": Idx::<Scope>(3),
+        },
+        Idx::<Pattern>(2): {
+            "item": VariableDeclaration {
+                name: "x",
+            },
+            "name": "x",
+            "range": 148..149,
+            "scope_id": Idx::<Scope>(4),
+        },
+    },
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
             "item": Named(
@@ -107,13 +200,13 @@ HirModule {
                     ],
                 ),
             ),
-            "range": 88..92,
+            "range": 120..124,
         },
         Idx::<TypeReference>(8): {
             "item": BuiltIn(
                 String,
             ),
-            "range": 96..102,
+            "range": 128..134,
         },
         Idx::<TypeReference>(9): {
             "item": Lambda {
@@ -121,17 +214,33 @@ HirModule {
                 return_type: Idx::<TypeReference>(8),
             },
             "name": "test2",
-            "range": 88..102,
+            "range": 120..134,
             "scope_id": Idx::<Scope>(0),
         },
     },
     type_definitions: EmptyIndex::<TypeDefinition>,
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        Idx::<Expression>(5): ValueDefinition {
+            name: "test2",
+            type_annotation: Some(
+                Idx::<TypeReference>(9),
+            ),
+            expr_idx: Idx::<Expression>(5),
+        },
+        Idx::<Expression>(3): ValueDefinition {
+            name: "test1",
+            type_annotation: Some(
+                Idx::<TypeReference>(6),
+            ),
+            expr_idx: Idx::<Expression>(3),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 3,
+            len: 5,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -145,6 +254,14 @@ HirModule {
                     parent: Idx::<Scope>(0),
                     tag: "type annotation",
                 },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
+                },
             ],
         },
     },
@@ -154,7 +271,7 @@ HirModule {
 [E11001] Error: Missing expected token while parsing the right parenthesis of a tuple type
    ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_tuple_type_without_right_paren.test:4:1 ]
    │
- 4 │ typeof test2 : Test -> String
+ 4 │ let test1 = |x, y| -> (y, "hi")
    │ │ 
    │ ╰─ expected `‘)’`
    │ 

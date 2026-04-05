@@ -1,15 +1,66 @@
 import test_data::Test
 
-typeof test : Test -> t2 -> Test where
+typeof test : Test[Int] -> t2 -> Test[Int] where
     typevar
     typevar t2
+let test = |x, y| -> x
 ===
 HirTypedModule {
     module_id: ModuleId {
         path: "main",
     },
-    expression_types: {},
-    pattern_types: {},
+    expression_types: {
+        Idx::<Expression>(0): Generic(
+            0,
+        ),
+        Idx::<Expression>(1): Lambda {
+            arg_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "test_data",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Test",
+                ),
+                args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+            return_type: Lambda {
+                arg_type: Generic(
+                    0,
+                ),
+                return_type: Bounded {
+                    base: TypeDef(
+                        Fql {
+                            module_id: ModuleId {
+                                path: "test_data",
+                            },
+                            local_id: Idx::<TypeDefinition>(0),
+                        },
+                        "Test",
+                    ),
+                    args: [
+                        BuiltIn(
+                            Int,
+                        ),
+                    ],
+                },
+            },
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+        ),
+        Idx::<Pattern>(1): Generic(
+            0,
+        ),
+    },
     warnings: [],
     errors: [],
     poly_instantiations: {},

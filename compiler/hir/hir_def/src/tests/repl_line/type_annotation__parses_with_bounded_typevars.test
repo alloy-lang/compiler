@@ -3,6 +3,7 @@ import std::option::Option
 typeof apply : Option[(t1 -> t2)] -> Option[t1] -> Option[t2] where
     typevar t1
     typevar t2
+let apply = |x, y| -> Option::None
 ===
 HirModule {
     imports: Index::<Import> {
@@ -19,8 +20,67 @@ HirModule {
             "scope_id": Idx::<Scope>(0),
         },
     },
-    expressions: EmptyIndex::<Expression>,
-    patterns: EmptyIndex::<Pattern>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": VariableRef {
+                path: OtherModule(
+                    Fqn {
+                        module_id: ModuleId {
+                            path: "std::option",
+                        },
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "option",
+                            ],
+                        ),
+                        name: "Option",
+                        sub_path: Some(
+                            "None",
+                        ),
+                    },
+                    [
+                        Pattern,
+                        Expression,
+                        Trait,
+                        TypeDefinition,
+                    ],
+                ),
+                scope: Idx::<Scope>(2),
+            },
+            "range": 148..160,
+        },
+        Idx::<Expression>(1): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                ],
+                body: Idx::<Expression>(0),
+            },
+            "name": "apply",
+            "range": 126..160,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "x",
+            },
+            "name": "x",
+            "range": 139..140,
+            "scope_id": Idx::<Scope>(2),
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableDeclaration {
+                name: "y",
+            },
+            "name": "y",
+            "range": 142..143,
+            "scope_id": Idx::<Scope>(2),
+        },
+    },
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
             "item": Named(
@@ -230,10 +290,19 @@ HirModule {
     },
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        Idx::<Expression>(1): ValueDefinition {
+            name: "apply",
+            type_annotation: Some(
+                Idx::<TypeReference>(13),
+            ),
+            expr_idx: Idx::<Expression>(1),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 2,
+            len: 3,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -242,6 +311,10 @@ HirModule {
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "type annotation",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
                 },
             ],
         },

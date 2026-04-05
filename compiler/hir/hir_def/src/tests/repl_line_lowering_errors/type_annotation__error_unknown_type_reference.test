@@ -1,9 +1,48 @@
 typeof test : Unknown -> Int -> String where
+let test = |x, y| -> "hello"
 ===
 HirModule {
     imports: EmptyIndex::<Import>,
-    expressions: EmptyIndex::<Expression>,
-    patterns: EmptyIndex::<Pattern>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": Literal(
+                String(
+                    "hello",
+                ),
+            ),
+            "range": 66..73,
+        },
+        Idx::<Expression>(1): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                ],
+                body: Idx::<Expression>(0),
+            },
+            "name": "test",
+            "range": 45..73,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "x",
+            },
+            "name": "x",
+            "range": 57..58,
+            "scope_id": Idx::<Scope>(2),
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableDeclaration {
+                name: "y",
+            },
+            "name": "y",
+            "range": 60..61,
+            "scope_id": Idx::<Scope>(2),
+        },
+    },
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
             "item": Named(
@@ -49,10 +88,19 @@ HirModule {
     type_definitions: EmptyIndex::<TypeDefinition>,
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        Idx::<Expression>(1): ValueDefinition {
+            name: "test",
+            type_annotation: Some(
+                Idx::<TypeReference>(4),
+            ),
+            expr_idx: Idx::<Expression>(1),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 2,
+            len: 3,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -61,6 +109,10 @@ HirModule {
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "type annotation",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
                 },
             ],
         },

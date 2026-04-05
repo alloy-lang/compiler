@@ -1,14 +1,130 @@
 import test_data::Test
 
-typeof test1 : Test -> String -> (String, String
-typeof test2 : Test -> String
+typeof test1 : Test[Int] -> String -> (String, String
+let test1 = |x, y| -> (y, "hello")
+typeof test2 : Test[Int] -> String
+let test2 = |x| -> "hello"
 ===
 HirTypedModule {
     module_id: ModuleId {
         path: "main",
     },
-    expression_types: {},
-    pattern_types: {},
+    expression_types: {
+        Idx::<Expression>(0): Generic(
+            0,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(2): Tuple(
+            NonEmpty(
+                [
+                    Generic(
+                        0,
+                    ),
+                    BuiltIn(
+                        String,
+                    ),
+                ],
+            ),
+        ),
+        Idx::<Expression>(3): Lambda {
+            arg_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "test_data",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Test",
+                ),
+                args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+            return_type: Lambda {
+                arg_type: BuiltIn(
+                    String,
+                ),
+                return_type: Tuple(
+                    NonEmpty(
+                        [
+                            BuiltIn(
+                                String,
+                            ),
+                            BuiltIn(
+                                String,
+                            ),
+                        ],
+                    ),
+                ),
+            },
+        },
+        Idx::<Expression>(4): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(5): Lambda {
+            arg_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "test_data",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Test",
+                ),
+                args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+            return_type: BuiltIn(
+                String,
+            ),
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+        Idx::<Pattern>(1): Generic(
+            0,
+        ),
+        Idx::<Pattern>(2): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+    },
     warnings: [],
     errors: [],
     poly_instantiations: {},
@@ -16,7 +132,7 @@ HirTypedModule {
 [E11001] Error: Missing expected token while parsing the right parenthesis of a tuple type
    ╭─[ ./test/main.alloy:4:1 ]
    │
- 4 │ typeof test2 : Test -> String
+ 4 │ let test1 = |x, y| -> (y, "hello")
    │ │ 
    │ ╰─ expected `‘)’`
    │ 

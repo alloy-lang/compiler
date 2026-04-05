@@ -124,6 +124,7 @@ impl<'db> LoweringCtx<'db> {
         }
 
         let mut value_definitions: FxHashMap<ExpressionIdx, ValueDefinition> = Default::default();
+        let mut matched_type_annotations: HashSet<TypeIdx> = HashSet::new();
         for (expression_id, _, _, name, scope) in self.expressions.iter_by_scope(Scopes::ROOT) {
             let value_definition =
                 match self
@@ -135,14 +136,26 @@ impl<'db> LoweringCtx<'db> {
                         expr_idx: expression_id,
                         type_annotation: None,
                     },
-                    Some((ta, _)) => ValueDefinition {
-                        name,
-                        expr_idx: expression_id,
-                        type_annotation: Some(ta),
-                    },
+                    Some((ta, _)) => {
+                        matched_type_annotations.insert(ta);
+                        ValueDefinition {
+                            name,
+                            expr_idx: expression_id,
+                            type_annotation: Some(ta),
+                        }
+                    }
                 };
 
             value_definitions.insert(expression_id, value_definition);
+        }
+
+        for (type_id, _, range, name, _) in self.type_references.iter_by_scope(Scopes::ROOT) {
+            if !matched_type_annotations.contains(&type_id) {
+                warnings.push(LoweringWarning::new(
+                    LoweringWarningKind::MissingDefinition { name },
+                    range,
+                ));
+            }
         }
 
         HirModule::new(

@@ -3,6 +3,7 @@ import test_data::Test
 typeof apply : Test[t1] -> t2 -> Test[t1, t2] where
     typevar t1
     typevar t2
+let apply = |x, y| -> "hello"
 ===
 HirModule {
     imports: Index::<Import> {
@@ -18,8 +19,46 @@ HirModule {
             "scope_id": Idx::<Scope>(0),
         },
     },
-    expressions: EmptyIndex::<Expression>,
-    patterns: EmptyIndex::<Pattern>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": Literal(
+                String(
+                    "hello",
+                ),
+            ),
+            "range": 128..135,
+        },
+        Idx::<Expression>(1): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                    Idx::<Pattern>(1),
+                ],
+                body: Idx::<Expression>(0),
+            },
+            "name": "apply",
+            "range": 106..135,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "x",
+            },
+            "name": "x",
+            "range": 119..120,
+            "scope_id": Idx::<Scope>(2),
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableDeclaration {
+                name: "y",
+            },
+            "name": "y",
+            "range": 122..123,
+            "scope_id": Idx::<Scope>(2),
+        },
+    },
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
             "item": Named(
@@ -182,10 +221,19 @@ HirModule {
     },
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        Idx::<Expression>(1): ValueDefinition {
+            name: "apply",
+            type_annotation: Some(
+                Idx::<TypeReference>(9),
+            ),
+            expr_idx: Idx::<Expression>(1),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 2,
+            len: 3,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -194,6 +242,10 @@ HirModule {
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "type annotation",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
                 },
             ],
         },

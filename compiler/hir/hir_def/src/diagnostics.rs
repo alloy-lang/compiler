@@ -327,6 +327,7 @@ impl Diagnostic for LoweringWarning {
         match &self.kind {
             LoweringWarningKind::DuplicateImport { .. } => Some("W22001"),
             LoweringWarningKind::UnusedImport { .. } => Some("W22002"),
+            LoweringWarningKind::MissingDefinition { .. } => Some("W22003"),
         }
     }
 
@@ -337,6 +338,9 @@ impl Diagnostic for LoweringWarning {
             }
             LoweringWarningKind::UnusedImport { import } => {
                 format!("Unused import `{}`", import.last())
+            }
+            LoweringWarningKind::MissingDefinition { name } => {
+                format!("Type annotation `{name}` has no corresponding definition")
             }
         }
     }
@@ -363,6 +367,9 @@ impl Diagnostic for LoweringWarning {
             LoweringWarningKind::UnusedImport { import } => {
                 builder.with_primary_label(format!("unused import `{}`", import.last()))
             }
+            LoweringWarningKind::MissingDefinition { name } => builder
+                .with_primary_label(format!("type annotation `{name}` has no definition"))
+                .with_help(format!("Add a `let {name} = ...` definition")),
         }
     }
 }
@@ -376,5 +383,8 @@ pub enum LoweringWarningKind {
     },
     UnusedImport {
         import: Import,
+    },
+    MissingDefinition {
+        name: Name,
     },
 }

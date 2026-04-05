@@ -1,0 +1,288 @@
+typedef Option[t] =
+    | None
+    | Some(t)
+end
+
+typeof apply : Option[(t1 -> t2)] -> Option[t1] -> Option[t2] where
+    typevar t1
+    typevar t2
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: EmptyIndex::<Expression>,
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                ThisModule {
+                    name: "t",
+                    subname: None,
+                    scope: Idx::<Scope>(1),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(0),
+                    ),
+                },
+            ),
+            "range": 42..43,
+        },
+        Idx::<TypeReference>(1): {
+            "item": ParenthesizedType(
+                Idx::<TypeReference>(0),
+            ),
+            "range": 41..44,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Named(
+                ThisModule {
+                    name: "Option",
+                    subname: None,
+                    scope: Idx::<Scope>(0),
+                    resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(0),
+                    ),
+                },
+            ),
+            "range": 65..71,
+        },
+        Idx::<TypeReference>(3): {
+            "item": Named(
+                ThisModule {
+                    name: "t1",
+                    subname: None,
+                    scope: Idx::<Scope>(2),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(1),
+                    ),
+                },
+            ),
+            "range": 73..75,
+        },
+        Idx::<TypeReference>(4): {
+            "item": Named(
+                ThisModule {
+                    name: "t2",
+                    subname: None,
+                    scope: Idx::<Scope>(2),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(2),
+                    ),
+                },
+            ),
+            "range": 79..81,
+        },
+        Idx::<TypeReference>(5): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(3),
+                return_type: Idx::<TypeReference>(4),
+            },
+            "range": 73..81,
+        },
+        Idx::<TypeReference>(6): {
+            "item": ParenthesizedType(
+                Idx::<TypeReference>(5),
+            ),
+            "range": 72..82,
+        },
+        Idx::<TypeReference>(7): {
+            "item": Bounded {
+                base: Idx::<TypeReference>(2),
+                args: [
+                    Idx::<TypeReference>(6),
+                ],
+            },
+            "range": 65..83,
+        },
+        Idx::<TypeReference>(8): {
+            "item": Named(
+                ThisModule {
+                    name: "Option",
+                    subname: None,
+                    scope: Idx::<Scope>(0),
+                    resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(0),
+                    ),
+                },
+            ),
+            "range": 87..93,
+        },
+        Idx::<TypeReference>(9): {
+            "item": Named(
+                ThisModule {
+                    name: "t1",
+                    subname: None,
+                    scope: Idx::<Scope>(2),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(1),
+                    ),
+                },
+            ),
+            "range": 94..96,
+        },
+        Idx::<TypeReference>(10): {
+            "item": Bounded {
+                base: Idx::<TypeReference>(8),
+                args: [
+                    Idx::<TypeReference>(9),
+                ],
+            },
+            "range": 87..97,
+        },
+        Idx::<TypeReference>(11): {
+            "item": Named(
+                ThisModule {
+                    name: "Option",
+                    subname: None,
+                    scope: Idx::<Scope>(0),
+                    resolution_kind: TypeDefinition,
+                    resolution_idx: TypeDefinition(
+                        Idx::<TypeDefinition>(0),
+                    ),
+                },
+            ),
+            "range": 101..107,
+        },
+        Idx::<TypeReference>(12): {
+            "item": Named(
+                ThisModule {
+                    name: "t2",
+                    subname: None,
+                    scope: Idx::<Scope>(2),
+                    resolution_kind: TypeVariable,
+                    resolution_idx: TypeVariable(
+                        Idx::<TypeVariable>(2),
+                    ),
+                },
+            ),
+            "range": 108..110,
+        },
+        Idx::<TypeReference>(13): {
+            "item": Bounded {
+                base: Idx::<TypeReference>(11),
+                args: [
+                    Idx::<TypeReference>(12),
+                ],
+            },
+            "range": 101..111,
+        },
+        Idx::<TypeReference>(14): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(10),
+                return_type: Idx::<TypeReference>(13),
+            },
+            "range": 87..111,
+        },
+        Idx::<TypeReference>(15): {
+            "item": Lambda {
+                arg_type: Idx::<TypeReference>(7),
+                return_type: Idx::<TypeReference>(14),
+            },
+            "name": "apply",
+            "range": 65..111,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_definitions: Index::<TypeDefinition> {
+        Idx::<TypeDefinition>(0): {
+            "item": TypeDefinition {
+                name: "Option",
+                type_args: [
+                    Idx::<TypeVariable>(0),
+                ],
+                kind: Union(
+                    [
+                        TypeDefinitionMember {
+                            name: "None",
+                            properties: [],
+                        },
+                        TypeDefinitionMember {
+                            name: "Some",
+                            properties: [
+                                Idx::<TypeReference>(1),
+                            ],
+                        },
+                    ],
+                ),
+            },
+            "name": "Option",
+            "range": 0..48,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_variables: Index::<TypeVariable> {
+        Idx::<TypeVariable>(0): {
+            "item": TypeVariable {
+                name: "t",
+                kind: Unbound,
+            },
+            "name": "t",
+            "range": 15..16,
+            "scope_id": Idx::<Scope>(1),
+        },
+        Idx::<TypeVariable>(1): {
+            "item": TypeVariable {
+                name: "t1",
+                kind: Unbound,
+            },
+            "name": "t1",
+            "range": 122..132,
+            "scope_id": Idx::<Scope>(2),
+        },
+        Idx::<TypeVariable>(2): {
+            "item": TypeVariable {
+                name: "t2",
+                kind: Unbound,
+            },
+            "name": "t2",
+            "range": 137..147,
+            "scope_id": Idx::<Scope>(2),
+        },
+    },
+    traits: EmptyIndex::<Trait>,
+    behaviors: EmptyIndex::<Behavior>,
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type definition",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [
+        LoweringWarning {
+            kind: MissingDefinition {
+                name: "apply",
+            },
+            range: 65..111,
+        },
+    ],
+    errors: [],
+}
+[W22003] Warning: Type annotation `apply` has no corresponding definition
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/type_annotation__missing_definition.test:6:16 ]
+   │
+ 6 │ typeof apply : Option[(t1 -> t2)] -> Option[t1] -> Option[t2] where
+   │                ───────────────────────┬──────────────────────  
+   │                                       ╰──────────────────────── type annotation `apply` has no definition
+   │ 
+   │ Help: Add a `let apply = ...` definition
+───╯
+
+

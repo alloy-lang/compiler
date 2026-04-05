@@ -1,17 +1,74 @@
-typedef Option[t] =
-    | None
-    | Some(t)
-end
+import std::option::Option
+import std::applicative::Applicative
 
 typeof apply : Option[(t1 -> t2)] -> Option[t1] -> Option[t2] where
     typevar t1
     typevar t2
+let apply = Applicative::apply
 ===
 HirTypedModule {
     module_id: ModuleId {
         path: "main",
     },
-    expression_types: {},
+    expression_types: {
+        Idx::<Expression>(0): Lambda {
+            arg_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "std::option",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Option",
+                ),
+                args: [
+                    Lambda {
+                        arg_type: Generic(
+                            0,
+                        ),
+                        return_type: Generic(
+                            1,
+                        ),
+                    },
+                ],
+            },
+            return_type: Lambda {
+                arg_type: Bounded {
+                    base: TypeDef(
+                        Fql {
+                            module_id: ModuleId {
+                                path: "std::option",
+                            },
+                            local_id: Idx::<TypeDefinition>(0),
+                        },
+                        "Option",
+                    ),
+                    args: [
+                        Generic(
+                            0,
+                        ),
+                    ],
+                },
+                return_type: Bounded {
+                    base: TypeDef(
+                        Fql {
+                            module_id: ModuleId {
+                                path: "std::option",
+                            },
+                            local_id: Idx::<TypeDefinition>(0),
+                        },
+                        "Option",
+                    ),
+                    args: [
+                        Generic(
+                            1,
+                        ),
+                    ],
+                },
+            },
+        },
+    },
     pattern_types: {},
     warnings: [],
     errors: [],

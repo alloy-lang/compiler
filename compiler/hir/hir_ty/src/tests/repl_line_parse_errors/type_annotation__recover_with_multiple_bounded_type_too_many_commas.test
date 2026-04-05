@@ -1,25 +1,50 @@
-import test_data::Test
+typedef Test[t1, t2] = Thing t1 t2
 
-typeof apply : Test[t1, , t2] where
-    typevar t1
-    typevar t2
+typeof apply : Test[Int, , Int]
+let apply = Test(0, 1)
 ===
 HirTypedModule {
     module_id: ModuleId {
         path: "main",
     },
-    expression_types: {},
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(2): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+    },
     pattern_types: {},
     warnings: [],
     errors: [],
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the type of a bounded type argument
-   ╭─[ ./test/main.alloy:3:25 ]
+   ╭─[ ./test/main.alloy:3:26 ]
    │
- 3 │ typeof apply : Test[t1, , t2] where
-   │                         │ 
-   │                         ╰─ expected `identifier` or `‘(’`
+ 3 │ typeof apply : Test[Int, , Int]
+   │                          │ 
+   │                          ╰─ expected `identifier` or `‘(’`
    │ 
    │ Help: While parsing the type of a bounded type argument, expected `identifier` or `‘(’`
 ───╯

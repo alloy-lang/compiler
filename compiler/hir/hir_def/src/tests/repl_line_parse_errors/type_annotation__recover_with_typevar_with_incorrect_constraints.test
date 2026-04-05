@@ -3,6 +3,7 @@ import test_data::Test
 typeof test : t1 -> t2 -> Test where
     typevar t1 = 0
     typevar t2
+let test = False
 ===
 HirModule {
     imports: Index::<Import> {
@@ -18,7 +19,18 @@ HirModule {
             "scope_id": Idx::<Scope>(0),
         },
     },
-    expressions: EmptyIndex::<Expression>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": Literal(
+                Bool(
+                    false,
+                ),
+            ),
+            "name": "test",
+            "range": 95..111,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     patterns: EmptyIndex::<Pattern>,
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
@@ -112,6 +124,15 @@ HirModule {
     },
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        Idx::<Expression>(0): ValueDefinition {
+            name: "test",
+            type_annotation: Some(
+                Idx::<TypeReference>(4),
+            ),
+            expr_idx: Idx::<Expression>(0),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

@@ -91,7 +91,14 @@ HirModule {
             ],
         },
     },
-    warnings: [],
+    warnings: [
+        LoweringWarning {
+            kind: MissingDefinition {
+                name: "test",
+            },
+            range: 14..17,
+        },
+    ],
     errors: [
         LoweringError {
             kind: UnknownReference {
@@ -108,8 +115,18 @@ HirModule {
         },
     ],
 }
+[W22003] Warning: Type annotation `test` has no corresponding definition
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/trait__error_trait_member_default_impl_referencing_non_abstract_type_annotation.test:1:15 ]
+   │
+ 1 │ typeof test : Int
+   │               ─┬─  
+   │                ╰─── type annotation `test` has no definition
+   │ 
+   │ Help: Add a `let test = ...` definition
+───╯
+
 [E22009] Error: Unknown value reference `test`
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/trait__error_trait_member_default_impl_referencing_external_type_annotation.test:5:20 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/trait__error_trait_member_default_impl_referencing_non_abstract_type_annotation.test:5:20 ]
    │
  5 │     let thing    = test
    │                    ──┬─  

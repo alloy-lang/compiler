@@ -1,24 +1,124 @@
 import test_data::Test
 
-typeof test1 : Test -> String -> String String
-typeof test2 : Test -> String
+typeof test1 : Test[Int] -> String -> String String
+let test1 = |x, y, z| -> z
+typeof test2 : Test[Int] -> String
+let test2 = |x| -> "hello"
 ===
 HirTypedModule {
     module_id: ModuleId {
         path: "main",
     },
-    expression_types: {},
-    pattern_types: {},
+    expression_types: {
+        Idx::<Expression>(0): Generic(
+            0,
+        ),
+        Idx::<Expression>(1): Lambda {
+            arg_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "test_data",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Test",
+                ),
+                args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+            return_type: Lambda {
+                arg_type: BuiltIn(
+                    String,
+                ),
+                return_type: Lambda {
+                    arg_type: BuiltIn(
+                        String,
+                    ),
+                    return_type: BuiltIn(
+                        String,
+                    ),
+                },
+            },
+        },
+        Idx::<Expression>(2): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(3): Lambda {
+            arg_type: Bounded {
+                base: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "test_data",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Test",
+                ),
+                args: [
+                    BuiltIn(
+                        Int,
+                    ),
+                ],
+            },
+            return_type: BuiltIn(
+                String,
+            ),
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+        Idx::<Pattern>(1): BuiltIn(
+            String,
+        ),
+        Idx::<Pattern>(2): Generic(
+            0,
+        ),
+        Idx::<Pattern>(3): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+    },
     warnings: [],
     errors: [],
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the `->` in a lambda type
-   ╭─[ ./test/main.alloy:3:41 ]
+   ╭─[ ./test/main.alloy:3:46 ]
    │
- 3 │ typeof test1 : Test -> String -> String String
-   │                                         │ 
-   │                                         ╰─ expected `‘->’`
+ 3 │ typeof test1 : Test[Int] -> String -> String String
+   │                                              │ 
+   │                                              ╰─ expected `‘->’`
    │ 
    │ Help: While parsing the `->` in a lambda type, expected `‘->’`
 ───╯

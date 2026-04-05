@@ -1,16 +1,70 @@
-import test_data::Test
+import test_data::{Test}
 import std::functor
 
-typeof test : t1 -> t2 -> Test where
+typeof test : t1 -> t2 -> Test[Int] where
     typevar t1 = functor::
     typevar t2
+let test = |x, y| -> Test(42)
 ===
 HirTypedModule {
     module_id: ModuleId {
         path: "main",
     },
-    expression_types: {},
-    pattern_types: {},
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+        Idx::<Expression>(2): Lambda {
+            arg_type: Generic(
+                0,
+            ),
+            return_type: Lambda {
+                arg_type: Generic(
+                    1,
+                ),
+                return_type: Bounded {
+                    base: TypeDef(
+                        Fql {
+                            module_id: ModuleId {
+                                path: "test_data",
+                            },
+                            local_id: Idx::<TypeDefinition>(0),
+                        },
+                        "Test",
+                    ),
+                    args: [
+                        BuiltIn(
+                            Int,
+                        ),
+                    ],
+                },
+            },
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+        ),
+        Idx::<Pattern>(1): Generic(
+            1,
+        ),
+    },
     warnings: [],
     errors: [],
     poly_instantiations: {},

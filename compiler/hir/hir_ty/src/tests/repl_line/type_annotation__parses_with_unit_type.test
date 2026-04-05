@@ -1,11 +1,32 @@
 typeof test : Int -> String -> ()
+let test = |x, y| -> ()
 ===
 HirTypedModule {
     module_id: ModuleId {
         path: "main",
     },
-    expression_types: {},
-    pattern_types: {},
+    expression_types: {
+        Idx::<Expression>(0): Unit,
+        Idx::<Expression>(1): Lambda {
+            arg_type: BuiltIn(
+                Int,
+            ),
+            return_type: Lambda {
+                arg_type: BuiltIn(
+                    String,
+                ),
+                return_type: Unit,
+            },
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Pattern>(1): BuiltIn(
+            String,
+        ),
+    },
     warnings: [],
     errors: [],
     poly_instantiations: {},

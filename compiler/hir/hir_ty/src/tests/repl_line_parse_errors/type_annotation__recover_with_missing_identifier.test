@@ -2,15 +2,62 @@ import test_data::Test
 
 typeof       : String
 typeof test2 : Test -> String -> Int
+let test2 = |x, y| -> 42
 ===
 HirTypedModule {
     module_id: ModuleId {
         path: "main",
     },
-    expression_types: {},
-    pattern_types: {},
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): Lambda {
+            arg_type: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "test_data",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            return_type: Lambda {
+                arg_type: BuiltIn(
+                    String,
+                ),
+                return_type: BuiltIn(
+                    Int,
+                ),
+            },
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): TypeDef(
+            Fql {
+                module_id: ModuleId {
+                    path: "test_data",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Test",
+        ),
+        Idx::<Pattern>(1): BuiltIn(
+            String,
+        ),
+    },
     warnings: [],
-    errors: [],
+    errors: [
+        TypeCheckingError {
+            kind: BoundedTypeArityMismatch {
+                type_name: "Test",
+                expected_arity: 1,
+                actual_arity: 0,
+                annotation_range: 61..65,
+            },
+            range: 61..65,
+        },
+    ],
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the name of a type
@@ -21,6 +68,14 @@ HirTypedModule {
    │              ╰─ expected `operator identifier` or `identifier`
    │ 
    │ Help: While parsing the name of a type, expected `operator identifier` or `identifier`
+───╯
+
+[E34003] Error: Type `Test` expects 1 type argument(s), but 0 were provided
+   ╭─[ ./test/main.alloy:4:16 ]
+   │
+ 4 │ typeof test2 : Test -> String -> Int
+   │                ──┬─  
+   │                  ╰─── `Test` expects 1 type argument(s), but 0 were provided
 ───╯
 
 

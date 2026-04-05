@@ -3,6 +3,7 @@ import test_data::Test
 typeof apply : Test[, t2] where
     typevar t1
     typevar t2
+let apply = True
 ===
 HirModule {
     imports: Index::<Import> {
@@ -18,7 +19,18 @@ HirModule {
             "scope_id": Idx::<Scope>(0),
         },
     },
-    expressions: EmptyIndex::<Expression>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": Literal(
+                Bool(
+                    true,
+                ),
+            ),
+            "name": "apply",
+            "range": 86..102,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
     patterns: EmptyIndex::<Pattern>,
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
@@ -93,6 +105,15 @@ HirModule {
     },
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        Idx::<Expression>(0): ValueDefinition {
+            name: "apply",
+            type_annotation: Some(
+                Idx::<TypeReference>(2),
+            ),
+            expr_idx: Idx::<Expression>(0),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {

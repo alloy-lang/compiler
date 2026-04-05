@@ -1,7 +1,9 @@
 import test_data::Test
 
 typeof test1 : self -> String
+let test1 = |x| -> "hi"
 typeof test2 : Test -> String
+let test2 = |x| -> "hi"
 ===
 HirModule {
     imports: Index::<Import> {
@@ -17,8 +19,64 @@ HirModule {
             "scope_id": Idx::<Scope>(0),
         },
     },
-    expressions: EmptyIndex::<Expression>,
-    patterns: EmptyIndex::<Pattern>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": Literal(
+                String(
+                    "hi",
+                ),
+            ),
+            "range": 73..77,
+        },
+        Idx::<Expression>(1): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(0),
+                ],
+                body: Idx::<Expression>(0),
+            },
+            "name": "test1",
+            "range": 54..77,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<Expression>(2): {
+            "item": Literal(
+                String(
+                    "hi",
+                ),
+            ),
+            "range": 127..131,
+        },
+        Idx::<Expression>(3): {
+            "item": Lambda {
+                args: [
+                    Idx::<Pattern>(1),
+                ],
+                body: Idx::<Expression>(2),
+            },
+            "name": "test2",
+            "range": 108..131,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: Index::<Pattern> {
+        Idx::<Pattern>(0): {
+            "item": VariableDeclaration {
+                name: "x",
+            },
+            "name": "x",
+            "range": 67..68,
+            "scope_id": Idx::<Scope>(3),
+        },
+        Idx::<Pattern>(1): {
+            "item": VariableDeclaration {
+                name: "x",
+            },
+            "name": "x",
+            "range": 121..122,
+            "scope_id": Idx::<Scope>(4),
+        },
+    },
     type_references: Index::<TypeReference> {
         Idx::<TypeReference>(0): {
             "item": SelfRef(
@@ -62,13 +120,13 @@ HirModule {
                     ],
                 ),
             ),
-            "range": 69..73,
+            "range": 93..97,
         },
         Idx::<TypeReference>(4): {
             "item": BuiltIn(
                 String,
             ),
-            "range": 77..83,
+            "range": 101..107,
         },
         Idx::<TypeReference>(5): {
             "item": Lambda {
@@ -76,17 +134,33 @@ HirModule {
                 return_type: Idx::<TypeReference>(4),
             },
             "name": "test2",
-            "range": 69..83,
+            "range": 93..107,
             "scope_id": Idx::<Scope>(0),
         },
     },
     type_definitions: EmptyIndex::<TypeDefinition>,
     traits: EmptyIndex::<Trait>,
     behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        Idx::<Expression>(1): ValueDefinition {
+            name: "test1",
+            type_annotation: Some(
+                Idx::<TypeReference>(2),
+            ),
+            expr_idx: Idx::<Expression>(1),
+        },
+        Idx::<Expression>(3): ValueDefinition {
+            name: "test2",
+            type_annotation: Some(
+                Idx::<TypeReference>(5),
+            ),
+            expr_idx: Idx::<Expression>(3),
+        },
+    },
     scopes: Scopes {
         current_scope: Idx::<Scope>(0),
         scopes: Arena {
-            len: 3,
+            len: 5,
             data: [
                 Scope {
                     parent: Idx::<Scope>(0),
@@ -99,6 +173,14 @@ HirModule {
                 Scope {
                     parent: Idx::<Scope>(0),
                     tag: "type annotation",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "lambda expression",
                 },
             ],
         },

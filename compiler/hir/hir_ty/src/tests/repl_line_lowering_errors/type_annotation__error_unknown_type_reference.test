@@ -1,13 +1,78 @@
 typeof test : Unknown -> Int -> String where
+let test = |x, y| -> "hello"
 ===
 HirTypedModule {
     module_id: ModuleId {
         path: "main",
     },
-    expression_types: {},
-    pattern_types: {},
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(1): Lambda {
+            arg_type: Generic(
+                0,
+            ),
+            return_type: Lambda {
+                arg_type: Generic(
+                    1,
+                ),
+                return_type: BuiltIn(
+                    String,
+                ),
+            },
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+        ),
+        Idx::<Pattern>(1): Generic(
+            1,
+        ),
+    },
     warnings: [],
-    errors: [],
+    errors: [
+        TypeCheckingError {
+            kind: ConflictingTypeAnnotation {
+                annotated_type: Lambda {
+                    arg: Missing,
+                    ret: Lambda {
+                        arg: BuiltIn(
+                            Int,
+                        ),
+                        ret: BuiltIn(
+                            String,
+                        ),
+                    },
+                },
+                annotation_range: 14..38,
+                value_type: Lambda {
+                    arg_type: Generic(
+                        0,
+                    ),
+                    return_type: Lambda {
+                        arg_type: Generic(
+                            1,
+                        ),
+                        return_type: BuiltIn(
+                            String,
+                        ),
+                    },
+                },
+                value_range: 45..73,
+                reason: DirectConflict {
+                    expected_type: Missing,
+                    expected_type_range: 0..0,
+                    actual_type: Generic(
+                        0,
+                    ),
+                    actual_type_range: 0..0,
+                },
+            },
+            range: 45..73,
+        },
+    ],
     poly_instantiations: {},
 }
 [E22009] Error: Unknown type reference `Unknown`
@@ -16,6 +81,25 @@ HirTypedModule {
  1 │ typeof test : Unknown -> Int -> String where
    │               ───┬───  
    │                  ╰───── cannot find type `Unknown` in this scope
+───╯
+
+[E34001] Error: Inferred type does not match annotated type
+   ╭─[ ./test/main.alloy:2:1 ]
+   │
+ 1 │ typeof test : Unknown -> Int -> String where
+   │               ────────────┬───────────  
+   │                           ╰───────────── The type annotation here says `<missing> -> Int -> String`
+ 2 │ let test = |x, y| -> "hello"
+   │ ──────────────┬─────────────  
+   │               ╰─────────────── but type inference determined this to be `t0 -> t1 -> String`
+   │
+   ├─[ ./test/main.alloy:2:1 ]
+   │
+ 1 │ typeof test : Unknown -> Int -> String where
+   │ │ 
+   │ ╰─ Specifically, the annotation expects `t0`
+   │ │ 
+   │ ╰─ to be `<missing>`
 ───╯
 
 

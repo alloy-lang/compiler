@@ -1,6 +1,7 @@
 let unknown = 1
 
 typeof test : unknown -> Int -> String where
+let test = |x, y| -> "hello"
 ===
 DefinitionInferenceResult {
     definition_type: Unconstrained,
@@ -8,8 +9,31 @@ DefinitionInferenceResult {
         Idx::<Expression>(0): BuiltIn(
             Int,
         ),
+        Idx::<Expression>(1): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(2): Lambda {
+            arg_type: Generic(
+                0,
+            ),
+            return_type: Lambda {
+                arg_type: Generic(
+                    1,
+                ),
+                return_type: BuiltIn(
+                    String,
+                ),
+            },
+        },
     },
-    pattern_types: {},
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+        ),
+        Idx::<Pattern>(1): Generic(
+            1,
+        ),
+    },
     variant_constructor_types: {},
     warnings: [],
     errors: [],

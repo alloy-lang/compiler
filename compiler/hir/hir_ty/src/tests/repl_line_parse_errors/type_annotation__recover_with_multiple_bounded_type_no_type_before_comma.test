@@ -1,27 +1,70 @@
-import test_data::Test
+typedef Test[t1, t2] = Thing t1 t2
 
-typeof apply : Test[, t2] where
-    typevar t1
-    typevar t2
+typeof apply : Test[, Int]
+let apply = Test(0, 1)
 ===
 HirTypedModule {
     module_id: ModuleId {
         path: "main",
     },
-    expression_types: {},
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(2): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Test",
+            ),
+            args: [
+                BuiltIn(
+                    Int,
+                ),
+                BuiltIn(
+                    Int,
+                ),
+            ],
+        },
+    },
     pattern_types: {},
     warnings: [],
-    errors: [],
+    errors: [
+        TypeCheckingError {
+            kind: BoundedTypeArityMismatch {
+                type_name: "Test",
+                expected_arity: 2,
+                actual_arity: 1,
+                annotation_range: 51..62,
+            },
+            range: 51..62,
+        },
+    ],
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the type of a bounded type argument
    ╭─[ ./test/main.alloy:3:21 ]
    │
- 3 │ typeof apply : Test[, t2] where
+ 3 │ typeof apply : Test[, Int]
    │                     │ 
    │                     ╰─ expected `identifier` or `‘(’`
    │ 
    │ Help: While parsing the type of a bounded type argument, expected `identifier` or `‘(’`
+───╯
+
+[E34003] Error: Type `Test` expects 2 type argument(s), but 1 were provided
+   ╭─[ ./test/main.alloy:3:16 ]
+   │
+ 3 │ typeof apply : Test[, Int]
+   │                ─────┬─────  
+   │                     ╰─────── `Test` expects 2 type argument(s), but 1 were provided
 ───╯
 
 
