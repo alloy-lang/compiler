@@ -146,17 +146,14 @@ impl<'db> TypeAnnotationChecker<'db> {
 
             // Constrained type variables - check consistency + trait constraints
             (
-                AnnotatedType::ConstrainedTypeVar { base, constraints },
+                AnnotatedType::ConstrainedTypeVar { base, .. },
                 InferredType::Generic(id),
-            ) => {
-                self.check_generic_consistency(
-                    AnnotationVarId::TypeVar(base.fql.clone()),
-                    *id,
-                    expected,
-                    found,
-                )?;
-                check_trait_constraints(self.db, found, constraints)
-            }
+            ) => self.check_generic_consistency(
+                AnnotationVarId::TypeVar(base.fql.clone()),
+                *id,
+                expected,
+                found,
+            ),
             (
                 AnnotatedType::ConstrainedTypeVar {
                     base,
@@ -175,9 +172,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                 )?;
                 check_constraint_sufficiency(self.db, annotation_constraints, inferred_constraints)
             }
-            (AnnotatedType::ConstrainedTypeVar { constraints, .. }, found_ty) => {
-                check_trait_constraints(self.db, found_ty, constraints)
-            }
+            (AnnotatedType::ConstrainedTypeVar { .. }, _found_ty) => Ok(()), // constraints checked during unification
 
             // Self type in annotation matches generics
             (AnnotatedType::SelfType { trait_fql, .. }, InferredType::Generic(id)) => self
@@ -201,8 +196,8 @@ impl<'db> TypeAnnotationChecker<'db> {
                     trait_constraints: constraints,
                     ..
                 },
-                found_ty,
-            ) if !constraints.is_empty() => check_trait_constraints(self.db, found_ty, constraints),
+                _found_ty,
+            ) if !constraints.is_empty() => Ok(()), // constraints checked during unification
 
             // Lambda types
             (
@@ -341,31 +336,6 @@ fn check_constraint_sufficiency(
         Err(ConflictingTypeAnnotationReason::InsufficientConstraints {
             missing_constraints: missing,
         })
-    }
-}
-
-/// Check if a type satisfies the given trait constraints
-fn check_trait_constraints(
-    db: &dyn HirTyDatabase,
-    ty: &InferredType,
-    constraints: &[res::TraitConstraint],
-) -> Result<(), ConflictingTypeAnnotationReason> {
-    match ty {
-        InferredType::TypeDef(type_fql, _) => {
-            for c in constraints {
-                if !c.has_behavior_for_trait(db, type_fql) {
-                    return Err(
-                        ConflictingTypeAnnotationReason::MissingBehaviorImplementation {
-                            trait_name: c.trait_fql.trait_name(db),
-                            type_name: type_fql.type_def_name(db),
-                        },
-                    );
-                }
-            }
-            Ok(())
-        }
-        InferredType::Generic(_) | InferredType::ConstrainedGeneric { .. } => Ok(()),
-        _ => Ok(()),
     }
 }
 

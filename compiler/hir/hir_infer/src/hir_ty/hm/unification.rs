@@ -4,25 +4,40 @@ use super::{EPFql, MonoType, TypeEquation, TypeVarId};
 use crate::diagnostics::TypeInferenceError;
 use crate::{diagnostics, HirInferDatabase};
 use alloy_hir_def as hir;
-use alloy_hir_resolved::{resolve_behavior_by_id, Fql, TraitConstraint};
+use alloy_hir_resolved::{EPTdFql, TraitConstraint};
 use diagnostics::TypeInferenceErrorKind;
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxHashMap, FxHashSet};
 
 /// Substitution mapping type variables to types
 #[derive(Debug, Clone)]
 pub struct Substitution {
-    pub(super) map: FxHashMap<TypeVarId, MonoType>,
+    map: FxHashMap<TypeVarId, MonoType>,
+    constraints: FxHashMap<TypeVarId, FxHashSet<TraitConstraint>>,
+    source_fqls: FxHashMap<TypeVarId, EPTdFql>,
 }
 
 impl Substitution {
     pub(super) fn new() -> Self {
         Self {
             map: FxHashMap::default(),
+            constraints: FxHashMap::default(),
+            source_fqls: FxHashMap::default(),
         }
     }
 
-    pub(super) fn insert(&mut self, var: TypeVarId, ty: MonoType) {
-        self.map.insert(var, ty);
+    pub(super) fn insert(&mut self, var: TypeVarId, ty: MonoType, source_fql: &EPTdFql) {
+        self.map.insert(var, ty.clone());
+        self.source_fqls.insert(var, source_fql.clone());
+    }
+
+    fn insert_constraints(&mut self, var: TypeVarId, ty: &MonoType) {
+        let target = self.apply_type_var(var);
+        if let MonoType::ConstrainedVar(_, ref c) = ty {
+            let store = self.constraints.entry(target).or_default();
+            for constraint in c {
+                store.insert(constraint.clone());
+            }
+        }
     }
 
     fn get(&self, var: TypeVarId) -> Option<&MonoType> {
@@ -103,14 +118,31 @@ impl Substitution {
 
         // Apply `self` to all bindings in `other`
         for (var, ty) in &other.map {
-            result.insert(*var, self.apply(ty));
+            result.insert(*var, self.apply(ty), &other.source_fqls[var]);
         }
 
         // Add all bindings from `self` that aren't in `other`
         for (var, ty) in &self.map {
             if !result.map.contains_key(var) {
-                result.insert(*var, ty.clone());
+                result.insert(*var, ty.clone(), &self.source_fqls[var]);
             }
+        }
+
+        for (var, cs) in &self.constraints {
+            let target = result.apply_type_var(*var);
+            result
+                .constraints
+                .entry(target)
+                .or_default()
+                .extend(cs.iter().cloned());
+        }
+        for (var, cs) in &other.constraints {
+            let target = result.apply_type_var(*var);
+            result
+                .constraints
+                .entry(target)
+                .or_default()
+                .extend(cs.iter().cloned());
         }
 
         result
@@ -118,7 +150,11 @@ impl Substitution {
 }
 
 /// Unification algorithm with occurs check
-fn unify_types(t1: &MonoType, t2: &MonoType) -> (Substitution, Vec<UnificationError>) {
+fn unify_types(
+    t1: &MonoType,
+    t2: &MonoType,
+    source_fql: &EPTdFql,
+) -> (Substitution, Vec<UnificationError>) {
     match (t1, t2) {
         // Same type variable
         (MonoType::Unconstrained, _) | (_, MonoType::Unconstrained) => {
@@ -147,23 +183,25 @@ fn unify_types(t1: &MonoType, t2: &MonoType) -> (Substitution, Vec<UnificationEr
                 )
             } else {
                 let mut subst = Substitution::new();
-                subst.insert(*v, t.clone());
+                subst.insert(*v, t.clone(), source_fql);
+                subst.insert_constraints(*v, t2);
+                subst.insert_constraints(*v, t1);
                 (subst, Vec::new())
             }
         }
 
         // Function types
         (MonoType::Function(arg1, ret1), MonoType::Function(arg2, ret2)) => {
-            let (subst1, err1) = unify_types(arg1, arg2);
+            let (subst1, err1) = unify_types(arg1, arg2, source_fql);
             let ret1_subst = subst1.apply(ret1);
             let ret2_subst = subst1.apply(ret2);
-            let (subst2, err2) = unify_types(&ret1_subst, &ret2_subst);
+            let (subst2, err2) = unify_types(&ret1_subst, &ret2_subst, source_fql);
             (subst1.compose(&subst2), [err1, err2].concat())
         }
 
         // Tuple types
         (MonoType::Tuple(ts1), MonoType::Tuple(ts2)) if ts1.len() == ts2.len() => {
-            let (subst, mut errors) = unify_many(ts1, ts2);
+            let (subst, mut errors) = unify_many(ts1, ts2, source_fql);
             if !errors.is_empty() {
                 // override member errors with the applied types for better error messages
                 errors = vec![UnificationError::TypeMismatch(
@@ -186,8 +224,8 @@ fn unify_types(t1: &MonoType, t2: &MonoType) -> (Substitution, Vec<UnificationEr
             },
         ) if args1.len() == args2.len() => {
             // First unify the constructors
-            let (constructor_subst, errors) = unify_types(c1, c2);
-            let (args_subst, mut args_errors) = unify_many(args1, args2);
+            let (constructor_subst, errors) = unify_types(c1, c2, source_fql);
+            let (args_subst, mut args_errors) = unify_many(args1, args2, source_fql);
             let subst = constructor_subst.compose(&args_subst);
 
             if !args_errors.is_empty() {
@@ -226,14 +264,18 @@ fn unify_types(t1: &MonoType, t2: &MonoType) -> (Substitution, Vec<UnificationEr
     }
 }
 
-fn unify_many(ts1: &[MonoType], ts2: &[MonoType]) -> (Substitution, Vec<UnificationError>) {
+fn unify_many(
+    ts1: &[MonoType],
+    ts2: &[MonoType],
+    source_fql: &EPTdFql,
+) -> (Substitution, Vec<UnificationError>) {
     let mut subst = Substitution::new();
     let mut errors = Vec::new();
 
     for (t1, t2) in ts1.iter().zip(ts2.iter()) {
         let t1_subst = subst.apply(t1);
         let t2_subst = subst.apply(t2);
-        let (new_subst, sub_errors) = unify_types(&t1_subst, &t2_subst);
+        let (new_subst, sub_errors) = unify_types(&t1_subst, &t2_subst, source_fql);
         subst = subst.compose(&new_subst);
         errors.extend(sub_errors);
     }
@@ -278,46 +320,39 @@ pub(super) fn solve_equations(
     equations: Vec<TypeEquation>,
 ) -> (
     Substitution,
-    FxHashMap<TypeVarId, Vec<TraitConstraint>>,
+    FxHashMap<TypeVarId, FxHashSet<TraitConstraint>>,
     Vec<TypeInferenceError>,
 ) {
     let mut subst = Substitution::new();
     let mut errors = Vec::new();
 
-    // First pass: collect substitutions
+    // First pass: collect substitutions and constraints
     for equation in &equations {
         let left = subst.apply(&equation.left);
         let right = subst.apply(&equation.right);
-        let (new_subst, _errors) = unify_types(&left, &right);
+        let source_fql = equation.source.clone().into();
+
+        let (new_subst, _errors) = unify_types(&left, &right, &source_fql);
         subst = subst.compose(&new_subst);
     }
 
-    // Collect constraints from ConstrainedVar nodes in equation types,
-    // resolving through the substitution to find the target variable.
-    let constraint_map = collect_constraints(&equations, &subst);
+    let constraint_map = subst.constraints.clone();
 
     // Check constraints: when a constrained type variable resolves to a
     // concrete type, verify that the type implements the required traits.
     for (var_id, constraints) in &constraint_map {
         let resolved = subst.apply(&MonoType::Var(*var_id));
-        if let MonoType::TypeDef {
-            fql: type_fql,
-            type_def_name,
-            ..
-        } = &resolved
-        {
-            for c in constraints {
-                if !c.has_behavior_for_trait(db, type_fql) {
-                    // Find the equation that caused this binding for a precise range
-                    let range = find_equation_range(db, &equations, *var_id, &subst);
-                    errors.push(TypeInferenceError::new(
-                        TypeInferenceErrorKind::UnsatisfiedConstraint {
-                            trait_fql_name: c.trait_fql_name.clone(),
-                            type_name: type_def_name.clone(),
-                        },
-                        range,
-                    ));
-                }
+        for constraint in constraints {
+            if !resolved.satisfies_constraint(db, constraint) {
+                let var_id1 = *var_id;
+                let range = subst.source_fqls[&var_id1].text_range(db);
+                errors.push(TypeInferenceError::new(
+                    TypeInferenceErrorKind::UnsatisfiedConstraint {
+                        trait_fql_name: constraint.trait_fql_name.clone(),
+                        type_name: format!("{resolved}"),
+                    },
+                    range,
+                ))
             }
         }
     }
@@ -326,7 +361,9 @@ pub(super) fn solve_equations(
     for equation in &equations {
         let left = subst.apply(&equation.left);
         let right = subst.apply(&equation.right);
-        let (_, unification_errors) = unify_types(&left, &right);
+        let source_fql = equation.source.clone().into();
+
+        let (_, unification_errors) = unify_types(&left, &right, &source_fql);
 
         for err in unification_errors {
             let (hir_module, _) = hir::lower_file(db, equation.source.module_id());
@@ -343,100 +380,4 @@ pub(super) fn solve_equations(
     }
 
     (subst, constraint_map, errors)
-}
-
-/// Walk equation types to collect all ConstrainedVar constraints,
-/// resolving variable IDs through the substitution.
-fn collect_constraints(
-    equations: &[TypeEquation],
-    subst: &Substitution,
-) -> FxHashMap<TypeVarId, Vec<TraitConstraint>> {
-    let mut constraints = FxHashMap::default();
-    for equation in equations {
-        collect_constrained_vars(&equation.left, subst, &mut constraints);
-        collect_constrained_vars(&equation.right, subst, &mut constraints);
-    }
-    constraints
-}
-
-fn collect_constrained_vars(
-    ty: &MonoType,
-    subst: &Substitution,
-    constraints: &mut FxHashMap<TypeVarId, Vec<TraitConstraint>>,
-) {
-    match ty {
-        MonoType::ConstrainedVar(v, c) => {
-            let target = subst.apply_type_var(*v);
-            let store = constraints.entry(target).or_default();
-            for constraint in c {
-                if !store.contains(constraint) {
-                    store.push(constraint.clone());
-                }
-            }
-        }
-        MonoType::Function(arg, ret) => {
-            collect_constrained_vars(arg, subst, constraints);
-            collect_constrained_vars(ret, subst, constraints);
-        }
-        MonoType::Tuple(tys) => {
-            for t in tys {
-                collect_constrained_vars(t, subst, constraints);
-            }
-        }
-        MonoType::App { constructor, args } => {
-            collect_constrained_vars(constructor, subst, constraints);
-            for a in args {
-                collect_constrained_vars(a, subst, constraints);
-            }
-        }
-        MonoType::Unconstrained
-        | MonoType::Var(_)
-        | MonoType::Concrete(_)
-        | MonoType::TypeDef { .. }
-        | MonoType::Unit => {}
-    }
-}
-
-/// Find the range of the equation that caused a constrained variable to
-/// resolve to a concrete type, for precise error reporting.
-fn find_equation_range(
-    db: &dyn HirInferDatabase,
-    equations: &[TypeEquation],
-    var_id: TypeVarId,
-    subst: &Substitution,
-) -> text_size::TextRange {
-    // Look for an equation where applying the substitution resolves our var
-    for equation in equations {
-        let mentions_var = mentions_type_var(&equation.left, var_id, subst)
-            || mentions_type_var(&equation.right, var_id, subst);
-        if mentions_var {
-            let (hir_module, _) = hir::lower_file(db, equation.source.module_id());
-            return match &equation.source {
-                EPFql::Expression(fql) => hir_module.get_expression_range(fql.local_id),
-                EPFql::Pattern(fql) => hir_module.get_pattern_range(fql.local_id),
-            };
-        }
-    }
-    text_size::TextRange::default()
-}
-
-/// Check if a MonoType mentions a type variable (directly or through substitution).
-fn mentions_type_var(ty: &MonoType, target: TypeVarId, subst: &Substitution) -> bool {
-    match ty {
-        MonoType::Var(v) | MonoType::ConstrainedVar(v, _) => {
-            *v == target || subst.apply_type_var(*v) == target
-        }
-        MonoType::Function(arg, ret) => {
-            mentions_type_var(arg, target, subst) || mentions_type_var(ret, target, subst)
-        }
-        MonoType::Tuple(tys) => tys.iter().any(|t| mentions_type_var(t, target, subst)),
-        MonoType::App { constructor, args } => {
-            mentions_type_var(constructor, target, subst)
-                || args.iter().any(|t| mentions_type_var(t, target, subst))
-        }
-        MonoType::Unconstrained
-        | MonoType::Concrete(_)
-        | MonoType::TypeDef { .. }
-        | MonoType::Unit => false,
-    }
 }

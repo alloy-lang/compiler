@@ -8,7 +8,6 @@
 
 use super::Fql;
 use alloy_hir_def as hir;
-use alloy_hir_def::TypeDefinition;
 use alloy_hir_resolved::{
     AnnotatedType, AnnotatedTypeVar, EPFql, EPTdFql, HirResolutionError, TraitConstraint,
     TypeVarReference,
@@ -20,6 +19,7 @@ mod constraint_gen;
 mod inference;
 pub mod unification;
 
+use crate::HirInferDatabase;
 pub(crate) use inference::infer_body_type;
 pub(crate) use inference::infer_expressions;
 
@@ -115,6 +115,50 @@ impl MonoType {
                 }
             }
             MonoType::Concrete(_) | MonoType::TypeDef { .. } | MonoType::Unit => {}
+        }
+    }
+
+    pub fn satisfies_constraint(
+        &self,
+        db: &dyn HirInferDatabase,
+        constraint: &TraitConstraint,
+    ) -> bool {
+        match self {
+            MonoType::TypeDef { fql: type_fql, .. } => {
+                constraint.has_behavior_for_trait(db, type_fql)
+            }
+            MonoType::Tuple(elements) => elements
+                .iter()
+                .all(|elem| elem.satisfies_constraint(db, constraint)),
+            MonoType::App { constructor, args } => {
+                constructor.satisfies_constraint(db, constraint)
+                    && args
+                        .iter()
+                        .all(|arg| arg.satisfies_constraint(db, constraint))
+            }
+            MonoType::Concrete(builtin) => match builtin {
+                hir::BuiltInType::Int
+                | hir::BuiltInType::Fraction
+                | hir::BuiltInType::String
+                | hir::BuiltInType::Char => matches!(
+                    constraint.trait_fql_name.as_str(),
+                    "std::eq::Eq" | "std::order::Ord" | "std::debug::Debug"
+                ),
+                hir::BuiltInType::Bool => {
+                    matches!(
+                        constraint.trait_fql_name.as_str(),
+                        "std::eq::Eq" | "std::debug::Debug"
+                    )
+                }
+            },
+            MonoType::Unit => matches!(
+                constraint.trait_fql_name.as_str(),
+                "std::eq::Eq" | "std::debug::Debug"
+            ),
+            MonoType::Function(_, _) => false, // functions cannot implement traits
+            MonoType::Unconstrained => true, // unconstrained types are considered to satisfy all constraints
+            MonoType::Var(_) => true,
+            MonoType::ConstrainedVar(_, constraints) => constraints.contains(constraint),
         }
     }
 }
@@ -225,7 +269,11 @@ impl PolyType {
     /// Instantiate a polytype with fresh type variables
     /// Returns (instantiated_type, fresh_vars_in_order)
     /// The fresh_vars Vec contains the fresh variables in the same order as self.quantified
-    fn instantiate(&self, gen: &mut TypeVarGenerator) -> (MonoType, Vec<TypeVarId>) {
+    fn instantiate(
+        &self,
+        gen: &mut TypeVarGenerator,
+        source_fql: &EPTdFql,
+    ) -> (MonoType, Vec<TypeVarId>) {
         if self.quantified.is_empty() {
             return (self.body.clone(), Vec::new());
         }
@@ -236,7 +284,7 @@ impl PolyType {
         for var in &self.quantified {
             let fresh = gen.fresh();
             fresh_vars.push(fresh);
-            subst.insert(*var, MonoType::Var(fresh));
+            subst.insert(*var, MonoType::Var(fresh), source_fql);
         }
 
         (subst.apply(&self.body), fresh_vars)
@@ -245,7 +293,7 @@ impl PolyType {
 
 /// Inference context for HM type inference
 pub(super) struct HMInferenceContext<'db> {
-    pub(super) db: &'db dyn crate::HirInferDatabase,
+    pub(super) db: &'db dyn HirInferDatabase,
     /// Type variable generator
     pub(super) type_var_gen: TypeVarGenerator,
     /// The expression currently being inferred by `infer_body_type`.
@@ -284,7 +332,7 @@ impl<'db> HMInferenceContext<'db> {
 }
 
 impl<'db> HMInferenceContext<'db> {
-    fn new(db: &'db dyn crate::HirInferDatabase) -> Self {
+    fn new(db: &'db dyn HirInferDatabase) -> Self {
         Self {
             db,
             type_var_gen: TypeVarGenerator::new(),
@@ -307,7 +355,7 @@ impl<'db> HMInferenceContext<'db> {
     fn maybe_find_type(&mut self, fql: impl Into<EPTdFql>) -> Option<MonoType> {
         let fql = fql.into();
         if let Some(poly_ty) = self.poly_env.get(&fql).cloned() {
-            let (instantiated, _fresh_vars) = poly_ty.instantiate(&mut self.type_var_gen);
+            let (instantiated, _fresh_vars) = poly_ty.instantiate(&mut self.type_var_gen, &fql);
             Some(instantiated)
         } else {
             self.type_env.get(&fql).cloned()
@@ -455,7 +503,7 @@ fn annotated_to_mono(annotated: &AnnotatedType, ctx: &mut HMInferenceContext) ->
 
 fn type_def_to_mono(
     ctx: &mut HMInferenceContext,
-    fql: &Fql<TypeDefinition>,
+    fql: &Fql<hir::TypeDefinition>,
     name: &hir::Name,
     type_args: &[TypeVarReference],
 ) -> MonoType {

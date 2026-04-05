@@ -79,6 +79,10 @@ fn collect_inference_results(
 ) -> DefinitionInferenceResult {
     let db = ctx.db;
     let (substitution, constraint_map, solve_errors) = solve_equations(db, ctx.equations.clone());
+    let constraint_map = constraint_map
+        .into_iter()
+        .map(|(var_id, constraints)| (var_id, constraints.into_iter().collect()))
+        .collect();
 
     let mut type_var_map: FxHashMap<TypeVarId, usize> = FxHashMap::default();
     let mut next_generic_id = 0;

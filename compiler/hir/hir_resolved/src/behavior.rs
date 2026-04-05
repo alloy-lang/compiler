@@ -79,3 +79,24 @@ pub fn resolve_behavior_by_id(
         values,
     }
 }
+
+#[salsa::tracked]
+pub fn resolve_behaviors(
+    db: &dyn hir::HirDefDatabase,
+    module_id: ModuleId,
+) -> FxHashMap<Fql<hir::TypeDefinition>, Vec<Behavior>> {
+    let (hir_module, _) = hir::lower_file(db, module_id);
+
+    let mut result: FxHashMap<_, Vec<_>> = FxHashMap::default();
+    for (idx, _, _, _) in hir_module.behaviors() {
+        let behavior = resolve_behavior_by_id(db, module_id, idx);
+        if let Ok(attached_type) = &behavior.attached_type {
+            result
+                .entry(attached_type.clone())
+                .or_default()
+                .push(behavior);
+        }
+    }
+
+    result
+}

@@ -1,0 +1,130 @@
+import std::order::Ord
+
+typeof bool_traits : t where
+  typevar t = Ord
+let bool_traits = True
+
+typeof unit_traits : t where
+  typevar t = Ord
+let unit_traits = ()
+
+typeof lambda_traits : t where
+  typevar t = Ord
+let lambda_traits = |x| -> x
+
+typeof tuple_traits_w_ord : t where
+  typevar t = Ord
+let tuple_traits_w_ord = (True, ())
+===
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Bool,
+        ),
+        Idx::<Expression>(1): Unit,
+        Idx::<Expression>(2): Generic(
+            0,
+        ),
+        Idx::<Expression>(3): Lambda {
+            arg_type: Generic(
+                0,
+            ),
+            return_type: Generic(
+                0,
+            ),
+        },
+        Idx::<Expression>(4): BuiltIn(
+            Bool,
+        ),
+        Idx::<Expression>(5): Unit,
+        Idx::<Expression>(6): Tuple(
+            NonEmpty(
+                [
+                    BuiltIn(
+                        Bool,
+                    ),
+                    Unit,
+                ],
+            ),
+        ),
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+        ),
+    },
+    variant_constructor_types: {},
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: UnsatisfiedConstraint {
+                trait_fql_name: "std::order::Ord",
+                type_name: "Bool",
+            },
+            range: 71..93,
+        },
+        TypeInferenceError {
+            kind: UnsatisfiedConstraint {
+                trait_fql_name: "std::order::Ord",
+                type_name: "()",
+            },
+            range: 142..162,
+        },
+        TypeInferenceError {
+            kind: UnsatisfiedConstraint {
+                trait_fql_name: "std::order::Ord",
+                type_name: "(Bool, ())",
+            },
+            range: 297..332,
+        },
+        TypeInferenceError {
+            kind: UnsatisfiedConstraint {
+                trait_fql_name: "std::order::Ord",
+                type_name: "t0 -> t0",
+            },
+            range: 213..241,
+        },
+    ],
+}
+[E33002] Error: Type `Bool` does not implement trait `std::order::Ord`
+   ╭─[ ./test/main.alloy:5:1 ]
+   │
+ 5 │ let bool_traits = True
+   │ ───────────┬──────────  
+   │            ╰──────────── missing implementation of trait `std::order::Ord`
+   │ 
+   │ Help: Type `Bool` must implement trait `std::order::Ord`
+───╯
+
+[E33002] Error: Type `()` does not implement trait `std::order::Ord`
+   ╭─[ ./test/main.alloy:9:1 ]
+   │
+ 9 │ let unit_traits = ()
+   │ ──────────┬─────────  
+   │           ╰─────────── missing implementation of trait `std::order::Ord`
+   │ 
+   │ Help: Type `()` must implement trait `std::order::Ord`
+───╯
+
+[E33002] Error: Type `(Bool, ())` does not implement trait `std::order::Ord`
+    ╭─[ ./test/main.alloy:17:1 ]
+    │
+ 17 │ let tuple_traits_w_ord = (True, ())
+    │ ─────────────────┬─────────────────  
+    │                  ╰─────────────────── missing implementation of trait `std::order::Ord`
+    │ 
+    │ Help: Type `(Bool, ())` must implement trait `std::order::Ord`
+────╯
+
+[E33002] Error: Type `t0 -> t0` does not implement trait `std::order::Ord`
+    ╭─[ ./test/main.alloy:13:1 ]
+    │
+ 13 │ let lambda_traits = |x| -> x
+    │ ──────────────┬─────────────  
+    │               ╰─────────────── missing implementation of trait `std::order::Ord`
+    │ 
+    │ Help: Type `t0 -> t0` must implement trait `std::order::Ord`
+────╯
+
+

@@ -1,5 +1,5 @@
 use crate::resolver::resolve_by_path;
-use crate::{resolve_behavior_by_id, Fql, TypeVariableResolver};
+use crate::{resolve_behaviors, Fql, TypeVariableResolver};
 use alloy_hir_def as hir;
 use alloy_hir_def::HirDefDatabase;
 use alloy_workspace::ModuleId;
@@ -19,20 +19,44 @@ impl TraitConstraint {
         db: &dyn HirDefDatabase,
         type_fql: &Fql<hir::TypeDefinition>,
     ) -> bool {
-        let (hir_module, _) = hir::lower_file(db, type_fql.module_id);
-        for (behavior_idx, _, _, _) in hir_module.behaviors() {
-            let behavior = resolve_behavior_by_id(db, type_fql.module_id, behavior_idx);
-            let Ok(attached_type) = &behavior.attached_type else {
-                continue;
-            };
+        let behaviors = resolve_behaviors(db, type_fql.module_id);
+        let Some(type_def_behaviors) = behaviors.get(type_fql) else {
+            return false;
+        };
+
+        // TODO: check to see if the trait has supertraits with behaviors that match, for transitive trait satisfaction
+        for behavior in type_def_behaviors {
             let Ok(attached_trait) = &behavior.attached_trait else {
                 continue;
             };
-            if attached_type == type_fql && attached_trait == &self.trait_fql {
+            if attached_trait == &self.trait_fql {
                 return true;
             }
         }
         false
+    }
+
+    pub fn is_satisfied_for_builtin(&self, builtin: &hir::BuiltInType) -> bool {
+        match builtin {
+            hir::BuiltInType::Int
+            | hir::BuiltInType::Fraction
+            | hir::BuiltInType::String
+            | hir::BuiltInType::Char => matches!(
+                self.trait_fql_name.as_str(),
+                "std::eq::Eq" | "std::order::Ord" | "std::debug::Debug"
+            ),
+            hir::BuiltInType::Bool => {
+                matches!(
+                    self.trait_fql_name.as_str(),
+                    "std::eq::Eq" | "std::debug::Debug"
+                )
+            }
+        }
+    }
+
+    pub fn is_satisfied_for_unit(&self, db: &dyn HirDefDatabase) -> bool {
+        let trait_fql_name = self.trait_fql.trait_fql_name(db);
+        matches!(trait_fql_name.as_str(), "std::eq::Eq" | "std::debug::Debug")
     }
 }
 

@@ -88,7 +88,7 @@ pub enum TypeInferenceErrorKind {
     HirResolutionError(HirResolutionError),
     UnsatisfiedConstraint {
         trait_fql_name: String,
-        type_name: hir::Name,
+        type_name: String,
     },
 }
 

@@ -1,0 +1,132 @@
+import std::eq::Eq
+import std::order::Ord
+import std::debug::Debug
+
+typeof int_traits : t where
+  typevar t = Eq + Ord + Debug
+let int_traits = 42
+
+typeof fraction_traits : t where
+  typevar t = Eq + Ord + Debug
+let fraction_traits = 42.5
+
+typeof string_traits : t where
+  typevar t = Eq + Ord + Debug
+let string_traits = "42"
+
+typeof char_traits : t where
+  typevar t = Eq + Ord + Debug
+let char_traits = '4'
+
+typeof bool_traits : t where
+  typevar t = Eq + Debug
+let bool_traits = True
+
+typeof unit_traits : t where
+  typevar t = Eq + Debug
+let unit_traits = ()
+
+typeof tuple_traits_w_ord : t where
+  typevar t = Eq + Ord + Debug
+let tuple_traits_w_ord = (42, 4.2, "42", '4')
+
+typeof tuple_traits_wo_ord : t where
+  typevar t = Eq + Debug
+let tuple_traits_wo_ord = (42, 4.2, "42", True, '4', ())
+===
+HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Fraction,
+        ),
+        Idx::<Expression>(2): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(3): BuiltIn(
+            Char,
+        ),
+        Idx::<Expression>(4): BuiltIn(
+            Bool,
+        ),
+        Idx::<Expression>(5): Unit,
+        Idx::<Expression>(6): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(7): BuiltIn(
+            Fraction,
+        ),
+        Idx::<Expression>(8): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(9): BuiltIn(
+            Char,
+        ),
+        Idx::<Expression>(10): Tuple(
+            NonEmpty(
+                [
+                    BuiltIn(
+                        Int,
+                    ),
+                    BuiltIn(
+                        Fraction,
+                    ),
+                    BuiltIn(
+                        String,
+                    ),
+                    BuiltIn(
+                        Char,
+                    ),
+                ],
+            ),
+        ),
+        Idx::<Expression>(11): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(12): BuiltIn(
+            Fraction,
+        ),
+        Idx::<Expression>(13): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(14): BuiltIn(
+            Bool,
+        ),
+        Idx::<Expression>(15): BuiltIn(
+            Char,
+        ),
+        Idx::<Expression>(16): Unit,
+        Idx::<Expression>(17): Tuple(
+            NonEmpty(
+                [
+                    BuiltIn(
+                        Int,
+                    ),
+                    BuiltIn(
+                        Fraction,
+                    ),
+                    BuiltIn(
+                        String,
+                    ),
+                    BuiltIn(
+                        Bool,
+                    ),
+                    BuiltIn(
+                        Char,
+                    ),
+                    Unit,
+                ],
+            ),
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [],
+    poly_instantiations: {},
+}
+
