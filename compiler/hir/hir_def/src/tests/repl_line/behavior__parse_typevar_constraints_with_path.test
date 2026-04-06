@@ -103,9 +103,7 @@ HirModule {
                 kind: Constrained(
                     NonEmpty(
                         [
-                            Trait(
-                                Idx::<TypeReference>(0),
-                            ),
+                            Idx::<TypeVariableConstraint>(0),
                         ],
                     ),
                 ),
@@ -113,6 +111,14 @@ HirModule {
             "name": "t1",
             "range": 117..146,
             "scope_id": Idx::<Scope>(3),
+        },
+    },
+    type_variable_constraint: Index::<TypeVariableConstraint> {
+        Idx::<TypeVariableConstraint>(0): {
+            "item": Trait(
+                Idx::<TypeReference>(0),
+            ),
+            "range": 130..146,
         },
     },
     traits: Index::<Trait> {

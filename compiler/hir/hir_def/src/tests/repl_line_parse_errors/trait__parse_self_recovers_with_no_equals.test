@@ -47,15 +47,21 @@ HirModule {
         },
     },
     type_definitions: EmptyIndex::<TypeDefinition>,
+    type_variable_constraint: Index::<TypeVariableConstraint> {
+        Idx::<TypeVariableConstraint>(0): {
+            "item": Trait(
+                Idx::<TypeReference>(0),
+            ),
+            "range": 53..69,
+        },
+    },
     traits: Index::<Trait> {
         Idx::<Trait>(0): {
             "item": Trait {
                 name: "TestTrait1",
                 scope: Idx::<Scope>(1),
                 self_constraints: [
-                    Trait(
-                        Idx::<TypeReference>(0),
-                    ),
+                    Idx::<TypeVariableConstraint>(0),
                 ],
                 named_type_variables: {},
                 members: [],

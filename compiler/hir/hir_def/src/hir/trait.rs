@@ -24,7 +24,7 @@ pub struct Trait {
     pub(crate) name: Name,
     /// The scope where this trait's members are defined
     scope: ScopeIdx,
-    self_constraints: Vec<TypeVariableConstraint>,
+    self_constraints: Vec<TypeVariableConstraintIdx>,
     named_type_variables: FxHashMap<Name, TypeVariableIdx>,
     members: Vec<TraitMember>,
 }
@@ -138,7 +138,7 @@ impl Trait {
     }
 
     /// Get the self-type constraints for this trait (e.g., `self = #Type[_] + Eq`)
-    pub fn self_constraints(&self) -> &[TypeVariableConstraint] {
+    pub fn self_constraints(&self) -> &[TypeVariableConstraintIdx] {
         &self.self_constraints
     }
 

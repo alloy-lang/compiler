@@ -8,15 +8,21 @@ HirModule {
     patterns: EmptyIndex::<Pattern>,
     type_references: EmptyIndex::<TypeReference>,
     type_definitions: EmptyIndex::<TypeDefinition>,
+    type_variable_constraint: Index::<TypeVariableConstraint> {
+        Idx::<TypeVariableConstraint>(0): {
+            "item": Kind(
+                6,
+            ),
+            "range": 30..56,
+        },
+    },
     traits: Index::<Trait> {
         Idx::<Trait>(0): {
             "item": Trait {
                 name: "Trait1",
                 scope: Idx::<Scope>(1),
                 self_constraints: [
-                    Kind(
-                        6,
-                    ),
+                    Idx::<TypeVariableConstraint>(0),
                 ],
                 named_type_variables: {},
                 members: [],

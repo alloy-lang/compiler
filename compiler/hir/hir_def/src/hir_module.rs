@@ -12,6 +12,7 @@ pub struct HirModule {
     type_references: Index<TypeReference>,
     type_definitions: Index<TypeDefinition>,
     type_variables: Index<TypeVariable>,
+    type_variable_constraints: Index<TypeVariableConstraint>,
     traits: Index<Trait>,
     behaviors: Index<Behavior, (TypeIdx, TypeIdx)>,
     value_definitions: FxHashMap<ExpressionIdx, ValueDefinition>,
@@ -30,6 +31,9 @@ impl fmt::Debug for HirModule {
         debug_struct.field("type_definitions", &self.type_definitions);
         if !self.type_variables.is_empty() {
             debug_struct.field("type_variables", &self.type_variables);
+        }
+        if !self.type_variable_constraints.is_empty() {
+            debug_struct.field("type_variable_constraint", &self.type_variable_constraints);
         }
         debug_struct.field("traits", &self.traits);
         debug_struct.field("behaviors", &self.behaviors);
@@ -61,6 +65,7 @@ impl HirModule {
             type_references: Default::default(),
             type_definitions: Default::default(),
             type_variables: Default::default(),
+            type_variable_constraints: Default::default(),
             traits: Default::default(),
             behaviors: Default::default(),
             value_definitions: Default::default(),
@@ -78,6 +83,7 @@ impl HirModule {
         type_references: Index<TypeReference>,
         type_definitions: Index<TypeDefinition>,
         type_variables: Index<TypeVariable>,
+        type_variable_constraints: Index<TypeVariableConstraint>,
         traits: Index<Trait>,
         behaviors: Index<Behavior, (TypeIdx, TypeIdx)>,
         value_definitions: FxHashMap<ExpressionIdx, ValueDefinition>,
@@ -92,6 +98,7 @@ impl HirModule {
             type_references,
             type_definitions,
             type_variables,
+            type_variable_constraints,
             traits,
             behaviors,
             value_definitions,
@@ -200,6 +207,17 @@ impl HirModule {
 
     pub fn get_type_variable(&self, idx: TypeVariableIdx) -> &TypeVariable {
         self.type_variables.get(idx)
+    }
+
+    pub fn get_type_variable_constraint(
+        &self,
+        idx: TypeVariableConstraintIdx,
+    ) -> &TypeVariableConstraint {
+        self.type_variable_constraints.get(idx)
+    }
+
+    pub fn get_type_variable_constraint_range(&self, idx: TypeVariableConstraintIdx) -> TextRange {
+        self.type_variable_constraints.get_range(idx)
     }
 
     pub fn get_expression(&self, idx: ExpressionIdx) -> &Expression {

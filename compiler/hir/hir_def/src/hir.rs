@@ -83,6 +83,7 @@ pub(crate) struct LoweringCtx<'db> {
     type_references: Index<TypeReference>,
     type_definitions: Index<TypeDefinition>,
     type_variables: Index<TypeVariable>,
+    type_variable_constraints: Index<TypeVariableConstraint>,
     traits: Index<Trait>,
     behaviors: Index<Behavior, (/* type */ TypeIdx, /* trait */ TypeIdx)>,
     scopes: Scopes,
@@ -102,6 +103,7 @@ impl<'db> LoweringCtx<'db> {
             type_references: Index::new(),
             type_definitions: Index::new(),
             type_variables: Index::new(),
+            type_variable_constraints: Index::new(),
             traits: Index::new(),
             behaviors: Index::new(),
             scopes: Scopes::default(),
@@ -165,6 +167,7 @@ impl<'db> LoweringCtx<'db> {
             self.type_references,
             self.type_definitions,
             self.type_variables,
+            self.type_variable_constraints,
             self.traits,
             self.behaviors,
             value_definitions,
@@ -549,6 +552,15 @@ impl<'db> LoweringCtx<'db> {
             }
             Ok(pid) => pid,
         }
+    }
+
+    pub(crate) fn add_type_variable_constraint(
+        &mut self,
+        type_variable_constraint: TypeVariableConstraint,
+        element: &impl AstElement,
+    ) -> TypeVariableConstraintIdx {
+        self.type_variable_constraints
+            .insert_not_named(type_variable_constraint, element.range())
     }
 
     pub(crate) fn add_trait(&mut self, trait_: Trait, element: &impl AstElement) {
