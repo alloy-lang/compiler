@@ -117,26 +117,6 @@ pub struct TypeVarReference {
 }
 
 impl AnnotatedType {
-    /// Check if this type contains type variables (is polymorphic)
-    #[must_use]
-    pub fn is_polymorphic(&self) -> bool {
-        match self {
-            AnnotatedType::TypeVar(_)
-            | AnnotatedType::ConstrainedTypeVar { .. }
-            | AnnotatedType::SelfType { .. } => true,
-            AnnotatedType::Lambda { arg, ret } => arg.is_polymorphic() || ret.is_polymorphic(),
-            AnnotatedType::Tuple(elements) => elements.iter().any(|e| e.is_polymorphic()),
-            AnnotatedType::Bounded { base, args } => {
-                base.is_polymorphic() || args.iter().any(|a| a.is_polymorphic())
-            }
-            AnnotatedType::Unit
-            | AnnotatedType::BuiltIn(_)
-            | AnnotatedType::TypeDef { .. }
-            | AnnotatedType::Unconstrained
-            | AnnotatedType::Missing => false,
-        }
-    }
-
     pub fn type_arity(&self) -> usize {
         match self {
             AnnotatedType::TypeDef { type_args, .. } => type_args.len(),
