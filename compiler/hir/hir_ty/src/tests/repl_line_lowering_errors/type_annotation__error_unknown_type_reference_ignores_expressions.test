@@ -68,7 +68,7 @@ HirTypedModule {
                 value_range: 62..90,
                 reason: DirectConflict {
                     expected_type: Missing,
-                    expected_type_range: 0..0,
+                    expected_type_range: 31..38,
                     actual_type: Generic(
                         0,
                     ),
@@ -103,8 +103,10 @@ HirTypedModule {
  1 │ let unknown = 1
    │ │ 
    │ ╰─ Specifically, the annotation expects `t0`
-   │ │ 
-   │ ╰─ to be `<missing>`
+   │ 
+ 3 │ typeof test : unknown -> Int -> String where
+   │               ───┬───  
+   │                  ╰───── to be `<missing>`
 ───╯
 
 

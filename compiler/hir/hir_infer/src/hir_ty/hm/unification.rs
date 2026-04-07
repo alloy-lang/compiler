@@ -35,7 +35,10 @@ impl Substitution {
         if let MonoType::ConstrainedVar(_, ref c) = ty {
             let store = self.constraints.entry(target).or_default();
             for constraint in c {
-                if !store.iter().any(|existing| existing.trait_fql == constraint.trait_fql) {
+                if !store
+                    .iter()
+                    .any(|existing| existing.trait_fql == constraint.trait_fql)
+                {
                     store.push(constraint.clone());
                 }
             }
@@ -67,7 +70,10 @@ impl Substitution {
                         MonoType::ConstrainedVar(v2, c2) => {
                             let mut merged = constraints.clone();
                             for c in c2 {
-                                if !merged.iter().any(|existing| existing.trait_fql == c.trait_fql) {
+                                if !merged
+                                    .iter()
+                                    .any(|existing| existing.trait_fql == c.trait_fql)
+                                {
                                     merged.push(c);
                                 }
                             }
@@ -134,7 +140,10 @@ impl Substitution {
             let target = result.apply_type_var(*var);
             let store = result.constraints.entry(target).or_default();
             for c in cs {
-                if !store.iter().any(|existing| existing.trait_fql == c.trait_fql) {
+                if !store
+                    .iter()
+                    .any(|existing| existing.trait_fql == c.trait_fql)
+                {
                     store.push(c.clone());
                 }
             }
@@ -143,7 +152,10 @@ impl Substitution {
             let target = result.apply_type_var(*var);
             let store = result.constraints.entry(target).or_default();
             for c in cs {
-                if !store.iter().any(|existing| existing.trait_fql == c.trait_fql) {
+                if !store
+                    .iter()
+                    .any(|existing| existing.trait_fql == c.trait_fql)
+                {
                     store.push(c.clone());
                 }
             }

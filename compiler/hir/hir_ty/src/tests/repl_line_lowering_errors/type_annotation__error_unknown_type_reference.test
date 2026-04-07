@@ -63,7 +63,7 @@ HirTypedModule {
                 value_range: 45..73,
                 reason: DirectConflict {
                     expected_type: Missing,
-                    expected_type_range: 0..0,
+                    expected_type_range: 14..21,
                     actual_type: Generic(
                         0,
                     ),
@@ -96,10 +96,10 @@ HirTypedModule {
    ├─[ ./test/main.alloy:2:1 ]
    │
  1 │ typeof test : Unknown -> Int -> String where
-   │ │ 
-   │ ╰─ Specifically, the annotation expects `t0`
-   │ │ 
-   │ ╰─ to be `<missing>`
+   │ │             ───┬───  
+   │ ╰────────────────────── Specifically, the annotation expects `t0`
+   │                  │     
+   │                  ╰───── to be `<missing>`
 ───╯
 
 

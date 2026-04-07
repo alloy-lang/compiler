@@ -261,7 +261,7 @@ HirTypedModule {
                             },
                         ],
                     },
-                    expected_type_range: 0..0,
+                    expected_type_range: 39..58,
                     actual_type: Lambda {
                         arg_type: Generic(
                             0,
@@ -314,8 +314,10 @@ HirTypedModule {
  1 │ import test_data::Test
    │ │ 
    │ ╰─ Specifically, the annotation expects `t0 -> t0`
-   │ │ 
-   │ ╰─ to be `Test[t1 -> Test[t1]]`
+   │ 
+ 3 │ typeof apply : Test[t1 -> Test[t1] where
+   │                ─────────┬─────────  
+   │                         ╰─────────── to be `Test[t1 -> Test[t1]]`
 ───╯
 
 

@@ -148,7 +148,7 @@ HirTypedModule {
                             },
                         ],
                     },
-                    expected_type_range: 0..0,
+                    expected_type_range: 39..42,
                     actual_type: Bounded {
                         base: TypeDef(
                             Fql {
@@ -206,8 +206,10 @@ HirTypedModule {
  1 │ typedef Box[t] = Box t
    │ │ 
    │ ╰─ Specifically, the annotation expects `Box[Int]`
-   │ │ 
-   │ ╰─ to be `Box`
+   │ 
+ 3 │ typeof wrong : Box
+   │                ─┬─  
+   │                 ╰─── to be `Box`
 ───╯
 
 

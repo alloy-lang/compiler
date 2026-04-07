@@ -58,8 +58,10 @@ fn check_type_annotation(
     }
 
     // Check if the inferred type is compatible with the expected type
-    let mut checker = TypeAnnotationChecker::new(db);
-    if let Err(reason) = checker.check_type_compatibility(&expected_type, &resolved_type) {
+    let mut checker = TypeAnnotationChecker::new(db, current_module_id);
+    if let Err(reason) =
+        checker.check_type_compatibility(&expected_type, &resolved_type, type_annotation_idx)
+    {
         result.error(
             TypeCheckingErrorKind::ConflictingTypeAnnotation {
                 annotated_type: expected_type,
@@ -83,35 +85,52 @@ type GenericMapping = FxHashMap<usize, AnnotationVarId>;
 
 struct TypeAnnotationChecker<'db> {
     db: &'db dyn HirTyDatabase,
+    module_id: ModuleId,
     generic_mapping: GenericMapping,
 }
 
 impl<'db> TypeAnnotationChecker<'db> {
-    fn new(db: &'db dyn HirTyDatabase) -> Self {
+    fn new(db: &'db dyn HirTyDatabase, module_id: ModuleId) -> Self {
         Self {
             db,
+            module_id,
             generic_mapping: GenericMapping::default(),
         }
     }
 
+    /// Look up the source range for a type annotation index.
+    fn annotation_range(&self, type_idx: TypeIdx) -> TextRange {
+        let (hir_module, _) = hir::lower_file(self.db, self.module_id);
+        hir_module.get_type_reference_range(type_idx)
+    }
+
+    fn direct_conflict(
+        &self,
+        expected: &AnnotatedType,
+        found: &InferredType,
+        type_idx: TypeIdx,
+    ) -> ConflictingTypeAnnotationReason {
+        ConflictingTypeAnnotationReason::DirectConflict {
+            expected_type: expected.clone(),
+            expected_type_range: self.annotation_range(type_idx),
+            actual_type: found.clone(),
+            actual_type_range: Default::default(), // TODO: track inferred type ranges for better error reporting
+        }
+    }
+
     /// Check if the `found` type is compatible with the `expected` annotation type.
-    /// This compares an AnnotatedType (what the user wrote) against a InferredType (what inference produced).
+    /// `type_idx` is the HIR type reference index for the annotation, used to look up source ranges.
     fn check_type_compatibility(
         &mut self,
         expected: &AnnotatedType,
         found: &InferredType,
+        expected_type_idx: TypeIdx,
     ) -> Result<(), ConflictingTypeAnnotationReason> {
-        // TODO: actual ranges for conflicts
         match (expected, found) {
             // Wildcards on either side
             (AnnotatedType::Unconstrained, _) | (_, InferredType::Unconstrained) => Ok(()),
             (AnnotatedType::Missing, _) | (_, InferredType::Missing) => {
-                Err(ConflictingTypeAnnotationReason::DirectConflict {
-                    expected_type: expected.clone(),
-                    expected_type_range: TextRange::default(),
-                    actual_type: found.clone(),
-                    actual_type_range: TextRange::default(),
-                })
+                Err(self.direct_conflict(expected, found, expected_type_idx))
             }
 
             // Unit
@@ -132,6 +151,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                     *id,
                     expected,
                     found,
+                    expected_type_idx,
                 ),
             // Unconstrained annotation type var vs constrained inferred generic — insufficient
             (AnnotatedType::TypeVar(atv), InferredType::ConstrainedGeneric { id, constraints }) => {
@@ -140,6 +160,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                     *id,
                     expected,
                     found,
+                    expected_type_idx,
                 )?;
                 check_constraint_sufficiency(self.db, &[], constraints)
             }
@@ -151,6 +172,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                     *id,
                     expected,
                     found,
+                    expected_type_idx,
                 ),
             (
                 AnnotatedType::ConstrainedTypeVar {
@@ -167,6 +189,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                     *id,
                     expected,
                     found,
+                    expected_type_idx,
                 )?;
                 check_constraint_sufficiency(self.db, annotation_constraints, inferred_constraints)
             }
@@ -179,6 +202,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                     *id,
                     expected,
                     found,
+                    expected_type_idx,
                 ),
             (
                 AnnotatedType::SelfType { trait_fql, .. },
@@ -188,6 +212,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                 *id,
                 expected,
                 found,
+                expected_type_idx,
             ),
             (
                 AnnotatedType::SelfType {
@@ -205,23 +230,43 @@ impl<'db> TypeAnnotationChecker<'db> {
                     return_type,
                 },
             ) => {
-                self.check_type_compatibility(arg, arg_type)?;
-                self.check_type_compatibility(ret, return_type)?;
+                let (hir_module, _) = hir::lower_file(self.db, self.module_id);
+                let type_ref = hir_module.get_type_reference(expected_type_idx);
+                match type_ref {
+                    hir::TypeReference::Lambda {
+                        arg_type: arg_idx,
+                        return_type: ret_idx,
+                    } => {
+                        self.check_type_compatibility(arg, arg_type, *arg_idx)?;
+                        self.check_type_compatibility(ret, return_type, *ret_idx)?;
+                    }
+                    _ => {
+                        self.check_type_compatibility(arg, arg_type, expected_type_idx)?;
+                        self.check_type_compatibility(ret, return_type, expected_type_idx)?;
+                    }
+                }
                 Ok(())
             }
 
             // Tuple types
             (AnnotatedType::Tuple(exp_elems), InferredType::Tuple(found_elems)) => {
                 if exp_elems.len() != found_elems.len() {
-                    return Err(ConflictingTypeAnnotationReason::DirectConflict {
-                        expected_type: expected.clone(),
-                        expected_type_range: TextRange::default(),
-                        actual_type: found.clone(),
-                        actual_type_range: TextRange::default(),
-                    });
+                    return Err(self.direct_conflict(expected, found, expected_type_idx));
                 }
-                for (exp_elem, found_elem) in exp_elems.iter().zip(found_elems.iter()) {
-                    self.check_type_compatibility(exp_elem, found_elem)?;
+                let (hir_module, _) = hir::lower_file(self.db, self.module_id);
+                let type_ref = hir_module.get_type_reference(expected_type_idx);
+                let elem_indices = match type_ref {
+                    hir::TypeReference::Tuple(indices) => Some(indices.clone()),
+                    _ => None,
+                };
+                for (i, (exp_elem, found_elem)) in
+                    exp_elems.iter().zip(found_elems.iter()).enumerate()
+                {
+                    let elem_idx = elem_indices
+                        .as_ref()
+                        .and_then(|indices| indices.get(i).copied())
+                        .unwrap_or(expected_type_idx);
+                    self.check_type_compatibility(exp_elem, found_elem, elem_idx)?;
                 }
                 Ok(())
             }
@@ -250,51 +295,44 @@ impl<'db> TypeAnnotationChecker<'db> {
                     args: found_args,
                 },
             ) => {
-                self.check_type_compatibility(exp_base, found_base)?;
                 if exp_args.len() != found_args.len() {
-                    return Err(ConflictingTypeAnnotationReason::DirectConflict {
-                        expected_type: expected.clone(),
-                        expected_type_range: TextRange::default(),
-                        actual_type: found.clone(),
-                        actual_type_range: TextRange::default(),
-                    });
+                    return Err(self.direct_conflict(expected, found, expected_type_idx));
                 }
-                for (exp_arg, found_arg) in exp_args.iter().zip(found_args.iter()) {
-                    self.check_type_compatibility(exp_arg, found_arg)?;
+                let (hir_module, _) = hir::lower_file(self.db, self.module_id);
+                let type_ref = hir_module.get_type_reference(expected_type_idx);
+                let (base_idx, arg_indices) = match type_ref {
+                    hir::TypeReference::Bounded { base, args } => (*base, Some(args.clone())),
+                    _ => (expected_type_idx, None),
+                };
+                self.check_type_compatibility(exp_base, found_base, base_idx)?;
+                for (i, (exp_arg, found_arg)) in exp_args.iter().zip(found_args.iter()).enumerate()
+                {
+                    let arg_idx = arg_indices
+                        .as_ref()
+                        .and_then(|indices| indices.get(i).copied())
+                        .unwrap_or(expected_type_idx);
+                    self.check_type_compatibility(exp_arg, found_arg, arg_idx)?;
                 }
                 Ok(())
             }
 
             // Everything else is incompatible
-            _ => Err(ConflictingTypeAnnotationReason::DirectConflict {
-                expected_type: expected.clone(),
-                expected_type_range: TextRange::default(),
-                actual_type: found.clone(),
-                actual_type_range: TextRange::default(),
-            }),
+            _ => Err(self.direct_conflict(expected, found, expected_type_idx)),
         }
     }
 
     /// Check that different annotation type variables don't claim the same inferred generic ID.
-    ///
-    /// If `Generic(0)` was already claimed by annotation var `a`, then annotation var `b`
-    /// cannot also claim it — that would mean the annotation treats them as independent
-    /// when inference says they're the same.
     fn check_generic_consistency(
         &mut self,
         var_id: AnnotationVarId,
         generic_id: usize,
         expected: &AnnotatedType,
         found: &InferredType,
+        type_idx: TypeIdx,
     ) -> Result<(), ConflictingTypeAnnotationReason> {
         if let Some(prev_var) = self.generic_mapping.get(&generic_id) {
             if *prev_var != var_id {
-                return Err(ConflictingTypeAnnotationReason::DirectConflict {
-                    expected_type: expected.clone(),
-                    expected_type_range: TextRange::default(),
-                    actual_type: found.clone(),
-                    actual_type_range: TextRange::default(),
-                });
+                return Err(self.direct_conflict(expected, found, type_idx));
             }
         } else {
             self.generic_mapping.insert(generic_id, var_id);
@@ -304,13 +342,8 @@ impl<'db> TypeAnnotationChecker<'db> {
 }
 
 /// Check that the annotation declares all constraints the body requires.
-///
-/// `annotation_constraints` are the traits declared on the type variable in the annotation.
-/// `inferred_constraints` are the traits required by the function body (from inference).
-/// Any inferred constraint not present in the annotation (or implied by its supertraits)
-/// is reported as missing.
 fn check_constraint_sufficiency(
-    db: &dyn HirTyDatabase,
+    _db: &dyn HirTyDatabase,
     annotation_constraints: &[res::TraitConstraint],
     inferred_constraints: &NonEmpty<res::TraitConstraint>,
 ) -> Result<(), ConflictingTypeAnnotationReason> {

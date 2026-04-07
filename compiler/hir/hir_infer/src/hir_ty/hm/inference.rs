@@ -188,7 +188,10 @@ fn mono_to_inferred_with_map(
             let mut all_constraints = constraints.clone();
             if let Some(map_constraints) = constraint_map.get(var_id) {
                 for c in map_constraints {
-                    if !all_constraints.iter().any(|existing| existing.trait_fql == c.trait_fql) {
+                    if !all_constraints
+                        .iter()
+                        .any(|existing| existing.trait_fql == c.trait_fql)
+                    {
                         all_constraints.push(c.clone());
                     }
                 }
