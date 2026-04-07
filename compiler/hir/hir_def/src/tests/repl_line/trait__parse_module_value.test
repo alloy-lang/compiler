@@ -36,12 +36,22 @@ HirModule {
     patterns: EmptyIndex::<Pattern>,
     type_references: EmptyIndex::<TypeReference>,
     type_definitions: EmptyIndex::<TypeDefinition>,
+    type_variable_constraint: Index::<TypeVariableConstraint> {
+        Idx::<TypeVariableConstraint>(0): {
+            "item": SelfRef(
+                Idx::<Scope>(1),
+            ),
+            "range": 21..27,
+        },
+    },
     traits: Index::<Trait> {
         Idx::<Trait>(0): {
             "item": Trait {
                 name: "Trait1",
                 scope: Idx::<Scope>(1),
-                self_constraints: [],
+                self_constraints: [
+                    Idx::<TypeVariableConstraint>(0),
+                ],
                 named_type_variables: {},
                 members: [
                     Concrete {

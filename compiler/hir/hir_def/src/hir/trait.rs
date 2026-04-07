@@ -30,12 +30,12 @@ pub struct Trait {
 }
 
 pub(super) fn lower_trait(ctx: &mut LoweringCtx, ast: &ast::TraitDef) {
-    let Some(name) = ast.name() else {
+    let Some(name_ast) = ast.name() else {
         // we can't lower a trait that we don't have a name for
         // we can skip it since it'll be reported as a parsing error
         return;
     };
-    let name = Name::new(name.text());
+    let name = Name::new(name_ast.text());
 
     let trait_ = ctx.inside_scope("trait", |ctx| {
         // Capture the current scope (the trait's scope)
@@ -46,20 +46,28 @@ pub(super) fn lower_trait(ctx: &mut LoweringCtx, ast: &ast::TraitDef) {
             .iter()
             .filter_map(|type_var| lower_named_type_variable(ctx, type_var))
             .collect();
+        let self_constraints = {
+            let mut self_constraints = match ast.self_type_variables().as_slice() {
+                [] => Vec::new(),
+                [type_var] => lower_self_type_variable_constraints(ctx, type_var),
+                many => {
+                    ctx.error(
+                        LoweringErrorKind::MultipleSelfTypeVariablesInTraitDefinition {
+                            trait_name: name.clone(),
+                            ranges: many.iter().map(AstElement::range).collect(),
+                        },
+                        ast.range(),
+                    );
+                    Vec::new()
+                }
+            };
+            let self_constraint = ctx.add_type_variable_constraint(
+                TypeVariableConstraint::SelfRef(trait_scope),
+                &name_ast,
+            );
+            self_constraints.push(self_constraint);
 
-        let self_constraints = match ast.self_type_variables().as_slice() {
-            [] => Vec::new(),
-            [type_var] => lower_self_type_variable_constraints(ctx, type_var),
-            many => {
-                ctx.error(
-                    LoweringErrorKind::MultipleSelfTypeVariablesInTraitDefinition {
-                        trait_name: name.clone(),
-                        ranges: many.iter().map(AstElement::range).collect(),
-                    },
-                    ast.range(),
-                );
-                Vec::new()
-            }
+            self_constraints
         };
 
         let type_annotations: FxHashMap<Name, TypeIdx> = ast

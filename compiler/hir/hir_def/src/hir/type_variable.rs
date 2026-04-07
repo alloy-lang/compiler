@@ -21,6 +21,7 @@ pub type TypeVariableConstraintIdx = Idx<TypeVariableConstraint>;
 pub enum TypeVariableConstraint {
     Kind(usize),
     Trait(TypeIdx),
+    SelfRef(ScopeIdx),
 }
 
 pub(super) fn lower_named_type_variable(

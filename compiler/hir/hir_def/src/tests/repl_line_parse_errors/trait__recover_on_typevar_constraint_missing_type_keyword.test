@@ -27,6 +27,12 @@ HirModule {
             ),
             "range": 34..38,
         },
+        Idx::<TypeVariableConstraint>(1): {
+            "item": SelfRef(
+                Idx::<Scope>(1),
+            ),
+            "range": 6..16,
+        },
     },
     traits: Index::<Trait> {
         Idx::<Trait>(0): {
@@ -35,6 +41,7 @@ HirModule {
                 scope: Idx::<Scope>(1),
                 self_constraints: [
                     Idx::<TypeVariableConstraint>(0),
+                    Idx::<TypeVariableConstraint>(1),
                 ],
                 named_type_variables: {
                     "t1": Idx::<TypeVariable>(0),

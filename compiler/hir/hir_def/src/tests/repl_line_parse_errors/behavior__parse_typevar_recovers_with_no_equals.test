@@ -103,7 +103,7 @@ HirModule {
                 kind: Constrained(
                     NonEmpty(
                         [
-                            Idx::<TypeVariableConstraint>(0),
+                            Idx::<TypeVariableConstraint>(1),
                         ],
                     ),
                 ),
@@ -115,6 +115,12 @@ HirModule {
     },
     type_variable_constraint: Index::<TypeVariableConstraint> {
         Idx::<TypeVariableConstraint>(0): {
+            "item": SelfRef(
+                Idx::<Scope>(2),
+            ),
+            "range": 50..60,
+        },
+        Idx::<TypeVariableConstraint>(1): {
             "item": Trait(
                 Idx::<TypeReference>(0),
             ),
@@ -126,7 +132,9 @@ HirModule {
             "item": Trait {
                 name: "TestTrait1",
                 scope: Idx::<Scope>(2),
-                self_constraints: [],
+                self_constraints: [
+                    Idx::<TypeVariableConstraint>(0),
+                ],
                 named_type_variables: {},
                 members: [],
             },
