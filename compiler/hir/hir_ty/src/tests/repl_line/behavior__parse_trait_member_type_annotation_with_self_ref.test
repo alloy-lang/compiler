@@ -18,7 +18,7 @@ HirTypedModule {
     expression_types: {
         Idx::<Expression>(0): Lambda {
             arg_type: ConstrainedGeneric {
-                id: 2,
+                id: 0,
                 constraints: NonEmpty(
                     [
                         TraitConstraint {
@@ -52,12 +52,18 @@ HirTypedModule {
             Int,
         ),
         Idx::<Expression>(2): Lambda {
-            arg_type: Generic(
-                0,
+            arg_type: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Type1",
             ),
             return_type: Lambda {
-                arg_type: Generic(
-                    1,
+                arg_type: BuiltIn(
+                    String,
                 ),
                 return_type: BuiltIn(
                     Int,
@@ -66,11 +72,17 @@ HirTypedModule {
         },
     },
     pattern_types: {
-        Idx::<Pattern>(0): Generic(
-            0,
+        Idx::<Pattern>(0): TypeDef(
+            Fql {
+                module_id: ModuleId {
+                    path: "main",
+                },
+                local_id: Idx::<TypeDefinition>(0),
+            },
+            "Type1",
         ),
-        Idx::<Pattern>(1): Generic(
-            1,
+        Idx::<Pattern>(1): BuiltIn(
+            String,
         ),
     },
     warnings: [],

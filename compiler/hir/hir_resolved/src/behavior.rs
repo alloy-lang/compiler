@@ -4,34 +4,25 @@ use crate::{resolve_trait_by_ref_id, Fql, HirResolutionError};
 use alloy_hir_def as hir;
 use alloy_workspace::ModuleId;
 use rustc_hash::FxHashMap;
-use std::collections::hash_map::Iter;
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ResolvedBehaviorMember {
+    pub name: hir::Name,
+    pub type_annotation: Option<Fql<hir::TypeReference>>,
+    pub value: Fql<hir::Expression>,
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Behavior {
     pub attached_trait: Result<Fql<hir::Trait>, HirResolutionError>,
     pub attached_type: Result<Fql<hir::TypeDefinition>, HirResolutionError>,
     pub named_type_variables: FxHashMap<hir::Name, (TypeVariable, Vec<HirResolutionError>)>,
-    pub type_annotations: FxHashMap<hir::Name, Fql<hir::TypeReference>>,
-    pub values: FxHashMap<hir::Name, Fql<hir::Expression>>,
+    pub members: Vec<ResolvedBehaviorMember>,
 }
 
 impl Behavior {
     pub fn has_implementation(&self, name: &hir::Name) -> bool {
-        self.values.contains_key(name)
-    }
-
-    pub fn named_type_variables(
-        &'_ self,
-    ) -> Iter<'_, hir::Name, (TypeVariable, Vec<HirResolutionError>)> {
-        self.named_type_variables.iter()
-    }
-
-    pub fn type_annotations(&'_ self) -> Iter<'_, hir::Name, Fql<hir::TypeReference>> {
-        self.type_annotations.iter()
-    }
-
-    pub fn values(&'_ self) -> Iter<'_, hir::Name, Fql<hir::Expression>> {
-        self.values.iter()
+        self.members.iter().any(|member| member.name == *name)
     }
 }
 
@@ -55,19 +46,13 @@ pub fn resolve_behavior_by_id(
         })
         .collect();
 
-    let type_annotations = behavior
-        .type_annotations()
-        .map(|(name, type_ref_idx)| {
-            let type_ref = Fql::new(module_id, *type_ref_idx);
-            (name.clone(), type_ref)
-        })
-        .collect();
-
-    let values = behavior
-        .values()
-        .map(|(name, expr_idx)| {
-            let expr = Fql::new(module_id, *expr_idx);
-            (name.clone(), expr)
+    let members = behavior
+        .members()
+        .iter()
+        .map(|member| ResolvedBehaviorMember {
+            name: member.name.clone(),
+            type_annotation: member.type_annotation.map(|ta| Fql::new(module_id, ta)),
+            value: Fql::new(module_id, member.value),
         })
         .collect();
 
@@ -75,8 +60,7 @@ pub fn resolve_behavior_by_id(
         attached_trait,
         attached_type,
         named_type_variables,
-        type_annotations,
-        values,
+        members,
     }
 }
 

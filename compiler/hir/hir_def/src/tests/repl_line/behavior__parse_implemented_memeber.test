@@ -217,10 +217,13 @@ HirModule {
                 attached_trait: Idx::<TypeReference>(0),
                 attached_type: Idx::<TypeReference>(1),
                 named_type_variables: {},
-                type_annotations: {},
-                values: {
-                    "eq": Idx::<Expression>(5),
-                },
+                members: [
+                    BehaviorMember {
+                        name: "eq",
+                        type_annotation: None,
+                        value: Idx::<Expression>(5),
+                    },
+                ],
             },
             "name": (
                 Idx::<TypeReference>(1),
@@ -228,6 +231,13 @@ HirModule {
             ),
             "range": 81..186,
             "scope_id": Idx::<Scope>(0),
+        },
+    },
+    value_definitions: {
+        Idx::<Expression>(5): ValueDefinition {
+            name: "eq",
+            type_annotation: None,
+            expr_idx: Idx::<Expression>(5),
         },
     },
     scopes: Scopes {

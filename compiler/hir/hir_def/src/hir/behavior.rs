@@ -1,9 +1,15 @@
 #[allow(clippy::wildcard_imports)]
 use super::*;
 use rustc_hash::FxHashMap;
-use std::collections::hash_map::Iter;
 
 pub type BehaviorIdx = Idx<Behavior>;
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct BehaviorMember {
+    pub name: Name,
+    pub type_annotation: Option<TypeIdx>,
+    pub value: ExpressionIdx,
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Behavior {
@@ -11,8 +17,7 @@ pub struct Behavior {
     pub attached_trait: TypeIdx,
     pub attached_type: TypeIdx,
     named_type_variables: FxHashMap<Name, TypeVariableIdx>,
-    type_annotations: FxHashMap<Name, TypeIdx>,
-    values: FxHashMap<Name, ExpressionIdx>,
+    members: Vec<BehaviorMember>,
 }
 
 impl Behavior {
@@ -20,16 +25,14 @@ impl Behavior {
         self.scope
     }
 
-    pub fn named_type_variables(&'_ self) -> Iter<'_, Name, TypeVariableIdx> {
+    pub fn named_type_variables(
+        &'_ self,
+    ) -> std::collections::hash_map::Iter<'_, Name, TypeVariableIdx> {
         self.named_type_variables.iter()
     }
 
-    pub fn type_annotations(&'_ self) -> Iter<'_, Name, TypeIdx> {
-        self.type_annotations.iter()
-    }
-
-    pub fn values(&'_ self) -> Iter<'_, Name, ExpressionIdx> {
-        self.values.iter()
+    pub fn members(&self) -> &[BehaviorMember] {
+        &self.members
     }
 }
 
@@ -52,16 +55,29 @@ pub(super) fn lower_behavior(ctx: &mut LoweringCtx, ast: &ast::BehaviorDef) {
         let trait_id = lower_type_reference(ctx, &trait_);
         let type_id = lower_type_reference(ctx, &type_);
 
-        let type_annotations = ast
+        let type_annotations: FxHashMap<Name, TypeIdx> = ast
             .type_annotations()
             .iter()
             .filter_map(|type_annotation| lower_type_annotation(ctx, type_annotation))
             .collect();
 
-        let values = ast
+        let values: FxHashMap<Name, ExpressionIdx> = ast
             .values()
             .iter()
             .filter_map(|value| lower_value(ctx, value))
+            .collect();
+
+        // Build members by pairing type annotations with values
+        let members = values
+            .into_iter()
+            .map(|(name, value)| {
+                let type_annotation = type_annotations.get(&name).copied();
+                BehaviorMember {
+                    name,
+                    type_annotation,
+                    value,
+                }
+            })
             .collect();
 
         Behavior {
@@ -69,8 +85,7 @@ pub(super) fn lower_behavior(ctx: &mut LoweringCtx, ast: &ast::BehaviorDef) {
             attached_trait: trait_id,
             attached_type: type_id,
             named_type_variables,
-            type_annotations,
-            values,
+            members,
         }
     });
 

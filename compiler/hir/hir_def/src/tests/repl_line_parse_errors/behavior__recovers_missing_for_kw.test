@@ -89,8 +89,7 @@ HirModule {
                 attached_trait: Idx::<TypeReference>(0),
                 attached_type: Idx::<TypeReference>(1),
                 named_type_variables: {},
-                type_annotations: {},
-                values: {},
+                members: [],
             },
             "name": (
                 Idx::<TypeReference>(1),

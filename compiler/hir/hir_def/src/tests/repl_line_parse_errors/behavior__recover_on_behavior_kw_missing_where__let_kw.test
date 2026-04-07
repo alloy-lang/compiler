@@ -100,10 +100,13 @@ HirModule {
                 attached_trait: Idx::<TypeReference>(0),
                 attached_type: Idx::<TypeReference>(1),
                 named_type_variables: {},
-                type_annotations: {},
-                values: {
-                    "a": Idx::<Expression>(0),
-                },
+                members: [
+                    BehaviorMember {
+                        name: "a",
+                        type_annotation: None,
+                        value: Idx::<Expression>(0),
+                    },
+                ],
             },
             "name": (
                 Idx::<TypeReference>(1),
@@ -111,6 +114,13 @@ HirModule {
             ),
             "range": 64..111,
             "scope_id": Idx::<Scope>(0),
+        },
+    },
+    value_definitions: {
+        Idx::<Expression>(0): ValueDefinition {
+            name: "a",
+            type_annotation: None,
+            expr_idx: Idx::<Expression>(0),
         },
     },
     scopes: Scopes {

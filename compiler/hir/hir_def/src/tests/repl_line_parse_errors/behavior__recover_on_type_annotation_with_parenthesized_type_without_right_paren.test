@@ -144,10 +144,7 @@ HirModule {
                 named_type_variables: {
                     "t1": Idx::<TypeVariable>(0),
                 },
-                type_annotations: {
-                    "test1": Idx::<TypeReference>(7),
-                },
-                values: {},
+                members: [],
             },
             "name": (
                 Idx::<TypeReference>(1),

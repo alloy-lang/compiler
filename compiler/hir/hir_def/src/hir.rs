@@ -151,6 +151,20 @@ impl<'db> LoweringCtx<'db> {
             value_definitions.insert(expression_id, value_definition);
         }
 
+        // Pair behavior member annotations with values
+        for (_idx, behavior, _, _) in self.behaviors.iter() {
+            for member in behavior.members() {
+                value_definitions.insert(
+                    member.value,
+                    ValueDefinition {
+                        name: member.name.clone(),
+                        expr_idx: member.value,
+                        type_annotation: member.type_annotation,
+                    },
+                );
+            }
+        }
+
         for (type_id, _, range, name, _) in self.type_references.iter_by_scope(Scopes::ROOT) {
             if !matched_type_annotations.contains(&type_id) {
                 warnings.push(LoweringWarning::new(

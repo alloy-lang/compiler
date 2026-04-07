@@ -146,12 +146,15 @@ HirModule {
                 attached_trait: Idx::<TypeReference>(1),
                 attached_type: Idx::<TypeReference>(2),
                 named_type_variables: {},
-                type_annotations: {
-                    "test": Idx::<TypeReference>(3),
-                },
-                values: {
-                    "test": Idx::<Expression>(1),
-                },
+                members: [
+                    BehaviorMember {
+                        name: "test",
+                        type_annotation: Some(
+                            Idx::<TypeReference>(3),
+                        ),
+                        value: Idx::<Expression>(1),
+                    },
+                ],
             },
             "name": (
                 Idx::<TypeReference>(2),
@@ -159,6 +162,15 @@ HirModule {
             ),
             "range": 91..165,
             "scope_id": Idx::<Scope>(0),
+        },
+    },
+    value_definitions: {
+        Idx::<Expression>(1): ValueDefinition {
+            name: "test",
+            type_annotation: Some(
+                Idx::<TypeReference>(3),
+            ),
+            expr_idx: Idx::<Expression>(1),
         },
     },
     scopes: Scopes {
