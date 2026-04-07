@@ -57,6 +57,7 @@ DefinitionInferenceResult {
             kind: UnsatisfiedConstraint {
                 trait_fql_name: "std::eq::Eq",
                 type_name: "Foo",
+                constraint_range: 234..236,
             },
             range: 163..181,
         },

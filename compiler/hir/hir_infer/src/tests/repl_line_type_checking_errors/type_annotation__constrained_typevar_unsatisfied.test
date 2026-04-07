@@ -52,6 +52,7 @@ DefinitionInferenceResult {
             kind: UnsatisfiedConstraint {
                 trait_fql_name: "std::order::Ord",
                 type_name: "Foo",
+                constraint_range: 157..160,
             },
             range: 161..179,
         },
@@ -63,6 +64,12 @@ DefinitionInferenceResult {
  14 │ let foo = Foo::Bar
     │ ─────────┬────────  
     │          ╰────────── missing implementation of trait `std::order::Ord`
+    │
+    ├─[ ./test/main.alloy:14:1 ]
+    │
+ 13 │   typevar t = Eq + Ord
+    │                    ─┬─  
+    │                     ╰─── required by this constraint
     │ 
     │ Help: Type `Foo` must implement trait `std::order::Ord`
 ────╯

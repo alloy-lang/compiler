@@ -23,7 +23,8 @@ pub fn resolve_super_traits(
 
     let (hir_module, _) = hir::lower_file(db, module_id);
     let trait_def = hir_module.get_trait(trait_idx);
-    for constraint in trait_def.self_constraints() {
+    for constraint_idx in trait_def.self_constraints() {
+        let constraint = hir_module.get_type_variable_constraint(*constraint_idx);
         if let hir::TypeVariableConstraint::Trait(type_idx) = constraint {
             if let Ok(super_fql) = resolve_trait_by_ref_id(db, module_id, *type_idx) {
                 for fql in resolve_super_traits(db, super_fql.module_id, super_fql.local_id) {

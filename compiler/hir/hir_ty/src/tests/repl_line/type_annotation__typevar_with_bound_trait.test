@@ -44,6 +44,12 @@ HirTypedModule {
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "main::TestTrait1",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "main",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(2),
+                                },
                             },
                         ],
                     ),
@@ -91,6 +97,12 @@ HirTypedModule {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "main::TestTrait1",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(2),
+                            },
                         },
                     ],
                 ),

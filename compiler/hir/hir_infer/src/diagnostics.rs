@@ -1,6 +1,5 @@
 use crate::hir_ty::UnificationError;
-use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, Severity};
-use alloy_hir_def as hir;
+use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, DiagnosticLabel, Severity};
 use alloy_hir_resolved::HirResolutionError;
 use text_size::TextRange;
 
@@ -49,6 +48,7 @@ impl Diagnostic for TypeInferenceError {
             TypeInferenceErrorKind::UnsatisfiedConstraint {
                 trait_fql_name: trait_name,
                 type_name,
+                ..
             } => {
                 format!("Type `{type_name}` does not implement trait `{trait_name}`")
             }
@@ -73,8 +73,13 @@ impl Diagnostic for TypeInferenceError {
             TypeInferenceErrorKind::UnsatisfiedConstraint {
                 trait_fql_name: trait_name,
                 type_name,
+                constraint_range,
             } => builder
                 .with_primary_label(format!("missing implementation of trait `{trait_name}`"))
+                .with_label(DiagnosticLabel::new(
+                    *constraint_range,
+                    "required by this constraint",
+                ))
                 .with_help(format!(
                     "Type `{type_name}` must implement trait `{trait_name}`"
                 )),
@@ -89,6 +94,7 @@ pub enum TypeInferenceErrorKind {
     UnsatisfiedConstraint {
         trait_fql_name: String,
         type_name: String,
+        constraint_range: TextRange,
     },
 }
 

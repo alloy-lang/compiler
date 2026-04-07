@@ -486,11 +486,13 @@ fn annotated_to_mono(annotated: &AnnotatedType, ctx: &mut HMInferenceContext) ->
             ..
         } => {
             let var_id = ctx.get_or_create_self_type_var(trait_fql.clone());
-            let primary = TraitConstraint {
-                trait_fql: trait_fql.clone(),
-                trait_fql_name: trait_fql.trait_fql_name(ctx.db),
-            };
-            let mut constraints = vec![primary];
+            // let primary = TraitConstraint {
+            //     trait_fql: trait_fql.clone(),
+            //     trait_fql_name: trait_fql.trait_fql_name(ctx.db),
+            //     type_var_constraint_fql: todo!(),
+            // };
+            // let mut constraints = vec![primary];
+            let mut constraints = vec![];
             for constraint in trait_constraints {
                 if !constraints.contains(constraint) {
                     constraints.push(constraint.clone());

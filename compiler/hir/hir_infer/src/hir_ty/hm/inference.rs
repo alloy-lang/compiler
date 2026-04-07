@@ -79,10 +79,6 @@ fn collect_inference_results(
 ) -> DefinitionInferenceResult {
     let db = ctx.db;
     let (substitution, constraint_map, solve_errors) = solve_equations(db, ctx.equations.clone());
-    let constraint_map = constraint_map
-        .into_iter()
-        .map(|(var_id, constraints)| (var_id, constraints.into_iter().collect()))
-        .collect();
 
     let mut type_var_map: FxHashMap<TypeVarId, usize> = FxHashMap::default();
     let mut next_generic_id = 0;
@@ -192,7 +188,7 @@ fn mono_to_inferred_with_map(
             let mut all_constraints = constraints.clone();
             if let Some(map_constraints) = constraint_map.get(var_id) {
                 for c in map_constraints {
-                    if !all_constraints.contains(c) {
+                    if !all_constraints.iter().any(|existing| existing.trait_fql == c.trait_fql) {
                         all_constraints.push(c.clone());
                     }
                 }

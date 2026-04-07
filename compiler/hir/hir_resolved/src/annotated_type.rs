@@ -11,6 +11,7 @@ use std::convert::TryFrom;
 pub struct TraitConstraint {
     pub trait_fql: Fql<hir::Trait>,
     pub trait_fql_name: String,
+    pub type_var_constraint_fql: Fql<hir::TypeVariableConstraint>,
 }
 
 impl TraitConstraint {
@@ -24,7 +25,6 @@ impl TraitConstraint {
             return false;
         };
 
-        // TODO: check to see if the trait has supertraits with behaviors that match, for transitive trait satisfaction
         for behavior in type_def_behaviors {
             let Ok(attached_trait) = &behavior.attached_trait else {
                 continue;
@@ -238,16 +238,12 @@ pub fn resolve_annotated_type(
                 hir_module.find_trait_containing_scope(*scope)
             {
                 let trait_fql = Fql::new(module_id, trait_idx);
-                let trait_constraints: Vec<TraitConstraint> = trait_def
-                    .self_constraints()
-                    .iter()
-                    .flat_map(|constraint| trait_constraints(db, module_id, constraint))
-                    .unique()
-                    .collect();
+                let trait_constraints =
+                    collect_trait_constraints(db, module_id, trait_def.self_constraints());
                 let kind_constraints = trait_def
                     .self_constraints()
                     .iter()
-                    .find_map(kind_constraints);
+                    .find_map(|constraint_idx| kind_constraints(db, module_id, constraint_idx));
 
                 AnnotatedType::SelfType {
                     trait_fql,
@@ -327,40 +323,87 @@ fn correct_arity(args: Vec<AnnotatedType>, expected_arity: usize) -> Vec<Annotat
     }
 }
 
+/// Collect and deduplicate trait constraints across multiple constraint indices.
+/// Direct constraints are collected before inherited super-trait constraints so
+/// that `unique_by` keeps the explicit declaration over the inherited one.
+fn collect_trait_constraints(
+    db: &dyn HirDefDatabase,
+    module_id: ModuleId,
+    constraint_idxs: &[hir::TypeVariableConstraintIdx],
+) -> Vec<TraitConstraint> {
+    let (directs, supers): (Vec<_>, Vec<_>) = constraint_idxs
+        .iter()
+        .map(|idx| trait_constraints(db, module_id, idx))
+        .unzip();
+    directs
+        .into_iter()
+        .flatten()
+        .chain(supers.into_iter().flatten())
+        .unique_by(|c| c.trait_fql.clone())
+        .collect()
+}
+
+/// Returns (direct_constraint, super_constraints) for a single constraint index.
 fn trait_constraints(
     db: &dyn HirDefDatabase,
     module_id: ModuleId,
-    c: &hir::TypeVariableConstraint,
-) -> Vec<TraitConstraint> {
-    let mut results = Vec::new();
+    idx: &hir::TypeVariableConstraintIdx,
+) -> (Vec<TraitConstraint>, Vec<TraitConstraint>) {
+    let (hir_module, _) = hir::lower_file(db, module_id);
+    let constraint = hir_module.get_type_variable_constraint(*idx);
 
-    if let hir::TypeVariableConstraint::Trait(type_idx) = c {
-        let Ok(trait_fql) = crate::resolve_trait_by_ref_id(db, module_id, *type_idx) else {
-            return results;
-        };
+    match constraint {
+        hir::TypeVariableConstraint::Trait(type_idx) => {
+            let Ok(trait_fql) = crate::resolve_trait_by_ref_id(db, module_id, *type_idx) else {
+                return (Vec::new(), Vec::new());
+            };
 
-        for super_trait_fql in
-            crate::resolve_super_traits(db, trait_fql.module_id, trait_fql.local_id)
-        {
-            results.push(TraitConstraint {
-                trait_fql_name: super_trait_fql.trait_fql_name(db),
-                trait_fql: super_trait_fql,
-            })
+            let direct = vec![TraitConstraint {
+                trait_fql_name: trait_fql.trait_fql_name(db),
+                trait_fql: trait_fql.clone(),
+                type_var_constraint_fql: Fql::new(module_id, *idx),
+            }];
+
+            let supers = crate::resolve_super_traits(db, trait_fql.module_id, trait_fql.local_id)
+                .into_iter()
+                .map(|super_trait_fql| TraitConstraint {
+                    trait_fql_name: super_trait_fql.trait_fql_name(db),
+                    trait_fql: super_trait_fql,
+                    type_var_constraint_fql: Fql::new(trait_fql.module_id, *idx),
+                })
+                .collect();
+
+            (direct, supers)
         }
+        hir::TypeVariableConstraint::SelfRef(scope) => {
+            let Some((trait_idx, _)) = hir_module.find_trait_containing_scope(*scope) else {
+                unreachable!("SelfRef constraint should only be added in the context of a trait, so we should always find a containing trait here")
+            };
 
-        results.push(TraitConstraint {
-            trait_fql_name: trait_fql.trait_fql_name(db),
-            trait_fql,
-        });
+            let trait_fql = Fql::new(module_id, trait_idx);
+            let direct = vec![TraitConstraint {
+                trait_fql_name: trait_fql.trait_fql_name(db),
+                trait_fql,
+                type_var_constraint_fql: Fql::new(module_id, *idx),
+            }];
+
+            (direct, Vec::new())
+        }
+        hir::TypeVariableConstraint::Kind(_) => (Vec::new(), Vec::new()),
     }
-
-    results
 }
 
-fn kind_constraints(c: &hir::TypeVariableConstraint) -> Option<usize> {
-    match c {
-        hir::TypeVariableConstraint::Trait(_) => None,
+fn kind_constraints(
+    db: &dyn HirDefDatabase,
+    module_id: ModuleId,
+    idx: &hir::TypeVariableConstraintIdx,
+) -> Option<usize> {
+    let (hir_module, _) = hir::lower_file(db, module_id);
+    let constraint = hir_module.get_type_variable_constraint(*idx);
+
+    match constraint {
         hir::TypeVariableConstraint::Kind(arity) => Some(*arity),
+        hir::TypeVariableConstraint::Trait(_) | hir::TypeVariableConstraint::SelfRef(_) => None,
     }
 }
 
@@ -450,14 +493,13 @@ pub fn resolve_type_variable_to_annotated(
     match kind {
         hir::TypeVariableKind::Unbound => AnnotatedType::TypeVar(type_var),
         hir::TypeVariableKind::Constrained(constraints) => {
-            let trait_constraints: Vec<TraitConstraint> = constraints
-                .iter()
-                .flat_map(|constraint| trait_constraints(db, module_id, constraint))
-                .unique()
-                .collect();
+            let trait_constraints = collect_trait_constraints(db, module_id, constraints);
 
             let type_arity = {
-                if let Some(arity) = constraints.iter().find_map(kind_constraints) {
+                if let Some(arity) = constraints
+                    .iter()
+                    .find_map(|constraint_idx| kind_constraints(db, module_id, constraint_idx))
+                {
                     arity
                 } else {
                     trait_constraints
@@ -468,7 +510,9 @@ pub fn resolve_type_variable_to_annotated(
                             trait_def
                                 .self_constraints()
                                 .iter()
-                                .find_map(kind_constraints)
+                                .find_map(|constraint_idx| {
+                                    kind_constraints(db, c.trait_fql.module_id, constraint_idx)
+                                })
                         })
                         .next()
                         .unwrap_or(0)

@@ -22,6 +22,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::monad::Monad",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                         TraitConstraint {
                             trait_fql: Fql {
@@ -31,6 +37,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::applicative::Applicative",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                         TraitConstraint {
                             trait_fql: Fql {
@@ -40,6 +52,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::functor::Functor",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                     ],
                 ),
@@ -58,6 +76,12 @@ DefinitionInferenceResult {
                                         local_id: Idx::<Trait>(0),
                                     },
                                     trait_fql_name: "std::monad::Monad",
+                                    type_var_constraint_fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "std::monad",
+                                        },
+                                        local_id: Idx::<TypeVariableConstraint>(4),
+                                    },
                                 },
                                 TraitConstraint {
                                     trait_fql: Fql {
@@ -67,6 +91,12 @@ DefinitionInferenceResult {
                                         local_id: Idx::<Trait>(0),
                                     },
                                     trait_fql_name: "std::applicative::Applicative",
+                                    type_var_constraint_fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "std::monad",
+                                        },
+                                        local_id: Idx::<TypeVariableConstraint>(4),
+                                    },
                                 },
                                 TraitConstraint {
                                     trait_fql: Fql {
@@ -76,6 +106,12 @@ DefinitionInferenceResult {
                                         local_id: Idx::<Trait>(0),
                                     },
                                     trait_fql_name: "std::functor::Functor",
+                                    type_var_constraint_fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "std::monad",
+                                        },
+                                        local_id: Idx::<TypeVariableConstraint>(4),
+                                    },
                                 },
                             ],
                         ),
@@ -101,6 +137,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::monad::Monad",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                         TraitConstraint {
                             trait_fql: Fql {
@@ -110,6 +152,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::applicative::Applicative",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                         TraitConstraint {
                             trait_fql: Fql {
@@ -119,6 +167,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::functor::Functor",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                     ],
                 ),
@@ -143,6 +197,12 @@ DefinitionInferenceResult {
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "std::monad::Monad",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(4),
+                                },
                             },
                             TraitConstraint {
                                 trait_fql: Fql {
@@ -152,6 +212,12 @@ DefinitionInferenceResult {
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "std::applicative::Applicative",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(4),
+                                },
                             },
                             TraitConstraint {
                                 trait_fql: Fql {
@@ -161,6 +227,12 @@ DefinitionInferenceResult {
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "std::functor::Functor",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(4),
+                                },
                             },
                         ],
                     ),
@@ -184,6 +256,12 @@ DefinitionInferenceResult {
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "std::monad::Monad",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(4),
+                                },
                             },
                             TraitConstraint {
                                 trait_fql: Fql {
@@ -193,6 +271,12 @@ DefinitionInferenceResult {
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "std::applicative::Applicative",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(4),
+                                },
                             },
                             TraitConstraint {
                                 trait_fql: Fql {
@@ -202,6 +286,12 @@ DefinitionInferenceResult {
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "std::functor::Functor",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(4),
+                                },
                             },
                         ],
                     ),
@@ -226,6 +316,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::monad::Monad",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                         TraitConstraint {
                             trait_fql: Fql {
@@ -235,6 +331,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::applicative::Applicative",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                         TraitConstraint {
                             trait_fql: Fql {
@@ -244,6 +346,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::functor::Functor",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                     ],
                 ),
@@ -268,6 +376,12 @@ DefinitionInferenceResult {
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "std::monad::Monad",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(4),
+                                },
                             },
                             TraitConstraint {
                                 trait_fql: Fql {
@@ -277,6 +391,12 @@ DefinitionInferenceResult {
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "std::applicative::Applicative",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(4),
+                                },
                             },
                             TraitConstraint {
                                 trait_fql: Fql {
@@ -286,6 +406,12 @@ DefinitionInferenceResult {
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "std::functor::Functor",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(4),
+                                },
                             },
                         ],
                     ),
@@ -304,6 +430,12 @@ DefinitionInferenceResult {
                                             local_id: Idx::<Trait>(0),
                                         },
                                         trait_fql_name: "std::monad::Monad",
+                                        type_var_constraint_fql: Fql {
+                                            module_id: ModuleId {
+                                                path: "std::monad",
+                                            },
+                                            local_id: Idx::<TypeVariableConstraint>(4),
+                                        },
                                     },
                                     TraitConstraint {
                                         trait_fql: Fql {
@@ -313,6 +445,12 @@ DefinitionInferenceResult {
                                             local_id: Idx::<Trait>(0),
                                         },
                                         trait_fql_name: "std::applicative::Applicative",
+                                        type_var_constraint_fql: Fql {
+                                            module_id: ModuleId {
+                                                path: "std::monad",
+                                            },
+                                            local_id: Idx::<TypeVariableConstraint>(4),
+                                        },
                                     },
                                     TraitConstraint {
                                         trait_fql: Fql {
@@ -322,6 +460,12 @@ DefinitionInferenceResult {
                                             local_id: Idx::<Trait>(0),
                                         },
                                         trait_fql_name: "std::functor::Functor",
+                                        type_var_constraint_fql: Fql {
+                                            module_id: ModuleId {
+                                                path: "std::monad",
+                                            },
+                                            local_id: Idx::<TypeVariableConstraint>(4),
+                                        },
                                     },
                                 ],
                             ),
@@ -347,6 +491,12 @@ DefinitionInferenceResult {
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "std::monad::Monad",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(4),
+                                },
                             },
                             TraitConstraint {
                                 trait_fql: Fql {
@@ -356,6 +506,12 @@ DefinitionInferenceResult {
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "std::applicative::Applicative",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(4),
+                                },
                             },
                             TraitConstraint {
                                 trait_fql: Fql {
@@ -365,6 +521,12 @@ DefinitionInferenceResult {
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "std::functor::Functor",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::monad",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(4),
+                                },
                             },
                         ],
                     ),
@@ -391,6 +553,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::monad::Monad",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                         TraitConstraint {
                             trait_fql: Fql {
@@ -400,6 +568,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::applicative::Applicative",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                         TraitConstraint {
                             trait_fql: Fql {
@@ -409,6 +583,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::functor::Functor",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                     ],
                 ),
@@ -427,6 +607,12 @@ DefinitionInferenceResult {
                                         local_id: Idx::<Trait>(0),
                                     },
                                     trait_fql_name: "std::monad::Monad",
+                                    type_var_constraint_fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "std::monad",
+                                        },
+                                        local_id: Idx::<TypeVariableConstraint>(4),
+                                    },
                                 },
                                 TraitConstraint {
                                     trait_fql: Fql {
@@ -436,6 +622,12 @@ DefinitionInferenceResult {
                                         local_id: Idx::<Trait>(0),
                                     },
                                     trait_fql_name: "std::applicative::Applicative",
+                                    type_var_constraint_fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "std::monad",
+                                        },
+                                        local_id: Idx::<TypeVariableConstraint>(4),
+                                    },
                                 },
                                 TraitConstraint {
                                     trait_fql: Fql {
@@ -445,6 +637,12 @@ DefinitionInferenceResult {
                                         local_id: Idx::<Trait>(0),
                                     },
                                     trait_fql_name: "std::functor::Functor",
+                                    type_var_constraint_fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "std::monad",
+                                        },
+                                        local_id: Idx::<TypeVariableConstraint>(4),
+                                    },
                                 },
                             ],
                         ),
@@ -470,6 +668,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::monad::Monad",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                         TraitConstraint {
                             trait_fql: Fql {
@@ -479,6 +683,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::applicative::Applicative",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                         TraitConstraint {
                             trait_fql: Fql {
@@ -488,6 +698,12 @@ DefinitionInferenceResult {
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::functor::Functor",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::monad",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(4),
+                            },
                         },
                     ],
                 ),

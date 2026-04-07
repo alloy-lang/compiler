@@ -554,10 +554,12 @@ mod hir_ty_small_tests {
         let ord_constraint = TraitConstraint {
             trait_fql: Fql::new(stdlib_order, idx!(0)),
             trait_fql_name: "std::order::Ord".to_string(),
+            type_var_constraint_fql: Fql::new(stdlib_order, idx!(0)),
         };
         let eq_constraint = TraitConstraint {
             trait_fql: Fql::new(stdlib_eq, idx!(0)),
             trait_fql_name: "std::eq::Eq".to_string(),
+            type_var_constraint_fql: Fql::new(stdlib_eq, idx!(0)),
         };
         let constrained_t1 = InferredType::ConstrainedGeneric {
             id: 1,
@@ -607,14 +609,17 @@ mod hir_ty_small_tests {
         let monad_constraint = TraitConstraint {
             trait_fql: Fql::new(stdlib_monad, idx!(0)),
             trait_fql_name: "std::monad::Monad".to_string(),
+            type_var_constraint_fql: Fql::new(stdlib_monad, idx!(4)),
         };
         let applicative_constraint = TraitConstraint {
             trait_fql: Fql::new(stdlib_applicative, idx!(0)),
             trait_fql_name: "std::applicative::Applicative".to_string(),
+            type_var_constraint_fql: Fql::new(stdlib_monad, idx!(4)),
         };
         let functor_constraint = TraitConstraint {
             trait_fql: Fql::new(stdlib_functor, idx!(0)),
             trait_fql_name: "std::functor::Functor".to_string(),
+            type_var_constraint_fql: Fql::new(stdlib_monad, idx!(4)),
         };
         let constrained_m = InferredType::ConstrainedGeneric {
             id: 0,

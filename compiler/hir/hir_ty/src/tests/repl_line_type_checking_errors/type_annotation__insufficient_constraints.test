@@ -19,20 +19,32 @@ HirTypedModule {
                         TraitConstraint {
                             trait_fql: Fql {
                                 module_id: ModuleId {
-                                    path: "std::order",
-                                },
-                                local_id: Idx::<Trait>(0),
-                            },
-                            trait_fql_name: "std::order::Ord",
-                        },
-                        TraitConstraint {
-                            trait_fql: Fql {
-                                module_id: ModuleId {
                                     path: "std::eq",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::eq::Eq",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(0),
+                            },
+                        },
+                        TraitConstraint {
+                            trait_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            trait_fql_name: "std::order::Ord",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(1),
+                            },
                         },
                     ],
                 ),
@@ -45,20 +57,32 @@ HirTypedModule {
                             TraitConstraint {
                                 trait_fql: Fql {
                                     module_id: ModuleId {
-                                        path: "std::order",
-                                    },
-                                    local_id: Idx::<Trait>(0),
-                                },
-                                trait_fql_name: "std::order::Ord",
-                            },
-                            TraitConstraint {
-                                trait_fql: Fql {
-                                    module_id: ModuleId {
                                         path: "std::eq",
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "std::eq::Eq",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::order",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(0),
+                                },
+                            },
+                            TraitConstraint {
+                                trait_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::order",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                trait_fql_name: "std::order::Ord",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::order",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(1),
+                                },
                             },
                         ],
                     ),
@@ -84,20 +108,32 @@ HirTypedModule {
                     TraitConstraint {
                         trait_fql: Fql {
                             module_id: ModuleId {
-                                path: "std::order",
-                            },
-                            local_id: Idx::<Trait>(0),
-                        },
-                        trait_fql_name: "std::order::Ord",
-                    },
-                    TraitConstraint {
-                        trait_fql: Fql {
-                            module_id: ModuleId {
                                 path: "std::eq",
                             },
                             local_id: Idx::<Trait>(0),
                         },
                         trait_fql_name: "std::eq::Eq",
+                        type_var_constraint_fql: Fql {
+                            module_id: ModuleId {
+                                path: "std::order",
+                            },
+                            local_id: Idx::<TypeVariableConstraint>(0),
+                        },
+                    },
+                    TraitConstraint {
+                        trait_fql: Fql {
+                            module_id: ModuleId {
+                                path: "std::order",
+                            },
+                            local_id: Idx::<Trait>(0),
+                        },
+                        trait_fql_name: "std::order::Ord",
+                        type_var_constraint_fql: Fql {
+                            module_id: ModuleId {
+                                path: "std::order",
+                            },
+                            local_id: Idx::<TypeVariableConstraint>(1),
+                        },
                     },
                 ],
             ),
@@ -110,20 +146,32 @@ HirTypedModule {
                         TraitConstraint {
                             trait_fql: Fql {
                                 module_id: ModuleId {
-                                    path: "std::order",
-                                },
-                                local_id: Idx::<Trait>(0),
-                            },
-                            trait_fql_name: "std::order::Ord",
-                        },
-                        TraitConstraint {
-                            trait_fql: Fql {
-                                module_id: ModuleId {
                                     path: "std::eq",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::eq::Eq",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(0),
+                            },
+                        },
+                        TraitConstraint {
+                            trait_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            trait_fql_name: "std::order::Ord",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(1),
+                            },
                         },
                     ],
                 ),
@@ -148,20 +196,32 @@ HirTypedModule {
                     TraitConstraint {
                         trait_fql: Fql {
                             module_id: ModuleId {
-                                path: "std::order",
-                            },
-                            local_id: Idx::<Trait>(0),
-                        },
-                        trait_fql_name: "std::order::Ord",
-                    },
-                    TraitConstraint {
-                        trait_fql: Fql {
-                            module_id: ModuleId {
                                 path: "std::eq",
                             },
                             local_id: Idx::<Trait>(0),
                         },
                         trait_fql_name: "std::eq::Eq",
+                        type_var_constraint_fql: Fql {
+                            module_id: ModuleId {
+                                path: "std::order",
+                            },
+                            local_id: Idx::<TypeVariableConstraint>(0),
+                        },
+                    },
+                    TraitConstraint {
+                        trait_fql: Fql {
+                            module_id: ModuleId {
+                                path: "std::order",
+                            },
+                            local_id: Idx::<Trait>(0),
+                        },
+                        trait_fql_name: "std::order::Ord",
+                        type_var_constraint_fql: Fql {
+                            module_id: ModuleId {
+                                path: "std::order",
+                            },
+                            local_id: Idx::<TypeVariableConstraint>(1),
+                        },
                     },
                 ],
             ),
@@ -187,20 +247,32 @@ HirTypedModule {
                             TraitConstraint {
                                 trait_fql: Fql {
                                     module_id: ModuleId {
-                                        path: "std::order",
-                                    },
-                                    local_id: Idx::<Trait>(0),
-                                },
-                                trait_fql_name: "std::order::Ord",
-                            },
-                            TraitConstraint {
-                                trait_fql: Fql {
-                                    module_id: ModuleId {
                                         path: "std::eq",
                                     },
                                     local_id: Idx::<Trait>(0),
                                 },
                                 trait_fql_name: "std::eq::Eq",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::order",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(0),
+                                },
+                            },
+                            TraitConstraint {
+                                trait_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::order",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                trait_fql_name: "std::order::Ord",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::order",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(1),
+                                },
                             },
                         ],
                     ),
@@ -239,20 +311,32 @@ HirTypedModule {
                         TraitConstraint {
                             trait_fql: Fql {
                                 module_id: ModuleId {
-                                    path: "std::order",
-                                },
-                                local_id: Idx::<Trait>(0),
-                            },
-                            trait_fql_name: "std::order::Ord",
-                        },
-                        TraitConstraint {
-                            trait_fql: Fql {
-                                module_id: ModuleId {
                                     path: "std::eq",
                                 },
                                 local_id: Idx::<Trait>(0),
                             },
                             trait_fql_name: "std::eq::Eq",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(0),
+                            },
+                        },
+                        TraitConstraint {
+                            trait_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            trait_fql_name: "std::order::Ord",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(1),
+                            },
                         },
                     ],
                 ),
@@ -348,20 +432,32 @@ HirTypedModule {
                                     TraitConstraint {
                                         trait_fql: Fql {
                                             module_id: ModuleId {
-                                                path: "std::order",
-                                            },
-                                            local_id: Idx::<Trait>(0),
-                                        },
-                                        trait_fql_name: "std::order::Ord",
-                                    },
-                                    TraitConstraint {
-                                        trait_fql: Fql {
-                                            module_id: ModuleId {
                                                 path: "std::eq",
                                             },
                                             local_id: Idx::<Trait>(0),
                                         },
                                         trait_fql_name: "std::eq::Eq",
+                                        type_var_constraint_fql: Fql {
+                                            module_id: ModuleId {
+                                                path: "std::order",
+                                            },
+                                            local_id: Idx::<TypeVariableConstraint>(0),
+                                        },
+                                    },
+                                    TraitConstraint {
+                                        trait_fql: Fql {
+                                            module_id: ModuleId {
+                                                path: "std::order",
+                                            },
+                                            local_id: Idx::<Trait>(0),
+                                        },
+                                        trait_fql_name: "std::order::Ord",
+                                        type_var_constraint_fql: Fql {
+                                            module_id: ModuleId {
+                                                path: "std::order",
+                                            },
+                                            local_id: Idx::<TypeVariableConstraint>(1),
+                                        },
                                     },
                                 ],
                             ),
@@ -390,8 +486,8 @@ HirTypedModule {
                 value_range: 149..224,
                 reason: InsufficientConstraints {
                     missing_constraints: [
-                        "std::order::Ord",
                         "std::eq::Eq",
+                        "std::order::Ord",
                     ],
                 },
             },
@@ -405,13 +501,13 @@ HirTypedModule {
    │
  4 │ typeof comparing : (t2 -> t1) -> t2 -> t2 -> Ordering where
    │                    ─────────────────┬────────────────  
-   │                                     ╰────────────────── type annotation is missing required constraint(s): `std::order::Ord`, `std::eq::Eq`
+   │                                     ╰────────────────── type annotation is missing required constraint(s): `std::eq::Eq`, `std::order::Ord`
    │ 
  7 │ let comparing = |convert, x, y| -> Ord::compare <| convert(x) <| convert(y)
    │ ─────────────────────────────────────┬─────────────────────────────────────  
-   │                                      ╰─────────────────────────────────────── but the body requires `std::order::Ord`, `std::eq::Eq`
+   │                                      ╰─────────────────────────────────────── but the body requires `std::eq::Eq`, `std::order::Ord`
    │ 
-   │ Help: Add the missing constraint(s) to the type annotation: `std::order::Ord`, `std::eq::Eq`
+   │ Help: Add the missing constraint(s) to the type annotation: `std::eq::Eq`, `std::order::Ord`
 ───╯
 
 

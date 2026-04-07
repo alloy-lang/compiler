@@ -3,6 +3,7 @@ use alloy_hir_resolved as res;
 use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType, AnnotatedTypeVar};
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
+use std::convert::TryFrom;
 
 use super::super::super::infer_body_type;
 use crate::hir_ty::InferredType;
@@ -122,17 +123,12 @@ impl ConversionContext {
                 trait_constraints,
                 ..
             } => {
-                let primary = res::TraitConstraint {
-                    trait_fql: trait_fql.clone(),
-                    trait_fql_name: trait_fql.trait_fql_name(db),
-                };
-                let mut constraints = NonEmpty::new(primary);
-                for trait_constraint in trait_constraints {
-                    constraints.push(trait_constraint.clone());
-                }
-
                 let id = self.self_type_id(trait_fql);
-                InferredType::ConstrainedGeneric { id, constraints }
+
+                match NonEmpty::try_from(trait_constraints.clone()) {
+                    Ok(constraints) => InferredType::ConstrainedGeneric { id, constraints },
+                    Err(_) => InferredType::Generic(id),
+                }
             }
         }
     }

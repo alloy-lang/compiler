@@ -32,6 +32,12 @@ DefinitionInferenceResult {
                                         local_id: Idx::<Trait>(0),
                                     },
                                     trait_fql_name: "main::TestTrait",
+                                    type_var_constraint_fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "main",
+                                        },
+                                        local_id: Idx::<TypeVariableConstraint>(1),
+                                    },
                                 },
                             ],
                         ),
@@ -57,6 +63,12 @@ DefinitionInferenceResult {
                                         local_id: Idx::<Trait>(0),
                                     },
                                     trait_fql_name: "main::TestTrait",
+                                    type_var_constraint_fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "main",
+                                        },
+                                        local_id: Idx::<TypeVariableConstraint>(1),
+                                    },
                                 },
                             ],
                         ),
@@ -80,6 +92,12 @@ DefinitionInferenceResult {
                                         local_id: Idx::<Trait>(0),
                                     },
                                     trait_fql_name: "main::TestTrait",
+                                    type_var_constraint_fql: Fql {
+                                        module_id: ModuleId {
+                                            path: "main",
+                                        },
+                                        local_id: Idx::<TypeVariableConstraint>(1),
+                                    },
                                 },
                             ],
                         ),

@@ -30,13 +30,18 @@ pub fn resolve_type_variable_by_id(
         hir::TypeVariableKind::Constrained(constraints) => {
             let constraint_results = constraints
                 .iter()
-                .map(|constraint| match constraint {
-                    hir::TypeVariableConstraint::Kind(kind) => {
-                        Ok(TypeVariableConstraint::Kind(*kind))
-                    }
-                    hir::TypeVariableConstraint::Trait(trait_path) => {
-                        resolve_trait_by_ref_id(db, module_id, *trait_path)
-                            .map(TypeVariableConstraint::Trait)
+                .map(|constraint_idx| {
+                    match hir_module.get_type_variable_constraint(*constraint_idx) {
+                        hir::TypeVariableConstraint::Kind(kind) => {
+                            Ok(TypeVariableConstraint::Kind(*kind))
+                        }
+                        hir::TypeVariableConstraint::Trait(trait_path) => {
+                            resolve_trait_by_ref_id(db, module_id, *trait_path)
+                                .map(TypeVariableConstraint::Trait)
+                        }
+                        hir::TypeVariableConstraint::SelfRef(_) => {
+                            unreachable!("self ref are not valid in this context")
+                        }
                     }
                 })
                 .collect::<Vec<_>>();

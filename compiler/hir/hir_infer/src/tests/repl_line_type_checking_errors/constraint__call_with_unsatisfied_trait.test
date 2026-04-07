@@ -78,6 +78,7 @@ DefinitionInferenceResult {
             kind: UnsatisfiedConstraint {
                 trait_fql_name: "std::eq::Eq",
                 type_name: "Foo",
+                constraint_range: 46..48,
             },
             range: 68..102,
         },
@@ -89,6 +90,12 @@ DefinitionInferenceResult {
  8 │ let x = Eq::eq(Foo::Bar, Foo::Bar)
    │ ─────────────────┬────────────────  
    │                  ╰────────────────── missing implementation of trait `std::eq::Eq`
+   │
+   ├─[ ./test/main.alloy:8:1 ]
+   │
+ 4 │ typedef Foo =
+   │      ─┬  
+   │       ╰── required by this constraint
    │ 
    │ Help: Type `Foo` must implement trait `std::eq::Eq`
 ───╯

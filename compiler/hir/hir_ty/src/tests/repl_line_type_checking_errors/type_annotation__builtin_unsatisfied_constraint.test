@@ -64,6 +64,7 @@ HirTypedModule {
                     kind: UnsatisfiedConstraint {
                         trait_fql_name: "std::order::Ord",
                         type_name: "Bool",
+                        constraint_range: 67..70,
                     },
                     range: 71..93,
                 },
@@ -76,6 +77,7 @@ HirTypedModule {
                     kind: UnsatisfiedConstraint {
                         trait_fql_name: "std::order::Ord",
                         type_name: "()",
+                        constraint_range: 138..141,
                     },
                     range: 142..162,
                 },
@@ -88,6 +90,7 @@ HirTypedModule {
                     kind: UnsatisfiedConstraint {
                         trait_fql_name: "std::order::Ord",
                         type_name: "(Bool, ())",
+                        constraint_range: 293..296,
                     },
                     range: 297..332,
                 },
@@ -100,6 +103,7 @@ HirTypedModule {
                     kind: UnsatisfiedConstraint {
                         trait_fql_name: "std::order::Ord",
                         type_name: "t0 -> t0",
+                        constraint_range: 209..212,
                     },
                     range: 213..241,
                 },
@@ -112,6 +116,7 @@ HirTypedModule {
                     kind: UnsatisfiedConstraint {
                         trait_fql_name: "std::eq::Eq",
                         type_name: "t0 -> t0",
+                        constraint_range: 362..365,
                     },
                     range: 213..241,
                 },
@@ -127,6 +132,12 @@ HirTypedModule {
  5 │ let bool_traits = True
    │ ───────────┬──────────  
    │            ╰──────────── missing implementation of trait `std::order::Ord`
+   │
+   ├─[ ./test/main.alloy:5:1 ]
+   │
+ 4 │   typevar t = Ord
+   │               ─┬─  
+   │                ╰─── required by this constraint
    │ 
    │ Help: Type `Bool` must implement trait `std::order::Ord`
 ───╯
@@ -137,6 +148,12 @@ HirTypedModule {
  9 │ let unit_traits = ()
    │ ──────────┬─────────  
    │           ╰─────────── missing implementation of trait `std::order::Ord`
+   │
+   ├─[ ./test/main.alloy:9:1 ]
+   │
+ 8 │   typevar t = Ord
+   │               ─┬─  
+   │                ╰─── required by this constraint
    │ 
    │ Help: Type `()` must implement trait `std::order::Ord`
 ───╯
@@ -147,6 +164,12 @@ HirTypedModule {
  17 │ let tuple_traits_w_ord = (True, ())
     │ ─────────────────┬─────────────────  
     │                  ╰─────────────────── missing implementation of trait `std::order::Ord`
+    │
+    ├─[ ./test/main.alloy:17:1 ]
+    │
+ 16 │   typevar t = Ord
+    │               ─┬─  
+    │                ╰─── required by this constraint
     │ 
     │ Help: Type `(Bool, ())` must implement trait `std::order::Ord`
 ────╯
@@ -157,6 +180,12 @@ HirTypedModule {
  13 │ let lambda_traits = |x| -> x
     │ ──────────────┬─────────────  
     │               ╰─────────────── missing implementation of trait `std::order::Ord`
+    │
+    ├─[ ./test/main.alloy:13:1 ]
+    │
+ 12 │   typevar t = Ord
+    │               ─┬─  
+    │                ╰─── required by this constraint
     │ 
     │ Help: Type `t0 -> t0` must implement trait `std::order::Ord`
 ────╯

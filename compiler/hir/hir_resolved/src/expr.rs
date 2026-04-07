@@ -222,6 +222,14 @@ fn find_function_target(
     }
 }
 
+// TODO: This only finds operators at module root scope. Operators defined inside
+// trait bodies (e.g., `let (==) = eq` in `trait Eq`) are not found because the
+// ExpressionResolver doesn't search trait member scopes. More broadly, we lack
+// trait method dispatch — `Eq::eq(a, b)` works (abstract trait call), but
+// `SomeType::eq(a, b)` (resolving through a behavior implementation) does not.
+// Resolution should only consider traits that are imported in the current scope
+// (like Rust's trait method resolution), avoiding the need to search through the
+// defining module for all behaviors a type implements.
 pub fn resolve_custom_binary_operator(
     db: &dyn hir::HirDefDatabase,
     source_ref: &Fql<hir::Expression>,

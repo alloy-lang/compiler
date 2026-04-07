@@ -6,13 +6,13 @@ use crate::{diagnostics, HirInferDatabase};
 use alloy_hir_def as hir;
 use alloy_hir_resolved::{EPTdFql, TraitConstraint};
 use diagnostics::TypeInferenceErrorKind;
-use rustc_hash::{FxHashMap, FxHashSet};
+use rustc_hash::FxHashMap;
 
 /// Substitution mapping type variables to types
 #[derive(Debug, Clone)]
 pub struct Substitution {
     map: FxHashMap<TypeVarId, MonoType>,
-    constraints: FxHashMap<TypeVarId, FxHashSet<TraitConstraint>>,
+    constraints: FxHashMap<TypeVarId, Vec<TraitConstraint>>,
     source_fqls: FxHashMap<TypeVarId, EPTdFql>,
 }
 
@@ -35,7 +35,9 @@ impl Substitution {
         if let MonoType::ConstrainedVar(_, ref c) = ty {
             let store = self.constraints.entry(target).or_default();
             for constraint in c {
-                store.insert(constraint.clone());
+                if !store.iter().any(|existing| existing.trait_fql == constraint.trait_fql) {
+                    store.push(constraint.clone());
+                }
             }
         }
     }
@@ -65,7 +67,7 @@ impl Substitution {
                         MonoType::ConstrainedVar(v2, c2) => {
                             let mut merged = constraints.clone();
                             for c in c2 {
-                                if !merged.contains(&c) {
+                                if !merged.iter().any(|existing| existing.trait_fql == c.trait_fql) {
                                     merged.push(c);
                                 }
                             }
@@ -130,19 +132,21 @@ impl Substitution {
 
         for (var, cs) in &self.constraints {
             let target = result.apply_type_var(*var);
-            result
-                .constraints
-                .entry(target)
-                .or_default()
-                .extend(cs.iter().cloned());
+            let store = result.constraints.entry(target).or_default();
+            for c in cs {
+                if !store.iter().any(|existing| existing.trait_fql == c.trait_fql) {
+                    store.push(c.clone());
+                }
+            }
         }
         for (var, cs) in &other.constraints {
             let target = result.apply_type_var(*var);
-            result
-                .constraints
-                .entry(target)
-                .or_default()
-                .extend(cs.iter().cloned());
+            let store = result.constraints.entry(target).or_default();
+            for c in cs {
+                if !store.iter().any(|existing| existing.trait_fql == c.trait_fql) {
+                    store.push(c.clone());
+                }
+            }
         }
 
         result
@@ -320,7 +324,7 @@ pub(super) fn solve_equations(
     equations: Vec<TypeEquation>,
 ) -> (
     Substitution,
-    FxHashMap<TypeVarId, FxHashSet<TraitConstraint>>,
+    FxHashMap<TypeVarId, Vec<TraitConstraint>>,
     Vec<TypeInferenceError>,
 ) {
     let mut subst = Substitution::new();
@@ -344,12 +348,21 @@ pub(super) fn solve_equations(
         let resolved = subst.apply(&MonoType::Var(*var_id));
         for constraint in constraints {
             if !resolved.satisfies_constraint(db, constraint) {
-                let var_id1 = *var_id;
-                let range = subst.source_fqls[&var_id1].text_range(db);
+                let source_fql = &subst.source_fqls[var_id];
+                let range = source_fql.text_range(db);
+
+                let (hir_module, _) =
+                    hir::lower_file(db, constraint.type_var_constraint_fql.module_id);
+
+                let constraint_range = hir_module.get_type_variable_constraint_range(
+                    constraint.type_var_constraint_fql.local_id,
+                );
+
                 errors.push(TypeInferenceError::new(
                     TypeInferenceErrorKind::UnsatisfiedConstraint {
                         trait_fql_name: constraint.trait_fql_name.clone(),
                         type_name: format!("{resolved}"),
+                        constraint_range,
                     },
                     range,
                 ))
