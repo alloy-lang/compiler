@@ -6,7 +6,7 @@
 use crate::diagnostics::{ConflictingTypeAnnotationReason, TypeCheckingErrorKind};
 use crate::{HirTyDatabase, HirTypedModule};
 use alloy_hir_def as hir;
-use alloy_hir_def::TypeIdx;
+use alloy_hir_def::{ExpressionIdx, PatternIdx, TypeIdx};
 use alloy_hir_infer::InferredType;
 use alloy_hir_resolved as res;
 use alloy_hir_resolved::{resolve_annotated_type, AnnotatedType, Fql};
@@ -14,6 +14,21 @@ use alloy_workspace::ModuleId;
 use non_empty_vec::NonEmpty;
 use rustc_hash::FxHashMap;
 use text_size::TextRange;
+
+#[derive(Debug, Clone, Copy)]
+enum InferredSource {
+    Expression(ExpressionIdx),
+    Pattern(PatternIdx),
+    /// Inside a curried lambda — the HIR has a flat `Lambda { args, body }` but
+    /// the inferred type is curried (`A -> B -> C`). This variant walks through
+    /// args one at a time as the checker recurses through nested `Lambda` types.
+    /// Range resolution returns the whole lambda expression's range, since the
+    /// curried intermediate doesn't have its own distinct source span.
+    CurriedLambda {
+        expr_idx: ExpressionIdx,
+        arg_offset: usize,
+    },
+}
 
 pub(crate) fn validate_type_annotations(
     db: &dyn HirTyDatabase,
@@ -32,7 +47,15 @@ pub(crate) fn validate_type_annotations(
             // Validate arity of bounded types in the annotation
             validate_type_reference_arity(db, result, module_id, type_annotation);
             // Check for type annotation conflicts
-            check_type_annotation(db, result, module_id, range, type_annotation, resolved_type);
+            check_type_annotation(
+                db,
+                result,
+                module_id,
+                range,
+                type_annotation,
+                resolved_type,
+                idx,
+            );
         }
     }
 }
@@ -44,6 +67,7 @@ fn check_type_annotation(
     range: TextRange,
     type_annotation_idx: TypeIdx,
     resolved_type: InferredType,
+    expr_idx: ExpressionIdx,
 ) {
     let expected_type = resolve_annotated_type(db, current_module_id, type_annotation_idx);
     let (hir_module, _) = hir::lower_file(db, current_module_id);
@@ -59,9 +83,12 @@ fn check_type_annotation(
 
     // Check if the inferred type is compatible with the expected type
     let mut checker = TypeAnnotationChecker::new(db, current_module_id);
-    if let Err(reason) =
-        checker.check_type_compatibility(&expected_type, &resolved_type, type_annotation_idx)
-    {
+    if let Err(reason) = checker.check_type_compatibility(
+        &expected_type,
+        &resolved_type,
+        type_annotation_idx,
+        InferredSource::Expression(expr_idx),
+    ) {
         result.error(
             TypeCheckingErrorKind::ConflictingTypeAnnotation {
                 annotated_type: expected_type,
@@ -85,23 +112,34 @@ type GenericMapping = FxHashMap<usize, AnnotationVarId>;
 
 struct TypeAnnotationChecker<'db> {
     db: &'db dyn HirTyDatabase,
-    module_id: ModuleId,
+    hir_module: hir::HirModule,
     generic_mapping: GenericMapping,
 }
 
 impl<'db> TypeAnnotationChecker<'db> {
     fn new(db: &'db dyn HirTyDatabase, module_id: ModuleId) -> Self {
+        let (hir_module, _) = hir::lower_file(db, module_id);
         Self {
             db,
-            module_id,
+            hir_module,
             generic_mapping: GenericMapping::default(),
         }
     }
 
     /// Look up the source range for a type annotation index.
     fn annotation_range(&self, type_idx: TypeIdx) -> TextRange {
-        let (hir_module, _) = hir::lower_file(self.db, self.module_id);
-        hir_module.get_type_reference_range(type_idx)
+        self.hir_module.get_type_reference_range(type_idx)
+    }
+
+    /// Look up the source range for an inferred type source.
+    fn inferred_range(&self, source: InferredSource) -> TextRange {
+        match source {
+            InferredSource::Expression(idx) => self.hir_module.get_expression_range(idx),
+            InferredSource::Pattern(idx) => self.hir_module.get_pattern_range(idx),
+            InferredSource::CurriedLambda { expr_idx, .. } => {
+                self.hir_module.get_expression_range(expr_idx)
+            }
+        }
     }
 
     fn direct_conflict(
@@ -109,28 +147,69 @@ impl<'db> TypeAnnotationChecker<'db> {
         expected: &AnnotatedType,
         found: &InferredType,
         type_idx: TypeIdx,
+        source: InferredSource,
     ) -> ConflictingTypeAnnotationReason {
         ConflictingTypeAnnotationReason::DirectConflict {
             expected_type: expected.clone(),
             expected_type_range: self.annotation_range(type_idx),
             actual_type: found.clone(),
-            actual_type_range: Default::default(), // TODO: track inferred type ranges for better error reporting
+            actual_type_range: self.inferred_range(source),
+        }
+    }
+
+    /// Decompose an `InferredSource` for a Lambda type's arg and return positions.
+    ///
+    /// When the source points at a lambda expression (`|x, y| -> body`), the
+    /// curried type `A -> B -> C` maps to:
+    ///   - arg: the pattern for `args[offset]`
+    ///   - ret: either the next curried arg or the body expression
+    fn lambda_sources(
+        &self,
+        source: InferredSource,
+    ) -> (InferredSource, InferredSource) {
+        let (expr_idx, offset) = match source {
+            InferredSource::Expression(idx) => (idx, 0),
+            InferredSource::CurriedLambda {
+                expr_idx,
+                arg_offset,
+            } => (expr_idx, arg_offset),
+            // Pattern source doesn't decompose into lambda parts
+            InferredSource::Pattern(_) => return (source, source),
+        };
+
+        let expr = self.hir_module.get_expression(expr_idx);
+        match expr {
+            hir::Expression::Lambda { args, body } if offset < args.len() => {
+                let arg_source = InferredSource::Pattern(args[offset]);
+                let ret_source = if offset + 1 < args.len() {
+                    InferredSource::CurriedLambda {
+                        expr_idx,
+                        arg_offset: offset + 1,
+                    }
+                } else {
+                    InferredSource::Expression(*body)
+                };
+                (arg_source, ret_source)
+            }
+            _ => (source, source),
         }
     }
 
     /// Check if the `found` type is compatible with the `expected` annotation type.
     /// `type_idx` is the HIR type reference index for the annotation, used to look up source ranges.
+    /// `inferred_source` tracks the position in the inferred type tree for error ranges.
     fn check_type_compatibility(
         &mut self,
         expected: &AnnotatedType,
         found: &InferredType,
         expected_type_idx: TypeIdx,
+        inferred_source: InferredSource,
     ) -> Result<(), ConflictingTypeAnnotationReason> {
         match (expected, found) {
             // Wildcards on either side
             (AnnotatedType::Unconstrained, _) | (_, InferredType::Unconstrained) => Ok(()),
             (AnnotatedType::Missing, _) | (_, InferredType::Missing) => {
-                Err(self.direct_conflict(expected, found, expected_type_idx))
+                Err(self.direct_conflict(expected, found, expected_type_idx, inferred_source))
             }
 
             // Unit
@@ -152,6 +231,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                     expected,
                     found,
                     expected_type_idx,
+                    inferred_source,
                 ),
             // Unconstrained annotation type var vs constrained inferred generic — insufficient
             (AnnotatedType::TypeVar(atv), InferredType::ConstrainedGeneric { id, constraints }) => {
@@ -161,6 +241,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                     expected,
                     found,
                     expected_type_idx,
+                    inferred_source,
                 )?;
                 check_constraint_sufficiency(self.db, &[], constraints)
             }
@@ -173,6 +254,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                     expected,
                     found,
                     expected_type_idx,
+                    inferred_source,
                 ),
             (
                 AnnotatedType::ConstrainedTypeVar {
@@ -190,6 +272,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                     expected,
                     found,
                     expected_type_idx,
+                    inferred_source,
                 )?;
                 check_constraint_sufficiency(self.db, annotation_constraints, inferred_constraints)
             }
@@ -203,6 +286,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                     expected,
                     found,
                     expected_type_idx,
+                    inferred_source,
                 ),
             (
                 AnnotatedType::SelfType { trait_fql, .. },
@@ -213,6 +297,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                 expected,
                 found,
                 expected_type_idx,
+                inferred_source,
             ),
             (
                 AnnotatedType::SelfType {
@@ -230,32 +315,30 @@ impl<'db> TypeAnnotationChecker<'db> {
                     return_type,
                 },
             ) => {
-                let (hir_module, _) = hir::lower_file(self.db, self.module_id);
-                let type_ref = hir_module.get_type_reference(expected_type_idx);
-                match type_ref {
+                let (arg_idx, ret_idx) = match self.hir_module.get_type_reference(expected_type_idx)
+                {
                     hir::TypeReference::Lambda {
-                        arg_type: arg_idx,
-                        return_type: ret_idx,
-                    } => {
-                        self.check_type_compatibility(arg, arg_type, *arg_idx)?;
-                        self.check_type_compatibility(ret, return_type, *ret_idx)?;
-                    }
-                    _ => {
-                        self.check_type_compatibility(arg, arg_type, expected_type_idx)?;
-                        self.check_type_compatibility(ret, return_type, expected_type_idx)?;
-                    }
-                }
+                        arg_type, return_type, ..
+                    } => (*arg_type, *return_type),
+                    _ => (expected_type_idx, expected_type_idx),
+                };
+                let (arg_source, ret_source) = self.lambda_sources(inferred_source);
+                self.check_type_compatibility(arg, arg_type, arg_idx, arg_source)?;
+                self.check_type_compatibility(ret, return_type, ret_idx, ret_source)?;
                 Ok(())
             }
 
             // Tuple types
             (AnnotatedType::Tuple(exp_elems), InferredType::Tuple(found_elems)) => {
                 if exp_elems.len() != found_elems.len() {
-                    return Err(self.direct_conflict(expected, found, expected_type_idx));
+                    return Err(self.direct_conflict(
+                        expected,
+                        found,
+                        expected_type_idx,
+                        inferred_source,
+                    ));
                 }
-                let (hir_module, _) = hir::lower_file(self.db, self.module_id);
-                let type_ref = hir_module.get_type_reference(expected_type_idx);
-                let elem_indices = match type_ref {
+                let elem_indices = match self.hir_module.get_type_reference(expected_type_idx) {
                     hir::TypeReference::Tuple(indices) => Some(indices.clone()),
                     _ => None,
                 };
@@ -266,7 +349,12 @@ impl<'db> TypeAnnotationChecker<'db> {
                         .as_ref()
                         .and_then(|indices| indices.get(i).copied())
                         .unwrap_or(expected_type_idx);
-                    self.check_type_compatibility(exp_elem, found_elem, elem_idx)?;
+                    self.check_type_compatibility(
+                        exp_elem,
+                        found_elem,
+                        elem_idx,
+                        inferred_source,
+                    )?;
                 }
                 Ok(())
             }
@@ -296,28 +384,49 @@ impl<'db> TypeAnnotationChecker<'db> {
                 },
             ) => {
                 if exp_args.len() != found_args.len() {
-                    return Err(self.direct_conflict(expected, found, expected_type_idx));
+                    return Err(self.direct_conflict(
+                        expected,
+                        found,
+                        expected_type_idx,
+                        inferred_source,
+                    ));
                 }
-                let (hir_module, _) = hir::lower_file(self.db, self.module_id);
-                let type_ref = hir_module.get_type_reference(expected_type_idx);
-                let (base_idx, arg_indices) = match type_ref {
-                    hir::TypeReference::Bounded { base, args } => (*base, Some(args.clone())),
-                    _ => (expected_type_idx, None),
-                };
-                self.check_type_compatibility(exp_base, found_base, base_idx)?;
+                let (base_idx, arg_indices) =
+                    match self.hir_module.get_type_reference(expected_type_idx) {
+                        hir::TypeReference::Bounded { base, args } => {
+                            (*base, Some(args.clone()))
+                        }
+                        _ => (expected_type_idx, None),
+                    };
+                self.check_type_compatibility(
+                    exp_base,
+                    found_base,
+                    base_idx,
+                    inferred_source,
+                )?;
                 for (i, (exp_arg, found_arg)) in exp_args.iter().zip(found_args.iter()).enumerate()
                 {
                     let arg_idx = arg_indices
                         .as_ref()
                         .and_then(|indices| indices.get(i).copied())
                         .unwrap_or(expected_type_idx);
-                    self.check_type_compatibility(exp_arg, found_arg, arg_idx)?;
+                    self.check_type_compatibility(
+                        exp_arg,
+                        found_arg,
+                        arg_idx,
+                        inferred_source,
+                    )?;
                 }
                 Ok(())
             }
 
             // Everything else is incompatible
-            _ => Err(self.direct_conflict(expected, found, expected_type_idx)),
+            _ => Err(self.direct_conflict(
+                expected,
+                found,
+                expected_type_idx,
+                inferred_source,
+            )),
         }
     }
 
@@ -329,10 +438,11 @@ impl<'db> TypeAnnotationChecker<'db> {
         expected: &AnnotatedType,
         found: &InferredType,
         type_idx: TypeIdx,
+        inferred_source: InferredSource,
     ) -> Result<(), ConflictingTypeAnnotationReason> {
         if let Some(prev_var) = self.generic_mapping.get(&generic_id) {
             if *prev_var != var_id {
-                return Err(self.direct_conflict(expected, found, type_idx));
+                return Err(self.direct_conflict(expected, found, type_idx, inferred_source));
             }
         } else {
             self.generic_mapping.insert(generic_id, var_id);

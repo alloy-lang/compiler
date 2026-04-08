@@ -93,7 +93,7 @@ HirTypedModule {
                     actual_type: Generic(
                         0,
                     ),
-                    actual_type_range: 0..0,
+                    actual_type_range: 67..68,
                 },
             },
             range: 54..80,
@@ -116,20 +116,12 @@ HirTypedModule {
    │
  3 │ typeof test1 : self -> String
    │                ───────┬──────  
-   │                       ╰──────── The type annotation here says `<missing> -> String`
+   │                       ╰──────── The type annotation says `<missing> -> String`
  4 │ let test1 = |x| -> "hello"
    │ ─────────────┬────────────  
-   │              ╰────────────── but type inference determined this to be `t0 -> String`
-   │
-   ├─[ ./test/main.alloy:4:1 ]
-   │
- 1 │ import test_data::Test
-   │ │ 
-   │ ╰─ Specifically, the annotation expects `t0`
-   │ 
- 3 │ typeof test1 : self -> String
-   │                ──┬─  
-   │                  ╰─── to be `<missing>`
+   │              ╰────────────── this is `t0`, but the annotation expects `<missing>`
+   │              │              
+   │              ╰────────────── but the body has type `t0 -> String`
 ───╯
 
 

@@ -165,7 +165,7 @@ HirTypedModule {
                             ),
                         ],
                     },
-                    actual_type_range: 0..0,
+                    actual_type_range: 43..62,
                 },
             },
             range: 43..62,
@@ -196,20 +196,10 @@ HirTypedModule {
    │
  3 │ typeof wrong : Box
    │                ─┬─  
-   │                 ╰─── The type annotation here says `Box`
+   │                 ╰─── The type annotation says `Box`
  4 │ let wrong = Box(42)
    │ ─────────┬─────────  
-   │          ╰─────────── but type inference determined this to be `Box[Int]`
-   │
-   ├─[ ./test/main.alloy:4:1 ]
-   │
- 1 │ typedef Box[t] = Box t
-   │ │ 
-   │ ╰─ Specifically, the annotation expects `Box[Int]`
-   │ 
- 3 │ typeof wrong : Box
-   │                ─┬─  
-   │                 ╰─── to be `Box`
+   │          ╰─────────── but the body has type `Box[Int]`
 ───╯
 
 

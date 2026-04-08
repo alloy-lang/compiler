@@ -90,19 +90,25 @@ impl Diagnostic for TypeCheckingError {
             TypeCheckingErrorKind::ConflictingTypeAnnotation { annotated_type, annotation_range, value_type, value_range, reason,  } => {
                 match reason {
                     ConflictingTypeAnnotationReason::DirectConflict { expected_type, expected_type_range, actual_type, actual_type_range } => {
-                        builder
+                        let builder = builder
                             .with_label(
-                                DiagnosticLabel::new(*annotation_range, format!("The type annotation here says `{annotated_type}`"))
+                                DiagnosticLabel::new(*annotation_range, format!("The type annotation says `{annotated_type}`"))
                             )
                             .with_label(
-                                DiagnosticLabel::new(*value_range, format!("but type inference determined this to be `{value_type}`"))
+                                DiagnosticLabel::new(*value_range, format!("but the body has type `{value_type}`"))
+                            );
+
+                        // Only show sub-type detail when it points at a narrower
+                        // range than the top-level labels — otherwise it's redundant.
+                        // Combine into a single label on the inferred side to avoid
+                        // splitting the output into multiple source sections.
+                        if *actual_type_range != *value_range || *expected_type_range != *annotation_range {
+                            builder.with_label(
+                                DiagnosticLabel::new(*actual_type_range, format!("this is `{actual_type}`, but the annotation expects `{expected_type}`"))
                             )
-                            .with_label(
-                                DiagnosticLabel::new(*actual_type_range, format!("Specifically, the annotation expects `{actual_type}`"))
-                            )
-                            .with_label(
-                                DiagnosticLabel::new(*expected_type_range, format!("to be `{expected_type}`"))
-                            )
+                        } else {
+                            builder
+                        }
                     }
                     ConflictingTypeAnnotationReason::MissingBehaviorImplementation { trait_name, type_name } => {
                         builder

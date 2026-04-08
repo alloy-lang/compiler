@@ -82,7 +82,7 @@ HirTypedModule {
                     actual_type: Generic(
                         0,
                     ),
-                    actual_type_range: 0..0,
+                    actual_type_range: 69..70,
                 },
             },
             range: 53..70,
@@ -95,19 +95,13 @@ HirTypedModule {
    │
  1 │ typeof id : a -> b where
    │             ───┬──  
-   │                ╰──── The type annotation here says `a -> b`
+   │                ╰──── The type annotation says `a -> b`
    │ 
  4 │ let id = |x| -> x
-   │ ────────┬────────  
-   │         ╰────────── but type inference determined this to be `t0 -> t0`
-   │
-   ├─[ ./test/main.alloy:4:1 ]
-   │
- 1 │ typeof id : a -> b where
-   │ │                ┬  
-   │ ╰─────────────────── Specifically, the annotation expects `t0`
-   │                  │  
-   │                  ╰── to be `b`
+   │ ────────┬───────┬  
+   │         ╰────────── but the body has type `t0 -> t0`
+   │                 │  
+   │                 ╰── this is `t0`, but the annotation expects `b`
 ───╯
 
 
