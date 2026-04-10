@@ -14,7 +14,7 @@ pub use hm::unification::UnificationError;
 /// Display-only metadata that does not participate in equality or hashing.
 /// Used to carry human-readable type variable names through to error messages
 /// without affecting type identity.
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct DisplayName(pub String);
 
 impl DisplayName {
@@ -25,20 +25,8 @@ impl DisplayName {
 
 impl std::fmt::Debug for DisplayName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "\"{}\"", self.0)
+        write!(f, "{:?}", self.0)
     }
-}
-
-impl PartialEq for DisplayName {
-    fn eq(&self, _other: &Self) -> bool {
-        true
-    }
-}
-
-impl Eq for DisplayName {}
-
-impl Hash for DisplayName {
-    fn hash<H: std::hash::Hasher>(&self, _state: &mut H) {}
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

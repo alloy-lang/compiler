@@ -471,7 +471,7 @@ mod hir_ty_small_tests {
                 "f",
                 0,
                 InferredType::Lambda {
-                    arg_type: Box::new(InferredType::Generic(0, DisplayName::new(""))),
+                    arg_type: Box::new(InferredType::Generic(0, DisplayName::new("a0"))),
                     return_type: Box::new(InferredType::BuiltIn(hir::BuiltInType::Int)),
                 },
             )],
@@ -501,9 +501,9 @@ mod hir_ty_small_tests {
                 "f",
                 0,
                 InferredType::Lambda {
-                    arg_type: Box::new(InferredType::Generic(0, DisplayName::new(""))),
+                    arg_type: Box::new(InferredType::Generic(0, DisplayName::new("a0"))),
                     return_type: Box::new(InferredType::Lambda {
-                        arg_type: Box::new(InferredType::Generic(1, DisplayName::new(""))),
+                        arg_type: Box::new(InferredType::Generic(1, DisplayName::new("b0"))),
                         return_type: Box::new(InferredType::Bounded {
                             base: Box::new(InferredType::TypeDef(
                                 Fql::new(other_module_id, idx!(0)),

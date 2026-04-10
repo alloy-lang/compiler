@@ -198,8 +198,8 @@ mod tests {
         assert_eq!(
             sig,
             InferredType::Lambda {
-                arg_type: Box::new(InferredType::Generic(0, DisplayName::new(""))),
-                return_type: Box::new(InferredType::Generic(0, DisplayName::new(""))),
+                arg_type: Box::new(InferredType::Generic(0, DisplayName::new("t1"))),
+                return_type: Box::new(InferredType::Generic(0, DisplayName::new("t1"))),
             }
         );
     }
