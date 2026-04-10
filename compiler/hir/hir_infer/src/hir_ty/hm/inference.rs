@@ -28,9 +28,8 @@ pub(crate) fn infer_body_type<'db>(
 
     if let Some(type_annotation) = value_def.type_annotation(db) {
         let annotated = resolve_annotated_type(db, module_id, type_annotation);
-        if let Some(annotated_mono) = ctx.converter.annotated_to_mono(&annotated) {
-            ctx.add_equation(inferred_mono, annotated_mono, expr_fql);
-        }
+        let annotated_mono = ctx.converter.annotated_to_mono(&annotated);
+        ctx.add_equation(inferred_mono, annotated_mono, expr_fql);
     }
 
     collect_inference_results(&mut ctx, module_id)

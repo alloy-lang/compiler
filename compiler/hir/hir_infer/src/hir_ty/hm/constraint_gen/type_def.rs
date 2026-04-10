@@ -100,9 +100,7 @@ fn build_constructor_type(
         .iter()
         .map(|type_idx| {
             let annotated = resolve_annotated_type(ctx.db, type_idx.module_id, type_idx.local_id);
-            ctx.converter
-                .annotated_to_mono(&annotated)
-                .unwrap_or_else(|| ctx.fresh_type_var())
+            ctx.converter.annotated_to_mono(&annotated)
         })
         .rev()
         .fold(result_type, |acc, param_ty| {

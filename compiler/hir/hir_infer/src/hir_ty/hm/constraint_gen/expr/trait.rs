@@ -12,12 +12,8 @@ pub(super) fn infer_abstract_member_ref(
     let annotated =
         res::resolve_annotated_type(ctx.db, type_annotation.module_id, type_annotation.local_id);
 
-    if let Some(mono_ty) = ctx.converter.annotated_to_mono(&annotated) {
-        return ctx.assign_type(source_fql, mono_ty);
-    }
-
-    let ty = ctx.fresh_type_var();
-    ctx.assign_type(source_fql, ty)
+    let mono_ty = ctx.converter.annotated_to_mono(&annotated);
+    ctx.assign_type(source_fql, mono_ty)
 }
 
 pub(super) fn infer_abstract_member_call(

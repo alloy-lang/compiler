@@ -15,9 +15,8 @@ HirTypedModule {
                 "a0",
             ),
             return_type: Lambda {
-                arg_type: Generic(
-                    1,
-                    "b0",
+                arg_type: BuiltIn(
+                    Int,
                 ),
                 return_type: BuiltIn(
                     String,
@@ -30,9 +29,8 @@ HirTypedModule {
             0,
             "a0",
         ),
-        Idx::<Pattern>(1): Generic(
-            1,
-            "b0",
+        Idx::<Pattern>(1): BuiltIn(
+            Int,
         ),
     },
     warnings: [],
@@ -57,9 +55,8 @@ HirTypedModule {
                         "a0",
                     ),
                     return_type: Lambda {
-                        arg_type: Generic(
-                            1,
-                            "b0",
+                        arg_type: BuiltIn(
+                            Int,
                         ),
                         return_type: BuiltIn(
                             String,
@@ -100,7 +97,7 @@ HirTypedModule {
    │ ────────────┬─┬─────────────  
    │             ╰───────────────── this is `a0`, but the annotation expects `<missing>`
    │               │               
-   │               ╰─────────────── but the body has type `a0 -> b0 -> String`
+   │               ╰─────────────── but the body has type `a0 -> Int -> String`
 ───╯
 
 

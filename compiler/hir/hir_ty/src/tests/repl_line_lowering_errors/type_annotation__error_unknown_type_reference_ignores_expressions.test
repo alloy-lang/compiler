@@ -15,14 +15,13 @@ HirTypedModule {
             String,
         ),
         Idx::<Expression>(2): Lambda {
-            arg_type: Generic(
-                0,
-                "a0",
+            arg_type: BuiltIn(
+                Int,
             ),
             return_type: Lambda {
                 arg_type: Generic(
-                    1,
-                    "b0",
+                    0,
+                    "a0",
                 ),
                 return_type: BuiltIn(
                     String,
@@ -31,13 +30,12 @@ HirTypedModule {
         },
     },
     pattern_types: {
-        Idx::<Pattern>(0): Generic(
-            0,
-            "a0",
+        Idx::<Pattern>(0): BuiltIn(
+            Int,
         ),
         Idx::<Pattern>(1): Generic(
-            1,
-            "b0",
+            0,
+            "a0",
         ),
     },
     warnings: [],
@@ -57,14 +55,13 @@ HirTypedModule {
                 },
                 annotation_range: 31..55,
                 value_type: Lambda {
-                    arg_type: Generic(
-                        0,
-                        "a0",
+                    arg_type: BuiltIn(
+                        Int,
                     ),
                     return_type: Lambda {
                         arg_type: Generic(
-                            1,
-                            "b0",
+                            0,
+                            "a0",
                         ),
                         return_type: BuiltIn(
                             String,
@@ -73,15 +70,13 @@ HirTypedModule {
                 },
                 value_range: 62..90,
                 reason: DirectConflict {
-                    expected_type: BuiltIn(
-                        Int,
-                    ),
-                    expected_type_range: 31..34,
+                    expected_type: Missing,
+                    expected_type_range: 38..45,
                     actual_type: Generic(
                         0,
                         "a0",
                     ),
-                    actual_type_range: 74..75,
+                    actual_type_range: 77..78,
                 },
             },
             range: 62..90,
@@ -104,10 +99,10 @@ HirTypedModule {
    │               ────────────┬───────────  
    │                           ╰───────────── The type annotation says `Int -> <missing> -> String`
  4 │ let test = |x, y| -> "hello"
-   │ ────────────┬─┬─────────────  
-   │             ╰───────────────── this is `a0`, but the annotation expects `Int`
-   │               │               
-   │               ╰─────────────── but the body has type `a0 -> b0 -> String`
+   │ ──────────────┬┬────────────  
+   │               ╰─────────────── but the body has type `Int -> a0 -> String`
+   │                │              
+   │                ╰────────────── this is `a0`, but the annotation expects `<missing>`
 ───╯
 
 

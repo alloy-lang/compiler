@@ -142,12 +142,12 @@ impl ToMonoTypeConverter {
         }
     }
 
-    pub(super) fn annotated_to_mono(&mut self, annotated: &AnnotatedType) -> Option<MonoType> {
+    pub(super) fn annotated_to_mono(&mut self, annotated: &AnnotatedType) -> MonoType {
         match annotated {
-            AnnotatedType::Missing => None,
-            AnnotatedType::Unconstrained => Some(MonoType::Unconstrained),
-            AnnotatedType::Unit => Some(MonoType::Unit),
-            AnnotatedType::BuiltIn(builtin) => Some(MonoType::Concrete(*builtin)),
+            AnnotatedType::Missing => MonoType::Var(self.fresh_type_var()),
+            AnnotatedType::Unconstrained => MonoType::Unconstrained,
+            AnnotatedType::Unit => MonoType::Unit,
+            AnnotatedType::BuiltIn(builtin) => MonoType::Concrete(*builtin),
             AnnotatedType::TypeDef {
                 fql,
                 name,
@@ -162,44 +162,40 @@ impl ToMonoTypeConverter {
                         )
                     })
                     .collect::<Vec<_>>();
-                Some(MonoType::TypeDef {
+                MonoType::TypeDef {
                     fql: fql.clone(),
                     type_args,
                     type_def_name: name.clone(),
-                })
+                }
             }
             AnnotatedType::Lambda { arg, ret } => {
-                let arg_mono = self.annotated_to_mono(arg)?;
-                let ret_mono = self.annotated_to_mono(ret)?;
-                Some(MonoType::Function(Box::new(arg_mono), Box::new(ret_mono)))
+                let arg_mono = self.annotated_to_mono(arg);
+                let ret_mono = self.annotated_to_mono(ret);
+                MonoType::Function(Box::new(arg_mono), Box::new(ret_mono))
             }
             AnnotatedType::Tuple(elements) => {
-                let mono_elements: Option<Vec<_>> =
+                let mono_elements: Vec<_> =
                     elements.iter().map(|e| self.annotated_to_mono(e)).collect();
-                mono_elements.map(MonoType::Tuple)
+                MonoType::Tuple(mono_elements)
             }
             AnnotatedType::Bounded { base, args } => {
-                let base_mono = self.annotated_to_mono(base)?;
-                let args_mono: Option<Vec<_>> =
-                    args.iter().map(|a| self.annotated_to_mono(a)).collect();
-                Some(MonoType::App {
+                let base_mono = self.annotated_to_mono(base);
+                let args_mono: Vec<_> = args.iter().map(|a| self.annotated_to_mono(a)).collect();
+                MonoType::App {
                     constructor: Box::new(base_mono),
-                    args: args_mono?,
-                })
+                    args: args_mono,
+                }
             }
             AnnotatedType::TypeVar(AnnotatedTypeVar { name, fql, .. }) => {
                 let var_id = self.get_or_create_annotation_type_var(fql.clone(), name.clone());
-                Some(MonoType::Var(var_id))
+                MonoType::Var(var_id)
             }
             AnnotatedType::ConstrainedTypeVar {
                 base: AnnotatedTypeVar { name, fql, .. },
                 constraints,
             } => {
                 let var_id = self.get_or_create_annotation_type_var(fql.clone(), name.clone());
-                Some(MonoType::ConstrainedVar(
-                    var_id,
-                    constraints.iter().cloned().collect(),
-                ))
+                MonoType::ConstrainedVar(var_id, constraints.iter().cloned().collect())
             }
             AnnotatedType::SelfType {
                 trait_fql,
@@ -213,7 +209,7 @@ impl ToMonoTypeConverter {
                         constraints.push(constraint.clone());
                     }
                 }
-                Some(MonoType::ConstrainedVar(var_id, constraints))
+                MonoType::ConstrainedVar(var_id, constraints)
             }
         }
     }
