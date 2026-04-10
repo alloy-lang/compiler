@@ -11,6 +11,7 @@ HirTypedModule {
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
                 0,
+                "a0",
             ),
             return_type: Lambda {
                 arg_type: BuiltIn(
@@ -30,6 +31,7 @@ HirTypedModule {
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             0,
+            "a0",
         ),
         Idx::<Pattern>(1): BuiltIn(
             Int,

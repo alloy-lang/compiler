@@ -31,6 +31,7 @@ DefinitionInferenceResult {
         Idx::<Expression>(1): Lambda {
             arg_type: ConstrainedGeneric {
                 id: 0,
+                name: "t1",
                 constraints: NonEmpty(
                     [
                         TraitConstraint {
@@ -54,6 +55,7 @@ DefinitionInferenceResult {
             return_type: Lambda {
                 arg_type: Generic(
                     1,
+                    "t2",
                 ),
                 return_type: Bounded {
                     base: TypeDef(
@@ -77,6 +79,7 @@ DefinitionInferenceResult {
     pattern_types: {
         Idx::<Pattern>(0): ConstrainedGeneric {
             id: 0,
+            name: "t1",
             constraints: NonEmpty(
                 [
                     TraitConstraint {
@@ -99,6 +102,7 @@ DefinitionInferenceResult {
         },
         Idx::<Pattern>(1): Generic(
             1,
+            "t2",
         ),
     },
     variant_constructor_types: {},

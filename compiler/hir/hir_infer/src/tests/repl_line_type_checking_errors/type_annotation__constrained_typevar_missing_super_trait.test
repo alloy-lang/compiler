@@ -56,7 +56,15 @@ DefinitionInferenceResult {
         TypeInferenceError {
             kind: UnsatisfiedConstraint {
                 trait_fql_name: "std::eq::Eq",
-                type_name: "Foo",
+                resolved_type: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "main",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Foo",
+                ),
                 constraint_range: 234..236,
             },
             range: 163..181,

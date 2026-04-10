@@ -11,13 +11,16 @@ DefinitionInferenceResult {
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
                 0,
+                "t1",
             ),
             return_type: Generic(
                 0,
+                "t1",
             ),
         },
         Idx::<Expression>(2): BuiltIn(
@@ -36,6 +39,7 @@ DefinitionInferenceResult {
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             0,
+            "a0",
         ),
     },
     variant_constructor_types: {},

@@ -12,6 +12,7 @@ HirTypedModule {
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(1): Lambda {
             arg_type: Bounded {
@@ -27,6 +28,7 @@ HirTypedModule {
                 args: [
                     Generic(
                         0,
+                        "t2",
                     ),
                 ],
             },
@@ -43,6 +45,7 @@ HirTypedModule {
                 args: [
                     Generic(
                         0,
+                        "t2",
                     ),
                 ],
             },
@@ -51,6 +54,7 @@ HirTypedModule {
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             0,
+            "a0",
         ),
     },
     warnings: [],
@@ -146,6 +150,7 @@ HirTypedModule {
                         args: [
                             Generic(
                                 0,
+                                "t2",
                             ),
                         ],
                     },
@@ -162,6 +167,7 @@ HirTypedModule {
                         args: [
                             Generic(
                                 0,
+                                "t2",
                             ),
                         ],
                     },
@@ -183,6 +189,7 @@ HirTypedModule {
                     expected_type_range: 56..58,
                     actual_type: Generic(
                         0,
+                        "t2",
                     ),
                     actual_type_range: 115..116,
                 },
@@ -211,9 +218,9 @@ HirTypedModule {
    │ 
  6 │ let apply = |x| -> x
    │ ──────────┬────────┬  
-   │           ╰─────────── but the body has type `Test[t0] -> Test[t0]`
+   │           ╰─────────── but the body has type `Test[t2] -> Test[t2]`
    │                    │  
-   │                    ╰── this is `t0`, but the annotation expects `t2`
+   │                    ╰── this is `t2`, but the annotation expects `t2`
 ───╯
 
 

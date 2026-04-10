@@ -18,6 +18,7 @@ non-empty-vec = { workspace = true }
 salsa = { workspace = true }
 text-size = { workspace = true }
 itertools = { workspace = true }
+log = "0.4.29"
 
 [dev-dependencies]
 alloy_test_harness = { workspace = true }

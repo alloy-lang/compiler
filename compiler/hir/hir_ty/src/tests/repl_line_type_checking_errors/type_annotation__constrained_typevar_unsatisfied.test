@@ -39,7 +39,15 @@ HirTypedModule {
                 TypeInferenceError {
                     kind: UnsatisfiedConstraint {
                         trait_fql_name: "std::order::Ord",
-                        type_name: "Foo",
+                        resolved_type: TypeDef(
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<TypeDefinition>(0),
+                            },
+                            "Foo",
+                        ),
                         constraint_range: 157..160,
                     },
                     range: 161..179,

@@ -24,6 +24,7 @@ HirTypedModule {
                 args: [
                     Generic(
                         0,
+                        "a0",
                     ),
                 ],
             },
@@ -46,6 +47,7 @@ HirTypedModule {
             args: [
                 Generic(
                     0,
+                    "a0",
                 ),
             ],
         },

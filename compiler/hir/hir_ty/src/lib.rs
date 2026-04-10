@@ -149,7 +149,7 @@ mod hir_ty_small_tests {
     use crate::diagnostics::TypeCheckingError;
     use crate::tests::TestHirTyDatabase;
     use alloy_hir_def as hir;
-    use alloy_hir_infer::InferredType;
+    use alloy_hir_infer::{DisplayName, InferredType};
     use alloy_hir_resolved::{Fql, TraitConstraint};
     use alloy_test_harness::idx;
     use alloy_workspace::{ModuleId, WorkspaceDatabase};
@@ -308,6 +308,7 @@ mod hir_ty_small_tests {
     #[test]
     fn infer_variable_ref_unused_lambda() {
         let mut db = TestHirTyDatabase::default();
+        let type_var = InferredType::Generic(0, DisplayName::new("a0"));
         check_named(
             &mut db,
             "let x = |a, b| -> a + b",
@@ -315,10 +316,10 @@ mod hir_ty_small_tests {
                 "x",
                 0,
                 InferredType::Lambda {
-                    arg_type: Box::new(InferredType::Generic(0)),
+                    arg_type: Box::new(type_var.clone()),
                     return_type: Box::new(InferredType::Lambda {
-                        arg_type: Box::new(InferredType::Generic(0)),
-                        return_type: Box::new(InferredType::Generic(0)),
+                        arg_type: Box::new(type_var.clone()),
+                        return_type: Box::new(type_var.clone()),
                     }),
                 },
             )],
@@ -328,6 +329,7 @@ mod hir_ty_small_tests {
     #[test]
     fn infer_lambda_based_on_usage() {
         let mut db = TestHirTyDatabase::default();
+        let type_var = InferredType::Generic(0, DisplayName::new("a0"));
         check_named(
             &mut db,
             r#"
@@ -339,10 +341,10 @@ mod hir_ty_small_tests {
                     "x",
                     0,
                     InferredType::Lambda {
-                        arg_type: Box::new(InferredType::Generic(0)),
+                        arg_type: Box::new(type_var.clone()),
                         return_type: Box::new(InferredType::Lambda {
-                            arg_type: Box::new(InferredType::Generic(0)),
-                            return_type: Box::new(InferredType::Generic(0)),
+                            arg_type: Box::new(type_var.clone()),
+                            return_type: Box::new(type_var.clone()),
                         }),
                     },
                 ),
@@ -395,6 +397,7 @@ mod hir_ty_small_tests {
     #[test]
     fn let_polymorphism_identity_function() {
         let mut db = TestHirTyDatabase::default();
+        let type_var_t1 = InferredType::Generic(0, DisplayName::new("t1"));
         check_named(
             &mut db,
             r#"
@@ -410,8 +413,8 @@ mod hir_ty_small_tests {
                     "id",
                     0,
                     InferredType::Lambda {
-                        arg_type: Box::new(InferredType::Generic(0)),
-                        return_type: Box::new(InferredType::Generic(0)),
+                        arg_type: Box::new(type_var_t1.clone()),
+                        return_type: Box::new(type_var_t1.clone()),
                     },
                 ),
                 (
@@ -468,7 +471,7 @@ mod hir_ty_small_tests {
                 "f",
                 0,
                 InferredType::Lambda {
-                    arg_type: Box::new(InferredType::Generic(0)),
+                    arg_type: Box::new(InferredType::Generic(0, DisplayName::new(""))),
                     return_type: Box::new(InferredType::BuiltIn(hir::BuiltInType::Int)),
                 },
             )],
@@ -498,9 +501,9 @@ mod hir_ty_small_tests {
                 "f",
                 0,
                 InferredType::Lambda {
-                    arg_type: Box::new(InferredType::Generic(0)),
+                    arg_type: Box::new(InferredType::Generic(0, DisplayName::new(""))),
                     return_type: Box::new(InferredType::Lambda {
-                        arg_type: Box::new(InferredType::Generic(1)),
+                        arg_type: Box::new(InferredType::Generic(1, DisplayName::new(""))),
                         return_type: Box::new(InferredType::Bounded {
                             base: Box::new(InferredType::TypeDef(
                                 Fql::new(other_module_id, idx!(0)),
@@ -554,18 +557,20 @@ mod hir_ty_small_tests {
         let ord_constraint = TraitConstraint {
             trait_fql: Fql::new(stdlib_order, idx!(0)),
             trait_fql_name: "std::order::Ord".to_string(),
-            type_var_constraint_fql: Fql::new(stdlib_order, idx!(0)),
+            type_var_constraint_fql: Fql::new(stdlib_order, idx!(1)),
         };
         let eq_constraint = TraitConstraint {
             trait_fql: Fql::new(stdlib_eq, idx!(0)),
             trait_fql_name: "std::eq::Eq".to_string(),
-            type_var_constraint_fql: Fql::new(stdlib_eq, idx!(0)),
+            type_var_constraint_fql: Fql::new(stdlib_order, idx!(0)),
         };
         let constrained_t1 = InferredType::ConstrainedGeneric {
-            id: 1,
-            constraints: ne_vec![ord_constraint, eq_constraint],
+            id: 0,
+            name: DisplayName::new("t1"),
+            constraints: ne_vec![eq_constraint, ord_constraint],
         };
 
+        let type_var_t2 = InferredType::Generic(1, DisplayName::new("t2"));
         check_named(
             &mut db,
             r"
@@ -582,13 +587,13 @@ mod hir_ty_small_tests {
                 0,
                 InferredType::Lambda {
                     arg_type: Box::new(InferredType::Lambda {
-                        arg_type: Box::new(InferredType::Generic(0)),
+                        arg_type: Box::new(type_var_t2.clone()),
                         return_type: Box::new(constrained_t1),
                     }),
                     return_type: Box::new(InferredType::Lambda {
-                        arg_type: Box::new(InferredType::Generic(0)),
+                        arg_type: Box::new(type_var_t2.clone()),
                         return_type: Box::new(InferredType::Lambda {
-                            arg_type: Box::new(InferredType::Generic(0)),
+                            arg_type: Box::new(type_var_t2.clone()),
                             return_type: Box::new(InferredType::TypeDef(
                                 Fql::new(stdlib_order, idx!(0)),
                                 hir::Name::new("Ordering"),
@@ -623,9 +628,11 @@ mod hir_ty_small_tests {
         };
         let constrained_m = InferredType::ConstrainedGeneric {
             id: 0,
+            name: DisplayName::new("m"),
             constraints: ne_vec![monad_constraint, applicative_constraint, functor_constraint],
         };
 
+        let type_var_t1 = InferredType::Generic(1, DisplayName::new("t1"));
         check_named(
             &mut db,
             r"
@@ -645,12 +652,12 @@ mod hir_ty_small_tests {
                         base: Box::new(constrained_m.clone()),
                         args: vec![InferredType::Bounded {
                             base: Box::new(constrained_m.clone()),
-                            args: vec![InferredType::Generic(1)],
+                            args: vec![type_var_t1.clone()],
                         }],
                     }),
                     return_type: Box::new(InferredType::Bounded {
                         base: Box::new(constrained_m),
-                        args: vec![InferredType::Generic(1)],
+                        args: vec![type_var_t1.clone()],
                     }),
                 },
             )],

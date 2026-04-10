@@ -27,13 +27,16 @@ HirTypedModule {
         Idx::<Expression>(1): Unit,
         Idx::<Expression>(2): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(3): Lambda {
             arg_type: Generic(
                 0,
+                "a0",
             ),
             return_type: Generic(
                 0,
+                "a0",
             ),
         },
         Idx::<Expression>(4): BuiltIn(
@@ -54,6 +57,7 @@ HirTypedModule {
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             0,
+            "a0",
         ),
     },
     warnings: [],
@@ -63,7 +67,9 @@ HirTypedModule {
                 TypeInferenceError {
                     kind: UnsatisfiedConstraint {
                         trait_fql_name: "std::order::Ord",
-                        type_name: "Bool",
+                        resolved_type: BuiltIn(
+                            Bool,
+                        ),
                         constraint_range: 67..70,
                     },
                     range: 71..93,
@@ -76,7 +82,7 @@ HirTypedModule {
                 TypeInferenceError {
                     kind: UnsatisfiedConstraint {
                         trait_fql_name: "std::order::Ord",
-                        type_name: "()",
+                        resolved_type: Unit,
                         constraint_range: 138..141,
                     },
                     range: 142..162,
@@ -89,7 +95,16 @@ HirTypedModule {
                 TypeInferenceError {
                     kind: UnsatisfiedConstraint {
                         trait_fql_name: "std::order::Ord",
-                        type_name: "(Bool, ())",
+                        resolved_type: Tuple(
+                            NonEmpty(
+                                [
+                                    BuiltIn(
+                                        Bool,
+                                    ),
+                                    Unit,
+                                ],
+                            ),
+                        ),
                         constraint_range: 293..296,
                     },
                     range: 297..332,
@@ -102,7 +117,16 @@ HirTypedModule {
                 TypeInferenceError {
                     kind: UnsatisfiedConstraint {
                         trait_fql_name: "std::order::Ord",
-                        type_name: "t0 -> t0",
+                        resolved_type: Lambda {
+                            arg_type: Generic(
+                                0,
+                                "a0",
+                            ),
+                            return_type: Generic(
+                                0,
+                                "a0",
+                            ),
+                        },
                         constraint_range: 209..212,
                     },
                     range: 213..241,
@@ -115,7 +139,16 @@ HirTypedModule {
                 TypeInferenceError {
                     kind: UnsatisfiedConstraint {
                         trait_fql_name: "std::eq::Eq",
-                        type_name: "t0 -> t0",
+                        resolved_type: Lambda {
+                            arg_type: Generic(
+                                0,
+                                "a0",
+                            ),
+                            return_type: Generic(
+                                0,
+                                "a0",
+                            ),
+                        },
                         constraint_range: 362..365,
                     },
                     range: 213..241,
@@ -174,7 +207,7 @@ HirTypedModule {
     │ Help: Type `(Bool, ())` must implement trait `std::order::Ord`
 ────╯
 
-[E33002] Error: Type `t0 -> t0` does not implement trait `std::order::Ord`
+[E33002] Error: Type `a0 -> a0` does not implement trait `std::order::Ord`
     ╭─[ ./test/main.alloy:13:1 ]
     │
  13 │ let lambda_traits = |x| -> x
@@ -187,17 +220,17 @@ HirTypedModule {
     │               ─┬─  
     │                ╰─── required by this constraint
     │ 
-    │ Help: Type `t0 -> t0` must implement trait `std::order::Ord`
+    │ Help: Type `a0 -> a0` must implement trait `std::order::Ord`
 ────╯
 
-[E33002] Error: Type `t0 -> t0` does not implement trait `std::eq::Eq`
+[E33002] Error: Type `a0 -> a0` does not implement trait `std::eq::Eq`
     ╭─[ ./test/main.alloy:13:1 ]
     │
  13 │ let lambda_traits = |x| -> x
     │ ──────────────┬─────────────  
     │               ╰─────────────── missing implementation of trait `std::eq::Eq`
     │ 
-    │ Help: Type `t0 -> t0` must implement trait `std::eq::Eq`
+    │ Help: Type `a0 -> a0` must implement trait `std::eq::Eq`
 ────╯
 
 

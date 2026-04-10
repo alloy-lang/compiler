@@ -8,17 +8,17 @@
 
 use super::Fql;
 use alloy_hir_def as hir;
-use alloy_hir_resolved::{
-    AnnotatedType, AnnotatedTypeVar, EPFql, EPTdFql, HirResolutionError, TraitConstraint,
-    TypeVarReference,
-};
+use alloy_hir_resolved::{EPFql, EPTdFql, HirResolutionError, TraitConstraint};
 use itertools::Itertools;
 use rustc_hash::{FxHashMap, FxHashSet};
 
 mod constraint_gen;
+mod converter;
 mod inference;
 pub mod unification;
+use converter::ToMonoTypeConverter;
 
+use crate::hir_ty::hm::converter::TypeVarGenerator;
 use crate::HirInferDatabase;
 pub(crate) use inference::infer_body_type;
 pub(crate) use inference::infer_expressions;
@@ -238,23 +238,6 @@ pub struct TypeEquation {
     pub(super) source: EPFql,
 }
 
-/// Context for generating fresh type variables
-pub struct TypeVarGenerator {
-    next_id: usize,
-}
-
-impl TypeVarGenerator {
-    fn new() -> Self {
-        Self { next_id: 0 }
-    }
-
-    fn fresh(&mut self) -> TypeVarId {
-        let id = self.next_id;
-        self.next_id += 1;
-        TypeVarId::new(id)
-    }
-}
-
 impl PolyType {
     pub(super) fn generalize_all(ty: MonoType) -> Self {
         let quantified = ty.free_type_vars();
@@ -294,8 +277,6 @@ impl PolyType {
 /// Inference context for HM type inference
 pub(super) struct HMInferenceContext<'db> {
     pub(super) db: &'db dyn HirInferDatabase,
-    /// Type variable generator
-    pub(super) type_var_gen: TypeVarGenerator,
     /// The expression currently being inferred by `infer_body_type`.
     /// Used to skip the `infer_value_signature` shortcut for this expression
     /// to prevent Salsa cycles.
@@ -311,40 +292,20 @@ pub(super) struct HMInferenceContext<'db> {
     /// Type variables created for unknown references (resolution errors).
     /// These should be treated as `Missing` rather than `Generic`.
     pub(super) resolution_error_vars: FxHashSet<TypeVarId>,
-    /// Maps annotation type variable Fql → TypeVarId
-    /// Ensures the same type variable declaration always maps to the same inference variable
-    pub(super) annotation_type_vars: FxHashMap<Fql<hir::TypeVariable>, TypeVarId>,
-    /// Maps Self type Fql → TypeVarId
-    /// Ensures the same Self type in the same trait always maps to the same inference variable
-    pub(super) self_type_vars: FxHashMap<Fql<hir::Trait>, TypeVarId>,
-    /// Maps TypeVarId → user-visible name (for error messages)
-    pub(super) type_var_names: FxHashMap<TypeVarId, hir::Name>,
-}
-
-impl<'db> HMInferenceContext<'db> {
-    /// Get the user-visible name for a type variable (for error messages)
-    fn get_type_var_name(&self, var_id: TypeVarId) -> String {
-        self.type_var_names
-            .get(&var_id)
-            .map(|name| name.to_string())
-            .unwrap_or_else(|| format!("t{}", var_id.0))
-    }
+    converter: ToMonoTypeConverter,
 }
 
 impl<'db> HMInferenceContext<'db> {
     fn new(db: &'db dyn HirInferDatabase) -> Self {
         Self {
             db,
-            type_var_gen: TypeVarGenerator::new(),
             inferring_expr: None,
             equations: Vec::new(),
             type_env: FxHashMap::default(),
             poly_env: FxHashMap::default(),
             resolution_errors: Vec::new(),
             resolution_error_vars: FxHashSet::default(),
-            annotation_type_vars: FxHashMap::default(),
-            self_type_vars: FxHashMap::default(),
-            type_var_names: FxHashMap::default(),
+            converter: ToMonoTypeConverter::empty(),
         }
     }
 
@@ -355,7 +316,8 @@ impl<'db> HMInferenceContext<'db> {
     fn maybe_find_type(&mut self, fql: impl Into<EPTdFql>) -> Option<MonoType> {
         let fql = fql.into();
         if let Some(poly_ty) = self.poly_env.get(&fql).cloned() {
-            let (instantiated, _fresh_vars) = poly_ty.instantiate(&mut self.type_var_gen, &fql);
+            let (instantiated, _fresh_vars) =
+                poly_ty.instantiate(&mut self.converter.type_var_gen, &fql);
             Some(instantiated)
         } else {
             self.type_env.get(&fql).cloned()
@@ -378,12 +340,12 @@ impl<'db> HMInferenceContext<'db> {
     }
 
     fn fresh_type_var(&mut self) -> MonoType {
-        MonoType::Var(self.type_var_gen.fresh())
+        MonoType::Var(self.converter.fresh_type_var())
     }
 
     fn unknown_reference(&mut self, err: HirResolutionError, fql: impl Into<EPFql>) -> MonoType {
         self.resolution_errors.push(err);
-        let var_id = self.type_var_gen.fresh();
+        let var_id = self.converter.fresh_type_var();
         self.resolution_error_vars.insert(var_id);
         let ty = MonoType::Var(var_id);
         self.assign_type(fql.into(), ty)
@@ -402,123 +364,5 @@ impl<'db> HMInferenceContext<'db> {
             right,
             source: fql.into(),
         });
-    }
-
-    /// Get or create a type variable for an annotation type variable (typevar declaration).
-    /// Ensures the same Fql<TypeDefinition> always maps to the same TypeVarId.
-    fn get_or_create_annotation_type_var(
-        &mut self,
-        fql: Fql<hir::TypeVariable>,
-        name: hir::Name,
-    ) -> TypeVarId {
-        if let Some(&var_id) = self.annotation_type_vars.get(&fql) {
-            return var_id;
-        }
-        let var_id = self.type_var_gen.fresh();
-        self.annotation_type_vars.insert(fql, var_id);
-        self.type_var_names.insert(var_id, name);
-        var_id
-    }
-
-    /// Get or create a type variable for a Self type in a trait context.
-    /// Ensures the same Fql<Trait> always maps to the same TypeVarId.
-    fn get_or_create_self_type_var(&mut self, trait_fql: Fql<hir::Trait>) -> TypeVarId {
-        if let Some(&var_id) = self.self_type_vars.get(&trait_fql) {
-            return var_id;
-        }
-        let var_id = self.type_var_gen.fresh();
-        self.self_type_vars.insert(trait_fql, var_id);
-        self.type_var_names.insert(var_id, hir::Name::new("Self"));
-        var_id
-    }
-}
-
-/// Convert an AnnotatedType to a MonoType for use in constraint generation.
-/// Uses stable Fql<TypeDefinition> identities for type variables, ensuring
-/// the same type variable declaration always maps to the same TypeVarId.
-fn annotated_to_mono(annotated: &AnnotatedType, ctx: &mut HMInferenceContext) -> Option<MonoType> {
-    match annotated {
-        AnnotatedType::Missing => None,
-        AnnotatedType::Unconstrained => Some(MonoType::Unconstrained),
-        AnnotatedType::Unit => Some(MonoType::Unit),
-        AnnotatedType::BuiltIn(builtin) => Some(MonoType::Concrete(*builtin)),
-        AnnotatedType::TypeDef {
-            fql,
-            name,
-            type_args,
-        } => Some(type_def_to_mono(ctx, fql, name, type_args)),
-        AnnotatedType::Lambda { arg, ret } => {
-            let arg_mono = annotated_to_mono(arg, ctx)?;
-            let ret_mono = annotated_to_mono(ret, ctx)?;
-            Some(MonoType::Function(Box::new(arg_mono), Box::new(ret_mono)))
-        }
-        AnnotatedType::Tuple(elements) => {
-            let mono_elements: Option<Vec<_>> =
-                elements.iter().map(|e| annotated_to_mono(e, ctx)).collect();
-            mono_elements.map(MonoType::Tuple)
-        }
-        AnnotatedType::Bounded { base, args } => {
-            let base_mono = annotated_to_mono(base, ctx)?;
-            let args_mono: Option<Vec<_>> =
-                args.iter().map(|a| annotated_to_mono(a, ctx)).collect();
-            Some(MonoType::App {
-                constructor: Box::new(base_mono),
-                args: args_mono?,
-            })
-        }
-        AnnotatedType::TypeVar(AnnotatedTypeVar { name, fql, .. }) => {
-            let var_id = ctx.get_or_create_annotation_type_var(fql.clone(), name.clone());
-            Some(MonoType::Var(var_id))
-        }
-        AnnotatedType::ConstrainedTypeVar {
-            base: AnnotatedTypeVar { name, fql, .. },
-            constraints,
-        } => {
-            let var_id = ctx.get_or_create_annotation_type_var(fql.clone(), name.clone());
-            Some(MonoType::ConstrainedVar(
-                var_id,
-                constraints.iter().cloned().collect(),
-            ))
-        }
-        AnnotatedType::SelfType {
-            trait_fql,
-            trait_constraints,
-            ..
-        } => {
-            let var_id = ctx.get_or_create_self_type_var(trait_fql.clone());
-            // let primary = TraitConstraint {
-            //     trait_fql: trait_fql.clone(),
-            //     trait_fql_name: trait_fql.trait_fql_name(ctx.db),
-            //     type_var_constraint_fql: todo!(),
-            // };
-            // let mut constraints = vec![primary];
-            let mut constraints = vec![];
-            for constraint in trait_constraints {
-                if !constraints.contains(constraint) {
-                    constraints.push(constraint.clone());
-                }
-            }
-            Some(MonoType::ConstrainedVar(var_id, constraints))
-        }
-    }
-}
-
-fn type_def_to_mono(
-    ctx: &mut HMInferenceContext,
-    fql: &Fql<hir::TypeDefinition>,
-    name: &hir::Name,
-    type_args: &[TypeVarReference],
-) -> MonoType {
-    let type_args = type_args
-        .iter()
-        .map(|ty_arg| {
-            ctx.get_or_create_annotation_type_var(ty_arg.fql.clone(), ty_arg.name.clone())
-        })
-        .collect::<Vec<_>>();
-
-    MonoType::TypeDef {
-        fql: fql.clone(),
-        type_args,
-        type_def_name: name.clone(),
     }
 }

@@ -22,6 +22,7 @@ DefinitionInferenceResult {
                 args: [
                     Generic(
                         0,
+                        "a0",
                     ),
                 ],
             },
@@ -44,6 +45,7 @@ DefinitionInferenceResult {
             args: [
                 Generic(
                     0,
+                    "a0",
                 ),
             ],
         },

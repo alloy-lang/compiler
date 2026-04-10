@@ -6,9 +6,40 @@ use non_empty_vec::NonEmpty;
 use std::hash::Hash;
 
 mod hm;
+
 pub(crate) use hm::infer_body_type;
 pub(crate) use hm::infer_expressions;
 pub use hm::unification::UnificationError;
+
+/// Display-only metadata that does not participate in equality or hashing.
+/// Used to carry human-readable type variable names through to error messages
+/// without affecting type identity.
+#[derive(Clone)]
+pub struct DisplayName(pub String);
+
+impl DisplayName {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self(name.into())
+    }
+}
+
+impl std::fmt::Debug for DisplayName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "\"{}\"", self.0)
+    }
+}
+
+impl PartialEq for DisplayName {
+    fn eq(&self, _other: &Self) -> bool {
+        true
+    }
+}
+
+impl Eq for DisplayName {}
+
+impl Hash for DisplayName {
+    fn hash<H: std::hash::Hasher>(&self, _state: &mut H) {}
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InferredType {
@@ -26,32 +57,12 @@ pub enum InferredType {
         base: Box<InferredType>,
         args: Vec<InferredType>,
     },
-    Generic(usize),
+    Generic(usize, DisplayName),
     ConstrainedGeneric {
         id: usize,
+        name: DisplayName,
         constraints: NonEmpty<res::TraitConstraint>,
     },
-}
-
-impl InferredType {
-    pub fn is_polymorphic(&self) -> bool {
-        match self {
-            InferredType::Generic(_) | InferredType::ConstrainedGeneric { .. } => true,
-            InferredType::Lambda {
-                arg_type,
-                return_type,
-            } => arg_type.is_polymorphic() || return_type.is_polymorphic(),
-            InferredType::Tuple(elements) => elements.iter().any(|e| e.is_polymorphic()),
-            InferredType::Bounded { base, args } => {
-                base.is_polymorphic() || args.iter().any(|a| a.is_polymorphic())
-            }
-            InferredType::Unconstrained
-            | InferredType::Missing
-            | InferredType::Unit
-            | InferredType::TypeDef(..)
-            | InferredType::BuiltIn(_) => false,
-        }
-    }
 }
 
 impl std::fmt::Display for InferredType {
@@ -82,9 +93,13 @@ impl std::fmt::Display for InferredType {
                 args.iter().join(", ").fmt(f)?;
                 write!(f, "]")
             }
-            InferredType::Generic(id) => write!(f, "t{id}"),
-            InferredType::ConstrainedGeneric { id, constraints } => {
-                write!(f, "t{id} : ")?;
+            InferredType::Generic(_, DisplayName(name)) => write!(f, "{name}"),
+            InferredType::ConstrainedGeneric {
+                name: DisplayName(name),
+                constraints,
+                ..
+            } => {
+                write!(f, "{name} : ")?;
                 constraints
                     .iter()
                     .map(|c| &c.trait_fql_name)

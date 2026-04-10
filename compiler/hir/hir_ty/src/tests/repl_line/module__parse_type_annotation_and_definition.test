@@ -19,9 +19,11 @@ HirTypedModule {
                     [
                         Generic(
                             0,
+                            "a0",
                         ),
                         Generic(
                             0,
+                            "a0",
                         ),
                     ],
                 ),
@@ -42,9 +44,11 @@ HirTypedModule {
                             [
                                 Generic(
                                     0,
+                                    "a0",
                                 ),
                                 Generic(
                                     0,
+                                    "a0",
                                 ),
                             ],
                         ),
@@ -54,24 +58,30 @@ HirTypedModule {
         },
         Idx::<Expression>(1): Generic(
             1,
+            "b0",
         ),
         Idx::<Expression>(2): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(3): Generic(
             1,
+            "b0",
         ),
         Idx::<Expression>(4): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(5): Tuple(
             NonEmpty(
                 [
                     Generic(
                         0,
+                        "a0",
                     ),
                     Generic(
                         0,
+                        "a0",
                     ),
                 ],
             ),
@@ -92,9 +102,11 @@ HirTypedModule {
                         [
                             Generic(
                                 0,
+                                "a0",
                             ),
                             Generic(
                                 0,
+                                "a0",
                             ),
                         ],
                     ),
@@ -105,18 +117,22 @@ HirTypedModule {
             arg_type: Lambda {
                 arg_type: Generic(
                     0,
+                    "t2",
                 ),
                 return_type: Generic(
                     1,
+                    "t1",
                 ),
             },
             return_type: Lambda {
                 arg_type: Generic(
                     0,
+                    "t2",
                 ),
                 return_type: Lambda {
                     arg_type: Generic(
                         0,
+                        "t2",
                     ),
                     return_type: Bounded {
                         base: TypeDef(
@@ -134,9 +150,11 @@ HirTypedModule {
                                     [
                                         Generic(
                                             1,
+                                            "t1",
                                         ),
                                         Generic(
                                             1,
+                                            "t1",
                                         ),
                                     ],
                                 ),
@@ -151,16 +169,20 @@ HirTypedModule {
         Idx::<Pattern>(0): Lambda {
             arg_type: Generic(
                 1,
+                "b0",
             ),
             return_type: Generic(
                 0,
+                "a0",
             ),
         },
         Idx::<Pattern>(1): Generic(
             1,
+            "b0",
         ),
         Idx::<Pattern>(2): Generic(
             1,
+            "b0",
         ),
     },
     warnings: [],

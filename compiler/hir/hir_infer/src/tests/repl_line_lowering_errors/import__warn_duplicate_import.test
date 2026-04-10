@@ -19,6 +19,7 @@ DefinitionInferenceResult {
             args: [
                 Generic(
                     0,
+                    "a0",
                 ),
             ],
         },

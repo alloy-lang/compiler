@@ -11,19 +11,23 @@ HirTypedModule {
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
                 0,
+                "a0",
             ),
             return_type: Generic(
                 0,
+                "a0",
             ),
         },
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             0,
+            "a0",
         ),
     },
     warnings: [],
@@ -180,9 +184,11 @@ HirTypedModule {
                 value_type: Lambda {
                     arg_type: Generic(
                         0,
+                        "a0",
                     ),
                     return_type: Generic(
                         0,
+                        "a0",
                     ),
                 },
                 value_range: 80..100,
@@ -265,9 +271,11 @@ HirTypedModule {
                     actual_type: Lambda {
                         arg_type: Generic(
                             0,
+                            "a0",
                         ),
                         return_type: Generic(
                             0,
+                            "a0",
                         ),
                     },
                     actual_type_range: 80..100,
@@ -307,7 +315,7 @@ HirTypedModule {
    │ 
  5 │ let apply = |x| -> x
    │ ──────────┬─────────  
-   │           ╰─────────── but the body has type `t0 -> t0`
+   │           ╰─────────── but the body has type `a0 -> a0`
 ───╯
 
 

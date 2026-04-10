@@ -12,6 +12,7 @@ DefinitionInferenceResult {
         Idx::<Expression>(0): Bounded {
             base: ConstrainedGeneric {
                 id: 0,
+                name: "m",
                 constraints: NonEmpty(
                     [
                         TraitConstraint {
@@ -66,6 +67,7 @@ DefinitionInferenceResult {
                 Bounded {
                     base: ConstrainedGeneric {
                         id: 0,
+                        name: "m",
                         constraints: NonEmpty(
                             [
                                 TraitConstraint {
@@ -119,6 +121,7 @@ DefinitionInferenceResult {
                     args: [
                         Generic(
                             1,
+                            "t2",
                         ),
                     ],
                 },
@@ -127,6 +130,7 @@ DefinitionInferenceResult {
         Idx::<Expression>(1): Bounded {
             base: ConstrainedGeneric {
                 id: 0,
+                name: "m",
                 constraints: NonEmpty(
                     [
                         TraitConstraint {
@@ -180,6 +184,7 @@ DefinitionInferenceResult {
             args: [
                 Generic(
                     1,
+                    "t2",
                 ),
             ],
         },
@@ -187,6 +192,7 @@ DefinitionInferenceResult {
             arg_type: Bounded {
                 base: ConstrainedGeneric {
                     id: 0,
+                    name: "m",
                     constraints: NonEmpty(
                         [
                             TraitConstraint {
@@ -240,12 +246,14 @@ DefinitionInferenceResult {
                 args: [
                     Generic(
                         1,
+                        "t2",
                     ),
                 ],
             },
             return_type: Bounded {
                 base: ConstrainedGeneric {
                     id: 0,
+                    name: "m",
                     constraints: NonEmpty(
                         [
                             TraitConstraint {
@@ -299,6 +307,7 @@ DefinitionInferenceResult {
                 args: [
                     Generic(
                         1,
+                        "t2",
                     ),
                 ],
             },
@@ -306,6 +315,7 @@ DefinitionInferenceResult {
         Idx::<Expression>(3): Bounded {
             base: ConstrainedGeneric {
                 id: 0,
+                name: "m",
                 constraints: NonEmpty(
                     [
                         TraitConstraint {
@@ -359,6 +369,7 @@ DefinitionInferenceResult {
             args: [
                 Generic(
                     1,
+                    "t2",
                 ),
             ],
         },
@@ -366,6 +377,7 @@ DefinitionInferenceResult {
             arg_type: Bounded {
                 base: ConstrainedGeneric {
                     id: 0,
+                    name: "m",
                     constraints: NonEmpty(
                         [
                             TraitConstraint {
@@ -420,6 +432,7 @@ DefinitionInferenceResult {
                     Bounded {
                         base: ConstrainedGeneric {
                             id: 0,
+                            name: "m",
                             constraints: NonEmpty(
                                 [
                                     TraitConstraint {
@@ -473,6 +486,7 @@ DefinitionInferenceResult {
                         args: [
                             Generic(
                                 1,
+                                "t1",
                             ),
                         ],
                     },
@@ -481,6 +495,7 @@ DefinitionInferenceResult {
             return_type: Bounded {
                 base: ConstrainedGeneric {
                     id: 0,
+                    name: "m",
                     constraints: NonEmpty(
                         [
                             TraitConstraint {
@@ -534,6 +549,7 @@ DefinitionInferenceResult {
                 args: [
                     Generic(
                         1,
+                        "t1",
                     ),
                 ],
             },
@@ -543,6 +559,7 @@ DefinitionInferenceResult {
         Idx::<Pattern>(0): Bounded {
             base: ConstrainedGeneric {
                 id: 0,
+                name: "m",
                 constraints: NonEmpty(
                     [
                         TraitConstraint {
@@ -597,6 +614,7 @@ DefinitionInferenceResult {
                 Bounded {
                     base: ConstrainedGeneric {
                         id: 0,
+                        name: "m",
                         constraints: NonEmpty(
                             [
                                 TraitConstraint {
@@ -650,6 +668,7 @@ DefinitionInferenceResult {
                     args: [
                         Generic(
                             1,
+                            "t2",
                         ),
                     ],
                 },
@@ -658,6 +677,7 @@ DefinitionInferenceResult {
         Idx::<Pattern>(1): Bounded {
             base: ConstrainedGeneric {
                 id: 0,
+                name: "m",
                 constraints: NonEmpty(
                     [
                         TraitConstraint {
@@ -711,6 +731,7 @@ DefinitionInferenceResult {
             args: [
                 Generic(
                     1,
+                    "t2",
                 ),
             ],
         },

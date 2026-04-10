@@ -53,6 +53,7 @@ DefinitionInferenceResult {
         ),
         Idx::<Expression>(5): Generic(
             0,
+            "a0",
         ),
     },
     pattern_types: {},
@@ -77,7 +78,15 @@ DefinitionInferenceResult {
         TypeInferenceError {
             kind: UnsatisfiedConstraint {
                 trait_fql_name: "std::eq::Eq",
-                type_name: "Foo",
+                resolved_type: TypeDef(
+                    Fql {
+                        module_id: ModuleId {
+                            path: "main",
+                        },
+                        local_id: Idx::<TypeDefinition>(0),
+                    },
+                    "Foo",
+                ),
                 constraint_range: 46..48,
             },
             range: 68..102,

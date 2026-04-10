@@ -30,7 +30,8 @@ DefinitionInferenceResult {
                     Int,
                 ),
                 Generic(
-                    0,
+                    2,
+                    "c0",
                 ),
             ],
         },
@@ -50,11 +51,13 @@ DefinitionInferenceResult {
                 ),
                 Generic(
                     0,
+                    "c0",
                 ),
             ],
         },
         Idx::<Expression>(3): Generic(
             1,
+            "b0",
         ),
         Idx::<Expression>(4): BuiltIn(
             Int,
@@ -66,6 +69,7 @@ DefinitionInferenceResult {
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             1,
+            "b0",
         ),
         Idx::<Pattern>(1): Bounded {
             base: TypeDef(
@@ -118,6 +122,7 @@ DefinitionInferenceResult {
         ): Lambda {
             arg_type: Generic(
                 0,
+                "l",
             ),
             return_type: Bounded {
                 base: TypeDef(
@@ -132,9 +137,11 @@ DefinitionInferenceResult {
                 args: [
                     Generic(
                         0,
+                        "l",
                     ),
                     Generic(
                         1,
+                        "r",
                     ),
                 ],
             },
@@ -147,6 +154,7 @@ DefinitionInferenceResult {
         ): Lambda {
             arg_type: Generic(
                 1,
+                "r",
             ),
             return_type: Bounded {
                 base: TypeDef(
@@ -161,9 +169,11 @@ DefinitionInferenceResult {
                 args: [
                     Generic(
                         0,
+                        "l",
                     ),
                     Generic(
                         1,
+                        "r",
                     ),
                 ],
             },

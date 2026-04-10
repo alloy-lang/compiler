@@ -13,11 +13,13 @@ HirTypedModule {
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(1): Lambda {
             arg_type: Bounded {
                 base: ConstrainedGeneric {
                     id: 0,
+                    name: "m",
                     constraints: NonEmpty(
                         [
                             TraitConstraint {
@@ -41,12 +43,14 @@ HirTypedModule {
                 args: [
                     Generic(
                         1,
+                        "t1",
                     ),
                 ],
             },
             return_type: Bounded {
                 base: ConstrainedGeneric {
                     id: 0,
+                    name: "m",
                     constraints: NonEmpty(
                         [
                             TraitConstraint {
@@ -70,6 +74,7 @@ HirTypedModule {
                 args: [
                     Generic(
                         1,
+                        "t1",
                     ),
                 ],
             },
@@ -78,6 +83,7 @@ HirTypedModule {
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             0,
+            "a0",
         ),
     },
     warnings: [],

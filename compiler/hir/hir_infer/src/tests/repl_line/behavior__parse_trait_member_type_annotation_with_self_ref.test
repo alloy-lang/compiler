@@ -17,6 +17,7 @@ DefinitionInferenceResult {
         Idx::<Expression>(0): Lambda {
             arg_type: ConstrainedGeneric {
                 id: 0,
+                name: "Self",
                 constraints: NonEmpty(
                     [
                         TraitConstraint {

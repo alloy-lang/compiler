@@ -12,10 +12,12 @@ HirTypedModule {
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
                 0,
+                "a0",
             ),
             return_type: Lambda {
                 arg_type: Generic(
                     1,
+                    "b0",
                 ),
                 return_type: BuiltIn(
                     String,
@@ -26,9 +28,11 @@ HirTypedModule {
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             0,
+            "a0",
         ),
         Idx::<Pattern>(1): Generic(
             1,
+            "b0",
         ),
     },
     warnings: [],
@@ -50,10 +54,12 @@ HirTypedModule {
                 value_type: Lambda {
                     arg_type: Generic(
                         0,
+                        "a0",
                     ),
                     return_type: Lambda {
                         arg_type: Generic(
                             1,
+                            "b0",
                         ),
                         return_type: BuiltIn(
                             String,
@@ -66,6 +72,7 @@ HirTypedModule {
                     expected_type_range: 14..21,
                     actual_type: Generic(
                         0,
+                        "a0",
                     ),
                     actual_type_range: 57..58,
                 },
@@ -91,9 +98,9 @@ HirTypedModule {
    │                           ╰───────────── The type annotation says `<missing> -> Int -> String`
  2 │ let test = |x, y| -> "hello"
    │ ────────────┬─┬─────────────  
-   │             ╰───────────────── this is `t0`, but the annotation expects `<missing>`
+   │             ╰───────────────── this is `a0`, but the annotation expects `<missing>`
    │               │               
-   │               ╰─────────────── but the body has type `t0 -> t1 -> String`
+   │               ╰─────────────── but the body has type `a0 -> b0 -> String`
 ───╯
 
 

@@ -5,17 +5,20 @@ DefinitionInferenceResult {
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(1): Lambda {
             arg_type: Missing,
             return_type: Generic(
                 0,
+                "a0",
             ),
         },
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             0,
+            "a0",
         ),
         Idx::<Pattern>(1): Missing,
     },

@@ -26,9 +26,11 @@ HirTypedModule {
                     Lambda {
                         arg_type: Generic(
                             0,
+                            "t1",
                         ),
                         return_type: Generic(
                             1,
+                            "t2",
                         ),
                     },
                 ],
@@ -47,6 +49,7 @@ HirTypedModule {
                     args: [
                         Generic(
                             0,
+                            "t1",
                         ),
                     ],
                 },
@@ -63,6 +66,7 @@ HirTypedModule {
                     args: [
                         Generic(
                             1,
+                            "t2",
                         ),
                     ],
                 },

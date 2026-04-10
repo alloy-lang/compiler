@@ -33,10 +33,12 @@ HirTypedModule {
         Idx::<Expression>(2): Lambda {
             arg_type: Generic(
                 0,
+                "t1",
             ),
             return_type: Lambda {
                 arg_type: Generic(
                     1,
+                    "t2",
                 ),
                 return_type: Bounded {
                     base: TypeDef(
@@ -60,9 +62,11 @@ HirTypedModule {
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             0,
+            "t1",
         ),
         Idx::<Pattern>(1): Generic(
             1,
+            "t2",
         ),
     },
     warnings: [],

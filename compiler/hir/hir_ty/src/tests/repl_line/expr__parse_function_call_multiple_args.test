@@ -22,33 +22,42 @@ HirTypedModule {
         ),
         Idx::<Expression>(3): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(4): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(5): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(6): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(7): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(8): Lambda {
             arg_type: Generic(
                 0,
+                "a0",
             ),
             return_type: Lambda {
                 arg_type: Generic(
                     0,
+                    "a0",
                 ),
                 return_type: Lambda {
                     arg_type: Generic(
                         0,
+                        "a0",
                     ),
                     return_type: Generic(
                         0,
+                        "a0",
                     ),
                 },
             },
@@ -69,12 +78,15 @@ HirTypedModule {
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             0,
+            "a0",
         ),
         Idx::<Pattern>(1): Generic(
             0,
+            "a0",
         ),
         Idx::<Pattern>(2): Generic(
             0,
+            "a0",
         ),
     },
     warnings: [],

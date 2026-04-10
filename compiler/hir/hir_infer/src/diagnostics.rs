@@ -1,4 +1,4 @@
-use crate::hir_ty::UnificationError;
+use crate::hir_ty::{InferredType, UnificationError};
 use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, DiagnosticLabel, Severity};
 use alloy_hir_resolved::HirResolutionError;
 use text_size::TextRange;
@@ -47,10 +47,10 @@ impl Diagnostic for TypeInferenceError {
             TypeInferenceErrorKind::HirResolutionError(err) => err.message(),
             TypeInferenceErrorKind::UnsatisfiedConstraint {
                 trait_fql_name: trait_name,
-                type_name,
+                resolved_type,
                 ..
             } => {
-                format!("Type `{type_name}` does not implement trait `{trait_name}`")
+                format!("Type `{resolved_type}` does not implement trait `{trait_name}`")
             }
         }
     }
@@ -72,7 +72,7 @@ impl Diagnostic for TypeInferenceError {
             TypeInferenceErrorKind::HirResolutionError(err) => err.build_report(builder),
             TypeInferenceErrorKind::UnsatisfiedConstraint {
                 trait_fql_name: trait_name,
-                type_name,
+                resolved_type,
                 constraint_range,
             } => builder
                 .with_primary_label(format!("missing implementation of trait `{trait_name}`"))
@@ -81,7 +81,7 @@ impl Diagnostic for TypeInferenceError {
                     "required by this constraint",
                 ))
                 .with_help(format!(
-                    "Type `{type_name}` must implement trait `{trait_name}`"
+                    "Type `{resolved_type}` must implement trait `{trait_name}`"
                 )),
         }
     }
@@ -93,7 +93,7 @@ pub enum TypeInferenceErrorKind {
     HirResolutionError(HirResolutionError),
     UnsatisfiedConstraint {
         trait_fql_name: String,
-        type_name: String,
+        resolved_type: InferredType,
         constraint_range: TextRange,
     },
 }

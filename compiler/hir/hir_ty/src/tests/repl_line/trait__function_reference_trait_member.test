@@ -20,10 +20,12 @@ HirTypedModule {
             arg_type: Lambda {
                 arg_type: Generic(
                     0,
+                    "t1",
                 ),
                 return_type: Bounded {
                     base: ConstrainedGeneric {
                         id: 1,
+                        name: "m",
                         constraints: NonEmpty(
                             [
                                 TraitConstraint {
@@ -47,6 +49,7 @@ HirTypedModule {
                     args: [
                         Generic(
                             2,
+                            "t2",
                         ),
                     ],
                 },
@@ -55,6 +58,7 @@ HirTypedModule {
                 arg_type: Bounded {
                     base: ConstrainedGeneric {
                         id: 1,
+                        name: "m",
                         constraints: NonEmpty(
                             [
                                 TraitConstraint {
@@ -78,12 +82,14 @@ HirTypedModule {
                     args: [
                         Generic(
                             0,
+                            "t1",
                         ),
                     ],
                 },
                 return_type: Bounded {
                     base: ConstrainedGeneric {
                         id: 1,
+                        name: "m",
                         constraints: NonEmpty(
                             [
                                 TraitConstraint {
@@ -107,6 +113,7 @@ HirTypedModule {
                     args: [
                         Generic(
                             2,
+                            "t2",
                         ),
                     ],
                 },

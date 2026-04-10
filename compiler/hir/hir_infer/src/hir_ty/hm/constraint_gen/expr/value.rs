@@ -6,7 +6,7 @@ use rustc_hash::FxHashMap;
 use std::convert::TryFrom;
 
 use super::super::super::infer_body_type;
-use crate::hir_ty::InferredType;
+use crate::hir_ty::{DisplayName, InferredType};
 use crate::HirInferDatabase;
 
 /// Infer the type signature of a value definition.
@@ -26,12 +26,15 @@ pub fn infer<'db>(db: &'db dyn HirInferDatabase, value_def: hir::ValueDef<'db>) 
     if let Some(type_annotation) = value_def.type_annotation(db) {
         let annotated = resolve_annotated_type(db, module_id, type_annotation);
         if !matches!(annotated, AnnotatedType::Missing) {
-            return annotated_to_inferred(db, &annotated);
+            return annotated_to_inferred(&annotated);
         }
     }
 
     // Otherwise, infer from the body
-    infer_body_type(db, value_def).definition_type
+    let inference_result = infer_body_type(db, value_def);
+
+    let expr_idx = value_def.expression_idx(db);
+    inference_result.expression_types[&expr_idx].clone()
 }
 
 fn infer_value_signature_cycle_initial(
@@ -44,9 +47,9 @@ fn infer_value_signature_cycle_initial(
 
 /// Convert an AnnotatedType to an InferredType, assigning sequential
 /// generic IDs to type variables.
-fn annotated_to_inferred(db: &dyn HirInferDatabase, annotated: &AnnotatedType) -> InferredType {
+fn annotated_to_inferred(annotated: &AnnotatedType) -> InferredType {
     let mut ctx = ConversionContext::default();
-    ctx.convert(db, annotated)
+    ctx.convert(annotated)
 }
 
 #[derive(Default)]
@@ -81,7 +84,7 @@ impl ConversionContext {
         id
     }
 
-    fn convert(&mut self, db: &dyn HirInferDatabase, annotated: &AnnotatedType) -> InferredType {
+    fn convert(&mut self, annotated: &AnnotatedType) -> InferredType {
         match annotated {
             AnnotatedType::Missing => InferredType::Missing,
             AnnotatedType::Unconstrained => InferredType::Unconstrained,
@@ -91,30 +94,31 @@ impl ConversionContext {
                 InferredType::TypeDef(fql.clone(), name.clone())
             }
             AnnotatedType::Lambda { arg, ret } => InferredType::Lambda {
-                arg_type: Box::new(self.convert(db, arg)),
-                return_type: Box::new(self.convert(db, ret)),
+                arg_type: Box::new(self.convert(arg)),
+                return_type: Box::new(self.convert(ret)),
             },
             AnnotatedType::Tuple(elements) => {
                 let resolved: Vec<InferredType> =
-                    elements.iter().map(|e| self.convert(db, e)).collect();
+                    elements.iter().map(|e| self.convert(e)).collect();
                 InferredType::Tuple(unsafe { NonEmpty::new_unchecked(resolved) })
             }
             AnnotatedType::Bounded { base, args } => InferredType::Bounded {
-                base: Box::new(self.convert(db, base)),
-                args: args.iter().map(|a| self.convert(db, a)).collect(),
+                base: Box::new(self.convert(base)),
+                args: args.iter().map(|a| self.convert(a)).collect(),
             },
-            AnnotatedType::TypeVar(AnnotatedTypeVar { fql, .. }) => {
+            AnnotatedType::TypeVar(AnnotatedTypeVar { fql, name, .. }) => {
                 let id = self.type_var_id(fql);
-                InferredType::Generic(id)
+                InferredType::Generic(id, DisplayName::new(name.to_string()))
             }
             AnnotatedType::ConstrainedTypeVar {
-                base: AnnotatedTypeVar { fql, .. },
+                base: AnnotatedTypeVar { fql, name, .. },
                 constraints,
                 ..
             } => {
                 let id = self.type_var_id(fql);
                 InferredType::ConstrainedGeneric {
                     id,
+                    name: DisplayName::new(name.to_string()),
                     constraints: constraints.clone(),
                 }
             }
@@ -124,10 +128,15 @@ impl ConversionContext {
                 ..
             } => {
                 let id = self.self_type_id(trait_fql);
+                let name = DisplayName::new("Self");
 
                 match NonEmpty::try_from(trait_constraints.clone()) {
-                    Ok(constraints) => InferredType::ConstrainedGeneric { id, constraints },
-                    Err(_) => InferredType::Generic(id),
+                    Ok(constraints) => InferredType::ConstrainedGeneric {
+                        id,
+                        name,
+                        constraints,
+                    },
+                    Err(_) => InferredType::Generic(id, name),
                 }
             }
         }
@@ -189,8 +198,8 @@ mod tests {
         assert_eq!(
             sig,
             InferredType::Lambda {
-                arg_type: Box::new(InferredType::Generic(0)),
-                return_type: Box::new(InferredType::Generic(0)),
+                arg_type: Box::new(InferredType::Generic(0, DisplayName::new(""))),
+                return_type: Box::new(InferredType::Generic(0, DisplayName::new(""))),
             }
         );
     }
@@ -235,13 +244,14 @@ mod tests {
 
         let sig = infer(&db, value_def);
         // Unannotated lambda: a + b constrains both args to same type
+        let type_var = InferredType::Generic(0, DisplayName::new("a0"));
         assert_eq!(
             sig,
             InferredType::Lambda {
-                arg_type: Box::new(InferredType::Generic(0)),
+                arg_type: Box::new(type_var.clone()),
                 return_type: Box::new(InferredType::Lambda {
-                    arg_type: Box::new(InferredType::Generic(0)),
-                    return_type: Box::new(InferredType::Generic(0)),
+                    arg_type: Box::new(type_var.clone()),
+                    return_type: Box::new(type_var.clone()),
                 }),
             }
         );
@@ -374,13 +384,15 @@ mod tests {
         let sig = infer(&db, value_def);
 
         // t1 -> t2 -> t1: t1 gets id 0, t2 gets id 1, second t1 reuses id 0
+        let type_var_t1 = InferredType::Generic(0, DisplayName::new("t1"));
+        let type_var_t2 = InferredType::Generic(1, DisplayName::new("t2"));
         assert_eq!(
             sig,
             InferredType::Lambda {
-                arg_type: Box::new(InferredType::Generic(0)),
+                arg_type: Box::new(type_var_t1.clone()),
                 return_type: Box::new(InferredType::Lambda {
-                    arg_type: Box::new(InferredType::Generic(1)),
-                    return_type: Box::new(InferredType::Generic(0)),
+                    arg_type: Box::new(type_var_t2.clone()),
+                    return_type: Box::new(type_var_t1.clone()),
                 }),
             }
         );

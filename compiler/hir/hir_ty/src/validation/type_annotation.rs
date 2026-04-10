@@ -163,10 +163,7 @@ impl<'db> TypeAnnotationChecker<'db> {
     /// curried type `A -> B -> C` maps to:
     ///   - arg: the pattern for `args[offset]`
     ///   - ret: either the next curried arg or the body expression
-    fn lambda_sources(
-        &self,
-        source: InferredSource,
-    ) -> (InferredSource, InferredSource) {
+    fn lambda_sources(&self, source: InferredSource) -> (InferredSource, InferredSource) {
         let (expr_idx, offset) = match source {
             InferredSource::Expression(idx) => (idx, 0),
             InferredSource::CurriedLambda {
@@ -224,7 +221,7 @@ impl<'db> TypeAnnotationChecker<'db> {
             }
 
             // Type variables in annotation match any generic in inference result
-            (AnnotatedType::TypeVar(atv), InferredType::Generic(id)) => self
+            (AnnotatedType::TypeVar(atv), InferredType::Generic(id, _)) => self
                 .check_generic_consistency(
                     AnnotationVarId::TypeVar(atv.fql.clone()),
                     *id,
@@ -234,7 +231,12 @@ impl<'db> TypeAnnotationChecker<'db> {
                     inferred_source,
                 ),
             // Unconstrained annotation type var vs constrained inferred generic — insufficient
-            (AnnotatedType::TypeVar(atv), InferredType::ConstrainedGeneric { id, constraints }) => {
+            (
+                AnnotatedType::TypeVar(atv),
+                InferredType::ConstrainedGeneric {
+                    id, constraints, ..
+                },
+            ) => {
                 self.check_generic_consistency(
                     AnnotationVarId::TypeVar(atv.fql.clone()),
                     *id,
@@ -247,7 +249,7 @@ impl<'db> TypeAnnotationChecker<'db> {
             }
 
             // Constrained type variables - check consistency + trait constraints
-            (AnnotatedType::ConstrainedTypeVar { base, .. }, InferredType::Generic(id)) => self
+            (AnnotatedType::ConstrainedTypeVar { base, .. }, InferredType::Generic(id, _)) => self
                 .check_generic_consistency(
                     AnnotationVarId::TypeVar(base.fql.clone()),
                     *id,
@@ -264,6 +266,7 @@ impl<'db> TypeAnnotationChecker<'db> {
                 InferredType::ConstrainedGeneric {
                     id,
                     constraints: inferred_constraints,
+                    ..
                 },
             ) => {
                 self.check_generic_consistency(
@@ -279,7 +282,7 @@ impl<'db> TypeAnnotationChecker<'db> {
             (AnnotatedType::ConstrainedTypeVar { .. }, _found_ty) => Ok(()), // constraints checked during unification
 
             // Self type in annotation matches generics
-            (AnnotatedType::SelfType { trait_fql, .. }, InferredType::Generic(id)) => self
+            (AnnotatedType::SelfType { trait_fql, .. }, InferredType::Generic(id, _)) => self
                 .check_generic_consistency(
                     AnnotationVarId::SelfType(trait_fql.clone()),
                     *id,
@@ -318,7 +321,9 @@ impl<'db> TypeAnnotationChecker<'db> {
                 let (arg_idx, ret_idx) = match self.hir_module.get_type_reference(expected_type_idx)
                 {
                     hir::TypeReference::Lambda {
-                        arg_type, return_type, ..
+                        arg_type,
+                        return_type,
+                        ..
                     } => (*arg_type, *return_type),
                     _ => (expected_type_idx, expected_type_idx),
                 };
@@ -349,19 +354,14 @@ impl<'db> TypeAnnotationChecker<'db> {
                         .as_ref()
                         .and_then(|indices| indices.get(i).copied())
                         .unwrap_or(expected_type_idx);
-                    self.check_type_compatibility(
-                        exp_elem,
-                        found_elem,
-                        elem_idx,
-                        inferred_source,
-                    )?;
+                    self.check_type_compatibility(exp_elem, found_elem, elem_idx, inferred_source)?;
                 }
                 Ok(())
             }
 
             (
                 AnnotatedType::Bounded { base, .. },
-                InferredType::Generic(_) | InferredType::ConstrainedGeneric { .. },
+                InferredType::Generic(..) | InferredType::ConstrainedGeneric { .. },
             ) if matches!(
                 base.as_ref(),
                 AnnotatedType::TypeVar(_)
@@ -393,40 +393,23 @@ impl<'db> TypeAnnotationChecker<'db> {
                 }
                 let (base_idx, arg_indices) =
                     match self.hir_module.get_type_reference(expected_type_idx) {
-                        hir::TypeReference::Bounded { base, args } => {
-                            (*base, Some(args.clone()))
-                        }
+                        hir::TypeReference::Bounded { base, args } => (*base, Some(args.clone())),
                         _ => (expected_type_idx, None),
                     };
-                self.check_type_compatibility(
-                    exp_base,
-                    found_base,
-                    base_idx,
-                    inferred_source,
-                )?;
+                self.check_type_compatibility(exp_base, found_base, base_idx, inferred_source)?;
                 for (i, (exp_arg, found_arg)) in exp_args.iter().zip(found_args.iter()).enumerate()
                 {
                     let arg_idx = arg_indices
                         .as_ref()
                         .and_then(|indices| indices.get(i).copied())
                         .unwrap_or(expected_type_idx);
-                    self.check_type_compatibility(
-                        exp_arg,
-                        found_arg,
-                        arg_idx,
-                        inferred_source,
-                    )?;
+                    self.check_type_compatibility(exp_arg, found_arg, arg_idx, inferred_source)?;
                 }
                 Ok(())
             }
 
             // Everything else is incompatible
-            _ => Err(self.direct_conflict(
-                expected,
-                found,
-                expected_type_idx,
-                inferred_source,
-            )),
+            _ => Err(self.direct_conflict(expected, found, expected_type_idx, inferred_source)),
         }
     }
 

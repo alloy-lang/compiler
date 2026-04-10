@@ -1,4 +1,3 @@
-use super::super::super::annotated_to_mono;
 use super::{HMInferenceContext, MonoType};
 use crate::hir_ty::hm::constraint_gen::infer_expr_hm;
 use alloy_hir_def as hir;
@@ -13,7 +12,7 @@ pub(super) fn infer_abstract_member_ref(
     let annotated =
         res::resolve_annotated_type(ctx.db, type_annotation.module_id, type_annotation.local_id);
 
-    if let Some(mono_ty) = annotated_to_mono(&annotated, ctx) {
+    if let Some(mono_ty) = ctx.converter.annotated_to_mono(&annotated) {
         return ctx.assign_type(source_fql, mono_ty);
     }
 

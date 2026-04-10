@@ -10,18 +10,22 @@ HirTypedModule {
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(1): Generic(
             1,
+            "b0",
         ),
         Idx::<Expression>(2): Tuple(
             NonEmpty(
                 [
                     Generic(
                         0,
+                        "a0",
                     ),
                     Generic(
                         1,
+                        "b0",
                     ),
                 ],
             ),
@@ -29,19 +33,23 @@ HirTypedModule {
         Idx::<Expression>(3): Lambda {
             arg_type: Generic(
                 0,
+                "a",
             ),
             return_type: Lambda {
                 arg_type: Generic(
                     1,
+                    "b",
                 ),
                 return_type: Tuple(
                     NonEmpty(
                         [
                             Generic(
                                 0,
+                                "a",
                             ),
                             Generic(
                                 1,
+                                "b",
                             ),
                         ],
                     ),
@@ -52,9 +60,11 @@ HirTypedModule {
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             0,
+            "a0",
         ),
         Idx::<Pattern>(1): Generic(
             1,
+            "b0",
         ),
     },
     warnings: [],

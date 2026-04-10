@@ -1,10 +1,7 @@
-use super::super::TypeVarId;
 use super::{type_def, HMInferenceContext, MonoType};
-use crate::hir_ty::InferredType;
 use alloy_hir_def as hir;
 use alloy_hir_resolved as res;
 use alloy_hir_resolved::Fql;
-use rustc_hash::FxHashMap;
 
 mod binary;
 mod function_call;
@@ -32,7 +29,7 @@ pub(crate) fn infer_expr_hm(
     if !ctx.matches_root(&source_fql) {
         if let Some(value_def) = hir::module_value_def(ctx.db, *module_id, *local_id) {
             let sig = value::infer(ctx.db, value_def);
-            return inferred_to_mono(&sig, ctx);
+            return ctx.converter.inferred_to_mono(&sig);
         }
     }
 
@@ -81,79 +78,6 @@ pub(crate) fn infer_expr_hm(
             type_annotation,
         } => r#trait::infer_abstract_member_ref(ctx, source_fql, type_annotation),
         res::Expression::Missing => infer_missing_expr(ctx, source_fql),
-    }
-}
-
-/// Convert an InferredType (from `infer_value_signature`) to a MonoType for use
-/// in constraint generation. Generic IDs are mapped to fresh type variables,
-/// with consistent mapping so the same Generic(id) produces the same TypeVarId.
-fn inferred_to_mono(inferred: &InferredType, ctx: &mut HMInferenceContext) -> MonoType {
-    let mut generic_map: FxHashMap<usize, TypeVarId> = FxHashMap::default();
-    inferred_to_mono_inner(inferred, ctx, &mut generic_map)
-}
-
-fn inferred_to_mono_inner(
-    inferred: &InferredType,
-    ctx: &mut HMInferenceContext,
-    generic_map: &mut FxHashMap<usize, TypeVarId>,
-) -> MonoType {
-    match inferred {
-        InferredType::Unconstrained => MonoType::Unconstrained,
-        InferredType::Missing => ctx.fresh_type_var(),
-        InferredType::Unit => MonoType::Unit,
-        InferredType::BuiltIn(b) => MonoType::Concrete(*b),
-        InferredType::TypeDef(fql, name) => MonoType::TypeDef {
-            fql: fql.clone(),
-            type_args: vec![],
-            type_def_name: name.clone(),
-        },
-        InferredType::Lambda {
-            arg_type,
-            return_type,
-        } => MonoType::Function(
-            Box::new(inferred_to_mono_inner(arg_type, ctx, generic_map)),
-            Box::new(inferred_to_mono_inner(return_type, ctx, generic_map)),
-        ),
-        InferredType::Tuple(elements) => MonoType::Tuple(
-            elements
-                .iter()
-                .map(|e| inferred_to_mono_inner(e, ctx, generic_map))
-                .collect(),
-        ),
-        InferredType::Bounded { base, args } => {
-            // When the base is a TypeDef, populate its type_args with fresh TypeVarIds
-            // to preserve arity information (used in error messages and display)
-            let constructor = match base.as_ref() {
-                InferredType::TypeDef(fql, name) => {
-                    let type_args = args.iter().map(|_| ctx.type_var_gen.fresh()).collect();
-                    MonoType::TypeDef {
-                        fql: fql.clone(),
-                        type_args,
-                        type_def_name: name.clone(),
-                    }
-                }
-                other => inferred_to_mono_inner(other, ctx, generic_map),
-            };
-            MonoType::App {
-                constructor: Box::new(constructor),
-                args: args
-                    .iter()
-                    .map(|a| inferred_to_mono_inner(a, ctx, generic_map))
-                    .collect(),
-            }
-        }
-        InferredType::Generic(id) => {
-            let var_id = *generic_map
-                .entry(*id)
-                .or_insert_with(|| ctx.type_var_gen.fresh());
-            MonoType::Var(var_id)
-        }
-        InferredType::ConstrainedGeneric { id, constraints } => {
-            let var_id = *generic_map
-                .entry(*id)
-                .or_insert_with(|| ctx.type_var_gen.fresh());
-            MonoType::ConstrainedVar(var_id, constraints.iter().cloned().collect())
-        }
     }
 }
 

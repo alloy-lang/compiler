@@ -14,6 +14,7 @@ HirTypedModule {
         Idx::<Expression>(0): Lambda {
             arg_type: ConstrainedGeneric {
                 id: 0,
+                name: "Self",
                 constraints: NonEmpty(
                     [
                         TraitConstraint {
@@ -52,6 +53,7 @@ HirTypedModule {
             return_type: Lambda {
                 arg_type: ConstrainedGeneric {
                     id: 0,
+                    name: "Self",
                     constraints: NonEmpty(
                         [
                             TraitConstraint {
@@ -100,9 +102,11 @@ HirTypedModule {
         },
         Idx::<Expression>(1): Generic(
             1,
+            "b0",
         ),
         Idx::<Expression>(2): ConstrainedGeneric {
             id: 0,
+            name: "Self",
             constraints: NonEmpty(
                 [
                     TraitConstraint {
@@ -141,6 +145,7 @@ HirTypedModule {
         Idx::<Expression>(3): Lambda {
             arg_type: ConstrainedGeneric {
                 id: 0,
+                name: "Self",
                 constraints: NonEmpty(
                     [
                         TraitConstraint {
@@ -188,9 +193,11 @@ HirTypedModule {
         },
         Idx::<Expression>(4): Generic(
             1,
+            "b0",
         ),
         Idx::<Expression>(5): ConstrainedGeneric {
             id: 0,
+            name: "Self",
             constraints: NonEmpty(
                 [
                     TraitConstraint {
@@ -239,9 +246,11 @@ HirTypedModule {
             arg_type: Lambda {
                 arg_type: Generic(
                     0,
+                    "t2",
                 ),
                 return_type: ConstrainedGeneric {
                     id: 1,
+                    name: "Self",
                     constraints: NonEmpty(
                         [
                             TraitConstraint {
@@ -281,10 +290,12 @@ HirTypedModule {
             return_type: Lambda {
                 arg_type: Generic(
                     0,
+                    "t2",
                 ),
                 return_type: Lambda {
                     arg_type: Generic(
                         0,
+                        "t2",
                     ),
                     return_type: TypeDef(
                         Fql {
@@ -303,9 +314,11 @@ HirTypedModule {
         Idx::<Pattern>(0): Lambda {
             arg_type: Generic(
                 1,
+                "b0",
             ),
             return_type: ConstrainedGeneric {
                 id: 0,
+                name: "Self",
                 constraints: NonEmpty(
                     [
                         TraitConstraint {
@@ -344,9 +357,11 @@ HirTypedModule {
         },
         Idx::<Pattern>(1): Generic(
             1,
+            "b0",
         ),
         Idx::<Pattern>(2): Generic(
             1,
+            "b0",
         ),
     },
     warnings: [],
@@ -424,9 +439,11 @@ HirTypedModule {
                     arg_type: Lambda {
                         arg_type: Generic(
                             0,
+                            "t2",
                         ),
                         return_type: ConstrainedGeneric {
                             id: 1,
+                            name: "Self",
                             constraints: NonEmpty(
                                 [
                                     TraitConstraint {
@@ -466,10 +483,12 @@ HirTypedModule {
                     return_type: Lambda {
                         arg_type: Generic(
                             0,
+                            "t2",
                         ),
                         return_type: Lambda {
                             arg_type: Generic(
                                 0,
+                                "t2",
                             ),
                             return_type: TypeDef(
                                 Fql {

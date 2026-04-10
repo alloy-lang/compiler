@@ -98,6 +98,7 @@ dependencies = [
  "camino",
  "itertools 0.14.0",
  "la-arena",
+ "log",
  "maplit",
  "non-empty-vec",
  "rustc-hash 1.1.0",

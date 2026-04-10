@@ -32,7 +32,8 @@ HirTypedModule {
                     Int,
                 ),
                 Generic(
-                    0,
+                    2,
+                    "c0",
                 ),
             ],
         },

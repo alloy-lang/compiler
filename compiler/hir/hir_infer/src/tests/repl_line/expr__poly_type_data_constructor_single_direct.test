@@ -54,6 +54,7 @@ DefinitionInferenceResult {
         ): Lambda {
             arg_type: Generic(
                 0,
+                "t",
             ),
             return_type: Bounded {
                 base: TypeDef(
@@ -68,6 +69,7 @@ DefinitionInferenceResult {
                 args: [
                     Generic(
                         0,
+                        "t",
                     ),
                 ],
             },

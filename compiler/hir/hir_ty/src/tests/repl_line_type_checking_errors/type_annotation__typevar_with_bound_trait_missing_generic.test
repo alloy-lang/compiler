@@ -34,6 +34,7 @@ HirTypedModule {
             arg_type: Bounded {
                 base: ConstrainedGeneric {
                     id: 0,
+                    name: "t1",
                     constraints: NonEmpty(
                         [
                             TraitConstraint {
@@ -57,12 +58,14 @@ HirTypedModule {
                 args: [
                     Generic(
                         1,
+                        "t2",
                     ),
                 ],
             },
             return_type: Lambda {
                 arg_type: Generic(
                     1,
+                    "t2",
                 ),
                 return_type: Bounded {
                     base: TypeDef(
@@ -87,6 +90,7 @@ HirTypedModule {
         Idx::<Pattern>(0): Bounded {
             base: ConstrainedGeneric {
                 id: 0,
+                name: "t1",
                 constraints: NonEmpty(
                     [
                         TraitConstraint {
@@ -110,11 +114,13 @@ HirTypedModule {
             args: [
                 Generic(
                     1,
+                    "t2",
                 ),
             ],
         },
         Idx::<Pattern>(1): Generic(
             1,
+            "t2",
         ),
     },
     warnings: [],
@@ -265,6 +271,7 @@ HirTypedModule {
                     arg_type: Bounded {
                         base: ConstrainedGeneric {
                             id: 0,
+                            name: "t1",
                             constraints: NonEmpty(
                                 [
                                     TraitConstraint {
@@ -288,12 +295,14 @@ HirTypedModule {
                         args: [
                             Generic(
                                 1,
+                                "t2",
                             ),
                         ],
                     },
                     return_type: Lambda {
                         arg_type: Generic(
                             1,
+                            "t2",
                         ),
                         return_type: Bounded {
                             base: TypeDef(
@@ -387,7 +396,7 @@ HirTypedModule {
     │ 
  10 │ let test_func = |a, b| -> test
     │ ───────────────┬────────────┬─  
-    │                ╰──────────────── but the body has type `t0 : main::TestTrait1[t1] -> t1 -> Test[Int]`
+    │                ╰──────────────── but the body has type `t1 : main::TestTrait1[t2] -> t2 -> Test[Int]`
     │                             │   
     │                             ╰─── this is `Test[Int]`, but the annotation expects `Test`
 ────╯

@@ -2,11 +2,12 @@
 
 use super::{EPFql, MonoType, TypeEquation, TypeVarId};
 use crate::diagnostics::TypeInferenceError;
+use crate::hir_ty::hm::converter::ToInferredTypeConverter;
 use crate::{diagnostics, HirInferDatabase};
 use alloy_hir_def as hir;
 use alloy_hir_resolved::{EPTdFql, TraitConstraint};
 use diagnostics::TypeInferenceErrorKind;
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxHashMap, FxHashSet};
 
 /// Substitution mapping type variables to types
 #[derive(Debug, Clone)]
@@ -137,28 +138,10 @@ impl Substitution {
         }
 
         for (var, cs) in &self.constraints {
-            let target = result.apply_type_var(*var);
-            let store = result.constraints.entry(target).or_default();
-            for c in cs {
-                if !store
-                    .iter()
-                    .any(|existing| existing.trait_fql == c.trait_fql)
-                {
-                    store.push(c.clone());
-                }
-            }
+            result.insert_constraints(*var, &MonoType::ConstrainedVar(*var, cs.clone()));
         }
         for (var, cs) in &other.constraints {
-            let target = result.apply_type_var(*var);
-            let store = result.constraints.entry(target).or_default();
-            for c in cs {
-                if !store
-                    .iter()
-                    .any(|existing| existing.trait_fql == c.trait_fql)
-                {
-                    store.push(c.clone());
-                }
-            }
+            result.insert_constraints(*var, &MonoType::ConstrainedVar(*var, cs.clone()));
         }
 
         result
@@ -334,11 +317,8 @@ pub enum UnificationError {
 pub(super) fn solve_equations(
     db: &dyn HirInferDatabase,
     equations: Vec<TypeEquation>,
-) -> (
-    Substitution,
-    FxHashMap<TypeVarId, Vec<TraitConstraint>>,
-    Vec<TypeInferenceError>,
-) {
+    converter: &mut ToInferredTypeConverter,
+) -> (Substitution, Vec<TypeInferenceError>) {
     let mut subst = Substitution::new();
     let mut errors = Vec::new();
 
@@ -370,10 +350,11 @@ pub(super) fn solve_equations(
                     constraint.type_var_constraint_fql.local_id,
                 );
 
+                let converted = converter.mono_to_inferred(&resolved, &FxHashSet::default());
                 errors.push(TypeInferenceError::new(
                     TypeInferenceErrorKind::UnsatisfiedConstraint {
                         trait_fql_name: constraint.trait_fql_name.clone(),
-                        type_name: format!("{resolved}"),
+                        resolved_type: converted,
                         constraint_range,
                     },
                     range,
@@ -404,5 +385,5 @@ pub(super) fn solve_equations(
         }
     }
 
-    (subst, constraint_map, errors)
+    (subst, errors)
 }

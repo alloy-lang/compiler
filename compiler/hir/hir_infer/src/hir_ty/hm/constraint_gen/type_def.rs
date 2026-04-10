@@ -1,4 +1,4 @@
-use crate::hir_ty::hm::{annotated_to_mono, HMInferenceContext, MonoType};
+use crate::hir_ty::hm::{HMInferenceContext, MonoType};
 use alloy_hir_def as hir;
 use alloy_hir_resolved as res;
 use alloy_hir_resolved::{resolve_annotated_type, EPTdFql, Fql};
@@ -64,7 +64,7 @@ fn build_constructor_type(
         .type_args
         .iter()
         .map(|ty_arg| {
-            ctx.get_or_create_annotation_type_var(
+            ctx.converter.get_or_create_annotation_type_var(
                 ty_arg.clone(),
                 hir_module.get_type_variable(ty_arg.local_id).name.clone(),
             )
@@ -100,7 +100,9 @@ fn build_constructor_type(
         .iter()
         .map(|type_idx| {
             let annotated = resolve_annotated_type(ctx.db, type_idx.module_id, type_idx.local_id);
-            annotated_to_mono(&annotated, ctx).unwrap_or_else(|| ctx.fresh_type_var())
+            ctx.converter
+                .annotated_to_mono(&annotated)
+                .unwrap_or_else(|| ctx.fresh_type_var())
         })
         .rev()
         .fold(result_type, |acc, param_ty| {

@@ -18,10 +18,12 @@ DefinitionInferenceResult {
             arg_type: Lambda {
                 arg_type: Generic(
                     0,
+                    "t1",
                 ),
                 return_type: Bounded {
                     base: ConstrainedGeneric {
                         id: 1,
+                        name: "m",
                         constraints: NonEmpty(
                             [
                                 TraitConstraint {
@@ -45,6 +47,7 @@ DefinitionInferenceResult {
                     args: [
                         Generic(
                             2,
+                            "t2",
                         ),
                     ],
                 },
@@ -53,6 +56,7 @@ DefinitionInferenceResult {
                 arg_type: Bounded {
                     base: ConstrainedGeneric {
                         id: 1,
+                        name: "m",
                         constraints: NonEmpty(
                             [
                                 TraitConstraint {
@@ -76,12 +80,14 @@ DefinitionInferenceResult {
                     args: [
                         Generic(
                             0,
+                            "t1",
                         ),
                     ],
                 },
                 return_type: Bounded {
                     base: ConstrainedGeneric {
                         id: 1,
+                        name: "m",
                         constraints: NonEmpty(
                             [
                                 TraitConstraint {
@@ -105,6 +111,7 @@ DefinitionInferenceResult {
                     args: [
                         Generic(
                             2,
+                            "t2",
                         ),
                     ],
                 },

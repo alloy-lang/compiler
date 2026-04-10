@@ -12,6 +12,7 @@ HirTypedModule {
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,
+            "a0",
         ),
         Idx::<Expression>(1): Lambda {
             arg_type: Bounded {
@@ -91,6 +92,7 @@ HirTypedModule {
         ),
         Idx::<Pattern>(2): Generic(
             0,
+            "a0",
         ),
         Idx::<Pattern>(3): Bounded {
             base: TypeDef(
