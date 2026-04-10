@@ -18,7 +18,6 @@ pub trait HirInferDatabase: hir::HirDefDatabase {}
 
 #[derive(Clone, PartialEq)]
 pub struct DefinitionInferenceResult {
-    pub definition_type: InferredType,
     pub expression_types: FxHashMap<hir::ExpressionIdx, InferredType>,
     pub pattern_types: FxHashMap<hir::PatternIdx, InferredType>,
     pub variant_constructor_types:
@@ -30,7 +29,7 @@ pub struct DefinitionInferenceResult {
 impl std::fmt::Debug for DefinitionInferenceResult {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("DefinitionInferenceResult")
-            .field("definition_type", &self.definition_type)
+            .field("definition_type", &InferredType::Unconstrained)
             .field(
                 "expression_types",
                 &self.expression_types.iter().collect::<BTreeMap<_, _>>(),
@@ -55,7 +54,6 @@ impl std::fmt::Debug for DefinitionInferenceResult {
 impl DefinitionInferenceResult {
     pub(crate) fn empty() -> Self {
         Self {
-            definition_type: InferredType::Unconstrained,
             expression_types: FxHashMap::default(),
             pattern_types: FxHashMap::default(),
             variant_constructor_types: FxHashMap::default(),
