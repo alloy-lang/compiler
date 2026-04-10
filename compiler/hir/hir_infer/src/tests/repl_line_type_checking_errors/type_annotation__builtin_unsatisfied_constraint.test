@@ -1,33 +1,82 @@
 import std::order::Ord
 
-typeof bool_traits : t where
+typeof test_traits : t -> Int where
   typevar t = Ord
-let bool_traits = True
+let test_traits = |x| -> 42
 
-typeof unit_traits : t where
-  typevar t = Ord
-let unit_traits = ()
+test_traits(True)
 
-typeof lambda_traits : t where
-  typevar t = Ord
-let lambda_traits = |x| -> x
+test_traits(())
 
-typeof tuple_traits_w_ord : t where
-  typevar t = Ord
-let tuple_traits_w_ord = (True, ())
+test_traits(|x| -> x)
+
+test_traits((True, ()))
+
 ===
 DefinitionInferenceResult {
     definition_type: Unconstrained,
     expression_types: {
         Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(1): Lambda {
+            arg_type: ConstrainedGeneric {
+                id: 0,
+                name: "t",
+                constraints: NonEmpty(
+                    [
+                        TraitConstraint {
+                            trait_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            trait_fql_name: "std::order::Ord",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(0),
+                            },
+                        },
+                        TraitConstraint {
+                            trait_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::eq",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            trait_fql_name: "std::eq::Eq",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(0),
+                            },
+                        },
+                    ],
+                ),
+            },
+            return_type: BuiltIn(
+                Int,
+            ),
+        },
+        Idx::<Expression>(2): BuiltIn(
             Bool,
         ),
-        Idx::<Expression>(1): Unit,
-        Idx::<Expression>(2): Generic(
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(4): Unit,
+        Idx::<Expression>(5): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(6): Generic(
             0,
             "a0",
         ),
-        Idx::<Expression>(3): Lambda {
+        Idx::<Expression>(7): Lambda {
             arg_type: Generic(
                 0,
                 "a0",
@@ -37,11 +86,14 @@ DefinitionInferenceResult {
                 "a0",
             ),
         },
-        Idx::<Expression>(4): BuiltIn(
+        Idx::<Expression>(8): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(9): BuiltIn(
             Bool,
         ),
-        Idx::<Expression>(5): Unit,
-        Idx::<Expression>(6): Tuple(
+        Idx::<Expression>(10): Unit,
+        Idx::<Expression>(11): Tuple(
             NonEmpty(
                 [
                     BuiltIn(
@@ -51,9 +103,50 @@ DefinitionInferenceResult {
                 ],
             ),
         ),
+        Idx::<Expression>(12): BuiltIn(
+            Int,
+        ),
     },
     pattern_types: {
-        Idx::<Pattern>(0): Generic(
+        Idx::<Pattern>(0): ConstrainedGeneric {
+            id: 0,
+            name: "t",
+            constraints: NonEmpty(
+                [
+                    TraitConstraint {
+                        trait_fql: Fql {
+                            module_id: ModuleId {
+                                path: "std::order",
+                            },
+                            local_id: Idx::<Trait>(0),
+                        },
+                        trait_fql_name: "std::order::Ord",
+                        type_var_constraint_fql: Fql {
+                            module_id: ModuleId {
+                                path: "main",
+                            },
+                            local_id: Idx::<TypeVariableConstraint>(0),
+                        },
+                    },
+                    TraitConstraint {
+                        trait_fql: Fql {
+                            module_id: ModuleId {
+                                path: "std::eq",
+                            },
+                            local_id: Idx::<Trait>(0),
+                        },
+                        trait_fql_name: "std::eq::Eq",
+                        type_var_constraint_fql: Fql {
+                            module_id: ModuleId {
+                                path: "std::order",
+                            },
+                            local_id: Idx::<TypeVariableConstraint>(0),
+                        },
+                    },
+                ],
+            ),
+        },
+        Idx::<Pattern>(1): Generic(
             0,
             "a0",
         ),
@@ -67,34 +160,9 @@ DefinitionInferenceResult {
                 resolved_type: BuiltIn(
                     Bool,
                 ),
-                constraint_range: 67..70,
+                constraint_range: 74..77,
             },
-            range: 71..93,
-        },
-        TypeInferenceError {
-            kind: UnsatisfiedConstraint {
-                trait_fql_name: "std::order::Ord",
-                resolved_type: Unit,
-                constraint_range: 138..141,
-            },
-            range: 142..162,
-        },
-        TypeInferenceError {
-            kind: UnsatisfiedConstraint {
-                trait_fql_name: "std::order::Ord",
-                resolved_type: Tuple(
-                    NonEmpty(
-                        [
-                            BuiltIn(
-                                Bool,
-                            ),
-                            Unit,
-                        ],
-                    ),
-                ),
-                constraint_range: 293..296,
-            },
-            range: 297..332,
+            range: 107..124,
         },
         TypeInferenceError {
             kind: UnsatisfiedConstraint {
@@ -109,9 +177,9 @@ DefinitionInferenceResult {
                         "a0",
                     ),
                 },
-                constraint_range: 209..212,
+                constraint_range: 74..77,
             },
-            range: 213..241,
+            range: 143..164,
         },
         TypeInferenceError {
             kind: UnsatisfiedConstraint {
@@ -126,20 +194,45 @@ DefinitionInferenceResult {
                         "a0",
                     ),
                 },
-                constraint_range: 362..365,
+                constraint_range: 234..236,
             },
-            range: 213..241,
+            range: 143..164,
+        },
+        TypeInferenceError {
+            kind: UnsatisfiedConstraint {
+                trait_fql_name: "std::order::Ord",
+                resolved_type: Unit,
+                constraint_range: 74..77,
+            },
+            range: 126..141,
+        },
+        TypeInferenceError {
+            kind: UnsatisfiedConstraint {
+                trait_fql_name: "std::order::Ord",
+                resolved_type: Tuple(
+                    NonEmpty(
+                        [
+                            BuiltIn(
+                                Bool,
+                            ),
+                            Unit,
+                        ],
+                    ),
+                ),
+                constraint_range: 74..77,
+            },
+            range: 166..189,
         },
     ],
 }
 [E33002] Error: Type `Bool` does not implement trait `std::order::Ord`
-   ╭─[ ./test/main.alloy:5:1 ]
+   ╭─[ ./test/main.alloy:7:1 ]
    │
- 5 │ let bool_traits = True
-   │ ───────────┬──────────  
-   │            ╰──────────── missing implementation of trait `std::order::Ord`
+ 7 │ test_traits(True)
+   │ ────────┬────────  
+   │         ╰────────── missing implementation of trait `std::order::Ord`
    │
-   ├─[ ./test/main.alloy:5:1 ]
+   ├─[ ./test/main.alloy:7:1 ]
    │
  4 │   typevar t = Ord
    │               ─┬─  
@@ -148,48 +241,16 @@ DefinitionInferenceResult {
    │ Help: Type `Bool` must implement trait `std::order::Ord`
 ───╯
 
-[E33002] Error: Type `()` does not implement trait `std::order::Ord`
-   ╭─[ ./test/main.alloy:9:1 ]
-   │
- 9 │ let unit_traits = ()
-   │ ──────────┬─────────  
-   │           ╰─────────── missing implementation of trait `std::order::Ord`
-   │
-   ├─[ ./test/main.alloy:9:1 ]
-   │
- 8 │   typevar t = Ord
-   │               ─┬─  
-   │                ╰─── required by this constraint
-   │ 
-   │ Help: Type `()` must implement trait `std::order::Ord`
-───╯
-
-[E33002] Error: Type `(Bool, ())` does not implement trait `std::order::Ord`
-    ╭─[ ./test/main.alloy:17:1 ]
-    │
- 17 │ let tuple_traits_w_ord = (True, ())
-    │ ─────────────────┬─────────────────  
-    │                  ╰─────────────────── missing implementation of trait `std::order::Ord`
-    │
-    ├─[ ./test/main.alloy:17:1 ]
-    │
- 16 │   typevar t = Ord
-    │               ─┬─  
-    │                ╰─── required by this constraint
-    │ 
-    │ Help: Type `(Bool, ())` must implement trait `std::order::Ord`
-────╯
-
 [E33002] Error: Type `a0 -> a0` does not implement trait `std::order::Ord`
-    ╭─[ ./test/main.alloy:13:1 ]
+    ╭─[ ./test/main.alloy:11:1 ]
     │
- 13 │ let lambda_traits = |x| -> x
-    │ ──────────────┬─────────────  
-    │               ╰─────────────── missing implementation of trait `std::order::Ord`
+ 11 │ test_traits(|x| -> x)
+    │ ──────────┬──────────  
+    │           ╰──────────── missing implementation of trait `std::order::Ord`
     │
-    ├─[ ./test/main.alloy:13:1 ]
+    ├─[ ./test/main.alloy:11:1 ]
     │
- 12 │   typevar t = Ord
+  4 │   typevar t = Ord
     │               ─┬─  
     │                ╰─── required by this constraint
     │ 
@@ -197,13 +258,45 @@ DefinitionInferenceResult {
 ────╯
 
 [E33002] Error: Type `a0 -> a0` does not implement trait `std::eq::Eq`
-    ╭─[ ./test/main.alloy:13:1 ]
+    ╭─[ ./test/main.alloy:11:1 ]
     │
- 13 │ let lambda_traits = |x| -> x
-    │ ──────────────┬─────────────  
-    │               ╰─────────────── missing implementation of trait `std::eq::Eq`
+ 11 │ test_traits(|x| -> x)
+    │ ──────────┬──────────  
+    │           ╰──────────── missing implementation of trait `std::eq::Eq`
     │ 
     │ Help: Type `a0 -> a0` must implement trait `std::eq::Eq`
+────╯
+
+[E33002] Error: Type `()` does not implement trait `std::order::Ord`
+   ╭─[ ./test/main.alloy:9:1 ]
+   │
+ 9 │ test_traits(())
+   │ ───────┬───────  
+   │        ╰───────── missing implementation of trait `std::order::Ord`
+   │
+   ├─[ ./test/main.alloy:9:1 ]
+   │
+ 4 │   typevar t = Ord
+   │               ─┬─  
+   │                ╰─── required by this constraint
+   │ 
+   │ Help: Type `()` must implement trait `std::order::Ord`
+───╯
+
+[E33002] Error: Type `(Bool, ())` does not implement trait `std::order::Ord`
+    ╭─[ ./test/main.alloy:13:1 ]
+    │
+ 13 │ test_traits((True, ()))
+    │ ───────────┬───────────  
+    │            ╰───────────── missing implementation of trait `std::order::Ord`
+    │
+    ├─[ ./test/main.alloy:13:1 ]
+    │
+  4 │   typevar t = Ord
+    │               ─┬─  
+    │                ╰─── required by this constraint
+    │ 
+    │ Help: Type `(Bool, ())` must implement trait `std::order::Ord`
 ────╯
 
 

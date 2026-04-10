@@ -8,9 +8,11 @@ behavior Ord for Foo where
   let compare = Ordering::EQ
 end
 
-typeof foo : t where
+typeof test : t -> Int where
   typevar t = Ord
-let foo = Foo::Bar
+let test = |x| -> 42
+
+test(Foo::Bar)
 ===
 DefinitionInferenceResult {
     definition_type: Unconstrained,
@@ -24,7 +26,53 @@ DefinitionInferenceResult {
             },
             "Ordering",
         ),
-        Idx::<Expression>(1): TypeDef(
+        Idx::<Expression>(1): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(2): Lambda {
+            arg_type: ConstrainedGeneric {
+                id: 0,
+                name: "t",
+                constraints: NonEmpty(
+                    [
+                        TraitConstraint {
+                            trait_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            trait_fql_name: "std::order::Ord",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(0),
+                            },
+                        },
+                        TraitConstraint {
+                            trait_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::eq",
+                                },
+                                local_id: Idx::<Trait>(0),
+                            },
+                            trait_fql_name: "std::eq::Eq",
+                            type_var_constraint_fql: Fql {
+                                module_id: ModuleId {
+                                    path: "std::order",
+                                },
+                                local_id: Idx::<TypeVariableConstraint>(0),
+                            },
+                        },
+                    ],
+                ),
+            },
+            return_type: BuiltIn(
+                Int,
+            ),
+        },
+        Idx::<Expression>(3): TypeDef(
             Fql {
                 module_id: ModuleId {
                     path: "main",
@@ -33,8 +81,50 @@ DefinitionInferenceResult {
             },
             "Foo",
         ),
+        Idx::<Expression>(4): BuiltIn(
+            Int,
+        ),
     },
-    pattern_types: {},
+    pattern_types: {
+        Idx::<Pattern>(0): ConstrainedGeneric {
+            id: 0,
+            name: "t",
+            constraints: NonEmpty(
+                [
+                    TraitConstraint {
+                        trait_fql: Fql {
+                            module_id: ModuleId {
+                                path: "std::order",
+                            },
+                            local_id: Idx::<Trait>(0),
+                        },
+                        trait_fql_name: "std::order::Ord",
+                        type_var_constraint_fql: Fql {
+                            module_id: ModuleId {
+                                path: "main",
+                            },
+                            local_id: Idx::<TypeVariableConstraint>(0),
+                        },
+                    },
+                    TraitConstraint {
+                        trait_fql: Fql {
+                            module_id: ModuleId {
+                                path: "std::eq",
+                            },
+                            local_id: Idx::<Trait>(0),
+                        },
+                        trait_fql_name: "std::eq::Eq",
+                        type_var_constraint_fql: Fql {
+                            module_id: ModuleId {
+                                path: "std::order",
+                            },
+                            local_id: Idx::<TypeVariableConstraint>(0),
+                        },
+                    },
+                ],
+            ),
+        },
+    },
     variant_constructor_types: {
         (
             Idx::<TypeDefinition>(0),
@@ -67,16 +157,16 @@ DefinitionInferenceResult {
                 ),
                 constraint_range: 234..236,
             },
-            range: 163..181,
+            range: 193..207,
         },
     ],
 }
 [E33002] Error: Type `Foo` does not implement trait `std::eq::Eq`
-    ╭─[ ./test/main.alloy:13:1 ]
+    ╭─[ ./test/main.alloy:15:1 ]
     │
- 13 │ let foo = Foo::Bar
-    │ ─────────┬────────  
-    │          ╰────────── missing implementation of trait `std::eq::Eq`
+ 15 │ test(Foo::Bar)
+    │ ───────┬──────  
+    │        ╰──────── missing implementation of trait `std::eq::Eq`
     │ 
     │ Help: Type `Foo` must implement trait `std::eq::Eq`
 ────╯
