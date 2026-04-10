@@ -11,8 +11,8 @@ pub(super) fn infer_if_then_else(
 ) -> MonoType {
     let cond_ty = super::infer_expr_hm(ctx, condition);
     ctx.add_equation(
-        cond_ty,
         MonoType::Concrete(hir::BuiltInType::Bool),
+        cond_ty,
         source_fql.clone(),
     );
 

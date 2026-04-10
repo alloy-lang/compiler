@@ -17,8 +17,8 @@ pub(super) fn infer(
             let rhs_ty = super::infer_expr_hm(ctx, rhs.clone());
 
             let num_ty = ctx.fresh_type_var();
-            ctx.add_equation(lhs_ty.clone(), num_ty.clone(), source_fql.clone());
-            ctx.add_equation(rhs_ty.clone(), num_ty.clone(), source_fql.clone());
+            ctx.add_equation(num_ty.clone(), lhs_ty.clone(), source_fql.clone());
+            ctx.add_equation(num_ty.clone(), rhs_ty.clone(), source_fql.clone());
             return ctx.assign_type(source_fql, num_ty);
         }
         hir::BinaryOp::Custom(path) => {

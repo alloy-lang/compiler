@@ -37,18 +37,6 @@ HirTypedModule {
                 TypeInferenceError {
                     kind: UnificationError(
                         TypeMismatch(
-                            Function(
-                                Var(
-                                    TypeVarId(
-                                        0,
-                                    ),
-                                ),
-                                Var(
-                                    TypeVarId(
-                                        0,
-                                    ),
-                                ),
-                            ),
                             App {
                                 constructor: TypeDef {
                                     fql: Fql {
@@ -97,6 +85,18 @@ HirTypedModule {
                                     ),
                                 ],
                             },
+                            Function(
+                                Var(
+                                    TypeVarId(
+                                        0,
+                                    ),
+                                ),
+                                Var(
+                                    TypeVarId(
+                                        0,
+                                    ),
+                                ),
+                            ),
                         ),
                     ),
                     range: 80..100,
@@ -296,12 +296,12 @@ HirTypedModule {
    │ Help: While parsing the `]` at the end of the bounded type arguments, expected `‘]’`
 ───╯
 
-[E33001] Error: Type mismatch: expected `t0 -> t0`, found `Test[t2 -> Test[t2]]`
+[E33001] Error: Type mismatch: expected `Test[t2 -> Test[t2]]`, found `t0 -> t0`
    ╭─[ ./test/main.alloy:5:1 ]
    │
  5 │ let apply = |x| -> x
    │ ──────────┬─────────  
-   │           ╰─────────── expected `t0 -> t0`, found `Test[t2 -> Test[t2]]`
+   │           ╰─────────── expected `Test[t2 -> Test[t2]]`, found `t0 -> t0`
    │ 
    │ Help: These types must be compatible
 ───╯

@@ -36,6 +36,20 @@ HirTypedModule {
                 TypeInferenceError {
                     kind: UnificationError(
                         TypeMismatch(
+                            TypeDef {
+                                fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "main",
+                                    },
+                                    local_id: Idx::<TypeDefinition>(0),
+                                },
+                                type_args: [
+                                    TypeVarId(
+                                        0,
+                                    ),
+                                ],
+                                type_def_name: "Box",
+                            },
                             App {
                                 constructor: TypeDef {
                                     fql: Fql {
@@ -56,20 +70,6 @@ HirTypedModule {
                                         Int,
                                     ),
                                 ],
-                            },
-                            TypeDef {
-                                fql: Fql {
-                                    module_id: ModuleId {
-                                        path: "main",
-                                    },
-                                    local_id: Idx::<TypeDefinition>(0),
-                                },
-                                type_args: [
-                                    TypeVarId(
-                                        0,
-                                    ),
-                                ],
-                                type_def_name: "Box",
                             },
                         ),
                     ),
@@ -173,12 +173,12 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[E33001] Error: Type mismatch: expected `Box[Int]`, found `Box`
+[E33001] Error: Type mismatch: expected `Box`, found `Box[Int]`
    ╭─[ ./test/main.alloy:4:1 ]
    │
  4 │ let wrong = Box(42)
    │ ─────────┬─────────  
-   │          ╰─────────── expected `Box[Int]`, found `Box`
+   │          ╰─────────── expected `Box`, found `Box[Int]`
    │ 
    │ Help: These types must be compatible
 ───╯

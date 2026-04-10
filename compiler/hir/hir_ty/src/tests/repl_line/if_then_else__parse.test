@@ -41,6 +41,9 @@ HirTypedModule {
                 TypeInferenceError {
                     kind: UnificationError(
                         TypeMismatch(
+                            Concrete(
+                                Bool,
+                            ),
                             App {
                                 constructor: TypeDef {
                                     fql: Fql {
@@ -62,9 +65,6 @@ HirTypedModule {
                                     ),
                                 ],
                             },
-                            Concrete(
-                                Bool,
-                            ),
                         ),
                     ),
                     range: 24..45,
@@ -75,12 +75,12 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
+[E33001] Error: Type mismatch: expected `Bool`, found `Test[Int]`
    ╭─[ ./test/main.alloy:3:1 ]
    │
  3 │ if test then 2 else 3
    │ ──────────┬──────────  
-   │           ╰──────────── expected `Test[Int]`, found `Bool`
+   │           ╰──────────── expected `Bool`, found `Test[Int]`
    │ 
    │ Help: These types must be compatible
 ───╯

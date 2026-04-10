@@ -150,11 +150,11 @@ impl Substitution {
 
 /// Unification algorithm with occurs check
 fn unify_types(
-    t1: &MonoType,
-    t2: &MonoType,
+    actual: &MonoType,
+    expected: &MonoType,
     source_fql: &EPTdFql,
 ) -> (Substitution, Vec<UnificationError>) {
-    match (t1, t2) {
+    match (actual, expected) {
         // Same type variable
         (MonoType::Unconstrained, _) | (_, MonoType::Unconstrained) => {
             (Substitution::new(), Vec::new())
@@ -183,8 +183,8 @@ fn unify_types(
             } else {
                 let mut subst = Substitution::new();
                 subst.insert(*v, t.clone(), source_fql);
-                subst.insert_constraints(*v, t2);
-                subst.insert_constraints(*v, t1);
+                subst.insert_constraints(*v, expected);
+                subst.insert_constraints(*v, actual);
                 (subst, Vec::new())
             }
         }
@@ -204,8 +204,8 @@ fn unify_types(
             if !errors.is_empty() {
                 // override member errors with the applied types for better error messages
                 errors = vec![UnificationError::TypeMismatch(
-                    Box::new(subst.apply(t1)),
-                    Box::new(subst.apply(t2)),
+                    Box::new(subst.apply(actual)),
+                    Box::new(subst.apply(expected)),
                 )];
             }
             (subst, errors)
@@ -230,8 +230,8 @@ fn unify_types(
             if !args_errors.is_empty() {
                 // override argument errors with the applied types for better error messages
                 args_errors = vec![UnificationError::TypeMismatch(
-                    Box::new(subst.apply(t1)),
-                    Box::new(subst.apply(t2)),
+                    Box::new(subst.apply(actual)),
+                    Box::new(subst.apply(expected)),
                 )];
             }
             (subst, [errors, args_errors].concat())
@@ -256,8 +256,8 @@ fn unify_types(
         _ => (
             Substitution::new(),
             vec![UnificationError::TypeMismatch(
-                Box::new(t1.clone()),
-                Box::new(t2.clone()),
+                Box::new(actual.clone()),
+                Box::new(expected.clone()),
             )],
         ),
     }
@@ -322,13 +322,16 @@ pub(super) fn solve_equations(
     let mut subst = Substitution::new();
     let mut errors = Vec::new();
 
-    // First pass: collect substitutions and constraints
+    // First pass: collect substitutions and constraints.
+    // Unify as (actual, expected) so that inferred type variables bind to
+    // annotation variables, preserving user-chosen names like `t` over
+    // auto-generated names like `a0`.
     for equation in &equations {
-        let left = subst.apply(&equation.left);
-        let right = subst.apply(&equation.right);
+        let expected = subst.apply(&equation.expected);
+        let actual = subst.apply(&equation.actual);
         let source_fql = equation.source.clone().into();
 
-        let (new_subst, _errors) = unify_types(&left, &right, &source_fql);
+        let (new_subst, _errors) = unify_types(&actual, &expected, &source_fql);
         subst = subst.compose(&new_subst);
     }
 
@@ -365,11 +368,11 @@ pub(super) fn solve_equations(
 
     // Second pass: collect unification errors
     for equation in &equations {
-        let left = subst.apply(&equation.left);
-        let right = subst.apply(&equation.right);
+        let expected = subst.apply(&equation.expected);
+        let actual = subst.apply(&equation.actual);
         let source_fql = equation.source.clone().into();
 
-        let (_, unification_errors) = unify_types(&left, &right, &source_fql);
+        let (_, unification_errors) = unify_types(&expected, &actual, &source_fql);
 
         for err in unification_errors {
             let (hir_module, _) = hir::lower_file(db, equation.source.module_id());

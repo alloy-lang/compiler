@@ -232,8 +232,8 @@ pub struct TypeConstraint {
 /// A type equation for unification (e.g., `τ1 = τ2`)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeEquation {
-    pub(super) left: MonoType,
-    pub(super) right: MonoType,
+    pub(super) expected: MonoType,
+    pub(super) actual: MonoType,
     /// Source location for error reporting
     pub(super) source: EPFql,
 }
@@ -357,11 +357,11 @@ impl<'db> HMInferenceContext<'db> {
         ty
     }
 
-    /// Add a type equation
-    fn add_equation(&mut self, left: MonoType, right: MonoType, fql: impl Into<EPFql>) {
+    /// Add a type equation: `expected = actual`.
+    fn add_equation(&mut self, expected: MonoType, actual: MonoType, fql: impl Into<EPFql>) {
         self.equations.push(TypeEquation {
-            left,
-            right,
+            expected,
+            actual,
             source: fql.into(),
         });
     }

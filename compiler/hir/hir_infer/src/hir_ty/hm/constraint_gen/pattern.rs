@@ -81,8 +81,12 @@ fn infer_destructure(
 
     let (field_types, result_type) = decompose_function_type(constructor_ty);
 
-    for (pattern_ty, field_ty) in field_pattern_types.iter().zip(field_types.iter()) {
-        ctx.add_equation(pattern_ty.clone(), field_ty.clone(), source_fql.clone());
+    for (actual_arg_ty, expected_arg_ty) in field_pattern_types.iter().zip(field_types.iter()) {
+        ctx.add_equation(
+            expected_arg_ty.clone(),
+            actual_arg_ty.clone(),
+            source_fql.clone(),
+        );
     }
 
     ctx.assign_type(source_fql, result_type)
