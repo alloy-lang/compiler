@@ -8,11 +8,11 @@ DefinitionInferenceResult {
     expression_types: {
         Idx::<Expression>(0): Generic(
             0,
-            "a0",
+            "t1",
         ),
         Idx::<Expression>(1): Generic(
             1,
-            "b0",
+            "t2",
         ),
         Idx::<Expression>(2): Lambda {
             arg_type: Generic(
@@ -40,16 +40,16 @@ DefinitionInferenceResult {
     pattern_types: {
         Idx::<Pattern>(0): Generic(
             0,
-            "a0",
+            "t1",
         ),
         Idx::<Pattern>(1): Lambda {
             arg_type: Generic(
                 0,
-                "a0",
+                "t1",
             ),
             return_type: Generic(
                 1,
-                "b0",
+                "t2",
             ),
         },
     },

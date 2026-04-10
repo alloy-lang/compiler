@@ -154,7 +154,7 @@ DefinitionInferenceResult {
             ),
         ): Lambda {
             arg_type: Generic(
-                1,
+                0,
                 "r",
             ),
             return_type: Bounded {
@@ -169,11 +169,11 @@ DefinitionInferenceResult {
                 ),
                 args: [
                     Generic(
-                        0,
+                        1,
                         "l",
                     ),
                     Generic(
-                        1,
+                        0,
                         "r",
                     ),
                 ],

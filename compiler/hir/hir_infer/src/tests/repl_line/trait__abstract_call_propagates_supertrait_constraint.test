@@ -11,7 +11,7 @@ DefinitionInferenceResult {
     expression_types: {
         Idx::<Expression>(0): Lambda {
             arg_type: ConstrainedGeneric {
-                id: 0,
+                id: 1,
                 name: "Self",
                 constraints: NonEmpty(
                     [
@@ -50,7 +50,7 @@ DefinitionInferenceResult {
             },
             return_type: Lambda {
                 arg_type: ConstrainedGeneric {
-                    id: 0,
+                    id: 1,
                     name: "Self",
                     constraints: NonEmpty(
                         [
@@ -99,11 +99,11 @@ DefinitionInferenceResult {
             },
         },
         Idx::<Expression>(1): Generic(
-            1,
-            "b0",
+            0,
+            "t2",
         ),
         Idx::<Expression>(2): ConstrainedGeneric {
-            id: 0,
+            id: 1,
             name: "Self",
             constraints: NonEmpty(
                 [
@@ -142,7 +142,7 @@ DefinitionInferenceResult {
         },
         Idx::<Expression>(3): Lambda {
             arg_type: ConstrainedGeneric {
-                id: 0,
+                id: 1,
                 name: "Self",
                 constraints: NonEmpty(
                     [
@@ -190,11 +190,11 @@ DefinitionInferenceResult {
             ),
         },
         Idx::<Expression>(4): Generic(
-            1,
-            "b0",
+            0,
+            "t2",
         ),
         Idx::<Expression>(5): ConstrainedGeneric {
-            id: 0,
+            id: 1,
             name: "Self",
             constraints: NonEmpty(
                 [
@@ -311,11 +311,11 @@ DefinitionInferenceResult {
     pattern_types: {
         Idx::<Pattern>(0): Lambda {
             arg_type: Generic(
-                1,
-                "b0",
+                0,
+                "t2",
             ),
             return_type: ConstrainedGeneric {
-                id: 0,
+                id: 1,
                 name: "Self",
                 constraints: NonEmpty(
                     [
@@ -354,12 +354,12 @@ DefinitionInferenceResult {
             },
         },
         Idx::<Pattern>(1): Generic(
-            1,
-            "b0",
+            0,
+            "t2",
         ),
         Idx::<Pattern>(2): Generic(
-            1,
-            "b0",
+            0,
+            "t2",
         ),
     },
     variant_constructor_types: {},

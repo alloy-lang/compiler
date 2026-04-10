@@ -121,7 +121,7 @@ DefinitionInferenceResult {
                     args: [
                         Generic(
                             1,
-                            "t2",
+                            "t1",
                         ),
                     ],
                 },
@@ -184,7 +184,7 @@ DefinitionInferenceResult {
             args: [
                 Generic(
                     1,
-                    "t2",
+                    "t1",
                 ),
             ],
         },
@@ -246,7 +246,7 @@ DefinitionInferenceResult {
                 args: [
                     Generic(
                         1,
-                        "t2",
+                        "t1",
                     ),
                 ],
             },
@@ -307,7 +307,7 @@ DefinitionInferenceResult {
                 args: [
                     Generic(
                         1,
-                        "t2",
+                        "t1",
                     ),
                 ],
             },
@@ -369,7 +369,7 @@ DefinitionInferenceResult {
             args: [
                 Generic(
                     1,
-                    "t2",
+                    "t1",
                 ),
             ],
         },
@@ -668,7 +668,7 @@ DefinitionInferenceResult {
                     args: [
                         Generic(
                             1,
-                            "t2",
+                            "t1",
                         ),
                     ],
                 },
@@ -731,7 +731,7 @@ DefinitionInferenceResult {
             args: [
                 Generic(
                     1,
-                    "t2",
+                    "t1",
                 ),
             ],
         },

@@ -49,18 +49,16 @@ DefinitionInferenceResult {
                 BuiltIn(
                     Int,
                 ),
-                Generic(
-                    0,
-                    "c0",
+                BuiltIn(
+                    Int,
                 ),
             ],
         },
         Idx::<Expression>(3): BuiltIn(
             Int,
         ),
-        Idx::<Expression>(4): Generic(
-            1,
-            "b0",
+        Idx::<Expression>(4): BuiltIn(
+            Int,
         ),
         Idx::<Expression>(5): BuiltIn(
             Int,
@@ -89,9 +87,8 @@ DefinitionInferenceResult {
                 ),
             ],
         },
-        Idx::<Pattern>(2): Generic(
-            1,
-            "b0",
+        Idx::<Pattern>(2): BuiltIn(
+            Int,
         ),
         Idx::<Pattern>(3): Bounded {
             base: TypeDef(

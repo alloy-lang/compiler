@@ -158,14 +158,14 @@ pub(crate) fn infer_module(
     let (hir_module, _) = hir::lower_file(db, module_id);
     let mut result = DefinitionInferenceResult::empty();
 
+    let expressions_result = crate::infer_expressions(db, module_id);
+    result = result.compose(expressions_result);
+
     for (_, value_def) in hir_module.values() {
         let value_def = hir::module_value_def(db, module_id, value_def.expr_idx).expect("");
         let def_result = crate::infer_body_type(db, value_def);
         result = result.compose(def_result);
     }
-
-    let expressions_result = crate::infer_expressions(db, module_id);
-    result = result.compose(expressions_result);
 
     result
 }
