@@ -1,7 +1,9 @@
+use super::unification::Substitution;
 use crate::hir_ty::hm::{MonoType, TypeVarId};
 use crate::{DisplayName, InferredType};
 use alloy_hir_def as hir;
 use alloy_hir_resolved::{AnnotatedType, AnnotatedTypeVar, Fql};
+use itertools::Itertools;
 use non_empty_vec::NonEmpty;
 use rustc_hash::{FxHashMap, FxHashSet};
 
@@ -25,15 +27,38 @@ pub(super) struct ToInferredTypeConverter {
     pub(super) type_var_gen: TypeVarGenerator,
 
     type_var_names: FxHashMap<TypeVarId, hir::Name>,
+    annotation_var_ids: Vec<TypeVarId>,
     seen: FxHashMap<TypeVarId, usize>,
 }
 
 impl ToInferredTypeConverter {
-    pub(super) fn from(other: &ToMonoTypeConverter) -> Self {
+    pub(super) fn from(
+        other: &ToMonoTypeConverter,
+        local_annotation_var_ids: &[TypeVarId],
+    ) -> Self {
         Self {
             type_var_gen: TypeVarGenerator::new(),
             type_var_names: other.type_var_names.clone(),
+            annotation_var_ids: local_annotation_var_ids
+                .iter()
+                .sorted_by(|a, b| a.0.cmp(&b.0))
+                .cloned()
+                .collect(),
             seen: FxHashMap::default(),
+        }
+    }
+
+    pub(super) fn propagate_annotation_names(&mut self, substitution: &Substitution) {
+        // For each local annotation type var, find the terminal var it resolves to
+        // and override that terminal's name with the annotation name. This ensures
+        // user-chosen names (e.g. "t1") take priority over internal names (e.g. "Self")
+        // while preserving names from other sources (type defs, cross-def references).
+        for &ann_var in &self.annotation_var_ids {
+            let Some(annotation_name) = self.type_var_names.get(&ann_var).cloned() else {
+                continue;
+            };
+            let terminal = substitution.apply_type_var(ann_var);
+            self.type_var_names.insert(terminal, annotation_name);
         }
     }
 
@@ -103,12 +128,14 @@ impl ToInferredTypeConverter {
     }
 
     fn resolve_generic(&mut self, var_id: TypeVarId) -> (usize, DisplayName) {
-        let generic_id = if let Some(generic_id) = self.seen.get(&var_id) {
-            *generic_id
-        } else {
-            let new_id = self.type_var_gen.fresh().0;
-            self.seen.insert(var_id, new_id);
-            new_id
+        let generic_id = {
+            if let Some(generic_id) = self.seen.get(&var_id) {
+                *generic_id
+            } else {
+                let new_id = self.type_var_gen.fresh().0;
+                self.seen.insert(var_id, new_id);
+                new_id
+            }
         };
 
         let name = self
@@ -315,6 +342,10 @@ impl ToMonoTypeConverter {
         self.self_type_vars.insert(trait_fql, var_id);
         self.type_var_names.insert(var_id, hir::Name::new("Self"));
         var_id
+    }
+
+    pub(super) fn annotation_var_ids(&self) -> FxHashSet<TypeVarId> {
+        self.annotation_type_vars.values().copied().collect()
     }
 
     pub(super) fn fresh_type_var(&mut self) -> TypeVarId {

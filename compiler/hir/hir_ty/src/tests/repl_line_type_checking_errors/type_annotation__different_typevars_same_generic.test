@@ -15,11 +15,11 @@ HirTypedModule {
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
                 0,
-                "b",
+                "a",
             ),
             return_type: Generic(
                 0,
-                "b",
+                "a",
             ),
         },
     },
@@ -63,11 +63,11 @@ HirTypedModule {
                 value_type: Lambda {
                     arg_type: Generic(
                         0,
-                        "b",
+                        "a",
                     ),
                     return_type: Generic(
                         0,
-                        "b",
+                        "a",
                     ),
                 },
                 value_range: 53..70,
@@ -87,7 +87,7 @@ HirTypedModule {
                     expected_type_range: 17..18,
                     actual_type: Generic(
                         0,
-                        "b",
+                        "a",
                     ),
                     actual_type_range: 69..70,
                 },
@@ -106,9 +106,9 @@ HirTypedModule {
    │ 
  4 │ let id = |x| -> x
    │ ────────┬───────┬  
-   │         ╰────────── but the body has type `b -> b`
+   │         ╰────────── but the body has type `a -> a`
    │                 │  
-   │                 ╰── this is `b`, but the annotation expects `b`
+   │                 ╰── this is `a`, but the annotation expects `b`
 ───╯
 
 

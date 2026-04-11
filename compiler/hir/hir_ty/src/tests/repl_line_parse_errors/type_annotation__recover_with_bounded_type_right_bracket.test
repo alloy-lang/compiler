@@ -28,7 +28,7 @@ HirTypedModule {
                 args: [
                     Generic(
                         0,
-                        "t2",
+                        "t1",
                     ),
                 ],
             },
@@ -45,7 +45,7 @@ HirTypedModule {
                 args: [
                     Generic(
                         0,
-                        "t2",
+                        "t1",
                     ),
                 ],
             },
@@ -150,7 +150,7 @@ HirTypedModule {
                         args: [
                             Generic(
                                 0,
-                                "t2",
+                                "t1",
                             ),
                         ],
                     },
@@ -167,7 +167,7 @@ HirTypedModule {
                         args: [
                             Generic(
                                 0,
-                                "t2",
+                                "t1",
                             ),
                         ],
                     },
@@ -189,7 +189,7 @@ HirTypedModule {
                     expected_type_range: 56..58,
                     actual_type: Generic(
                         0,
-                        "t2",
+                        "t1",
                     ),
                     actual_type_range: 115..116,
                 },
@@ -218,9 +218,9 @@ HirTypedModule {
    │ 
  6 │ let apply = |x| -> x
    │ ──────────┬────────┬  
-   │           ╰─────────── but the body has type `Test[t2] -> Test[t2]`
+   │           ╰─────────── but the body has type `Test[t1] -> Test[t1]`
    │                    │  
-   │                    ╰── this is `t2`, but the annotation expects `t2`
+   │                    ╰── this is `t1`, but the annotation expects `t2`
 ───╯
 
 

@@ -335,6 +335,8 @@ pub(super) fn solve_equations(
         subst = subst.compose(&new_subst);
     }
 
+    converter.propagate_annotation_names(&subst);
+
     let constraint_map = subst.constraints.clone();
 
     // Check constraints: when a constrained type variable resolves to a

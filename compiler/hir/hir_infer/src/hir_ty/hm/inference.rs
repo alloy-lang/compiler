@@ -10,6 +10,7 @@ use crate::{DefinitionInferenceResult, HirInferDatabase, TypeInferenceError};
 use alloy_hir_def as hir;
 use alloy_hir_resolved::resolve_annotated_type;
 use alloy_workspace::ModuleId;
+use rustc_hash::FxHashSet;
 
 #[salsa::tracked(cycle_initial = infer_body_type_cycle_initial)]
 pub(crate) fn infer_body_type<'db>(
@@ -26,13 +27,18 @@ pub(crate) fn infer_body_type<'db>(
 
     let inferred_mono = infer_expr_hm(&mut ctx, expr_fql.clone());
 
-    if let Some(type_annotation) = value_def.type_annotation(db) {
+    let local_annotation_var_ids = if let Some(type_annotation) = value_def.type_annotation(db) {
+        let vars_before = ctx.converter.annotation_var_ids();
         let annotated = resolve_annotated_type(db, module_id, type_annotation);
         let annotated_mono = ctx.converter.annotated_to_mono(&annotated);
         ctx.add_equation(annotated_mono, inferred_mono, expr_fql);
-    }
+        let vars_after = ctx.converter.annotation_var_ids();
+        &vars_after - &vars_before
+    } else {
+        FxHashSet::default()
+    };
 
-    collect_inference_results(&mut ctx, module_id)
+    collect_inference_results(&mut ctx, module_id, local_annotation_var_ids)
 }
 
 fn infer_body_type_cycle_initial(
@@ -58,20 +64,27 @@ pub(crate) fn infer_expressions(
         infer_expr_hm(&mut ctx, expr_fql);
     }
 
-    collect_inference_results(&mut ctx, module_id)
+    collect_inference_results(&mut ctx, module_id, FxHashSet::default())
 }
 
 /// Collect inference results from a completed inference context.
 ///
 /// Solves type equations, checks trait constraints, converts MonoTypes
 /// to InferredTypes, and collects errors.
+///
+/// `local_annotation_var_ids` are the type vars from the definition's own
+/// annotation — only these names are propagated to inferred types.
 fn collect_inference_results(
     ctx: &mut HMInferenceContext<'_>,
     module_id: ModuleId,
+    local_annotation_var_ids: FxHashSet<super::TypeVarId>,
 ) -> DefinitionInferenceResult {
     let db = ctx.db;
 
-    let mut converter = ToInferredTypeConverter::from(&ctx.converter);
+    let mut converter = ToInferredTypeConverter::from(
+        &ctx.converter,
+        &local_annotation_var_ids.into_iter().collect::<Vec<_>>(),
+    );
     let (substitution, solve_errors) = solve_equations(db, ctx.equations.clone(), &mut converter);
 
     let mut result = DefinitionInferenceResult::empty();

@@ -1,9 +1,9 @@
 import std::function::(<|)
 import std::order::{Ord, Ordering}
 
-typeof comparing : (t2 -> t1) -> t2 -> t2 -> Ordering where
-  typevar t1
-  typevar t2
+typeof comparing : (t222 -> t111) -> t222 -> t222 -> Ordering where
+  typevar t111
+  typevar t222
 let comparing = |convert, x, y| -> Ord::compare <| convert(x) <| convert(y)
 ===
 HirTypedModule {
@@ -246,11 +246,11 @@ HirTypedModule {
             arg_type: Lambda {
                 arg_type: Generic(
                     0,
-                    "t2",
+                    "t222",
                 ),
                 return_type: ConstrainedGeneric {
                     id: 1,
-                    name: "Self",
+                    name: "t111",
                     constraints: NonEmpty(
                         [
                             TraitConstraint {
@@ -290,12 +290,12 @@ HirTypedModule {
             return_type: Lambda {
                 arg_type: Generic(
                     0,
-                    "t2",
+                    "t222",
                 ),
                 return_type: Lambda {
                     arg_type: Generic(
                         0,
-                        "t2",
+                        "t222",
                     ),
                     return_type: TypeDef(
                         Fql {
@@ -378,7 +378,7 @@ HirTypedModule {
                                     },
                                     local_id: Idx::<TypeVariable>(1),
                                 },
-                                name: "t2",
+                                name: "t222",
                                 type_arity: 0,
                             },
                         ),
@@ -390,7 +390,7 @@ HirTypedModule {
                                     },
                                     local_id: Idx::<TypeVariable>(0),
                                 },
-                                name: "t1",
+                                name: "t111",
                                 type_arity: 0,
                             },
                         ),
@@ -404,7 +404,7 @@ HirTypedModule {
                                     },
                                     local_id: Idx::<TypeVariable>(1),
                                 },
-                                name: "t2",
+                                name: "t222",
                                 type_arity: 0,
                             },
                         ),
@@ -417,7 +417,7 @@ HirTypedModule {
                                         },
                                         local_id: Idx::<TypeVariable>(1),
                                     },
-                                    name: "t2",
+                                    name: "t222",
                                     type_arity: 0,
                                 },
                             ),
@@ -434,16 +434,16 @@ HirTypedModule {
                         },
                     },
                 },
-                annotation_range: 82..116,
+                annotation_range: 82..124,
                 value_type: Lambda {
                     arg_type: Lambda {
                         arg_type: Generic(
                             0,
-                            "t2",
+                            "t222",
                         ),
                         return_type: ConstrainedGeneric {
                             id: 1,
-                            name: "Self",
+                            name: "t111",
                             constraints: NonEmpty(
                                 [
                                     TraitConstraint {
@@ -483,12 +483,12 @@ HirTypedModule {
                     return_type: Lambda {
                         arg_type: Generic(
                             0,
-                            "t2",
+                            "t222",
                         ),
                         return_type: Lambda {
                             arg_type: Generic(
                                 0,
-                                "t2",
+                                "t222",
                             ),
                             return_type: TypeDef(
                                 Fql {
@@ -502,15 +502,49 @@ HirTypedModule {
                         },
                     },
                 },
-                value_range: 149..224,
+                value_range: 161..236,
                 reason: InsufficientConstraints {
                     missing_constraints: [
-                        "std::eq::Eq",
-                        "std::order::Ord",
+                        (
+                            TraitConstraint {
+                                trait_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::eq",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                trait_fql_name: "std::eq::Eq",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::order",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(0),
+                                },
+                            },
+                            234..236,
+                        ),
+                        (
+                            TraitConstraint {
+                                trait_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::order",
+                                    },
+                                    local_id: Idx::<Trait>(0),
+                                },
+                                trait_fql_name: "std::order::Ord",
+                                type_var_constraint_fql: Fql {
+                                    module_id: ModuleId {
+                                        path: "std::order",
+                                    },
+                                    local_id: Idx::<TypeVariableConstraint>(1),
+                                },
+                            },
+                            215..218,
+                        ),
                     ],
                 },
             },
-            range: 149..224,
+            range: 161..236,
         },
     ],
     poly_instantiations: {},
@@ -518,9 +552,9 @@ HirTypedModule {
 [E34001] Error: Inferred type does not match annotated type
    ╭─[ ./test/main.alloy:7:1 ]
    │
- 4 │ typeof comparing : (t2 -> t1) -> t2 -> t2 -> Ordering where
-   │                    ─────────────────┬────────────────  
-   │                                     ╰────────────────── type annotation is missing required constraint(s): `std::eq::Eq`, `std::order::Ord`
+ 4 │ typeof comparing : (t222 -> t111) -> t222 -> t222 -> Ordering where
+   │                    ─────────────────────┬────────────────────  
+   │                                         ╰────────────────────── type annotation is missing required constraint(s): `std::eq::Eq`, `std::order::Ord`
    │ 
  7 │ let comparing = |convert, x, y| -> Ord::compare <| convert(x) <| convert(y)
    │ ─────────────────────────────────────┬─────────────────────────────────────  
