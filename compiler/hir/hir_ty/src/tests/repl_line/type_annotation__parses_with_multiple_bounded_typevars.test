@@ -12,12 +12,12 @@ HirTypedModule {
     },
     expression_types: {
         Idx::<Expression>(0): Generic(
-            2,
-            "c0",
+            0,
+            "a0",
         ),
         Idx::<Expression>(1): Generic(
-            3,
-            "d0",
+            1,
+            "b0",
         ),
         Idx::<Expression>(2): Bounded {
             base: TypeDef(
@@ -31,12 +31,12 @@ HirTypedModule {
             ),
             args: [
                 Generic(
-                    2,
-                    "c0",
+                    0,
+                    "a0",
                 ),
                 Generic(
-                    3,
-                    "d0",
+                    1,
+                    "b0",
                 ),
             ],
         },
@@ -53,14 +53,14 @@ HirTypedModule {
                 ),
                 args: [
                     Generic(
-                        3,
+                        0,
                         "t1",
                     ),
                 ],
             },
             return_type: Lambda {
                 arg_type: Generic(
-                    4,
+                    1,
                     "t2",
                 ),
                 return_type: Bounded {
@@ -75,11 +75,11 @@ HirTypedModule {
                     ),
                     args: [
                         Generic(
-                            3,
+                            0,
                             "t1",
                         ),
                         Generic(
-                            4,
+                            1,
                             "t2",
                         ),
                     ],
@@ -89,8 +89,8 @@ HirTypedModule {
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            2,
-            "c0",
+            0,
+            "a0",
         ),
         Idx::<Pattern>(1): Bounded {
             base: TypeDef(
@@ -104,14 +104,14 @@ HirTypedModule {
             ),
             args: [
                 Generic(
-                    3,
+                    0,
                     "t1",
                 ),
             ],
         },
         Idx::<Pattern>(2): Generic(
-            3,
-            "d0",
+            1,
+            "b0",
         ),
     },
     warnings: [],

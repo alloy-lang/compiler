@@ -30,8 +30,8 @@ DefinitionInferenceResult {
                     Int,
                 ),
                 Generic(
-                    2,
-                    "c0",
+                    0,
+                    "a0",
                 ),
             ],
         },
@@ -118,7 +118,7 @@ DefinitionInferenceResult {
             ),
         ): Lambda {
             arg_type: Generic(
-                0,
+                1,
                 "l",
             ),
             return_type: Bounded {
@@ -133,11 +133,11 @@ DefinitionInferenceResult {
                 ),
                 args: [
                     Generic(
-                        0,
+                        1,
                         "l",
                     ),
                     Generic(
-                        1,
+                        2,
                         "r",
                     ),
                 ],

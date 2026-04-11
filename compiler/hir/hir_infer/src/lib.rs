@@ -521,13 +521,13 @@ mod hir_infer_small_tests {
             type_var_constraint_fql: Fql::new(stdlib_order, idx!(0)),
         };
         let constrained_t1 = InferredType::ConstrainedGeneric {
-            id: 0,
+            id: 1,
             name: DisplayName::new("t1"),
             constraints: ne_vec![eq_constraint, ord_constraint],
         };
 
         // TODO: new test, should fail if t1 doesn't constrain on Ord
-        let type_var_t2 = InferredType::Generic(1, DisplayName::new("t2"));
+        let type_var_t2 = InferredType::Generic(0, DisplayName::new("t2"));
         check_named(
             &mut db,
             r"

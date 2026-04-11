@@ -29,8 +29,8 @@ HirTypedModule {
             ),
             args: [
                 Generic(
-                    2,
-                    "c0",
+                    0,
+                    "a0",
                 ),
                 BuiltIn(
                     Bool,
@@ -49,8 +49,8 @@ HirTypedModule {
             ),
             args: [
                 Generic(
-                    2,
-                    "c0",
+                    0,
+                    "a0",
                 ),
                 BuiltIn(
                     Bool,
@@ -69,8 +69,8 @@ HirTypedModule {
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            2,
-            "c0",
+            0,
+            "a0",
         ),
         Idx::<Pattern>(1): Bounded {
             base: TypeDef(
@@ -84,8 +84,8 @@ HirTypedModule {
             ),
             args: [
                 Generic(
-                    2,
-                    "c0",
+                    0,
+                    "a0",
                 ),
                 BuiltIn(
                     Bool,
@@ -107,8 +107,8 @@ HirTypedModule {
             ),
             args: [
                 Generic(
-                    2,
-                    "c0",
+                    0,
+                    "a0",
                 ),
                 BuiltIn(
                     Bool,

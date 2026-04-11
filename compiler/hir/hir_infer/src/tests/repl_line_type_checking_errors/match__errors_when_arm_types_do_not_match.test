@@ -27,8 +27,8 @@ DefinitionInferenceResult {
             ),
             args: [
                 Generic(
-                    2,
-                    "c0",
+                    0,
+                    "a0",
                 ),
                 BuiltIn(
                     Bool,
@@ -47,8 +47,8 @@ DefinitionInferenceResult {
             ),
             args: [
                 Generic(
-                    2,
-                    "c0",
+                    0,
+                    "a0",
                 ),
                 BuiltIn(
                     Bool,
@@ -67,8 +67,8 @@ DefinitionInferenceResult {
     },
     pattern_types: {
         Idx::<Pattern>(0): Generic(
-            2,
-            "c0",
+            0,
+            "a0",
         ),
         Idx::<Pattern>(1): Bounded {
             base: TypeDef(
@@ -82,8 +82,8 @@ DefinitionInferenceResult {
             ),
             args: [
                 Generic(
-                    2,
-                    "c0",
+                    0,
+                    "a0",
                 ),
                 BuiltIn(
                     Bool,
@@ -105,8 +105,8 @@ DefinitionInferenceResult {
             ),
             args: [
                 Generic(
-                    2,
-                    "c0",
+                    0,
+                    "a0",
                 ),
                 BuiltIn(
                     Bool,
@@ -122,7 +122,7 @@ DefinitionInferenceResult {
             ),
         ): Lambda {
             arg_type: Generic(
-                0,
+                1,
                 "l",
             ),
             return_type: Bounded {
@@ -137,11 +137,11 @@ DefinitionInferenceResult {
                 ),
                 args: [
                     Generic(
-                        0,
+                        1,
                         "l",
                     ),
                     Generic(
-                        1,
+                        2,
                         "r",
                     ),
                 ],
@@ -154,7 +154,7 @@ DefinitionInferenceResult {
             ),
         ): Lambda {
             arg_type: Generic(
-                0,
+                1,
                 "r",
             ),
             return_type: Bounded {
@@ -169,11 +169,11 @@ DefinitionInferenceResult {
                 ),
                 args: [
                     Generic(
-                        1,
+                        2,
                         "l",
                     ),
                     Generic(
-                        0,
+                        1,
                         "r",
                     ),
                 ],

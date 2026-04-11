@@ -8,8 +8,9 @@ use crate::diagnostics::TypeInferenceErrorKind;
 use crate::hir_ty::hm::converter::ToInferredTypeConverter;
 use crate::{DefinitionInferenceResult, HirInferDatabase, TypeInferenceError};
 use alloy_hir_def as hir;
-use alloy_hir_resolved::resolve_annotated_type;
+use alloy_hir_resolved::{resolve_annotated_type, EPTdFql};
 use alloy_workspace::ModuleId;
+use itertools::Itertools;
 use rustc_hash::FxHashSet;
 
 #[salsa::tracked(cycle_initial = infer_body_type_cycle_initial)]
@@ -27,15 +28,15 @@ pub(crate) fn infer_body_type<'db>(
 
     let inferred_mono = infer_expr_hm(&mut ctx, expr_fql.clone());
 
-    let local_annotation_var_ids = if let Some(type_annotation) = value_def.type_annotation(db) {
+    let local_annotation_var_ids = {
         let vars_before = ctx.converter.annotation_var_ids();
-        let annotated = resolve_annotated_type(db, module_id, type_annotation);
-        let annotated_mono = ctx.converter.annotated_to_mono(&annotated);
-        ctx.add_equation(annotated_mono, inferred_mono, expr_fql);
+        if let Some(type_annotation) = value_def.type_annotation(db) {
+            let annotated = resolve_annotated_type(db, module_id, type_annotation);
+            let annotated_mono = ctx.converter.annotated_to_mono(&annotated);
+            ctx.add_equation(annotated_mono, inferred_mono, expr_fql);
+        }
         let vars_after = ctx.converter.annotation_var_ids();
         &vars_after - &vars_before
-    } else {
-        FxHashSet::default()
     };
 
     collect_inference_results(&mut ctx, module_id, local_annotation_var_ids)
@@ -96,7 +97,8 @@ fn collect_inference_results(
     poly_bodies
         .chain(mono_bodies)
         .filter(|(fql, _)| fql.module_id() == module_id)
-        .map(|(fql, mono)| (fql.clone(), substitution.apply(mono)))
+        .map(|(fql, mono)| (fql.clone(), substitution.apply(&mono)))
+        .sorted_by_key(|(fql, _)| lexical_sort_key(fql))
         .map(|(fql, mono)| {
             (
                 fql,
@@ -121,4 +123,14 @@ fn collect_inference_results(
     result.extend_errors(&solve_errors);
 
     result
+}
+
+/// intra-module sorting
+fn lexical_sort_key(fql: &EPTdFql) -> (u8, u32) {
+    match fql {
+        EPTdFql::Pattern(fql) => (0, u32::from(fql.local_id.into_raw())),
+        EPTdFql::Expression(fql) => (1, u32::from(fql.local_id.into_raw())),
+        EPTdFql::TypeDefinition(fql) => (2, u32::from(fql.local_id.into_raw())),
+        EPTdFql::TypeDefinitionVariant(fql, _) => (3, u32::from(fql.local_id.into_raw())),
+    }
 }

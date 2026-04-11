@@ -17,7 +17,7 @@ HirTypedModule {
     expression_types: {
         Idx::<Expression>(0): Lambda {
             arg_type: Generic(
-                1,
+                0,
                 "t",
             ),
             return_type: Bounded {
@@ -32,7 +32,7 @@ HirTypedModule {
                 ),
                 args: [
                     Generic(
-                        1,
+                        0,
                         "t",
                     ),
                 ],

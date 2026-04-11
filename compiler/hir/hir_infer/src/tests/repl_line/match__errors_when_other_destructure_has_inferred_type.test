@@ -30,8 +30,8 @@ DefinitionInferenceResult {
                     Int,
                 ),
                 Generic(
-                    2,
-                    "c0",
+                    0,
+                    "a0",
                 ),
             ],
         },

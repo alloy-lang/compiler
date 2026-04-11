@@ -8,12 +8,12 @@ DefinitionInferenceResult {
             "a0",
         ),
         Idx::<Expression>(1): Generic(
-            2,
-            "c0",
-        ),
-        Idx::<Expression>(2): Generic(
             1,
             "b0",
+        ),
+        Idx::<Expression>(2): Generic(
+            2,
+            "c0",
         ),
         Idx::<Expression>(3): Tuple(
             NonEmpty(
@@ -23,12 +23,12 @@ DefinitionInferenceResult {
                         "a0",
                     ),
                     Generic(
-                        2,
-                        "c0",
-                    ),
-                    Generic(
                         1,
                         "b0",
+                    ),
+                    Generic(
+                        2,
+                        "c0",
                     ),
                 ],
             ),
@@ -40,13 +40,13 @@ DefinitionInferenceResult {
             ),
             return_type: Lambda {
                 arg_type: Generic(
-                    2,
-                    "c0",
+                    1,
+                    "b0",
                 ),
                 return_type: Lambda {
                     arg_type: Generic(
-                        1,
-                        "b0",
+                        2,
+                        "c0",
                     ),
                     return_type: Tuple(
                         NonEmpty(
@@ -56,12 +56,12 @@ DefinitionInferenceResult {
                                     "a0",
                                 ),
                                 Generic(
-                                    2,
-                                    "c0",
-                                ),
-                                Generic(
                                     1,
                                     "b0",
+                                ),
+                                Generic(
+                                    2,
+                                    "c0",
                                 ),
                             ],
                         ),
@@ -76,12 +76,12 @@ DefinitionInferenceResult {
             "a0",
         ),
         Idx::<Pattern>(1): Generic(
-            2,
-            "c0",
-        ),
-        Idx::<Pattern>(2): Generic(
             1,
             "b0",
+        ),
+        Idx::<Pattern>(2): Generic(
+            2,
+            "c0",
         ),
     },
     variant_constructor_types: {},

@@ -12,7 +12,7 @@ DefinitionInferenceResult {
     expression_types: {
         Idx::<Expression>(0): Lambda {
             arg_type: Generic(
-                1,
+                0,
                 "t",
             ),
             return_type: Bounded {
@@ -27,7 +27,7 @@ DefinitionInferenceResult {
                 ),
                 args: [
                     Generic(
-                        1,
+                        0,
                         "t",
                     ),
                 ],
@@ -79,7 +79,7 @@ DefinitionInferenceResult {
             None,
         ): Lambda {
             arg_type: Generic(
-                0,
+                1,
                 "t",
             ),
             return_type: Bounded {
@@ -94,7 +94,7 @@ DefinitionInferenceResult {
                 ),
                 args: [
                     Generic(
-                        0,
+                        1,
                         "t",
                     ),
                 ],
