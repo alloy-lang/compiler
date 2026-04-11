@@ -34,45 +34,33 @@ HirTypedModule {
         TypeCheckingError {
             kind: InferenceError(
                 TypeInferenceError {
-                    kind: UnificationError(
-                        TypeMismatch(
-                            TypeDef {
-                                fql: Fql {
+                    kind: TypeMismatch {
+                        expected: TypeDef(
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<TypeDefinition>(0),
+                            },
+                            "Box",
+                        ),
+                        found: Bounded {
+                            base: TypeDef(
+                                Fql {
                                     module_id: ModuleId {
                                         path: "main",
                                     },
                                     local_id: Idx::<TypeDefinition>(0),
                                 },
-                                type_args: [
-                                    TypeVarId(
-                                        0,
-                                    ),
-                                ],
-                                type_def_name: "Box",
-                            },
-                            App {
-                                constructor: TypeDef {
-                                    fql: Fql {
-                                        module_id: ModuleId {
-                                            path: "main",
-                                        },
-                                        local_id: Idx::<TypeDefinition>(0),
-                                    },
-                                    type_args: [
-                                        TypeVarId(
-                                            1,
-                                        ),
-                                    ],
-                                    type_def_name: "Box",
-                                },
-                                args: [
-                                    Concrete(
-                                        Int,
-                                    ),
-                                ],
-                            },
-                        ),
-                    ),
+                                "Box",
+                            ),
+                            args: [
+                                BuiltIn(
+                                    Int,
+                                ),
+                            ],
+                        },
+                    },
                     range: 43..62,
                 },
             ),

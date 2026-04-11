@@ -1,4 +1,4 @@
-use crate::hir_ty::{InferredType, UnificationError};
+use crate::hir_ty::{InferredType, TypeVarId};
 use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, DiagnosticLabel, Severity};
 use alloy_hir_resolved::HirResolutionError;
 use text_size::TextRange;
@@ -28,7 +28,8 @@ impl Diagnostic for TypeInferenceError {
 
     fn code(&self) -> Option<&str> {
         match &self.kind {
-            TypeInferenceErrorKind::UnificationError(_) => Some("E33001"),
+            TypeInferenceErrorKind::InfiniteType { .. } => Some("E33003"),
+            TypeInferenceErrorKind::TypeMismatch { .. } => Some("E33001"),
             TypeInferenceErrorKind::HirResolutionError(err) => err.code(),
             TypeInferenceErrorKind::UnsatisfiedConstraint { .. } => Some("E33002"),
         }
@@ -36,14 +37,15 @@ impl Diagnostic for TypeInferenceError {
 
     fn message(&self) -> String {
         match &self.kind {
-            TypeInferenceErrorKind::UnificationError(unif_err) => match unif_err {
-                UnificationError::TypeMismatch(expected, found) => {
-                    format!("Type mismatch: expected `{expected}`, found `{found}`",)
-                }
-                UnificationError::OccursCheck(var, ty) => {
-                    format!("Infinite type detected: `{var}` occurs in `{ty}`")
-                }
-            },
+            TypeInferenceErrorKind::TypeMismatch { expected, found } => {
+                format!("Type mismatch: expected `{expected}`, found `{found}`",)
+            }
+            TypeInferenceErrorKind::InfiniteType {
+                type_var_id,
+                inferred_type,
+            } => {
+                format!("Infinite type detected: `{type_var_id}` occurs in `{inferred_type}`")
+            }
             TypeInferenceErrorKind::HirResolutionError(err) => err.message(),
             TypeInferenceErrorKind::UnsatisfiedConstraint {
                 trait_fql_name: trait_name,
@@ -61,14 +63,17 @@ impl Diagnostic for TypeInferenceError {
 
     fn build_report<'a>(&self, builder: DiagnosticBuilder<'a>) -> DiagnosticBuilder<'a> {
         match &self.kind {
-            TypeInferenceErrorKind::UnificationError(unif_err) => match unif_err {
-                UnificationError::TypeMismatch(expected, found) => builder
-                    .with_primary_label(format!("expected `{expected}`, found `{found}`"))
-                    .with_help("These types must be compatible"),
-                UnificationError::OccursCheck(var, ty) => builder
-                    .with_primary_label(format!("type variable `{var}` occurs in `{ty}`"))
-                    .with_help("This would create an infinite type, which is not allowed"),
-            },
+            TypeInferenceErrorKind::TypeMismatch { expected, found } => builder
+                .with_primary_label(format!("expected `{expected}`, found `{found}`"))
+                .with_help("These types must be compatible"),
+            TypeInferenceErrorKind::InfiniteType {
+                type_var_id,
+                inferred_type,
+            } => builder
+                .with_primary_label(format!(
+                    "type variable `{type_var_id}` occurs in `{inferred_type}`"
+                ))
+                .with_help("This would create an infinite type, which is not allowed"),
             TypeInferenceErrorKind::HirResolutionError(err) => err.build_report(builder),
             TypeInferenceErrorKind::UnsatisfiedConstraint {
                 trait_fql_name: trait_name,
@@ -89,7 +94,15 @@ impl Diagnostic for TypeInferenceError {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TypeInferenceErrorKind {
-    UnificationError(UnificationError),
+    // OccursCheck
+    InfiniteType {
+        type_var_id: TypeVarId,
+        inferred_type: InferredType,
+    },
+    TypeMismatch {
+        expected: InferredType,
+        found: InferredType,
+    },
     HirResolutionError(HirResolutionError),
     UnsatisfiedConstraint {
         trait_fql_name: String,

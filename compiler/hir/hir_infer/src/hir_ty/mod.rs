@@ -9,7 +9,7 @@ mod hm;
 
 pub(crate) use hm::infer_body_type;
 pub(crate) use hm::infer_expressions;
-pub use hm::unification::UnificationError;
+pub use hm::TypeVarId;
 
 /// Display-only metadata that does not participate in equality or hashing.
 /// Used to carry human-readable type variable names through to error messages

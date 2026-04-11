@@ -179,64 +179,46 @@ DefinitionInferenceResult {
     warnings: [],
     errors: [
         TypeInferenceError {
-            kind: UnificationError(
-                TypeMismatch(
-                    App {
-                        constructor: TypeDef {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "main",
-                                },
-                                local_id: Idx::<TypeDefinition>(0),
+            kind: TypeMismatch {
+                expected: Bounded {
+                    base: TypeDef(
+                        Fql {
+                            module_id: ModuleId {
+                                path: "main",
                             },
-                            type_args: [
-                                TypeVarId(
-                                    0,
-                                ),
-                                TypeVarId(
-                                    1,
-                                ),
-                            ],
-                            type_def_name: "Either",
+                            local_id: Idx::<TypeDefinition>(0),
                         },
-                        args: [
-                            Concrete(
-                                Int,
-                            ),
-                            Concrete(
-                                Int,
-                            ),
-                        ],
-                    },
-                    App {
-                        constructor: TypeDef {
-                            fql: Fql {
-                                module_id: ModuleId {
-                                    path: "main",
-                                },
-                                local_id: Idx::<TypeDefinition>(0),
+                        "Either",
+                    ),
+                    args: [
+                        BuiltIn(
+                            Int,
+                        ),
+                        BuiltIn(
+                            Int,
+                        ),
+                    ],
+                },
+                found: Bounded {
+                    base: TypeDef(
+                        Fql {
+                            module_id: ModuleId {
+                                path: "main",
                             },
-                            type_args: [
-                                TypeVarId(
-                                    6,
-                                ),
-                                TypeVarId(
-                                    7,
-                                ),
-                            ],
-                            type_def_name: "Either",
+                            local_id: Idx::<TypeDefinition>(0),
                         },
-                        args: [
-                            Concrete(
-                                String,
-                            ),
-                            Concrete(
-                                Int,
-                            ),
-                        ],
-                    },
-                ),
-            ),
+                        "Either",
+                    ),
+                    args: [
+                        BuiltIn(
+                            String,
+                        ),
+                        BuiltIn(
+                            Int,
+                        ),
+                    ],
+                },
+            },
             range: 115..133,
         },
     ],

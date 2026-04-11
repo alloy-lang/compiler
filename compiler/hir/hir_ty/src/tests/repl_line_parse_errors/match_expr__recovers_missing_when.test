@@ -48,34 +48,27 @@ HirTypedModule {
         TypeCheckingError {
             kind: InferenceError(
                 TypeInferenceError {
-                    kind: UnificationError(
-                        TypeMismatch(
-                            App {
-                                constructor: TypeDef {
-                                    fql: Fql {
-                                        module_id: ModuleId {
-                                            path: "test_data",
-                                        },
-                                        local_id: Idx::<TypeDefinition>(0),
+                    kind: TypeMismatch {
+                        expected: Bounded {
+                            base: TypeDef(
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "test_data",
                                     },
-                                    type_args: [
-                                        TypeVarId(
-                                            0,
-                                        ),
-                                    ],
-                                    type_def_name: "Test",
+                                    local_id: Idx::<TypeDefinition>(0),
                                 },
-                                args: [
-                                    Concrete(
-                                        Int,
-                                    ),
-                                ],
-                            },
-                            Concrete(
-                                Bool,
+                                "Test",
                             ),
+                            args: [
+                                BuiltIn(
+                                    Int,
+                                ),
+                            ],
+                        },
+                        found: BuiltIn(
+                            Bool,
                         ),
-                    ),
+                    },
                     range: 39..43,
                 },
             ),
@@ -84,34 +77,27 @@ HirTypedModule {
         TypeCheckingError {
             kind: InferenceError(
                 TypeInferenceError {
-                    kind: UnificationError(
-                        TypeMismatch(
-                            App {
-                                constructor: TypeDef {
-                                    fql: Fql {
-                                        module_id: ModuleId {
-                                            path: "test_data",
-                                        },
-                                        local_id: Idx::<TypeDefinition>(0),
+                    kind: TypeMismatch {
+                        expected: Bounded {
+                            base: TypeDef(
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "test_data",
                                     },
-                                    type_args: [
-                                        TypeVarId(
-                                            0,
-                                        ),
-                                    ],
-                                    type_def_name: "Test",
+                                    local_id: Idx::<TypeDefinition>(0),
                                 },
-                                args: [
-                                    Concrete(
-                                        Int,
-                                    ),
-                                ],
-                            },
-                            Concrete(
-                                Bool,
+                                "Test",
                             ),
+                            args: [
+                                BuiltIn(
+                                    Int,
+                                ),
+                            ],
+                        },
+                        found: BuiltIn(
+                            Bool,
                         ),
-                    ),
+                    },
                     range: 53..58,
                 },
             ),

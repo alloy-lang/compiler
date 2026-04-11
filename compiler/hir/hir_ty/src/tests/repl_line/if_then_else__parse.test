@@ -39,34 +39,27 @@ HirTypedModule {
         TypeCheckingError {
             kind: InferenceError(
                 TypeInferenceError {
-                    kind: UnificationError(
-                        TypeMismatch(
-                            Concrete(
-                                Bool,
-                            ),
-                            App {
-                                constructor: TypeDef {
-                                    fql: Fql {
-                                        module_id: ModuleId {
-                                            path: "test_data",
-                                        },
-                                        local_id: Idx::<TypeDefinition>(0),
-                                    },
-                                    type_args: [
-                                        TypeVarId(
-                                            0,
-                                        ),
-                                    ],
-                                    type_def_name: "Test",
-                                },
-                                args: [
-                                    Concrete(
-                                        Int,
-                                    ),
-                                ],
-                            },
+                    kind: TypeMismatch {
+                        expected: BuiltIn(
+                            Bool,
                         ),
-                    ),
+                        found: Bounded {
+                            base: TypeDef(
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "test_data",
+                                    },
+                                    local_id: Idx::<TypeDefinition>(0),
+                                },
+                                "Test",
+                            ),
+                            args: [
+                                BuiltIn(
+                                    Int,
+                                ),
+                            ],
+                        },
+                    },
                     range: 24..45,
                 },
             ),

@@ -2,11 +2,11 @@
 
 use super::{EPFql, MonoType, TypeEquation, TypeVarId};
 use crate::diagnostics::TypeInferenceError;
+use crate::diagnostics::TypeInferenceErrorKind;
 use crate::hir_ty::hm::converter::ToInferredTypeConverter;
-use crate::{diagnostics, HirInferDatabase};
+use crate::HirInferDatabase;
 use alloy_hir_def as hir;
 use alloy_hir_resolved::{EPTdFql, TraitConstraint};
-use diagnostics::TypeInferenceErrorKind;
 use rustc_hash::{FxHashMap, FxHashSet};
 
 /// Substitution mapping type variables to types
@@ -383,10 +383,26 @@ pub(super) fn solve_equations(
                 EPFql::Pattern(fql) => hir_module.get_pattern_range(fql.local_id),
             };
 
-            errors.push(TypeInferenceError::new(
-                TypeInferenceErrorKind::UnificationError(err),
-                range,
-            ));
+            match err {
+                UnificationError::OccursCheck(type_var_id, mono) => {
+                    errors.push(TypeInferenceError::new(
+                        TypeInferenceErrorKind::InfiniteType {
+                            type_var_id,
+                            inferred_type: converter.mono_to_inferred(&mono, &FxHashSet::default()),
+                        },
+                        range,
+                    ));
+                }
+                UnificationError::TypeMismatch(expected, actual) => {
+                    errors.push(TypeInferenceError::new(
+                        TypeInferenceErrorKind::TypeMismatch {
+                            expected: converter.mono_to_inferred(&expected, &FxHashSet::default()),
+                            found: converter.mono_to_inferred(&actual, &FxHashSet::default()),
+                        },
+                        range,
+                    ));
+                }
+            }
         }
     }
 

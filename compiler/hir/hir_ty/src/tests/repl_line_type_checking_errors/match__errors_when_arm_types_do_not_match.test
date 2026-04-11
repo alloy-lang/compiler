@@ -121,16 +121,14 @@ HirTypedModule {
         TypeCheckingError {
             kind: InferenceError(
                 TypeInferenceError {
-                    kind: UnificationError(
-                        TypeMismatch(
-                            Concrete(
-                                String,
-                            ),
-                            Concrete(
-                                Int,
-                            ),
+                    kind: TypeMismatch {
+                        expected: BuiltIn(
+                            String,
                         ),
-                    ),
+                        found: BuiltIn(
+                            Int,
+                        ),
+                    },
                     range: 154..155,
                 },
             ),

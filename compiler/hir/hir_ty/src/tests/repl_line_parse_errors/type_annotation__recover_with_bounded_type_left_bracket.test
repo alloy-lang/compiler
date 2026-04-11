@@ -15,12 +15,12 @@ HirTypedModule {
         ),
         Idx::<Expression>(1): Lambda {
             arg_type: Generic(
-                0,
-                "a0",
+                1,
+                "b0",
             ),
             return_type: Generic(
-                0,
-                "a0",
+                1,
+                "b0",
             ),
         },
     },
@@ -35,70 +35,54 @@ HirTypedModule {
         TypeCheckingError {
             kind: InferenceError(
                 TypeInferenceError {
-                    kind: UnificationError(
-                        TypeMismatch(
-                            App {
-                                constructor: TypeDef {
-                                    fql: Fql {
-                                        module_id: ModuleId {
-                                            path: "test_data",
-                                        },
-                                        local_id: Idx::<TypeDefinition>(0),
+                    kind: TypeMismatch {
+                        expected: Bounded {
+                            base: TypeDef(
+                                Fql {
+                                    module_id: ModuleId {
+                                        path: "test_data",
                                     },
-                                    type_args: [
-                                        TypeVarId(
-                                            1,
-                                        ),
-                                    ],
-                                    type_def_name: "Test",
+                                    local_id: Idx::<TypeDefinition>(0),
                                 },
-                                args: [
-                                    Function(
-                                        Var(
-                                            TypeVarId(
-                                                2,
-                                            ),
-                                        ),
-                                        App {
-                                            constructor: TypeDef {
-                                                fql: Fql {
-                                                    module_id: ModuleId {
-                                                        path: "test_data",
-                                                    },
-                                                    local_id: Idx::<TypeDefinition>(0),
-                                                },
-                                                type_args: [
-                                                    TypeVarId(
-                                                        1,
-                                                    ),
-                                                ],
-                                                type_def_name: "Test",
-                                            },
-                                            args: [
-                                                Var(
-                                                    TypeVarId(
-                                                        2,
-                                                    ),
-                                                ),
-                                            ],
-                                        },
-                                    ),
-                                ],
-                            },
-                            Function(
-                                Var(
-                                    TypeVarId(
-                                        0,
-                                    ),
-                                ),
-                                Var(
-                                    TypeVarId(
-                                        0,
-                                    ),
-                                ),
+                                "Test",
                             ),
-                        ),
-                    ),
+                            args: [
+                                Lambda {
+                                    arg_type: Generic(
+                                        0,
+                                        "t1",
+                                    ),
+                                    return_type: Bounded {
+                                        base: TypeDef(
+                                            Fql {
+                                                module_id: ModuleId {
+                                                    path: "test_data",
+                                                },
+                                                local_id: Idx::<TypeDefinition>(0),
+                                            },
+                                            "Test",
+                                        ),
+                                        args: [
+                                            Generic(
+                                                0,
+                                                "t1",
+                                            ),
+                                        ],
+                                    },
+                                },
+                            ],
+                        },
+                        found: Lambda {
+                            arg_type: Generic(
+                                1,
+                                "b0",
+                            ),
+                            return_type: Generic(
+                                1,
+                                "b0",
+                            ),
+                        },
+                    },
                     range: 80..100,
                 },
             ),
@@ -183,12 +167,12 @@ HirTypedModule {
                 annotation_range: 39..58,
                 value_type: Lambda {
                     arg_type: Generic(
-                        0,
-                        "a0",
+                        1,
+                        "b0",
                     ),
                     return_type: Generic(
-                        0,
-                        "a0",
+                        1,
+                        "b0",
                     ),
                 },
                 value_range: 80..100,
@@ -270,12 +254,12 @@ HirTypedModule {
                     expected_type_range: 39..58,
                     actual_type: Lambda {
                         arg_type: Generic(
-                            0,
-                            "a0",
+                            1,
+                            "b0",
                         ),
                         return_type: Generic(
-                            0,
-                            "a0",
+                            1,
+                            "b0",
                         ),
                     },
                     actual_type_range: 80..100,
@@ -296,12 +280,12 @@ HirTypedModule {
    │ Help: While parsing the `]` at the end of the bounded type arguments, expected `‘]’`
 ───╯
 
-[E33001] Error: Type mismatch: expected `Test[t2 -> Test[t2]]`, found `t0 -> t0`
+[E33001] Error: Type mismatch: expected `Test[t1 -> Test[t1]]`, found `b0 -> b0`
    ╭─[ ./test/main.alloy:5:1 ]
    │
  5 │ let apply = |x| -> x
    │ ──────────┬─────────  
-   │           ╰─────────── expected `Test[t2 -> Test[t2]]`, found `t0 -> t0`
+   │           ╰─────────── expected `Test[t1 -> Test[t1]]`, found `b0 -> b0`
    │ 
    │ Help: These types must be compatible
 ───╯
@@ -315,7 +299,7 @@ HirTypedModule {
    │ 
  5 │ let apply = |x| -> x
    │ ──────────┬─────────  
-   │           ╰─────────── but the body has type `a0 -> a0`
+   │           ╰─────────── but the body has type `b0 -> b0`
 ───╯
 
 

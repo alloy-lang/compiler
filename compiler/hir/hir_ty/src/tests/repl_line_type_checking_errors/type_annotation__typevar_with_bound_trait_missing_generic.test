@@ -128,45 +128,33 @@ HirTypedModule {
         TypeCheckingError {
             kind: InferenceError(
                 TypeInferenceError {
-                    kind: UnificationError(
-                        TypeMismatch(
-                            TypeDef {
-                                fql: Fql {
+                    kind: TypeMismatch {
+                        expected: TypeDef(
+                            Fql {
+                                module_id: ModuleId {
+                                    path: "test_data",
+                                },
+                                local_id: Idx::<TypeDefinition>(0),
+                            },
+                            "Test",
+                        ),
+                        found: Bounded {
+                            base: TypeDef(
+                                Fql {
                                     module_id: ModuleId {
                                         path: "test_data",
                                     },
                                     local_id: Idx::<TypeDefinition>(0),
                                 },
-                                type_args: [
-                                    TypeVarId(
-                                        5,
-                                    ),
-                                ],
-                                type_def_name: "Test",
-                            },
-                            App {
-                                constructor: TypeDef {
-                                    fql: Fql {
-                                        module_id: ModuleId {
-                                            path: "test_data",
-                                        },
-                                        local_id: Idx::<TypeDefinition>(0),
-                                    },
-                                    type_args: [
-                                        TypeVarId(
-                                            2,
-                                        ),
-                                    ],
-                                    type_def_name: "Test",
-                                },
-                                args: [
-                                    Concrete(
-                                        Int,
-                                    ),
-                                ],
-                            },
-                        ),
-                    ),
+                                "Test",
+                            ),
+                            args: [
+                                BuiltIn(
+                                    Int,
+                                ),
+                            ],
+                        },
+                    },
                     range: 169..199,
                 },
             ),
