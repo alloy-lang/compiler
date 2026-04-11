@@ -436,7 +436,7 @@ impl<'db> TypeAnnotationChecker<'db> {
 
 /// Check that the annotation declares all constraints the body requires.
 fn check_constraint_sufficiency(
-    _db: &dyn HirTyDatabase,
+    db: &dyn HirTyDatabase,
     annotation_constraints: &[res::TraitConstraint],
     inferred_constraints: &NonEmpty<res::TraitConstraint>,
 ) -> Result<(), ConflictingTypeAnnotationReason> {
@@ -450,8 +450,15 @@ fn check_constraint_sufficiency(
     let missing: Vec<_> = inferred_constraints
         .iter()
         .filter(|ic| !satisfied.contains(&ic.trait_fql))
-        .map(|c| c.trait_fql_name.clone())
+        .cloned()
+        .map(|ic| {
+            let (hir_module, _) = hir::lower_file(db, ic.type_var_constraint_fql.module_id);
+            let range =
+                hir_module.get_type_variable_constraint_range(ic.type_var_constraint_fql.local_id);
+            (ic, range)
+        })
         .collect();
+
     if missing.is_empty() {
         Ok(())
     } else {

@@ -1,6 +1,7 @@
 use alloy_diagnostics::{Diagnostic, DiagnosticBuilder, DiagnosticLabel, Severity};
 use alloy_hir_def as hir;
 use alloy_hir_infer::InferredType;
+use alloy_hir_resolved as res;
 use alloy_hir_resolved::{AnnotatedType, HirResolutionError};
 use text_size::TextRange;
 
@@ -116,7 +117,8 @@ impl Diagnostic for TypeCheckingError {
                             .with_help(format!("Type `{type_name}` must implement trait `{trait_name}`"))
                     }
                     ConflictingTypeAnnotationReason::InsufficientConstraints { missing_constraints } => {
-                        let missing = missing_constraints.iter().map(|c| format!("`{c}`")).collect::<Vec<_>>().join(", ");
+                        let missing = missing_constraints.iter().map(|(c, _)| format!("`{}`", c.trait_fql_name)).collect::<Vec<_>>().join(", ");
+
                         builder
                             .with_label(
                                 DiagnosticLabel::new(*annotation_range, format!("type annotation is missing required constraint(s): {missing}"))
@@ -209,7 +211,7 @@ pub enum ConflictingTypeAnnotationReason {
         type_name: hir::Name,
     },
     InsufficientConstraints {
-        missing_constraints: Vec<String>,
+        missing_constraints: Vec<(res::TraitConstraint, TextRange)>,
     },
 }
 
