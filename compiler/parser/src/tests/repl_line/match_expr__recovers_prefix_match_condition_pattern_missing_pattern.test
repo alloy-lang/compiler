@@ -37,4 +37,4 @@ SourceFile@0..37
       MatchTargetValue@36..37
         IntLiteral@36..37
           Integer@36..37 "1"
-error at position 22 while parsing a pattern after a prefix operator. Missing expected integer or fraction
+error at position 21 while parsing a pattern after a prefix operator. Missing expected integer or fraction

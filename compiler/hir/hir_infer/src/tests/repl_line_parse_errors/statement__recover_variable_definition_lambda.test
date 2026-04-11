@@ -84,11 +84,11 @@ DefinitionInferenceResult {
 ───╯
 
 [E11001] Error: Missing expected token while parsing the body of a lambda expression
-   ╭─[ ./test/main.alloy:2:1 ]
+   ╭─[ ./test/main.alloy:1:20 ]
    │
- 2 │ let add2 = |a, b| -> a + b
-   │ │ 
-   │ ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+ 1 │ let add1 = |a, 9| -
+   │                    │ 
+   │                    ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
    │ 
    │ Help: While parsing the body of a lambda expression, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
 ───╯

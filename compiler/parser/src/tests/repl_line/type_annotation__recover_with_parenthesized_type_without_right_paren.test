@@ -46,4 +46,4 @@ SourceFile@0..70
       TypeIdentifier@64..70
         Path@64..70
           Ident@64..70 "String"
-error at position 41 while parsing the right parenthesis of a parenthesized type. Missing expected ‘,’ or ‘)’
+error at position 40 while parsing the right parenthesis of a parenthesized type. Missing expected ‘,’ or ‘)’

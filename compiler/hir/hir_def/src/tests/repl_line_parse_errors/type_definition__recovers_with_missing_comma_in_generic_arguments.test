@@ -86,11 +86,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the comma between arguments in a bounded type
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_definition__recovers_with_missing_comma_in_generic_arguments.test:1:18 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_definition__recovers_with_missing_comma_in_generic_arguments.test:1:17 ]
    │
  1 │ typedef Test1[t1 t2] = Empty
-   │                  │ 
-   │                  ╰─ expected `‘,’`
+   │                 │ 
+   │                 ╰─ expected `‘,’`
    │ 
    │ Help: While parsing the comma between arguments in a bounded type, expected `‘,’`
 ───╯

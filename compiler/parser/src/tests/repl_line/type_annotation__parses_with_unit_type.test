@@ -24,4 +24,4 @@ SourceFile@0..34
         UnitType@32..34
           LParen@32..33 "("
           RParen@33..34 ")"
-error at position 14 while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context. Missing expected identifier
+error at position 13 while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context. Missing expected identifier

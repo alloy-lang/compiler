@@ -15,11 +15,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the `where` keyword at the start of a trait definition
-   ╭─[ ./test/main.alloy:4:5 ]
+   ╭─[ ./test/main.alloy:3:17 ]
    │
- 4 │     self = Functor
-   │     │ 
-   │     ╰─ expected `‘where‘`
+ 3 │ trait TestTrait1
+   │                 │ 
+   │                 ╰─ expected `‘where‘`
    │ 
    │ Help: While parsing the `where` keyword at the start of a trait definition, expected `‘where‘`
 ───╯

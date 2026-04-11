@@ -146,6 +146,7 @@ impl<'t, 'input> Parser<'t, 'input> {
         recovery_set: TokenSet,
     ) -> Option<CompletedMarker> {
         let last_token_range = self.source.last_token_range().unwrap_or_default();
+        let prev_non_trivia_range = self.source.previous_non_trivia_token_range();
 
         let current_token = self.source.peek_nth_token(0);
         let (found, range) = if let Some(Token { kind, range, .. }) = current_token {
@@ -163,7 +164,9 @@ impl<'t, 'input> Parser<'t, 'input> {
             Some(kind) => {
                 if self.at_set(recovery_set) {
                     ParseErrorKind::Missing {
-                        offset: range.start(),
+                        offset: prev_non_trivia_range
+                            .map(|r| r.end())
+                            .unwrap_or_else(|| range.start()),
                     }
                 } else {
                     ParseErrorKind::Unexpected { found: kind, range }

@@ -52,11 +52,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing a comma between expressions inside parentheses
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/expr__fails_when_tuple_missing_comma.test:1:4 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/expr__fails_when_tuple_missing_comma.test:1:3 ]
    │
  1 │ (1 2)
-   │    │ 
-   │    ╰─ expected `‘,’`
+   │   │ 
+   │   ╰─ expected `‘,’`
    │ 
    │ Help: While parsing a comma between expressions inside parentheses, expected `‘,’`
 ───╯

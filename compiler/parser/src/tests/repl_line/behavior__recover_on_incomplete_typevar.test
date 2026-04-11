@@ -28,4 +28,4 @@ SourceFile@0..56
       Equals@51..52 "="
       Whitespace@52..53 "\n"
     EndKw@53..56 "end"
-error at position 53 while parsing the constraints for a type variable. Missing expected identifier
+error at position 52 while parsing the constraints for a type variable. Missing expected identifier

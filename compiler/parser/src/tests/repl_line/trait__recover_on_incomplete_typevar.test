@@ -18,4 +18,4 @@ SourceFile@0..43
       Equals@38..39 "="
       Whitespace@39..40 "\n"
     EndKw@40..43 "end"
-error at position 40 while parsing the constraints for a type variable. Missing expected ‘#’ or identifier
+error at position 39 while parsing the constraints for a type variable. Missing expected ‘#’ or identifier

@@ -200,11 +200,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the `[` at the start of the bounded type arguments
-   ╭─[ ./test/main.alloy:3:33 ]
+   ╭─[ ./test/main.alloy:3:32 ]
    │
  3 │ typeof apply : Test[t1] -> Test t2] where
-   │                                 │ 
-   │                                 ╰─ expected `‘[’`
+   │                                │ 
+   │                                ╰─ expected `‘[’`
    │ 
    │ Help: While parsing the `[` at the start of the bounded type arguments, expected `‘[’`
 ───╯

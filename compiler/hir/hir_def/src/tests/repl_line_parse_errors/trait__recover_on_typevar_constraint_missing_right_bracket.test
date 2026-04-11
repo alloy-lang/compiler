@@ -74,11 +74,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the `]` at the end of the [_] pattern thingy
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_typevar_constraint_missing_right_bracket.test:3:5 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_typevar_constraint_missing_right_bracket.test:2:19 ]
    │
- 3 │     typevar t1
-   │     │ 
-   │     ╰─ expected `‘]’`
+ 2 │     self = #Type[_
+   │                   │ 
+   │                   ╰─ expected `‘]’`
    │ 
    │ Help: While parsing the `]` at the end of the [_] pattern thingy, expected `‘]’`
 ───╯

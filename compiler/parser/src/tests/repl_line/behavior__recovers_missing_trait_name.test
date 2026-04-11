@@ -34,4 +34,4 @@ SourceFile@0..122
     Comment@88..118 "-- imagine all the th ..."
     Whitespace@118..119 "\n"
     EndKw@119..122 "end"
-error at position 9 while parsing the name of a trait at the start of a behavior definition. Missing expected identifier or ‘(’
+error at position 8 while parsing the name of a trait at the start of a behavior definition. Missing expected identifier or ‘(’

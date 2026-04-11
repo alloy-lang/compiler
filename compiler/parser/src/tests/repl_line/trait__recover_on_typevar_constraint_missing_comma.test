@@ -31,4 +31,4 @@ SourceFile@0..63
       Ident@57..59 "t1"
       Whitespace@59..60 "\n"
     EndKw@60..63 "end"
-error at position 42 while parsing the comma between `_` in the [_] pattern thingy. Missing expected ‘,’
+error at position 41 while parsing the comma between `_` in the [_] pattern thingy. Missing expected ‘,’

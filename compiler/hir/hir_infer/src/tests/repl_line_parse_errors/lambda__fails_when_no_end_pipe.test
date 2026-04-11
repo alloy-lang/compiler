@@ -37,11 +37,11 @@ DefinitionInferenceResult {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the `|` at the end of a lambda expression's argument list
-   ╭─[ ./test/main.alloy:1:13 ]
+   ╭─[ ./test/main.alloy:1:12 ]
    │
  1 │ |arg1, arg2 -> 8
-   │             │ 
-   │             ╰─ expected `‘|’`
+   │            │ 
+   │            ╰─ expected `‘|’`
    │ 
    │ Help: While parsing the `|` at the end of a lambda expression's argument list, expected `‘|’`
 ───╯

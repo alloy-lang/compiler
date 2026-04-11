@@ -33,6 +33,21 @@ impl<'t, 'input> Source<'t, 'input> {
         self.tokens.last().map(|Token { range, .. }| *range)
     }
 
+    pub(crate) fn previous_non_trivia_token_range(&mut self) -> Option<TextRange> {
+        self.eat_trivia();
+
+        let mut idx = self.cursor;
+        while idx > 0 {
+            idx -= 1;
+            let token = self.tokens.get(idx)?;
+            if !token.kind.is_trivia() {
+                return Some(token.range);
+            }
+        }
+
+        None
+    }
+
     fn peek_kind_raw(&mut self, skip: usize) -> Option<TokenKind> {
         self.peek_token_raw(skip).map(|Token { kind, .. }| *kind)
     }

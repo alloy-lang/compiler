@@ -19,4 +19,4 @@ SourceFile@0..17
     Whitespace@15..16 " "
     IntLiteral@16..17
       Integer@16..17 "2"
-error at position 4 while parsing the name in a value definition. Missing expected operator identifier or identifier
+error at position 3 while parsing the name in a value definition. Missing expected operator identifier or identifier

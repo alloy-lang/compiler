@@ -26,21 +26,21 @@ HirTypedModule {
 ───╯
 
 [E11001] Error: Missing expected token while parsing the ‘=’ in a value definition
-   ╭─[ ./test/main.alloy:2:1 ]
+   ╭─[ ./test/main.alloy:1:6 ]
    │
- 2 │ let b = 2
-   │ │ 
-   │ ╰─ expected `‘=’`
+ 1 │ let 1
+   │      │ 
+   │      ╰─ expected `‘=’`
    │ 
    │ Help: While parsing the ‘=’ in a value definition, expected `‘=’`
 ───╯
 
 [E11001] Error: Missing expected token while parsing the expression in a value definition
-   ╭─[ ./test/main.alloy:2:1 ]
+   ╭─[ ./test/main.alloy:1:6 ]
    │
- 2 │ let b = 2
-   │ │ 
-   │ ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+ 1 │ let 1
+   │      │ 
+   │      ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
    │ 
    │ Help: While parsing the expression in a value definition, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
 ───╯

@@ -19,11 +19,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the `where` keyword at the start of a behavior definition
-   ╭─[ ./test/main.alloy:8:5 ]
+   ╭─[ ./test/main.alloy:7:30 ]
    │
- 8 │     typevar t1
-   │     │ 
-   │     ╰─ expected `‘where‘`
+ 7 │ behavior TestTrait1 for Type1
+   │                              │ 
+   │                              ╰─ expected `‘where‘`
    │ 
    │ Help: While parsing the `where` keyword at the start of a behavior definition, expected `‘where‘`
 ───╯

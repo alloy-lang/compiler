@@ -21,4 +21,4 @@ SourceFile@0..39
     Whitespace@33..34 " "
     TypeDefinitionMember@34..39
       Ident@34..39 "Empty"
-error at position 18 while parsing the name of a type definition member. Missing expected identifier
+error at position 17 while parsing the name of a type definition member. Missing expected identifier

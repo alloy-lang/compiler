@@ -120,11 +120,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the condition in a match expression branch
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/match_expr__recovers_missing_match_condition.test:4:5 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/match_expr__recovers_missing_match_condition.test:4:4 ]
    │
  4 │   \ -> 0
-   │     │ 
-   │     ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `‘-’`, `‘(’` or `‘_’`
+   │    │ 
+   │    ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `‘-’`, `‘(’` or `‘_’`
    │ 
    │ Help: While parsing the condition in a match expression branch, expected `integer`, `fraction`, `string`, `char`, `identifier`, `‘-’`, `‘(’` or `‘_’`
 ───╯

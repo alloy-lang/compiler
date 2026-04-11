@@ -30,4 +30,4 @@ SourceFile@0..66
       Ident@60..62 "t2"
       Whitespace@62..63 "\n"
     EndKw@63..66 "end"
-error at position 52 while parsing the name of a type variable. Missing expected identifier
+error at position 47 while parsing the name of a type variable. Missing expected identifier

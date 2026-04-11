@@ -15,11 +15,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the `=` sign in a trait `self` constraint
-   ╭─[ ./test/main.alloy:4:10 ]
+   ╭─[ ./test/main.alloy:4:9 ]
    │
  4 │     self functor::Functor
-   │          │ 
-   │          ╰─ expected `‘=’`
+   │         │ 
+   │         ╰─ expected `‘=’`
    │ 
    │ Help: While parsing the `=` sign in a trait `self` constraint, expected `‘=’`
 ───╯

@@ -16,11 +16,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the name in a value definition
-   ╭─[ ./test/main.alloy:1:5 ]
+   ╭─[ ./test/main.alloy:1:4 ]
    │
  1 │ let = 1
-   │     │ 
-   │     ╰─ expected `operator identifier` or `identifier`
+   │    │ 
+   │    ╰─ expected `operator identifier` or `identifier`
    │ 
    │ Help: While parsing the name in a value definition, expected `operator identifier` or `identifier`
 ───╯

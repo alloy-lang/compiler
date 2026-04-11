@@ -28,11 +28,11 @@ DefinitionInferenceResult {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing a comma between expressions inside parentheses
-   ╭─[ ./test/main.alloy:1:4 ]
+   ╭─[ ./test/main.alloy:1:3 ]
    │
  1 │ (1 2)
-   │    │ 
-   │    ╰─ expected `‘,’`
+   │   │ 
+   │   ╰─ expected `‘,’`
    │ 
    │ Help: While parsing a comma between expressions inside parentheses, expected `‘,’`
 ───╯

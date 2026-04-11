@@ -89,11 +89,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the argument of a match expression
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/match_expr__recovers_missing_condition.test:2:7 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/match_expr__recovers_missing_condition.test:2:6 ]
    │
  2 │ match when
-   │       │ 
-   │       ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+   │      │ 
+   │      ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
    │ 
    │ Help: While parsing the argument of a match expression, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
 ───╯

@@ -91,11 +91,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the condition in a match expression branch
-   ╭─[ ./test/main.alloy:4:5 ]
+   ╭─[ ./test/main.alloy:4:4 ]
    │
  4 │   \ -> 0
-   │     │ 
-   │     ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `‘-’`, `‘(’` or `‘_’`
+   │    │ 
+   │    ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `‘-’`, `‘(’` or `‘_’`
    │ 
    │ Help: While parsing the condition in a match expression branch, expected `integer`, `fraction`, `string`, `char`, `identifier`, `‘-’`, `‘(’` or `‘_’`
 ───╯

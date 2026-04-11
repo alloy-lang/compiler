@@ -112,21 +112,21 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the colon after the name of a type
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_type_annotation_with_incomplete_type.test:3:5 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_type_annotation_with_incomplete_type.test:2:17 ]
    │
- 3 │     typeof test2 : self -> String -> Int
-   │     │ 
-   │     ╰─ expected `‘:’`
+ 2 │     typeof test1
+   │                 │ 
+   │                 ╰─ expected `‘:’`
    │ 
    │ Help: While parsing the colon after the name of a type, expected `‘:’`
 ───╯
 
 [E11001] Error: Missing expected token while parsing a type in a type annotation
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_type_annotation_with_incomplete_type.test:3:5 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_type_annotation_with_incomplete_type.test:2:17 ]
    │
- 3 │     typeof test2 : self -> String -> Int
-   │     │ 
-   │     ╰─ expected `identifier`, `‘self‘` or `‘(’`
+ 2 │     typeof test1
+   │                 │ 
+   │                 ╰─ expected `identifier`, `‘self‘` or `‘(’`
    │ 
    │ Help: While parsing a type in a type annotation, expected `identifier`, `‘self‘` or `‘(’`
 ───╯

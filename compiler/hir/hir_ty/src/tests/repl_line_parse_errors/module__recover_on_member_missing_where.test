@@ -13,11 +13,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the where keyword at the start of a module definition
-   ╭─[ ./test/main.alloy:2:5 ]
+   ╭─[ ./test/main.alloy:1:19 ]
    │
- 2 │     import really::really::real::Thing1
-   │     │ 
-   │     ╰─ expected `‘where‘`
+ 1 │ module TestModule1
+   │                   │ 
+   │                   ╰─ expected `‘where‘`
    │ 
    │ Help: While parsing the where keyword at the start of a module definition, expected `‘where‘`
 ───╯

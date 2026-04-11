@@ -29,4 +29,4 @@ SourceFile@0..47
         Integer@42..43 "1"
         Whitespace@43..44 "\n"
     EndKw@44..47 "end"
-error at position 34 while parsing the `where` keyword at the start of a behavior definition. Missing expected ‘where‘
+error at position 29 while parsing the `where` keyword at the start of a behavior definition. Missing expected ‘where‘

@@ -32,4 +32,4 @@ SourceFile@0..63
     Whitespace@57..58 " "
     TypeDefinitionMember@58..63
       Ident@58..63 "Empty"
-error at position 18 while parsing the name of a bounded type argument. Missing expected identifier
+error at position 17 while parsing the name of a bounded type argument. Missing expected identifier

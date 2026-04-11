@@ -37,4 +37,4 @@ SourceFile@0..97
       DoubleColon@89..91 "::"
       ImportDefSegment@91..97
         Ident@91..97 "Thing2"
-error at position 23 while parsing the where keyword at the start of a module definition. Missing expected ‘where‘
+error at position 18 while parsing the where keyword at the start of a module definition. Missing expected ‘where‘

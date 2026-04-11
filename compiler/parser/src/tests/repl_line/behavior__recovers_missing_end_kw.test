@@ -47,4 +47,4 @@ SourceFile@0..156
     Comment@122..152 "-- imagine all the th ..."
     Whitespace@152..153 "\n"
     EndKw@153..156 "end"
-error at position 95 while parsing the `end` keyword after a behavior definition. Missing expected ‘end‘
+error at position 58 while parsing the `end` keyword after a behavior definition. Missing expected ‘end‘

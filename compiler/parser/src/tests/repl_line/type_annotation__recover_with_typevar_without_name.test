@@ -37,4 +37,4 @@ SourceFile@0..63
       TypevarKw@53..60 "typevar"
       Whitespace@60..61 " "
       Ident@61..63 "t2"
-error at position 53 while parsing the name of a type variable. Missing expected identifier
+error at position 48 while parsing the name of a type variable. Missing expected identifier

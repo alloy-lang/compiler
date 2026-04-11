@@ -41,5 +41,5 @@ SourceFile@0..84
               Ident@77..80 "Int"
               Whitespace@80..81 "\n"
     EndKw@81..84 "end"
-error at position 44 while parsing the colon after the name of a type. Missing expected ‘:’
-error at position 44 while parsing a type in a type annotation. Missing expected identifier, ‘self‘ or ‘(’
+error at position 39 while parsing the colon after the name of a type. Missing expected ‘:’
+error at position 39 while parsing a type in a type annotation. Missing expected identifier, ‘self‘ or ‘(’

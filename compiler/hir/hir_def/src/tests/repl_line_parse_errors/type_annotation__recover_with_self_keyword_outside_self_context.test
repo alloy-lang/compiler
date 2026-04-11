@@ -189,11 +189,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_self_keyword_outside_self_context.test:3:16 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_self_keyword_outside_self_context.test:3:15 ]
    │
  3 │ typeof test1 : self -> String
-   │                │ 
-   │                ╰─ expected `identifier`
+   │               │ 
+   │               ╰─ expected `identifier`
    │ 
    │ Help: While parsing a type, encountered an unexpected `self` reference outside a trait or behavior context, expected `identifier`
 ───╯

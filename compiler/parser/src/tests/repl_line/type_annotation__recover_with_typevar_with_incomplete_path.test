@@ -46,4 +46,4 @@ SourceFile@0..78
       TypevarKw@68..75 "typevar"
       Whitespace@75..76 " "
       Ident@76..78 "t2"
-error at position 68 while parsing the trait name in a type variable constraint. Missing expected identifier
+error at position 63 while parsing the trait name in a type variable constraint. Missing expected identifier

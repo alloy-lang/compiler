@@ -35,4 +35,4 @@ SourceFile@0..58
         TypeIdentifier@55..58
           Path@55..58
             Ident@55..58 "Int"
-error at position 13 while parsing the name of a type. Missing expected operator identifier or identifier
+error at position 6 while parsing the name of a type. Missing expected operator identifier or identifier

@@ -29,4 +29,4 @@ SourceFile@0..23
     VariableRef@22..23
       Path@22..23
         Ident@22..23 "a"
-error at position 6 while parsing the ‘=’ in a value definition. Missing expected ‘=’
+error at position 5 while parsing the ‘=’ in a value definition. Missing expected ‘=’

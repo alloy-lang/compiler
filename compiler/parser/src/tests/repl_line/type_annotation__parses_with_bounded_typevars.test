@@ -70,6 +70,6 @@ SourceFile@0..91
       TypevarKw@81..88 "typevar"
       Whitespace@88..89 " "
       Ident@89..91 "t2"
-error at position 15 while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context. Missing expected identifier
-error at position 35 while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context. Missing expected identifier
-error at position 47 while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context. Missing expected identifier
+error at position 14 while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context. Missing expected identifier
+error at position 34 while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context. Missing expected identifier
+error at position 46 while parsing a type, encountered an unexpected `self` reference outside a trait or behavior context. Missing expected identifier

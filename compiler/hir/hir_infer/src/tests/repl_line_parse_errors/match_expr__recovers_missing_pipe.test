@@ -36,11 +36,11 @@ DefinitionInferenceResult {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the `|` at the start of a match expression branch
-   ╭─[ ./test/main.alloy:4:3 ]
+   ╭─[ ./test/main.alloy:3:16 ]
    │
- 4 │   True -> 0
-   │   │ 
-   │   ╰─ expected `’\’`
+ 3 │ match test when
+   │                │ 
+   │                ╰─ expected `’\’`
    │ 
    │ Help: While parsing the `|` at the start of a match expression branch, expected `’\’`
 ───╯

@@ -37,4 +37,4 @@ SourceFile@0..91
       DoubleColon@83..85 "::"
       ImportDefSegment@85..91
         Ident@85..91 "Thing2"
-error at position 7 while parsing the name of the module in a module definition. Missing expected identifier
+error at position 6 while parsing the name of the module in a module definition. Missing expected identifier

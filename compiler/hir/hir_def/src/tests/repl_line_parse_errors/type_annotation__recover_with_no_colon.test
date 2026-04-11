@@ -205,21 +205,21 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the colon after the name of a type
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_no_colon.test:4:1 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_no_colon.test:3:13 ]
    │
- 4 │ let test1 = |x, y| -> "hi"
-   │ │ 
-   │ ╰─ expected `‘:’`
+ 3 │ typeof test1
+   │             │ 
+   │             ╰─ expected `‘:’`
    │ 
    │ Help: While parsing the colon after the name of a type, expected `‘:’`
 ───╯
 
 [E11001] Error: Missing expected token while parsing a type in a type annotation
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_no_colon.test:4:1 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_no_colon.test:3:13 ]
    │
- 4 │ let test1 = |x, y| -> "hi"
-   │ │ 
-   │ ╰─ expected `identifier` or `‘(’`
+ 3 │ typeof test1
+   │             │ 
+   │             ╰─ expected `identifier` or `‘(’`
    │ 
    │ Help: While parsing a type in a type annotation, expected `identifier` or `‘(’`
 ───╯

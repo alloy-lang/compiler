@@ -234,11 +234,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the right parenthesis of a parenthesized type
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_parenthesized_type_without_right_paren.test:4:1 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_parenthesized_type_without_right_paren.test:3:41 ]
    │
- 4 │ let test1 = |x, y| -> "hi"
-   │ │ 
-   │ ╰─ expected `‘,’` or `‘)’`
+ 3 │ typeof test1 : Test -> String -> (String
+   │                                         │ 
+   │                                         ╰─ expected `‘,’` or `‘)’`
    │ 
    │ Help: While parsing the right parenthesis of a parenthesized type, expected `‘,’` or `‘)’`
 ───╯

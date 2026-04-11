@@ -17,5 +17,5 @@ SourceFile@0..35
     Whitespace@29..30 " "
     TypeDefinitionMember@30..35
       Ident@30..35 "Empty"
-error at position 14 while parsing the equals sign in a type definition. Missing expected ‘=’
-error at position 14 while parsing the name of a type definition member. Missing expected identifier
+error at position 13 while parsing the equals sign in a type definition. Missing expected ‘=’
+error at position 13 while parsing the name of a type definition member. Missing expected identifier

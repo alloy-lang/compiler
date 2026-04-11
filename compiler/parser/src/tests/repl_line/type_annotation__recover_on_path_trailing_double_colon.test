@@ -40,4 +40,4 @@ SourceFile@0..81
           Ident@64..75 "ResultThing"
           DoubleColon@75..77 "::"
           Ident@77..81 "More"
-error at position 39 while parsing a type in a type annotation. Missing expected identifier
+error at position 38 while parsing a type in a type annotation. Missing expected identifier

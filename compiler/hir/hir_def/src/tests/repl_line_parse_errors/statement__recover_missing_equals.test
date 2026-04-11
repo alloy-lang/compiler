@@ -81,11 +81,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the ‘=’ in a value definition
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/statement__recover_missing_equals.test:1:7 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/statement__recover_missing_equals.test:1:6 ]
    │
  1 │ let a (1 + 2)
-   │       │ 
-   │       ╰─ expected `‘=’`
+   │      │ 
+   │      ╰─ expected `‘=’`
    │ 
    │ Help: While parsing the ‘=’ in a value definition, expected `‘=’`
 ───╯

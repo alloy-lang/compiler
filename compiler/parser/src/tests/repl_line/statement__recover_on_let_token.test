@@ -19,4 +19,4 @@ SourceFile@0..17
     VariableRef@16..17
       Path@16..17
         Ident@16..17 "a"
-error at position 8 while parsing the expression in a value definition. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error at position 7 while parsing the expression in a value definition. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’

@@ -54,4 +54,4 @@ SourceFile@0..135
       Ident@129..131 "t1"
       Whitespace@131..132 "\n"
     EndKw@132..135 "end"
-error at position 9 while parsing the name of a trait at the start of a behavior definition. Missing expected identifier or ‘(’
+error at position 8 while parsing the name of a trait at the start of a behavior definition. Missing expected identifier or ‘(’

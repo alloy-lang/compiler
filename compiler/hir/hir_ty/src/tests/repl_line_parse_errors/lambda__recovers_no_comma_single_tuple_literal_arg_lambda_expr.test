@@ -57,11 +57,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing a comma between expressions inside parentheses
-   ╭─[ ./test/main.alloy:1:5 ]
+   ╭─[ ./test/main.alloy:1:4 ]
    │
  1 │ |(a b)| -> 5
-   │     │ 
-   │     ╰─ expected `‘,’`
+   │    │ 
+   │    ╰─ expected `‘,’`
    │ 
    │ Help: While parsing a comma between expressions inside parentheses, expected `‘,’`
 ───╯

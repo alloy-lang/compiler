@@ -14,11 +14,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the name of a type definition member
-   ╭─[ ./test/main.alloy:3:3 ]
+   ╭─[ ./test/main.alloy:2:4 ]
    │
- 3 │   | Empty
-   │   │ 
-   │   ╰─ expected `identifier`
+ 2 │   |
+   │    │ 
+   │    ╰─ expected `identifier`
    │ 
    │ Help: While parsing the name of a type definition member, expected `identifier`
 ───╯

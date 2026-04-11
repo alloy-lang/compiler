@@ -48,4 +48,4 @@ SourceFile@0..71
       TypevarKw@61..68 "typevar"
       Whitespace@68..69 " "
       Ident@69..71 "t2"
-error at position 32 while parsing the `[` at the start of the bounded type arguments. Missing expected ‘[’
+error at position 31 while parsing the `[` at the start of the bounded type arguments. Missing expected ‘[’

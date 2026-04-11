@@ -49,4 +49,4 @@ SourceFile@0..76
       TypeIdentifier@70..76
         Path@70..76
           Ident@70..76 "String"
-error at position 40 while parsing the `->` in a lambda type. Missing expected ‘->’
+error at position 39 while parsing the `->` in a lambda type. Missing expected ‘->’

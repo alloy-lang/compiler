@@ -58,4 +58,4 @@ SourceFile@0..108
               Ident@101..104 "Int"
               Whitespace@104..105 "\n"
     EndKw@105..108 "end"
-error at position 42 while parsing the colon after the name of a type. Missing expected ‘:’
+error at position 39 while parsing the colon after the name of a type. Missing expected ‘:’

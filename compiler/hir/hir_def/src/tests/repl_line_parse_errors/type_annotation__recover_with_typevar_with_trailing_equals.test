@@ -153,11 +153,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the constraints for a type variable
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_typevar_with_trailing_equals.test:5:5 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/type_annotation__recover_with_typevar_with_trailing_equals.test:4:17 ]
    │
- 5 │     typevar t2
-   │     │ 
-   │     ╰─ expected `identifier`
+ 4 │     typevar t1 =
+   │                 │ 
+   │                 ╰─ expected `identifier`
    │ 
    │ Help: While parsing the constraints for a type variable, expected `identifier`
 ───╯

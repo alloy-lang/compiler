@@ -39,4 +39,4 @@ SourceFile@0..42
       MatchTargetValue@41..42
         IntLiteral@41..42
           Integer@41..42 "1"
-error at position 30 while parsing the value in a match expression branch. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’
+error at position 27 while parsing the value in a match expression branch. Missing expected integer, fraction, string, char, identifier, operator identifier, ‘-’, ‘(’, ‘if‘, ‘match‘ or ‘|’

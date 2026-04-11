@@ -43,4 +43,4 @@ SourceFile@0..64
       TypeIdentifier@58..64
         Path@58..64
           Ident@58..64 "String"
-error at position 35 while parsing the right parenthesis of a unit type. Missing expected ‘)’
+error at position 34 while parsing the right parenthesis of a unit type. Missing expected ‘)’

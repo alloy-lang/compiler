@@ -139,11 +139,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the `where` keyword at the start of a behavior definition
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/behavior__recover_on_behavior_kw_missing_where__typeof_kw.test:8:5 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/behavior__recover_on_behavior_kw_missing_where__typeof_kw.test:7:30 ]
    │
- 8 │     typeof test : String
-   │     │ 
-   │     ╰─ expected `‘where‘`
+ 7 │ behavior TestTrait1 for Type1
+   │                              │ 
+   │                              ╰─ expected `‘where‘`
    │ 
    │ Help: While parsing the `where` keyword at the start of a behavior definition, expected `‘where‘`
 ───╯

@@ -34,4 +34,4 @@ SourceFile@0..123
     Comment@89..119 "-- imagine all the th ..."
     Whitespace@119..120 "\n"
     EndKw@120..123 "end"
-error at position 20 while parsing the name of a type at the start of a behavior definition. Missing expected identifier or ‘(’
+error at position 19 while parsing the name of a type at the start of a behavior definition. Missing expected identifier or ‘(’

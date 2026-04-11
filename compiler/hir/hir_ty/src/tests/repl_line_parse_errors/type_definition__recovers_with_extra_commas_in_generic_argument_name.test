@@ -12,11 +12,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the name of a bounded type argument
-   ╭─[ ./test/main.alloy:1:19 ]
+   ╭─[ ./test/main.alloy:1:18 ]
    │
  1 │ typedef Test1[t1, , t3] = Empty
-   │                   │ 
-   │                   ╰─ expected `identifier`
+   │                  │ 
+   │                  ╰─ expected `identifier`
    │ 
    │ Help: While parsing the name of a bounded type argument, expected `identifier`
 ───╯

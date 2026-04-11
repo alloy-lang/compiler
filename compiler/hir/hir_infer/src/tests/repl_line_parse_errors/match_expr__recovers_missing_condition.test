@@ -31,11 +31,11 @@ DefinitionInferenceResult {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the argument of a match expression
-   ╭─[ ./test/main.alloy:1:7 ]
+   ╭─[ ./test/main.alloy:1:6 ]
    │
  1 │ match when
-   │       │ 
-   │       ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
+   │      │ 
+   │      ╰─ expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
    │ 
    │ Help: While parsing the argument of a match expression, expected `integer`, `fraction`, `string`, `char`, `identifier`, `operator identifier`, `‘-’`, `‘(’`, `‘if‘`, `‘match‘` or `‘|’`
 ───╯

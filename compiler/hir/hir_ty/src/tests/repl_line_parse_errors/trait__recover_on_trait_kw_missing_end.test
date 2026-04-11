@@ -20,11 +20,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the `end` keyword after a trait definition
-   ╭─[ ./test/main.alloy:6:1 ]
+   ╭─[ ./test/main.alloy:4:15 ]
    │
- 6 │ trait TestTrait2 where
-   │ │ 
-   │ ╰─ expected `‘end‘`
+ 4 │     typevar t1
+   │               │ 
+   │               ╰─ expected `‘end‘`
    │ 
    │ Help: While parsing the `end` keyword after a trait definition, expected `‘end‘`
 ───╯

@@ -107,11 +107,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the `->` in a match expression branch
-   ╭─[ ./test/main.alloy:4:10 ]
+   ╭─[ ./test/main.alloy:4:9 ]
    │
  4 │   \ True 0
-   │          │ 
-   │          ╰─ expected `‘->’`
+   │         │ 
+   │         ╰─ expected `‘->’`
    │ 
    │ Help: While parsing the `->` in a match expression branch, expected `‘->’`
 ───╯

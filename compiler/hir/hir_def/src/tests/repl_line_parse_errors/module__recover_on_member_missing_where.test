@@ -80,11 +80,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the where keyword at the start of a module definition
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/module__recover_on_member_missing_where.test:2:5 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/module__recover_on_member_missing_where.test:1:19 ]
    │
- 2 │     import really::really::real::Thing1
-   │     │ 
-   │     ╰─ expected `‘where‘`
+ 1 │ module TestModule1
+   │                   │ 
+   │                   ╰─ expected `‘where‘`
    │ 
    │ Help: While parsing the where keyword at the start of a module definition, expected `‘where‘`
 ───╯

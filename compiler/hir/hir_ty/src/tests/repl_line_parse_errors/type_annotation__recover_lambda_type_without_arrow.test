@@ -116,11 +116,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the `->` in a lambda type
-   ╭─[ ./test/main.alloy:3:46 ]
+   ╭─[ ./test/main.alloy:3:45 ]
    │
  3 │ typeof test1 : Test[Int] -> String -> String String
-   │                                              │ 
-   │                                              ╰─ expected `‘->’`
+   │                                             │ 
+   │                                             ╰─ expected `‘->’`
    │ 
    │ Help: While parsing the `->` in a lambda type, expected `‘->’`
 ───╯

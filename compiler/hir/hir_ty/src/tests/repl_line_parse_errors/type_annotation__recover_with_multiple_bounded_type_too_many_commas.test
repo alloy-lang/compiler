@@ -40,11 +40,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the type of a bounded type argument
-   ╭─[ ./test/main.alloy:3:26 ]
+   ╭─[ ./test/main.alloy:3:25 ]
    │
  3 │ typeof apply : Test[Int, , Int]
-   │                          │ 
-   │                          ╰─ expected `identifier` or `‘(’`
+   │                         │ 
+   │                         ╰─ expected `identifier` or `‘(’`
    │ 
    │ Help: While parsing the type of a bounded type argument, expected `identifier` or `‘(’`
 ───╯

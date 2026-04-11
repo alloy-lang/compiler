@@ -16,11 +16,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the `+` between type constraints
-   ╭─[ ./test/main.alloy:4:20 ]
+   ╭─[ ./test/main.alloy:4:19 ]
    │
  4 │     self = Functor #Type[_]
-   │                    │ 
-   │                    ╰─ expected `‘+’`
+   │                   │ 
+   │                   ╰─ expected `‘+’`
    │ 
    │ Help: While parsing the `+` between type constraints, expected `‘+’`
 ───╯

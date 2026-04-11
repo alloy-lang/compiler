@@ -61,11 +61,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the name of a type
-   ╭─[ ./test/main.alloy:3:14 ]
+   ╭─[ ./test/main.alloy:3:7 ]
    │
  3 │ typeof       : String
-   │              │ 
-   │              ╰─ expected `operator identifier` or `identifier`
+   │       │ 
+   │       ╰─ expected `operator identifier` or `identifier`
    │ 
    │ Help: While parsing the name of a type, expected `operator identifier` or `identifier`
 ───╯

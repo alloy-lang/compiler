@@ -80,11 +80,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the name of the module in a module definition
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/module__recover_on_where_missing_name.test:1:8 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/module__recover_on_where_missing_name.test:1:7 ]
    │
  1 │ module where
-   │        │ 
-   │        ╰─ expected `identifier`
+   │       │ 
+   │       ╰─ expected `identifier`
    │ 
    │ Help: While parsing the name of the module in a module definition, expected `identifier`
 ───╯

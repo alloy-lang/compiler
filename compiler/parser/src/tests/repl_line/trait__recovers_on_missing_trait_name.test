@@ -36,4 +36,4 @@ SourceFile@0..109
       Ident@103..105 "t1"
       Whitespace@105..106 "\n"
     EndKw@106..109 "end"
-error at position 6 while parsing the name of the trait in a trait definition. Missing expected identifier
+error at position 5 while parsing the name of the trait in a trait definition. Missing expected identifier

@@ -43,21 +43,21 @@ DefinitionInferenceResult {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing a comma between arguments in a lambda expression
-   ╭─[ ./test/main.alloy:1:7 ]
+   ╭─[ ./test/main.alloy:1:6 ]
    │
  1 │ |arg1 1001 'c'| -> 8
-   │       │ 
-   │       ╰─ expected `‘,’`
+   │      │ 
+   │      ╰─ expected `‘,’`
    │ 
    │ Help: While parsing a comma between arguments in a lambda expression, expected `‘,’`
 ───╯
 
 [E11001] Error: Missing expected token while parsing a comma between arguments in a lambda expression
-   ╭─[ ./test/main.alloy:1:12 ]
+   ╭─[ ./test/main.alloy:1:11 ]
    │
  1 │ |arg1 1001 'c'| -> 8
-   │            │ 
-   │            ╰─ expected `‘,’`
+   │           │ 
+   │           ╰─ expected `‘,’`
    │ 
    │ Help: While parsing a comma between arguments in a lambda expression, expected `‘,’`
 ───╯

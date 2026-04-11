@@ -124,11 +124,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the when keyword of a match expression
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/match_expr__recovers_missing_when.test:4:3 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/match_expr__recovers_missing_when.test:3:11 ]
    │
- 4 │   \ True -> 0
-   │   │ 
-   │   ╰─ expected `‘when‘`
+ 3 │ match test
+   │           │ 
+   │           ╰─ expected `‘when‘`
    │ 
    │ Help: While parsing the when keyword of a match expression, expected `‘when‘`
 ───╯

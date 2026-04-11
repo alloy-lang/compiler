@@ -106,11 +106,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the right parenthesis of a parenthesized type
-   ╭─[ ./test/main.alloy:4:1 ]
+   ╭─[ ./test/main.alloy:3:46 ]
    │
- 4 │ let test1 = |x, y| -> "hello"
-   │ │ 
-   │ ╰─ expected `‘,’` or `‘)’`
+ 3 │ typeof test1 : Test[Int] -> String -> (String
+   │                                              │ 
+   │                                              ╰─ expected `‘,’` or `‘)’`
    │ 
    │ Help: While parsing the right parenthesis of a parenthesized type, expected `‘,’` or `‘)’`
 ───╯

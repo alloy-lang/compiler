@@ -69,11 +69,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the colon after the name of a type
-   ╭─[ ./test/main.alloy:3:16 ]
+   ╭─[ ./test/main.alloy:3:13 ]
    │
  3 │ typeof test1   String
-   │                │ 
-   │                ╰─ expected `‘:’`
+   │             │ 
+   │             ╰─ expected `‘:’`
    │ 
    │ Help: While parsing the colon after the name of a type, expected `‘:’`
 ───╯

@@ -59,4 +59,4 @@ SourceFile@0..178
       Ident@172..174 "t1"
       Whitespace@174..175 "\n"
     EndKw@175..178 "end"
-error at position 88 while parsing the `end` keyword after a behavior definition. Missing expected ‘end‘
+error at position 86 while parsing the `end` keyword after a behavior definition. Missing expected ‘end‘

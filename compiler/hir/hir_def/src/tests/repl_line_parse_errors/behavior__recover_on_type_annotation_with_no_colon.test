@@ -204,11 +204,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the colon after the name of a type
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/behavior__recover_on_type_annotation_with_no_colon.test:8:20 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/behavior__recover_on_type_annotation_with_no_colon.test:8:17 ]
    │
  8 │     typeof test1   self -> String -> Int
-   │                    │ 
-   │                    ╰─ expected `‘:’`
+   │                 │ 
+   │                 ╰─ expected `‘:’`
    │ 
    │ Help: While parsing the colon after the name of a type, expected `‘:’`
 ───╯

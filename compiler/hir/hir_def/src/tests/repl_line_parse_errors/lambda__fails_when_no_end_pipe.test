@@ -64,11 +64,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the `|` at the end of a lambda expression's argument list
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/lambda__fails_when_no_end_pipe.test:1:13 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/lambda__fails_when_no_end_pipe.test:1:12 ]
    │
  1 │ |arg1, arg2 -> 8
-   │             │ 
-   │             ╰─ expected `‘|’`
+   │            │ 
+   │            ╰─ expected `‘|’`
    │ 
    │ Help: While parsing the `|` at the end of a lambda expression's argument list, expected `‘|’`
 ───╯

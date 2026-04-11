@@ -250,21 +250,21 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing a comma between arguments in a function call
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/expr__recovers_function_call_missing_comma.test:6:9 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/expr__recovers_function_call_missing_comma.test:6:8 ]
    │
  6 │ funky(x y z)
-   │         │ 
-   │         ╰─ expected `‘,’`
+   │        │ 
+   │        ╰─ expected `‘,’`
    │ 
    │ Help: While parsing a comma between arguments in a function call, expected `‘,’`
 ───╯
 
 [E11001] Error: Missing expected token while parsing a comma between arguments in a function call
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/expr__recovers_function_call_missing_comma.test:6:11 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/expr__recovers_function_call_missing_comma.test:6:10 ]
    │
  6 │ funky(x y z)
-   │           │ 
-   │           ╰─ expected `‘,’`
+   │          │ 
+   │          ╰─ expected `‘,’`
    │ 
    │ Help: While parsing a comma between arguments in a function call, expected `‘,’`
 ───╯

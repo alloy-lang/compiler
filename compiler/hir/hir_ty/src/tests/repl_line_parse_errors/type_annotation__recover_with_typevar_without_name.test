@@ -70,11 +70,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the name of a type variable
-   ╭─[ ./test/main.alloy:5:5 ]
+   ╭─[ ./test/main.alloy:4:12 ]
    │
- 5 │     typevar t2
-   │     │ 
-   │     ╰─ expected `identifier`
+ 4 │     typevar
+   │            │ 
+   │            ╰─ expected `identifier`
    │ 
    │ Help: While parsing the name of a type variable, expected `identifier`
 ───╯

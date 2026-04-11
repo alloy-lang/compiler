@@ -67,11 +67,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the name of a type variable
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_typevar_without_name.test:3:5 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/trait__recover_on_typevar_without_name.test:2:12 ]
    │
- 3 │     typevar t2
-   │     │ 
-   │     ╰─ expected `identifier`
+ 2 │     typevar
+   │            │ 
+   │            ╰─ expected `identifier`
    │ 
    │ Help: While parsing the name of a type variable, expected `identifier`
 ───╯

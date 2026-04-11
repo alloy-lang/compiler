@@ -18,4 +18,4 @@ SourceFile@0..39
           Ident@28..35 "Functor"
           Whitespace@35..36 "\n"
     EndKw@36..39 "end"
-error at position 21 while parsing the `where` keyword at the start of a trait definition. Missing expected ‘where‘
+error at position 16 while parsing the `where` keyword at the start of a trait definition. Missing expected ‘where‘

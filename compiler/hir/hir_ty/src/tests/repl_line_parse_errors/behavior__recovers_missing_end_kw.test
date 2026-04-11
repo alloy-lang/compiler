@@ -18,11 +18,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the `end` keyword after a behavior definition
-   ╭─[ ./test/main.alloy:6:1 ]
+   ╭─[ ./test/main.alloy:3:36 ]
    │
- 6 │ trait TestTrait1 where
-   │ │ 
-   │ ╰─ expected `‘end‘`
+ 3 │ behavior TestTrait1 for Type1 where
+   │                                    │ 
+   │                                    ╰─ expected `‘end‘`
    │ 
    │ Help: While parsing the `end` keyword after a behavior definition, expected `‘end‘`
 ───╯

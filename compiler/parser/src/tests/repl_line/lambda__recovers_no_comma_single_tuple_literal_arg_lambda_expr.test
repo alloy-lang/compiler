@@ -22,4 +22,4 @@ SourceFile@0..12
     LambdaExprBody@11..12
       IntLiteral@11..12
         Integer@11..12 "5"
-error at position 4 while parsing a comma between expressions inside parentheses. Missing expected ‘,’
+error at position 3 while parsing a comma between expressions inside parentheses. Missing expected ‘,’

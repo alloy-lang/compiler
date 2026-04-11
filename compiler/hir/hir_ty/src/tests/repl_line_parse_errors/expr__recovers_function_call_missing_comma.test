@@ -93,21 +93,21 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing a comma between arguments in a function call
-   ╭─[ ./test/main.alloy:6:9 ]
+   ╭─[ ./test/main.alloy:6:8 ]
    │
  6 │ funky(x y z)
-   │         │ 
-   │         ╰─ expected `‘,’`
+   │        │ 
+   │        ╰─ expected `‘,’`
    │ 
    │ Help: While parsing a comma between arguments in a function call, expected `‘,’`
 ───╯
 
 [E11001] Error: Missing expected token while parsing a comma between arguments in a function call
-   ╭─[ ./test/main.alloy:6:11 ]
+   ╭─[ ./test/main.alloy:6:10 ]
    │
  6 │ funky(x y z)
-   │           │ 
-   │           ╰─ expected `‘,’`
+   │          │ 
+   │          ╰─ expected `‘,’`
    │ 
    │ Help: While parsing a comma between arguments in a function call, expected `‘,’`
 ───╯

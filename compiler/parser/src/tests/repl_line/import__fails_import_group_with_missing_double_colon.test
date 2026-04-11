@@ -25,4 +25,4 @@ SourceFile@0..52
     DoubleColon@47..49 "::"
     ImportDefSegment@49..52
       Ident@49..52 "map"
-error at position 20 while parsing the ‘::’ between import segments. Missing expected ‘::’
+error at position 19 while parsing the ‘::’ between import segments. Missing expected ‘::’

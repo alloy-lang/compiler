@@ -107,11 +107,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the when keyword of a match expression
-   ╭─[ ./test/main.alloy:4:3 ]
+   ╭─[ ./test/main.alloy:3:11 ]
    │
- 4 │   \ True -> 0
-   │   │ 
-   │   ╰─ expected `‘when‘`
+ 3 │ match test
+   │           │ 
+   │           ╰─ expected `‘when‘`
    │ 
    │ Help: While parsing the when keyword of a match expression, expected `‘when‘`
 ───╯

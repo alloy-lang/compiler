@@ -12,11 +12,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the equals sign in a type definition
-   ╭─[ ./test/main.alloy:1:17 ]
+   ╭─[ ./test/main.alloy:1:14 ]
    │
  1 │ typedef Test1   Empty
-   │                 │ 
-   │                 ╰─ expected `‘=’`
+   │              │ 
+   │              ╰─ expected `‘=’`
    │ 
    │ Help: While parsing the equals sign in a type definition, expected `‘=’`
 ───╯

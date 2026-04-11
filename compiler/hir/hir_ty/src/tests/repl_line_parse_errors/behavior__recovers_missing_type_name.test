@@ -17,11 +17,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the name of a type at the start of a behavior definition
-   ╭─[ ./test/main.alloy:1:21 ]
+   ╭─[ ./test/main.alloy:1:20 ]
    │
  1 │ behavior Trait1 for where
-   │                     │ 
-   │                     ╰─ expected `identifier` or `‘(’`
+   │                    │ 
+   │                    ╰─ expected `identifier` or `‘(’`
    │ 
    │ Help: While parsing the name of a type at the start of a behavior definition, expected `identifier` or `‘(’`
 ───╯

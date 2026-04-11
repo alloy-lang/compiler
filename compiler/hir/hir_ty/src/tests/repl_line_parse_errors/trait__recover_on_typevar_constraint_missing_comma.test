@@ -14,11 +14,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the comma between `_` in the [_] pattern thingy
-   ╭─[ ./test/main.alloy:2:20 ]
+   ╭─[ ./test/main.alloy:2:19 ]
    │
  2 │     self = #Type[_ _]
-   │                    │ 
-   │                    ╰─ expected `‘,’`
+   │                   │ 
+   │                   ╰─ expected `‘,’`
    │ 
    │ Help: While parsing the comma between `_` in the [_] pattern thingy, expected `‘,’`
 ───╯

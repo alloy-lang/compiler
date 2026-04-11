@@ -73,21 +73,21 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing a comma between arguments in a lambda expression
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/lambda__fails_when_multi_arg_has_no_comma.test:1:7 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/lambda__fails_when_multi_arg_has_no_comma.test:1:6 ]
    │
  1 │ |arg1 1001 'c'| -> 8
-   │       │ 
-   │       ╰─ expected `‘,’`
+   │      │ 
+   │      ╰─ expected `‘,’`
    │ 
    │ Help: While parsing a comma between arguments in a lambda expression, expected `‘,’`
 ───╯
 
 [E11001] Error: Missing expected token while parsing a comma between arguments in a lambda expression
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/lambda__fails_when_multi_arg_has_no_comma.test:1:12 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/lambda__fails_when_multi_arg_has_no_comma.test:1:11 ]
    │
  1 │ |arg1 1001 'c'| -> 8
-   │            │ 
-   │            ╰─ expected `‘,’`
+   │           │ 
+   │           ╰─ expected `‘,’`
    │ 
    │ Help: While parsing a comma between arguments in a lambda expression, expected `‘,’`
 ───╯

@@ -74,11 +74,11 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the trait name in a type variable constraint
-   ╭─[ ./test/main.alloy:6:5 ]
+   ╭─[ ./test/main.alloy:5:27 ]
    │
- 6 │     typevar t2
-   │     │ 
-   │     ╰─ expected `identifier`
+ 5 │     typevar t1 = functor::
+   │                           │ 
+   │                           ╰─ expected `identifier`
    │ 
    │ Help: While parsing the trait name in a type variable constraint, expected `identifier`
 ───╯

@@ -78,11 +78,11 @@ HirModule {
     errors: [],
 }
 [E11001] Error: Missing expected token while parsing the name of a type at the start of a behavior definition
-   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/behavior__recovers_missing_type_name.test:3:21 ]
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_parse_errors/behavior__recovers_missing_type_name.test:3:20 ]
    │
  3 │ behavior Trait1 for where
-   │                     │ 
-   │                     ╰─ expected `identifier` or `‘(’`
+   │                    │ 
+   │                    ╰─ expected `identifier` or `‘(’`
    │ 
    │ Help: While parsing the name of a type at the start of a behavior definition, expected `identifier` or `‘(’`
 ───╯

@@ -14,21 +14,21 @@ HirTypedModule {
     poly_instantiations: {},
 }
 [E11001] Error: Missing expected token while parsing the colon after the name of a type
-   ╭─[ ./test/main.alloy:3:5 ]
+   ╭─[ ./test/main.alloy:2:17 ]
    │
- 3 │     typeof test2 : self -> String -> Int
-   │     │ 
-   │     ╰─ expected `‘:’`
+ 2 │     typeof test1
+   │                 │ 
+   │                 ╰─ expected `‘:’`
    │ 
    │ Help: While parsing the colon after the name of a type, expected `‘:’`
 ───╯
 
 [E11001] Error: Missing expected token while parsing a type in a type annotation
-   ╭─[ ./test/main.alloy:3:5 ]
+   ╭─[ ./test/main.alloy:2:17 ]
    │
- 3 │     typeof test2 : self -> String -> Int
-   │     │ 
-   │     ╰─ expected `identifier`, `‘self‘` or `‘(’`
+ 2 │     typeof test1
+   │                 │ 
+   │                 ╰─ expected `identifier`, `‘self‘` or `‘(’`
    │ 
    │ Help: While parsing a type in a type annotation, expected `identifier`, `‘self‘` or `‘(’`
 ───╯
