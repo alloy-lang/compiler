@@ -80,14 +80,50 @@ impl DiagnosticsReporter {
             .any(|entry| entry.diagnostic.severity() == Severity::Error)
     }
 
+    fn filter_hidden(&self) -> Vec<&DiagnosticEntry> {
+        let len = self.entries.len();
+        let mut keep = vec![true; len];
+
+        for i in 0..len {
+            if !keep[i] {
+                continue;
+            }
+            for j in 0..len {
+                if i == j || !keep[j] {
+                    continue;
+                }
+                if self.entries[i].module_id != self.entries[j].module_id {
+                    continue;
+                }
+                if self.entries[i]
+                    .diagnostic
+                    .is_hidden_by(self.entries[j].diagnostic.as_ref())
+                {
+                    keep[i] = false;
+                    break;
+                }
+            }
+        }
+
+        let mut iter = keep.iter();
+        self.entries
+            .iter()
+            .filter(|_| *iter.next().unwrap())
+            .collect()
+    }
+
     /// Render all diagnostics to a string with colors
     pub fn render(&self, db: &dyn WorkspaceDatabase) -> String {
-        self.render_with_config(db, None)
+        self.render_with_config(db, None, &self.filter_hidden())
     }
 
     /// Render all diagnostics to a string without colors
     pub fn render_no_color(&self, db: &dyn WorkspaceDatabase) -> String {
-        self.render_with_config(db, Some(Config::default().with_color(false)))
+        self.render_with_config(
+            db,
+            Some(Config::default().with_color(false)),
+            &self.filter_hidden(),
+        )
     }
 
     /// Print all diagnostics to stderr with colors
@@ -110,10 +146,15 @@ impl DiagnosticsReporter {
     }
 
     /// Internal helper to render with optional config
-    fn render_with_config(&self, db: &dyn WorkspaceDatabase, config: Option<Config>) -> String {
+    fn render_with_config(
+        &self,
+        db: &dyn WorkspaceDatabase,
+        config: Option<Config>,
+        entries: &[&DiagnosticEntry],
+    ) -> String {
         let mut output = String::new();
 
-        for entry in &self.entries {
+        for entry in entries {
             let source_file = db.get_source(entry.module_id);
 
             let source_id = source_file.raw_path(db);

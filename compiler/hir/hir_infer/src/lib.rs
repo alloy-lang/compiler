@@ -8,7 +8,7 @@ mod hir_ty;
 pub use hir_ty::{DisplayName, InferredType};
 
 mod diagnostics;
-pub use diagnostics::{TypeInferenceError, TypeInferenceWarning};
+pub use diagnostics::{TypeInferenceError, TypeInferenceErrorKind, TypeInferenceWarning};
 
 #[cfg(test)]
 mod tests;

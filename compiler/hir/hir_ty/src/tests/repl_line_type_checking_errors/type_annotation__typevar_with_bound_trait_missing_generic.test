@@ -357,16 +357,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[E33001] Error: Type mismatch: expected `Test`, found `Test[Int]`
-    ╭─[ ./test/main.alloy:10:1 ]
-    │
- 10 │ let test_func = |a, b| -> test
-    │ ───────────────┬──────────────  
-    │                ╰──────────────── expected `Test`, found `Test[Int]`
-    │ 
-    │ Help: These types must be compatible
-────╯
-
 [E34003] Error: Type `Test` expects 1 type argument(s), but 0 were provided
    ╭─[ ./test/main.alloy:7:36 ]
    │

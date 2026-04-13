@@ -43,6 +43,10 @@ impl Diagnostic for TypeCheckingError {
         Severity::Error
     }
 
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
     fn code(&self) -> Option<&str> {
         match &self.kind {
             TypeCheckingErrorKind::ConflictingTypeAnnotation { .. } => Some("E34001"),
@@ -154,6 +158,46 @@ impl Diagnostic for TypeCheckingError {
                 .with_help(format!(
                     "Trait `{trait_name}` requires an implementation of `{member_name}` for type `{type_name}`",
                 )),
+        }
+    }
+
+    fn is_hidden_by(&self, other: &dyn Diagnostic) -> bool {
+        if !self.overlaps_with(other) {
+            return false;
+        }
+
+        // Cross-phase: any wrapped inference/resolution error hidden by parse errors
+        if matches!(
+            self.kind,
+            TypeCheckingErrorKind::InferenceError(_) | TypeCheckingErrorKind::HirResolutionError(_)
+        ) && other.as_any().is::<alloy_parser::ParseError>()
+        {
+            return true;
+        }
+
+        // Intra-phase: downcast to TypeCheckingError for kind-level matching
+        let Some(other) = other.as_any().downcast_ref::<TypeCheckingError>() else {
+            return false;
+        };
+        match (&self.kind, &other.kind) {
+            // Wrapped TypeMismatch hidden by ConflictingTypeAnnotation or BoundedTypeArityMismatch
+            (
+                TypeCheckingErrorKind::InferenceError(ie),
+                TypeCheckingErrorKind::ConflictingTypeAnnotation { .. }
+                | TypeCheckingErrorKind::BoundedTypeArityMismatch { .. },
+            ) if matches!(
+                ie.kind(),
+                alloy_hir_infer::TypeInferenceErrorKind::TypeMismatch { .. }
+            ) =>
+            {
+                true
+            }
+            // ConflictingTypeAnnotation hidden by BoundedTypeArityMismatch
+            (
+                TypeCheckingErrorKind::ConflictingTypeAnnotation { .. },
+                TypeCheckingErrorKind::BoundedTypeArityMismatch { .. },
+            ) => true,
+            _ => false,
         }
     }
 }

@@ -237,6 +237,10 @@ impl Diagnostic for ParseError {
         Severity::Error
     }
 
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
     fn code(&self) -> Option<&str> {
         match &self.kind {
             ParseErrorKind::Missing { .. } => Some("E11001"),

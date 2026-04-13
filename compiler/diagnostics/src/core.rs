@@ -86,4 +86,22 @@ pub trait Diagnostic: std::fmt::Debug {
     fn build_report<'a>(&self, builder: DiagnosticBuilder<'a>) -> DiagnosticBuilder<'a> {
         builder.with_primary_label(self.message())
     }
+
+    /// Returns true if this diagnostic should be hidden given the presence of `other`.
+    ///
+    /// Used for error precedence: higher-priority diagnostics at overlapping ranges
+    /// suppress lower-priority ones (e.g., a specific type annotation error suppresses
+    /// a generic unification error for the same range).
+    fn is_hidden_by(&self, _other: &dyn Diagnostic) -> bool {
+        false
+    }
+
+    /// Check whether two text ranges overlap (touching ranges DO overlap).
+    fn overlaps_with(&self, other: &dyn Diagnostic) -> bool {
+        self.primary_span().start() <= other.primary_span().end()
+            && other.primary_span().start() <= self.primary_span().end()
+    }
+
+    /// Upcast to `Any` for downcasting to concrete types within the same crate.
+    fn as_any(&self) -> &dyn std::any::Any;
 }

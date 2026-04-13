@@ -117,16 +117,6 @@ HirTypedModule {
 ───╯
 
 [E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
-   ╭─[ ./test/main.alloy:4:5 ]
-   │
- 4 │   \ True 0
-   │     ──┬─  
-   │       ╰─── expected `Test[Int]`, found `Bool`
-   │ 
-   │ Help: These types must be compatible
-───╯
-
-[E33001] Error: Type mismatch: expected `Test[Int]`, found `Bool`
    ╭─[ ./test/main.alloy:5:5 ]
    │
  5 │   \ False -> 1

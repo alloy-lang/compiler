@@ -31,6 +31,10 @@ impl Diagnostic for LoweringError {
         Severity::Error
     }
 
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
     fn code(&self) -> Option<&str> {
         match &self.kind {
             LoweringErrorKind::ConflictingValue { .. } => Some("E22001"),
@@ -321,6 +325,10 @@ impl LoweringWarning {
 impl Diagnostic for LoweringWarning {
     fn severity(&self) -> Severity {
         Severity::Warning
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
     }
 
     fn code(&self) -> Option<&str> {

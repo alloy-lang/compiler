@@ -92,6 +92,10 @@ impl Diagnostic for HirResolutionError {
         Severity::Error
     }
 
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
     fn code(&self) -> Option<&str> {
         match self {
             HirResolutionError::UnresolvedModule { err, .. } => err.code(),

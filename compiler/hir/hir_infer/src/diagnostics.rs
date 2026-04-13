@@ -19,11 +19,19 @@ impl TypeInferenceError {
     pub fn range(&self) -> TextRange {
         self.range
     }
+
+    pub fn kind(&self) -> &TypeInferenceErrorKind {
+        &self.kind
+    }
 }
 
 impl Diagnostic for TypeInferenceError {
     fn severity(&self) -> Severity {
         Severity::Error
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
     }
 
     fn code(&self) -> Option<&str> {
@@ -89,6 +97,14 @@ impl Diagnostic for TypeInferenceError {
                     "Type `{resolved_type}` must implement trait `{trait_name}`"
                 )),
         }
+    }
+
+    fn is_hidden_by(&self, other: &dyn Diagnostic) -> bool {
+        if !self.overlaps_with(other) {
+            return false;
+        }
+        // Inference errors are hidden by parse errors at overlapping ranges
+        other.as_any().is::<alloy_parser::ParseError>()
     }
 }
 

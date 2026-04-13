@@ -9,6 +9,7 @@ edition = "2018"
 alloy_ast = { workspace = true }
 alloy_diagnostics = { workspace = true }
 alloy_hir_def = { workspace = true }
+alloy_parser = { workspace = true }
 alloy_hir_resolved = { workspace = true }
 alloy_workspace = { workspace = true }
 alloy_scope = { workspace = true }

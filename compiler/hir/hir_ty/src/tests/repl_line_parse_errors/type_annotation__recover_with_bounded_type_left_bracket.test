@@ -280,16 +280,6 @@ HirTypedModule {
    │ Help: While parsing the `]` at the end of the bounded type arguments, expected `‘]’`
 ───╯
 
-[E33001] Error: Type mismatch: expected `Test[t1 -> Test[t1]]`, found `b0 -> b0`
-   ╭─[ ./test/main.alloy:5:1 ]
-   │
- 5 │ let apply = |x| -> x
-   │ ──────────┬─────────  
-   │           ╰─────────── expected `Test[t1 -> Test[t1]]`, found `b0 -> b0`
-   │ 
-   │ Help: These types must be compatible
-───╯
-
 [E34001] Error: Inferred type does not match annotated type
    ╭─[ ./test/main.alloy:5:1 ]
    │

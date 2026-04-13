@@ -161,16 +161,6 @@ HirTypedModule {
     ],
     poly_instantiations: {},
 }
-[E33001] Error: Type mismatch: expected `Box`, found `Box[Int]`
-   ╭─[ ./test/main.alloy:4:1 ]
-   │
- 4 │ let wrong = Box(42)
-   │ ─────────┬─────────  
-   │          ╰─────────── expected `Box`, found `Box[Int]`
-   │ 
-   │ Help: These types must be compatible
-───╯
-
 [E34003] Error: Type `Box` expects 1 type argument(s), but 0 were provided
    ╭─[ ./test/main.alloy:3:16 ]
    │
