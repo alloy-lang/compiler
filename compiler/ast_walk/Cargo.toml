@@ -1,0 +1,12 @@
+[package]
+name = "alloy_ast_walk"
+version = "0.1.0"
+authors = ["theochupp <tclchiam@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+alloy_ast = { workspace = true }
+
+[dev-dependencies]
+alloy_parser = { workspace = true }
+alloy_test_harness = { workspace = true }

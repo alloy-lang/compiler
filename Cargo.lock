@@ -23,6 +23,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "alloy_ast_walk"
+version = "0.1.0"
+dependencies = [
+ "alloy_ast",
+ "alloy_parser",
+ "alloy_test_harness",
+]
+
+[[package]]
 name = "alloy_compiler"
 version = "0.1.0"
 dependencies = [

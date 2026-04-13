@@ -2,6 +2,7 @@
 members = [
     "compiler",
     "compiler/ast",
+    "compiler/ast_walk",
     "compiler/diagnostics",
     "compiler/hir",
     "compiler/hir/hir_def",
@@ -40,6 +41,7 @@ url = "2.5.8"
 walkdir = "2"
 
 alloy_ast = { path = "compiler/ast" }
+alloy_ast_walk = { path = "compiler/ast_walk" }
 alloy_compiler = { path = "compiler" }
 alloy_diagnostics = { path = "compiler/diagnostics" }
 alloy_hir_def = { path = "compiler/hir/hir_def" }
