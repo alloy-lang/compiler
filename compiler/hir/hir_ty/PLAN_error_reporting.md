@@ -2,78 +2,24 @@
 
 ## Overview
 
-Two remaining TODOs related to error reporting: duplicate error deduplication and warning kinds.
-
-Unknown reference error reporting has been implemented — `unknown_reference()` in `HMInferenceContext` now collects `HirResolutionError`s which are converted to diagnostics in the inference output.
+Two TODOs related to error reporting. Error deduplication is implemented; warning kinds remain.
 
 ---
 
-## TODO 1: Duplicate error reporting (ConflictingTypeAnnotation + UnificationError)
+## TODO 1: Duplicate error reporting — DONE
 
-**File:** `compiler/hir/hir_infer/src/hir_ty/hm/inference.rs` (inference output) and `compiler/hir/hir_ty/src/validation/type_annotation.rs` (validation layer)
+Implemented via `is_hidden_by` on the `Diagnostic` trait. Each diagnostic declares what suppresses it using `as_any()` downcasting for intra-crate type matching and cross-crate `ParseError` checks. `DiagnosticsReporter::filter_hidden()` applies O(n²) filtering before rendering.
 
-### Problem
+**Suppression rules:**
+- E33001 (TypeMismatch, wrapped) hidden by E34001 or E34003 at overlapping range
+- E34001 (ConflictingTypeAnnotation) hidden by E34003 at overlapping range
+- Wrapped E33xxx/E32xxx hidden by ParseError at overlapping range
 
-When a type annotation conflicts with the inferred type, the system generates two errors for the same issue:
-
-1. **`UnificationError`** — emitted during constraint solving when the annotation equation fails to unify (from `alloy_hir_infer`).
-2. **`ConflictingTypeAnnotation`** — emitted during the post-inference annotation validation (from `alloy_hir_typed` validation layer).
-
-Both errors point to the same source range and describe the same underlying problem.
-
-### Root cause
-
-In `infer_definition_constraints()`, non-polymorphic annotations are added as type equations (`ctx.add_equation(inferred, annotated, fql)`), producing `UnificationError` on failure. Then `validate_type_annotations()` in the `alloy_hir_typed` layer also checks annotations against inferred types, producing `ConflictingTypeAnnotation` on failure.
-
-### Error precedence
-
-When multiple errors cover the same annotation range, keep only the highest-priority error:
-
-1. **BoundedTypeArityMismatch (E34003)** — most specific. If present, suppress ConflictingTypeAnnotation and UnificationError for the same annotation.
-2. **ConflictingTypeAnnotation (E34001)** — show if no arity error covers this annotation.
-3. **UnificationError (E33001)** — least specific, show only if no higher-level error covers this range.
-
-Example: `typeof wrong : Box` with `typedef Box[t]` currently produces all three errors. After de-dup, only E34003 should remain.
-
-### Plan — Three-phase approach
-
-**Phase 1 (Short-term): Range-based deduplication with precedence**
-
-After collecting all errors in `type_check_module()`, apply precedence-based filtering. Higher-priority errors suppress lower-priority errors at the same range:
-
-```rust
-fn deduplicate_errors(errors: &mut Vec<TypeCheckingError>) {
-    let annotation_ranges: FxHashSet<TextRange> = errors.iter()
-        .filter(|e| matches!(e.kind, TypeCheckingErrorKind::ConflictingTypeAnnotation { .. }))
-        .map(|e| e.range)
-        .collect();
-
-    errors.retain(|e| {
-        if matches!(e.kind, TypeCheckingErrorKind::InferenceError(_)) {
-            !annotation_ranges.contains(&e.range)
-        } else {
-            true
-        }
-    });
-}
-```
-
-**Phase 2 (Medium-term): Prevent the duplicate at source**
-
-Instead of adding the annotation as a unification equation, only use it during the post-unification check. Remove the `add_equation` call for annotations and rely solely on `validate_type_annotations()`.
-
-**Phase 3 (Long-term): Error recovery with tracking**
-
-Maintain a set of expression FQLs that already have errors. Before adding an error for an expression, check if it's already errored. This prevents all cascading errors.
-
-### Recommendation
-
-Start with **Phase 1** — it's safe, isolated, and immediately improves the user experience.
-
-### Tests
-
-- Update the `conflicting_type_annotation` test in `compiler/hir/hir_ty/src/lib.rs` to expect exactly one error.
-- Ensure standalone `UnificationError`s (not caused by annotations) are preserved.
+**Key files:**
+- `compiler/diagnostics/src/core.rs` — `is_hidden_by`, `overlaps_with`, `as_any` on `Diagnostic` trait
+- `compiler/diagnostics/src/reporter.rs` — `filter_hidden()` method
+- `compiler/hir/hir_infer/src/diagnostics.rs` — `TypeInferenceError::is_hidden_by`
+- `compiler/hir/hir_ty/src/diagnostics.rs` — `TypeCheckingError::is_hidden_by`
 
 ---
 
@@ -105,11 +51,3 @@ Initially, implement at least one warning to validate the pipeline:
 ### Dependencies
 
 - Decide on test failure policy for warnings (see `PLAN_infrastructure.md`).
-
----
-
-## Implementation Order
-
-1. **TODO 1, Phase 1** — Range-based deduplication. Standalone change.
-2. **TODO 2** — Define at least one warning variant.
-3. **TODO 1, Phase 2/3** — Deeper deduplication work. Can be deferred.
