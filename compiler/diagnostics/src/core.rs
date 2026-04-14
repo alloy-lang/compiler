@@ -96,12 +96,163 @@ pub trait Diagnostic: std::fmt::Debug {
         false
     }
 
-    /// Check whether two text ranges overlap (touching ranges DO overlap).
+    /// Check whether two text ranges overlap.
+    ///
+    /// Semantics:
+    /// - Non-empty ranges overlap only when they have positive-width intersection.
+    /// - A point range (`start == end`) overlaps a non-empty range only if the
+    ///   point lies strictly inside the non-empty range.
+    /// - Two point ranges overlap only when they are at the same offset.
     fn overlaps_with(&self, other: &dyn Diagnostic) -> bool {
-        self.primary_span().start() <= other.primary_span().end()
-            && other.primary_span().start() <= self.primary_span().end()
+        let lhs = self.primary_span();
+        let rhs = other.primary_span();
+
+        let lhs_empty = lhs.start() == lhs.end();
+        let rhs_empty = rhs.start() == rhs.end();
+
+        match (lhs_empty, rhs_empty) {
+            (false, false) => lhs.start() < rhs.end() && rhs.start() < lhs.end(),
+            (true, true) => lhs.start() == rhs.start(),
+            (true, false) => rhs.start() <= lhs.start() && lhs.start() < rhs.end(),
+            (false, true) => lhs.start() <= rhs.start() && rhs.start() < lhs.end(),
+        }
+    }
+
+    /// Check overlap, but treat `other` point-spans as inclusive on this
+    /// diagnostic's end boundary.
+    ///
+    /// Useful for recovery diagnostics where a missing-token point can be
+    /// emitted just after the token that semantically triggered the error.
+    fn overlaps_or_contains(&self, other: &dyn Diagnostic) -> bool {
+        let self_span = self.primary_span();
+        let other_span = other.primary_span();
+
+        if other_span.start() == other_span.end() {
+            let point = other_span.start();
+            self_span.start() <= point && point <= self_span.end()
+        } else {
+            self.overlaps_with(other)
+        }
     }
 
     /// Upcast to `Any` for downcasting to concrete types within the same crate.
     fn as_any(&self) -> &dyn std::any::Any;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Diagnostic, Severity};
+    use text_size::TextRange;
+
+    #[derive(Debug)]
+    struct DummyDiagnostic {
+        span: TextRange,
+    }
+
+    impl Diagnostic for DummyDiagnostic {
+        fn severity(&self) -> Severity {
+            Severity::Error
+        }
+
+        fn message(&self) -> String {
+            "dummy diagnostic".to_string()
+        }
+
+        fn primary_span(&self) -> TextRange {
+            self.span
+        }
+
+        fn as_any(&self) -> &dyn std::any::Any {
+            self
+        }
+    }
+
+    #[test]
+    fn overlaps_when_ranges_intersect() {
+        let lhs = DummyDiagnostic {
+            span: TextRange::new(0.into(), 5.into()),
+        };
+        let rhs = DummyDiagnostic {
+            span: TextRange::new(3.into(), 8.into()),
+        };
+
+        assert!(lhs.overlaps_with(&rhs));
+        assert!(rhs.overlaps_with(&lhs));
+    }
+
+    #[test]
+    fn does_not_overlap_when_ranges_are_disjoint() {
+        let lhs = DummyDiagnostic {
+            span: TextRange::new(0.into(), 5.into()),
+        };
+        let rhs = DummyDiagnostic {
+            span: TextRange::new(6.into(), 8.into()),
+        };
+
+        assert!(!lhs.overlaps_with(&rhs));
+        assert!(!rhs.overlaps_with(&lhs));
+    }
+
+    #[test]
+    fn does_not_overlap_when_ranges_only_touch_at_boundary() {
+        let lhs = DummyDiagnostic {
+            span: TextRange::new(0.into(), 5.into()),
+        };
+        let rhs = DummyDiagnostic {
+            span: TextRange::new(5.into(), 8.into()),
+        };
+
+        assert!(!lhs.overlaps_with(&rhs));
+        assert!(!rhs.overlaps_with(&lhs));
+    }
+
+    #[test]
+    fn does_not_overlap_when_point_span_is_at_range_end() {
+        let range = DummyDiagnostic {
+            span: TextRange::new(0.into(), 5.into()),
+        };
+        let point_at_end = DummyDiagnostic {
+            span: TextRange::new(5.into(), 5.into()),
+        };
+
+        assert!(!range.overlaps_with(&point_at_end));
+        assert!(!point_at_end.overlaps_with(&range));
+    }
+
+    #[test]
+    fn overlaps_when_point_span_is_inside_range() {
+        let range = DummyDiagnostic {
+            span: TextRange::new(0.into(), 5.into()),
+        };
+        let point_inside = DummyDiagnostic {
+            span: TextRange::new(3.into(), 3.into()),
+        };
+
+        assert!(range.overlaps_with(&point_inside));
+        assert!(point_inside.overlaps_with(&range));
+    }
+
+    #[test]
+    fn overlaps_or_contains_other_point_includes_end_boundary_point() {
+        let range = DummyDiagnostic {
+            span: TextRange::new(0.into(), 5.into()),
+        };
+        let point_at_end = DummyDiagnostic {
+            span: TextRange::new(5.into(), 5.into()),
+        };
+
+        assert!(range.overlaps_or_contains(&point_at_end));
+    }
+
+    #[test]
+    fn overlaps_or_contains_other_point_delegates_for_non_point_ranges() {
+        let lhs = DummyDiagnostic {
+            span: TextRange::new(0.into(), 5.into()),
+        };
+        let rhs = DummyDiagnostic {
+            span: TextRange::new(5.into(), 8.into()),
+        };
+
+        assert!(!lhs.overlaps_or_contains(&rhs));
+    }
 }

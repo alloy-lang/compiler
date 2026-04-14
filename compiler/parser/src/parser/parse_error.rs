@@ -241,6 +241,27 @@ impl Diagnostic for ParseError {
         self
     }
 
+    fn overlaps_with(&self, other: &dyn Diagnostic) -> bool {
+        // Parse errors are currently point spans at an offset where a token was
+        // missing/unexpected. For suppression, treat this as "before" the next
+        // token and avoid matching when it sits exactly at another diagnostic's
+        // end boundary.
+        let lhs = self.primary_span();
+        let rhs = other.primary_span();
+
+        if lhs.start() == lhs.end() {
+            let point = lhs.start();
+            return rhs.start() <= point && point < rhs.end();
+        }
+
+        if rhs.start() == rhs.end() {
+            let point = rhs.start();
+            return lhs.start() <= point && point < lhs.end();
+        }
+
+        lhs.start() < rhs.end() && rhs.start() < lhs.end()
+    }
+
     fn code(&self) -> Option<&str> {
         match &self.kind {
             ParseErrorKind::Missing { .. } => Some("E11001"),

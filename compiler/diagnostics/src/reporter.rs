@@ -181,3 +181,164 @@ impl DiagnosticsReporter {
         output
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::DiagnosticsReporter;
+    use crate::test_db::TestDiagnosticsDatabase;
+    use crate::{Diagnostic, Severity};
+    use text_size::TextRange;
+
+    #[derive(Debug, Clone)]
+    struct TestDiag {
+        code: &'static str,
+        span: TextRange,
+        hidden_by: Option<&'static str>,
+    }
+
+    impl Diagnostic for TestDiag {
+        fn severity(&self) -> Severity {
+            Severity::Error
+        }
+
+        fn code(&self) -> Option<&str> {
+            Some(self.code)
+        }
+
+        fn message(&self) -> String {
+            format!("diagnostic {}", self.code)
+        }
+
+        fn primary_span(&self) -> TextRange {
+            self.span
+        }
+
+        fn is_hidden_by(&self, other: &dyn Diagnostic) -> bool {
+            if !self.overlaps_with(other) {
+                return false;
+            }
+            match self.hidden_by {
+                None => false,
+                Some(code) => other.code() == Some(code),
+            }
+        }
+
+        fn as_any(&self) -> &dyn std::any::Any {
+            self
+        }
+    }
+
+    #[test]
+    fn filter_hidden_removes_overlapping_lower_priority_entries() {
+        let db = TestDiagnosticsDatabase::default();
+        let module_id = alloy_workspace::ModuleId::new(&db, "test::one".to_string());
+        let mut reporter = DiagnosticsReporter::new();
+
+        reporter.add(
+            module_id,
+            TestDiag {
+                code: "LOW",
+                span: TextRange::new(10.into(), 20.into()),
+                hidden_by: Some("HIGH"),
+            },
+        );
+        reporter.add(
+            module_id,
+            TestDiag {
+                code: "HIGH",
+                span: TextRange::new(15.into(), 16.into()),
+                hidden_by: None,
+            },
+        );
+
+        let filtered = reporter.filter_hidden();
+
+        assert_eq!(filtered.len(), 1);
+        assert_eq!(filtered[0].diagnostic.code(), Some("HIGH"));
+    }
+
+    #[test]
+    fn filter_hidden_keeps_non_overlapping_entries() {
+        let db = TestDiagnosticsDatabase::default();
+        let module_id = alloy_workspace::ModuleId::new(&db, "test::one".to_string());
+        let mut reporter = DiagnosticsReporter::new();
+
+        reporter.add(
+            module_id,
+            TestDiag {
+                code: "LOW",
+                span: TextRange::new(0.into(), 2.into()),
+                hidden_by: Some("HIGH"),
+            },
+        );
+        reporter.add(
+            module_id,
+            TestDiag {
+                code: "HIGH",
+                span: TextRange::new(10.into(), 12.into()),
+                hidden_by: None,
+            },
+        );
+
+        let filtered = reporter.filter_hidden();
+
+        assert_eq!(filtered.len(), 2);
+    }
+
+    #[test]
+    fn filter_hidden_does_not_hide_for_touching_boundary_spans() {
+        let db = TestDiagnosticsDatabase::default();
+        let module_id = alloy_workspace::ModuleId::new(&db, "test::one".to_string());
+        let mut reporter = DiagnosticsReporter::new();
+
+        reporter.add(
+            module_id,
+            TestDiag {
+                code: "LOW",
+                span: TextRange::new(0.into(), 5.into()),
+                hidden_by: Some("HIGH"),
+            },
+        );
+        reporter.add(
+            module_id,
+            TestDiag {
+                code: "HIGH",
+                span: TextRange::new(5.into(), 8.into()),
+                hidden_by: None,
+            },
+        );
+
+        let filtered = reporter.filter_hidden();
+
+        assert_eq!(filtered.len(), 2);
+    }
+
+    #[test]
+    fn filter_hidden_does_not_hide_across_modules_with_same_range() {
+        let db = TestDiagnosticsDatabase::default();
+        let module_a = alloy_workspace::ModuleId::new(&db, "test::a".to_string());
+        let module_b = alloy_workspace::ModuleId::new(&db, "test::b".to_string());
+        let mut reporter = DiagnosticsReporter::new();
+
+        reporter.add(
+            module_a,
+            TestDiag {
+                code: "LOW",
+                span: TextRange::new(10.into(), 20.into()),
+                hidden_by: Some("HIGH"),
+            },
+        );
+        reporter.add(
+            module_b,
+            TestDiag {
+                code: "HIGH",
+                span: TextRange::new(10.into(), 20.into()),
+                hidden_by: None,
+            },
+        );
+
+        let filtered = reporter.filter_hidden();
+
+        assert_eq!(filtered.len(), 2);
+    }
+}

@@ -162,17 +162,17 @@ impl Diagnostic for TypeCheckingError {
     }
 
     fn is_hidden_by(&self, other: &dyn Diagnostic) -> bool {
-        if !self.overlaps_with(other) {
-            return false;
-        }
-
         // Cross-phase: any wrapped inference/resolution error hidden by parse errors
         if matches!(
-            self.kind,
+            &self.kind,
             TypeCheckingErrorKind::InferenceError(_) | TypeCheckingErrorKind::HirResolutionError(_)
         ) && other.as_any().is::<alloy_parser::ParseError>()
         {
-            return true;
+            return self.overlaps_or_contains(other);
+        }
+
+        if !self.overlaps_with(other) {
+            return false;
         }
 
         // Intra-phase: downcast to TypeCheckingError for kind-level matching
@@ -202,22 +202,6 @@ impl Diagnostic for TypeCheckingError {
     }
 }
 
-// TODO: Duplicate error reporting issue
-//
-// Currently, when a type annotation conflicts with the inferred type, we generate both:
-// 1. ConflictingTypeAnnotation - High-level error comparing annotation vs inferred type
-// 2. UnificationError - Low-level error from the unification algorithm attempting to unify them
-//
-// This results in redundant error messages for the same underlying issue. The ConflictingTypeAnnotation
-// is more specific and user-friendly, so ideally we should suppress the UnificationError in this case.
-//
-// Potential solutions:
-// - Short-term: Deduplicate errors based on range after collection
-// - Medium-term: Use InferredType::Error sentinel to prevent cascading errors
-// - Long-term: Implement proper error recovery strategy that tracks which expressions already have errors
-//
-// For now, having both errors is useful for debugging the type checker itself, but this should be
-// addressed once the type system is more stable.
 #[derive(Debug, Clone, PartialEq)]
 pub enum TypeCheckingErrorKind {
     ConflictingTypeAnnotation {

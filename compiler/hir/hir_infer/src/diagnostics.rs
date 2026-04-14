@@ -100,11 +100,12 @@ impl Diagnostic for TypeInferenceError {
     }
 
     fn is_hidden_by(&self, other: &dyn Diagnostic) -> bool {
-        if !self.overlaps_with(other) {
+        // Inference errors are hidden by parse errors in the same region.
+        let Some(_) = other.as_any().downcast_ref::<alloy_parser::ParseError>() else {
             return false;
-        }
-        // Inference errors are hidden by parse errors at overlapping ranges
-        other.as_any().is::<alloy_parser::ParseError>()
+        };
+
+        self.overlaps_or_contains(other)
     }
 }
 
