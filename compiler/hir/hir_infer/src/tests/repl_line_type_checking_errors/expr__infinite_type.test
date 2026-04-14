@@ -1,0 +1,92 @@
+let f = |x| -> x(x)
+===
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
+    expression_types: {
+        Idx::<Expression>(0): Generic(
+            0,
+            "a0",
+        ),
+        Idx::<Expression>(1): Generic(
+            1,
+            "b0",
+        ),
+        Idx::<Expression>(2): Lambda {
+            arg_type: Generic(
+                0,
+                "a0",
+            ),
+            return_type: Generic(
+                1,
+                "b0",
+            ),
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+            "a0",
+        ),
+    },
+    variant_constructor_types: {},
+    warnings: [],
+    errors: [
+        TypeInferenceError {
+            kind: InfiniteType {
+                type_var_id: TypeVarId(
+                    0,
+                ),
+                inferred_type: Lambda {
+                    arg_type: Generic(
+                        0,
+                        "a0",
+                    ),
+                    return_type: Generic(
+                        1,
+                        "b0",
+                    ),
+                },
+            },
+            range: 15..19,
+        },
+        TypeInferenceError {
+            kind: InfiniteType {
+                type_var_id: TypeVarId(
+                    0,
+                ),
+                inferred_type: Lambda {
+                    arg_type: Generic(
+                        0,
+                        "a0",
+                    ),
+                    return_type: Generic(
+                        1,
+                        "b0",
+                    ),
+                },
+            },
+            range: 15..19,
+        },
+    ],
+}
+[E33003] Error: Infinite type detected: `t0` occurs in `a0 -> b0`
+   ╭─[ ./test/main.alloy:1:16 ]
+   │
+ 1 │ let f = |x| -> x(x)
+   │                ──┬─  
+   │                  ╰─── type variable `t0` occurs in `a0 -> b0`
+   │ 
+   │ Help: This would create an infinite type, which is not allowed
+───╯
+
+[E33003] Error: Infinite type detected: `t0` occurs in `a0 -> b0`
+   ╭─[ ./test/main.alloy:1:16 ]
+   │
+ 1 │ let f = |x| -> x(x)
+   │                ──┬─  
+   │                  ╰─── type variable `t0` occurs in `a0 -> b0`
+   │ 
+   │ Help: This would create an infinite type, which is not allowed
+───╯
+
+

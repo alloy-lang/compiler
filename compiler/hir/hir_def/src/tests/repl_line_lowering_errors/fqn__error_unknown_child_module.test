@@ -1,0 +1,166 @@
+import std
+
+typeof test : std::nonexistent::SomeType where
+let test = 1
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [],
+                last: "std",
+            },
+            "name": "std",
+            "range": 0..10,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": Literal(
+                Int(
+                    1,
+                ),
+            ),
+            "name": "test",
+            "range": 59..71,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                UnresolvedModule(
+                    UnknownChildModule {
+                        module_id: VirtualModuleId {
+                            path: "std",
+                        },
+                        unknown_child: "nonexistent",
+                        available_child_modules: [
+                            ModuleId {
+                                path: "std::applicative",
+                            },
+                            ModuleId {
+                                path: "std::bool",
+                            },
+                            ModuleId {
+                                path: "std::function",
+                            },
+                            ModuleId {
+                                path: "std::debug",
+                            },
+                            ModuleId {
+                                path: "std::monad",
+                            },
+                            ModuleId {
+                                path: "std::eq",
+                            },
+                            ModuleId {
+                                path: "std::functor",
+                            },
+                            ModuleId {
+                                path: "std::either",
+                            },
+                            ModuleId {
+                                path: "std::option",
+                            },
+                            ModuleId {
+                                path: "std::order",
+                            },
+                        ],
+                    },
+                ),
+            ),
+            "name": "test",
+            "range": 26..52,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    traits: EmptyIndex::<Trait>,
+    behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        Idx::<Expression>(0): ValueDefinition {
+            name: "test",
+            type_annotation: Some(
+                Idx::<TypeReference>(0),
+            ),
+            expr_idx: Idx::<Expression>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        LoweringError {
+            kind: FailedModuleResolution {
+                reference_type: Type,
+                fqn_error: UnknownChildModule {
+                    module_id: VirtualModuleId {
+                        path: "std",
+                    },
+                    unknown_child: "nonexistent",
+                    available_child_modules: [
+                        ModuleId {
+                            path: "std::applicative",
+                        },
+                        ModuleId {
+                            path: "std::bool",
+                        },
+                        ModuleId {
+                            path: "std::function",
+                        },
+                        ModuleId {
+                            path: "std::debug",
+                        },
+                        ModuleId {
+                            path: "std::monad",
+                        },
+                        ModuleId {
+                            path: "std::eq",
+                        },
+                        ModuleId {
+                            path: "std::functor",
+                        },
+                        ModuleId {
+                            path: "std::either",
+                        },
+                        ModuleId {
+                            path: "std::option",
+                        },
+                        ModuleId {
+                            path: "std::order",
+                        },
+                    ],
+                },
+            },
+            range: 26..52,
+        },
+    ],
+}
+[E21002] Error: Module 'std' does not contain child module 'nonexistent'
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/fqn__error_unknown_child_module.test:3:15 ]
+   │
+ 3 │ typeof test : std::nonexistent::SomeType where
+   │               ─────────────┬────────────  
+   │                            ╰────────────── module 'std' does not contain child module 'nonexistent'
+   │ 
+   │ Help: Module 'std' has the following child modules: std::applicative, std::bool, std::function, std::debug, std::monad, std::eq, std::functor, std::either, std::option, std::order
+───╯
+
+

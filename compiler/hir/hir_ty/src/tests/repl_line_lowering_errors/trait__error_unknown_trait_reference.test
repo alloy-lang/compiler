@@ -1,0 +1,81 @@
+typeof test : t where
+  typevar t = NonexistentTrait
+let test = 1
+===
+HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {},
+    warnings: [],
+    errors: [
+        TypeCheckingError {
+            kind: ConflictingTypeAnnotation {
+                annotated_type: TypeVar(
+                    AnnotatedTypeVar {
+                        fql: Fql {
+                            module_id: ModuleId {
+                                path: "main",
+                            },
+                            local_id: Idx::<TypeVariable>(0),
+                        },
+                        name: "t",
+                        type_arity: 0,
+                    },
+                ),
+                annotation_range: 14..15,
+                value_type: BuiltIn(
+                    Int,
+                ),
+                value_range: 53..65,
+                reason: DirectConflict {
+                    expected_type: TypeVar(
+                        AnnotatedTypeVar {
+                            fql: Fql {
+                                module_id: ModuleId {
+                                    path: "main",
+                                },
+                                local_id: Idx::<TypeVariable>(0),
+                            },
+                            name: "t",
+                            type_arity: 0,
+                        },
+                    ),
+                    expected_type_range: 14..15,
+                    actual_type: BuiltIn(
+                        Int,
+                    ),
+                    actual_type_range: 53..65,
+                },
+            },
+            range: 53..65,
+        },
+    ],
+    poly_instantiations: {},
+}
+[E22009] Error: Unknown type reference `NonexistentTrait`
+   ╭─[ ./test/main.alloy:2:15 ]
+   │
+ 2 │   typevar t = NonexistentTrait
+   │               ────────┬───────  
+   │                       ╰───────── cannot find type `NonexistentTrait` in this scope
+───╯
+
+[E34001] Error: Inferred type does not match annotated type
+   ╭─[ ./test/main.alloy:3:1 ]
+   │
+ 1 │ typeof test : t where
+   │               ┬  
+   │               ╰── The type annotation says `t`
+   │ 
+ 3 │ let test = 1
+   │ ──────┬─────  
+   │       ╰─────── but the body has type `Int`
+───╯
+
+

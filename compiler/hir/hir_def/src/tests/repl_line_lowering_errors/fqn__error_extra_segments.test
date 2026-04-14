@@ -1,0 +1,134 @@
+import std
+
+typeof test : std::option::map::extra::stuff where
+let test = 1
+===
+HirModule {
+    imports: Index::<Import> {
+        Idx::<Import>(0): {
+            "item": Import {
+                segments: [],
+                last: "std",
+            },
+            "name": "std",
+            "range": 0..10,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": Literal(
+                Int(
+                    1,
+                ),
+            ),
+            "name": "test",
+            "range": 63..75,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                UnresolvedModule(
+                    ExtraSegments {
+                        fqn: Fqn {
+                            module_id: ModuleId {
+                                path: "std::option",
+                            },
+                            module: NonEmpty(
+                                [
+                                    "std",
+                                    "option",
+                                ],
+                            ),
+                            name: "map",
+                            sub_path: Some(
+                                "extra",
+                            ),
+                        },
+                        extra_segments: NonEmpty(
+                            [
+                                "stuff",
+                            ],
+                        ),
+                    },
+                ),
+            ),
+            "name": "test",
+            "range": 26..56,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    traits: EmptyIndex::<Trait>,
+    behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        Idx::<Expression>(0): ValueDefinition {
+            name: "test",
+            type_annotation: Some(
+                Idx::<TypeReference>(0),
+            ),
+            expr_idx: Idx::<Expression>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        LoweringError {
+            kind: FailedModuleResolution {
+                reference_type: Type,
+                fqn_error: ExtraSegments {
+                    fqn: Fqn {
+                        module_id: ModuleId {
+                            path: "std::option",
+                        },
+                        module: NonEmpty(
+                            [
+                                "std",
+                                "option",
+                            ],
+                        ),
+                        name: "map",
+                        sub_path: Some(
+                            "extra",
+                        ),
+                    },
+                    extra_segments: NonEmpty(
+                        [
+                            "stuff",
+                        ],
+                    ),
+                },
+            },
+            range: 26..56,
+        },
+    ],
+}
+[E21004] Error: Module 'std::option' found but extra path segments 'stuff' were not resolved
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/fqn__error_extra_segments.test:3:15 ]
+   │
+ 3 │ typeof test : std::option::map::extra::stuff where
+   │               ───────────────┬──────────────  
+   │                              ╰──────────────── module 'std::option' found but extra path segments 'stuff' were not resolved
+   │ 
+   │ Help: Module 'std::option' was found, but the path segments 'stuff' could not be resolved within it
+───╯
+
+

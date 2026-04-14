@@ -1,0 +1,90 @@
+typeof test : unknown_module::SomeType where
+let test = 1
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": Literal(
+                Int(
+                    1,
+                ),
+            ),
+            "name": "test",
+            "range": 45..57,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": Named(
+                UnknownReference(
+                    NonEmpty(
+                        [
+                            "unknown_module",
+                            "SomeType",
+                        ],
+                    ),
+                ),
+            ),
+            "name": "test",
+            "range": 14..38,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    traits: EmptyIndex::<Trait>,
+    behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        Idx::<Expression>(0): ValueDefinition {
+            name: "test",
+            type_annotation: Some(
+                Idx::<TypeReference>(0),
+            ),
+            expr_idx: Idx::<Expression>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 2,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        LoweringError {
+            kind: UnknownReference {
+                reference: "unknown_module",
+                reference_type: Type,
+                path: NonEmpty(
+                    [
+                        "unknown_module",
+                        "SomeType",
+                    ],
+                ),
+                current_scope: Idx::<Scope>(1),
+            },
+            range: 14..38,
+        },
+    ],
+}
+[E22009] Error: Unknown type reference `unknown_module`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/fqn__error_unknown_root_module.test:1:15 ]
+   │
+ 1 │ typeof test : unknown_module::SomeType where
+   │               ────────────┬───────────  
+   │                           ╰───────────── cannot find type `unknown_module` in this scope
+───╯
+
+

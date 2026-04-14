@@ -1,0 +1,95 @@
+typeof test : Int where
+typeof test : String where
+let test = 1
+===
+HirModule {
+    imports: EmptyIndex::<Import>,
+    expressions: Index::<Expression> {
+        Idx::<Expression>(0): {
+            "item": Literal(
+                Int(
+                    1,
+                ),
+            ),
+            "name": "test",
+            "range": 51..63,
+            "scope_id": Idx::<Scope>(0),
+        },
+    },
+    patterns: EmptyIndex::<Pattern>,
+    type_references: Index::<TypeReference> {
+        Idx::<TypeReference>(0): {
+            "item": BuiltIn(
+                Int,
+            ),
+            "name": "test",
+            "range": 14..17,
+            "scope_id": Idx::<Scope>(0),
+        },
+        Idx::<TypeReference>(1): {
+            "item": BuiltIn(
+                String,
+            ),
+            "range": 38..44,
+        },
+        Idx::<TypeReference>(2): {
+            "item": Missing,
+            "range": 24..50,
+        },
+    },
+    type_definitions: EmptyIndex::<TypeDefinition>,
+    traits: EmptyIndex::<Trait>,
+    behaviors: EmptyIndex::<Behavior>,
+    value_definitions: {
+        Idx::<Expression>(0): ValueDefinition {
+            name: "test",
+            type_annotation: Some(
+                Idx::<TypeReference>(0),
+            ),
+            expr_idx: Idx::<Expression>(0),
+        },
+    },
+    scopes: Scopes {
+        current_scope: Idx::<Scope>(0),
+        scopes: Arena {
+            len: 3,
+            data: [
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "root",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+                Scope {
+                    parent: Idx::<Scope>(0),
+                    tag: "type annotation",
+                },
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        LoweringError {
+            kind: ConflictingTypeAnnotationName {
+                name: "test",
+                first: 14..17,
+                second: 24..50,
+            },
+            range: 24..50,
+        },
+    ],
+}
+[E22004] Error: Conflicting type annotation for `test`
+   ╭─[ /Users/theodorechupp/Documents/github/compiler/compiler/hir/hir_def/src/tests/repl_line_lowering_errors/type_annotation__error_duplicate_annotation.test:2:1 ]
+   │
+ 1 │ typeof test : Int where
+   │               ─┬─  
+   │                ╰─── type annotation for `test` first defined here
+ 2 │ typeof test : String where
+   │ ─────────────┬────────────  
+   │              ╰────────────── conflicting type annotation for `test`
+───╯
+
+

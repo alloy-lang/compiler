@@ -1,0 +1,25 @@
+typeof test : t where
+  typevar t = NonexistentTrait
+let test = 1
+===
+DefinitionInferenceResult {
+    definition_type: Unconstrained,
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {},
+    variant_constructor_types: {},
+    warnings: [],
+    errors: [],
+}
+[E22009] Error: Unknown type reference `NonexistentTrait`
+   ╭─[ ./test/main.alloy:2:15 ]
+   │
+ 2 │   typevar t = NonexistentTrait
+   │               ────────┬───────  
+   │                       ╰───────── cannot find type `NonexistentTrait` in this scope
+───╯
+
+
