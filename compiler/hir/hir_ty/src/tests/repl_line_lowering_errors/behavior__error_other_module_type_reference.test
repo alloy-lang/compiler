@@ -51,16 +51,4 @@ HirTypedModule {
    │ Help: Make sure the module path is correct
 ───╯
 
-[E21001] Error: Cannot find module 'other'
-   ╭─[ ./test/main.alloy:7:1 ]
-   │
- 7 │ ╭─▶ behavior TestTrait1 for other::Type1 where
-   ┆ ┆   
- 9 │ ├─▶ end
-   │ │        
-   │ ╰──────── Cannot find module 'other'
-   │     
-   │     Help: Make sure the module path is correct
-───╯
-
 

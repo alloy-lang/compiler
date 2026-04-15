@@ -101,11 +101,20 @@ impl Diagnostic for TypeInferenceError {
 
     fn is_hidden_by(&self, other: &dyn Diagnostic) -> bool {
         // Inference errors are hidden by parse errors in the same region.
-        let Some(_) = other.as_any().downcast_ref::<alloy_parser::ParseError>() else {
-            return false;
-        };
+        if other.as_any().is::<alloy_parser::ParseError>() {
+            return self.overlaps_or_contains(other);
+        }
 
-        self.overlaps_or_contains(other)
+        // Wrapped resolution errors are hidden by lowering errors at the same range.
+        // The lowering error is the root cause; the resolution error is a downstream
+        // consequence that adds no new information.
+        if matches!(self.kind, TypeInferenceErrorKind::HirResolutionError(_))
+            && other.as_any().is::<alloy_hir_def::LoweringError>()
+        {
+            return self.overlaps_with(other);
+        }
+
+        false
     }
 }
 

@@ -67,14 +67,4 @@ HirTypedModule {
    │         ╰─── cannot find value `test` in this scope
 ───╯
 
-[E32002] Error: Cannot find value `test` in this scope
-   ╭─[ ./test/main.alloy:1:7 ]
-   │
- 1 │ match test when
-   │       ──┬─  
-   │         ╰─── cannot find `test`
-   │ 
-   │ Help: No value named `test` found in module `main`
-───╯
-
 

@@ -57,14 +57,4 @@ DefinitionInferenceResult {
    │        ╰─────── cannot find pattern `Option` in this scope
 ───╯
 
-[E32003] Error: Cannot find pattern `Option::Some` in this scope
-   ╭─[ ./test/main.alloy:1:2 ]
-   │
- 1 │ |Option::Some(x)| -> x
-   │  ───────┬───────  
-   │         ╰───────── cannot find pattern `Option::Some`
-   │ 
-   │ Help: No pattern named `Option::Some` found in module `main`
-───╯
-
 

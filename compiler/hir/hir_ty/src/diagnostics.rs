@@ -162,13 +162,23 @@ impl Diagnostic for TypeCheckingError {
     }
 
     fn is_hidden_by(&self, other: &dyn Diagnostic) -> bool {
-        // Cross-phase: any wrapped inference/resolution error hidden by parse errors
+        // Cross-phase: wrapped inference/resolution errors hidden by parse errors
         if matches!(
             &self.kind,
             TypeCheckingErrorKind::InferenceError(_) | TypeCheckingErrorKind::HirResolutionError(_)
         ) && other.as_any().is::<alloy_parser::ParseError>()
         {
             return self.overlaps_or_contains(other);
+        }
+
+        // Cross-phase: wrapped inference/resolution errors hidden by lowering errors
+        // at the same range (the lowering error is the root cause)
+        if matches!(
+            &self.kind,
+            TypeCheckingErrorKind::InferenceError(_) | TypeCheckingErrorKind::HirResolutionError(_)
+        ) && other.as_any().is::<hir::LoweringError>()
+        {
+            return self.overlaps_with(other);
         }
 
         if !self.overlaps_with(other) {
