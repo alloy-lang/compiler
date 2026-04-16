@@ -1,0 +1,111 @@
+typeof test : -> String
+let test = |x| -> "hello"
+===
+HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            String,
+        ),
+        Idx::<Expression>(1): Lambda {
+            arg_type: Generic(
+                0,
+                "a0",
+            ),
+            return_type: BuiltIn(
+                String,
+            ),
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+            "a0",
+        ),
+    },
+    warnings: [],
+    errors: [
+        TypeCheckingError {
+            kind: InferenceError(
+                TypeInferenceError {
+                    kind: TypeMismatch {
+                        expected: BuiltIn(
+                            String,
+                        ),
+                        found: Lambda {
+                            arg_type: Generic(
+                                0,
+                                "a0",
+                            ),
+                            return_type: BuiltIn(
+                                String,
+                            ),
+                        },
+                    },
+                    range: 24..49,
+                },
+            ),
+            range: 24..49,
+        },
+        TypeCheckingError {
+            kind: ConflictingTypeAnnotation {
+                annotated_type: BuiltIn(
+                    String,
+                ),
+                annotation_range: 17..23,
+                value_type: Lambda {
+                    arg_type: Generic(
+                        0,
+                        "a0",
+                    ),
+                    return_type: BuiltIn(
+                        String,
+                    ),
+                },
+                value_range: 24..49,
+                reason: DirectConflict {
+                    expected_type: BuiltIn(
+                        String,
+                    ),
+                    expected_type_range: 17..23,
+                    actual_type: Lambda {
+                        arg_type: Generic(
+                            0,
+                            "a0",
+                        ),
+                        return_type: BuiltIn(
+                            String,
+                        ),
+                    },
+                    actual_type_range: 24..49,
+                },
+            },
+            range: 24..49,
+        },
+    ],
+    poly_instantiations: {},
+}
+[E11001] Error: Missing expected token while parsing a type in a type annotation
+   ╭─[ ./test/main.alloy:1:14 ]
+   │
+ 1 │ typeof test : -> String
+   │              │ 
+   │              ╰─ expected `identifier`
+   │ 
+   │ Help: While parsing a type in a type annotation, expected `identifier`
+───╯
+
+[E34001] Error: Inferred type does not match annotated type
+   ╭─[ ./test/main.alloy:2:1 ]
+   │
+ 1 │ typeof test : -> String
+   │                  ───┬──  
+   │                     ╰──── The type annotation says `String`
+ 2 │ let test = |x| -> "hello"
+   │ ────────────┬────────────  
+   │             ╰────────────── but the body has type `a0 -> String`
+───╯
+
+

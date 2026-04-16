@@ -98,7 +98,12 @@ impl<'t, 'input> Parser<'t, 'input> {
     }
 
     pub(crate) fn bump(&mut self, kind: TokenKind) {
-        assert!(self.at(kind));
+        assert!(
+            self.at(kind),
+            "expected {:?}, but found {:?}",
+            kind,
+            self.source.peek_nth_kind(0)
+        );
         self.bump_any();
     }
 

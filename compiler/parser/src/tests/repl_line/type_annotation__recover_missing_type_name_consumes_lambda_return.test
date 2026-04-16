@@ -1,0 +1,40 @@
+typeof test : -> String
+let test = |x| -> "hello"
+===
+SourceFile@0..49
+  TypeAnnotation@0..24
+    TypeOfKw@0..6 "typeof"
+    Whitespace@6..7 " "
+    Ident@7..11 "test"
+    Whitespace@11..12 " "
+    Colon@12..13 ":"
+    Whitespace@13..14 " "
+    LambdaType@14..24
+      Path@14..14
+      RightArrow@14..16 "->"
+      Whitespace@16..17 " "
+      TypeIdentifier@17..24
+        Path@17..24
+          Ident@17..23 "String"
+          Whitespace@23..24 "\n"
+  ValueDef@24..49
+    LetKw@24..27 "let"
+    Whitespace@27..28 " "
+    Ident@28..32 "test"
+    Whitespace@32..33 " "
+    Equals@33..34 "="
+    Whitespace@34..35 " "
+    LambdaExpr@35..49
+      LambdaExprArgList@35..39
+        Pipe@35..36 "|"
+        LambdaExprArg@36..37
+          VariableDeclaration@36..37
+            Ident@36..37 "x"
+        Pipe@37..38 "|"
+        Whitespace@38..39 " "
+      RightArrow@39..41 "->"
+      Whitespace@41..42 " "
+      LambdaExprBody@42..49
+        StringLiteral@42..49
+          String@42..49 "\"hello\""
+error at position 13 while parsing a type in a type annotation. Missing expected identifier

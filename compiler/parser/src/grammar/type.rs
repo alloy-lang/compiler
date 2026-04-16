@@ -70,6 +70,10 @@ fn parse_single_type(
         let cm = m.complete(p, SyntaxKind::SelfType);
 
         Some(cm)
+    } else if p.maybe_at(TokenKind::RightArrow) {
+        p.error_with_recovery(context, ts![TokenKind::RightArrow]);
+        p.bump(TokenKind::RightArrow);
+        parse_type(p, context, mode, ts![], parent_recovery_set)
     } else if p.at(TokenKind::LParen) {
         Some(parse_parenthesized_type(
             p,
