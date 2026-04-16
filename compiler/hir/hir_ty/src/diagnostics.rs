@@ -162,6 +162,10 @@ impl Diagnostic for TypeCheckingError {
     }
 
     fn is_hidden_by(&self, other: &dyn Diagnostic) -> bool {
+        if Some(self) == other.as_any().downcast_ref::<Self>() {
+            return true;
+        }
+
         // Cross-phase: wrapped inference/resolution errors hidden by parse errors
         if matches!(
             &self.kind,
@@ -186,7 +190,7 @@ impl Diagnostic for TypeCheckingError {
         }
 
         // Intra-phase: downcast to TypeCheckingError for kind-level matching
-        let Some(other) = other.as_any().downcast_ref::<TypeCheckingError>() else {
+        let Some(other) = other.as_any().downcast_ref::<Self>() else {
             return false;
         };
         match (&self.kind, &other.kind) {

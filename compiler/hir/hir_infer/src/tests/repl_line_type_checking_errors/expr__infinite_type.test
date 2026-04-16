@@ -79,14 +79,4 @@ DefinitionInferenceResult {
    │ Help: This would create an infinite type, which is not allowed
 ───╯
 
-[E33003] Error: Infinite type detected: `t0` occurs in `a0 -> b0`
-   ╭─[ ./test/main.alloy:1:16 ]
-   │
- 1 │ let f = |x| -> x(x)
-   │                ──┬─  
-   │                  ╰─── type variable `t0` occurs in `a0 -> b0`
-   │ 
-   │ Help: This would create an infinite type, which is not allowed
-───╯
-
 
