@@ -167,6 +167,31 @@ DefinitionInferenceResult {
         TypeInferenceError {
             kind: UnsatisfiedConstraint {
                 trait_fql_name: "std::order::Ord",
+                resolved_type: Tuple(
+                    NonEmpty(
+                        [
+                            BuiltIn(
+                                Bool,
+                            ),
+                            Unit,
+                        ],
+                    ),
+                ),
+                constraint_range: 74..77,
+            },
+            range: 166..189,
+        },
+        TypeInferenceError {
+            kind: UnsatisfiedConstraint {
+                trait_fql_name: "std::order::Ord",
+                resolved_type: Unit,
+                constraint_range: 74..77,
+            },
+            range: 126..141,
+        },
+        TypeInferenceError {
+            kind: UnsatisfiedConstraint {
+                trait_fql_name: "std::order::Ord",
                 resolved_type: Lambda {
                     arg_type: Generic(
                         0,
@@ -198,31 +223,6 @@ DefinitionInferenceResult {
             },
             range: 143..164,
         },
-        TypeInferenceError {
-            kind: UnsatisfiedConstraint {
-                trait_fql_name: "std::order::Ord",
-                resolved_type: Unit,
-                constraint_range: 74..77,
-            },
-            range: 126..141,
-        },
-        TypeInferenceError {
-            kind: UnsatisfiedConstraint {
-                trait_fql_name: "std::order::Ord",
-                resolved_type: Tuple(
-                    NonEmpty(
-                        [
-                            BuiltIn(
-                                Bool,
-                            ),
-                            Unit,
-                        ],
-                    ),
-                ),
-                constraint_range: 74..77,
-            },
-            range: 166..189,
-        },
     ],
 }
 [E33002] Error: Type `Bool` does not implement trait `std::order::Ord`
@@ -239,6 +239,38 @@ DefinitionInferenceResult {
    │                ╰─── required by this constraint
    │ 
    │ Help: Type `Bool` must implement trait `std::order::Ord`
+───╯
+
+[E33002] Error: Type `(Bool, ())` does not implement trait `std::order::Ord`
+    ╭─[ ./test/main.alloy:13:1 ]
+    │
+ 13 │ test_traits((True, ()))
+    │ ───────────┬───────────  
+    │            ╰───────────── missing implementation of trait `std::order::Ord`
+    │
+    ├─[ ./test/main.alloy:13:1 ]
+    │
+  4 │   typevar t = Ord
+    │               ─┬─  
+    │                ╰─── required by this constraint
+    │ 
+    │ Help: Type `(Bool, ())` must implement trait `std::order::Ord`
+────╯
+
+[E33002] Error: Type `()` does not implement trait `std::order::Ord`
+   ╭─[ ./test/main.alloy:9:1 ]
+   │
+ 9 │ test_traits(())
+   │ ───────┬───────  
+   │        ╰───────── missing implementation of trait `std::order::Ord`
+   │
+   ├─[ ./test/main.alloy:9:1 ]
+   │
+ 4 │   typevar t = Ord
+   │               ─┬─  
+   │                ╰─── required by this constraint
+   │ 
+   │ Help: Type `()` must implement trait `std::order::Ord`
 ───╯
 
 [E33002] Error: Type `a0 -> a0` does not implement trait `std::order::Ord`
@@ -265,38 +297,6 @@ DefinitionInferenceResult {
     │           ╰──────────── missing implementation of trait `std::eq::Eq`
     │ 
     │ Help: Type `a0 -> a0` must implement trait `std::eq::Eq`
-────╯
-
-[E33002] Error: Type `()` does not implement trait `std::order::Ord`
-   ╭─[ ./test/main.alloy:9:1 ]
-   │
- 9 │ test_traits(())
-   │ ───────┬───────  
-   │        ╰───────── missing implementation of trait `std::order::Ord`
-   │
-   ├─[ ./test/main.alloy:9:1 ]
-   │
- 4 │   typevar t = Ord
-   │               ─┬─  
-   │                ╰─── required by this constraint
-   │ 
-   │ Help: Type `()` must implement trait `std::order::Ord`
-───╯
-
-[E33002] Error: Type `(Bool, ())` does not implement trait `std::order::Ord`
-    ╭─[ ./test/main.alloy:13:1 ]
-    │
- 13 │ test_traits((True, ()))
-    │ ───────────┬───────────  
-    │            ╰───────────── missing implementation of trait `std::order::Ord`
-    │
-    ├─[ ./test/main.alloy:13:1 ]
-    │
-  4 │   typevar t = Ord
-    │               ─┬─  
-    │                ╰─── required by this constraint
-    │ 
-    │ Help: Type `(Bool, ())` must implement trait `std::order::Ord`
 ────╯
 
 

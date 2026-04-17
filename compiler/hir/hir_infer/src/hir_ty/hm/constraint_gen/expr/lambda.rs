@@ -14,12 +14,15 @@ pub(super) fn infer(
         .map(|arg_id| infer_pattern_hm(ctx, arg_id.clone()))
         .collect::<Vec<_>>();
 
-    let body_ty = super::infer_expr_hm(ctx, body);
-
-    let mut func_ty = body_ty;
+    let return_var = ctx.fresh_type_var();
+    let mut func_ty = return_var.clone();
     for arg_ty in arg_types.into_iter().rev() {
         func_ty = MonoType::Function(Box::new(arg_ty), Box::new(func_ty));
     }
+    let func_ty = ctx.assign_type(source_fql.clone(), func_ty);
 
-    ctx.assign_type(source_fql, func_ty)
+    let body_ty = super::infer_expr_hm(ctx, body);
+    ctx.add_equation(return_var, body_ty, source_fql);
+
+    func_ty
 }
