@@ -179,7 +179,7 @@ pub fn run_test_dir(
 
         let file_name = test_path.file_name().unwrap().to_os_string();
 
-        if test_path.ends_with("test") {
+        if test_path.extension().and_then(|e| e.to_str()) != Some("test") {
             continue;
         }
 
