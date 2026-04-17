@@ -6,7 +6,7 @@ use super::unification::solve_equations;
 use super::HMInferenceContext;
 use crate::diagnostics::TypeInferenceErrorKind;
 use crate::hir_ty::hm::converter::ToInferredTypeConverter;
-use crate::{DefinitionInferenceResult, HirInferDatabase, TypeInferenceError};
+use crate::{DefinitionInferenceResult, HirInferDatabase, InferredType, TypeInferenceError};
 use alloy_hir_def as hir;
 use alloy_hir_resolved::{resolve_annotated_type, EPTdFql};
 use alloy_workspace::ModuleId;
@@ -42,12 +42,17 @@ pub(crate) fn infer_body_type<'db>(
     collect_inference_results(&mut ctx, module_id, local_annotation_var_ids)
 }
 
-fn infer_body_type_cycle_initial(
-    _db: &dyn HirInferDatabase,
+fn infer_body_type_cycle_initial<'db>(
+    db: &'db dyn HirInferDatabase,
     _id: salsa::Id,
-    _value_def: hir::ValueDef,
+    value_def: hir::ValueDef<'db>,
 ) -> DefinitionInferenceResult {
-    DefinitionInferenceResult::empty()
+    let mut result = DefinitionInferenceResult::empty();
+    result.expression_types.insert(
+        value_def.expression_idx(db),
+        InferredType::Unconstrained,
+    );
+    result
 }
 
 pub(crate) fn infer_expressions(

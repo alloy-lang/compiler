@@ -1,0 +1,60 @@
+let is_even = |n| -> is_odd(n)
+let is_odd = |n| -> is_even(n)
+===
+HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): Generic(
+            0,
+            "a0",
+        ),
+        Idx::<Expression>(1): Generic(
+            2,
+            "b0",
+        ),
+        Idx::<Expression>(2): Lambda {
+            arg_type: Generic(
+                0,
+                "a0",
+            ),
+            return_type: Generic(
+                1,
+                "b0",
+            ),
+        },
+        Idx::<Expression>(3): Generic(
+            1,
+            "a0",
+        ),
+        Idx::<Expression>(4): Generic(
+            3,
+            "b0",
+        ),
+        Idx::<Expression>(5): Lambda {
+            arg_type: Generic(
+                0,
+                "a0",
+            ),
+            return_type: Generic(
+                1,
+                "b0",
+            ),
+        },
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+            "a0",
+        ),
+        Idx::<Pattern>(1): Generic(
+            1,
+            "a0",
+        ),
+    },
+    warnings: [],
+    errors: [],
+    poly_instantiations: {},
+}
+
