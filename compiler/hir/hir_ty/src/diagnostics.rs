@@ -54,6 +54,8 @@ impl Diagnostic for TypeCheckingError {
             TypeCheckingErrorKind::InferenceError(err) => err.code(),
             TypeCheckingErrorKind::HirResolutionError(err) => err.code(),
             TypeCheckingErrorKind::MissingTraitMemberImplementation { .. } => Some("E34002"),
+            TypeCheckingErrorKind::NonExhaustiveMatch { .. } => Some("E34004"),
+            TypeCheckingErrorKind::UnreachablePattern { .. } => Some("E34005"),
         }
     }
 
@@ -83,6 +85,25 @@ impl Diagnostic for TypeCheckingError {
                     "Behavior must implement abstract member `{member_name}` from trait `{trait_name}`"
                 )
             }
+            TypeCheckingErrorKind::NonExhaustiveMatch { missing, .. } => {
+                let missing_list = missing
+                    .iter()
+                    .map(|p| format!("`{p}`"))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                format!("Non-exhaustive match: missing {missing_list}")
+            }
+            TypeCheckingErrorKind::UnreachablePattern { reason } => match reason {
+                UnreachableReason::AfterWildcard => {
+                    "Unreachable pattern: a prior arm already matches everything".to_string()
+                }
+                UnreachableReason::DuplicateArm => {
+                    "Unreachable pattern: duplicates a prior arm".to_string()
+                }
+                UnreachableReason::AlreadyExhaustive => {
+                    "Unreachable pattern: prior arms already cover all cases".to_string()
+                }
+            },
         }
     }
 
@@ -158,6 +179,26 @@ impl Diagnostic for TypeCheckingError {
                 .with_help(format!(
                     "Trait `{trait_name}` requires an implementation of `{member_name}` for type `{type_name}`",
                 )),
+            TypeCheckingErrorKind::NonExhaustiveMatch { scrutinee_type, missing } => {
+                let missing_list = missing
+                    .iter()
+                    .map(|p| format!("`{p}`"))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                builder
+                    .with_primary_label(format!(
+                        "match on `{scrutinee_type}` is missing {missing_list}"
+                    ))
+                    .with_help("Add arms for the missing patterns, or use a wildcard `_`")
+            }
+            TypeCheckingErrorKind::UnreachablePattern { reason } => {
+                let label = match reason {
+                    UnreachableReason::AfterWildcard => "unreachable — a prior arm already matches everything",
+                    UnreachableReason::DuplicateArm => "unreachable — duplicates a prior arm",
+                    UnreachableReason::AlreadyExhaustive => "unreachable — prior arms cover all cases",
+                };
+                builder.with_primary_label(label.to_string())
+            }
         }
     }
 
@@ -166,20 +207,28 @@ impl Diagnostic for TypeCheckingError {
             return true;
         }
 
-        // Cross-phase: wrapped inference/resolution errors hidden by parse errors
+        // Cross-phase: wrapped inference/resolution errors + exhaustiveness
+        // errors hidden by parse errors (the parse error is the root cause and
+        // the match structure can't be trusted)
         if matches!(
             &self.kind,
-            TypeCheckingErrorKind::InferenceError(_) | TypeCheckingErrorKind::HirResolutionError(_)
+            TypeCheckingErrorKind::InferenceError(_)
+                | TypeCheckingErrorKind::HirResolutionError(_)
+                | TypeCheckingErrorKind::NonExhaustiveMatch { .. }
+                | TypeCheckingErrorKind::UnreachablePattern { .. }
         ) && other.as_any().is::<alloy_parser::ParseError>()
         {
             return self.overlaps_or_contains(other);
         }
 
-        // Cross-phase: wrapped inference/resolution errors hidden by lowering errors
-        // at the same range (the lowering error is the root cause)
+        // Cross-phase: wrapped inference/resolution errors + exhaustiveness
+        // errors hidden by lowering errors at the same range
         if matches!(
             &self.kind,
-            TypeCheckingErrorKind::InferenceError(_) | TypeCheckingErrorKind::HirResolutionError(_)
+            TypeCheckingErrorKind::InferenceError(_)
+                | TypeCheckingErrorKind::HirResolutionError(_)
+                | TypeCheckingErrorKind::NonExhaustiveMatch { .. }
+                | TypeCheckingErrorKind::UnreachablePattern { .. }
         ) && other.as_any().is::<hir::LoweringError>()
         {
             return self.overlaps_with(other);
@@ -238,6 +287,42 @@ pub enum TypeCheckingErrorKind {
         member_name: hir::Name,
         type_name: hir::Name,
     },
+    NonExhaustiveMatch {
+        scrutinee_type: InferredType,
+        missing: Vec<MissingPattern>,
+    },
+    UnreachablePattern {
+        reason: UnreachableReason,
+    },
+}
+
+/// A pattern the match does not cover. Rendered in error messages.
+#[derive(Debug, Clone, PartialEq)]
+pub enum MissingPattern {
+    BoolLiteral(bool),
+    Variant(hir::Name),
+    /// Non-enumerable (e.g., Int, String, Char) — "_" suffices.
+    Wildcard,
+}
+
+impl std::fmt::Display for MissingPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MissingPattern::BoolLiteral(b) => write!(f, "{}", if *b { "True" } else { "False" }),
+            MissingPattern::Variant(name) => write!(f, "{name}"),
+            MissingPattern::Wildcard => write!(f, "_"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum UnreachableReason {
+    /// A prior arm already matches everything of this type.
+    AfterWildcard,
+    /// A prior arm has the exact same literal/variant.
+    DuplicateArm,
+    /// Prior arms together cover all cases; this arm is redundant.
+    AlreadyExhaustive,
 }
 
 #[derive(Debug, Clone, PartialEq)]

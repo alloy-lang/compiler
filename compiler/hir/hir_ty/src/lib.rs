@@ -140,6 +140,7 @@ pub fn type_check_module(db: &dyn HirTyDatabase, module_id: ModuleId) -> HirType
 
     validation::validate_behaviors(db, module_id, &mut result);
     validation::validate_type_annotations(db, module_id, &mut result);
+    validation::validate_exhaustiveness(db, module_id, &mut result);
 
     result
 }

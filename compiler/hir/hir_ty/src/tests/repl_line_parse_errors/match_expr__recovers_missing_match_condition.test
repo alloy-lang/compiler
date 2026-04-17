@@ -87,6 +87,30 @@ HirTypedModule {
             ),
             range: 53..58,
         },
+        TypeCheckingError {
+            kind: NonExhaustiveMatch {
+                scrutinee_type: Bounded {
+                    base: TypeDef(
+                        Fql {
+                            module_id: ModuleId {
+                                path: "test_data",
+                            },
+                            local_id: Idx::<TypeDefinition>(0),
+                        },
+                        "Test",
+                    ),
+                    args: [
+                        BuiltIn(
+                            Int,
+                        ),
+                    ],
+                },
+                missing: [
+                    Wildcard,
+                ],
+            },
+            range: 24..63,
+        },
     ],
     poly_instantiations: {},
 }

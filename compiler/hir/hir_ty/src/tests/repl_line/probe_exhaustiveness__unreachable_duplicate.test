@@ -1,0 +1,60 @@
+let test = True
+
+match test when
+  \ True -> 0
+  \ True -> 1
+  \ _    -> 2
+===
+HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Bool,
+        ),
+        Idx::<Expression>(1): BuiltIn(
+            Bool,
+        ),
+        Idx::<Expression>(2): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(4): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(5): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): BuiltIn(
+            Bool,
+        ),
+        Idx::<Pattern>(1): BuiltIn(
+            Bool,
+        ),
+        Idx::<Pattern>(2): Unconstrained,
+    },
+    warnings: [],
+    errors: [
+        TypeCheckingError {
+            kind: UnreachablePattern {
+                reason: DuplicateArm,
+            },
+            range: 51..55,
+        },
+    ],
+    poly_instantiations: {},
+}
+[E34005] Error: Unreachable pattern: duplicates a prior arm
+   ╭─[ ./test/main.alloy:5:5 ]
+   │
+ 5 │   \ True -> 1
+   │     ──┬─  
+   │       ╰─── unreachable — duplicates a prior arm
+───╯
+
+

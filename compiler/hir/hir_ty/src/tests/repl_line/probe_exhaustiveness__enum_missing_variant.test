@@ -1,0 +1,138 @@
+typedef Either[l, r] =
+  | Left(l)
+  | Right(r)
+end
+
+let test = Either::Right(True)
+
+match test when
+  \ Either::Left(l) -> 0
+===
+HirTypedModule {
+    module_id: ModuleId {
+        path: "main",
+    },
+    expression_types: {
+        Idx::<Expression>(0): BuiltIn(
+            Bool,
+        ),
+        Idx::<Expression>(1): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Either",
+            ),
+            args: [
+                Generic(
+                    0,
+                    "a0",
+                ),
+                BuiltIn(
+                    Bool,
+                ),
+            ],
+        },
+        Idx::<Expression>(2): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Either",
+            ),
+            args: [
+                Generic(
+                    0,
+                    "a0",
+                ),
+                BuiltIn(
+                    Bool,
+                ),
+            ],
+        },
+        Idx::<Expression>(3): BuiltIn(
+            Int,
+        ),
+        Idx::<Expression>(4): BuiltIn(
+            Int,
+        ),
+    },
+    pattern_types: {
+        Idx::<Pattern>(0): Generic(
+            0,
+            "a0",
+        ),
+        Idx::<Pattern>(1): Bounded {
+            base: TypeDef(
+                Fql {
+                    module_id: ModuleId {
+                        path: "main",
+                    },
+                    local_id: Idx::<TypeDefinition>(0),
+                },
+                "Either",
+            ),
+            args: [
+                Generic(
+                    0,
+                    "a0",
+                ),
+                BuiltIn(
+                    Bool,
+                ),
+            ],
+        },
+    },
+    warnings: [],
+    errors: [
+        TypeCheckingError {
+            kind: NonExhaustiveMatch {
+                scrutinee_type: Bounded {
+                    base: TypeDef(
+                        Fql {
+                            module_id: ModuleId {
+                                path: "main",
+                            },
+                            local_id: Idx::<TypeDefinition>(0),
+                        },
+                        "Either",
+                    ),
+                    args: [
+                        Generic(
+                            0,
+                            "a0",
+                        ),
+                        BuiltIn(
+                            Bool,
+                        ),
+                    ],
+                },
+                missing: [
+                    Variant(
+                        "Right",
+                    ),
+                ],
+            },
+            range: 85..125,
+        },
+    ],
+    poly_instantiations: {},
+}
+[E34004] Error: Non-exhaustive match: missing `Right`
+   ╭─[ ./test/main.alloy:8:1 ]
+   │
+ 8 │ ╭─▶ match test when
+ 9 │ ├─▶   \ Either::Left(l) -> 0
+   │ │                             
+   │ ╰───────────────────────────── match on `Either[a0, Bool]` is missing `Right`
+   │     
+   │     Help: Add arms for the missing patterns, or use a wildcard `_`
+───╯
+
+
