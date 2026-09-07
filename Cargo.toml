@@ -25,7 +25,7 @@ ordered-float = "3.0"
 pretty_assertions = "1.2"
 rowan = "0.15"
 rustc-hash = "1.1"
-salsa = { git = "https://github.com/salsa-rs/salsa", package = "salsa-2022", rev = "05b4e3ebdcdc47730cdd359e7e97fb2470527279" }
+salsa = { git = "https://github.com/salsa-rs/salsa", package = "salsa-2022", rev = "e021c01d4939408c89c9325ad2426660117a8b32" }
 serde = "1.0"
 text-size = "1.1"
 toml = "0.8"
